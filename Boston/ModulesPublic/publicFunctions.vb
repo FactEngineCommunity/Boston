@@ -324,7 +324,7 @@ StillCannotFindTheDatabaseSQLite:
 #Region "MS Jet"
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-                    pdbConnection = New ADODB.Connection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
+                    pdbConnection = New FactEngine.MSAccessConnection(Nothing, Nothing) ' ADODB.Connection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
                     pdb_OLEDB_connection = New OleDb.OleDbConnection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
 
 #Region "SHIFT KEY DOWN - User Points to database"

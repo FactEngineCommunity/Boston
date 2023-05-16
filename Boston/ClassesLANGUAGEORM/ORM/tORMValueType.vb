@@ -183,7 +183,6 @@ Namespace FBM
             End Set
         End Property
 
-
         <XmlIgnore()>
         Public Shadows Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
@@ -241,6 +240,10 @@ Namespace FBM
         Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
         <NonSerialized()>
         Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+        <NonSerialized()>
+        Public Shadows Event updated()
+        <NonSerialized()>
+        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Sub New()
             Me.ConceptType = pcenumConceptType.ValueType
@@ -1383,12 +1386,6 @@ Namespace FBM
 
         End Sub
 
-        'Public Sub ModelUpdated() Handles model.ModelUpdated
-        '    RaiseEvent updated()
-        'End Sub
-
-        Public Shadows Event updated()
-        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Private Sub Concept_Updated() Handles Concept.ConceptSymbolUpdated
 

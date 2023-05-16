@@ -155,8 +155,7 @@ Namespace FBM
         Public DiagramView As MindFusion.Diagramming.WinForms.DiagramView
 
         <JsonIgnore()>
-        <NonSerialized(),
-        XmlIgnore()>
+        <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _SelectedObject As New List(Of Object) 'NB Each SelectedObject will be an 'Instance' type object with X,Y coordinates
 
@@ -223,8 +222,7 @@ Namespace FBM
 
         Public FactTypeInstance As New List(Of FBM.FactTypeInstance)
 
-        <NonSerialized(),
-        XmlIgnore()>
+        <XmlIgnore()>
         Public _RoleInstance As New List(Of FBM.RoleInstance)
         Public Property RoleInstance As List(Of FBM.RoleInstance)
             Get
@@ -300,8 +298,12 @@ Namespace FBM
             End Set
         End Property
 
+        <NonSerialized()>
         Public Event PageDeleted()
-
+        <NonSerialized()>
+        Public Event PageUpdated()
+        <NonSerialized()>
+        Public Event TableCellClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.CellEventArgs)
         '----------------------------------------------------------------------------------
 
 
@@ -392,9 +394,15 @@ Namespace FBM
                               Optional ByVal abAddToModel As Boolean = False,
                               Optional ByVal abMakeModelObjectsMDAModelElements As Boolean = False,
                               Optional ByVal abSetRDSModel As Boolean = True,
-                              Optional ByVal abMakeDirty As Boolean = False) As FBM.Page
+                              Optional ByVal abMakeDirty As Boolean = False,
+                              Optional ByRef arExistingPage As FBM.Page = Nothing) As FBM.Page
 
             Dim lrPage As New FBM.Page
+
+            If arExistingPage IsNot Nothing Then
+                lrPage = arExistingPage
+            End If
+
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrValueTypeInstance As FBM.ValueTypeInstance
             Dim lrFactTypeInstance As FBM.FactTypeInstance
@@ -3393,9 +3401,6 @@ NextY:
         Private Sub TableCellClickedHandler(ByVal sender As Object, ByVal e As MindFusion.Diagramming.CellEventArgs) Handles _Diagram.CellClicked
             RaiseEvent TableCellClicked(sender, e)
         End Sub
-
-        Public Event PageUpdated()
-        Public Event TableCellClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.CellEventArgs)
 
         ''' <summary>
         ''' Call when it is necessary to reselect a PageObject for Verbalisation.

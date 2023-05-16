@@ -310,29 +310,51 @@ Namespace FBM
         End Property
 #End Region
 
+        <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
-
+        <NonSerialized()>
         Public Event CardinalityChanged(ByVal aiNewCardinality As Integer)
+        <NonSerialized()>
         Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean) Implements iModelObject.RemovedFromModel
+        <NonSerialized()>
         Public Event RemoveIndex(ByVal abBroadcastInterfaceEvent As Boolean)
+        <NonSerialized()>
         Public Event RoleConstraintTypeChanged(ByVal aiNewRoleConstraintType As pcenumRoleConstraintType)
+        <NonSerialized()>
         Public Event RingConstraintTypeChanged(ByVal aiNewRingConstraintType As pcenumRingConstraintType)
+        <NonSerialized()>
         Public Event LevelNrChanged(ByVal aiNewLevelNr As Integer)
+        <NonSerialized()>
         Public Event CardinalityRangeTypeChanged(ByVal aiNewCardinalityRangeType As pcenumCardinalityRangeType)
+        <NonSerialized()>
         Public Event MaximumFrequencyCountChanged(ByVal aiNewMaximumFrequencyCount As Integer)
+        <NonSerialized()>
         Public Event MaximumValueChanged(ByVal aiMaximumValue As String)
+        <NonSerialized()>
         Public Event MinimumFrequencyCountChanged(ByVal aiNewMinimumFrequencyCount As Integer)
+        <NonSerialized()>
         Public Event MinimumValueChanged(ByVal aiMaximumValue As String)
+        <NonSerialized()>
         Public Event IsDeonticChanged(ByVal abNewIsDeontic As Boolean)
+        <NonSerialized()>
         Public Event IsPreferredIdentifierChanged(ByVal abNewIsPreferredIdentifier As Boolean)
+        <NonSerialized()>
         Public Event RoleConstraintRoleAdded(ByRef arRoleConstraintRole As FBM.RoleConstraintRole, ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+        <NonSerialized()>
         Public Event RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As FBM.RoleConstraintRole)
+        <NonSerialized()>
         Public Event ArgumentRemoved(ByRef arRoleConstraintArgument As FBM.RoleConstraintArgument)
+        <NonSerialized()>
         Public Event ValueConstraintAdded(ByVal asNewValueConstraint As String)
+        <NonSerialized()>
         Public Event ValueConstraintCleared()
+        <NonSerialized()>
         Public Event ValueConstraintRemoved(ByVal asRemovedValueConstraint As String)
+        <NonSerialized()>
         Public Event ValueConstraintModified(ByVal asOldValue As String, ByVal asNewValue As String)
+        <NonSerialized()>
         Public Event ValueRangeTypeChanged(ByVal aiNewValueRangeType As pcenumValueRangeType)
+        <NonSerialized()>
         Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Sub New()

@@ -50,9 +50,11 @@ Namespace FBM
             End Get
         End Property
 
+        <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
-
+        <NonSerialized()>
         Public Event Deleted()
+        <NonSerialized()>
         Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Public Sub New()

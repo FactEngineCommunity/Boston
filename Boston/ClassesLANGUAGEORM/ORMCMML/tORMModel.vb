@@ -4,6 +4,7 @@ Namespace FBM
 
     Partial Public Class Model 'See also the folder ORMRDS/tORMModel.vb
 
+        <NonSerialized()>
         Public Event StateTransitionAdded(ByRef lrFact As FBM.Fact)
 
         Public Sub addCMMLColumnToRelationOrigin(ByRef arRelation As RDS.Relation,

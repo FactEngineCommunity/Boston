@@ -323,37 +323,63 @@ Namespace FBM
             End Get
         End Property
 
+        <NonSerialized()>
         Public Shadows Event Updated()
+        <NonSerialized()>
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
+        <NonSerialized()>
         Public Event FactTableUpdated(ByRef arFact As FBM.Fact, ByVal abAddToPage As Boolean, ByRef arPage As FBM.Page)
+        <NonSerialized()>
         Public Event IUConstraintAdded(ByRef arFactType As FBM.FactType, ByRef arRoleConstraint As FBM.RoleConstraint)
+        <NonSerialized()>
         Public Event IUConstraintRemoved(ByRef arFactType As FBM.FactType, ByVal arRoleConstraint As FBM.RoleConstraint)
         'Because otherwise Copy will try and serialise the frmToolboxORMReadingEditor
         <NonSerialized()>
         Public Event FactTypeReadingAdded(ByRef arFactTypeReading As FBM.FactTypeReading)
+        <NonSerialized()>
         Public Event FactTypeReadingModified(ByRef arFactTypeReading As FBM.FactTypeReading)
         'Because otherwise Copy will try and serialise the frmToolboxORMReadingEditor
         <NonSerialized()>
         Public Event FactTypeReadingRemoved(ByRef arFactTypeReading As FBM.FactTypeReading)
+        <NonSerialized()>
         Public Event RoleAdded(ByRef arRole As FBM.Role)
+        <NonSerialized()>
         Public Event RoleRemoved(ByRef arRole As FBM.Role)
+        <NonSerialized()>
         Public Event FactRemoved(ByRef arFact As FBM.Fact)
+        <NonSerialized()>
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
+        <NonSerialized()>
         Public Event IsIndependentChanged(ByVal abNewIsIndependent As Boolean) Implements iFBMIndependence.IsIndependentChanged
+        <NonSerialized()>
         Public Event IsObjectifiedChanged(ByVal abNewIsObjectified As Boolean)
+        <NonSerialized()>
         Public Event IsLinkFactTypeChanged()
+        <NonSerialized()>
         Public Event IsStoredChanged(ByVal abIsStored As Boolean)
+        <NonSerialized()>
         Public Event IsSubtypeStateControllingChanged(ByVal abIsSubtypeStateControlling As Boolean)
+        <NonSerialized()>
         Public Event IsPreferredReferenceModeChanged(ByVal abNewIsPreferrdReferenceMode As Boolean)
+        <NonSerialized()>
         Public Event IsSubtypeRelationshipFactTypeChanged(ByVal abNewIsSubtypeRelationshipFactType As Boolean)
+        <NonSerialized()>
         Public Event LinkFactTypeRoleChanged(ByRef arRole As FBM.Role)
+        <NonSerialized()>
         Public Event MadeManyToManyRelationship()
+        <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
+        <NonSerialized()>
         Public Event Objectified() 'When the FactType is changed to an ObjectifiedFactType
+        <NonSerialized()>
         Public Event ObjectifyingEntityTypeChanged(ByRef arNewObjectifyingEntityType As FBM.EntityType)
+        <NonSerialized()>
         Public Event ObjectificationRemoved() 'When the objectification of the FactType is removed.
+        <NonSerialized()>
         Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
+        <NonSerialized()>
         Public Event ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean, ByRef arPage As FBM.Page)
+        <NonSerialized()>
         Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Public Sub New()
@@ -4682,6 +4708,8 @@ CommitTransaction:
 
                     Me.Id = asNewName
                     Me.isDirty = True
+                    Me.RoleGroup.ForEach(Sub(x) x.isDirty = True)
+                    Me.FactTypeReading.ForEach(Sub(x) x.isDirty = True)
                     If Not Me.Model.StoreAsXML Then
                         Call Me.Save() 'Sets the new Name, TableFactType.ModifyKey (above) only modifies the key.
                     End If

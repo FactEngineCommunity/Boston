@@ -650,7 +650,7 @@ RetryTypeOfJoin:
                 Me._X = Me.FactType.Shape.Bounds.X + 3
                 Me._Y = Me.FactType.Shape.Bounds.Y + 4 + ((Me.FactType.FactType.GetHighestConstraintLevel - 1) * 1.6)
 
-                If Me.Role.SequenceNr = 1 Then
+                If Me.SequenceNr = 1 Then
                     '--------------------------------------------------------------------
                     'Is first Role in the RoleGroup/FactType, so setup a new ShapeGroup 
                     '--------------------------------------------------------------------

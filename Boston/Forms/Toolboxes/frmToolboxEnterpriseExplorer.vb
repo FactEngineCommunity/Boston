@@ -34,6 +34,11 @@ Public Class frmToolboxEnterpriseExplorer
     Private ziMouseButton As MouseButtons
 
 
+    ''' <summary>
+    ''' NB SetupForm called from Timer_FormSetup.Tick
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub frm_enterprise_tree_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         Try
@@ -488,24 +493,35 @@ Public Class frmToolboxEnterpriseExplorer
         Dim lrPage As FBM.Page = Nothing
         Dim lrModel As FBM.Model = Nothing
 
-        If node IsNot Nothing Then
-            Me.TreeView.Focus()
-            node.EnsureVisible()
-            Me.TreeView.ForceSelectedNode(node)
-            lrMenuOption = Me.TreeView.SelectedNode.Tag
-            Select Case lrMenuOption.MenuType
-                Case Is = pcenumMenuType.modelORMModel
-                Case Is = pcenumMenuType.pageORMModel,
-                          pcenumMenuType.pageERD
-                    lrPage = lrMenuOption.Tag
-                    If Not lrPage.Loaded Then
-                        frmMain.Cursor = Cursors.WaitCursor
-                        frmMain.Invalidate()
-                        Call lrPage.Model.Load(True)
-                        frmMain.Cursor = Cursors.Default
-                    End If
-            End Select
-        End If
+        Try
+            If node IsNot Nothing Then
+                Me.TreeView.Focus()
+                node.EnsureVisible()
+                Me.TreeView.ForceSelectedNode(node)
+                lrMenuOption = Me.TreeView.SelectedNode.Tag
+
+                Select Case lrMenuOption.MenuType
+                    Case Is = pcenumMenuType.modelORMModel
+                    Case Is = pcenumMenuType.pageORMModel,
+                              pcenumMenuType.pageERD
+                        lrPage = lrMenuOption.Tag
+
+                        If Not lrPage.Loaded Then
+                            frmMain.Cursor = Cursors.WaitCursor
+                            frmMain.Invalidate()
+                            Call lrPage.Model.Load(True, abDontUseBLOBLoading:=True)
+                            frmMain.Cursor = Cursors.Default
+                        End If
+                End Select
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
     Private Sub RemoveModelFromNode(ByVal arModel As FBM.Model, ByVal aoTreeNode As TreeNode)
@@ -910,7 +926,7 @@ Public Class frmToolboxEnterpriseExplorer
                     lsMessage &= "Click [Yes] to load the Model now."
 
                     If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
-                        Call lrModel.Load(True)
+                        Call lrModel.Load(True, abDontUseBLOBLoading:=True)
                     End If
 
                     Me.TreeView.SelectedNode = loTreeNode
@@ -1140,11 +1156,18 @@ Public Class frmToolboxEnterpriseExplorer
                     pdb_OLEDB_connection.Close() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                     Boston.OpenDatabase() 'keep this here (Close/Open database). Because Access doesn't refresh quick enough from the Save Broadcast above.
                 End If
-                Call arModel.Load(True, My.Settings.ModelLoadPagesUseThreading, Me.BackgroundWorkerModelLoader)
+
+                Dim lrReturnModel = arModel.Load(True, My.Settings.ModelLoadPagesUseThreading, Me.BackgroundWorkerModelLoader)
+
+                If lrReturnModel IsNot arModel Then
+                    arModel = lrReturnModel
+                End If
+
                 Call Me.HideCircularProgressBar()
                 Me.Cursor = Cursors.Default
                 Boston.WriteToStatusBar("Loaded Model: '" & arModel.Name & "'")
             End If
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1235,6 +1258,14 @@ Public Class frmToolboxEnterpriseExplorer
                                 End If
                             Else
                                 Call Me.DoModelLoading(lrModel)
+
+                                If lrModel.LoadedFromBLOB Then
+                                    loObject.Tag = lrModel
+                                    For Each lrTreeNode In Me.TreeView.SelectedNode.Nodes
+                                        Call lrTreeNode.Remove
+                                    Next
+                                    Call Me.AddPagesForModel(lrModel, Me.TreeView.SelectedNode)
+                                End If
                             End If
 
                             '-----------------------------------------
@@ -2887,7 +2918,7 @@ Public Class frmToolboxEnterpriseExplorer
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
                         objStreamReader.Close()
                         lrModel = lrXMLModel.MapToFBMModel
-                    Case Is = "1.5"
+                    Case Is = "1.7"
                         lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
                         Dim lrXMLModel As New XMLModel.Model
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
@@ -3515,7 +3546,7 @@ Public Class frmToolboxEnterpriseExplorer
             '-------------------------------------------------------
             'Check if the page has already been opened for editing
             '-------------------------------------------------------
-            If lrPage.FormLoaded Then
+            If lrPage.FormLoaded And lrPage.Form IsNot Nothing Then
                 '-------------------------------------------------------------------
                 'The Page has already been loaded for Editing
                 '  Set the ZOrder of the Form on which the Page is loaded to OnTop
@@ -4489,7 +4520,7 @@ Public Class frmToolboxEnterpriseExplorer
                                 End If
 
                                 If Not lrDestinationModel.Loaded Then
-                                    Call lrDestinationModel.Load()
+                                    Call lrDestinationModel.Load(abDontUseBLOBLoading:=True)
                                 End If
 
 #Region "Merge Models"
@@ -4571,7 +4602,7 @@ Public Class frmToolboxEnterpriseExplorer
                             If lrPage.Model.ModelId <> lrModel.ModelId Then
 
                                 If Not lrModel.Loaded Then
-                                    Call lrModel.Load()
+                                    Call lrModel.Load(abDontUseBLOBLoading:=True)
                                 End If
 
                                 lrPage.Name = lrModel.CreateUniquePageName(lrPage.Name, 0)
@@ -5076,7 +5107,7 @@ Public Class frmToolboxEnterpriseExplorer
             'CodesSafe-Load the model
             If Not lrModel.Loaded Then
                 With New WaitCursor
-                    Call lrModel.Load(False, False, Nothing, False)
+                    Call lrModel.Load(False, False, Nothing, False, abDontUseBLOBLoading:=True)
                 End With
             End If
 
@@ -5165,7 +5196,7 @@ Public Class frmToolboxEnterpriseExplorer
             'CodesSafe-Load the model
             If Not lrModel.Loaded Then
                 With New WaitCursor
-                    Call lrModel.Load(False, False, Nothing, False)
+                    Call lrModel.Load(False, False, Nothing, False, abDontUseBLOBLoading:=True)
                 End With
             End If
 
@@ -5440,7 +5471,7 @@ Public Class frmToolboxEnterpriseExplorer
             'CodesSafe-Load the model
             If Not lrModel.Loaded Then
                 With New WaitCursor
-                    Call lrModel.Load(False, False, Nothing, False)
+                    Call lrModel.Load(False, False, Nothing, False, abDontUseBLOBLoading:=True)
                 End With
             End If
 

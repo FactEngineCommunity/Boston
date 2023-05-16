@@ -31,11 +31,17 @@ Namespace RDS
         <NonSerialized()>
         Public DatabaseDataType As New List(Of DatabaseDataType)
 
+        <NonSerialized()>
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
+        <NonSerialized()>
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
+        <NonSerialized()>
         Public Event RelationAdded(ByRef arRelation As RDS.Relation)
+        <NonSerialized()>
         Public Event RelationRemoved(ByVal arRelation As RDS.Relation)
+        <NonSerialized()>
         Public Event TableAdded(ByRef arTable As RDS.Table)
+        <NonSerialized()>
         Public Event TableRemoved(ByRef arTable As RDS.Table)
 
         ''' <summary>

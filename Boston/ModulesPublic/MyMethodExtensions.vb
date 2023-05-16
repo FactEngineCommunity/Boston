@@ -3,8 +3,21 @@ Imports System.Runtime.CompilerServices
 Imports Microsoft.VisualBasic
 Imports System.ComponentModel
 Imports System.Text.RegularExpressions
+Imports System.Runtime.Serialization.Formatters.Binary
+Imports System.IO
+Imports System.Runtime.Serialization
+Imports System.Runtime.InteropServices
 
 Module MyMethodExtensions
+
+    <Extension()>
+    Public Sub ReplaceWith(Of T As Class)(ByRef obj As T, other As T)
+        Dim size = Marshal.SizeOf(GetType(T))
+        Dim ptr = Marshal.AllocHGlobal(size)
+        Marshal.StructureToPtr(other, ptr, False)
+        Marshal.PtrToStructure(ptr, obj)
+        Marshal.FreeHGlobal(ptr)
+    End Sub
 
     ''' <summary>
     ''' Add/Append and item to an array.

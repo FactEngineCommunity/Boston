@@ -35,7 +35,6 @@ Namespace FBM
         Public WithEvents Concept As FBM.Concept  'New 'The Concept that is related to the ModelObject within the Model/ModelDictionary
 
         <XmlIgnore()>
-        <NonSerialized()>
         Public _ModelError As New List(Of FBM.ModelError)
 
         Public Overridable Property ModelError As List(Of FBM.ModelError)
@@ -1535,6 +1534,8 @@ Namespace FBM
                         Else
                             Return Nothing
                         End If
+                    Case Is = GetType(FBM.Role)
+                        Return Nothing
                     Case Else
                         Return New RDS.Table
                 End Select

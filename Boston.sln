@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Boston", "Boston\Boston.vbproj", "{2EF147C3-A7CB-4A22-9665-8AA25C6DB51F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourcePlugins.Firebird", "SourcePlugins.Firebird\SourcePlugins.Firebird.csproj", "{F57411BC-3145-46E8-8CE6-6114804FE8D7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2EF147C3-A7CB-4A22-9665-8AA25C6DB51F} = {2EF147C3-A7CB-4A22-9665-8AA25C6DB51F}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

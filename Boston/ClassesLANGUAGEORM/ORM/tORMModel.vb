@@ -7,9 +7,11 @@ Imports System.Xml.Linq
 Imports <xmlns:ns="http://www.w3.org/2001/XMLSchema">
 Imports System.Text.RegularExpressions
 Imports Newtonsoft.Json
+Imports System.Runtime.InteropServices
 
 Namespace FBM
     <Serializable()>
+    <StructLayout(LayoutKind.Sequential)>
     Public Class Model
         Implements IEquatable(Of FBM.Model)
 
@@ -47,6 +49,9 @@ Namespace FBM
         <NonSerialized()>
         <XmlIgnore()>
         Public LoadedByOntologyBrowser As Boolean = False
+
+        <XmlIgnore()>
+        Public LoadedFromBLOB As Boolean = False
 
         ''' <summary>
         ''' A list of Languages that the ORM Model represents. Defaults to including ORM, but may include EntityRelationshipDiagrams, PropertyGraphSchemas etc
@@ -132,7 +137,6 @@ Namespace FBM
         Public [Dictionary] As New Dictionary(Of String, Integer)
 
         <Newtonsoft.Json.JsonIgnore()>
-        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelDictionary As New List(Of FBM.DictionaryEntry)
@@ -160,7 +164,6 @@ Namespace FBM
             End Get
         End Property
 
-        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _EntityType As New List(Of FBM.EntityType)
@@ -282,7 +285,6 @@ Namespace FBM
         ''' </summary>
         ''' <remarks></remarks>  
         <Newtonsoft.Json.JsonIgnore()>
-        <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public WithEvents _Page As New List(Of FBM.Page)
@@ -558,9 +560,14 @@ Namespace FBM
 
         End Function
 
-        Public Function Clone() As FBM.Model
+        Public Function Clone(Optional arModel As FBM.Model = Nothing, Optional abAddToModel As Boolean = False) As FBM.Model
 
             Dim lrORMModel As New FBM.Model(pcenumLanguage.ORMModel, Me.Name, True)
+
+            If arModel IsNot Nothing Then
+                lrORMModel = arModel
+            End If
+
             Dim lrEntityType As FBM.EntityType
             Dim lrValueType As FBM.ValueType
             Dim lrFactType As FBM.FactType
@@ -587,23 +594,23 @@ Namespace FBM
                 lrORMModel.IsDirty = .IsDirty
 
                 For Each lrEntityType In .EntityType
-                    lrORMModel.AddEntityType(lrEntityType.Clone(lrORMModel))
+                    lrORMModel.AddEntityType(lrEntityType.Clone(lrORMModel, abAddToModel, lrEntityType.IsMDAModelElement))
                 Next
 
                 For Each lrValueType In .ValueType
-                    lrORMModel.AddValueType(lrValueType.Clone(lrORMModel))
+                    lrORMModel.AddValueType(lrValueType.Clone(lrORMModel, abAddToModel, lrValueType.IsMDAModelElement))
                 Next
 
                 For Each lrFactType In .FactType
-                    lrORMModel.AddFactType(lrFactType.Clone(lrORMModel))
+                    lrORMModel.AddFactType(lrFactType.Clone(lrORMModel, abAddToModel, lrFactType.IsMDAModelElement))
                 Next
 
                 For Each lrRoleConstraint In .RoleConstraint
-                    lrORMModel.AddRoleConstraint(lrRoleConstraint.Clone(lrORMModel))
+                    lrORMModel.AddRoleConstraint(lrRoleConstraint.Clone(lrORMModel, abAddToModel, lrRoleConstraint.IsMDAModelElement))
                 Next
 
                 For Each lrModelNote In .ModelNote
-                    lrORMModel.ModelNote.Add(lrModelNote.Clone(lrORMModel))
+                    lrORMModel.ModelNote.Add(lrModelNote.Clone(lrORMModel, abAddToModel, lrModelNote.IsMDAModelElement))
                 Next
 
                 For Each lrModelError In .ModelError
@@ -611,7 +618,17 @@ Namespace FBM
                 Next
 
                 For Each lrPage In .Page
-                    lrORMModel.Page.Add(lrPage.Clone(lrORMModel))
+
+                    If arModel Is Nothing Then
+                        lrORMModel.Page.Add(lrPage.Clone(lrORMModel))
+                    Else
+                        Dim lrExistingPage = arModel.Page.Find(Function(x) x.PageId = lrPage.PageId)
+                        If lrExistingPage IsNot Nothing Then
+                            lrPage.Clone(lrORMModel,,,,, lrExistingPage)
+                        Else
+                            lrORMModel.Page.Add(lrPage.Clone(lrORMModel))
+                        End If
+                    End If
                 Next
 
             End With
@@ -619,6 +636,7 @@ Namespace FBM
             Return lrORMModel
 
         End Function
+
 
         Public Sub CreateModelDictionaryEntryForModelElement(ByRef arModelElement As FBM.ModelObject)
 
@@ -762,11 +780,21 @@ Namespace FBM
             Try
 
                 For Each lrValueType In Me.ValueType
-                    lrValueType._ModelError.Clear()
+                    Try
+                        lrValueType._ModelError.Clear()
+                    Catch ex As Exception
+                        lrValueType._ModelError = New List(Of ModelError)
+                    End Try
+
                 Next
 
                 For Each lrEntityType In Me.EntityType
-                    lrEntityType._ModelError.Clear()
+                    Try
+                        lrEntityType._ModelError.Clear()
+                    Catch ex As Exception
+                        lrEntityType._ModelError = New List(Of ModelError)
+                    End Try
+
                 Next
 
                 For Each lrFactType In Me.FactType
@@ -775,7 +803,12 @@ Namespace FBM
 
                     lrFactType.ModelError.Clear()
                     For Each lrFact In lrFactType.Fact
-                        lrFact._ModelError.Clear()
+                        Try
+                            lrFact._ModelError.Clear()
+                        Catch ex As Exception
+                            lrFact._ModelError = New List(Of ModelError)
+                        End Try
+
                     Next
                 Next
 
@@ -3436,6 +3469,58 @@ PostRDSProcessing:
         End Sub
 
         ''' <summary>
+        ''' Generally called on Model Load from BLOB (Deserialised Binary Object). Because some members are not serialised.
+        ''' </summary>
+        Public Sub DefaultSetup()
+
+            Try
+                Me._ORMQL = New ORMQL.Processor(Me)
+
+                Me.Dictionary = New Dictionary(Of String, Integer)
+                Dim liInd = 0
+                For Each lrDictionaryEntry In Me.ModelDictionary
+                    Try
+                        Me.Dictionary.Add(lrDictionaryEntry.Symbol, liInd)
+                    Catch
+                        'Shouldn't be here, but not a biggie. liInd incremented anyway.
+                    End Try
+
+                    liInd += 1
+                Next
+
+                Me.Role = New List(Of FBM.Role)
+                Dim larRole = (From FactType In Me.FactType
+                               From Role In FactType.RoleGroup
+                               Select Role).ToList
+                Me.Role.AddRange(larRole)
+
+                If Me.RDS Is Nothing Then
+                    Me.RDS = New RDS.Model(Me)
+                End If
+
+                Me._ModelError = New List(Of FBM.ModelError)
+
+                Me.SharedModel = New Viev.FBM.Interface.Model
+
+                Dim larFactTypeInstance = (From Page In Me.Page
+                                           From FactTypeInstance In Page.FactTypeInstance
+                                           Select FactTypeInstance).ToList
+
+                larFactTypeInstance.ForEach(Sub(x) x.IsDisplayedAssociated = False)
+                larFactTypeInstance.ForEach(Sub(x) x.FactTable = New FBM.FactTable)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        ''' <summary>
         ''' Deprecates the Realisations for a DictionaryEntry in the ModelDictionary
         ''' </summary>
         ''' <param name="arDictionaryEntry"></param>
@@ -4517,7 +4602,7 @@ SkipRDSProcessing:
                 If Me.StoreAsXML And Not abForceDatabaseSave Then
                     If Not Me.Loaded And Not Me.Loading Then
                         With New WaitCursor
-                            Me.Load()
+                            Me.Load(abDontUseBLOBLoading:=True)
                         End With
                     End If
                     Call Me.SaveToXMLDocument()
@@ -4606,6 +4691,8 @@ SkipRDSProcessing:
                     End If
                 Next
 
+                Dim loTemp = pdbConnection
+
                 Boston.WriteToStatusBar("",, 0)
             Catch ex As Exception
                 Dim lsMessage As String
@@ -4639,7 +4726,9 @@ SkipRDSProcessing:
                     Exit Sub
                 End If
 
-                Dim lsFileLocationName As String = ""
+                Dim lsXMLFileLocationName As String = ""
+                Dim lsBLOBFileLocationName As String = ""
+
                 If Boston.IsSerializable(lrExportModel) Then
 
                     Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
@@ -4654,16 +4743,29 @@ SkipRDSProcessing:
                         lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
                     End If
                     System.IO.Directory.CreateDirectory(lsFolderLocation)
-                    lsFileName = Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
-                    lsFileLocationName = lsFolderLocation & "\" & lsFileName
+                    lsFileName = Trim(Me.ModelId & "-" & Me.Name)
+                    lsXMLFileLocationName = lsFolderLocation & "\" & lsFileName & ".fbm"
+                    lsBLOBFileLocationName = lsFolderLocation & "\" & lsFileName & ".bfbm"
 
-                    loStreamWriter = New StreamWriter(lsFileLocationName)
+                    '----------------------------------------------------------------
+                    'XML
+#Region "XML Serialisation"
+                    loStreamWriter = New StreamWriter(lsXMLFileLocationName)
 
                     loXMLSerialiser = New XmlSerializer(GetType(XMLModel.Model))
 
                     ' Serialize object to file
                     loXMLSerialiser.Serialize(loStreamWriter, lrExportModel)
                     loStreamWriter.Close()
+#End Region
+
+                    '----------------------------------------------------------------
+                    'BLOB Serialisation
+#Region "BLOB Serialisation"
+                    If My.Settings.DatabaseStoreModelsAsBLOBsParallelToXML Then
+                        BinarySerialiser.SerializeObject(lsBLOBFileLocationName, Me)
+                    End If
+#End Region
 
                     Me.Page.Select(Function(x)
                                        x.IsDirty = False
@@ -5963,27 +6065,30 @@ SkipRDSProcessing:
         ''' <param name="aoBackgroundWorker">Used for Prgress reporting.</param>
         ''' <param name="abSkipAlreadyLoadedModelElements">True if to test whether ModelElements have already been loaded.</param>
         ''' <remarks></remarks>
-        Public Sub Load(Optional ByVal abLoadPages As Boolean = False,
-                        Optional ByVal abUseThreading As Boolean = True,
-                        Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
-                        Optional ByVal abSkipAlreadyLoadedModelElements As Boolean = False)
+        Public Function Load(Optional ByVal abLoadPages As Boolean = False,
+                             Optional ByVal abUseThreading As Boolean = True,
+                             Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                             Optional ByVal abSkipAlreadyLoadedModelElements As Boolean = False,
+                             Optional ByVal abDontUseBLOBLoading As Boolean = False) As FBM.Model
 
             'CodeSafe
-            If Me.Loading Or Me.Loaded Then Exit Sub
+            If Me.Loading Or Me.Loaded Then Return Me
 
             Me.Loading = True
 
+            Dim lrReturnModel As FBM.Model = Me
+
             If Me.StoreAsXML Then
-                Call Me.LoadFromXML(aoBackgroundWorker, abSkipAlreadyLoadedModelElements)
+                lrReturnModel = Me.LoadFromXML(aoBackgroundWorker, abSkipAlreadyLoadedModelElements, abDontUseBLOBLoading)
             Else
                 Call Me.LoadFromDatabase(abLoadPages, abUseThreading And My.Settings.ModelLoadPagesUseThreading, aoBackgroundWorker)
             End If
 
-            Me.Loaded = True
+            lrReturnModel.Loaded = True
 
             '20220821-VM-Keep for a year. Set ObjectifyingEntityType.Id to that of its FactType
 #Region "Fix ObjectifyingEntityTypes for v6.4"
-            Dim larEntityType = From FactType In Me.FactType
+            Dim larEntityType = From FactType In lrReturnModel.FactType
                                 Where FactType.ObjectifyingEntityType IsNot Nothing
                                 Where FactType.ObjectifyingEntityType.Id <> FactType.Id
                                 Select FactType.ObjectifyingEntityType
@@ -5999,22 +6104,24 @@ SkipRDSProcessing:
             '--------------------------------------
             'Flush unused ModelDictionary entries
             '--------------------------------------
-            For Each lrDictionaryEntry In Me.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
+            For Each lrDictionaryEntry In lrReturnModel.ModelDictionary.FindAll(Function(x) (x.Realisations.Count = 0) And Not x.isGeneralConcept)
                 Me.RemoveDictionaryEntry(lrDictionaryEntry, True)
             Next
 
             '20180410-VM-ToDo-Test to see if the RDF has been created for the Model.
-            Me.RDSCreated = True 'For now for testing. 
+            lrReturnModel.RDSCreated = True 'For now for testing. 
 
             Boston.WriteToStatusBar(".")
 
-            Me.Loading = False
+            lrReturnModel.Loading = False
 
-            If Me.IsDirty Then
-                Call Me.Save()
+            If lrReturnModel.IsDirty Then
+                Call lrReturnModel.Save()
             End If
 
-        End Sub
+            Return lrReturnModel
+
+        End Function
 
         Public Sub LoadFactTypesRelatedToModelElement(ByRef arModelElement As FBM.ModelObject, ByVal abLoadAssociatedInternalUniquenessConstraints As Boolean)
 
@@ -6418,12 +6525,14 @@ SkipModelElement: 'Because is not in the ModelDictionary
         ''' </summary>
         ''' <param name="aoBackgroundWorker">BackgroundWorker for displaying the percentage of Model loaded.</param>
         ''' <param name="abSkipAlreadyLoadedModelElements">True if to test whether ModelElements have already been loaded.</param>
-        Public Sub LoadFromXML(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
-                               Optional ByVal abSkipAlreadyLoadedModelElements As Boolean = False)
+        Public Function LoadFromXML(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
+                                    Optional ByVal abSkipAlreadyLoadedModelElements As Boolean = False,
+                                    Optional ByVal abDontUseBLOBLoading As Boolean = False) As FBM.Model
 
             Dim lsFolderLocation As String
             Dim lsFileName As String
-            Dim lsFileLocationName As String
+            Dim lsXMLFileLocationName As String
+            Dim lsBLOBFileLocationName As String
 
             Try
                 If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
@@ -6436,86 +6545,108 @@ SkipModelElement: 'Because is not in the ModelDictionary
                     lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
                 End If
 
-                lsFileName = Me.ModelId & "-" & Me.Name & ".fbm"
-                lsFileLocationName = lsFolderLocation & "\" & lsFileName
+                lsFileName = Me.ModelId & "-" & Me.Name
+                lsXMLFileLocationName = lsFolderLocation & "\" & lsFileName & ".fbm"
+                lsBLOBFileLocationName = lsFolderLocation & "\" & lsFileName & ".bfbm"
 
-                If Not File.Exists(lsFileLocationName) Then
+                If Not File.Exists(lsXMLFileLocationName) Then
                     prApplication.ThrowErrorMessage("Oops. The XML file for this Model no longer exists. Consider removing the Model from the Model Explorer.", pcenumErrorType.Warning, Nothing, False, False, True)
-                    Exit Sub
+                    Return Me
                 End If
 
-                '==================================================================================================
-                Dim xml As XDocument = Nothing
-                Dim lsXSDVersionNr As String = ""
+                Dim loDeserializedModel As FBM.Model = Nothing
 
-                'Deserialize text file to a new object.
-                Dim objStreamReader As New StreamReader(lsFileLocationName)
+                If abDontUseBLOBLoading Then GoTo XMLDeserialisation
 
-                xml = XDocument.Load(lsFileLocationName)
+                If System.IO.File.Exists(lsBLOBFileLocationName) Then
+#Region "BLOB Deserialisation"
+                    Try
+                        loDeserializedModel = DirectCast(BinarySerialiser.DeserializeObject(lsBLOBFileLocationName), FBM.Model)
+                        loDeserializedModel.LoadedFromBLOB = True
+                        loDeserializedModel.IsDirty = False
+                        Call loDeserializedModel.DefaultSetup()
+                    Catch ex As Exception
+                        GoTo XMLDeserialisation
+                    End Try
+#End Region
+                Else
+                    '==================================================================================================
+                    'XML Deserialisation
+XMLDeserialisation:
+#Region "XML Deserialisation"
+                    Dim xml As XDocument = Nothing
+                    Dim lsXSDVersionNr As String = ""
 
-                Boston.WriteToStatusBar("Loading model.", True)
-                If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(60)
+                    'Deserialize text file to a new object.
+                    Dim objStreamReader As New StreamReader(lsXMLFileLocationName)
 
-                lsXSDVersionNr = xml.<Model>.@XSDVersionNr
-                '=====================================================================================================
-                Dim lrSerializer As XmlSerializer = Nothing
-                Select Case lsXSDVersionNr
-                    Case Is = "0.81"
-                        lrSerializer = New XmlSerializer(GetType(XMLModelv081.Model))
-                        Dim lrXMLModel As New XMLModelv081.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me)
-                    Case Is = "1"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel1.Model))
-                        Dim lrXMLModel As New XMLModel1.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me)
-                    Case Is = "1.1"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel11.Model))
-                        Dim lrXMLModel As New XMLModel11.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me)
-                    Case Is = "1.2"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel12.Model))
-                        Dim lrXMLModel As New XMLModel12.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me)
-                    Case Is = "1.3"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel13.Model))
-                        Dim lrXMLModel As New XMLModel13.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
+                    xml = XDocument.Load(lsXMLFileLocationName)
 
-                        lrXMLModel.MapToFBMModel(Me)
-                    Case Is = "1.4"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel14.Model))
-                        Dim lrXMLModel As New XMLModel14.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me)
-                    Case Is = "1.5"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel15.Model))
-                        Dim lrXMLModel As New XMLModel15.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me)
-                    Case Is = "1.6"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel16.Model))
-                        Dim lrXMLModel As New XMLModel16.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me)
-                    Case Is = "1.7"
-                        lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
-                        Dim lrXMLModel As New XMLModel.Model
-                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
-                        objStreamReader.Close()
-                        lrXMLModel.MapToFBMModel(Me, aoBackgroundWorker, abSkipAlreadyLoadedModelElements)
-                End Select
+                    Boston.WriteToStatusBar("Loading model.", True)
+                    If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(60)
+
+                    lsXSDVersionNr = xml.<Model>.@XSDVersionNr
+                    '=====================================================================================================
+                    Dim lrSerializer As XmlSerializer = Nothing
+                    Select Case lsXSDVersionNr
+                        Case Is = "0.81"
+                            lrSerializer = New XmlSerializer(GetType(XMLModelv081.Model))
+                            Dim lrXMLModel As New XMLModelv081.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me)
+                        Case Is = "1"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel1.Model))
+                            Dim lrXMLModel As New XMLModel1.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me)
+                        Case Is = "1.1"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel11.Model))
+                            Dim lrXMLModel As New XMLModel11.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me)
+                        Case Is = "1.2"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel12.Model))
+                            Dim lrXMLModel As New XMLModel12.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me)
+                        Case Is = "1.3"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel13.Model))
+                            Dim lrXMLModel As New XMLModel13.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+
+                            lrXMLModel.MapToFBMModel(Me)
+                        Case Is = "1.4"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel14.Model))
+                            Dim lrXMLModel As New XMLModel14.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me)
+                        Case Is = "1.5"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel15.Model))
+                            Dim lrXMLModel As New XMLModel15.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me)
+                        Case Is = "1.6"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel16.Model))
+                            Dim lrXMLModel As New XMLModel16.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me)
+                        Case Is = "1.7"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
+                            Dim lrXMLModel As New XMLModel.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me, aoBackgroundWorker, abSkipAlreadyLoadedModelElements)
+                    End Select
+#End Region
+                End If
 
                 Me.Page.Select(Function(x)
                                    x.IsDirty = False
@@ -6525,11 +6656,18 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(80)
 
                 '================================================================================================================
+                'If Model is from BLOB, return that, because it's too costly to replace this model (Deep Clone). Cheaper to replay Model/Page in Tree in the ModelExplorer
+                Dim lrReturnModel As FBM.Model = Me
+                If loDeserializedModel IsNot Nothing Then
+                    lrReturnModel = loDeserializedModel
+                End If
+
+                '================================================================================================================
                 'CMML/RDS/STM
-                If (Me.ModelId <> "Core") And Me.HasCoreModel Then
+                If (Me.ModelId <> "Core") And lrReturnModel.HasCoreModel Then
                     'Has Core Model, perform Core management.
-                    Call Me.performCoreManagement()
-                    Call Me.PopulateAllCoreStructuresFromCoreMDAElements(aoBackgroundWorker)
+                    Call lrReturnModel.performCoreManagement()
+                    Call lrReturnModel.PopulateAllCoreStructuresFromCoreMDAElements(aoBackgroundWorker)
                     Me.RDSCreated = True
                 ElseIf (Me.ModelId <> "Core") Then
 #Region "Has No Core Model"
@@ -6571,14 +6709,16 @@ SkipModelElement: 'Because is not in the ModelDictionary
                     '==================================================
 #End Region
 
-                    Call Me.createEntityRelationshipArtifacts()
-                    Call Me.PopulateAllCoreStructuresFromCoreMDAElements(aoBackgroundWorker)
+                    Call lrReturnModel.createEntityRelationshipArtifacts()
+                    Call lrReturnModel.PopulateAllCoreStructuresFromCoreMDAElements(aoBackgroundWorker)
                     Me.RDSCreated = True
                 End If
 
                 Me.IsDirty = False
                 '==================================================================================================
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(100)
+
+                Return lrReturnModel
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -6587,8 +6727,11 @@ SkipModelElement: 'Because is not in the ModelDictionary
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return Me
             End Try
-        End Sub
+
+        End Function
 
         Public Sub LoadPagesFromXML()
 

@@ -848,7 +848,7 @@ CouldntSaveToBostonDatabase:
             If MsgBox(lsMessage, MsgBoxStyle.Information + MsgBoxStyle.YesNoCancel) = DialogResult.Yes Then
 
                 With New WaitCursor
-                    If Not Me.zrModel.Loaded Then Me.zrModel.Load(True, True, Nothing)
+                    If Not Me.zrModel.Loaded Then Me.zrModel.Load(True, True, Nothing, abDontUseBLOBLoading:=True)
                     Me.zrModel.RapidEmpty(True)
                     Me.zrModel.Save(True, True, True)
                 End With

@@ -257,12 +257,19 @@ Namespace FBM
 
         Public NORMALinksToUnaryFactTypeValueType As Boolean = False
 
+        <NonSerialized()>
         Public Event MandatoryChanged(ByVal abMandatoryStatus As Boolean)
+        <NonSerialized()>
         Public Event RoleJoinModified(ByRef arModelObject As FBM.ModelObject)
+        <NonSerialized()>
         Public Event RoleNameChanged(ByVal asNewRoleName As String)
+        <NonSerialized()>
         Public Event ValueRangeChanged(ByVal asNewValueRange As String)
+        <NonSerialized()>
         Public Event ValueConstraintAdded(ByVal asValueConstraint As String)
+        <NonSerialized()>
         Public Event ValueConstraintRemoved(ByVal asRemovedValueConstraint As String)
+        <NonSerialized()>
         Public Event ValueConstraintModified(ByVal asOldValue As String, ByVal asNewValue As String)
 
         Sub New()

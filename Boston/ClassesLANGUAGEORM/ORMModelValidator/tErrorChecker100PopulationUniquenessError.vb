@@ -33,6 +33,7 @@ Namespace Validation
                         If lrFactType.InternalUniquenessConstraint.Count = 0 Then
                             Dim larModelErrorFactData = (From Fact In lrFactType.Fact
                                                          From FactData In Fact.Data
+                                                         Where FactData.ModelError IsNot Nothing
                                                          Where FactData.ModelError.Count > 0
                                                          Select FactData).ToList
 

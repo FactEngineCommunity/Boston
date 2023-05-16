@@ -1225,6 +1225,8 @@ SkipModelNote:
 
                 If Not abCalledAsThread Then
                     Boston.WriteToStatusBar("Loading Model. Mapping Page: " & arXMLPage.Name & ".", True)
+                Else
+                    Boston.WriteToStatusBar("Loading Model. Page: " & arXMLPage.Name & ".", True)
                 End If
 
                 If arPage Is Nothing Then

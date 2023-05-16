@@ -19,10 +19,15 @@ Public Class RecordsetProxy
             Select Case value.GetType()
                 Case GetType(FactEngine.SQLiteConnection)
                     _innerRecordset = New SQLite.Recordset
+                    Me._innerRecordset.ActiveConnection = value
+                Case GetType(FactEngine.MSAccessConnection)
+                    _innerRecordset = New ADODB.Recordset
+                    Me._innerRecordset.ActiveConnection = value.Connection
                 Case Else
                     _innerRecordset = New ADODB.Recordset()
+                    Me._innerRecordset.ActiveConnection = value
             End Select
-            Me._innerRecordset.ActiveConnection = value
+
         End Set
     End Property
 

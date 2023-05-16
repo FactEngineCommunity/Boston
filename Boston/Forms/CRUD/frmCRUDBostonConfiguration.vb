@@ -64,7 +64,9 @@ Public Class frmCRUDBostonConfiguration
             'Database
             '-----------------
             Call Me.LoadDatabaseTypes()
+            RemoveHandler CheckBoxUseThreadingDatabaseLoad.CheckedChanged, AddressOf CheckBoxUseThreadingDatabaseLoad_CheckedChanged
             Me.CheckBoxUseThreadingDatabaseLoad.Checked = My.Settings.ModelLoadPagesUseThreading
+            AddHandler CheckBoxUseThreadingDatabaseLoad.CheckedChanged, AddressOf CheckBoxUseThreadingDatabaseLoad_CheckedChanged
 
             Me.TextBoxDatabaseConnectionString.Text = My.Settings.DatabaseConnectionString
 
@@ -182,6 +184,7 @@ Public Class frmCRUDBostonConfiguration
     Private Sub button_okay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles button_okay.Click
 
         Dim lsReturnString As String = ""
+        Dim lbApplicationRestartRequired As Boolean = False
 
         Try
 
@@ -194,6 +197,19 @@ Public Class frmCRUDBostonConfiguration
             End If
 
             If check_fields(lsReturnString) Then
+
+                '------------------------------------------------------------------------
+                'DatabaseType - Check if changed
+                '---------------------------------
+                If Me.ComboBoxDatabaseType.SelectedItem.Tag.ToString <> My.Settings.DatabaseType Then
+
+                    If MsgBox("Changing the database type requires an application restart. Are you happy with that?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                        lbApplicationRestartRequired = True
+                    Else
+                        Exit Sub
+                    End If
+
+                End If
 
                 My.Settings.DebugMode = ComboBoxDebugMode.SelectedItem
                 My.Settings.DatabaseType = Me.ComboBoxDatabaseType.SelectedItem.ToString
@@ -267,6 +283,11 @@ Public Class frmCRUDBostonConfiguration
                 Me.Dispose()
 
                 Call prApplication.triggerConfigurationChanged()
+
+                If lbApplicationRestartRequired Then
+                    Process.Start(Application.ExecutablePath)
+                    Application.Exit()
+                End If
             Else
                 MsgBox(lsReturnString)
             End If
@@ -369,19 +390,24 @@ Public Class frmCRUDBostonConfiguration
             liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
             larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
 
+            Dim laiDatabaseType = {pcenumDatabaseType.MSJet, pcenumDatabaseType.SQLite}
+
             For liInd = 1 To larDatabaseType.Count
 
                 Dim liDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(larDatabaseType(liInd - 1).DatabaseType, pcenumDatabaseType.None)), pcenumDatabaseType)
-                Dim lrComboboxItem As New tComboboxItem(larDatabaseType(liInd - 1).DatabaseType, larDatabaseType(liInd - 1).DatabaseType, liDatabaseType)
-                liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
 
-                If larDatabaseType(liInd - 1).DatabaseType = My.Settings.DatabaseType Then
-                    Me.ComboBoxDatabaseType.SelectedIndex = liNewIndex
+                If laiDatabaseType.Contains(liDatabaseType) Then
+                    Dim lrComboboxItem As New tComboboxItem(larDatabaseType(liInd - 1).DatabaseType, larDatabaseType(liInd - 1).DatabaseType, liDatabaseType)
+                    liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
+
+                    If larDatabaseType(liInd - 1).DatabaseType = My.Settings.DatabaseType Then
+                        Me.ComboBoxDatabaseType.SelectedIndex = liNewIndex
+                    End If
                 End If
             Next
         Else
             Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.MSJet.ToString)
-            Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLServer.ToString)
+            Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLite.ToString)
 
             Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(My.Settings.DatabaseType)
 
@@ -730,10 +756,12 @@ Public Class frmCRUDBostonConfiguration
     Private Sub CheckBoxUseThreadingDatabaseLoad_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxUseThreadingDatabaseLoad.CheckedChanged
 
         Try
-            Dim lsMessage = "For some database types it is recommended that Threading is turned off for Boston database loading."
-            lsMessage.AppendDoubleLineBreak("E.g. Databases such as SQLite may lock during database load if threading is turned on.")
-            lsMessage.AppendDoubleLineBreak("Consult with FactEngine if you are unsure as to how to proceed with this option.")
-            MsgBox(lsMessage)
+            If Me.CheckBoxUseThreadingDatabaseLoad.Checked Then
+                Dim lsMessage = "For some database types it is recommended that Threading is turned off for Boston database loading."
+                lsMessage.AppendDoubleLineBreak("E.g. Databases such as SQLite may lock during database load if threading is turned on.")
+                lsMessage.AppendDoubleLineBreak("Consult with FactEngine if you are unsure as to how to proceed with this option.")
+                MsgBox(lsMessage)
+            End If
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

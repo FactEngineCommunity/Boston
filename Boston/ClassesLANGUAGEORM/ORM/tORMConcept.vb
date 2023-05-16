@@ -22,7 +22,7 @@ Namespace FBM
             End Set
         End Property
 
-
+        <NonSerialized()>
         Public Event ConceptSymbolUpdated() 'Used to let Proxy 'Instances' in the MVC (Model View Controler) attach
         ' delegates to the object they represent such that if the ModelObject is 'updated'
         ' (e.g. an EntityType has its Name changed) from one Page (e.g. on a 'Use Case Diagram'), then the 

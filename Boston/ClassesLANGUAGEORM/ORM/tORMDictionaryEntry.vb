@@ -618,6 +618,7 @@ Namespace FBM
 
         End Sub
 
+        <NonSerialized()>
         Public Shadows Event updated()
 
         Private Sub Concept_Updated() Handles Concept.ConceptSymbolUpdated

@@ -129,7 +129,7 @@ Namespace SourcePlugins.Boston
             If Me.BostonModel Is Nothing Then Return larSchemaRow
 
             If Not Me.BostonModel.Loaded Then
-                Call Me.BostonModel.Load()
+                Call Me.BostonModel.Load(abDontUseBLOBLoading:=True)
             End If
 
             Try

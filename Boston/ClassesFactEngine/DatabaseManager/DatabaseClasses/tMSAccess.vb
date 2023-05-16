@@ -1,5 +1,6 @@
 ﻿Imports System.Threading.Tasks
 Imports Boston.ORMQL
+Imports System.Reflection
 
 Namespace FactEngine
 
@@ -9,9 +10,16 @@ Namespace FactEngine
 
         Private FBMModel As FBM.Model
 
-        Private DbConnection As New ADODB.Connection
+        Private _DbConnection As New ADODB.Connection
 
-        Public DatabaseConnectionString As String
+        Public Property Connection As ADODB.Connection
+            Get
+                Return Me._DbConnection
+            End Get
+            Set(value As ADODB.Connection)
+                Me._DbConnection = value
+            End Set
+        End Property
 
         Public Sub New(ByRef arFBMModel As FBM.Model, ByVal asDatabaseConnectionString As String)
             Me.FBMModel = arFBMModel
@@ -21,33 +29,35 @@ Namespace FactEngine
             Dim lsDataProvider As String
             Dim lsMessage As String
 
-            Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-            lrSQLConnectionStringBuilder.ConnectionString = Me.DatabaseConnectionString
+            If asDatabaseConnectionString IsNot Nothing Then
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                lrSQLConnectionStringBuilder.ConnectionString = Me.DatabaseConnectionString
 
-            lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
-            lsDataProvider = lrSQLConnectionStringBuilder("Provider")
+                lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+                lsDataProvider = lrSQLConnectionStringBuilder("Provider")
 
-            If Not System.IO.File.Exists(lsDatabaseLocation) Then
+                If Not System.IO.File.Exists(lsDatabaseLocation) Then
 
-                lsMessage = "Cannot find the database at the configured location:"
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= lsDatabaseLocation
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "Manage the Database ConnectionString for the datase in the Model's configuration"
+                    lsMessage = "Cannot find the database at the configured location:"
+                    lsMessage &= vbCrLf & vbCrLf
+                    lsMessage &= lsDatabaseLocation
+                    lsMessage &= vbCrLf & vbCrLf
+                    lsMessage &= "Manage the Database ConnectionString for the datase in the Model's configuration"
 
-                MsgBox(lsMessage)
+                    MsgBox(lsMessage)
 
+                End If
+
+                '------------------------------------------------
+                'Open the (database) connection
+                '------------------------------------------------
+                Try
+                    Me._DbConnection.Open(Me.DatabaseConnectionString)
+                    Me.Connected = True
+                Catch
+                    MsgBox("Failed To open the Microsoft Access database connection.")
+                End Try
             End If
-
-            '------------------------------------------------
-            'Open the (database) connection
-            '------------------------------------------------
-            Try
-                Me.DbConnection.Open(Me.DatabaseConnectionString)
-                Me.Connected = True
-            Catch
-                MsgBox("Failed To open the Microsoft Access database connection.")
-            End Try
 
         End Sub
 
@@ -154,7 +164,22 @@ Namespace FactEngine
         Private Function iDatabaseConnection_GOAsync(asQuery As String) As Task(Of Recordset) Implements iDatabaseConnection.GOAsync
             Throw New NotImplementedException()
         End Function
-    End Class
 
+        Public Overrides Sub Open(Optional ByVal asDatabaseConnectionString As String = Nothing)
+
+            Try
+                Call Me._DbConnection.Open(asDatabaseConnectionString)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+    End Class
 
 End Namespace

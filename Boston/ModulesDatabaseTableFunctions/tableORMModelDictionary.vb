@@ -381,6 +381,7 @@ Namespace TableModelDictionary
 
                 pdbConnection.BeginTrans()
                 pdbConnection.Execute(lsSQLQuery)
+                pdbConnection.CommitTrans()
 
                 ''===============================================================================================
                 ''ConceptInstance
@@ -398,8 +399,7 @@ Namespace TableModelDictionary
                 'lsSQLQuery &= "                   WHERE MMR.ModelId = MCIModelId"
                 'lsSQLQuery &= "                     AND MMR.FactTypeId = MMFT.FactTypeId"
 
-                pdbConnection.Execute(lsSQLQuery)
-                pdbConnection.CommitTrans()
+
 
 
             Catch ex As Exception

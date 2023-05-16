@@ -9,6 +9,7 @@ Imports System.Windows.Forms
 Imports Boston.PluginInterface.Sources
 Imports System.Reflection
 Imports Boston.FBM
+Imports System.Xml.Serialization
 
 Namespace SourcePlugins.Boston
     Partial Public Class Manage
@@ -261,7 +262,7 @@ Namespace SourcePlugins.Boston
                 Dim lrEntity As RDS.Table
 
                 If Not Me.BostonModel.Loaded Then
-                    Call Me.BostonModel.Load()
+                    Call Me.BostonModel.Load(abDontUseBLOBLoading:=True)
                 End If
                 Me.LabelModelName.Text = Me.BostonModel.Name
                 Me.BostonModel.RDS.Table.Sort(AddressOf RDS.Table.CompareName)

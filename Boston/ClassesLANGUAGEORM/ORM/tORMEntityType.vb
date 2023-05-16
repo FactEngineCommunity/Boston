@@ -268,31 +268,59 @@ Namespace FBM
             End Get
         End Property
 
+        <NonSerialized()>
         Public Event ChangingToFactType(ByRef arFactType As FBM.FactType)
+        <NonSerialized()>
         Public Event DataTypeChanged(ByVal aiNewDataType As pcenumORMDataType)
+        <NonSerialized()>
         Public Event DataTypePrecisionChanged(ByVal aiNewDataTypePrecision As Integer)
+        <NonSerialized()>
         Public Event DataTypeLengthChanged(ByVal aiDataTypeLength As Integer)
+        <NonSerialized()>
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
+        <NonSerialized()>
         Public Event ExpandReferenceScheme()
+        <NonSerialized()>
         Public Event IsActorChanged(ByVal abIsActor As Boolean)
+        <NonSerialized()>
         Public Event IsDatabaseReservedWordChanged(ByVal abIsDatabaseReservedWord As Boolean)
+        <NonSerialized()>
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
+        <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         'Public Event NameChanged(ByVal asNewName As String)
+        <NonSerialized()>
         Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean)
+        <NonSerialized()>
         Public Event SubtypeConstraintRemoved(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
+        <NonSerialized()>
         Public Event ReferenceModeChanged(ByVal asNewReferenceMode As String, ByVal abSimpleAssignment As Boolean, ByVal abBroadcastInterfaceEvent As Boolean)
+        <NonSerialized()>
         Public Event ReferenceModeFactTypeChanged(ByRef arNewReferenceModeFactType As FBM.FactType)
+        <NonSerialized()>
         Public Event ReferenceModeValueTypeChanged(ByRef arNewReferenceModeValueType As FBM.ValueType)
+        <NonSerialized()>
         Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
+        <NonSerialized()>
         Public Event PreferredIdentifierRCIdChanged(ByVal asNewPreferredIndentifierRCId As String)
+        <NonSerialized()>
         Public Event ReferenceModeRoleConstraintChanged(ByRef arNewReferenceModeRoleConstraint As FBM.RoleConstraint)
+        <NonSerialized()>
         Public Event IsObjectifyingEntityTypeChanged(ByVal abNewIsObjectifyingEntityType As Boolean)
+        <NonSerialized()>
         Public Event IsIndependentChanged(ByVal abNewIsIndependent As Boolean) Implements iFBMIndependence.IsIndependentChanged
+        <NonSerialized()>
         Public Event IsPersonalChanged(ByVal abNewIsPersonal As Boolean)
+        <NonSerialized()>
         Public Event IsAbsorbedChanged(ByVal abNewIsAbsorbed As Boolean)
+        <NonSerialized()>
         Public Event ObjectifiedFactTypeChanged(ByRef arNewObjectifiedFactType As FBM.FactType)
+        <NonSerialized()>
         Public Event SimpleReferenceSchemeRemoved()
+        <NonSerialized()>
+        Public Shadows Event updated(ByVal aiConceptType As pcenumConceptType)
+        <NonSerialized()>
+        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         ''' <summary>
         ''' Parameterless Constructor.
@@ -3286,8 +3314,6 @@ SkipSettingReferenceModeObjects:
 
         End Sub
 
-        Public Shadows Event updated(ByVal aiConceptType As pcenumConceptType)
-        Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Private Sub Concept_Updated() Handles Concept.ConceptSymbolUpdated
 

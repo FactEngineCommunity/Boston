@@ -348,19 +348,19 @@ ConfigurationOK:
 
                 '=======================================
                 Call TableModel.GetModelDetails(prApplication.Language.Model)
-                    Call prApplication.Language.Model.Load()
+                Call prApplication.Language.Model.Load(abDontUseBLOBLoading:=True)
 
-                    prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
+                prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
 
-                    If pbLogStartup Then
-                        prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
-                    End If
-                    '=======================================
+                If pbLogStartup Then
+                    prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
+                End If
+                '=======================================
 
-                    '==========================================
-                    'Client/Server                
+                '==========================================
+                'Client/Server                
 #Region "Client/Server"
-                    If My.Settings.UseClientServer _
+                If My.Settings.UseClientServer _
                 And My.Settings.RequireLoginAtStartup _
                 And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                         If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -541,7 +541,7 @@ SkipRegistrationChecking:
 
             Boston.WriteToStatusBar("Loading the Core MetaMetaModel")
             Call TableModel.GetModelDetails(prApplication.CMML.Core)
-            prApplication.CMML.Core.Load(True, False)
+            prApplication.CMML.Core.Load(True, False, abDontUseBLOBLoading:=True)
 
             If pbLogStartup Then
                 prApplication.ThrowErrorMessage("Successfully loaded the Core Model", pcenumErrorType.Information)
