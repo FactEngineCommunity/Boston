@@ -67,6 +67,7 @@ Public Class frmCRUDBostonConfiguration
             RemoveHandler CheckBoxUseThreadingDatabaseLoad.CheckedChanged, AddressOf CheckBoxUseThreadingDatabaseLoad_CheckedChanged
             Me.CheckBoxUseThreadingDatabaseLoad.Checked = My.Settings.ModelLoadPagesUseThreading
             AddHandler CheckBoxUseThreadingDatabaseLoad.CheckedChanged, AddressOf CheckBoxUseThreadingDatabaseLoad_CheckedChanged
+            Me.CheckBoxStoreAndUseBinarySerialisations.Checked = My.Settings.DatabaseStoreModelsAsBLOBsParallelToXML
 
             Me.TextBoxDatabaseConnectionString.Text = My.Settings.DatabaseConnectionString
 
@@ -219,6 +220,7 @@ Public Class frmCRUDBostonConfiguration
 
                 'Database
                 My.Settings.ModelLoadPagesUseThreading = Me.CheckBoxUseThreadingDatabaseLoad.Checked
+                My.Settings.DatabaseStoreModelsAsBLOBsParallelToXML = Me.CheckBoxStoreAndUseBinarySerialisations.Checked
 
                 'Import/Export
                 My.Settings.ExportFBMExcludeMDAModelElements = Me.CheckBoxExportSuppressMDAModelElements.Checked
@@ -406,8 +408,8 @@ Public Class frmCRUDBostonConfiguration
                 End If
             Next
         Else
-            Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.MSJet.ToString)
-            Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLite.ToString)
+            Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.MSJet, pcenumDatabaseType.MSJet.ToString, pcenumDatabaseType.MSJet))
+            Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.SQLite, pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.SQLite))
 
             Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(My.Settings.DatabaseType)
 

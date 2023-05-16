@@ -39,6 +39,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxVirtualAnalystDisplayBriana = New System.Windows.Forms.CheckBox()
         Me.ButtonImportLanguageRules = New System.Windows.Forms.Button()
         Me.GroupBoxDatabase = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxUseThreadingDatabaseLoad = New System.Windows.Forms.CheckBox()
         Me.ButtonFileSelect = New System.Windows.Forms.Button()
         Me.TextBoxDatabaseConnectionString = New System.Windows.Forms.TextBox()
         Me.LabelConnectionString = New System.Windows.Forms.Label()
@@ -111,7 +112,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxUseThreadingDatabaseLoad = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxStoreAndUseBinarySerialisations = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -301,6 +302,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxDatabase
         '
+        Me.GroupBoxDatabase.Controls.Add(Me.CheckBoxStoreAndUseBinarySerialisations)
         Me.GroupBoxDatabase.Controls.Add(Me.CheckBoxUseThreadingDatabaseLoad)
         Me.GroupBoxDatabase.Controls.Add(Me.ButtonFileSelect)
         Me.GroupBoxDatabase.Controls.Add(Me.TextBoxDatabaseConnectionString)
@@ -313,6 +315,16 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxDatabase.TabIndex = 12
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
+        '
+        'CheckBoxUseThreadingDatabaseLoad
+        '
+        Me.CheckBoxUseThreadingDatabaseLoad.AutoSize = True
+        Me.CheckBoxUseThreadingDatabaseLoad.Location = New System.Drawing.Point(28, 84)
+        Me.CheckBoxUseThreadingDatabaseLoad.Name = "CheckBoxUseThreadingDatabaseLoad"
+        Me.CheckBoxUseThreadingDatabaseLoad.Size = New System.Drawing.Size(223, 17)
+        Me.CheckBoxUseThreadingDatabaseLoad.TabIndex = 11
+        Me.CheckBoxUseThreadingDatabaseLoad.Text = "Use &Threading on Boston Database Load"
+        Me.CheckBoxUseThreadingDatabaseLoad.UseVisualStyleBackColor = True
         '
         'ButtonFileSelect
         '
@@ -473,7 +485,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage2.Size = New System.Drawing.Size(606, 635)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Client/Server"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -571,7 +583,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage3.Controls.Add(Me.GroupBoxFactEngine)
         Me.TabPage3.Location = New System.Drawing.Point(4, 22)
         Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage3.Size = New System.Drawing.Size(606, 635)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "FactEngine"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -729,7 +741,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage4.Controls.Add(Me.GroupBoxERDiagrams)
         Me.TabPage4.Location = New System.Drawing.Point(4, 22)
         Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage4.Size = New System.Drawing.Size(606, 635)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "ER Diagrams"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -772,7 +784,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage6.Controls.Add(Me.GroupBox5)
         Me.TabPage6.Location = New System.Drawing.Point(4, 22)
         Me.TabPage6.Name = "TabPage6"
-        Me.TabPage6.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage6.Size = New System.Drawing.Size(606, 635)
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Reverse Engineering"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -824,7 +836,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage5.Location = New System.Drawing.Point(4, 22)
         Me.TabPage5.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage5.Size = New System.Drawing.Size(606, 635)
         Me.TabPage5.TabIndex = 4
         Me.TabPage5.Text = "Boston"
         Me.TabPage5.UseVisualStyleBackColor = True
@@ -946,7 +958,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage7.Controls.Add(Me.GroupBoxModelling)
         Me.TabPage7.Location = New System.Drawing.Point(4, 22)
         Me.TabPage7.Name = "TabPage7"
-        Me.TabPage7.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage7.Size = New System.Drawing.Size(606, 635)
         Me.TabPage7.TabIndex = 6
         Me.TabPage7.Text = "Modelling"
         Me.TabPage7.UseVisualStyleBackColor = True
@@ -962,7 +974,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxModelling.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBoxModelling.Location = New System.Drawing.Point(0, 0)
         Me.GroupBoxModelling.Name = "GroupBoxModelling"
-        Me.GroupBoxModelling.Size = New System.Drawing.Size(606, 604)
+        Me.GroupBoxModelling.Size = New System.Drawing.Size(606, 635)
         Me.GroupBoxModelling.TabIndex = 0
         Me.GroupBoxModelling.TabStop = False
         '
@@ -1026,7 +1038,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage8.Controls.Add(Me.GroupBoxCodeGeneration)
         Me.TabPage8.Location = New System.Drawing.Point(4, 22)
         Me.TabPage8.Name = "TabPage8"
-        Me.TabPage8.Size = New System.Drawing.Size(606, 604)
+        Me.TabPage8.Size = New System.Drawing.Size(606, 635)
         Me.TabPage8.TabIndex = 7
         Me.TabPage8.Text = "Code Generation"
         Me.TabPage8.UseVisualStyleBackColor = True
@@ -1054,15 +1066,16 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxUseThreadingDatabaseLoad
+        'CheckBoxStoreAndUseBinarySerialisations
         '
-        Me.CheckBoxUseThreadingDatabaseLoad.AutoSize = True
-        Me.CheckBoxUseThreadingDatabaseLoad.Location = New System.Drawing.Point(28, 84)
-        Me.CheckBoxUseThreadingDatabaseLoad.Name = "CheckBoxUseThreadingDatabaseLoad"
-        Me.CheckBoxUseThreadingDatabaseLoad.Size = New System.Drawing.Size(223, 17)
-        Me.CheckBoxUseThreadingDatabaseLoad.TabIndex = 11
-        Me.CheckBoxUseThreadingDatabaseLoad.Text = "Use &Threading on Boston Database Load"
-        Me.CheckBoxUseThreadingDatabaseLoad.UseVisualStyleBackColor = True
+        Me.CheckBoxStoreAndUseBinarySerialisations.AutoSize = True
+        Me.CheckBoxStoreAndUseBinarySerialisations.Enabled = False
+        Me.CheckBoxStoreAndUseBinarySerialisations.Location = New System.Drawing.Point(279, 84)
+        Me.CheckBoxStoreAndUseBinarySerialisations.Name = "CheckBoxStoreAndUseBinarySerialisations"
+        Me.CheckBoxStoreAndUseBinarySerialisations.Size = New System.Drawing.Size(190, 17)
+        Me.CheckBoxStoreAndUseBinarySerialisations.TabIndex = 12
+        Me.CheckBoxStoreAndUseBinarySerialisations.Text = "Store and Use Binary Serialisations"
+        Me.CheckBoxStoreAndUseBinarySerialisations.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -1209,4 +1222,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxModelllingUseThreadingLoadingXMLPage As CheckBox
     Friend WithEvents ButtonFileSelect As Button
     Friend WithEvents CheckBoxUseThreadingDatabaseLoad As CheckBox
+    Friend WithEvents CheckBoxStoreAndUseBinarySerialisations As CheckBox
 End Class

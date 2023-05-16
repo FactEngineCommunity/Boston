@@ -322,7 +322,7 @@ Public Class frmDiagramPGS
             Me.Tag = arPage
 
             Me.zoTreeNode = aoTreeNode
-
+            Me.zrPage.ERDiagram = New ERD.Diagram
             Me.zrPage.ERDiagram.Entity.Clear()
 
             '------------------------------------------------------------------------------

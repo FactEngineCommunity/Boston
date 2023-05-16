@@ -1242,6 +1242,9 @@ Public Class frmToolboxEnterpriseExplorer
                             If (MouseButtons = MouseButtons.Right) Or (Me.ziMouseButton = MouseButtons.Right) Then Exit Sub
 
                             Me.TreeView.SelectedNode.Expand()
+                            Me.Invalidate()
+                            Me.Refresh()
+                            frmMain.Refresh()
 
                             If lrModel.Loaded Then
                                 '-------------------------------------------------------------------------------
@@ -1257,12 +1260,16 @@ Public Class frmToolboxEnterpriseExplorer
                                     Boston.WriteToStatusBar("Model loaded")
                                 End If
                             Else
-                                Call Me.DoModelLoading(lrModel)
+                                With New WaitCursor
+                                    Boston.WriteToStatusBar("Loading Model.", True)
+                                    Call Me.DoModelLoading(lrModel)
+                                End With
 
                                 If lrModel.LoadedFromBLOB Then
                                     loObject.Tag = lrModel
                                     For Each lrTreeNode In Me.TreeView.SelectedNode.Nodes
                                         Call lrTreeNode.Remove
+                                        prPageNodes.Remove(lrTreeNode.Tag)
                                     Next
                                     Call Me.AddPagesForModel(lrModel, Me.TreeView.SelectedNode)
                                 End If

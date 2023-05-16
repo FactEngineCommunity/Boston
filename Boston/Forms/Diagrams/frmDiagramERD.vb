@@ -196,6 +196,7 @@ Public Class frmDiagramERD
 
             '-------------------------------------------------------------------------
             'Clear the Entities and Attributes in the Page because it is reloading.
+            Me.zrPage.ERDiagram = New ERD.Diagram
             Me.zrPage.ERDiagram.Entity.Clear()
             Me.zrPage.ERDiagram.Attribute.Clear()
             Me.zrPage.ERDiagram.Relation.Clear()

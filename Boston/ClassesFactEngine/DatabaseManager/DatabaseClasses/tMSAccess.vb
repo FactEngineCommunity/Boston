@@ -61,6 +61,54 @@ Namespace FactEngine
 
         End Sub
 
+        Public Shadows Function BeginTrans() As Object
+            Try
+                Me.Connection.BeginTrans()
+                Return Nothing
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True, ex)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Shadows Function CommitTrans() As Object
+            Try
+                Me.Connection.CommitTrans()
+                Return Nothing
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True, ex)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Overrides Sub Execute(asQuery As String)
+
+            Try
+                Call Me.Connection.Execute(asQuery)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
         ''' <summary>
         ''' Returns a list of the Relations/ForeignKeys in the database. As used in Reverse Engineering a database.
         ''' </summary>

@@ -6558,9 +6558,11 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
                 If abDontUseBLOBLoading Then GoTo XMLDeserialisation
 
-                If System.IO.File.Exists(lsBLOBFileLocationName) Then
+                If System.IO.File.Exists(lsBLOBFileLocationName) And My.Settings.DatabaseStoreModelsAsBLOBsParallelToXML Then
 #Region "BLOB Deserialisation"
                     Try
+                        '20230517-VM-Having tested this...the binary file takes twice as long to load and is 300% bigger than the XML by necessity.
+                        '  But, we'll keep this code just the same as it is configurable as to whether BLOBs are used at all.
                         loDeserializedModel = DirectCast(BinarySerialiser.DeserializeObject(lsBLOBFileLocationName), FBM.Model)
                         loDeserializedModel.LoadedFromBLOB = True
                         loDeserializedModel.IsDirty = False
