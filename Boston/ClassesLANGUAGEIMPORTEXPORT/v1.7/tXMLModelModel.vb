@@ -2579,7 +2579,7 @@ SkipEntityType:
                                 arNORMADocument.ORMModel.Constraints.Items.Add(lrNORMARoleConstraint)
 
                             Catch ex As Exception
-                                prApplication.ThrowErrorMessage("Error loading External Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True)
+                                prApplication.ThrowErrorMessage("Error exporting External Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True)
                             End Try
 #End Region 'External Uniqueness Constraint
                         Case Is = pcenumRoleConstraintType.RoleValueConstraint.ToString

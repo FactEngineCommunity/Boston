@@ -2,7 +2,7 @@ Imports System.ComponentModel
 Imports System.Collections.Generic
 Imports System.Xml.Serialization
 Imports System.Reflection
-
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -192,8 +192,10 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public _Role As New List(Of FBM.Role)
+        <JSONIgnore()>
         <XmlIgnore()>
         Public Property Role As List(Of FBM.Role)
             Get

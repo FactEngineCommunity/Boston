@@ -141,7 +141,7 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelDictionary As New List(Of FBM.DictionaryEntry)
 
-        <Newtonsoft.Json.JsonIgnore()>
+
         Public Overridable Property ModelDictionary() As List(Of FBM.DictionaryEntry)
             Get
                 Return Me._ModelDictionary
@@ -304,6 +304,7 @@ Namespace FBM
         ''' <remarks></remarks>
         <NonSerialized()>
         <XmlIgnore()>
+        <JsonIgnore()>
         Public RDS As New RDS.Model(Me)
 
         ''' <summary>
@@ -4763,7 +4764,8 @@ SkipRDSProcessing:
                     'BLOB Serialisation
 #Region "BLOB Serialisation"
                     If My.Settings.DatabaseStoreModelsAsBLOBsParallelToXML Then
-                        BinarySerialiser.SerializeObject(lsBLOBFileLocationName, Me)
+                        'BinarySerialiser.SerializeObject(lsBLOBFileLocationName, Me)
+                        BinarySerialiser.Serialize(Of FBM.Model)(lsBLOBFileLocationName, Me)
                     End If
 #End Region
 
@@ -6563,7 +6565,8 @@ SkipModelElement: 'Because is not in the ModelDictionary
                     Try
                         '20230517-VM-Having tested this...the binary file takes twice as long to load and is 300% bigger than the XML by necessity.
                         '  But, we'll keep this code just the same as it is configurable as to whether BLOBs are used at all.
-                        loDeserializedModel = DirectCast(BinarySerialiser.DeserializeObject(lsBLOBFileLocationName), FBM.Model)
+                        'loDeserializedModel = DirectCast(BinarySerialiser.DeserializeObject(lsBLOBFileLocationName), FBM.Model)
+                        loDeserializedModel = BinarySerialiser.Deserialize(Of FBM.Model)(lsBLOBFileLocationName)
                         loDeserializedModel.LoadedFromBLOB = True
                         loDeserializedModel.IsDirty = False
                         Call loDeserializedModel.DefaultSetup()

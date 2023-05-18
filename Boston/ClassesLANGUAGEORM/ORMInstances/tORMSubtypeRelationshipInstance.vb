@@ -2,6 +2,7 @@ Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.ComponentModel
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()>
@@ -95,6 +96,7 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
             Get
                 Throw New NotImplementedException()

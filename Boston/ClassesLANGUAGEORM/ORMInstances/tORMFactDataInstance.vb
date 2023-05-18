@@ -191,6 +191,7 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
             Get
                 Throw New NotImplementedException()

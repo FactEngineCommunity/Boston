@@ -1,6 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports MindFusion.Diagramming
 Imports System.Xml.Serialization
+Imports Newtonsoft.Json
 
 Namespace FBM
     '---------------------------------------------------------------------
@@ -59,6 +60,7 @@ Namespace FBM
         Public Property X As Integer = 0 Implements FBM.iPageObject.X
         Public Property Y As Integer = 0 Implements FBM.iPageObject.Y
 
+        <JsonIgnore()>
         Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
             Get
                 Throw New NotImplementedException()

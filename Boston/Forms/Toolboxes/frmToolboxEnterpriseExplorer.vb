@@ -5368,7 +5368,7 @@ Public Class frmToolboxEnterpriseExplorer
                 Dim lbExcludeMDAModelElements As Boolean = My.Settings.ExportFBMExcludeMDAModelElements
 
                 If Not My.Settings.ExportFBMExcludeMDAModelElements Then
-                    lsMessage = "Double you want exclude Boston Core MDA (Model Driven Architecture) elements? (recommended)"
+                    lsMessage = "Do you want exclude Boston Core MDA (Model Driven Architecture) elements? (recommended)"
                     If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
                         lbExcludeMDAModelElements = True
                     End If

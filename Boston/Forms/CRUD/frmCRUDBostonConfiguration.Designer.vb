@@ -39,6 +39,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxVirtualAnalystDisplayBriana = New System.Windows.Forms.CheckBox()
         Me.ButtonImportLanguageRules = New System.Windows.Forms.Button()
         Me.GroupBoxDatabase = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxStoreAndUseBinarySerialisations = New System.Windows.Forms.CheckBox()
         Me.CheckBoxUseThreadingDatabaseLoad = New System.Windows.Forms.CheckBox()
         Me.ButtonFileSelect = New System.Windows.Forms.Button()
         Me.TextBoxDatabaseConnectionString = New System.Windows.Forms.TextBox()
@@ -112,7 +113,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxStoreAndUseBinarySerialisations = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -315,6 +315,17 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxDatabase.TabIndex = 12
         Me.GroupBoxDatabase.TabStop = False
         Me.GroupBoxDatabase.Text = "Database:"
+        '
+        'CheckBoxStoreAndUseBinarySerialisations
+        '
+        Me.CheckBoxStoreAndUseBinarySerialisations.AutoSize = True
+        Me.CheckBoxStoreAndUseBinarySerialisations.Enabled = False
+        Me.CheckBoxStoreAndUseBinarySerialisations.Location = New System.Drawing.Point(279, 84)
+        Me.CheckBoxStoreAndUseBinarySerialisations.Name = "CheckBoxStoreAndUseBinarySerialisations"
+        Me.CheckBoxStoreAndUseBinarySerialisations.Size = New System.Drawing.Size(190, 17)
+        Me.CheckBoxStoreAndUseBinarySerialisations.TabIndex = 12
+        Me.CheckBoxStoreAndUseBinarySerialisations.Text = "Store and Use Binary Serialisations"
+        Me.CheckBoxStoreAndUseBinarySerialisations.UseVisualStyleBackColor = True
         '
         'CheckBoxUseThreadingDatabaseLoad
         '
@@ -1065,17 +1076,6 @@ Partial Class frmCRUDBostonConfiguration
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
-        '
-        'CheckBoxStoreAndUseBinarySerialisations
-        '
-        Me.CheckBoxStoreAndUseBinarySerialisations.AutoSize = True
-        Me.CheckBoxStoreAndUseBinarySerialisations.Enabled = False
-        Me.CheckBoxStoreAndUseBinarySerialisations.Location = New System.Drawing.Point(279, 84)
-        Me.CheckBoxStoreAndUseBinarySerialisations.Name = "CheckBoxStoreAndUseBinarySerialisations"
-        Me.CheckBoxStoreAndUseBinarySerialisations.Size = New System.Drawing.Size(190, 17)
-        Me.CheckBoxStoreAndUseBinarySerialisations.TabIndex = 12
-        Me.CheckBoxStoreAndUseBinarySerialisations.Text = "Store and Use Binary Serialisations"
-        Me.CheckBoxStoreAndUseBinarySerialisations.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '

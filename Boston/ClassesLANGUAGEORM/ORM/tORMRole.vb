@@ -55,6 +55,7 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         Public ReadOnly Property InternalUniquenessConstraint As List(Of FBM.RoleConstraint)
             Get
                 Return Me.FactType.InternalUniquenessConstraint.FindAll(Function(x) x.Role.Contains(Me))

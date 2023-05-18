@@ -66,17 +66,18 @@ Namespace FBM
                 'See if the NewSymbol is already in the ModelDictionary
                 '--------------------------------------------------------
                 Dim lsOriginalSymbol As String = ""
-                Dim lrOriginalDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Concept.Symbol, pcenumConceptType.Value)
-                Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.Model, value, pcenumConceptType.Value)
+                Dim lrOriginalDictionaryEntry As FBM.DictionaryEntry '20230518-Was-New FBM.DictionaryEntry(Me.Model, Me.Concept.Symbol, pcenumConceptType.Value)
+                Dim lrNewDictionaryEntry As FBM.DictionaryEntry '20230518-VM-Was- New FBM.DictionaryEntry(Me.Model, value, pcenumConceptType.Value)
                 Dim lsDebugMessage As String = ""
                 'Dim lsMessage As String
 
                 Try
 
                     lsOriginalSymbol = Me.Concept.Symbol
-                    'Call prApplication.ThrowErrorMessage("....This is the fact being modified..." & Me.Fact.Symbol, pcenumErrorType.Information)
 
+                    'Call prApplication.ThrowErrorMessage("....This is the fact being modified..." & Me.Fact.Symbol, pcenumErrorType.Information)
                     If lsOriginalSymbol = value Then Exit Property 'Nothing to do here
+
 
                     lrNewDictionaryEntry = New FBM.DictionaryEntry(Me.Model, value, pcenumConceptType.Value)
                     lrNewDictionaryEntry.isDirty = True
