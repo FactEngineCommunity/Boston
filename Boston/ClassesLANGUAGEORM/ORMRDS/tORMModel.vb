@@ -1852,6 +1852,10 @@ Namespace FBM
         Public Sub PopulateAllCoreStructuresFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             Try
+                'CodeSafe
+                If Me.RDS.Table.Count > 0 Then Exit Sub
+
+
                 Me.RDSLoading = True
                 Dim lsMessage As String
 
@@ -1894,7 +1898,7 @@ Namespace FBM
                     End If
 
                     lrTable = New RDS.Table(Me.RDS, lrORMRecordset("Element").Data, lrModelElement)
-                    Me.RDS.Table.Add(lrTable)
+                    Me.RDS.Table.AddUnique(lrTable)
 
                     'PGS Relation
                     lsSQLQuery = " SELECT COUNT(*)"

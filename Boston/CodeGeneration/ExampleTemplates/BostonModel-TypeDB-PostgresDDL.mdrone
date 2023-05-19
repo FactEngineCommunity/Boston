@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<MDProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="www.metadrone.com.angry.army.1.0">
+  <Name>PostgresDDL</Name>
+  <Profile>
+    <OpenEditorGUIDs>
+      <string>d749ab2c-b69c-4de9-bcdc-de12df1937a0</string>
+      <string>cbd2a156-c6e6-4095-89e8-e697c010f044</string>
+      <string>27bab1c2-806c-4890-9dc6-46cde1b2b6b3</string>
+    </OpenEditorGUIDs>
+    <SelectedEditorGUID>d749ab2c-b69c-4de9-bcdc-de12df1937a0</SelectedEditorGUID>
+  </Profile>
+  <Properties>
+    <EditorGUID>df0402cc-6f98-43de-96a4-8c40729df90a</EditorGUID>
+    <BeginTag>&lt;&lt;!</BeginTag>
+    <EndTag>!&gt;&gt;</EndTag>
+    <SuperMain>call PostgresDDL</SuperMain>
+  </Properties>
+  <Folders />
+  <Sources>
+    <Source>
+      <Name>Source</Name>
+      <Provider>BostonModel</Provider>
+      <BostonModelId>793a61c9-63e6-4fd4-9395-9e8bc61433f2</BostonModelId>
+      <ConnectionString>None Required</ConnectionString>
+      <SchemaQuery>Boston Model direct query. No need for a Schema Query here at all</SchemaQuery>
+      <TableSchemaQuery>Boston Model direct query. No need for a Schema Query here at all</TableSchemaQuery>
+      <ColumnSchemaQuery>Boston Model direct query. No need for a Schema Query here at all.</ColumnSchemaQuery>
+      <TableNamePlaceHolder>Boston Model direct query. No need for a Schema Query here.</TableNamePlaceHolder>
+      <RoutineSchemaQuery>Boston Model direct query. No need for a Schema Query here.</RoutineSchemaQuery>
+      <Transformations>//if column.value = "Date"
+//    set column.value = "[Date]"
+//else
+//    set column.value = column.value
+//end if
+
+if column.datatype = "Boolean"
+	set column.datatype = "boolean"
+	
+elseif column.datatype = "LogicalTrueFalse"
+	set column.datatype = "boolean"
+	
+elseif column.datatype = "LogicalYesNo"
+	set column.datatype = "boolean"
+	
+elseif column.datatype = "NumericAutoCounter"
+	set column.datatype = "integer"
+
+elseif column.datatype = "NumericDecimal"
+	set column.datatype = "decimal"
+	
+elseif column.datatype = "NumericFloatCustomPrecision"
+	set column.datatype = "real" // Not sure about this
+	
+elseif column.datatype = "NumericFloatDoublePrecision"
+	set column.datatype = "double precision"
+	
+elseif column.datatype = "NumericFloatSinglePrecision"
+	set column.datatype = "real"
+	
+elseif column.datatype = "NumericMoney"
+	set column.datatype = "decimal"
+	
+elseif column.datatype = "NumericSignedBigInteger"
+	set column.datatype = "bigint"
+	
+elseif column.datatype = "NumericSignedInteger"
+	set column.datatype = "integer"
+	
+elseif column.datatype = "NumericSignedSmallInteger"
+	set column.datatype = "smallint"
+	
+elseif column.datatype = "NumericUnsignedBigInteger"
+	set column.datatype = "bigint"
+	
+elseif column.datatype = "NumericUnsignedInteger"
+	set column.datatype = "integer"
+	
+elseif column.datatype = "NumericUnsignedSmallInteger"
+	set column.datatype = "smallint"
+	
+elseif column.datatype = "NumericUnsignedTinyInteger"
+	set column.datatype = "smallint"
+	
+elseif column.datatype = "OtherObjectID"
+	set column.datatype = "bigint" // ?
+	
+elseif column.datatype = "OtherRowID"
+	set column.datatype = "bigint" // ?
+	
+elseif column.datatype = "RawDataFixedLength"
+	set column.datatype = "bytea" // NB: limited to 1GB and input format differs from BLOB SQL standard; alternative is "Large Object" which is difficult to use; true images can be handled via a PG extension if necessary
+	
+elseif column.datatype = "RawDataLargeLength"
+	set column.datatype = "bytea"
+	
+elseif column.datatype = "RawDataOLEObject"
+	set column.datatype = "bytea"
+	
+elseif column.datatype = "RawDataPicture"
+	set column.datatype = "bytea"
+	
+elseif column.datatype = "RawDataVariableLength"
+	set column.datatype = "bytea"
+	
+elseif column.datatype = "TemporalAutoTimestamp"
+	set column.datatype = "timestamp"
+	
+elseif column.datatype = "TemporalDate"
+	set column.datatype = "date"
+	
+elseif column.datatype = "TemporalDateAndTime"
+	set column.datatype = "timestamp"
+	
+elseif column.datatype = "TemporalTime"
+	set column.datatype = "time"
+	
+elseif column.datatype = "TextFixedLength"
+	set column.datatype = "character"
+	
+elseif column.datatype = "TextLargeLength"
+	set column.datatype = "character" // ?
+	
+elseif column.datatype = "TextVariableLength"
+	set column.datatype = "character varying"
+	
+end</Transformations>
+      <EditorGUID>d749ab2c-b69c-4de9-bcdc-de12df1937a0</EditorGUID>
+    </Source>
+  </Sources>
+  <Packages>
+    <MDPackage>
+      <TagVal>
+        <GUID>c8e045a3-efc6-4f64-94af-7f1712cc100b</GUID>
+      </TagVal>
+      <Name>PostgresDDL</Name>
+      <Main>
+        <EditorGUID>cbd2a156-c6e6-4095-89e8-e697c010f044</EditorGUID>
+        <OwnerGUID>c8e045a3-efc6-4f64-94af-7f1712cc100b</OwnerGUID>
+        <Text>//**** Preprocessors ******
+#ignorecase on  // case sensitivity of string comparisons
+#safebegin = "" // begin of safe zone
+#safeend = ""   // end of safe zone
+
+//**** Define globals ******
+set MainConn = sources.Source
+set BasePath = ""
+set OutputName = "PostgresDDL.txt"
+
+call PostgresDDL
+</Text>
+      </Main>
+      <Folders />
+      <Templates>
+        <Template>
+          <Name>Template</Name>
+          <EditorGUID>27bab1c2-806c-4890-9dc6-46cde1b2b6b3</EditorGUID>
+          <OwnerGUID>c8e045a3-efc6-4f64-94af-7f1712cc100b</OwnerGUID>
+          <Text>&lt;&lt;!header; is PostgresDDL()
+    return BasePath + OutputName
+end!&gt;&gt;
+&lt;&lt;!for table tbl in MainConn!&gt;&gt;
+&lt;&lt;!"CREATE TABLE " + tbl + " ("!&gt;&gt;
+&lt;&lt;!set liInd = 1!&gt;&gt;
+&lt;&lt;!for column col in tbl!&gt;&gt;
+	&lt;&lt;!col + " "!&gt;&gt;&lt;&lt;!col.datatype!&gt;&gt;&lt;&lt;!if col.length &gt; 0!&gt;&gt;&lt;&lt;!"(" + col.length + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if not col.nullable!&gt;&gt;&lt;&lt;!" NOT NULL"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if col.hascheckvalue = True!&gt;&gt;&lt;&lt;!set liInd2 = 1!&gt;&gt;&lt;&lt;!" CHECK (" + col + " IN ("!&gt;&gt;&lt;&lt;!for string str in col.checkvalue!&gt;&gt;&lt;&lt;!if liInd2 &gt; 1!&gt;&gt;&lt;&lt;!","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!str!&gt;&gt;&lt;&lt;!set liInd2 = liInd2 + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!"))"!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.columncount!&gt;&gt;&lt;&lt;!","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set liInd = liInd + 1!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;&lt;&lt;!if tbl.pkcolumncount &gt; 0!&gt;&gt;&lt;&lt;!set indxString = ""!&gt;&gt;&lt;&lt;!set liInd = 1!&gt;&gt;
+&lt;&lt;!for pkcolumn indx in tbl!&gt;&gt;&lt;&lt;!if indx.isprimarykey!&gt;&gt;&lt;&lt;!set indxString = indxString &amp; indx!&gt;&gt;&lt;&lt;!if liInd &lt; tbl.pkcolumncount!&gt;&gt;&lt;&lt;!set indxString = indxString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set liInd = liInd + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+	&lt;&lt;!if indxString &lt;&gt; ""!&gt;&gt;&lt;&lt;!",PRIMARY KEY (" + indxString + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+	&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!for index idx in tbl!&gt;&gt;&lt;&lt;!set licol = 1!&gt;&gt;
+	&lt;&lt;!if not idx.isprimarykey!&gt;&gt;	&lt;&lt;!",CONSTRAINT " + idx.name + " UNIQUE ("!&gt;&gt;&lt;&lt;!for column col in idx!&gt;&gt;&lt;&lt;!col!&gt;&gt;&lt;&lt;!if licol &lt; idx.columncount!&gt;&gt;&lt;&lt;!","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set licol = licol + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!")"!&gt;&gt;
+	&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!set reftab = ""!&gt;&gt;
+&lt;&lt;!set reftab2 = ""!&gt;&gt;
+&lt;&lt;!set refIndx = ""!&gt;&gt;
+&lt;&lt;!for relation rel in tbl!&gt;&gt;&lt;&lt;!set reftab = rel.referencedtablename!&gt;&gt;&lt;&lt;!set astring = ""!&gt;&gt;&lt;&lt;!set referencingString = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!if reftab2 &lt;&gt; reftab!&gt;&gt;
+	&lt;&lt;!"    ,CONSTRAINT " + tbl.value + rel.referencedtablename + "_FK FOREIGN KEY ("!&gt;&gt;&lt;&lt;!for table tbl2 in MainConn!&gt;&gt;&lt;&lt;!if tbl2.value = rel.referencedtablename and refIndx = ""!&gt;&gt;&lt;&lt;!set liIndA = 1!&gt;&gt;&lt;&lt;!for idcolumn indx2 in tbl2!&gt;&gt;&lt;&lt;!if indx2.isprimarykey!&gt;&gt;&lt;&lt;!set astring = astring + indx2!&gt;&gt;&lt;&lt;!for relations rel3 in tbl!&gt;&gt;&lt;&lt;!if rel3.referencedcolumnname = indx2!&gt;&gt;&lt;&lt;!set referencingString = referencingString + rel3.referencingcolumnname!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!if liIndA &lt; rel.columncount!&gt;&gt;&lt;&lt;!set astring = astring + ","!&gt;&gt;&lt;&lt;!set referencingString = referencingString + ","!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set liIndA = liIndA + 1!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndx = "Covered"!&gt;&gt;&lt;&lt;!set reftab2 = reftab!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!set refIndx = ""!&gt;&gt;&lt;&lt;!end!&gt;&gt;&lt;&lt;!referencingString + ") REFERENCES "!&gt;&gt;&lt;&lt;!rel.referencedtablename + "(" + astring + ")"!&gt;&gt;&lt;&lt;!end!&gt;&gt;  
+&lt;&lt;!set reftab2 = reftab!&gt;&gt;
+&lt;&lt;!end!&gt;&gt;
+&lt;&lt;!");"!&gt;&gt;
+
+&lt;&lt;!end!&gt;&gt;
+</Text>
+        </Template>
+      </Templates>
+      <VBCode />
+      <CSCode />
+    </MDPackage>
+  </Packages>
+  <Bin />
+</MDProject>

@@ -38,6 +38,7 @@ Namespace FBM
         Public Shadows JoinedORMObject As New FBM.ModelObject 'WithEvents
 
         <XmlAttribute()>
+        <JsonIgnore()>
         Public Shadows ReadOnly Property TypeOfJoin As pcenumRoleJoinType
             Get
                 If Me.JoinedORMObject Is Nothing Then
@@ -91,6 +92,7 @@ RetryTypeOfJoin:
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         Public Shadows ReadOnly Property JoinsEntityType As FBM.EntityTypeInstance
             Get
                 If Me.TypeOfJoin = pcenumRoleJoinType.EntityType Then
@@ -102,6 +104,7 @@ RetryTypeOfJoin:
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         Public Shadows ReadOnly Property JoinsValueType As FBM.ValueTypeInstance
             Get
                 If Me.TypeOfJoin = pcenumRoleJoinType.ValueType Then
@@ -113,6 +116,7 @@ RetryTypeOfJoin:
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         Public Shadows ReadOnly Property JoinsFactType As FBM.FactTypeInstance
             Get
                 If Me.TypeOfJoin = pcenumRoleJoinType.FactType Then

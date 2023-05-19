@@ -53,6 +53,7 @@ Namespace FBM
 
         Public _PredicatePart As New List(Of FBM.PredicatePart)
 
+        <JsonIgnore()>
         Public Overridable Property PredicatePart() As List(Of FBM.PredicatePart)
             Get
                 Return Me._PredicatePart

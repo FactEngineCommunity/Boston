@@ -3314,17 +3314,6 @@ SkipSettingReferenceModeObjects:
 
         End Sub
 
-
-        Private Sub Concept_Updated() Handles Concept.ConceptSymbolUpdated
-
-            'VM-20180319-Commented out, because was calling SetName twice/again when the Name of the EntityType was simply changed.
-            'Me.SetName(Me.Concept.Symbol)
-
-            'VM-20180319-Dummy Code to trap the debug stoppoint, to see if removing the above affects anything
-            Dim liDummyCodeInd As Integer = 0
-
-        End Sub
-
         ''' <summary>
         ''' Sets the CompoundReferenceScheme.RoleConstraint for the EntityType.
         ''' NB Precondition: EntityType has no ReferenceMode (SimpleReferenceScheme), else throws exception.

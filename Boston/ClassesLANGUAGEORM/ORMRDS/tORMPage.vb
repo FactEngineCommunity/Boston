@@ -5,7 +5,7 @@ Namespace FBM
 
     Partial Public Class Page
 
-        <Newtonsoft.Json.JsonIgnore()>
+        <JsonIgnore()>
         <NonSerialized()>
         Public WithEvents RDSModel As New RDS.Model
 

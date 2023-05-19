@@ -74,6 +74,7 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public WithEvents _Model As FBM.Model
         <XmlIgnore()>
+        <JsonProperty()>
         Public Overridable Property Model() As FBM.Model
             Get
                 Return Me._Model
@@ -269,6 +270,7 @@ Namespace FBM
         <JsonIgnore()>
         <NonSerialized()>
         Private _ERDiagram As New ERD.Diagram
+        <JsonIgnore()>
         Public Overridable Property ERDiagram As ERD.Diagram
             Get
                 Return Me._ERDiagram
@@ -1284,7 +1286,7 @@ Namespace FBM
 
                     Select Case lrModelObject.ConceptType
                         Case Is = pcenumConceptType.EntityType
-                            Dim lrEntityType As New FBM.EntityType
+                            Dim lrEntityType As FBM.EntityType
                             lrEntityType = lrModelObject
                             '----------------------------------------------------------------------
                             'Change the Model of the EntityType to the Model of the current Page.
@@ -1293,7 +1295,7 @@ Namespace FBM
                             '----------------------------------------------------------------------
                             lrEntityType.Model = Me.Model
 
-                            If Not IsSomething(Me.EntityTypeInstance.Find(AddressOf lrEntityType.Equals)) Then
+                            If Me.EntityTypeInstance.Find(AddressOf lrEntityType.Equals) Is Nothing Then
                                 Dim lrEntityTypeInstance = Me.DropEntityTypeAtPoint(lrEntityType, loPoint)
 
                                 For Each lrSubtypeModelObject As FBM.ModelObject In lrEntityTypeInstance.EntityType.getSubtypes

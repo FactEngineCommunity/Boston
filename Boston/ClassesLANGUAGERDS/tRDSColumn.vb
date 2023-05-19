@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports System.Xml.Serialization
+Imports Newtonsoft.Json
 
 Namespace RDS
 
@@ -251,6 +252,7 @@ Namespace RDS
             End Get
         End Property
 
+        <JSONIgnore()>
         Public ReadOnly Property OutgoingRelation As List(Of RDS.Relation)
             Get
                 Dim larRelation = From Relation In Me.Relation
@@ -261,6 +263,7 @@ Namespace RDS
             End Get
         End Property
 
+        <JsonIgnore()>
         Public ReadOnly Property IncomingRelation As List(Of RDS.Relation)
             Get
                 Dim larRelation = (From Relation In Me.Relation

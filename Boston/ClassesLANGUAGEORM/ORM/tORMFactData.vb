@@ -1,6 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -34,6 +35,20 @@ Namespace FBM
         <XmlIgnore()>
         Public WithEvents Fact As FBM.Fact 'The Fact within which this RoleData represents a Value. e.g. in Fact P={a,b,c} this RoleData may represent the value, b.
         '20210413-VM-Was New FBM.Fact
+
+        <XmlIgnore()>
+        <JsonProperty()>
+        <Browsable(False),
+        [ReadOnly](True),
+        BindableAttribute(False)>
+        Public Overrides Property Concept As FBM.Concept
+            Get
+                Return Me._Concept
+            End Get
+            Set(value As FBM.Concept)
+                Me._Concept = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' The Role to which the 'Concept' (Value) is related within the Fact.
@@ -689,7 +704,7 @@ Namespace FBM
 
         'End Sub
 
-        Private Sub update_from_concept() Handles Concept.ConceptSymbolUpdated
+        Private Sub update_from_concept() Handles _Concept.ConceptSymbolUpdated
             Try
                 RaiseEvent ConceptSymbolUpdated()
                 Me.makeDirty()

@@ -26,17 +26,27 @@ Namespace FBM
             End Set
         End Property
 
-        '20220507-VM-Was. Was stopping FactData records from being deserialised.
-        '<NonSerialized()>
+
+        Public WithEvents _Concept As FBM.Concept
+
         <XmlIgnore()>
+        <JsonProperty()>
         <Browsable(False),
         [ReadOnly](True),
         BindableAttribute(False)>
-        Public WithEvents Concept As FBM.Concept  'New 'The Concept that is related to the ModelObject within the Model/ModelDictionary
+        Public Overridable Property Concept As FBM.Concept  'New 'The Concept that is related to the ModelObject within the Model/ModelDictionary
+            Get
+                Return Me._Concept
+            End Get
+            Set(value As FBM.Concept)
+                Me._Concept = value
+            End Set
+        End Property
 
+        <JsonIgnore()>
         <XmlIgnore()>
         Public _ModelError As New List(Of FBM.ModelError)
-
+        <JsonIgnore()>
         Public Overridable Property ModelError As List(Of FBM.ModelError)
             Get
                 Return _ModelError

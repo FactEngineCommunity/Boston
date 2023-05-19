@@ -168,9 +168,11 @@ Namespace FBM
         <XmlIgnore()> _
         Public SequenceNr As Integer 'The position withn the FactType/RoleGroup
 
+        <JsonIgnore()>
         Public _TypeOfJoin As pcenumRoleJoinType = pcenumRoleJoinType.None
 
         <XmlAttribute()>
+        <JsonIgnore()>
         Public ReadOnly Property TypeOfJoin As pcenumRoleJoinType
             Get
                 If Me.JoinedORMObject Is Nothing Then

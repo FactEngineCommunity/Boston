@@ -223,6 +223,7 @@ Namespace FBM
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Fact As New List(Of FBM.Fact)
+        <JsonIgnore()>
         Public Property Fact() As List(Of FBM.Fact)
             Get
                 Return Me._Fact

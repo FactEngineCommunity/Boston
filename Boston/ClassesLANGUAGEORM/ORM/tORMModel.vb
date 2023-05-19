@@ -167,6 +167,7 @@ Namespace FBM
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _EntityType As New List(Of FBM.EntityType)
+        <JsonIgnore()>
         Public Overridable Property EntityType() As List(Of FBM.EntityType)
             Get
                 Return Me._EntityType
@@ -179,6 +180,7 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ValueType As New List(Of FBM.ValueType)
         <XmlElement()>
+        <JsonIgnore()>
         Public Overridable Property ValueType() As List(Of FBM.ValueType)
             Get
                 Return Me._ValueType
@@ -198,6 +200,7 @@ Namespace FBM
         ''' NB The Clipboard requires this element to be serialised for copying and pasting orm diagram elements between Pages/Models.
         ''' </summary>
         <XmlElement>
+        <JsonIgnore()>
         Public Overridable Property FactType() As List(Of FBM.FactType)
             Get
                 Return Me._FactType
@@ -207,6 +210,7 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         Public ReadOnly Property FactTypeReading As List(Of FBM.FactTypeReading)
             Get
                 Dim larFactTypeReading = From FactType In Me.FactType.FindAll(Function(x) Not x.IsMDAModelElement)
@@ -232,6 +236,7 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Role As New List(Of FBM.Role)
         <XmlIgnore()>
+        <JsonIgnore()>
         Public Overridable Property Role() As List(Of FBM.Role)
             Get
                 Return Me._Role
@@ -244,6 +249,7 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _RoleConstraint As New List(Of FBM.RoleConstraint)
         <XmlElement>
+        <JsonIgnore()>
         Public Overridable Property RoleConstraint() As List(Of FBM.RoleConstraint)
             Get
                 Return Me._RoleConstraint
@@ -257,6 +263,7 @@ Namespace FBM
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelNote As New List(Of FBM.ModelNote)
+        <JsonIgnore()>
         Public Overridable Property ModelNote() As List(Of FBM.ModelNote)
             Get
                 Return Me._ModelNote
@@ -270,6 +277,7 @@ Namespace FBM
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ModelError As New List(Of FBM.ModelError)
+        <JsonIgnore()>
         Public Property ModelError() As List(Of FBM.ModelError)
             Get
                 Return Me._ModelError
@@ -289,6 +297,7 @@ Namespace FBM
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public WithEvents _Page As New List(Of FBM.Page)
 
+        <JsonIgnore()>
         Public Overridable Property Page() As List(Of FBM.Page)
             Get
                 Return Me._Page
@@ -313,6 +322,7 @@ Namespace FBM
         ''' <remarks></remarks>
         <NonSerialized()>
         <XmlIgnore()>
+        <JsonIgnore()>
         Public UML As New CMML.Model(Me)
 
         ''' <summary>
@@ -320,6 +330,7 @@ Namespace FBM
         ''' </summary>
         <NonSerialized()>
         <XmlIgnore()>
+        <JsonIgnore()>
         Public STM As New FBM.STM.Model(Me)
 
         Public CoreVersionNumber As String 'the version number of the Core Model injected into the Model, or the version number of the Core Model itself if Me is Core.
@@ -6560,14 +6571,33 @@ SkipModelElement: 'Because is not in the ModelDictionary
 
                 If abDontUseBLOBLoading Then GoTo XMLDeserialisation
 
+#Region "Notes on Serialisation/Deserialisation"
+                '-------------------------------------------------------------------------------
+                '20230518-VM-Notes on Serialisation/Deserialisation
+                'I've tried everything, XML (with object references), JSON (with object references), Binary Serialisation (.Net standard and others).
+                ' Binary Serialisation seems the best because it is the smallest filesize of XML, JSON and Binary, and deserialises fairly quickly.
+                ' I have tried various (non .Net standard) serialisers, and there have been a few problems:
+                '   - File Size (e.g. for XML and JSON with object references);
+                '   - Compatibility with .Net Framework v4.8 (per Boston) and where a lot of serialisers are for .Net core (these days).
+                '       A .Net Core serialiser (as in HyperSerialiser) would/could possibly be faster (even much faster) than the standard .Net Binary Serialiser,
+                '       but first we'd have to move Boston to .Net core.
+                '-------------------------------------------------------------------------------
+#End Region
+
                 If System.IO.File.Exists(lsBLOBFileLocationName) And My.Settings.DatabaseStoreModelsAsBLOBsParallelToXML Then
 #Region "BLOB Deserialisation"
                     Try
+                        '---------------------------------------------------------------------------------------------------------------
                         '20230517-VM-Having tested this...the binary file takes twice as long to load and is 300% bigger than the XML by necessity.
                         '  But, we'll keep this code just the same as it is configurable as to whether BLOBs are used at all.
-                        'loDeserializedModel = DirectCast(BinarySerialiser.DeserializeObject(lsBLOBFileLocationName), FBM.Model)
+                        '  - Newtonsoft.JSON seems like a decent serialiser. Handles Cicular References, and has Object References.
+                        '    File sizes are large and serialisation is slow compared to the  FBM XML serialisation model. But at least we know it works.
+                        '---------------------------------------------------------------------------------------------------------------
+                        'loDeserializedModel = DirectCast(BinarySerialiser.DeserializeObject(lsBLOBFileLocationName), FBM.Model)                          
                         loDeserializedModel = BinarySerialiser.Deserialize(Of FBM.Model)(lsBLOBFileLocationName)
                         loDeserializedModel.LoadedFromBLOB = True
+                        loDeserializedModel.Loaded = True
+                        loDeserializedModel.Loading = False
                         loDeserializedModel.IsDirty = False
                         Call loDeserializedModel.DefaultSetup()
                     Catch ex As Exception

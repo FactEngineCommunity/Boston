@@ -21,6 +21,7 @@ Namespace FBM
 
         Private Shadows _Data As New List(Of FBM.FactDataInstance)
         <XmlIgnore()>
+        <JsonIgnore()>
         Public Shadows Property Data As List(Of FBM.FactDataInstance)
             Get
                 Return Me._Data

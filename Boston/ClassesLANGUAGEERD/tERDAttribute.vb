@@ -152,13 +152,10 @@ Namespace ERD
         Public WithEvents Column As RDS.Column = Nothing
 
 
-        Public Property IsPartOfRelation() As Boolean
+        Public ReadOnly Property IsPartOfRelation() As Boolean
             Get
                 Return IsSomething(Me.Relation)
             End Get
-            Set(ByVal value As Boolean)
-                Throw New NotImplementedException("This property is Read Only.")
-            End Set
         End Property
 
         ''' <summary>

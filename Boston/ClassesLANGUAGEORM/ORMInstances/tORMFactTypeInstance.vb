@@ -110,10 +110,12 @@ Namespace FBM
 
         Public Shadows LinkFactTypeRole As FBM.RoleInstance
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <JsonProperty()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private Shadows _RoleGroup As New List(Of FBM.RoleInstance)
-        <XmlIgnore()> _
+        <XmlIgnore()>
+        <JsonIgnore()>
         Public Shadows Property RoleGroup() As List(Of FBM.RoleInstance)
             Get
                 Return Me._RoleGroup

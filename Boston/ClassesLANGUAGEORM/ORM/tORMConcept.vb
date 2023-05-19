@@ -1,5 +1,6 @@
 ﻿Imports System.ComponentModel
 Imports System.Xml.Serialization
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -33,6 +34,7 @@ Namespace FBM
         ''' Used for saving; to make saving much faster. Only hit the database if need to. See also Me.MakeDirtry
         ''' </summary>
         ''' <remarks></remarks>
+        <JSONIgnore()>
         Public isDirty As Boolean = True
 
         Public Sub New()
