@@ -7,9 +7,10 @@ Namespace FBM
     Public Class Concept
         Implements IEquatable(Of FBM.Concept)
 
-        <XmlIgnore()> _
-        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _Symbol As String = ""
         <XmlAttribute()> _
         <Browsable(False)> _

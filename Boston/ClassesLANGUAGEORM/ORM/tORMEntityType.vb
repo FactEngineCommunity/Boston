@@ -3,6 +3,7 @@ Imports System.Collections.Generic
 Imports System.Collections.Specialized
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports Newtonsoft.Json
 
 Namespace FBM
     <Serializable()> _
@@ -27,6 +28,7 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean = False
         <XmlAttribute()>
@@ -39,6 +41,7 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         Private _IsActor As Boolean
         Public Property IsActor As Boolean
             Get
@@ -50,6 +53,7 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ReferenceMode As String = ""
         <XmlIgnore()>
@@ -64,12 +68,13 @@ Namespace FBM
 
         <XmlIgnore()>
         Public primitive_type_entity_id As Integer = 0
+
         <XmlIgnore()>
         Public PrimativeType As String = ""
 
         <XmlIgnore()>
+        <JsonIgnore()>
         Public _ReferenceModeFactType As FBM.FactType = Nothing
-
         <XmlIgnore()>
         Public Property ReferenceModeFactType() As FBM.FactType
             Get
@@ -112,6 +117,7 @@ Namespace FBM
         Public WithEvents ReferenceModeValueType As FBM.ValueType = Nothing
 
         <XmlIgnore()>
+        <JsonIgnore()>
         Public _PreferredIdentifierRCId As String = Nothing
         <XmlIgnore()>
         Public Property PreferredIdentifierRCId() As String
@@ -124,6 +130,7 @@ Namespace FBM
         End Property
 
         <XmlElement()>
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _ReferenceModeRoleConstraint As FBM.RoleConstraint = Nothing
         <XmlIgnore()>
@@ -142,6 +149,7 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsIndependent As Boolean
         <XmlAttribute()>
@@ -158,6 +166,7 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         Public value_constraint As New StringCollection
         <XmlIgnore()>
         <CategoryAttribute("Entity Type"),
@@ -178,6 +187,7 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsPersonal As Boolean = False
         <XmlAttribute()>
@@ -193,10 +203,6 @@ Namespace FBM
             End Set
         End Property
 
-        '20200422-Removed. Keep removed if all okay.
-        '<XmlIgnore()>
-        '<DebuggerBrowsable(DebuggerBrowsableState.Never)>
-        'Public Shadows _IsAbsorbed As Boolean = False
         <XmlAttribute()>
         <CategoryAttribute("Entity Type"),
         DefaultValueAttribute(False),
@@ -211,12 +217,16 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         Public KLLetter As String  'When doing proofs in ORM, is the letter within the formal theory of KL (Knowledge Language) assigned to this EntityType
         <XmlIgnore()>
+        <JsonIgnore()>
         Public date_created As Date 'The date that the EntityType was created within Boston.
         <XmlIgnore()>
+        <JsonIgnore()>
         Public last_modified As Date 'The date on which the EntityType was last modified.
         <XmlIgnore()>
+        <JsonIgnore()>
         Public last_modified_user_id As String 'The Id of the Richmond User who last created/modified the EntityType.
 
 
@@ -247,6 +257,7 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         Public Shadows Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
                 Dim larModelError As New List(Of FBM.ModelError)
@@ -262,6 +273,7 @@ Namespace FBM
             End Set
         End Property
 
+        <JsonIgnore()>
         Public ReadOnly Property HasModelError() As Boolean Implements iValidationErrorHandler.HasModelError
             Get
                 Return Me.ModelError.Count > 0

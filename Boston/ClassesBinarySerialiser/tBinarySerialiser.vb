@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 Imports System.Reflection
 
 Public Class BinarySerialiser
@@ -42,7 +43,7 @@ Public Class BinarySerialiser
 
         Dim loJSONSerialiserSettings As New Newtonsoft.Json.JsonSerializerSettings() With {
                                                                     .PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                                                                    .ReferenceLoopHandling = ReferenceLoopHandling.Ignore, 'Serialise
+                                                                    .ReferenceLoopHandling = ReferenceLoopHandling.Serialize, 'Ignore,
                                                                     .TypeNameHandling = TypeNameHandling.All,
                                                                     .NullValueHandling = NullValueHandling.Ignore,
                                                                     .Error = Sub(sender As Object, e As Newtonsoft.Json.Serialization.ErrorEventArgs)
@@ -105,7 +106,6 @@ Public Class BinarySerialiser
     Public Shared Function Deserialize(Of T)(fileName As String) As T
 
         Try
-
             Dim loJSONSerialiserSettings As New Newtonsoft.Json.JsonSerializerSettings() With {
                                                             .PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                                                             .TypeNameHandling = TypeNameHandling.Auto,
@@ -156,3 +156,4 @@ Public Class BinarySerialiser
     End Function
 
 End Class
+

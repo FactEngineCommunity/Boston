@@ -4777,6 +4777,7 @@ SkipRDSProcessing:
                     If My.Settings.DatabaseStoreModelsAsBLOBsParallelToXML Then
                         'BinarySerialiser.SerializeObject(lsBLOBFileLocationName, Me)
                         BinarySerialiser.Serialize(Of FBM.Model)(lsBLOBFileLocationName, Me)
+                        'Notes...when using newtonsoft.json, <JSONIgnore> the Private _Field, and not the Public Property Field.
                     End If
 #End Region
 

@@ -198,6 +198,7 @@ Namespace FBM
         <XmlAttribute()>
         Public GUID As String = System.Guid.NewGuid.ToString
 
+        <JsonIgnore()>
         Public _IsAbsorbed As Boolean = False
         <XmlAttribute()>
         Public Property IsAbsorbed As Boolean
@@ -224,6 +225,7 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _IsDerived As Boolean = False
 
@@ -238,6 +240,7 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Public _DerivationText As String = ""
 

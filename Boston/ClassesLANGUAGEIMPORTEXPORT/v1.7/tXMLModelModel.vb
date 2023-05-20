@@ -1255,8 +1255,7 @@ SkipModelNote:
                         lrValueTypeInstance.Model = arModel
                         lrValueTypeInstance.Page = lrPage
                         lrValueTypeInstance.Id = lrConceptInstance.Symbol
-                        lrValueTypeInstance.ValueType.Id = lrValueTypeInstance.Id
-                        lrValueTypeInstance.ValueType = arModel.ValueType.Find(AddressOf lrValueTypeInstance.ValueType.Equals)
+                        lrValueTypeInstance.ValueType = arModel.ValueType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
                         lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
                         lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
                         lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
@@ -1363,41 +1362,46 @@ SkipEntityTypeInstance:
                     '----------------------------------------
                     Dim lrFactInstance As FBM.FactInstance
                     Dim lrFactDataInstance As FBM.FactDataInstance
-                    For Each lrFact In lrFactType.Fact
 
-                        Dim lrFactConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact)
-                        If lrFactConceptInstance IsNot Nothing Then
-                            '----------------------------------
-                            'The Fact is included on the Page
-                            '----------------------------------
-                            lrFactInstance = lrFact.CloneInstance(lrPage)
-                            lrFactInstance.X = lrFactConceptInstance.X
-                            lrFactInstance.Y = lrFactConceptInstance.Y
-                            lrFactInstance.isDirty = True
-                            For Each lrFactDataInstance In lrFactInstance.Data
-                                lrFactDataInstance.isDirty = True
-                            Next
-                            lrFactTypeInstance.Fact.Add(lrFactInstance)
-                            lrFactTypeInstance.Page.FactInstance.Add(lrFactInstance)
-                            lrFactTypeInstance.isDirty = True
+                    Dim lrXMLPage = arXMLPage
+                    Dim larFact = (From Fact In lrFactType.Fact
+                                   From ConceptInstance In lrXMLPage.ConceptInstance
+                                   Where ConceptInstance.ConceptType = pcenumConceptType.Fact
+                                   Where Fact.Id = ConceptInstance.Symbol
+                                   Select New With {.Fact = Fact, .X = ConceptInstance.X, .Y = ConceptInstance.Y}).ToList
 
-                            For Each lrFactDataInstance In lrFactInstance.Data
+                    For Each lrFactConceptInstance In larFact
 
-                                Dim lrFactDataConceptInstance As New FBM.ConceptInstance
-                                lrFactDataConceptInstance.Symbol = lrFactDataInstance.Data
-                                lrFactDataConceptInstance.RoleId = lrFactDataInstance.Role.Id
+                        'Dim lrFactConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact)
 
-                                lrFactDataConceptInstance = arXMLPage.ConceptInstance.Find(AddressOf lrFactDataConceptInstance.EqualsBySymbolRoleId)
+                        '----------------------------------
+                        'The Fact is included on the Page
+                        '----------------------------------
+                        lrFactInstance = lrFactConceptInstance.Fact.CloneInstance(lrPage)
+                        lrFactInstance.X = lrFactConceptInstance.X
+                        lrFactInstance.Y = lrFactConceptInstance.Y
+                        lrFactInstance.isDirty = True
+                        For Each lrFactDataInstance In lrFactInstance.Data
+                            lrFactDataInstance.isDirty = True
+                        Next
+                        lrFactTypeInstance.Fact.Add(lrFactInstance)
+                        lrFactTypeInstance.Page.FactInstance.Add(lrFactInstance)
+                        lrFactTypeInstance.isDirty = True
 
-                                If lrFactDataConceptInstance IsNot Nothing Then
-                                    lrFactDataInstance.X = lrFactDataConceptInstance.X
-                                    lrFactDataInstance.Y = lrFactDataConceptInstance.Y
-                                End If
-                                lrPage.ValueInstance.AddUnique(lrFactDataInstance)
-                            Next
+                        For Each lrFactDataInstance In lrFactInstance.Data
 
-                        End If
+                            Dim lrFactDataConceptInstance As New FBM.ConceptInstance
+                            lrFactDataConceptInstance.Symbol = lrFactDataInstance.Data
+                            lrFactDataConceptInstance.RoleId = lrFactDataInstance.Role.Id
 
+                            lrFactDataConceptInstance = arXMLPage.ConceptInstance.Find(AddressOf lrFactDataConceptInstance.EqualsBySymbolRoleId)
+
+                            If lrFactDataConceptInstance IsNot Nothing Then
+                                lrFactDataInstance.X = lrFactDataConceptInstance.X
+                                lrFactDataInstance.Y = lrFactDataConceptInstance.Y
+                            End If
+                            lrPage.ValueInstance.AddUnique(lrFactDataInstance)
+                        Next
                     Next
 
                     'FactTable
