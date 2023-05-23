@@ -9,7 +9,15 @@ Namespace FactEngine
 
         Public DefaultQueryLimit As Integer = 100
 
-        Public State As Integer = 0
+        Public _State As Integer = 0
+        Public Overridable Property State As Integer
+            Get
+                Return Me._State
+            End Get
+            Set(value As Integer)
+                Me._State = value
+            End Set
+        End Property
 
         Public Property ConnectionString As String
             Get

@@ -77,6 +77,17 @@ Public Class frmCRUDModel
                 End If
             End If
 
+            '===Model Settings - From ReferenceFieldTable/Value=======================================================================
+            'UseNeo4jStyleEdgeLabels
+            Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+            Dim larExpandoFields() As Object = {}
+            larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.zrModel.ModelId})
+            larExpandoFields.Add(New With {.FieldName = "SettingName", .Value = "UseNeo4jStyleEdgeLabels"})
+            Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loTransformation,, larExpandoFields)
+
+            Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked = larTransformationTuples(0).Setting
+
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -186,10 +197,10 @@ Public Class frmCRUDModel
                     End If
                 Next
             Else
-                Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLite.ToString)
-                Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.MSJet.ToString)
-                Me.ComboBoxDatabaseType.Items.Add(pcenumDatabaseType.SQLServer.ToString)
-
+                Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.SQLite, pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.None))
+                Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.MSJet, pcenumDatabaseType.MSJet.ToString, pcenumDatabaseType.None))
+                Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.SQLServer, pcenumDatabaseType.SQLServer.ToString, pcenumDatabaseType.None))
+                Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.Neo4j, pcenumDatabaseType.Neo4j.ToString, pcenumDatabaseType.None))
                 Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(Me.zrModel.TargetDatabaseType.ToString)
             End If
 

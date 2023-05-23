@@ -21,6 +21,15 @@ Namespace FactEngine
             End Set
         End Property
 
+        Public Overrides Property State As Integer
+            Get
+                Return Me.Connection.State
+            End Get
+            Set(value As Integer)
+                Me._State = value
+            End Set
+        End Property
+
         Public Sub New(ByRef arFBMModel As FBM.Model, ByVal asDatabaseConnectionString As String)
             Me.FBMModel = arFBMModel
             Me.DatabaseConnectionString = asDatabaseConnectionString

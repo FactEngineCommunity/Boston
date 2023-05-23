@@ -54,6 +54,11 @@ Partial Class frmCRUDModel
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.Tab1 = New System.Windows.Forms.TabPage()
         Me.Advanced = New System.Windows.Forms.TabPage()
+        Me.GroupBoxClientServer = New System.Windows.Forms.GroupBox()
+        Me.LabelNamespace = New System.Windows.Forms.Label()
+        Me.LabelPromptNamespace = New System.Windows.Forms.Label()
+        Me.LabelProject = New System.Windows.Forms.Label()
+        Me.LabelPromptProject = New System.Windows.Forms.Label()
         Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
         Me.LabelModelId = New System.Windows.Forms.Label()
         Me.ButtonReplaceDatabaseModel = New System.Windows.Forms.Button()
@@ -77,11 +82,8 @@ Partial Class frmCRUDModel
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.GroupBoxClientServer = New System.Windows.Forms.GroupBox()
-        Me.LabelPromptProject = New System.Windows.Forms.Label()
-        Me.LabelProject = New System.Windows.Forms.Label()
-        Me.LabelNamespace = New System.Windows.Forms.Label()
-        Me.LabelPromptNamespace = New System.Windows.Forms.Label()
+        Me.GraphModeling = New System.Windows.Forms.TabPage()
+        Me.CheckBoxUseNeo4jStyleEdgeLabels = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -90,10 +92,11 @@ Partial Class frmCRUDModel
         Me.TabControl1.SuspendLayout()
         Me.Tab1.SuspendLayout()
         Me.Advanced.SuspendLayout()
+        Me.GroupBoxClientServer.SuspendLayout()
         Me.TabPageReverseEngineering.SuspendLayout()
         Me.TabPageConnection.SuspendLayout()
         Me.GroupBoxConnection.SuspendLayout()
-        Me.GroupBoxClientServer.SuspendLayout()
+        Me.GraphModeling.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -123,7 +126,7 @@ Partial Class frmCRUDModel
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDatabase)
         Me.GroupBox_main.Location = New System.Drawing.Point(12, 14)
         Me.GroupBox_main.Name = "GroupBox_main"
-        Me.GroupBox_main.Size = New System.Drawing.Size(595, 329)
+        Me.GroupBox_main.Size = New System.Drawing.Size(595, 345)
         Me.GroupBox_main.TabIndex = 6
         Me.GroupBox_main.TabStop = False
         '
@@ -384,6 +387,7 @@ Partial Class frmCRUDModel
         Me.TabControl1.Controls.Add(Me.Advanced)
         Me.TabControl1.Controls.Add(Me.TabPageReverseEngineering)
         Me.TabControl1.Controls.Add(Me.TabPageConnection)
+        Me.TabControl1.Controls.Add(Me.GraphModeling)
         Me.TabControl1.Location = New System.Drawing.Point(8, 8)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(2)
         Me.TabControl1.Name = "TabControl1"
@@ -420,6 +424,57 @@ Partial Class frmCRUDModel
         Me.Advanced.TabIndex = 1
         Me.Advanced.Text = "Advanced"
         Me.Advanced.UseVisualStyleBackColor = True
+        '
+        'GroupBoxClientServer
+        '
+        Me.GroupBoxClientServer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxClientServer.Controls.Add(Me.LabelNamespace)
+        Me.GroupBoxClientServer.Controls.Add(Me.LabelPromptNamespace)
+        Me.GroupBoxClientServer.Controls.Add(Me.LabelProject)
+        Me.GroupBoxClientServer.Controls.Add(Me.LabelPromptProject)
+        Me.GroupBoxClientServer.Location = New System.Drawing.Point(13, 163)
+        Me.GroupBoxClientServer.Name = "GroupBoxClientServer"
+        Me.GroupBoxClientServer.Size = New System.Drawing.Size(600, 68)
+        Me.GroupBoxClientServer.TabIndex = 13
+        Me.GroupBoxClientServer.TabStop = False
+        Me.GroupBoxClientServer.Text = "Client/Server"
+        '
+        'LabelNamespace
+        '
+        Me.LabelNamespace.AutoSize = True
+        Me.LabelNamespace.Location = New System.Drawing.Point(90, 42)
+        Me.LabelNamespace.Name = "LabelNamespace"
+        Me.LabelNamespace.Size = New System.Drawing.Size(27, 13)
+        Me.LabelNamespace.TabIndex = 3
+        Me.LabelNamespace.Text = "N/A"
+        '
+        'LabelPromptNamespace
+        '
+        Me.LabelPromptNamespace.AutoSize = True
+        Me.LabelPromptNamespace.Location = New System.Drawing.Point(16, 42)
+        Me.LabelPromptNamespace.Name = "LabelPromptNamespace"
+        Me.LabelPromptNamespace.Size = New System.Drawing.Size(67, 13)
+        Me.LabelPromptNamespace.TabIndex = 2
+        Me.LabelPromptNamespace.Text = "Namespace:"
+        '
+        'LabelProject
+        '
+        Me.LabelProject.AutoSize = True
+        Me.LabelProject.Location = New System.Drawing.Point(90, 26)
+        Me.LabelProject.Name = "LabelProject"
+        Me.LabelProject.Size = New System.Drawing.Size(27, 13)
+        Me.LabelProject.TabIndex = 1
+        Me.LabelProject.Text = "N/A"
+        '
+        'LabelPromptProject
+        '
+        Me.LabelPromptProject.AutoSize = True
+        Me.LabelPromptProject.Location = New System.Drawing.Point(16, 26)
+        Me.LabelPromptProject.Name = "LabelPromptProject"
+        Me.LabelPromptProject.Size = New System.Drawing.Size(43, 13)
+        Me.LabelPromptProject.TabIndex = 0
+        Me.LabelPromptProject.Text = "Project:"
         '
         'ButtonCopyModelIdToClipboard
         '
@@ -634,56 +689,25 @@ Partial Class frmCRUDModel
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
-        'GroupBoxClientServer
+        'GraphModeling
         '
-        Me.GroupBoxClientServer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBoxClientServer.Controls.Add(Me.LabelNamespace)
-        Me.GroupBoxClientServer.Controls.Add(Me.LabelPromptNamespace)
-        Me.GroupBoxClientServer.Controls.Add(Me.LabelProject)
-        Me.GroupBoxClientServer.Controls.Add(Me.LabelPromptProject)
-        Me.GroupBoxClientServer.Location = New System.Drawing.Point(13, 163)
-        Me.GroupBoxClientServer.Name = "GroupBoxClientServer"
-        Me.GroupBoxClientServer.Size = New System.Drawing.Size(600, 68)
-        Me.GroupBoxClientServer.TabIndex = 13
-        Me.GroupBoxClientServer.TabStop = False
-        Me.GroupBoxClientServer.Text = "Client/Server"
+        Me.GraphModeling.Controls.Add(Me.CheckBoxUseNeo4jStyleEdgeLabels)
+        Me.GraphModeling.Location = New System.Drawing.Point(4, 22)
+        Me.GraphModeling.Name = "GraphModeling"
+        Me.GraphModeling.Size = New System.Drawing.Size(621, 498)
+        Me.GraphModeling.TabIndex = 4
+        Me.GraphModeling.Text = "Graph Modeling"
+        Me.GraphModeling.UseVisualStyleBackColor = True
         '
-        'LabelPromptProject
+        'CheckBoxUseNeo4jStyleEdgeLabels
         '
-        Me.LabelPromptProject.AutoSize = True
-        Me.LabelPromptProject.Location = New System.Drawing.Point(16, 26)
-        Me.LabelPromptProject.Name = "LabelPromptProject"
-        Me.LabelPromptProject.Size = New System.Drawing.Size(43, 13)
-        Me.LabelPromptProject.TabIndex = 0
-        Me.LabelPromptProject.Text = "Project:"
-        '
-        'LabelProject
-        '
-        Me.LabelProject.AutoSize = True
-        Me.LabelProject.Location = New System.Drawing.Point(90, 26)
-        Me.LabelProject.Name = "LabelProject"
-        Me.LabelProject.Size = New System.Drawing.Size(27, 13)
-        Me.LabelProject.TabIndex = 1
-        Me.LabelProject.Text = "N/A"
-        '
-        'LabelNamespace
-        '
-        Me.LabelNamespace.AutoSize = True
-        Me.LabelNamespace.Location = New System.Drawing.Point(90, 42)
-        Me.LabelNamespace.Name = "LabelNamespace"
-        Me.LabelNamespace.Size = New System.Drawing.Size(27, 13)
-        Me.LabelNamespace.TabIndex = 3
-        Me.LabelNamespace.Text = "N/A"
-        '
-        'LabelPromptNamespace
-        '
-        Me.LabelPromptNamespace.AutoSize = True
-        Me.LabelPromptNamespace.Location = New System.Drawing.Point(16, 42)
-        Me.LabelPromptNamespace.Name = "LabelPromptNamespace"
-        Me.LabelPromptNamespace.Size = New System.Drawing.Size(67, 13)
-        Me.LabelPromptNamespace.TabIndex = 2
-        Me.LabelPromptNamespace.Text = "Namespace:"
+        Me.CheckBoxUseNeo4jStyleEdgeLabels.AutoSize = True
+        Me.CheckBoxUseNeo4jStyleEdgeLabels.Location = New System.Drawing.Point(20, 15)
+        Me.CheckBoxUseNeo4jStyleEdgeLabels.Name = "CheckBoxUseNeo4jStyleEdgeLabels"
+        Me.CheckBoxUseNeo4jStyleEdgeLabels.Size = New System.Drawing.Size(164, 17)
+        Me.CheckBoxUseNeo4jStyleEdgeLabels.TabIndex = 0
+        Me.CheckBoxUseNeo4jStyleEdgeLabels.Text = "Use Neo4j Style Edge Labels"
+        Me.CheckBoxUseNeo4jStyleEdgeLabels.UseVisualStyleBackColor = True
         '
         'frmCRUDModel
         '
@@ -711,12 +735,14 @@ Partial Class frmCRUDModel
         Me.Tab1.ResumeLayout(False)
         Me.Advanced.ResumeLayout(False)
         Me.Advanced.PerformLayout()
+        Me.GroupBoxClientServer.ResumeLayout(False)
+        Me.GroupBoxClientServer.PerformLayout()
         Me.TabPageReverseEngineering.ResumeLayout(False)
         Me.TabPageConnection.ResumeLayout(False)
         Me.GroupBoxConnection.ResumeLayout(False)
         Me.GroupBoxConnection.PerformLayout()
-        Me.GroupBoxClientServer.ResumeLayout(False)
-        Me.GroupBoxClientServer.PerformLayout()
+        Me.GraphModeling.ResumeLayout(False)
+        Me.GraphModeling.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -779,4 +805,6 @@ Partial Class frmCRUDModel
     Friend WithEvents LabelPromptNamespace As Label
     Friend WithEvents LabelProject As Label
     Friend WithEvents LabelPromptProject As Label
+    Friend WithEvents GraphModeling As TabPage
+    Friend WithEvents CheckBoxUseNeo4jStyleEdgeLabels As CheckBox
 End Class

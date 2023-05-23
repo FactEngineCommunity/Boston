@@ -47,7 +47,7 @@ Public Class frmCRUDEditReferenceTable
         Dim liInd As Integer = 0
         Dim lo_reference_table As ReferenceTable
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Try
             lREcordset.ActiveConnection = pdbConnection

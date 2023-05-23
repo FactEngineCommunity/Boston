@@ -1,5 +1,6 @@
 Imports DynamicClassLibrary.Factory
 Imports System.Reflection
+Imports System.Dynamic
 
 Namespace TableReferenceFieldValue
 
@@ -171,7 +172,8 @@ Namespace TableReferenceFieldValue
         ''' <remarks></remarks>
         Function GetReferenceFieldValueTuples(ByVal aiReferenceTableId As Integer,
                                               ByRef aoWorkingClass As Object,
-                                              Optional ByRef arReferenceTable As ReferenceTable = Nothing) As List(Of Object)
+                                              Optional ByRef arReferenceTable As ReferenceTable = Nothing,
+                                              Optional aarExpandoFieldValue As Object() = Nothing) As List(Of Object)
 
             Dim liInd As Integer = 0
             Dim loField As New Object
@@ -191,7 +193,7 @@ Namespace TableReferenceFieldValue
 
                 If arReferenceTable IsNot Nothing Then
                     arReferenceTable.ReferenceTuple.Clear()
-                    arReferenceTable.Name = TableReferenceTable.getReferenceTableNameById(aiReferenceTableId)
+                    arReferenceTable.Name = TableReferenceTable.GetReferenceTableNameById(aiReferenceTableId)
                 End If
 
                 laaReferenceFieldList = GetReferenceFieldListByReferenceTableId(aiReferenceTableId)
@@ -217,7 +219,7 @@ Namespace TableReferenceFieldValue
 
                 lsSQLQuery = "SELECT rfv1.row_id AS RowId,"
                 For liInd = 1 To liFieldCount
-                    lsSQLQuery &= "rfv" & Trim(CStr(liInd)) & ".data AS [Data]"
+                    lsSQLQuery &= "rfv" & Trim(CStr(liInd)) & ".data AS " & laaReferenceFieldList(liInd - 1) '"[Data" & "]"
                     If liInd < liFieldCount Then
                         lsSQLQuery &= ","
                     End If
@@ -239,6 +241,19 @@ Namespace TableReferenceFieldValue
                     lsSQLQuery &= "rfv" & Trim(CStr(liInd)) & ".reference_table_id = " & aiReferenceTableId
                     lsSQLQuery &= " AND rfv" & Trim(CStr(liInd)) & ".reference_field_id = " & liInd
                     lsSQLQuery &= " AND rfv" & Trim(CStr(liInd)) & ".row_id = rfv1.row_id"
+#Region "Field/Value to test"
+                    If aarExpandoFieldValue IsNot Nothing Then
+                        Try
+                            For Each loExpandoField As Object In aarExpandoFieldValue
+                                If laaReferenceFieldList(liInd - 1) = loExpandoField.FieldName Then
+                                    lsSQLQuery &= " AND rfv" & Trim(CStr(liInd)) & ".Data = '" & loExpandoField.Value & "'"
+                                End If
+                            Next
+                        Catch ex As Exception
+                            'Not a biggie
+                        End Try
+                    End If
+#End Region
                     If liInd < liFieldCount Then
                         lsSQLQuery &= " AND "
                     End If
@@ -271,6 +286,7 @@ Namespace TableReferenceFieldValue
 
                 While Not lREcordset.EOF
                     loTupleObject = loTuple.clone
+
                     '-------------------
                     'Set the values
                     '-------------------
@@ -285,7 +301,9 @@ Namespace TableReferenceFieldValue
                                 '  ORACLE database, RowId, for unique tuples etc.
                                 '------------------------------------------------------------
                                 loTupleObject.row_id = lREcordset("RowId").Value
+                                lrReferenceTuple.RowId = loTupleObject.row_id
                             Case Else
+
                                 Dim pro As System.Reflection.PropertyInfo
                                 pro = loTupleObject.GetType.GetProperty(laaReferenceFieldList(liInd - 1))
                                 Try
