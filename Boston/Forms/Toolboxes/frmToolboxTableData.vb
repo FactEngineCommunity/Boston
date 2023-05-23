@@ -38,11 +38,33 @@ Public Class frmToolboxTableData
             Else
                 If Me.mrTable IsNot Nothing Then
 
+                    Dim larColumn As New List(Of RDS.Column) 'Needed if a virtual table is needed for a Neo4j/Graph Edge Type;
+
                     Select Case Me.mrModel.TargetDatabaseType
                         Case Is = pcenumDatabaseType.Neo4j
-                            lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
-                            Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
-                            lsSQLQuery &= "RETURN " & lsColumnList & ";"
+                            If Me.mrTable.isPGSRelation Then
+                                Dim larRelation = mrTable.getRelations
+                                If larRelation.Count > 2 Then
+                                Else
+                                    'Example:
+                                    'MATCH (person:Person)-[:DRIVES]->(carType:CarType)
+                                    'Return ID(person) As personId, person.FirstName As firstName, person.LastName As lastName, ID(carType) As carTypeId, carType.CarTypeName As carTypeName
+                                    lsSQLQuery = "MATCH "
+                                    lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")"
+                                    lsSQLQuery &= "-[:" & Me.mrTable.DBName & "]-"
+                                    lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
+                                    lsSQLQuery &= "RETURN "
+                                    Dim lsColumnList As String = String.Join(" + ' ' + ", larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(0).DestinationTable.Name) & "." & x.Name))
+                                    lsColumnList &= ", " & String.Join(" + ' ' + ", larRelation(1).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(1).DestinationTable.Name) & "." & x.Name))
+                                    larColumn.AddRange(larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Clone(Nothing, Nothing)).ToList())
+                                    larColumn.AddRange(larRelation(1).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Clone(Nothing, Nothing)).ToList())
+                                    lsSQLQuery &= lsColumnList & vbCrLf & "LIMIT 100;"
+                                End If
+                            Else
+                                lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
+                                Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
+                                lsSQLQuery &= "RETURN " & lsColumnList & ";"
+                            End If
                         Case Is = pcenumDatabaseType.TypeDB
                             lsSQLQuery = "match $table isa " & mrTable.DatabaseName
                             For Each lrColumn In Me.mrTable.Column
@@ -57,7 +79,7 @@ Public Class frmToolboxTableData
                             lsSQLQuery &= " LIMIT 100"
                     End Select
 
-                    Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery)
+                    Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery,, larColumn)
 
                 ElseIf Me.mrFactType IsNot Nothing Then
 
@@ -136,13 +158,24 @@ Public Class frmToolboxTableData
 
     End Sub
 
-    Private Sub PopulateDataGridFromDatabaseQuery(ByVal asDatabaseQuery As String, Optional arTable As RDS.Table = Nothing)
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="asDatabaseQuery"></param>
+    ''' <param name="arTable"></param>
+    ''' <param name="aarColumn">If for an Edge Type a virtual table needs to be created, with Unique Identifiers (e.g. FirstName + ' ' + LastName) rather than the Many-2-Many Foreign Key reference Ids.</param>
+    Private Sub PopulateDataGridFromDatabaseQuery(ByVal asDatabaseQuery As String,
+                                                  Optional arTable As RDS.Table = Nothing,
+                                                  Optional aarColumn As List(Of RDS.Column) = Nothing)
 
         Try
             Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(asDatabaseQuery)
 
-            Dim lrTable As RDS.Table = Me.mrTable
-            If arTable IsNot Nothing Then
+            Dim lrTable As RDS.Table
+            If arTable Is Nothing And aarColumn IsNot Nothing Then
+                lrTable = New RDS.Table(Me.mrModel.RDS, "DummyEdgeTable", Nothing)
+                lrTable.Column = aarColumn
+            Else
                 lrTable = arTable
             End If
 
@@ -721,43 +754,117 @@ Public Class frmToolboxTableData
         Try
             If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
             Else
+                Dim larColumn As List(Of RDS.Column) = Nothing
+
                 If Me.mrTable Is Nothing Then
                 Else
+
                     Select Case Me.mrModel.TargetDatabaseType
                         Case Is = pcenumDatabaseType.Neo4j
-                            lsSQLQuery = "MATCH (" & LCase(mrTable.Name) & ":" & mrTable.DatabaseName & ")" & vbCrLf
 
-                            For liInd = 0 To Me.mrTable.Column.Count - 1
-                                For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
-                                    If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
-                                        Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
-                                    End If
+                            If Me.mrTable.isPGSRelation Then
+                                '=======================================================================================
+                                'Example
+                                'MATCH(person: Person)
+                                'WHERE person.FirstName = {firstName} And person.LastName = {lastName}
+                                'With person
+                                'MATCH(carType: CarType)
+                                'WHERE carType.CarTypeName = {carTypeName}
+                                'MATCH (person:Person)-[:DRIVES]->(carType:CarType)
+                                'Return ID(person) As personId, person.FirstName As firstName, person.LastName As lastName, ID(carType) As carTypeId, carType.CarTypeName As carTypeName
+
+                                'Later we'll use this for CREATE as well.
+                                'CREATE(person)-[:DRIVES]->(carType)
+                                '=====================================================================================
+                                Dim larRelation = mrTable.getRelations
+
+
+                                lsSQLQuery = "MATCH "
+                                lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")" & vbCrLf
+                                lsSQLQuery &= "MATCH "
+                                lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
+
+                                '================WHERE===================
+                                For liInd = 0 To Me.mrDataGridList.mrTable.Column.Count - 1
+                                    For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+                                        If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
+                                            Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                                        End If
+                                    Next
                                 Next
-                            Next
 
-                            Dim lsFilterString As String = Me.AdvancedDataGridView.FilterString
+                                Dim lsFilterString As String = Me.AdvancedDataGridView.FilterString
 
-                            For Each lrColumn In Me.mrTable.Column
-                                lsFilterString = lsFilterString.Replace("[" & lrColumn.Name & "]", LCase(Me.mrTable.Name) & "." & lrColumn.Name)
-                            Next
+                                For Each lrColumn In Me.mrDataGridList.mrTable.Column
+                                    lsFilterString = lsFilterString.Replace("[" & lrColumn.Name & "]", LCase(lrColumn.Table.Name) & "." & lrColumn.Name)
+                                Next
 
-                            'lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
-                            lsFilterString = lsFilterString.Replace("(", "[").Replace(")", "]")
-                            lsFilterString = lsFilterString.Replace("%", ".*")
-                            lsFilterString = lsFilterString.Replace("LIKE", "=~")
-                            Try
-                                lsFilterString = lsFilterString.Substring(1, lsFilterString.Length - 2)
-                            Catch ex As Exception
-                                'Not a biggie at this stage.
-                            End Try
+                                'lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+                                lsFilterString = lsFilterString.Replace("(", "[").Replace(")", "]")
+                                lsFilterString = lsFilterString.Replace("%", ".*")
+                                lsFilterString = lsFilterString.Replace("LIKE", "=~")
+                                Try
+                                    lsFilterString = lsFilterString.Substring(1, lsFilterString.Length - 2)
+                                Catch ex As Exception
+                                    'Not a biggie at this stage.
+                                End Try
 
-                            'WHERE Clause                    
-                            If Trim(lsFilterString) <> "" Then
-                                lsSQLQuery &= " WHERE " & lsFilterString
+                                'WHERE Clause                    
+                                If Trim(lsFilterString) <> "" Then
+                                    lsSQLQuery &= " WHERE " & lsFilterString
+                                End If
+                                '========================================
+
+                                lsSQLQuery.AppendLine("MATCH ")
+                                lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")"
+                                lsSQLQuery &= "-[:" & Me.mrTable.DBName & "]-"
+                                lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
+                                lsSQLQuery.AppendLine("RETURN ")
+                                Dim lsColumnList As String = String.Join(" + ' ' + ", larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(0).DestinationTable.Name) & "." & x.Name))
+                                lsColumnList &= ", " & String.Join(" + ' ' + ", larRelation(1).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(1).DestinationTable.Name) & "." & x.Name))
+                                larColumn = New List(Of RDS.Column)
+                                larColumn.AddRange(larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Clone(Nothing, Nothing)).ToList())
+                                larColumn.AddRange(larRelation(1).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Clone(Nothing, Nothing)).ToList())
+                                lsSQLQuery &= lsColumnList & ";"
+
+
+                            Else
+                                'Normal Table/NodeType
+
+                                lsSQLQuery = "MATCH (" & LCase(mrTable.Name) & ":" & mrTable.DatabaseName & ")" & vbCrLf
+
+                                For liInd = 0 To Me.mrTable.Column.Count - 1
+                                    For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+                                        If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
+                                            Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                                        End If
+                                    Next
+                                Next
+
+                                Dim lsFilterString As String = Me.AdvancedDataGridView.FilterString
+
+                                For Each lrColumn In Me.mrTable.Column
+                                    lsFilterString = lsFilterString.Replace("[" & lrColumn.Name & "]", LCase(Me.mrTable.Name) & "." & lrColumn.Name)
+                                Next
+
+                                'lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+                                lsFilterString = lsFilterString.Replace("(", "[").Replace(")", "]")
+                                lsFilterString = lsFilterString.Replace("%", ".*")
+                                lsFilterString = lsFilterString.Replace("LIKE", "=~")
+                                Try
+                                    lsFilterString = lsFilterString.Substring(1, lsFilterString.Length - 2)
+                                Catch ex As Exception
+                                    'Not a biggie at this stage.
+                                End Try
+
+                                'WHERE Clause                    
+                                If Trim(lsFilterString) <> "" Then
+                                    lsSQLQuery &= " WHERE " & lsFilterString
+                                End If
+                                Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
+                                lsSQLQuery &= vbCrLf & "RETURN " & lsColumnList
+                                lsSQLQuery &= vbCrLf & " LIMIT 100"
                             End If
-                            Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
-                            lsSQLQuery &= vbCrLf & "RETURN " & lsColumnList
-                            lsSQLQuery &= vbCrLf & " LIMIT 100"
 
                         Case Is = pcenumDatabaseType.SQLite,
                                   pcenumDatabaseType.SQLServer,
@@ -797,11 +904,13 @@ Public Class frmToolboxTableData
 #End Region
                     End Select
 
-                    Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsSQLQuery)
 
-                    Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+                    If Me.mrTable.isPGSRelation Then
+                        Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery,, larColumn)
+                    Else
+                        Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Me.mrTable)
+                    End If
 
-                    Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
                 End If
             End If
 

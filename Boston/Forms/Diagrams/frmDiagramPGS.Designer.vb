@@ -46,6 +46,7 @@ Partial Class frmDiagramPGS
         Me.ConvertToFactTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemViewNodeTableData = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemNodeTypeShowInModelDictionary = New System.Windows.Forms.ToolStripMenuItem()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.HiddenDiagram = New MindFusion.Diagramming.Diagram()
         Me.MorphTimer = New System.Windows.Forms.Timer(Me.components)
@@ -112,7 +113,6 @@ Partial Class frmDiagramPGS
         Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.ToolStripMenuItemNodeTypeShowInModelDictionary = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Node.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -124,7 +124,7 @@ Partial Class frmDiagramPGS
         '
         Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator15, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem1, Me.ToolStripSeparator17, Me.RenameToolStripMenuItem, Me.ToolStripSeparator12, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.DisplayAsEdgeTypeToolStripMenuItem, Me.ToolStripSeparator18, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator11, Me.ToolStripMenuItemViewNodeTableData, Me.ToolStripMenuItemNodeTypeShowInModelDictionary, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Node.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(211, 338)
+        Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(211, 316)
         '
         'MorphToToolStripMenuItem
         '
@@ -253,6 +253,13 @@ Partial Class frmDiagramPGS
         Me.ToolStripMenuItemViewNodeTableData.Name = "ToolStripMenuItemViewNodeTableData"
         Me.ToolStripMenuItemViewNodeTableData.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemViewNodeTableData.Text = "View &Node Data"
+        '
+        'ToolStripMenuItemNodeTypeShowInModelDictionary
+        '
+        Me.ToolStripMenuItemNodeTypeShowInModelDictionary.Image = Global.Boston.My.Resources.Resources.dictionary16x16
+        Me.ToolStripMenuItemNodeTypeShowInModelDictionary.Name = "ToolStripMenuItemNodeTypeShowInModelDictionary"
+        Me.ToolStripMenuItemNodeTypeShowInModelDictionary.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemNodeTypeShowInModelDictionary.Text = "Show in Model &Dictionary"
         '
         'PropertiesToolStripMenuItem1
         '
@@ -504,7 +511,7 @@ Partial Class frmDiagramPGS
         '
         Me.ContextMenuStrip_Relation.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem1, Me.ToolStripSeparator8, Me.ToolStripMenuItemLinkViewReadingEditor, Me.ViewVerbalisationToolStripMenuItem, Me.ToolStripSeparator10, Me.ToolStripMenuItem2, Me.ToolStripMenuItem1, Me.ToolStripSeparator13, Me.DisplayAsNodeToolStripMenuItem, Me.MakeManytoManyRelationshipToolStripMenuItem, Me.ToolStripSeparator14, Me.ToolStripMenuItemRelationRemoveFromPage, Me.RemoveFromPageAndModelToolStripMenuItem, Me.ToolStripSeparator19, Me.ToolStripMenuItemViewEdgeTableData, Me.ToolStripMenuItem3})
         Me.ContextMenuStrip_Relation.Name = "ContextMenuStrip_Relation"
-        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 276)
+        Me.ContextMenuStrip_Relation.Size = New System.Drawing.Size(256, 298)
         '
         'MorphToToolStripMenuItem1
         '
@@ -614,7 +621,6 @@ Partial Class frmDiagramPGS
         '
         'ToolStripMenuItemViewEdgeTableData
         '
-        Me.ToolStripMenuItemViewEdgeTableData.Enabled = False
         Me.ToolStripMenuItemViewEdgeTableData.Image = Global.Boston.My.Resources.Resources.Table
         Me.ToolStripMenuItemViewEdgeTableData.Name = "ToolStripMenuItemViewEdgeTableData"
         Me.ToolStripMenuItemViewEdgeTableData.Size = New System.Drawing.Size(255, 22)
@@ -738,13 +744,6 @@ Partial Class frmDiagramPGS
         Me.HiddenDiagramView.Size = New System.Drawing.Size(938, 524)
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'ToolStripMenuItemNodeTypeShowInModelDictionary
-        '
-        Me.ToolStripMenuItemNodeTypeShowInModelDictionary.Image = Global.Boston.My.Resources.Resources.dictionary16x16
-        Me.ToolStripMenuItemNodeTypeShowInModelDictionary.Name = "ToolStripMenuItemNodeTypeShowInModelDictionary"
-        Me.ToolStripMenuItemNodeTypeShowInModelDictionary.Size = New System.Drawing.Size(210, 22)
-        Me.ToolStripMenuItemNodeTypeShowInModelDictionary.Text = "Show in Model &Dictionary"
         '
         'frmDiagramPGS
         '

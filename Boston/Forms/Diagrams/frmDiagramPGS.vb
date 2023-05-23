@@ -5184,7 +5184,7 @@ EndProcessing:
                 lrPGSRelation = Me.zrPage.SelectedObject(0)
             Catch ex As Exception
                 lsMessage = "Oops. Something went wrong. Click on the canvas then the Edge Type again."
-                MsgBox(lsMessage)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
                 Exit Sub
             End Try
 
