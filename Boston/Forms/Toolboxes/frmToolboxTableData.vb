@@ -275,33 +275,73 @@ Public Class frmToolboxTableData
 #End Region
                     Case Is = pcenumDatabaseType.Neo4j
 #Region "Cypher"
-                        lsSQLQuery = "CREATE (" & LCase(Me.mrTable.Name) & ":" & Me.mrTable.Name & " {"
+                        If Me.mrTable.isPGSRelation Then
 
-                        liInd = 0
-                        For Each lrColumn In Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not x.isPartOfPrimaryKey)
-                            If liInd > 0 Then lsSQLQuery &= ","
-                            lsSQLQuery &= lrColumn.Name & ":"
-                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
-                            Select Case lrColumn.getMetamodelDataType
-                                Case Is = pcenumORMDataType.TemporalDate,
+                            '=======================================================================================
+                            'Example
+                            'MATCH(person: Person)
+                            'WHERE person.FirstName = {firstName} And person.LastName = {lastName}
+                            'With person
+                            'MATCH(carType: CarType)
+                            'WHERE carType.CarTypeName = {carTypeName}
+                            'MATCH (person:Person)-[:DRIVES]->(carType:CarType)
+                            'Return ID(person) As personId, person.FirstName As firstName, person.LastName As lastName, ID(carType) As carTypeId, carType.CarTypeName As carTypeName
+
+                            'Later we'll use this for CREATE as well.
+                            'CREATE(person)-[:DRIVES]->(carType)
+                            '=====================================================================================
+                            Dim larRelation = mrTable.getRelations
+
+                            lsSQLQuery = "MATCH "
+                            lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")" & vbCrLf
+                            lsSQLQuery &= "MATCH "
+                            lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
+
+                            '================WHERE===================                                      
+                            lsSQLQuery.AppendLine(" WHERE ")
+                            liInd = 0
+                            For Each lrColumn In Me.mrDataGridList.mrTable.Column
+                                If liInd > 0 Then lsSQLQuery.AppendLine("AND ")
+                                lsSQLQuery &= LCase(lrColumn.Table.Name) & "." & lrColumn.Name & " = "
+                                lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType)
+                                lsSQLQuery &= lrFact.Data(liInd).Data
+                                lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType)
+                                liInd += 1
+                            Next
+
+                            '==CREATE======================================
+                            lsSQLQuery.AppendLine("CREATE (")
+                            lsSQLQuery &= LCase(larRelation(0).DestinationTable.Name) & ")-[:" & Me.mrTable.DBName & "]->(" & LCase(larRelation(1).DestinationTable.Name) & ")"
+
+                        Else
+                            lsSQLQuery = "CREATE (" & LCase(Me.mrTable.Name) & ":" & Me.mrTable.Name & " {"
+
+                            liInd = 0
+                            For Each lrColumn In Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not x.isPartOfPrimaryKey)
+                                If liInd > 0 Then lsSQLQuery &= ","
+                                lsSQLQuery &= lrColumn.Name & ":"
+                                lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                                Select Case lrColumn.getMetamodelDataType
+                                    Case Is = pcenumORMDataType.TemporalDate,
                                   pcenumORMDataType.TemporalDateAndTime
-                                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
-                                Case Else
-                                    lsSQLQuery &= lrFact.Data(liInd).Data
-                            End Select
+                                        lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
+                                    Case Else
+                                        lsSQLQuery &= lrFact.Data(liInd).Data
+                                End Select
 
-                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
-                            liInd += 1
-                        Next
+                                lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                                liInd += 1
+                            Next
 
-                        lsSQLQuery &= "})"
+                            lsSQLQuery &= "})"
+                        End If
 #End Region
                     Case Else
                         lsMessage = "Cannot create records for the database type, " & Me.mrModel.TargetDatabaseType.ToString
                         Exit Sub
                 End Select
 
-                Dim lrRecordset = Me.mrModel.DatabaseConnection.GO(lsSQLQuery)
+                Dim lrRecordset = Me.mrModel.DatabaseConnection.GONonQuery(lsSQLQuery)
 
                 If Not lrRecordset.ErrorReturned Then
                     Me.ToolStripButtonCommit.Enabled = False
@@ -447,48 +487,61 @@ Public Class frmToolboxTableData
         Dim lsMessage As String
 
         Try
-            If Me.mrRDSRelation Is Nothing Then
+            Dim lsColumnName As String
+
+#Region "Get the Column"
+            Dim lsColumn As String = Me.mrRecordset.Columns(e.ColumnIndex)
+
+            Select Case Me.mrModel.TargetDatabaseType
+                Case Is = pcenumDatabaseType.Neo4j
+                    Try
+                        lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
+                    Catch ex As Exception
+                        lsColumnName = lsColumn
+                    End Try
+                Case Else
+                    lsColumnName = lsColumn
+            End Select
+
+            Dim lrTable As RDS.Table = Me.mrTable
+
+            If Me.mrTable.isPGSRelation Then
+                'Dummy Table used for PGS Relations, especially for Neo4J (Because show Unique Key values, rather than PK Values on many-to-many tables etc.
+                lrTable = Me.mrDataGridList.mrTable
+            End If
+
+            Dim lrColumn As RDS.Column = lrTable.Column.Find(Function(x) x.Name = lsColumnName)
+
+            If lrColumn Is Nothing Then
+                lsMessage = "A column with the name, " & lsColumnName & ", does not exist in the Entity, " & Me.mrTable.Name & ", in the Model you are working on."
+                Me.ToolStripStatusLabel.Text = lsMessage
+                Me.ToolStripStatusLabel.ForeColor = Color.Red
+                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True)
+                Exit Sub
+            End If
+#End Region
+
+#Region "Get the New Value"
+            Select Case lrColumn.getMetamodelDataType
+                Case Is = pcenumORMDataType.TemporalDate,
+                              pcenumORMDataType.TemporalDateAndTime
+                    Me.NewValue = Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(Me.NewValue)
+                Case Else
+                    'Nothing to do.
+            End Select
+#End Region
+
+            Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+
+            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
+
+            If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
+
+            If Me.mrRDSRelation Is Nothing And Not Me.mrTable.isPGSRelation Then
+#Region "RDSRelation"
                 '---------------------------------------------
                 'Straight Table. I.e. mrTable isnot Nothing.
-
-                Dim lsColumnName As String
-
-                Dim lsColumn As String = Me.mrRecordset.Columns(e.ColumnIndex)
-
-                Select Case Me.mrModel.TargetDatabaseType
-                    Case Is = pcenumDatabaseType.Neo4j
-                        Try
-                            lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
-                        Catch ex As Exception
-                            lsColumnName = lsColumn
-                        End Try
-                    Case Else
-                        lsColumnName = lsColumn
-                End Select
-
-                Dim lrColumn As RDS.Column = Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName)
-
-                If lrColumn Is Nothing Then
-                    lsMessage = "A column with the name, " & lsColumnName & ", does not exist in the Entity, " & Me.mrTable.Name & ", in the Model you are working on."
-                    Me.ToolStripStatusLabel.Text = lsMessage
-                    Me.ToolStripStatusLabel.ForeColor = Color.Red
-                    Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True)
-                    Exit Sub
-                End If
-
-                Select Case lrColumn.getMetamodelDataType
-                    Case Is = pcenumORMDataType.TemporalDate,
-                              pcenumORMDataType.TemporalDateAndTime
-                        Me.NewValue = Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(Me.NewValue)
-                    Case Else
-                        'Nothing to do.
-                End Select
-
-                Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
-                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
-
-                If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
 
                 Dim larPKColumn As List(Of RDS.Column)
                 '= Me.mrTable.getPrimaryKeyColumns
@@ -528,8 +581,19 @@ Public Class frmToolboxTableData
                     Me.ToolStripStatusLabel.ForeColor = Color.Red
                     Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
                 End If
+#End Region
+            ElseIf Me.mrTable.isPGSRelation Then
+                'Special handling of a PGS Relation, especially if is a Neo4j database
+
+                If Me.AllDataGridCulumnsPopulatedByRow(e.RowIndex) Then
+                    Debugger.Break()
+                Else
+                    Exit Sub
+                End If
 
             Else
+                '20230523-VM-I don't understand this code. Need to look at it more.
+                '  E.g. Why would e.ColumnIndex have to be 1?
                 Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
 
                 If e.ColumnIndex = 1 Then
@@ -705,7 +769,12 @@ Public Class frmToolboxTableData
 
             Select Case Me.mrModel.TargetDatabaseType
                 Case Is = pcenumDatabaseType.Neo4j
-                    larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+                    If Me.mrTable.isPGSRelation Then
+                        larColumn = Me.mrDataGridList.mrTable.Column
+                    Else
+                        larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+                    End If
+
                 Case Else
                     larColumn = Me.mrTable.Column.ToList
             End Select
@@ -777,7 +846,6 @@ Public Class frmToolboxTableData
                                 'CREATE(person)-[:DRIVES]->(carType)
                                 '=====================================================================================
                                 Dim larRelation = mrTable.getRelations
-
 
                                 lsSQLQuery = "MATCH "
                                 lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")" & vbCrLf
@@ -928,5 +996,30 @@ Public Class frmToolboxTableData
     Private Sub AdvancedDataGridView_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles AdvancedDataGridView.DataError
         'Debugger.Break()
     End Sub
+
+    Private Function AllDataGridCulumnsPopulatedByRow(ByVal aiRowIndex As Integer)
+
+        Try
+
+            For liInd = 0 To Me.AdvancedDataGridView.ColumnCount - 1
+                If Trim(Me.AdvancedDataGridView.Rows(aiRowIndex).Cells(liInd).Value) = "" Then
+                    Return False
+                End If
+            Next
+
+            Return True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
 
 End Class

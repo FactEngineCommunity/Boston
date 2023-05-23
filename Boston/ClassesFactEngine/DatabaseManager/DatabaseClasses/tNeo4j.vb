@@ -1319,7 +1319,15 @@ FinishedProcessing:
             Try
                 lrRecordset.Query = asSQLQuery
 
-                Dim loResult As IResult = Me._driver.Session.Run(asSQLQuery)
+                'Dim loResult As IResult = Me._driver.Session.Run(asSQLQuery)
+                Dim loResult As IResultSummary = Me._driver.Session.ExecuteWrite(Function(tx) tx.Run(asSQLQuery).Consume())
+
+                Select Case loResult.QueryType
+                    Case Is = QueryType.WriteOnly
+                        If loResult.Counters.NodesCreated = 0 And loResult.Counters.LabelsAdded = 0 And loResult.Counters.RelationshipsCreated = 0 Then
+                            lrRecordset.ErrorString = "No changes/no records."
+                        End If
+                End Select
 
                 Return lrRecordset
 
