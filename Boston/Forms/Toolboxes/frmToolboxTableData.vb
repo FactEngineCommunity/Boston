@@ -62,6 +62,8 @@ Public Class frmToolboxTableData
                                 End If
                             Else
                                 lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
+                                '20230525-VM-Move on this. Make Model store Setting ShowPrimaryKeyColumns in TableDataEditForm...then check on isPartOfPrimaryKey accordingly.
+                                '  The reason why is that if we are creating the table then we might not want to see that data. But if is a database like Northwind NEO4j, we might want to see OrderId for instance.
                                 Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
                                 lsSQLQuery &= "RETURN " & lsColumnList & ";"
                             End If
@@ -79,7 +81,17 @@ Public Class frmToolboxTableData
                             lsSQLQuery &= " LIMIT 100"
                     End Select
 
-                    Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery,, larColumn)
+                    If Me.mrTable Is Nothing Then
+                        Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery,, larColumn)
+                    Else
+                        If Me.mrTable.isPGSRelation Then
+                            Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery,, larColumn)
+                        Else
+                            Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Me.mrTable)
+                        End If
+
+                    End If
+
 
                 ElseIf Me.mrFactType IsNot Nothing Then
 
@@ -98,9 +110,22 @@ Public Class frmToolboxTableData
 
                     Select Case Me.mrModel.TargetDatabaseType
                         Case Is = pcenumDatabaseType.Neo4j
-                            'lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
-                            'Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
-                            'lsSQLQuery &= "RETURN " & lsColumnList & ";"
+                            Dim lsFirstColumnName As String = String.Join("", lrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Name))
+                            Dim lsSecondColumnName As String = String.Join("", lrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Name))
+
+                            larColumn.Add(New RDS.Column(lrRDSRelation.OriginTable, lsFirstColumnName, Nothing, Nothing, False, Nothing))
+                            larColumn.Add(New RDS.Column(lrRDSRelation.DestinationTable, lsSecondColumnName, Nothing, Nothing, False, Nothing))
+
+                            lsSQLQuery = "MATCH "
+                            lsSQLQuery &= "(" & LCase(lrRDSRelation.OriginTable.Name) & ":" & lrRDSRelation.OriginTable.Name & ")"
+                            lsSQLQuery &= "-[:" & Me.mrFactType.DBName & "]-"
+                            lsSQLQuery &= "(" & LCase(lrRDSRelation.DestinationTable.Name) & ":" & lrRDSRelation.DestinationTable.Name & ")" & vbCrLf
+                            lsSQLQuery &= "RETURN "
+                            lsFirstColumnName = String.Join(" + ' ' + ", lrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(lrRDSRelation.OriginTable.Name) & "." & x.Name))
+                            lsSecondColumnName = String.Join(" + ' ' + ", lrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(lrRDSRelation.DestinationTable.Name) & "." & x.Name))
+                            Dim lsColumnList = lsFirstColumnName & ", " & lsSecondColumnName
+                            lsSQLQuery &= lsColumnList & ";"
+
                         Case Is = pcenumDatabaseType.TypeDB
                             'lsSQLQuery = "match $table isa " & mrTable.DatabaseName
                             'For Each lrColumn In Me.mrTable.Column
@@ -132,7 +157,13 @@ Public Class frmToolboxTableData
 
                     Dim lrTable As New RDS.Table(Me.mrModel.RDS, "DummyTable", Nothing)
                     lrTable.Column.AddRange(larColumn)
-                    Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, lrTable)
+
+                    If Me.mrTable IsNot Nothing Then
+                        Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, lrTable)
+                    Else
+                        Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Nothing, larColumn)
+                    End If
+
 
                 End If
             End If
@@ -177,6 +208,14 @@ Public Class frmToolboxTableData
                 lrTable.Column = aarColumn
             Else
                 lrTable = arTable
+            End If
+
+            If aarColumn IsNot Nothing Then
+                Dim liInd = 0
+                For Each lrColumn In aarColumn
+                    Me.mrRecordset.Columns(liInd) = lrColumn.Name
+                    liInd += 1
+                Next
             End If
 
             If Me.mrRecordset.Facts.Count = 0 And Me.mrTable IsNot Nothing Then
@@ -276,7 +315,7 @@ Public Class frmToolboxTableData
                     Case Is = pcenumDatabaseType.Neo4j
 #Region "Cypher"
                         If Me.mrTable.isPGSRelation Then
-
+#Region "PGS Relation - Propery Graph Schema Relation, Table is relation, rather than a Foreign Key Relationship"
                             '=======================================================================================
                             'Example
                             'MATCH(person: Person)
@@ -312,7 +351,7 @@ Public Class frmToolboxTableData
                             '==CREATE======================================
                             lsSQLQuery.AppendLine("CREATE (")
                             lsSQLQuery &= LCase(larRelation(0).DestinationTable.Name) & ")-[:" & Me.mrTable.DBName & "]->(" & LCase(larRelation(1).DestinationTable.Name) & ")"
-
+#End Region
                         Else
                             lsSQLQuery = "CREATE (" & LCase(Me.mrTable.Name) & ":" & Me.mrTable.Name & " {"
 
@@ -534,11 +573,21 @@ Public Class frmToolboxTableData
 
             Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
 
+            '------------------------------------------------
+            'CodeSafe - Exit if no change
+            If Me.NewValue = lsOldValue Then Exit Sub
+
+            '------------------------------------------------
+            'Get a clone of the Fact for PGSRelations
+            Dim lrOriginalFact As FBM.Fact = Me.mrRecordset.Facts(e.RowIndex).Clone(New FBM.FactType(Me.mrModel, "DummyFactType", True), True)
+
             '==========================================================================================
             'Update the FactData for the Fact
             Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
             '==========================================================================================
 
+            '============================================================
+            'No need to continue if is new Record/Row.
             If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
 
             If Me.mrRDSRelation Is Nothing And Not Me.mrTable.isPGSRelation Then
@@ -586,15 +635,75 @@ Public Class frmToolboxTableData
                 End If
 #End Region
             ElseIf Me.mrTable.isPGSRelation Then
+#Region "PGS Relation - Property Graph Schema Relation Table, as opposed Foreign Key Relationship."
                 'Special handling of a PGS Relation, especially if is a Neo4j database
 
                 If Me.AllDataGridCulumnsPopulatedByRow(e.RowIndex) Then
                     Debugger.Break()
+#Region "Create Boilerplate"
+                    Dim larRelation = mrTable.getRelations
+
+                    Dim lsQuery As String = ""
+                    Dim lsMatchClause As String = ""
+                    Dim lsWhereClause As String = ""
+
+                    '================WHERE===================                                      
+                    lsWhereClause = " WHERE "
+                    Dim liInd = 0
+                    For Each lrColumn In Me.mrDataGridList.mrTable.Column
+                        If liInd > 0 Then lsWhereClause.AppendLine("AND ")
+                        lsWhereClause &= LCase(lrColumn.Table.Name) & "." & lrColumn.Name & " = "
+                        lsWhereClause &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType)
+                        lsWhereClause &= "{" & liInd.ToString & "}" 'lrFact.Data(liInd).Data
+                        lsWhereClause &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType)
+                        liInd += 1
+                    Next
+#End Region
+
+
+#Region "Delete Existing Relationship"
+
+                    lsMatchClause = "MATCH "
+                    lsMatchClause &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")"
+                    lsMatchClause.AppendString("-[r:" & Me.mrTable.DBName & "]-")
+                    lsMatchClause &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
+
+                    lsQuery.AppendString(lsMatchClause)
+                    Dim lsDeleteWhereClause = String.Format(lsWhereClause, lrOriginalFact.Data(0).Data, lrOriginalFact.Data(1).Data)
+                    lsQuery.AppendLine(lsDeleteWhereClause)
+
+                    '==DELETE======================================
+                    lsQuery.AppendLine("DELETE r")
+
+                    Dim lrRecordset = Me.mrModel.DatabaseConnection.GONonQuery(lsQuery)
+#End Region
+
+#Region "Create New Relationship"
+                    lsQuery = ""
+
+                    lsMatchClause = "MATCH "
+                    lsMatchClause &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")" & vbCrLf
+                    lsMatchClause &= "MATCH "
+                    lsMatchClause &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
+
+
+                    lsQuery.AppendString(lsMatchClause)
+                    Dim lsCreateWhereClause = String.Format(lsWhereClause, Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(0)).Data, Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(1)).Data)
+                    lsQuery.AppendLine(lsCreateWhereClause)
+
+                    '==CREATE======================================
+                    lsQuery.AppendLine("CREATE (")
+                    lsQuery &= LCase(larRelation(0).DestinationTable.Name) & ")-[:" & Me.mrTable.DBName & "]->(" & LCase(larRelation(1).DestinationTable.Name) & ")"
+
+                    lrRecordset = Me.mrModel.DatabaseConnection.GONonQuery(lsQuery)
+#End Region
                 Else
                     Exit Sub
                 End If
-
+#End Region
             Else
+#Region "RDS Relation"
+                'RDS Relation
                 '20230523-VM-I don't understand this code. Need to look at it more.
                 '  E.g. Why would e.ColumnIndex have to be 1?
                 Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
@@ -665,7 +774,7 @@ Public Class frmToolboxTableData
                                                                                          lsNewValue,
                                                                                          larPKColumn)
                 End If
-
+#End Region
             End If
 
         Catch ex As Exception

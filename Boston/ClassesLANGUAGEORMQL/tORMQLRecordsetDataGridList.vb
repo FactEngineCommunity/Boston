@@ -19,7 +19,7 @@ Namespace ORMQL
             Me.mrTable = arTable
 
             Me.DynamicClass = New tClass
-            For Each lsColumn In Me.mrRecordset.Columns
+            For Each lsColumn In arTable.Column.Select(Function(x) x.Name).ToList  '20230525-VM-Was Me.mrRecordset.Columns....but for concat Columns was not working. FirstName + ' ' + LastName
 
                 Dim lsColumnName As String
                 Try
@@ -103,7 +103,7 @@ Namespace ORMQL
                     For Each lrData In Me.mrRecordset.Facts(index).Data
 
                         Try
-                            Dim lsColumn As String = Me.mrRecordset.Facts(index).Data(liInd).Role.Name '20230414-VM-Me.mrRecordset.Columns(liInd)
+                            Dim lsColumn As String = Me.mrRecordset.Columns(liInd) '20230525-Me.mrRecordset.Facts(index).Data(liInd).Role.Name '20230414-VM-Me.mrRecordset.Columns(liInd)
                             Dim lsColumnName As String
                             Try
                                 lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
@@ -112,9 +112,15 @@ Namespace ORMQL
                             End Try
 
                             'Dim lsString = Me.mrRecordset.Columns(liInd)
-                            Dim piInstance As PropertyInfo = Me.DynamicObject.GetType.GetProperty(lsColumnName)
+                            Dim piInstance As PropertyInfo = Nothing
 
-                            Select Case Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName).getMetamodelDataType 'Was lsString
+                            piInstance = NullVal(Me.DynamicObject.GetType.GetProperty(lsColumnName), Me.DynamicObject.GetType.GetProperty(Me.mrTable.Column(liInd).Name))
+
+                            Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength
+
+                            liDataType = Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName).getMetamodelDataType
+
+                            Select Case liDataType 'Was lsString
                                 Case Is = pcenumORMDataType.TemporalDate,
                                           pcenumORMDataType.TemporalDateAndTime
                                     Try
