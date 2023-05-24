@@ -84,8 +84,9 @@ Public Class frmCRUDModel
             larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.zrModel.ModelId})
             larExpandoFields.Add(New With {.FieldName = "SettingName", .Value = "UseNeo4jStyleEdgeLabels"})
             Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loTransformation,, larExpandoFields)
-
-            Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked = larTransformationTuples(0).Setting
+            If larTransformationTuples.Count > 0 Then
+                Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked = larTransformationTuples(0).Setting
+            End If
 
 
         Catch ex As Exception
@@ -121,6 +122,16 @@ Public Class frmCRUDModel
             Me.zrModel.DatabaseRole = Trim(Me.TextBoxRoleName.Text)
             Me.zrModel.Port = Trim(Me.TextBoxPort.Text)
             Me.zrModel.StoreAsXML = Me.CheckBoxSaveToXML.Checked
+
+            '======Settings===Stored In ReferenceFieldTable/Value============================================
+            'UseNeo4jStyleEdgeLabels
+#Region "UseNeo4jStyleEdgeLabels"
+            Dim loSetting As New With {.ModelId = Me.zrModel.ModelId, .SettingName = "UseNeo4jStyleEdgeLabels", .Setting = Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked}
+            Dim larKeyFields() As Object = {}
+            larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})
+            larKeyFields.Add(New With {.FieldId = 2, .FieldName = "SettingName", .Value = "UseNeo4jStyleEdgeLabels"})
+            Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
+#End Region
 
             Try
                 If Me.zrModel.TreeNode IsNot Nothing Then

@@ -1,4 +1,5 @@
 Imports System.Reflection
+Imports System.Dynamic
 
 Namespace TableReferenceTable
     Module TableReferenceTable
@@ -186,6 +187,78 @@ Namespace TableReferenceTable
 
         End Sub
 
+        Public Sub UpSert(referenceTableId As Integer, aoObject As Object, aarKeyFields() As Object)
+
+            Try
+                Dim larKeyValuePairs() As Object = {}
+
+                Dim objectType As Type = aoObject.GetType()
+
+                ' Get all properties of the object
+                Dim properties As PropertyInfo() = objectType.GetProperties()
+
+                For Each propertyInfo As PropertyInfo In properties
+
+
+                    Dim fieldName As String = propertyInfo.Name
+                    Dim value As Object = propertyInfo.GetValue(aoObject)
+                    Dim liFieldId = tableReferenceField.GetReferenceTableFieldIdByLabel(referenceTableId, fieldName)
+                    Dim lbIsKey As Boolean = aarKeyFields.Where(Function(x) x.FieldName = fieldName).Count > 0
+
+                    Dim lrFieldKeyValue = New With {.FieldId = liFieldId, .FieldName = fieldName, .IsKey = lbIsKey, .Value = value}
+
+                    larKeyValuePairs.Add(lrFieldKeyValue)
+                Next
+
+                ' Check if the virtual row already exists based on the key fields
+                Dim larObject = TableReferenceFieldValue.GetReferenceFieldValueTuples(referenceTableId, Nothing,, aarKeyFields)
+                If larObject.Count = 0 Then
+                    ' Insert the reference_field_value rows to represent the virtual row
+                    InsertVirtualRow(referenceTableId, larKeyValuePairs)
+                Else
+                    larKeyValuePairs = larKeyValuePairs.Where(Function(x) x.IsKey = False).ToArray
+                    For Each lrKeyValue In larKeyValuePairs
+                        Dim lrReferenceFieldValue = New tReferenceFieldValue(referenceTableId, lrKeyValue.FieldId, larObject(0).row_id, lrKeyValue.Value)
+                        Call TableReferenceFieldValue.UpdateReferenceFieldValue(lrReferenceFieldValue)
+                    Next
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+
+        Private Sub InsertVirtualRow(ByVal aiReferenceTableId As Integer, aarKeyValuePairs() As Object)
+
+            Try
+
+                Dim lrReferenceFieldValue As New tReferenceFieldValue
+                lrReferenceFieldValue.ReferenceTableId = aiReferenceTableId
+                lrReferenceFieldValue.RowId = System.Guid.NewGuid.ToString
+
+                For Each lrKeyValuePair In aarKeyValuePairs
+                    lrReferenceFieldValue.ReferenceFieldId = lrKeyValuePair.FieldId
+                    lrReferenceFieldValue.Data = lrKeyValuePair.Value
+                    lrReferenceFieldValue.Save()
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
 
     End Module
 End Namespace

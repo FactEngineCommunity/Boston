@@ -534,12 +534,15 @@ Public Class frmToolboxTableData
 
             Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
 
+            '==========================================================================================
+            'Update the FactData for the Fact
             Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
+            '==========================================================================================
 
             If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
 
             If Me.mrRDSRelation Is Nothing And Not Me.mrTable.isPGSRelation Then
-#Region "RDSRelation"
+#Region "Table - Straight/Standard Table"
                 '---------------------------------------------
                 'Straight Table. I.e. mrTable isnot Nothing.
 

@@ -181,7 +181,7 @@ Module tableReferenceField
     End Function
 
 
-    Function GetReferenceFieldDetailsById(ByVal l_reference_field_id As Integer, ByVal ar_reference_field As tReferenceField) As Boolean
+    Function GetReferenceFieldDetailsById(ByVal aiReferenceTableId As Integer, ByVal aiReferenceFieldId As Integer, ByRef arReferenceField As tReferenceField) As Boolean
 
         'Returns the values for a reference_field
         'given a reference_field_Id
@@ -198,20 +198,21 @@ Module tableReferenceField
         GetReferenceFieldDetailsById = False
 
         lsSQLQuery = "SELECT * FROM ReferenceField"
-        lsSQLQuery &= " WHERE reference_field_Id = " & l_reference_field_id
+        lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId
+        lsSQLQuery &= " AND reference_field_Id = " & aiReferenceFieldId
 
         lREcordset.Open(lsSQLQuery, , , pc_cmd_table)
 
         If Not lREcordset.EOF Then
-            ar_reference_field.reference_field_id = l_reference_field_id
-            ar_reference_field.label = lREcordset("reference_field_Label").Value
-            ar_reference_field.ReferenceTableId = lREcordset("reference_table_id").Value
-            ar_reference_field.data_type = lREcordset("reference_data_type_Id").Value
-            ar_reference_field.cardinality = lREcordset("Cardinality").Value
-            ar_reference_field.required = lREcordset("Required").Value
+            arReferenceField.reference_field_id = aiReferenceFieldId
+            arReferenceField.label = lREcordset("reference_field_Label").Value
+            arReferenceField.ReferenceTableId = lREcordset("reference_table_id").Value
+            arReferenceField.data_type = lREcordset("reference_data_type_Id").Value
+            arReferenceField.cardinality = lREcordset("Cardinality").Value
+            arReferenceField.required = lREcordset("Required").Value
             GetReferenceFieldDetailsById = True
         Else
-            MsgBox("Cannot location Confguration_Item for reference_field_Id - '" & l_reference_field_id & "'")
+            MsgBox("Cannot location Confguration_Item for reference_field_Id - '" & aiReferenceFieldId & "'")
             GetReferenceFieldDetailsById = False
         End If
 

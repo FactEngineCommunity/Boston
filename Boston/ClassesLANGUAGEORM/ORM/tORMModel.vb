@@ -3811,6 +3811,11 @@ PostRDSProcessing:
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
                 End Try
 
+                'Settings - Stored in ReferenceFieldValue
+                Dim larExpandoFields() As Object = {}
+                larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.ModelId})
+                Call TableReferenceFieldValue.DeleteReferenceFieldValuesByMatch(39, larExpandoFields)
+
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 

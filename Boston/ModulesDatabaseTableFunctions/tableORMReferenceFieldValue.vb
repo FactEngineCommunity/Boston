@@ -65,6 +65,31 @@ Namespace TableReferenceFieldValue
 
         End Sub
 
+        Public Sub DeleteReferenceFieldValuesByMatch(ByVal arReferenceTableId As Integer, ByVal aarExpandoObject() As ExpandoObject)
+
+            Try
+
+                Dim lsSQLQuery As String = ""
+                Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(arReferenceTableId, loTransformation,, aarExpandoObject)
+
+                lsSQLQuery = "DELETE FROM ReferenceFieldValue"
+                lsSQLQuery &= " WHERE reference_table_id = " & arReferenceTableId
+                lsSQLQuery &= "   AND row_id IN (" & String.Join(",", larTransformationTuples.Select(Function(obj) $"'{obj.RowId}'")) & ")"
+
+                Call pdbConnection.Execute(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Sub DeleteReferenceFieldValuesForReferenceTableById(ByVal aiReferenceTableId As Integer)
 
             Try
@@ -187,7 +212,6 @@ Namespace TableReferenceFieldValue
             Dim liFieldCount As Integer
 
             Try
-
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = ADODB.CursorTypeEnum.adOpenStatic
 
@@ -282,7 +306,7 @@ Namespace TableReferenceFieldValue
 
                 Dim lrReferenceTuple As New ReferenceTuple
 
-                lREcordset.MoveFirst()
+                If Not lREcordset.EOF Then lREcordset.MoveFirst()
 
                 While Not lREcordset.EOF
                     loTupleObject = loTuple.clone
@@ -345,7 +369,7 @@ Namespace TableReferenceFieldValue
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
-                Return Nothing
+                Return New List(Of Object)
             End Try
 
         End Function
