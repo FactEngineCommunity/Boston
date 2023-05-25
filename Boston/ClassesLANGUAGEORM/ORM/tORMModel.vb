@@ -435,6 +435,11 @@ Namespace FBM
             End Get
         End Property
 
+        ''' <summary>
+        ''' True if in the Property Graph Schema view we want to show BOOKING_HAS_SEAT (as a Object Type's DBName) rather than 'has' (the PredicatePart of a FactTypeReading).
+        ''' </summary>
+        Public UseNeo4jStyleEdgeLabels As Boolean
+
         <NonSerialized()>
         Public Event Deleting()
         <NonSerialized()>
@@ -3737,6 +3742,8 @@ PostRDSProcessing:
         Public Sub RemoveFromDatabase()
 
             Dim lsMessage As String
+
+#Region "Old Empty Code - 20230526-VM-Remove if not missed. At this stage this code has been coded out for at least a year."
             'Dim liInd As Integer = 0
             'Dim lrEntityType As FBM.EntityType
             'Dim lrValueType As FBM.ValueType
@@ -3775,6 +3782,7 @@ PostRDSProcessing:
             '    TableModelDictionary.DeleteModelDictionaryEntry(lrDictionaryEntry)
             'Next
             'Me.ModelDictionary.Clear()
+#End Region
 
             Dim lsFileLocationName As String = ""
 
@@ -3811,7 +3819,8 @@ PostRDSProcessing:
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
                 End Try
 
-                'Settings - Stored in ReferenceFieldValue
+                '--------------------------------------------------------------------------------------
+                'Setting Removal - Stored in ReferenceFieldValue
                 Dim larExpandoFields() As Object = {}
                 larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.ModelId})
                 Call TableReferenceFieldValue.DeleteReferenceFieldValuesByMatch(39, larExpandoFields)
@@ -6103,6 +6112,9 @@ SkipRDSProcessing:
                 Call Me.LoadFromDatabase(abLoadPages, abUseThreading And My.Settings.ModelLoadPagesUseThreading, aoBackgroundWorker)
             End If
 
+            'Settings that are stored in the ReferenceTable/FieldValue tables.
+            Call Me.GetReferenceTableModelSettings()
+
             lrReturnModel.Loaded = True
 
             '20220821-VM-Keep for a year. Set ObjectifyingEntityType.Id to that of its FactType
@@ -7004,6 +7016,30 @@ XMLDeserialisation:
 
             Try
                 RaiseEvent ModelElementModified(arModelElement)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub GetReferenceTableModelSettings()
+
+            Try
+                Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                Dim larExpandoFields() As Object = {}
+                larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.ModelId})
+                larExpandoFields.Add(New With {.FieldName = "SettingName", .Value = "UseNeo4jStyleEdgeLabels"})
+                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loTransformation,, larExpandoFields)
+                If larTransformationTuples.Count > 0 Then
+                    Me.UseNeo4jStyleEdgeLabels = larTransformationTuples(0).Setting
+                End If
+
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

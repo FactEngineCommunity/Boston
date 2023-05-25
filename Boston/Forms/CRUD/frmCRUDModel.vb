@@ -79,14 +79,8 @@ Public Class frmCRUDModel
 
             '===Model Settings - From ReferenceFieldTable/Value=======================================================================
             'UseNeo4jStyleEdgeLabels
-            Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-            Dim larExpandoFields() As Object = {}
-            larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.zrModel.ModelId})
-            larExpandoFields.Add(New With {.FieldName = "SettingName", .Value = "UseNeo4jStyleEdgeLabels"})
-            Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loTransformation,, larExpandoFields)
-            If larTransformationTuples.Count > 0 Then
-                Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked = larTransformationTuples(0).Setting
-            End If
+            Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked = Me.zrModel.UseNeo4jStyleEdgeLabels
+
 
 
         Catch ex As Exception
@@ -126,6 +120,8 @@ Public Class frmCRUDModel
             '======Settings===Stored In ReferenceFieldTable/Value============================================
             'UseNeo4jStyleEdgeLabels
 #Region "UseNeo4jStyleEdgeLabels"
+            Me.zrModel.UseNeo4jStyleEdgeLabels = Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked
+
             Dim loSetting As New With {.ModelId = Me.zrModel.ModelId, .SettingName = "UseNeo4jStyleEdgeLabels", .Setting = Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked}
             Dim larKeyFields() As Object = {}
             larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})

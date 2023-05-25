@@ -397,6 +397,11 @@ Namespace PGS
                         GoTo SetPredicateNoMatterWhat
                     End Try
 
+                    If Me.Model.UseNeo4jStyleEdgeLabels And lrFactType.DBName <> "" Then
+                        Me.Link.Text = lrFactType.DBName
+                        Exit Sub
+                    End If
+
                     If lrFactType.FactTypeReading.Count = 0 Then
                         'There is no predicate to set.
                         lsPredicate = "Set a predicate"
@@ -521,6 +526,14 @@ SetPredicateNoMatterWhat:
 SimplePredicate:
                     '=================================================================
                     'Destination Predicates. CodeSafe - GetIt
+                    Dim lrFactType = Me.RDSRelation.ResponsibleFactType
+
+                    If Me.Model.UseNeo4jStyleEdgeLabels And lrFactType.DBName <> "" Then
+                        Me.Link.Text = lrFactType.DBName
+                        Exit Sub
+                    End If
+
+
                     Dim lsOriginPredicate As String = ""
                     Dim lsDestinationPredicate As String = ""
 
