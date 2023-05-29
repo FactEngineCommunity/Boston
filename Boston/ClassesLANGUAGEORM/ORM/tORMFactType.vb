@@ -235,12 +235,30 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlIgnore>
+        Private Property _ObjectifyingEntityType As FBM.EntityType = Nothing
+
         ''' <summary>
         ''' The EntityType for the FactType if the FactType is objectified.
         ''' </summary>
         ''' <remarks></remarks>
-        <XmlIgnore()>
-        Public ObjectifyingEntityType As FBM.EntityType
+        <XmlAttribute()>
+        Public Property ObjectifyingEntityType As FBM.EntityType
+            Get
+                'CodeSafe
+                If Me.IsObjectified And Me._ObjectifyingEntityType Is Nothing Then
+                    Me._ObjectifyingEntityType = Me.Model.CreateEntityType(Me.Id, False,,, True)
+                    Me._ObjectifyingEntityType.IsObjectifyingEntityType = True
+                    Me._ObjectifyingEntityType.ObjectifiedFactType = Me
+                    Me.Model.AddEntityType(Me._ObjectifyingEntityType, True, True, Nothing)
+                End If
+
+                Return Me._ObjectifyingEntityType
+            End Get
+            Set(value As FBM.EntityType)
+                Me._ObjectifyingEntityType = value
+            End Set
+        End Property
 
         <XmlIgnore()>
         Public KLFunctionLabel As String = "" 'When generating a proof for a model under KL, is the unique pcenumKLFunction label assigned to the FactType

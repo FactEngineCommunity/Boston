@@ -477,11 +477,12 @@ Namespace FactEngine
             Return "yyyy-MM-dd HH:mm:ss"
         End Function
 
-        Public Overrides Sub Execute(asQuery As String)
+        Public Overloads Sub Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False)
 
             Try
                 Call Me.GONonQuery(asQuery)
             Catch ex As Exception
+                If abIgnoreErrors Then Exit Sub
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 

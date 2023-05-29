@@ -687,9 +687,24 @@ OpenConnection:
 
         End Function
 
-        Public Sub WriteToStatusBar(ByVal asMessage As String, Optional ByVal abRefreshForm As Boolean = False, Optional ByVal aiProgressPercent As Integer = 0)
+        ''' <summary>
+        ''' Writes to the status bar of the Main form (frmMain).
+        ''' </summary>
+        ''' <param name="asMessage"></param>
+        ''' <param name="abRefreshForm">Refreshes the foorm (frmMain)</param>
+        ''' <param name="aiProgressPercent"></param>
+        ''' <param name="abAppendMessageOnly">As when adding dots (.) to a message that already exists.</param>
+        Public Sub WriteToStatusBar(ByVal asMessage As String,
+                                    Optional ByVal abRefreshForm As Boolean = False,
+                                    Optional ByVal aiProgressPercent As Integer = 0,
+                                    Optional abAppendMessageOnly As Boolean = False)
 
-            frmMain.StatusLabelGeneralStatus.Text = asMessage
+            If abAppendMessageOnly Then
+                frmMain.StatusLabelGeneralStatus.Text = frmMain.StatusLabelGeneralStatus.Text & asMessage
+            Else
+                frmMain.StatusLabelGeneralStatus.Text = asMessage
+            End If
+
 
             If aiProgressPercent > 0 Then
                 frmMain.ToolStripProgressBar.Visible = True

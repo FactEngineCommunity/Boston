@@ -161,7 +161,11 @@ Namespace Database
                     pdbConnection.BeginTrans()
                     'transaction = pdb_OLEDB_connection.BeginTransaction()
 
+                    Dim liStepCount As Integer = lrRecordset.RecordCount
+                    Dim liStep = 1
                     While Not lrRecordset.EOF
+
+                        Call prApplication.WriteToStatusBar(".", True, Math.Min(100, (liStep / liStepCount) * 100), True)
 
                         lsStallMessage = ""
                         '---------------------------------------------------
@@ -333,10 +337,12 @@ Namespace Database
                                             streamWriter.Close()
                                         End Using
 
-                                        Dim lsShellCommand As String = Boston.MyPath & "\dbwconsole\DBWConsole.exe " & lsSQLFilePath & "script.sql " & lsSQLFilePath & "boston.mdb"
+                                        Dim lsShellCommand As String = Boston.MyPath & "\dbwconsole\DBWConsole.exe " & lsSQLFilePath & "script.sql " & lsSQLFilePath & "boston.mdb /e"
 
                                         Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
-                                        Shell(lsShellCommand, lrDatabaseUpgradeSQL.AllowFail)
+
+
+                                        Shell(lsShellCommand, lrDatabaseUpgradeSQL.AllowFail, True, 5000)
 
                                     End SyncLock
 
@@ -352,6 +358,7 @@ Namespace Database
 
                         End Select
 
+                        liStep += 1
                         lrRecordset.MoveNext()
                     End While
 

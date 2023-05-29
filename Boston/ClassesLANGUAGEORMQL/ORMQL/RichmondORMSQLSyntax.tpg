@@ -16,7 +16,7 @@ MODELNAME     -> @"[aA-zZ]+";
 MODELELEMENTNAME -> @"[A-Z0-9][a-z0-9]+([_|\sA-Z0-9][a-z0-9]+)*"; //@"(([A-Z0-9][a-z0-9]+)+[_|\s]?)+";  //@"[aA-zZ]+";
 MODELID	-> @"[aA-zZ0-9\-]+";
 NUMBER 	-> @"[0-9]+";
-PAGENAME      -> @"[aA-zZ0-9\.\s\-]+"; 
+PAGENAME      -> @"[aA-zZ0-9\.\/\#\s\-]+"; 
 PLUSMINUS 	-> @"(\+|-)";
 PREDICATE	-> @"[a-z\s]+";
 ROLENAME      ->  @"[aA-zZ]+";

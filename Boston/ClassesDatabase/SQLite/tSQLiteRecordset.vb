@@ -87,8 +87,8 @@ Namespace SQLite
                             Case GetType(Int32)
                                 Return New With {.value = CInt(value)}
                             Case GetType(String)
-                                Return New With {.value = CStr(NullVal(value, ""))}
-                                'Return CStr(value)
+                                Return New With {.value = CStr(NullVal(value, ""))} '20230528-VM-At least this date, was: Return CStr(value)
+
                             Case GetType(Double)
                                 Return New With {.value = CDbl(value)}
                             Case GetType(Boolean)

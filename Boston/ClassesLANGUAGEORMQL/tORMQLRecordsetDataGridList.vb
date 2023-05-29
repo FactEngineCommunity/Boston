@@ -94,6 +94,11 @@ Namespace ORMQL
             End Get
         End Property
 
+        ''' <summary>
+        ''' Returns an Item in the List/Enumerator, rather than an item in the set of Columns.
+        ''' </summary>
+        ''' <param name="index"></param>
+        ''' <returns></returns>
         Default Public Property Item(index As Integer) As Object Implements IList.Item
             Get
                 Try

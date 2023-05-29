@@ -30,7 +30,7 @@ Namespace TableModelDictionary
                 lsSQLQuery &= ",'" & Trim(arModelDictionaryEntry.DBName) & "'"
                 lsSQLQuery &= ")"
 
-                pdbConnection.Execute(lsSQLQuery)
+                pdbConnection.Execute(lsSQLQuery, abIgnoreAnyErrors)
 
             Catch ex As Exception
                 If Not abIgnoreAnyErrors Then

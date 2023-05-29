@@ -85,7 +85,7 @@ Namespace TinyPG
             Patterns.Add(TokenType.NUMBER, regex)
             Tokens.Add(TokenType.NUMBER)
 
-            regex = new Regex("[aA-zZ0-9\.\s\-]+", RegexOptions.Compiled)
+            regex = new Regex("[aA-zZ0-9\.\/\#\s\-]+", RegexOptions.Compiled)
             Patterns.Add(TokenType.PAGENAME, regex)
             Tokens.Add(TokenType.PAGENAME)
 
@@ -643,8 +643,10 @@ Namespace TinyPG
         WHITESPACE  = 141
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Class Token 
+        Implements ICloneable
+
         Private m_startPos As Integer
         Private m_endPos As Integer
         Private m_text As String
@@ -705,7 +707,7 @@ Namespace TinyPG
             End Set
         End Property
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Type As TokenType
 
         Public Sub New()
@@ -737,6 +739,29 @@ Namespace TinyPG
                 Return Type.ToString()
             End If
         End Function
+
+        Public Function Clone() As Object Implements ICloneable.Clone
+            Dim lrToken As New Token
+            Dim lrSkippedToken As Token
+            With Me
+                lrToken.m_startPos = .m_startPos
+                lrToken.m_endPos = .m_endPos
+                lrToken.m_text = .m_text
+                lrToken.m_value = .m_value
+                lrToken.Type = .Type
+
+                ' contains all prior skipped symbols
+                If .m_skipped IsNot Nothing Then
+                    lrToken.m_skipped = New List(Of Token)
+                    For Each lrSkippedToken In .m_skipped
+                        lrToken.m_skipped.Add(lrSkippedToken.Clone)
+                    Next
+                End If
+            End With
+
+            Return lrToken
+        End Function
+
     End Class
 #End Region
 End Namespace

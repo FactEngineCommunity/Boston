@@ -339,7 +339,8 @@ Namespace TableReferenceFieldValue
 
 
                                 If arReferenceTable IsNot Nothing Then
-                                    lrReferenceTuple.KeyValuePair.Add(New KeyValuePair(laaReferenceFieldList(liInd - 1), CStr(Viev.NullVal(loField.value, " "))))
+                                    '20230528-VM-loField.Value
+                                    lrReferenceTuple.KeyValuePair.Add(New KeyValuePair(laaReferenceFieldList(liInd - 1), CStr(Viev.NullVal(lREcordset(1).Value, " "))))
                                 End If
                         End Select
 

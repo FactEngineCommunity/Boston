@@ -97,8 +97,8 @@ Public Class frmMain
             '====================================================================================
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
-            psApplicationApplicationVersionNr = "6.6"
-            psApplicationDatabaseVersionNr = "1.37"
+            psApplicationApplicationVersionNr = "7.0"
+            psApplicationDatabaseVersionNr = "1.38"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
 
             Dim loAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
@@ -154,6 +154,7 @@ ConfigurationOK:
             '==============================================================================================================================
             Me.StatusLabelGeneralStatus.Text = "Initialising Application"
             prApplication = New tApplication
+            prApplication.MainForm = Me
             Me.StatusLabelGeneralStatus.Text = "Application Initialised"
 
             prApplication.SoftwareCategory = prSoftwareCategory
@@ -232,6 +233,26 @@ ConfigurationOK:
                     'Move the database to My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
                     '  and update the ConnectionString for the database.
                     '----------------------------------------------------------------------------------------
+#Region "AppData - database.sql to AppData\Local\FactEngine\Boston\database\boston.sqlite"
+                    Try
+                        ' Get the local AppData folder specific to your company and application
+                        Dim localAppDataFolder As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.CompanyName, Application.ProductName)
+
+                        ' Create the destination folder if it doesn't exist
+                        Directory.CreateDirectory(localAppDataFolder)
+
+                        ' Set the source and destination file paths
+                        Dim sourceFilePath As String = Path.Combine(Application.StartupPath, "database\boston.sqlite")
+                        Dim destinationFilePath As String = Path.Combine(localAppDataFolder, "database\boston.sqlite")
+
+                        ' Move the file
+                        File.Copy(sourceFilePath, destinationFilePath)
+                    Catch ex As Exception
+                        prApplication.ThrowErrorMessage("Failed to move the boston.sqlite database to AppData\Local", pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+                    End Try
+#End Region
+
+
                     lsCommonDatabaseFileLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
                     IO.Directory.CreateDirectory(lsCommonDatabaseFileLocation)
 
@@ -4499,10 +4520,16 @@ SaveModel:
                         Boston.WaitForFile(prApplication.DatabaseLocationName, IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
                         System.IO.File.Copy(lsSQLFilePath & "boston.mdb", prApplication.DatabaseLocationName, True)
                         Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
-                        System.IO.File.Delete(lsSQLFilePath & "boston.mdb")
-                        System.IO.File.Delete(lsSQLFilePath & "boston.ldb")
+                        Try
+                            System.IO.File.Delete(lsSQLFilePath & "boston.mdb")
+                            System.IO.File.Delete(lsSQLFilePath & "boston.ldb")
+                        Catch ex As Exception
+                            prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+                        End Try
+
                         Boston.OpenDatabase(prApplication.DatabaseLocationName)
 
+                        lfrmFlashCard = New frmFlashCard
                         lfrmFlashCard.ziIntervalMilliseconds = 5600
                         lfrmFlashCard.BackColor = Color.LightGray
                         lsMessage = "Successfully upgraded to database version: " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
@@ -5916,4 +5943,25 @@ SaveModel:
         End Try
 
     End Sub
+
+    Public Delegate Sub UpdateUIDelegate()
+
+    Public Sub UpdateUI()
+
+        Try
+            Me.StatusBarToolStripMenuItem.Invalidate()
+            Me.StatusLabelGeneralStatus.Invalidate()
+
+            Me.Refresh()
+            Me.Invalidate()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
 End Class

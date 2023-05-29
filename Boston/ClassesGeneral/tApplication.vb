@@ -750,4 +750,47 @@ Public Class tApplication
 
     End Sub
 
+    ''' <summary>
+    ''' Writes to the status bar of the Main form (frmMain).
+    ''' </summary>
+    ''' <param name="asMessage"></param>
+    ''' <param name="abRefreshForm">Refreshes the foorm (frmMain)</param>
+    ''' <param name="aiProgressPercent"></param>
+    ''' <param name="abAppendMessageOnly">As when adding dots (.) to a message that already exists.</param>
+    Public Sub WriteToStatusBar(ByVal asMessage As String,
+                                    Optional ByVal abRefreshForm As Boolean = False,
+                                    Optional ByVal aiProgressPercent As Integer = 0,
+                                    Optional abAppendMessageOnly As Boolean = False)
+
+        If abAppendMessageOnly Then
+            Me.MainForm.StatusLabelGeneralStatus.Text = Me.MainForm.StatusLabelGeneralStatus.Text & asMessage
+        Else
+            Me.MainForm.StatusLabelGeneralStatus.Text = asMessage
+        End If
+
+
+        If aiProgressPercent > 0 Then
+            Me.MainForm.ToolStripProgressBar.Visible = True
+            Me.MainForm.ToolStripProgressBar.Value = aiProgressPercent
+        Else
+            Me.MainForm.ToolStripProgressBar.Visible = False
+        End If
+
+        If abRefreshForm Then
+            Me.MainForm.Refresh()
+        End If
+        Me.MainForm.Invalidate()
+
+        Dim mainForm As frmMain = Application.OpenForms.OfType(Of frmMain)().FirstOrDefault()
+        If mainForm IsNot Nothing Then
+            ' Create an instance of the delegate
+            Dim updateDelegate As New frmMain.UpdateUIDelegate(AddressOf frmMain.UpdateUI)
+
+            ' Call BeginInvoke to execute the UI update code on the main UI thread
+            mainForm.BeginInvoke(updateDelegate)
+        End If
+
+    End Sub
+
+
 End Class
