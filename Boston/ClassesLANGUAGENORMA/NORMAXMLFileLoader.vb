@@ -958,6 +958,14 @@ SkippedSubtypeRelationship:
                             Next
 
                             lrFactType.Objectify(True)
+
+                            'LinkFactType details. 20230530-VM-Wrote the below, but decided not to use.
+                            'For Each lrRole In lrFactType.RoleGroup
+                            '    Dim loXMLImpliedFactResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:ImpliedFact>
+                            '                                 Where ModelInformation.Elements.<orm:FactRoles>.<orm:RoleProxy>.<orm:Role>.First.Attribute("ref").Value = lrRole.Id
+                            '                                 Where ModelInformation.Elements.<orm:FactRoles>.<orm:Role>.<orm:RolePlayer>.First.Attribute("ref").Value = lrFactType.ObjectifyingEntityType.NORMAReferenceId
+                            '                                 Select ModelInformation
+                            'Next
                         End If
 
                     End If 'Adding new FactType to the Model.
@@ -2615,6 +2623,7 @@ SkippedRole:
 
                                 If lrRole IsNot Nothing Then
                                     If Not lrRole.FactType.IsObjectified Then
+
                                         lrRoleConstraint.CurrentArgument.JoinPath.RolePath.AddUnique(lrRole)
 
                                         If lrRole.FactType.IsBinaryFactType Then

@@ -195,8 +195,22 @@ Namespace FBM
         <XmlAttribute()>
         Public Id As String = System.Guid.NewGuid.ToString 'The unique Identifier of the ModelObject within the Model.
 
+        <XmlIgnore()>
+        Private _GUID As String = System.Guid.NewGuid.ToString
+
         <XmlAttribute()>
-        Public GUID As String = System.Guid.NewGuid.ToString
+        Public Property GUID As String
+            Get
+                If Me.NORMAReferenceId = "" Then 'Default is ""
+                    Return Me._GUID
+                Else
+                    Return Me.NORMAReferenceId
+                End If
+            End Get
+            Set(value As String)
+                Me._GUID = value
+            End Set
+        End Property
 
         <JsonIgnore()>
         Public _IsAbsorbed As Boolean = False
@@ -481,6 +495,7 @@ Namespace FBM
         ''' </summary>
         <XmlIgnore()>
         Public NORMAName As String = "" 'The Original NORMA name for the ModelObject. Used because Boston limits Concept/Symbol lengths to 100, whereas NORMA names are boundless.
+
         <XmlIgnore()>
         Public NORMAReferenceId As String = ""
 

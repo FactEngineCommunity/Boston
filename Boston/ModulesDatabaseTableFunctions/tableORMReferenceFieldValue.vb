@@ -65,7 +65,7 @@ Namespace TableReferenceFieldValue
 
         End Sub
 
-        Public Sub DeleteReferenceFieldValuesByMatch(ByVal arReferenceTableId As Integer, ByVal aarExpandoObject() As ExpandoObject)
+        Public Sub DeleteReferenceFieldValuesByMatch(ByVal arReferenceTableId As Integer, ByVal aarExpandoObject() As Object)
 
             Try
 
@@ -73,11 +73,13 @@ Namespace TableReferenceFieldValue
                 Dim loTransformation As Object = New System.Dynamic.ExpandoObject
                 Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(arReferenceTableId, loTransformation,, aarExpandoObject)
 
-                lsSQLQuery = "DELETE FROM ReferenceFieldValue"
-                lsSQLQuery &= " WHERE reference_table_id = " & arReferenceTableId
-                lsSQLQuery &= "   AND row_id IN (" & String.Join(",", larTransformationTuples.Select(Function(obj) $"'{obj.RowId}'")) & ")"
+                If larTransformationTuples.Count > 0 Then
+                    lsSQLQuery = "DELETE FROM ReferenceFieldValue"
+                    lsSQLQuery &= " WHERE reference_table_id = " & arReferenceTableId
+                    lsSQLQuery &= "   AND row_id IN (" & String.Join(",", larTransformationTuples.Select(Function(obj) $"'{obj.RowId}'")) & ")"
 
-                Call pdbConnection.Execute(lsSQLQuery)
+                    Call pdbConnection.Execute(lsSQLQuery)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
