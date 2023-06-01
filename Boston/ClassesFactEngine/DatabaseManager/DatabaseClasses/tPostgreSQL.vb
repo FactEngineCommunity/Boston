@@ -11,32 +11,83 @@ Namespace FactEngine
 
         Private FBMModel As FBM.Model
 
-        Public DatabaseConnectionString As String
 
-        Public ODBCConnection As System.Data.Odbc.OdbcConnection
+        Private _Connection As System.Data.Odbc.OdbcConnection
+        Public Property Connection As System.Data.Odbc.OdbcConnection
+            Get
+                Return Me._Connection
+            End Get
+            Set(value As System.Data.Odbc.OdbcConnection)
+                Me._Connection = value
+            End Set
+        End Property
+
 
         Public Sub New(ByRef arFBMModel As FBM.Model,
                        ByVal asDatabaseConnectionString As String,
-                       ByVal aiDefaultQueryLimit As Integer)
+                       ByVal aiDefaultQueryLimit As Integer,
+                       Optional abOpenConnection As Boolean = True)
 
             Try
                 Me.FBMModel = arFBMModel
                 Me.DatabaseConnectionString = asDatabaseConnectionString
                 Me.DefaultQueryLimit = aiDefaultQueryLimit
 
-                Me.ODBCConnection = New System.Data.Odbc.OdbcConnection(Me.DatabaseConnectionString)
-                Try
-                    Me.ODBCConnection.Open()
-                    Me.Connected = True
-                Catch
-                    MsgBox("Failed To open the MongoDB database connection.")
-                End Try
+                Me.Connection = New System.Data.Odbc.OdbcConnection(Me.DatabaseConnectionString)
+
+                If abOpenConnection Then
+                    Try
+                        Me.Connection.Open()
+                        Me.Connected = True
+                    Catch
+                        MsgBox("Failed To open the MongoDB database connection.")
+                    End Try
+                End If
 
             Catch ex As Exception
 
             End Try
 
         End Sub
+
+        Public Overrides Sub Open(Optional ByVal asDatabaseConnectionString As String = Nothing)
+
+            Try
+                If asDatabaseConnectionString IsNot Nothing Then
+                    Me.DatabaseConnectionString = asDatabaseConnectionString
+                End If
+
+                If Me.DatabaseConnectionString Is Nothing Then
+                    Throw New Exception("Must have Database Connection String for the database")
+                End If
+
+                Try
+                    Me._Connection = New System.Data.Odbc.OdbcConnection(Me.DatabaseConnectionString)
+
+                    ' Open the connection (which will test the connection string)
+                    Call Me.Connection.Open()
+
+                    Me.State = 1
+                    Me.Connected = True
+
+                Catch ex As Exception
+                    Me.Connected = False
+                    Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
+                End Try
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+
 
         ''' <summary>
         ''' Adds a new Column to a Table.
@@ -331,6 +382,21 @@ Namespace FactEngine
         Public Overrides Function dateToTextOperator() As String
             Return "::text"
         End Function
+
+        Public Overloads Sub Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False)
+
+            Try
+                Call Me.GONonQuery(asQuery)
+            Catch ex As Exception
+                If abIgnoreErrors Then Exit Sub
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
 
         Public Overrides Function FormatDateTime(ByVal asOriginalDate As String,
                                                  Optional ByVal abIgnoreError As Boolean = False,
@@ -991,7 +1057,7 @@ Namespace FactEngine
                 '==========================================================
                 'Populate the lrRecordset with results from the database
 
-                Dim command As OdbcCommand = New OdbcCommand(asQuery, Me.ODBCConnection)
+                Dim command As OdbcCommand = New OdbcCommand(asQuery, Me.Connection)
                 Dim reader As OdbcDataReader = command.ExecuteReader()
 
                 'Dim adapter As OdbcDataAdapter = New OdbcDataAdapter(asQuery, Me.ODBCConnection)
@@ -1095,25 +1161,10 @@ Namespace FactEngine
             Try
                 lrRecordset.Query = asSQLQuery
 
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Dim command As New OdbcCommand(asSQLQuery, Me.Connection)
 
-                If lrSQLiteConnection Is Nothing Then
-                    Throw New Exception("SQLite Adaptor: Could not create SQLite database connection to execute the query.")
-                End If
-
-
-                Using cmd As New System.Data.SQLite.SQLiteCommand(lrSQLiteConnection)
-                    cmd.CommandText = asSQLQuery
-                    cmd.Prepare()
-
-                    Try
-                        result = cmd.ExecuteNonQuery()
-                    Catch SQLiteException As System.Data.SQLite.SQLiteException
-                        Throw New Exception(SQLiteException.Message)
-                    End Try
-                End Using
-
-                lrSQLiteConnection.Close()
+                ' Execute the non-query statement
+                Dim rowsAffected As Integer = command.ExecuteNonQuery()
 
                 Return lrRecordset
 

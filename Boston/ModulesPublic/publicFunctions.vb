@@ -236,7 +236,14 @@ Namespace Boston
                 '------------------------------------------------                 
                 Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
 
-                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+                If My.Settings.DatabaseType = pcenumDatabaseType.PostgreSQL.ToString Then
+#Region "Postgres"
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                    pdbConnection = New FactEngine.PostgreSQLConnection(Nothing, lsConnectionString, 10000, False)
+                    pdb_OLEDB_connection = New FactEngine.PostgreSQLConnection(Nothing, lsConnectionString, 10000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
+#End Region
+                ElseIf My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
 #Region "SQLite"
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
@@ -330,7 +337,7 @@ StillCannotFindTheDatabaseSQLite:
 #Region "SHIFT KEY DOWN - User Points to database"
                     If My.Computer.Keyboard.ShiftKeyDown Then
 UserSelectedDatabase:
-                            Using lrOpenFileDialog As New OpenFileDialog
+                        Using lrOpenFileDialog As New OpenFileDialog
 
                             lrOpenFileDialog.Filter = "Boston Database (*.vdb, *.mdb)|*.vdb; *.mdb|All Files|*.*"
 
@@ -355,7 +362,6 @@ UserSelectedDatabase:
                         End Using
 #End Region
                     End If
-#End Region
 
                     lsDatabaseLocation = Boston.returnIfTrue(asDatabaseLocationFile IsNot Nothing, asDatabaseLocationFile, lrSQLConnectionStringBuilder("Data Source"))
                     lsDataProvider = lrSQLConnectionStringBuilder("Provider")
@@ -435,6 +441,7 @@ StillCannotFindTheDatabase:
                         '    Return False
                         'End If
 #End Region
+#End Region
                     End If
 #End Region
                 End If
@@ -460,13 +467,17 @@ OpenConnection:
                 pdbConnection.Open(lsConnectionString)
 
 #Region "OLEDB"
-                'lsDatabaseLocation
-                lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
-                lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
-                lrSQLConnectionStringBuilder("Provider") = "Microsoft.ACE.OLEDB.12.0" ' "Microsoft.Jet.OLEDB.4.0"
+                Select Case My.Settings.DatabaseType
+                    Case Is = pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.MSJet.ToString
 
-                pdb_OLEDB_connection.ConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                pdb_OLEDB_connection.Open()
+                        'lsDatabaseLocation
+                        lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
+                        lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+                        lrSQLConnectionStringBuilder("Provider") = "Microsoft.ACE.OLEDB.12.0" ' "Microsoft.Jet.OLEDB.4.0"
+
+                        pdb_OLEDB_connection.ConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        pdb_OLEDB_connection.Open()
+                End Select
 #End Region
                 Return True
 

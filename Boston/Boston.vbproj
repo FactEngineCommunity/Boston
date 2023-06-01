@@ -460,6 +460,7 @@
     <Compile Include="ClassesClientServer\tProjectUserPermission.vb" />
     <Compile Include="ClassesClientServer\tRole.vb" />
     <Compile Include="ClassesClientServer\tUser.vb" />
+    <Compile Include="ClassesDatabase\Postgres\tPostgresRecordset.vb" />
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
     <Compile Include="ClassesDatabase\SQLite\tSQLiteRecordset.vb" />
     <Compile Include="ClassesDatabase\tFieldClass.vb" />

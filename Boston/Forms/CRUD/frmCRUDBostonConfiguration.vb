@@ -328,6 +328,13 @@ Public Class frmCRUDBostonConfiguration
         End If
 
         Try
+            Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
+                Case Is = pcenumDatabaseType.SQLite, pcenumDatabaseType.MSJet
+                    'Nothing to do here.
+                Case Else
+                    GoTo TestConnectionString
+            End Select
+
 
             Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing
 
@@ -350,6 +357,7 @@ Public Class frmCRUDBostonConfiguration
                 Return False
             End If
 
+TestConnectionString:
             Try
                 Select Case Me.ComboBoxDatabaseType.SelectedItem.Tag
                     Case Is = pcenumDatabaseType.SQLite
@@ -359,6 +367,21 @@ Public Class frmCRUDBostonConfiguration
                     Case Is = pcenumDatabaseType.MSJet
                         Dim ldbConnection As New ADODB.Connection
                         Call ldbConnection.Open(lsConnectionString)
+                    Case Is = pcenumDatabaseType.PostgreSQL
+                        ' Create an instance of the OdbcConnection class
+                        Using connection As New System.Data.Odbc.OdbcConnection(lsConnectionString)
+                            Try
+                                ' Open the connection (which will test the connection string)
+                                connection.Open()
+
+                                ' If the connection string is valid, this block will be executed
+                                Console.WriteLine("Connection successful!")
+                            Catch ex As Exception
+                                ' If there is an exception, the connection string is likely invalid or there is an issue with the database server
+                                Throw New Exception("Connection failed!" & ex.Message)
+
+                            End Try
+                        End Using
                 End Select
             Catch ex As Exception
                 asReturnMessage &= "Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message
@@ -392,7 +415,7 @@ Public Class frmCRUDBostonConfiguration
             liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
             larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
 
-            Dim laiDatabaseType = {pcenumDatabaseType.MSJet, pcenumDatabaseType.SQLite}
+            Dim laiDatabaseType = {pcenumDatabaseType.MSJet, pcenumDatabaseType.SQLite, pcenumDatabaseType.PostgreSQL}
 
             For liInd = 1 To larDatabaseType.Count
 

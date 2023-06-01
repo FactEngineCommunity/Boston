@@ -23,6 +23,9 @@ Public Class RecordsetProxy
                 Case GetType(FactEngine.MSAccessConnection)
                     _innerRecordset = New ADODB.Recordset
                     Me._innerRecordset.ActiveConnection = value.Connection
+                Case GetType(FactEngine.PostgreSQLConnection)
+                    _innerRecordset = New Postgres.Recordset
+                    Me._innerRecordset.ActiveConnection = value
                 Case Else
                     _innerRecordset = New ADODB.Recordset()
                     Me._innerRecordset.ActiveConnection = value
