@@ -102,13 +102,25 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _ReferenceMode As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ReferenceMode() As String
             Get
                 Return Me._ReferenceMode
             End Get
             Set(ByVal value As String)
                 Me._ReferenceMode = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _HideReferenceMode As Boolean
+        <XmlAttribute()>
+        Public Property HideReferenceMode() As Boolean
+            Get
+                Return Me._HideReferenceMode
+            End Get
+            Set(ByVal value As Boolean)
+                Me._HideReferenceMode = value
             End Set
         End Property
 

@@ -66,6 +66,9 @@ Namespace FBM
             End Set
         End Property
 
+        <XmlAttribute>
+        Public HideReferenceMode As Boolean = False
+
         <XmlIgnore()>
         Public primitive_type_entity_id As Integer = 0
 
@@ -292,6 +295,8 @@ Namespace FBM
         Public Event DerivationTextChanged(ByVal asDerivationText As String)
         <NonSerialized()>
         Public Event ExpandReferenceScheme()
+        <NonSerialized()>
+        Public Event HideReferenceModeChanged(ByVal abHideReferenceMode As Boolean)
         <NonSerialized()>
         Public Event IsActorChanged(ByVal abIsActor As Boolean)
         <NonSerialized()>
@@ -3432,6 +3437,22 @@ SkipSettingReferenceModeObjects:
 
             Me._ModelError.Add(arModelError)
             RaiseEvent ModelErrorAdded(arModelError)
+
+        End Sub
+
+        Public Sub SetHideReferenceMode(ByVal abHideReferenceMode As Boolean)
+
+            Try
+                Me.HideReferenceMode = abHideReferenceMode
+                RaiseEvent HideReferenceModeChanged(abHideReferenceMode)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

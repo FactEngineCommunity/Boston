@@ -193,10 +193,10 @@ Namespace FBM
         <XmlIgnore()> _
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Public Shadows _ReferenceMode As String
-        <XmlAttribute()> _
-        <CategoryAttribute("Entity Type"), _
-         DescriptionAttribute("The 'Reference Mode' for the Entity Type"), _
-         TypeConverter(GetType(tMyConverter))> _
+        <XmlAttribute()>
+        <CategoryAttribute("Entity Type"),
+         DescriptionAttribute("The 'Reference Mode' for the Entity Type"),
+         TypeConverter(GetType(tMyConverter))>
         Public Shadows Property ReferenceMode() As String
             Get
                 Dim TempString As String = ""
@@ -219,9 +219,27 @@ Namespace FBM
                 Return TempString
             End Get
             Set(ByVal Value As String)
-                Me._ReferenceMode = Value                
+                Me._ReferenceMode = Value
             End Set
         End Property
+
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public Shadows _HideReferenceMode As Boolean
+
+        <XmlAttribute()>
+        <CategoryAttribute("Entity Type"),
+         DescriptionAttribute("True if the Reference Mode for the Entity Type is hidden on Pages.")>
+        Public Shadows Property HideReferenceMode As Boolean
+            Get
+                Return Me._HideReferenceMode
+            End Get
+            Set(value As Boolean)
+                Me._HideReferenceMode = value
+            End Set
+        End Property
+
+
 
         <XmlIgnore()> _
         Public _DataType As pcenumORMDataType
@@ -1141,7 +1159,7 @@ Namespace FBM
                     loEntityWidth = New SizeF(loEntityWidth.Width + 8, loEntityWidth.Height)
                 End If
 
-                If (Me.HasSimpleReferenceScheme And Not Me.EntityType.IsSubtype) Or lbIsVariedReferenceSchemeSubtype Then
+                If Not Me.HideReferenceMode And ((Me.HasSimpleReferenceScheme And Not Me.EntityType.IsSubtype) Or lbIsVariedReferenceSchemeSubtype) Then
                     loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
                     Me.Shape.SetRect(loRectangle, False)
                     loRectangle = New Rectangle(Me.X + 2, Me.ReferenceModeShape.Bounds.Y, loReferenceModeWidth.Width, loReferenceModeWidth.Height + 1)
@@ -2116,6 +2134,8 @@ MoveOn:
                             Else
                                 'Call Me.SetPropertyAttributes(Me, "DataType", True)
                             End If
+                        Case Is = "HideReferenceMode"
+                            Call Me.EntityType.SetHideReferenceMode(Me.HideReferenceMode)
                         Case Is = "Name"
                             If Me.EntityType.Name = Me.Name Then
                                 '------------------------------------------------------------
@@ -2181,7 +2201,7 @@ MoveOn:
 
                     Call Me.SetShapeSizesAndPositions()
 
-                    ''------------------
+                    '20230602-VM-Remove after 6 months'------------------
                     ''Diagram is set.
                     ''------------------
                     'If IsSomething(Me.EntityTypeNameShape) Then
@@ -3299,6 +3319,23 @@ MoveOn:
                 Return New Point(0, 0)
             End If
         End Function
+
+        Private Sub _EntityType_HideReferenceModeChanged(abHideReferenceMode As Boolean) Handles _EntityType.HideReferenceModeChanged
+
+            Try
+                Me._HideReferenceMode = abHideReferenceMode
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
 
     End Class
 

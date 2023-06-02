@@ -131,6 +131,7 @@ SkipModelLevelValueType:
                     lrXMLEntityType.IsObjectifyingEntityType = lrEntityType.IsObjectifyingEntityType
                     lrXMLEntityType.Instance = lrEntityType.Instance
                     lrXMLEntityType.ReferenceMode = lrEntityType.ReferenceMode
+                    lrXMLEntityType.HideReferenceMode = lrEntityType.HideReferenceMode
                     lrXMLEntityType.IsIndependent = lrEntityType.IsIndependent
                     lrXMLEntityType.IsAbsorbed = lrEntityType.IsAbsorbed
                     lrXMLEntityType.IsPersonal = lrEntityType.IsPersonal
@@ -764,6 +765,7 @@ SkipValueType:
                     lrEntityType.GUID = lrXMLEntityType.GUID
                     lrEntityType.Name = lrXMLEntityType.Name
                     lrEntityType.ReferenceMode = lrXMLEntityType.ReferenceMode
+                    lrEntityType.HideReferenceMode = lrXMLEntityType.HideReferenceMode
                     lrEntityType.IsDerived = lrXMLEntityType.IsDerived
                     lrEntityType.DerivationText = lrXMLEntityType.DerivationText
                     'lrEntityType.ShortDescription = 
@@ -1319,6 +1321,7 @@ SkipValueTypeInstance:
                     lrEntityTypeInstance.EntityType = lrEntityType
                     lrEntityTypeInstance._Name = lrEntityTypeInstance.Id
                     lrEntityTypeInstance.ReferenceMode = lrEntityType.ReferenceMode
+                    lrEntityTypeInstance._HideReferenceMode = lrEntityType.HideReferenceMode
                     lrEntityTypeInstance.IsObjectifyingEntityType = lrEntityType.IsObjectifyingEntityType
                     lrEntityTypeInstance.IsAbsorbed = lrEntityType.IsAbsorbed
                     lrEntityTypeInstance.IsDerived = lrEntityType.IsDerived
