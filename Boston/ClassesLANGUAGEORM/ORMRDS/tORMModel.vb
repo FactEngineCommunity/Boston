@@ -1901,15 +1901,19 @@ Namespace FBM
                     Me.RDS.Table.AddUnique(lrTable)
 
                     'PGS Relation
-                    lsSQLQuery = " SELECT COUNT(*)"
-                    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
-                    lsSQLQuery &= " WHERE IsPGSRelation = '" & lrTable.Name & "'"
+                    Try
+                        lsSQLQuery = " SELECT COUNT(*)"
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
+                        lsSQLQuery &= " WHERE IsPGSRelation = '" & lrTable.Name & "'"
 
-                    lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    If lrORMRecordset3(0).Data > 0 Then
-                        lrTable.isPGSRelation = True
-                    End If
+                        If lrORMRecordset3(0).Data > 0 Then
+                            lrTable.isPGSRelation = True
+                        End If
+                    Catch ex As Exception
+                        'Not a biggie at this stage.
+                    End Try
 
                     lrORMRecordset.MoveNext()
 #End Region

@@ -47,6 +47,7 @@ Namespace FBM
         <XmlIgnore()>
         Public _ModelError As New List(Of FBM.ModelError)
         <JsonIgnore()>
+        <XmlIgnore()>
         Public Overridable Property ModelError As List(Of FBM.ModelError)
             Get
                 Return _ModelError

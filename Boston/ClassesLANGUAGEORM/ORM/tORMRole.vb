@@ -556,7 +556,6 @@ Namespace FBM
                                               Optional ByVal abForceReferencingErrorThrowing As Boolean = Nothing,
                                               Optional ByRef arFactTypeInstance As FBM.FactTypeInstance = Nothing) As FBM.RoleInstance
 
-            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrRoleInstance As New FBM.RoleInstance
             Dim lsMessage As String = ""
 
@@ -620,6 +619,10 @@ Namespace FBM
 #End Region
                         Case Is = pcenumRoleJoinType.FactType
                             lrRoleInstance.JoinedORMObject = arPage.FactTypeInstance.Find(Function(x) x.Id = .JoinedORMObject.Id)
+
+                            If lrRoleInstance.JoinedORMObject Is Nothing Then
+                                lrRoleInstance.JoinedORMObject = arPage.EntityTypeInstance.Find(Function(x) x.Id = .JoinedORMObject.Id)
+                            End If
 #Region "FactType Error"
                             If lrRoleInstance.JoinedORMObject Is Nothing Then
                                 lrRoleInstance.JoinedORMObject = .JoinedORMObject.CloneInstance(arPage, abAddToPage)

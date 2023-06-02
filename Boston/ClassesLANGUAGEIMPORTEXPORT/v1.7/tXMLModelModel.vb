@@ -17,6 +17,12 @@ Namespace XMLModel
         Public ORMModel As New XMLModel.ORMModel
         Public ORMDiagram As New List(Of XMLModel.Page)
 
+        ' Build a dictionaries for faster search
+        Dim ValueTypeDictionary As Dictionary(Of String, FBM.ValueType)
+        Dim EntityTypeDictionary As Dictionary(Of String, FBM.EntityType)
+        Dim FactTypeDictionary As Dictionary(Of String, FBM.FactType)
+        Dim RoleConstraintDictionary As Dictionary(Of String, FBM.RoleConstraint)
+
         Private Function FactTypeIsReferenceModeFactType(ByVal asXMLFactTypeId As String) As Boolean
 
             Try
@@ -689,6 +695,7 @@ SkipModelLevelRoleConstraint:
                 '==============================
                 'Map the ValueTypes
                 '==============================
+#Region "ValueTypes"
                 Dim lrXMLValueType As XMLModel.ValueType
                 Dim lrValueType As FBM.ValueType
                 Dim lsValueTypeConstraintValue As String
@@ -730,11 +737,16 @@ SkipModelLevelRoleConstraint:
 SkipValueType:
                 Next
 
+                ' Build a dictionary for faster search
+                Me.ValueTypeDictionary = lrModel.ValueType.ToDictionary(Function(x) x.Id)
+
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(62)
+#End Region
 
                 '==============================
                 'Map the EntityTypes
                 '==============================
+#Region "EntityTypes"
                 Dim lrXMLEntityType As XMLModel.EntityType
                 Dim lrEntityType As FBM.EntityType
 
@@ -787,7 +799,12 @@ SkipValueType:
 SkipEntityType:
                 Next
 
+                ' Build a dictionary for faster search
+                Me.EntityTypeDictionary = lrModel.EntityType.ToDictionary(Function(x) x.Id)
+
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(64)
+#End Region
+
 
                 '==============================
                 'Map the FactTypes
@@ -809,6 +826,9 @@ SkipEntityType:
                     Call Me.GetFactTypeDetails(lrFactType, lrXMLFactType)
 SkipFactType:
                 Next
+
+                ' Build a dictionary for faster search
+                Me.FactTypeDictionary = lrModel.FactType.ToDictionary(Function(x) x.Id)
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(66)
 
@@ -1067,6 +1087,9 @@ SkipRoleConstraintRole:
 SkipRoleConstraint:
                 Next
 
+                ' Build a dictionary for faster search
+                Me.RoleConstraintDictionary = lrModel.RoleConstraint.ToDictionary(Function(x) x.Id)
+
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(68)
 
                 '-----------------------------------------------------------------------------
@@ -1248,6 +1271,7 @@ SkipModelNote:
                 '=============================
 #Region "ValueTypeInstances"
                 Dim lrValueTypeInstance As FBM.ValueTypeInstance
+                Dim lrValueType As FBM.ValueType = Nothing
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType)
                     Try
@@ -1255,7 +1279,9 @@ SkipModelNote:
                         lrValueTypeInstance.Model = arModel
                         lrValueTypeInstance.Page = lrPage
                         lrValueTypeInstance.Id = lrConceptInstance.Symbol
-                        lrValueTypeInstance.ValueType = arModel.ValueType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        ' Perform the search using the dictionary                                
+                        Me.ValueTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrValueType) '20230602-CM-Was .ValueType = arModel.ValueType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        lrValueTypeInstance.ValueType = lrValueType
                         lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
                         lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
                         lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
@@ -1280,13 +1306,15 @@ SkipValueTypeInstance:
                 '=============================
 #Region "EntityTypeInstances"
                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                Dim lrEntityType As FBM.EntityType
+                Dim lrEntityType As FBM.EntityType = Nothing
+
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
                     lrEntityTypeInstance = New FBM.EntityTypeInstance
                     lrEntityTypeInstance.Model = arModel
                     lrEntityTypeInstance.Page = lrPage
                     lrEntityTypeInstance.Id = lrConceptInstance.Symbol
-                    lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.Id)
+                    ' Perform the search using the dictionary                                
+                    Me.EntityTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrEntityType) '20230602-CM-Was lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.Id)
                     If lrEntityType Is Nothing Then GoTo SkipEntityTypeInstance
                     lrEntityTypeInstance.EntityType = lrEntityType
                     lrEntityTypeInstance._Name = lrEntityTypeInstance.Id
@@ -1299,10 +1327,10 @@ SkipValueTypeInstance:
                     lrEntityTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
 
                     If lrEntityTypeInstance.EntityType.ReferenceModeValueType IsNot Nothing Then
-                        lrEntityTypeInstance.ReferenceModeValueType = lrPage.ValueTypeInstance.Find(Function(x) x.Id = lrEntityTypeInstance.EntityType.ReferenceModeValueType.Id)
+                        lrEntityTypeInstance.ReferenceModeValueType = lrPage.ValueTypeInstance.Find(Function(x) x.Id = lrEntityType.ReferenceModeValueType.Id)
                     End If
 
-                    lrEntityTypeInstance.PreferredIdentifierRCId = lrEntityTypeInstance.EntityType.PreferredIdentifierRCId
+                    lrEntityTypeInstance.PreferredIdentifierRCId = lrEntityType.PreferredIdentifierRCId
 
                     lrEntityTypeInstance.Visible = lrConceptInstance.Visible
                     lrEntityTypeInstance.X = lrConceptInstance.X
@@ -1321,16 +1349,17 @@ SkipEntityTypeInstance:
                 Dim lrDerivationTextConceptInstance As FBM.ConceptInstance
                 Dim lrFactTypeReadingConceptInstance As FBM.ConceptInstance
                 Dim lrFactTypeNameConceptInstance As FBM.ConceptInstance
-                Dim lrFact As FBM.Fact
-                Dim lrFactType As FBM.FactType
+                Dim lrFactType As FBM.FactType = Nothing
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
-                    lrFactType = arModel.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                    ' Perform the search using the dictionary        
+                    Me.FactTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrFactType) '20230602-CM-Was lrFactType = arModel.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
                     If lrFactType Is Nothing Then GoTo SkipFactTypeInstance
                     lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True,, lrConceptInstance.InstanceNumber)
                     lrFactTypeInstance.X = lrConceptInstance.X
                     lrFactTypeInstance.Y = lrConceptInstance.Y
                     lrFactTypeInstance.DBName = lrFactType.DBName
+                    lrFactTypeInstance.Visible = lrConceptInstance.Visible
 
                     If lrFactType.IsDerived Then
                         lrDerivationTextConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
@@ -1472,6 +1501,7 @@ SkipFactTypeInstance:
                                 lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, True)
                                 lrSubtypeRelationshipInstance.ModelElement = lrModelElementInstance
                                 lrSubtypeRelationshipInstance.parentModelElement = lrParentModelElementInstance
+                                lrSubtypeRelationshipInstance.Visible = lrSubtypeRelationshipInstance.FactType.Visible
 
                                 Select Case lrModelElementInstance.ConceptType
                                     Case Is = pcenumConceptType.EntityType
@@ -1517,7 +1547,8 @@ SkipFactTypeInstance:
                 'Map the RoleConstraintInstances
                 '=================================
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                Dim lrRoleConstraint As FBM.RoleConstraint
+                Dim lrRoleConstraint As FBM.RoleConstraint = Nothing
+
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
 
                     If IsSomething(lrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrConceptInstance.Symbol)) Then
@@ -1526,7 +1557,8 @@ SkipFactTypeInstance:
                         '  FactType.CloneInstance adds RoleConstraintInstances to the Page
                         '-------------------------------------------------------------------
                     Else
-                        lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        ' Perform the search using the dictionary                                
+                        Me.RoleConstraintDictionary.TryGetValue(lrConceptInstance.Symbol, lrRoleConstraint) '20230602-CM-Was lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrConceptInstance.Symbol)
 
                         Try
                             lrRoleConstraintInstance = Nothing
@@ -1604,6 +1636,8 @@ SkipFactTypeInstance:
                 Next
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70 + CInt(9 * (arModel.Page.FindAll(Function(x) x.Loaded = True).Count / arModel.Page.Count)))
+
+FinishedPage:
 
                 lrPage.Loaded = True
                 lrPage.Loaded = False

@@ -2006,14 +2006,24 @@ ReattachRoles:
 
                         'Redraw Link to nearest ConceptInstance
                         If lrRoleInstance.JoinedORMObject IsNot Nothing Then
+
+                            'CodeSafe - 20230602-VM-I'm not sure why this would be like this.
+                            If lrRoleInstance.JoinedORMObject.Id <> lrRoleInstance.Role.JoinedORMObject.Id Then
+                                lrRoleInstance.JoinedORMObject = lrRoleInstance.Role.JoinedORMObject.CloneModelObject(lrRoleInstance.Model)
+                                lrRoleInstance.JoinedORMObject.ConceptType = lrRoleInstance.Role.JoinedORMObject.ConceptType
+                            End If
+
                             Dim larModelElementInstance = From ModelElementInstance In Me.Page.GetAllPageObjects(False, False, lrRoleInstance.JoinedORMObject)
                                                           Where ModelElementInstance.Visible = True
+                                                          Where ModelElementInstance.Id <> Me.Id
                                                           Select ModelElementInstance
 
                             If larModelElementInstance.Count > 1 Then
 
                                 Dim larClosestModelElementInstance = (From ModelElementInstance In larModelElementInstance
-                                                                      Select New With {.ModelElementInstance = ModelElementInstance, .Shape = ModelElementInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(lrRoleInstance.X - ModelElementInstance.ShapeMidPoint.X) ^ 2 + Math.Abs(lrRoleInstance.Y - ModelElementInstance.ShapeMidPoint.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
+                                                                      Select New With {.ModelElementInstance = ModelElementInstance,
+                                                                                       .Shape = ModelElementInstance.Shape,
+                                                                                       .Hypotenuse = Math.Sqrt(Math.Abs(lrRoleInstance.X - ModelElementInstance.ShapeMidPoint.X) ^ 2 + Math.Abs(lrRoleInstance.Y - ModelElementInstance.ShapeMidPoint.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
 
                                 Try
                                     lrRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape

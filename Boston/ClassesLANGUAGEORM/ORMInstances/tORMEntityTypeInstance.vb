@@ -352,7 +352,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._X = value
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     Dim loRectangle As New Rectangle(Me.X, Me.Shape.Bounds.Y, Me.Shape.Bounds.Width, Me.Shape.Bounds.Height)
                     Me.Shape.SetRect(loRectangle, False)
                 End If
@@ -366,7 +366,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._Y = value
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     Dim loRectangle As New Rectangle(Me.Shape.Bounds.X, Me.Y, Me.Shape.Bounds.Width, Me.Shape.Bounds.Height)
                     Me.Shape.SetRect(loRectangle, False)
                 End If
@@ -427,6 +427,7 @@ Namespace FBM
         XmlIgnore()>
         Public IncomingLink As New List(Of DiagramLink) 'For when the EntityType is a Process in a UseCaseDiagram etc
 
+        <NonSerialized()>
         Public Event ExpandReferenceModeChanged(ByVal abExpandReferenceMode As Boolean)
 
         Sub New()
@@ -3244,6 +3245,8 @@ MoveOn:
 
                 For Each lrSubtypeRelationshipInstance In Me.SubtypeRelationship
 
+                    If lrSubtypeRelationshipInstance.Visible = False Then Continue For
+
                     Dim lrFactTypeInstance = lrSubtypeRelationshipInstance.FactType
 
                     If lrFactTypeInstance.RoleGroup(1).JoinedORMObject IsNot Nothing Then
@@ -3262,8 +3265,12 @@ MoveOn:
                                 If lrSubtypeRelationshipInstance.Link Is Nothing Then
                                     Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
                                 End If
+                                Try
+                                    lrSubtypeRelationshipInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                                Catch ex As Exception
+                                    Me.Page.Diagram.Links.Add(lrSubtypeRelationshipInstance.Link)
+                                End Try
 
-                                lrSubtypeRelationshipInstance.Link.Destination = larClosestModelElementInstance.First.Shape
                             End If
                             Me.Page.Diagram.Invalidate()
                         End If

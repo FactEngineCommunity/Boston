@@ -5732,11 +5732,15 @@ SkipPopup:
             '-----------------------------------        
             For Each lrEntityTypeInstance In arPage.EntityTypeInstance.FindAll(Function(x) x.SubtypeRelationship.Count > 0)
                 For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
+                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And x.Visible)
+                    If lrFactTypeInstance Is Nothing Then Continue For
                     Call lrSubtypeRelationship.DisplayAndAssociate()
                 Next
             Next
             For Each lrValueTypeInstance In arPage.ValueTypeInstance
                 For Each lrSubtypeRelationship In lrValueTypeInstance.SubtypeRelationship
+                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And x.Visible)
+                    If lrFactTypeInstance Is Nothing Then Continue For
                     Call lrSubtypeRelationship.DisplayAndAssociate()
                 Next
             Next
@@ -13007,11 +13011,17 @@ SkipRemovalFromModel:
         Try
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrFactTypeInstance As FBM.FactTypeInstance
+            Dim lrSubtypeRelationship As FBM.tSubtypeRelationship = Nothing
             Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
 
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
             For Each lrFactType In lrEntityTypeInstance.EntityType.getConnectedFactTypes.FindAll(Function(x) x.IsSubtypeRelationshipFactType)
+
+                lrSubtypeRelationship = (From EntityType In Me.zrPage.Model.EntityType
+                                         From SubtypeRelationship In EntityType.SubtypeRelationship
+                                         Where SubtypeRelationship.FactType.Id = lrFactType.Id
+                                         Select SubtypeRelationship).First
 
                 If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id).Count = 0 Then
 
@@ -13023,9 +13033,9 @@ SkipRemovalFromModel:
                                                              Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
                                                              Select SubtypeRelationshipInstance).First
                         Else
-                            Dim lrSubtypeRelationship = (From SubtypeRelationship In lrFactType.RoleGroup(0).JoinedORMObject.SubtypeRelationship
-                                                         Where SubtypeRelationship.FactType.Id = lrFactType.Id
-                                                         Select SubtypeRelationship).First
+                            lrSubtypeRelationship = (From SubtypeRelationship In lrFactType.RoleGroup(0).JoinedORMObject.SubtypeRelationship
+                                                     Where SubtypeRelationship.FactType.Id = lrFactType.Id
+                                                     Select SubtypeRelationship).First
                             lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(Me.zrPage, True)
                         End If
 
@@ -13038,14 +13048,19 @@ SkipRemovalFromModel:
                     Try
                         lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id)
 
-                        lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
-                                                         Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
-                                                         Select SubtypeRelationshipInstance).First
-
                         Dim lrModelElement As FBM.ModelObject
                         Dim lrModelelementInstance As FBM.FactTypeInstance
 
-                        lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
+                        lrModelElement = lrFactTypeInstance.RoleGroup(1).JoinedORMObject
+
+                        Try
+                            lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
+                                                             Where SubtypeRelationshipInstance.SubtypeRelationship.FactType.Id = lrFactTypeInstance.Id
+                                                             Select SubtypeRelationshipInstance).First
+                        Catch ex As Exception
+                            lrSubtypeRelationshipInstance = New FBM.SubtypeRelationshipInstance(Me.zrPage, lrEntityTypeInstance, lrModelElement)
+                            lrSubtypeRelationshipInstance.SubtypeRelationship = lrSubtypeRelationship
+                        End Try
 
                         If lrModelElement Is Nothing Then
                             lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
@@ -13379,6 +13394,26 @@ SkipRemovalFromModel:
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub RemoveFromPageToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles RemoveFromPageToolStripMenuItem2.Click
+
+        Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
+
+        Try
+            lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
+
+            Call lrSubtypeRelationshipInstance.RemoveFromPage()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

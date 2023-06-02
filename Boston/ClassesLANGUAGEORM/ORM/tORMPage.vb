@@ -1056,6 +1056,8 @@ Namespace FBM
                     Return Nothing
                 End If
 
+                If Me.Name = "All others" And arFactType.Id = "ControlFlowConnection" Then Debugger.Break()
+
                 'Return failsafe
                 DropFactTypeAtPoint = Nothing
 
@@ -1118,7 +1120,7 @@ Namespace FBM
                     End If
 
                     lrFactTypeInstance = arFactType.CloneInstance(Me, False)
-
+                    lrFactTypeInstance.Visible = True
                     '----------------------------------------------------------------------------------------
                     'Create a ConceptInstance that can be broadcast to other ClientServer Boston instances.
                     lrConceptInstance = New FBM.ConceptInstance(Me.Model, Me, lrFactType.Id, pcenumConceptType.FactType)
@@ -1346,7 +1348,19 @@ Namespace FBM
                             lrRoleJoinedFactType.Model = Me.Model
 
                             If Me.FactTypeInstance.Find(AddressOf lrRoleJoinedFactType.Equals) Is Nothing Then
-                                Call Me.DropFactTypeAtPoint(lrRoleJoinedFactType, loPoint, False,,,,,, abShowFactTypeNames)
+                                If lrRoleJoinedFactType.IsObjectified Or lrRoleJoinedFactType.HasTotalRoleConstraint Then
+                                    If Me.EntityTypeInstance.Find(Function(x) x.Id = lrRoleJoinedFactType.Id) Is Nothing Then
+                                        If lrRoleJoinedFactType.ObjectifyingEntityType IsNot Nothing Then
+                                            Call Me.DropEntityTypeAtPoint(lrRoleJoinedFactType.ObjectifyingEntityType, loPoint)
+                                        Else
+                                            Call Me.DropFactTypeAtPoint(lrRoleJoinedFactType, loPoint, False,,,,,, abShowFactTypeNames)
+                                        End If
+
+                                    End If
+                                Else
+                                        Call Me.DropFactTypeAtPoint(lrRoleJoinedFactType, loPoint, False,,,,,, abShowFactTypeNames)
+                                End If
+
                             End If
 
                             If lrRoleJoinedFactType.IsObjectified And abShowFactTypeNames Then

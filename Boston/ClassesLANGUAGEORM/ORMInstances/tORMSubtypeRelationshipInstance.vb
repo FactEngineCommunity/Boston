@@ -32,9 +32,9 @@ Namespace FBM
         ''' The FactTypeInstance of the FactType that represents the Subtype
         ''' </summary>
         ''' <remarks></remarks>
-        Public Shadows FactType As New FBM.FactTypeInstance
+        Public Shadows FactType As FBM.FactTypeInstance
 
-        Public Shadows WithEvents SubtypeRelationship As New FBM.tSubtypeRelationship
+        Public Shadows WithEvents SubtypeRelationship As FBM.tSubtypeRelationship
 
         <XmlIgnore>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -197,6 +197,8 @@ Namespace FBM
                         End If
                     End If
                 End If
+
+                If Me.Visible = False Then Exit Sub
 
                 '--------------------------------------------------------
                 'Create a Link for the SubType on the DiagramView object

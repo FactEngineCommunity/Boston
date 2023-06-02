@@ -24,7 +24,7 @@ SINGLEQUOTE   -> @"'";
 STAR          -> "\*";
 USERTABLENAME -> @"[aA-zZ0-9]+";
 WHERECLAUSECOLUMNNAMESTR -> @"[aA-zZ0-9]+";
-VALUE         -> @"[a-zA-Z0-9,\-\s_\.\""+#*?$@!%]*"; //20230530-Was->[aA-zZ0-9,\-\s+\#\*\?]*";
+VALUE         -> @"[a-zA-Z0-9,\-\s_\.\""+\[\]#*?$@!%]*"; //20230530-Was->[aA-zZ0-9,\-\s+\#\*\?]*";
 
 //Keywords
 KEYWDADD	-> "ADD";

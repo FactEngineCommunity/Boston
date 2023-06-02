@@ -333,18 +333,27 @@ Namespace NORMA
 
         Public Function LoadEntityType(ByRef arModel As FBM.Model,
                                        ByRef arNORMAXMLDOC As XDocument,
-                                       ByVal asNORMAReferenceId As String) As FBM.EntityType
+                                       ByVal asNORMAReferenceId As String,
+                                       Optional ByVal abLookForObjectifiedType As Boolean = False) As FBM.EntityType
 
             Dim lrEntityType As New FBM.EntityType
             Dim loElement As XElement
 
             Try
-                loElement = (From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
-                             Select ModelInformation
-                             Where ModelInformation.Attribute("id").Value = asNORMAReferenceId).First
+                If abLookForObjectifiedType Then
+                    loElement = (From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                 Select ModelInformation
+                                 Where ModelInformation.Attribute("id").Value = asNORMAReferenceId).First
+                Else
+                    loElement = (From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                                 Select ModelInformation
+                                 Where ModelInformation.Attribute("id").Value = asNORMAReferenceId).First
+                End If
+
 
                 lrEntityType = New FBM.EntityType(arModel, pcenumLanguage.ORMModel, loElement.Attribute("Name").Value, loElement.Attribute("Name").Value, Nothing)
                 lrEntityType.NORMAReferenceId = loElement.Attribute("id").Value
+                lrEntityType.IsObjectifyingEntityType = abLookForObjectifiedType
 
                 arModel.AddEntityType(lrEntityType, False, False, Nothing, True)
 
@@ -1295,6 +1304,25 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                             End If
                             lrFactType.ObjectifyingEntityType.SetReferenceMode(lsReferenceMode, True,, False,, True, True)
                             lrFactType.ObjectifyingEntityType.NORMAReferenceId = loXMLElementQueryResult(0).Attribute("id").Value
+                        End If
+
+                        If lrFactType.HasTotalRoleConstraint And Not lrFactType.IsObjectified And lrFactType.ObjectifyingEntityType Is Nothing Then
+                            'NORMA has Objectifying Entity Types for this condition.
+                            lrFactType.ObjectifyingEntityType = arModel.EntityType.Find(Function(x) x.Id = lrFactType.Id)
+
+                            If lrFactType.ObjectifyingEntityType Is Nothing Then
+
+                                Try
+                                    loElement = (From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                                 Select ModelInformation
+                                                 Where ModelInformation.<orm:NestedPredicate>(0).Attribute("ref").Value = lrFactType.NORMAReferenceId).First
+
+                                    lrFactType.ObjectifyingEntityType = Me.LoadEntityType(arModel, arNORMAXMLDOC, loElement.Attribute("id").Value, True)
+                                Catch ex As Exception
+                                    'Oh well. We tried.
+                                End Try
+
+                            End If
                         End If
 
                     End If 'FactType exists in Model
@@ -2901,16 +2929,19 @@ SkippedRole:
                                 'ObjectifyingEntityType
                                 '  For some ObjectifiedFactTypes, the ObjectifyingEntityType is shown rather than the FactType itself.
                                 '-----------------------------------------------------------------------------------------------------
-                                lrEntityTypeInstance = lrFactType.ObjectifyingEntityType.CloneInstance(lrPage, False, True, False)
-                                lrEntityTypeInstance.InstanceNumber = lrPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count + 1
+                                Try
+                                    lrEntityTypeInstance = lrFactType.ObjectifyingEntityType.CloneInstance(lrPage, False, True, False)
+                                    lrEntityTypeInstance.InstanceNumber = lrPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count + 1
 
-                                lrEntityTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
-                                lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
-                                lrEntityTypeInstance.Visible = True
-                                lrEntityTypeInstance.ExpandReferenceMode = False
+                                    lrEntityTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
+                                    lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
+                                    lrEntityTypeInstance.Visible = True
+                                    lrEntityTypeInstance.ExpandReferenceMode = False
 
-                                lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
-
+                                    lrPage.EntityTypeInstance.Add(lrEntityTypeInstance)
+                                Catch ex As Exception
+                                    GoTo LoadFactTypeInstance
+                                End Try
                             Else
                                 '------------------------------------
                                 'Clone an Instance of the FactType
