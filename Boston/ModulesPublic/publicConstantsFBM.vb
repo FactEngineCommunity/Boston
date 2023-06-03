@@ -1,6 +1,6 @@
 ﻿Public Module publicConstantsFBM
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumLanguage
         ORMModel = 1
         UMLUseCaseDiagram = 2
@@ -16,6 +16,11 @@
         BPMNConversationDiagram = 13
         BPMNCollaborationDiagram = 14
         BPMNProcessDigram = 15
+    End Enum
+
+    <Serializable()>
+    Public Enum pcenumConceptInstanceFlag
+        EntityTypeHideReferenceMode = 1
     End Enum
 
     <Serializable()>

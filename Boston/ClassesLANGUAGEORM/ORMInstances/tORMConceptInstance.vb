@@ -41,6 +41,9 @@ Namespace FBM
         <XmlAttribute()>
         Public InstanceNumber As Integer = 1
 
+        <XmlElement()>
+        Public ConceptInstanceFlag As New List(Of FBM.ConceptInstanceFlag)
+
         Public Sub New()
             '-------------------
             'Parameterless New

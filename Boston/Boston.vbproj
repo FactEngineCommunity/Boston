@@ -656,6 +656,7 @@
     <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMFactTypeReading.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMRoleConstraint.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMInstances\tORMConceptInstanceFlag.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker131PopulationHasNULLValueError.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker130ModelElementAppearsOnNoPage.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker140CMMLModelError.vb" />

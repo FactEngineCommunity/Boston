@@ -232,10 +232,10 @@ Namespace FBM
          DescriptionAttribute("True if the Reference Mode for the Entity Type is hidden on Pages.")>
         Public Shadows Property HideReferenceMode As Boolean
             Get
-                Return Me._HideReferenceMode
+                Return Me.Flag.Find(Function(x) x.Flag = pcenumConceptInstanceFlag.EntityTypeHideReferenceMode) IsNot Nothing
             End Get
             Set(value As Boolean)
-                Me._HideReferenceMode = value
+                Me.Flag.AddUnique(New FBM.ConceptInstanceFlag(Me.Model, Me.Page, Me.Id, pcenumConceptType.EntityType, Me.InstanceNumber, pcenumConceptInstanceFlag.EntityTypeHideReferenceMode))
             End Set
         End Property
 
@@ -436,6 +436,8 @@ Namespace FBM
                 End If
             End Set
         End Property
+
+        Public Flag As New List(Of FBM.ConceptInstanceFlag)
 
         <NonSerialized(),
         XmlIgnore()>
@@ -652,7 +654,7 @@ Namespace FBM
             lrConceptInstance.Visible = Me.Visible
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
-
+            lrConceptInstance.ConceptInstanceFlag = Me.Flag
             Return lrConceptInstance
 
         End Function

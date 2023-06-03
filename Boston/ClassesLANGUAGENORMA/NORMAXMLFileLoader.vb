@@ -2780,7 +2780,6 @@ SkippedRole:
                         'EntityType
                         '-----------------------
 #Region "Entity Type"
-                        Dim lbExpandReferenceScheme As Boolean = False
                         lrEntityType = New FBM.EntityType
                         lrEntityType.NORMAReferenceId = lrObjectTypeXElement.Attribute("ref").Value
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
@@ -2789,17 +2788,10 @@ SkippedRole:
                         If IsSomething(loXMLElementQueryResult(0)) Then
                             lrEntityType.Name = loXMLElementQueryResult(0).Attribute("Name")
                             lrEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lrEntityType.NORMAReferenceId)
-
-                            Try
-                                If My.Settings.NORMAImportingAlwaysCollapseReferenceMode Then
-                                    lbExpandReferenceScheme = False
-                                Else
-                                    lbExpandReferenceScheme = CBool(lrObjectTypeShapeXElement.Attribute("ExpandRefMode").Value)
-                                End If
-
-                            Catch ex As Exception
-                                'Not a Biggie
-                            End Try
+                            Dim expandReferenceModeAttribute = lrObjectTypeShapeXElement.Attribute("ExpandRefMode")
+                            If expandReferenceModeAttribute IsNot Nothing Then
+                                lrEntityType.HideReferenceMode = CBool(expandReferenceModeAttribute.Value)
+                            End If
                         Else
                             lrEntityType = Nothing
                         End If
@@ -2853,7 +2845,7 @@ SkippedRole:
                             lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                             lrEntityTypeInstance.Visible = True
 
-                            lrEntityTypeInstance.ExpandReferenceMode = lbExpandReferenceScheme
+                            lrEntityTypeInstance.HideReferenceMode = lrEntityType.HideReferenceMode
 #End Region
                         ElseIf IsSomething(lrValueType) Then
 #Region "ValueTypes"

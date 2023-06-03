@@ -1321,7 +1321,7 @@ SkipValueTypeInstance:
                     lrEntityTypeInstance.EntityType = lrEntityType
                     lrEntityTypeInstance._Name = lrEntityTypeInstance.Id
                     lrEntityTypeInstance.ReferenceMode = lrEntityType.ReferenceMode
-                    lrEntityTypeInstance._HideReferenceMode = lrEntityType.HideReferenceMode
+                    lrEntityTypeInstance.HideReferenceMode = lrConceptInstance.ConceptInstanceFlag.Find(Function(x) x.Flag = pcenumConceptInstanceFlag.EntityTypeHideReferenceMode) IsNot Nothing
                     lrEntityTypeInstance.IsObjectifyingEntityType = lrEntityType.IsObjectifyingEntityType
                     lrEntityTypeInstance.IsAbsorbed = lrEntityType.IsAbsorbed
                     lrEntityTypeInstance.IsDerived = lrEntityType.IsDerived
