@@ -49,7 +49,7 @@ Namespace FTR
             Patterns.Add(TokenType.MODELELEMENTNAME, regex)
             Tokens.Add(TokenType.MODELELEMENTNAME)
 
-            regex = new Regex("(?!([a-z]+\-))(?!([a-z\s]+$))([a-z']+[^\-])", RegexOptions.Compiled)
+            regex = new Regex("(?!([a-z]+\-))(?!([a-z\s]+$))([a-z'#,*?$@!%]+[^\-])", RegexOptions.Compiled)
             Patterns.Add(TokenType.PREDICATEPART, regex)
             Tokens.Add(TokenType.PREDICATEPART)
 

@@ -164,7 +164,7 @@ Namespace FBM
                 loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(liX, liY, StringSize.Width, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
                 loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
                 loDroppedNode.Text = Trim(lsDottedReadingText)
-                loDroppedNode.TextColor = Color.Blue
+                loDroppedNode.TextColor = Color.Black ' 20230603-VM-Was Color.Blue
                 loDroppedNode.Transparent = True
                 loDroppedNode.ZTop()
                 loDroppedNode.Tag = Me
