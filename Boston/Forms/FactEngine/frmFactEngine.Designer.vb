@@ -69,6 +69,7 @@ Partial Class frmFactEngine
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
         Me.TabPageGraph = New System.Windows.Forms.TabPage()
+        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStripGraph = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.LayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -76,8 +77,8 @@ Partial Class frmFactEngine
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
-        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
+        Me.ToolStripComboBoxQueryLanguage = New System.Windows.Forms.ToolStripComboBox()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -472,7 +473,7 @@ Partial Class frmFactEngine
         'ToolStrip3
         '
         Me.ToolStrip3.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonQueryGO})
+        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonQueryGO, Me.ToolStripComboBoxQueryLanguage})
         Me.ToolStrip3.Location = New System.Drawing.Point(2, 2)
         Me.ToolStrip3.Name = "ToolStrip3"
         Me.ToolStrip3.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
@@ -498,6 +499,24 @@ Partial Class frmFactEngine
         Me.TabPageGraph.TabIndex = 2
         Me.TabPageGraph.Text = "Graph"
         Me.TabPageGraph.UseVisualStyleBackColor = True
+        '
+        'GraphView
+        '
+        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
+        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
+        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
+        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
+        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
+        Me.GraphView.Diagram = Me.Diagram
+        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GraphView.Location = New System.Drawing.Point(0, 0)
+        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
+        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
+        Me.GraphView.Name = "GraphView"
+        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
+        Me.GraphView.Size = New System.Drawing.Size(1074, 205)
+        Me.GraphView.TabIndex = 0
+        Me.GraphView.Text = "DiagramView1"
         '
         'ContextMenuStripGraph
         '
@@ -529,23 +548,13 @@ Partial Class frmFactEngine
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
-        'GraphView
+        'ToolStripComboBoxQueryLanguage
         '
-        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
-        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
-        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
-        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
-        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
-        Me.GraphView.Diagram = Me.Diagram
-        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.GraphView.Location = New System.Drawing.Point(0, 0)
-        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
-        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
-        Me.GraphView.Name = "GraphView"
-        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.GraphView.Size = New System.Drawing.Size(1074, 205)
-        Me.GraphView.TabIndex = 0
-        Me.GraphView.Text = "DiagramView1"
+        Me.ToolStripComboBoxQueryLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ToolStripComboBoxQueryLanguage.Items.AddRange(New Object() {"SQL", "TypeQL", "Cypher"})
+        Me.ToolStripComboBoxQueryLanguage.MergeIndex = 0
+        Me.ToolStripComboBoxQueryLanguage.Name = "ToolStripComboBoxQueryLanguage"
+        Me.ToolStripComboBoxQueryLanguage.Size = New System.Drawing.Size(121, 31)
         '
         'frmFactEngine
         '
@@ -638,4 +647,5 @@ Partial Class frmFactEngine
     Friend WithEvents Diagram1 As MindFusion.Diagramming.Diagram
     Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents Diagram3 As MindFusion.Diagramming.Diagram
+    Friend WithEvents ToolStripComboBoxQueryLanguage As ToolStripComboBox
 End Class

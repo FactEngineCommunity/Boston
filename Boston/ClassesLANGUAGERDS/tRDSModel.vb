@@ -534,6 +534,75 @@ Namespace RDS
             End Try
         End Sub
 
+        Public Function BuildGraphSchema(tables As IEnumerable(Of RDS.Table)) As GraphStandard.GraphSchemaRepresentation
+
+            Dim graphSchemaRepresentation As New GraphStandard.GraphSchemaRepresentation()
+            Dim graphSchema As New GraphStandard.GraphSchema()
+            Dim nodeLabels As New List(Of GraphStandard.NodeLabel)()
+            Dim relationshipTypes As New List(Of GraphStandard.RelationshipType)()
+            Dim nodeObjectTypes As New List(Of GraphStandard.NodeObjectType)()
+            Dim relationshipObjectTypes As New List(Of GraphStandard.RelationshipObjectType)()
+
+            For Each lrTable In Me.Table
+                ' NodeLabel
+                Dim nodeLabel As New GraphStandard.NodeLabel() With {
+                    .id = "nl:" & lrTable.Name,
+                    .Token = lrTable.Name
+                }
+                nodeLabels.Add(nodeLabel)
+
+                ' NodeObjectType
+                Dim nodeObjectType As New GraphStandard.NodeObjectType() With {
+                    .id = "n:" & lrTable.Name,
+                    .Labels = New List(Of GraphStandard.NodeLabelRef)() From {
+                        New GraphStandard.NodeLabelRef() With {.ref = "#nl:" & lrTable.Name}
+                    },
+                    .Properties = New List(Of GraphStandard.NodeProperty)()
+                }
+
+                For Each lrColumn In lrTable.Column
+                    ' NodeProperty
+                    Dim nodeProperty As New GraphStandard.NodeProperty() With {
+                        .Token = lrColumn.Name,
+                        .Type = New GraphStandard.NodeType() With {.Type = lrColumn.getMetamodelDataType.ToString},
+                        .Nullable = Not lrColumn.isPartOfPrimaryKey
+                    }
+                    nodeObjectType.Properties.Add(nodeProperty)
+                Next
+
+                nodeObjectTypes.Add(nodeObjectType)
+
+            Next
+
+            ' RelationshipObjectType
+            For Each lrRelation In Me.Relation.FindAll(Function(x) x.ResponsibleFactType.DBName <> "")
+                Dim relationshipObjectType As New GraphStandard.RelationshipObjectType() With {
+                    .id = "r:" & lrRelation.ResponsibleFactType.DBName,
+                    .Type = New GraphStandard.RelationshipTypeRef() With {.ref = "#rt:" & lrRelation.ResponsibleFactType.DBName},
+                    .From = New GraphStandard.RelationshipNodeRef() With {.ref = "#n:" & lrRelation.OriginTable.Name},
+                    .To = New GraphStandard.RelationshipNodeRef() With {.ref = "#n:" & lrRelation.DestinationTable.Name},
+                    .Properties = New List(Of GraphStandard.RelationshipProperty)() From {
+                        New GraphStandard.RelationshipProperty() With {
+                                    .Token = lrRelation.ResponsibleFactType.DBName,
+                                    .Type = New GraphStandard.RelationshipPropertyType() With {.Type = "string"},
+                                    .Nullable = False
+                                }
+                            }
+                        }
+
+                relationshipObjectTypes.Add(relationshipObjectType)
+            Next
+
+            graphSchema.NodeLabels = nodeLabels
+            graphSchema.RelationshipTypes = relationshipTypes
+            graphSchema.NodeObjectTypes = nodeObjectTypes
+            graphSchema.RelationshipObjectTypes = relationshipObjectTypes
+
+            graphSchemaRepresentation.GraphSchema = graphSchema
+
+            Return graphSchemaRepresentation
+        End Function
+
 
     End Class
 

@@ -106,6 +106,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\CircularProgressBar.dll</HintPath>
     </Reference>
+    <Reference Include="Common">
+      <HintPath>..\Dependencies\OpenCypherTranspiler\Common.dll</HintPath>
+    </Reference>
     <Reference Include="CsvHelper, Version=26.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
       <HintPath>..\packages\CsvHelper.26.0.1\lib\net47\CsvHelper.dll</HintPath>
     </Reference>
@@ -181,6 +184,9 @@
     </Reference>
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="LogicalPlanner">
+      <HintPath>..\Dependencies\OpenCypherTranspiler\LogicalPlanner.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
@@ -265,6 +271,9 @@
     <Reference Include="OpenAI_API, Version=1.6.0.0, Culture=neutral, PublicKeyToken=1b0a4c0430762146, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenAI.1.6.0\lib\netstandard2.0\OpenAI_API.dll</HintPath>
     </Reference>
+    <Reference Include="openCypherParser">
+      <HintPath>..\Dependencies\OpenCypherTranspiler\openCypherParser.dll</HintPath>
+    </Reference>
     <Reference Include="Overview, Version=5.1.1.19450, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Overview.dll</HintPath>
@@ -273,15 +282,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\PdfExport.dll</HintPath>
     </Reference>
-    <Reference Include="Polly">
-      <HintPath>..\Dependencies\Relational.AI\Polly.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="protobuf-net.Core, Version=3.0.0.0, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
       <HintPath>..\packages\protobuf-net.Core.3.2.16\lib\net462\protobuf-net.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="RelationalAI">
-      <HintPath>..\Dependencies\Relational.AI\RelationalAI.dll</HintPath>
     </Reference>
     <Reference Include="Ruler, Version=5.1.1.19449, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -298,6 +301,9 @@
     <Reference Include="ShapeToolBar, Version=5.1.1.19450, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\ShapeToolBar.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLRenderer">
+      <HintPath>..\Dependencies\OpenCypherTranspiler\SQLRenderer.dll</HintPath>
     </Reference>
     <Reference Include="SvgExport, Version=5.0.1.29914, Culture=neutral, PublicKeyToken=21bf4734c13246ea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -477,7 +483,6 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMSAccess.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMongoDb.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tPostgreSQL.vb" />
-    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tRelationalAI.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSnowflake.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tNeo4j.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
@@ -631,6 +636,19 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ClassesGeneral\WaitCursor.vb" />
+    <Compile Include="ClassesGraphStandard\tGraphSchema.vb" />
+    <Compile Include="ClassesGraphStandard\tNodeLabel.vb" />
+    <Compile Include="ClassesGraphStandard\tNodeLabelRef.vb" />
+    <Compile Include="ClassesGraphStandard\tNodeObjectType.vb" />
+    <Compile Include="ClassesGraphStandard\tNodeProperty.vb" />
+    <Compile Include="ClassesGraphStandard\tNodeType.vb" />
+    <Compile Include="ClassesGraphStandard\tRelationshipNodeRef.vb" />
+    <Compile Include="ClassesGraphStandard\tRelationshipObjectType.vb" />
+    <Compile Include="ClassesGraphStandard\tRelationshipProperty.vb" />
+    <Compile Include="ClassesGraphStandard\tRelationshipPropertyItemType.vb" />
+    <Compile Include="ClassesGraphStandard\tRelationshipPropertyType.vb" />
+    <Compile Include="ClassesGraphStandard\tRelationshipType.vb" />
+    <Compile Include="ClassesGraphStandard\tRelationshipTypeRef.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\Interfaces\iBPMNPageObject.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNActor.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNActorProcessRelation.vb" />
@@ -660,6 +678,7 @@
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker131PopulationHasNULLValueError.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker130ModelElementAppearsOnNoPage.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMModelValidator\tErrorChecker140CMMLModelError.vb" />
+    <Compile Include="ClassesLANGUAGERDS\tRDSGraphProvider.vb" />
     <Compile Include="ClassesLANGUAGEUMLUCD\tUCDActorName.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLModel.vb" />
     <Compile Include="ClassesLANGUAGECMML\tCMMLPage.vb" />

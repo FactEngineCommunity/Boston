@@ -350,27 +350,27 @@ ConnectionFailed:
                         Me.LabelOpenSuccessfull.Text = "Fail"
 
                     Case Is = pcenumDatabaseType.RelationalAI
-                        Dim lsReturnMessage As String = Nothing
+'                        Dim lsReturnMessage As String = Nothing
 
-                        Me.LabelOpenSuccessfull.Visible = True
+'                        Me.LabelOpenSuccessfull.Visible = True
 
-                        Try
-                            Dim lrConnection = New FactEngine.RelationalAIConnection(Me.zrModel,
-                                                                                     Trim(Me.TextBoxDatabaseConnectionString.Text),
-                                                                                     0,
-                                                                                     False)
-                            Me.LabelOpenSuccessfull.ForeColor = Color.Green
-                            Me.LabelOpenSuccessfull.Text = "Success"
+'                        Try
+'                            Dim lrConnection = New FactEngine.RelationalAIConnection(Me.zrModel,
+'                                                                                     Trim(Me.TextBoxDatabaseConnectionString.Text),
+'                                                                                     0,
+'                                                                                     False)
+'                            Me.LabelOpenSuccessfull.ForeColor = Color.Green
+'                            Me.LabelOpenSuccessfull.Text = "Success"
 
-                            Return True
+'                            Return True
 
-                        Catch ex As Exception
-                            lsMessage = ex.Message
-                            GoTo RAIConnectionFailed
-                        End Try
-RAIConnectionFailed:
-                        Me.LabelOpenSuccessfull.ForeColor = Color.Red
-                        Me.LabelOpenSuccessfull.Text = "Fail" & lsMessage
+'                        Catch ex As Exception
+'                            lsMessage = ex.Message
+'                            GoTo RAIConnectionFailed
+'                        End Try
+'RAIConnectionFailed:
+'                        Me.LabelOpenSuccessfull.ForeColor = Color.Red
+'                        Me.LabelOpenSuccessfull.Text = "Fail" & lsMessage
 
                     Case Is = pcenumDatabaseType.MSJet
 

@@ -2769,6 +2769,20 @@ NextWord:
         Dim lrRecordset As New ORMQL.Recordset
 
         Try
+            Dim lsQuery As String = Me.TextBoxQuery.Text
+
+            If Me.ToolStripComboBoxQueryLanguage.Text = "Cypher" Then
+                Debugger.Break()
+
+                Dim graphDef = New RDS.GraphProvider(prApplication.WorkingModel.RDS)
+                Dim lrParser = New openCypherTranspiler.openCypherParser.OpenCypherParser(Nothing)
+                Dim plan = openCypherTranspiler.LogicalPlanner.LogicalPlan.ProcessQueryTree(lrParser.Parse(lsQuery), graphDef, Nothing)
+                Dim sqlRender = New openCypherTranspiler.SQLRenderer.SQLRenderer(graphDef, Nothing)
+                lsQuery = sqlRender.RenderPlan(plan)
+
+                Debugger.Break()
+            End If
+
             With New WaitCursor
                 'Clear the Graph View because there is not enough information to create a graph.
                 Call Me.clearGraphView()
@@ -2797,7 +2811,7 @@ NextWord:
                 Me.LabelError.Text = ""
 
                 'Get the Query from the SQL/Cypher/etc query textbox
-                Dim lsQuery = Me.TextBoxQuery.Text '.Replace(vbLf, " ") 'Leave this here.
+                'was Dim lsQuery = lsQuery '.Replace(vbLf, " ") 'Leave this here.
 
                 'If the user has highlighted a section of a query to execute, execute that.
                 If Me.TextBoxQuery.SelectionLength > 0 Then

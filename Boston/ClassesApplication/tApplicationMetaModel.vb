@@ -4,7 +4,7 @@ Partial Public Class tApplication
     Public Function getModelsByModelElementName(ByVal asModelElementName As String) As List(Of FBM.Model)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larModel As New List(Of FBM.Model)
 
@@ -44,7 +44,7 @@ Partial Public Class tApplication
     Public Function getModelsByPredicatePartText(ByVal asPredicatePartText As String) As List(Of FBM.Model)
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         Dim larModel As New List(Of FBM.Model)
 
