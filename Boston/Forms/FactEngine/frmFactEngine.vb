@@ -55,6 +55,8 @@ Public Class frmFactEngine
 
         Me.TextBoxInput.AllowDrop = True
 
+        Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 0
+
         Me.ToolStripMenuItemNaturalLanguage.Visible = My.Settings.FactEngineUseTransformations
 
         '-------------------------------------------------------
@@ -2772,7 +2774,7 @@ NextWord:
             Dim lsQuery As String = Me.TextBoxQuery.Text
 
             If Me.ToolStripComboBoxQueryLanguage.Text = "Cypher" Then
-                Debugger.Break()
+                'Debugger.Break()
 
                 Dim graphDef = New RDS.GraphProvider(prApplication.WorkingModel.RDS)
                 Dim lrParser = New openCypherTranspiler.openCypherParser.OpenCypherParser(Nothing)
@@ -2780,7 +2782,7 @@ NextWord:
                 Dim sqlRender = New openCypherTranspiler.SQLRenderer.SQLRenderer(graphDef, Nothing)
                 lsQuery = sqlRender.RenderPlan(plan)
 
-                Debugger.Break()
+                'Debugger.Break()
             End If
 
             With New WaitCursor
@@ -2857,6 +2859,10 @@ NextWord:
 
                                     Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
                                 Next
+                            End If
+
+                            If lrRecordset.Warning.Count > 0 Then
+                                Me.LabelError.Text.AppendDoubleLineBreak(lrRecordset.Warning(0))
                             End If
                     End Select
                 End If
