@@ -3358,4 +3358,19 @@ NextWord:
     Private Sub TextBoxNaturalLanguage_LostFocus(sender As Object, e As EventArgs) Handles TextBoxNaturalLanguage.LostFocus
         Me.zbTextBoxNaturalLanguageFocused = False
     End Sub
+
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+
+        Try
+            Me.TextBoxQuery.Text = ""
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
 End Class

@@ -68,8 +68,8 @@ Partial Class frmFactEngine
         Me.TextBoxQuery = New System.Windows.Forms.TextBox()
         Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButtonQueryGO = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripComboBoxQueryLanguage = New System.Windows.Forms.ToolStripComboBox()
         Me.TabPageGraph = New System.Windows.Forms.TabPage()
-        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.ContextMenuStripGraph = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.LayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClearToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -78,7 +78,9 @@ Partial Class frmFactEngine
         Me.Diagram1 = New MindFusion.Diagramming.Diagram()
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
-        Me.ToolStripComboBoxQueryLanguage = New System.Windows.Forms.ToolStripComboBox()
+        Me.GraphView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.Diagram4 = New MindFusion.Diagramming.Diagram()
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -473,7 +475,7 @@ Partial Class frmFactEngine
         'ToolStrip3
         '
         Me.ToolStrip3.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonQueryGO, Me.ToolStripComboBoxQueryLanguage})
+        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonQueryGO, Me.ToolStripComboBoxQueryLanguage, Me.ToolStripButton1})
         Me.ToolStrip3.Location = New System.Drawing.Point(2, 2)
         Me.ToolStrip3.Name = "ToolStrip3"
         Me.ToolStrip3.Padding = New System.Windows.Forms.Padding(0, 0, 2, 0)
@@ -490,6 +492,14 @@ Partial Class frmFactEngine
         Me.ToolStripButtonQueryGO.Size = New System.Drawing.Size(28, 28)
         Me.ToolStripButtonQueryGO.Text = "ToolStripButton1"
         '
+        'ToolStripComboBoxQueryLanguage
+        '
+        Me.ToolStripComboBoxQueryLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ToolStripComboBoxQueryLanguage.Items.AddRange(New Object() {"SQL", "TypeQL", "Cypher"})
+        Me.ToolStripComboBoxQueryLanguage.MergeIndex = 0
+        Me.ToolStripComboBoxQueryLanguage.Name = "ToolStripComboBoxQueryLanguage"
+        Me.ToolStripComboBoxQueryLanguage.Size = New System.Drawing.Size(121, 31)
+        '
         'TabPageGraph
         '
         Me.TabPageGraph.Controls.Add(Me.GraphView)
@@ -499,24 +509,6 @@ Partial Class frmFactEngine
         Me.TabPageGraph.TabIndex = 2
         Me.TabPageGraph.Text = "Graph"
         Me.TabPageGraph.UseVisualStyleBackColor = True
-        '
-        'GraphView
-        '
-        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
-        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
-        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
-        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
-        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
-        Me.GraphView.Diagram = Me.Diagram
-        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.GraphView.Location = New System.Drawing.Point(0, 0)
-        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
-        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
-        Me.GraphView.Name = "GraphView"
-        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.GraphView.Size = New System.Drawing.Size(1074, 205)
-        Me.GraphView.TabIndex = 0
-        Me.GraphView.Text = "DiagramView1"
         '
         'ContextMenuStripGraph
         '
@@ -548,13 +540,32 @@ Partial Class frmFactEngine
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
-        'ToolStripComboBoxQueryLanguage
+        'GraphView
         '
-        Me.ToolStripComboBoxQueryLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ToolStripComboBoxQueryLanguage.Items.AddRange(New Object() {"SQL", "TypeQL", "Cypher"})
-        Me.ToolStripComboBoxQueryLanguage.MergeIndex = 0
-        Me.ToolStripComboBoxQueryLanguage.Name = "ToolStripComboBoxQueryLanguage"
-        Me.ToolStripComboBoxQueryLanguage.Size = New System.Drawing.Size(121, 31)
+        Me.GraphView.Behavior = MindFusion.Diagramming.Behavior.LinkShapes
+        Me.GraphView.ContextMenuStrip = Me.ContextMenuStripGraph
+        Me.GraphView.ControlHandlesStyle = MindFusion.Diagramming.HandlesStyle.HatchHandles
+        Me.GraphView.ControlMouseAction = MindFusion.Diagramming.ControlMouseAction.SelectNode
+        Me.GraphView.DelKeyAction = MindFusion.Diagramming.DelKeyAction.DeleteSelectedItems
+        Me.GraphView.Diagram = Me.Diagram
+        Me.GraphView.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GraphView.Location = New System.Drawing.Point(0, 0)
+        Me.GraphView.MiddleButtonActions = MindFusion.Diagramming.MouseButtonActions.None
+        Me.GraphView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
+        Me.GraphView.Name = "GraphView"
+        Me.GraphView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
+        Me.GraphView.Size = New System.Drawing.Size(1074, 205)
+        Me.GraphView.TabIndex = 0
+        Me.GraphView.Text = "DiagramView1"
+        '
+        'ToolStripButton1
+        '
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(28, 28)
+        Me.ToolStripButton1.Text = "ToolStripButton1"
         '
         'frmFactEngine
         '
@@ -648,4 +659,6 @@ Partial Class frmFactEngine
     Friend WithEvents Diagram2 As MindFusion.Diagramming.Diagram
     Friend WithEvents Diagram3 As MindFusion.Diagramming.Diagram
     Friend WithEvents ToolStripComboBoxQueryLanguage As ToolStripComboBox
+    Friend WithEvents ToolStripButton1 As ToolStripButton
+    Friend WithEvents Diagram4 As MindFusion.Diagramming.Diagram
 End Class
