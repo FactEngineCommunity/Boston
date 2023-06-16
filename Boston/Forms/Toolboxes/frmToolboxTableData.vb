@@ -41,7 +41,8 @@ Public Class frmToolboxTableData
                     Dim larColumn As New List(Of RDS.Column) 'Needed if a virtual table is needed for a Neo4j/Graph Edge Type;
 
                     Select Case Me.mrModel.TargetDatabaseType
-                        Case Is = pcenumDatabaseType.Neo4j
+                        Case Is = pcenumDatabaseType.Neo4j,
+                                  pcenumDatabaseType.KuzuDB
                             If Me.mrTable.isPGSRelation Then
                                 Dim larRelation = mrTable.getRelations
                                 If larRelation.Count > 2 Then
@@ -64,7 +65,7 @@ Public Class frmToolboxTableData
                                 lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
                                 '20230525-VM-Move on this. Make Model store Setting ShowPrimaryKeyColumns in TableDataEditForm...then check on isPartOfPrimaryKey accordingly.
                                 '  The reason why is that if we are creating the table then we might not want to see that data. But if is a database like Northwind NEO4j, we might want to see OrderId for instance.
-                                Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
+                                Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not (x.isPartOfPrimaryKey Or x.isForeignKey)).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.DBName))
                                 lsSQLQuery &= "RETURN " & lsColumnList & ";"
                             End If
                         Case Is = pcenumDatabaseType.TypeDB
@@ -109,7 +110,8 @@ Public Class frmToolboxTableData
                     Dim larColumn As New List(Of RDS.Column)
 
                     Select Case Me.mrModel.TargetDatabaseType
-                        Case Is = pcenumDatabaseType.Neo4j
+                        Case Is = pcenumDatabaseType.Neo4j,
+                                  pcenumDatabaseType.KuzuDB
                             Dim lsFirstColumnName As String = String.Join("", lrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Name))
                             Dim lsSecondColumnName As String = String.Join("", lrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Name))
 
@@ -207,7 +209,12 @@ Public Class frmToolboxTableData
                 lrTable = New RDS.Table(Me.mrModel.RDS, "DummyEdgeTable", Nothing)
                 lrTable.Column = aarColumn
             Else
-                lrTable = arTable
+                lrTable = arTable.Clone
+                Select Case Me.mrModel.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.KuzuDB
+                        Dim lrPKColumn As RDS.Column = lrTable.getPrimaryKeyColumns(0)
+                        lrTable.Column.RemoveAt(lrTable.Column.IndexOf(lrPKColumn))
+                End Select
             End If
 
             If aarColumn IsNot Nothing Then
@@ -220,7 +227,8 @@ Public Class frmToolboxTableData
 
             If Me.mrRecordset.Facts.Count = 0 And Me.mrTable IsNot Nothing Then
                 Select Case Me.mrModel.TargetDatabaseType
-                    Case Is = pcenumDatabaseType.Neo4j
+                    Case Is = pcenumDatabaseType.Neo4j,
+                              pcenumDatabaseType.KuzuDB
                         Dim larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
 
                         For Each lrColumn In larColumn
@@ -312,7 +320,8 @@ Public Class frmToolboxTableData
                         Next
                         lsSQLQuery &= ")"
 #End Region
-                    Case Is = pcenumDatabaseType.Neo4j
+                    Case Is = pcenumDatabaseType.Neo4j,
+                              pcenumDatabaseType.KuzuDB
 #Region "Cypher"
                         If Me.mrTable.isPGSRelation Then
 #Region "PGS Relation - Propery Graph Schema Relation, Table is relation, rather than a Foreign Key Relationship"
@@ -532,7 +541,8 @@ Public Class frmToolboxTableData
             Dim lsColumn As String = Me.mrRecordset.Columns(e.ColumnIndex)
 
             Select Case Me.mrModel.TargetDatabaseType
-                Case Is = pcenumDatabaseType.Neo4j
+                Case Is = pcenumDatabaseType.Neo4j,
+                          pcenumDatabaseType.KuzuDB
                     Try
                         lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
                     Catch ex As Exception
@@ -598,7 +608,8 @@ Public Class frmToolboxTableData
                 Dim larPKColumn As List(Of RDS.Column)
                 '= Me.mrTable.getPrimaryKeyColumns
                 Select Case Me.mrModel.TargetDatabaseType
-                    Case Is = pcenumDatabaseType.Neo4j
+                    Case Is = pcenumDatabaseType.Neo4j,
+                              pcenumDatabaseType.KuzuDB
                         larPKColumn = Me.mrTable.getFirstUniquenessConstraintColumns
                     Case Else
                         larPKColumn = Me.mrTable.getPrimaryKeyColumns
@@ -715,7 +726,9 @@ Public Class frmToolboxTableData
                     Dim larPKColumn As List(Of RDS.Column)
 
                     Select Case Me.mrModel.TargetDatabaseType
-                        Case Is = pcenumDatabaseType.Neo4j
+                        Case Is = pcenumDatabaseType.Neo4j,
+                                  pcenumDatabaseType.KuzuDB
+
                             larPKColumn = Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns
                         Case Else
                             larPKColumn = Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns
@@ -806,7 +819,8 @@ Public Class frmToolboxTableData
                         Dim lsSQLQuery As String = ""
 
                         Select Case Me.mrModel.TargetDatabaseType
-                            Case Is = pcenumDatabaseType.Neo4j
+                            Case Is = pcenumDatabaseType.Neo4j,
+                                      pcenumDatabaseType.KuzuDB
                                 lsSQLQuery = "MATCH (" & LCase(Me.mrTable.Name) & ":" & Me.mrTable.Name & " {"
 
                                 Dim larPKColumn As List(Of RDS.Column)
@@ -880,7 +894,8 @@ Public Class frmToolboxTableData
             Dim larColumn As List(Of RDS.Column)
 
             Select Case Me.mrModel.TargetDatabaseType
-                Case Is = pcenumDatabaseType.Neo4j
+                Case Is = pcenumDatabaseType.Neo4j,
+                          pcenumDatabaseType.KuzuDB
                     If Me.mrTable.isPGSRelation Then
                         larColumn = Me.mrDataGridList.mrTable.Column
                     Else
@@ -894,7 +909,9 @@ Public Class frmToolboxTableData
             For Each lrColumn In larColumn
 
                 Select Case Me.mrModel.TargetDatabaseType
-                    Case Is = pcenumDatabaseType.Neo4j
+                    Case Is = pcenumDatabaseType.Neo4j,
+                              pcenumDatabaseType.KuzuDB
+
                         lrColumn.TemporaryData = LCase(Me.mrTable.Name) & "." & lrColumn.Name
                     Case Else
                         lrColumn.TemporaryData = lrColumn.Name
@@ -941,7 +958,8 @@ Public Class frmToolboxTableData
                 Else
 
                     Select Case Me.mrModel.TargetDatabaseType
-                        Case Is = pcenumDatabaseType.Neo4j
+                        Case Is = pcenumDatabaseType.Neo4j,
+                                  pcenumDatabaseType.KuzuDB
 
                             If Me.mrTable.isPGSRelation Then
                                 '=======================================================================================

@@ -274,6 +274,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.Neo4j
                     loNode.ImageIndex = 14
                     loNode.SelectedImageIndex = 14
+                Case Is = pcenumDatabaseType.KuzuDB
+                    loNode.ImageIndex = 22
+                    loNode.SelectedImageIndex = 22
                 Case Is = pcenumDatabaseType.RelationalAI
                     loNode.ImageIndex = 21
                     loNode.SelectedImageIndex = 21

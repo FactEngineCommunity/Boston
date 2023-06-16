@@ -226,6 +226,8 @@ Namespace TableReferenceFieldValue
 
                 liFieldCount = laaReferenceFieldList.Count
 
+                Dim loTuple_list As New List(Of Object)
+
 #Region "Check if new field added"
                 lsSQLQuery = "SELECT Max(RFV.reference_field_id) FROM ReferenceFieldValue RFV WHERE RFV.reference_table_id = " & aiReferenceTableId
 
@@ -240,7 +242,10 @@ Namespace TableReferenceFieldValue
                     lREcordset.Close()
                 End Try
 
-
+                'CodeSafe
+                If liFieldCount = 0 Then
+                    Return loTuple_list
+                End If
 #End Region
 
                 lsSQLQuery = "SELECT rfv1.row_id AS RowId,"
@@ -303,8 +308,6 @@ Namespace TableReferenceFieldValue
                 'Return a sample of the Tuple instance
                 '---------------------------------------
                 aoWorkingClass = loTuple.clone
-
-                Dim loTuple_list As New List(Of Object)
 
                 Dim lrReferenceTuple As New ReferenceTuple
 

@@ -1,0 +1,1 @@
+Provider=ODBC;DSN=PostgreSQL30;Uid=postgres;Pwd=postgres;

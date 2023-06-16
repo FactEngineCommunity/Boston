@@ -23,7 +23,8 @@
                 Select Case Me.Model.TargetDatabaseType
                     Case Is = pcenumDatabaseType.TypeDB
                         lsSQLQuery = lrQueryGraph.generateTypeQL(Me.WHICHSELECTStatement)
-                    Case Is = pcenumDatabaseType.Neo4j
+                    Case Is = pcenumDatabaseType.Neo4j,
+                              pcenumDatabaseType.KuzuDB
                         lsSQLQuery = lrQueryGraph.generateCypher(Me.WHICHSELECTStatement)
                     Case Is = pcenumDatabaseType.RelationalAI
                         lsSQLQuery = lrQueryGraph.generateRelationalAIQL(Me.WHICHSELECTStatement)

@@ -106,7 +106,8 @@ Namespace Database
                 Case Is = pcenumDatabaseType.MSJet
                     Return "*"
                 Case Is = pcenumDatabaseType.TypeDB,
-                          pcenumDatabaseType.Neo4j
+                          pcenumDatabaseType.Neo4j,
+                          pcenumDatabaseType.KuzuDB
                     Return ".*"
                 Case Else
                     Return "%"

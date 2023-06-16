@@ -170,7 +170,8 @@ Namespace FactEngine
                         If prApplication.WorkingModel.DatabaseConnection IsNot Nothing Then
 
                             Select Case prApplication.WorkingModel.TargetDatabaseType
-                                Case Is = pcenumDatabaseType.Neo4j
+                                Case Is = pcenumDatabaseType.Neo4j,
+                                          pcenumDatabaseType.KuzuDB
                                     Return " =~ "
                                 Case Else
                                     Return " LIKE "

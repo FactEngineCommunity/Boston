@@ -2,20 +2,20 @@
 Imports System.Data.SQLite
 Imports System.Reflection
 Imports System.Threading.Tasks
-Imports Neo4j
-Imports Neo4j.Driver
+Imports kuzunet
 
 Namespace FactEngine
 
-    Public Class Neo4jConnection
+    Public Class KuzuDBConnection
         Inherits FactEngine.DatabaseConnection
         Implements FactEngine.iDatabaseConnection
 
         Private FBMModel As FBM.Model
 
-        Public Shadows DatabaseConnectionString As String
+        Public Shadows DatabaseConnectionString As String = ""
 
-        Private ReadOnly _driver As IDriver
+        Private db As kuzu_database
+        Private conn As kuzu_connection
 
         Public Sub New(ByRef arFBMModel As FBM.Model,
                        ByVal asDatabaseConnectionString As String,
@@ -26,10 +26,8 @@ Namespace FactEngine
             Me.DatabaseConnectionString = asDatabaseConnectionString
             Me.DefaultQueryLimit = aiDefaultQueryLimit
 
-            'Connection String: Idea to ues
-            'Data Source=URI;User Id=admin;Password=admin;
-            '20220606-VM-This works
-            'Data Source=bolt://localhost:7687;User Id=;Password=;
+            'Connection String: Idea to use
+            'Data Source=Data Source:<Path to Folder for KuzuDB>;User Id=admin;Password=admin;            
 
             If abCreatingNewDatabase Then Exit Sub
 
@@ -37,15 +35,16 @@ Namespace FactEngine
                 Dim lrSQLConnectionStringBuilder As New System.Data.SqlClient.SqlConnectionStringBuilder(asDatabaseConnectionString)
                 lrSQLConnectionStringBuilder.ConnectionString = asDatabaseConnectionString
 
-                Dim lsURI As String = ""
+                Dim lsDBFolder As String = ""
                 Dim lsUsername As String = ""
                 Dim lsPassword As String = ""
 
-                lsURI = lrSQLConnectionStringBuilder("Data Source")
+                lsDBFolder = lrSQLConnectionStringBuilder("Data Source")
                 lsUsername = lrSQLConnectionStringBuilder.UserID
                 lsPassword = lrSQLConnectionStringBuilder.Password
 
-                _driver = GraphDatabase.Driver(lsURI, AuthTokens.Basic(lsUsername, lsPassword))
+                Me.db = kuzu_database_init(lsDBFolder, 0)
+                Me.conn = kuzu_connection_init(db)
 
                 Me.Connected = True 'Connections are actually made for each Query.                
 
@@ -976,130 +975,10 @@ Namespace FactEngine
 
         Public Overrides Async Function GOAsync(asQuery As String) As Threading.Tasks.Task(Of ORMQL.Recordset) Implements iDatabaseConnection.GOAsync
 
-            Dim lrRecordset As New ORMQL.Recordset
-
-            '==========================================================
-            'Populate the lrRecordset with results from the database
-
-            Dim larFact As New List(Of FBM.Fact)
-            Dim lrFactType = New FBM.FactType(Me.FBMModel, "DummyFactType", True)
-            Dim lrFact As FBM.Fact
-
-            Try
-                Using session = _driver.AsyncSession(Function(configBuilder) configBuilder.WithDatabase("neo4j"))
-
-
-                    Try
-                        Dim ReadResults = Await session.ReadTransactionAsync(Async Function(tx)
-                                                                                 Dim result = Await tx.RunAsync(asQuery)
-                                                                                 Return Await result.ToListAsync()
-                                                                             End Function)
-
-                        ' Just peek to check if any value available.
-                        ' Getting count here will consume all the records
-                        ' Use loResult.ToList() if you need all the record in separate list                        
-                        Dim loResult As IResult
-
-                        If loResult.Peek() IsNot Nothing Then
-
-                            '==================================================================
-                            'Column Names   
-                            Dim lsColumnName As String
-                            For Each liFieldInd In loResult.Keys
-                                lsColumnName = liFieldInd
-                                '                        lsColumnName = lrFactType.CreateUniqueRoleName(loResult(0).Keys(liFieldInd), 0)
-                                Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
-                                lrFactType.RoleGroup.AddUnique(lrRole)
-                                lrRecordset.Columns.Add(lsColumnName)
-                            Next
-                            '==================================================================
-
-                            ' looping each record will consume the record from list
-                            ' consumed record will be removed from the list
-                            For Each lrRecord In loResult
-
-                                lrFact = New FBM.Fact(lrFactType, False)
-                                Dim loFieldValue As Object = Nothing
-                                Dim liInd As Integer
-                                For liInd = 0 To lrRecord.Keys.Count - 1
-
-                                    loFieldValue = lrRecord.Values(loResult.Keys(liInd))
-                                    If loFieldValue Is Nothing Then
-                                        loFieldValue = "NULL"
-                                        GoTo AddFactData
-                                    End If
-
-                                    Select Case True
-
-                                        Case TypeOf loFieldValue Is String
-                                            If Not NullVal(lrRecord.Values(loResult.Keys(liInd)), "") = "" Then
-                                                loFieldValue = lrRecord.Values(loResult.Keys(liInd))
-                                            Else
-                                                loFieldValue = ""
-                                            End If
-
-                                        Case TypeOf loFieldValue Is Neo4j.Driver.IRelationship
-                                            ' cast the object to relationship interface
-                                            Dim loRelationship As Neo4j.Driver.IRelationship = loFieldValue
-                                            ' find the relational nodes
-                                            Dim lsFirst = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.StartNodeId).Value.Labels(0) ' StartNodeElementId
-                                            Dim lsLast = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.EndNodeId).Value.Labels(0) 'EndNodeElementId
-                                            ' build relationship string
-                                            '                                loFieldValue = $"{lsFirst}-{loRelationship.Type}->{lsLast}"
-                                            Exit Select
-
-                                        Case TypeOf loFieldValue Is INode
-                                            ' cast the object to Node interface
-                                            Dim loNode As INode = loFieldValue
-                                            loFieldValue = loNode.ToString()
-                                            Exit Select
-
-                                        Case Else
-                                            '    Try
-                                            '        loFieldValue = lrSQLiteDataReader.GetValue(liInd)
-                                            '    Catch ex As Exception
-                                            '        'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
-                                            '        loFieldValue = lrSQLiteDataReader.GetString(liInd)
-                                            '    End Try
-                                            loFieldValue = lrRecord.Values(loResult.Keys(liInd))
-                                    End Select
-
-                                    ' check 
-AddFactData:
-                                    Try
-                                        lrFact.Data.Add(New FBM.FactData(lrFactType.RoleGroup(liInd), New FBM.Concept(Viev.NullVal(loFieldValue, "")), lrFact))
-                                        '=====================================================
-                                    Catch ex As Exception
-                                        Throw New Exception("Tried to add a recordset Column that is not in the Project Columns. Column Index: " & liInd)
-                                    End Try
-                                Next
-
-                                larFact.Add(lrFact)
-
-                                If larFact.Count = Me.DefaultQueryLimit Then
-                                    lrRecordset.Warning.Add("Query limit of " & Me.DefaultQueryLimit.ToString & " reached.")
-                                    GoTo FinishedProcessing
-                                End If
-
-                            Next
-                        End If
-FinishedProcessing:
-
-                    Catch ex As Neo4jException
-                        Throw New Exception(ex.Message)
-                    End Try
-                End Using
-
-                lrRecordset.Facts = larFact
-
-            Catch ex As Exception
-                lrRecordset.ErrorString = ex.Message
-                Return lrRecordset
-            End Try
+            Throw New NotImplementedException
+            Return Nothing
 
         End Function
-
-
 
         Public Overrides Function GO(asQuery As String) As ORMQL.Recordset Implements iDatabaseConnection.GO
 
@@ -1119,21 +998,23 @@ FinishedProcessing:
 
                 '=====================================================
                 'Works for: MATCH (p:Person)-[r:ACTED_IN]-(m:Movie {title:"The Matrix"}) RETURN p.name, m.title
-                'NB Neo4j is case sensitive.
+                'NB Kuzu is case sensitive.
 
                 ' this will auto set the query type for you, this method can handle both Read/Write queries
-                Dim loResult As IResult = Me._driver.Session.Run(asQuery)
+                Dim loResult As kuzu_query_result = kuzu_connection_query(Me.conn, asQuery)
 
                 ' Just peek to check if any value available.
                 ' Getting count here will consume all the records
                 ' Use loResult.ToList() if you need all the record in separate list
-                If loResult.Peek() IsNot Nothing Then
+                If kuzu_query_result_has_next(loResult) Then
+
+                    Dim liFieldCount As Integer = kuzu_query_result_get_num_columns(loResult)
 
                     '==================================================================
                     'Column Names   
                     Dim lsColumnName As String
-                    For Each liFieldInd In loResult.Keys
-                        lsColumnName = liFieldInd
+                    For liInd = 0 To liFieldCount - 1
+                        lsColumnName = kuzu_query_result_get_column_name(loResult, liInd)
                         '                        lsColumnName = lrFactType.CreateUniqueRoleName(loResult(0).Keys(liFieldInd), 0)
                         Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
                         lrFactType.RoleGroup.AddUnique(lrRole)
@@ -1143,43 +1024,64 @@ FinishedProcessing:
 
                     ' looping each record will consume the record from list
                     ' consumed record will be removed from the list
-                    For Each lrRecord In loResult
+                    While (kuzu_query_result_has_next(loResult))
 
                         lrFact = New FBM.Fact(lrFactType, False)
                         Dim loFieldValue As Object = Nothing
                         Dim liInd As Integer
-                        For liInd = 0 To lrRecord.Keys.Count - 1
 
-                            loFieldValue = lrRecord.Values(loResult.Keys(liInd))
-                            If loFieldValue Is Nothing Then
+                        '===================================
+                        'Create a Tuple for the Result/Row
+                        Dim tuple As kuzu_flat_tuple = kuzu_query_result_get_next(loResult)
+
+                        For liInd = 0 To liFieldCount - 1
+
+                            Dim value As kuzu_value = kuzu_flat_tuple_get_value(tuple, liInd)
+
+                            If value Is Nothing Then
                                 loFieldValue = "NULL"
                                 GoTo AddFactData
                             End If
 
-                            Select Case True
+                            Select Case kuzu_data_type_get_id(kuzu_value_get_data_type(value)).ToString
 
-                                Case TypeOf loFieldValue Is String
-                                    If Not NullVal(lrRecord.Values(loResult.Keys(liInd)), "") = "" Then
-                                        loFieldValue = lrRecord.Values(loResult.Keys(liInd))
+                                Case Is = "KUZU_NODE"
+
+                                    Dim loNodeValue As kuzu_node_val = kuzu_value_get_node_val(value)
+
+                                    loFieldValue = kuzu_node_val_get_id(loNodeValue)
+                                    loFieldValue = kuzu_node_val_to_string(loNodeValue)
+
+                                Case Is = "KUZU_STRING"
+
+                                    Dim lsTempValue = kuzu_value_get_string(value)
+
+                                    If Not NullVal(lsTempValue, "") = "" Then
+                                        loFieldValue = lsTempValue
                                     Else
                                         loFieldValue = ""
                                     End If
+                                Case Is = "KUZU_INT64"
 
-                                Case TypeOf loFieldValue Is Neo4j.Driver.IRelationship
-                                    ' cast the object to relationship interface
-                                    Dim loRelationship As Neo4j.Driver.IRelationship = loFieldValue
-                                    ' find the relational nodes
-                                    Dim lsFirst = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.StartNodeId).Value.Labels(0) ' StartNodeElementId
-                                    Dim lsLast = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.EndNodeId).Value.Labels(0) 'EndNodeElementId
-                                    ' build relationship string
-                                    loFieldValue = $"{lsFirst}-{loRelationship.Type}->{lsLast}"
-                                    Exit Select
+                                    Dim llTempValue As Long = kuzu_value_get_int64(value)
+                                    loFieldValue = llTempValue
 
-                                Case TypeOf loFieldValue Is INode
-                                    ' cast the object to Node interface
-                                    Dim loNode As INode = loFieldValue
-                                    loFieldValue = loNode.ToString()
-                                    Exit Select
+                                    '============================================
+                                    'Case TypeOf loFieldValue Is Neo4j.Driver.IRelationship
+                                    '    ' cast the object to relationship interface
+                                    '    Dim loRelationship As Neo4j.Driver.IRelationship = loFieldValue
+                                    '    ' find the relational nodes
+                                    '    Dim lsFirst = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.StartNodeId).Value.Labels(0) ' StartNodeElementId
+                                    '    Dim lsLast = lrRecord.Values.First(Function(x) x.Value.ElementId = loRelationship.EndNodeId).Value.Labels(0) 'EndNodeElementId
+                                    '    ' build relationship string
+                                    '    loFieldValue = $"{lsFirst}-{loRelationship.Type}->{lsLast}"
+                                    '    Exit Select
+
+                                    'Case TypeOf loFieldValue Is INode
+                                    '    ' cast the object to Node interface
+                                    '    Dim loNode As INode = loFieldValue
+                                    '    loFieldValue = loNode.ToString()
+                                    '    Exit Select
 
                                 Case Else
                                     '    Try
@@ -1188,7 +1090,7 @@ FinishedProcessing:
                                     '        'Sometimes DateTime values are not in the correct format. None the less they are stored in SQLite.
                                     '        loFieldValue = lrSQLiteDataReader.GetString(liInd)
                                     '    End Try
-                                    loFieldValue = lrRecord.Values(loResult.Keys(liInd)).ToString
+                                    loFieldValue = value.ToString
                             End Select
 
                             ' check 
@@ -1208,12 +1110,11 @@ AddFactData:
                             GoTo FinishedProcessing
                         End If
 
-                    Next
+                    End While
                 End If
 FinishedProcessing:
 
                 lrRecordset.Facts = larFact
-
 #End Region
 
 #Region "Old Code"
@@ -1317,20 +1218,9 @@ FinishedProcessing:
             Dim lrRecordset As New ORMQL.Recordset
 
             Try
-                lrRecordset.Query = asSQLQuery
-
-                'Dim loResult As IResult = Me._driver.Session.Run(asSQLQuery)
-                Dim loResult As IResultSummary = Me._driver.Session.ExecuteWrite(Function(tx) tx.Run(asSQLQuery).Consume())
-
-                Select Case loResult.QueryType
-                    Case Is = QueryType.WriteOnly
-                        If loResult.Counters.NodesCreated = 0 And loResult.Counters.LabelsAdded = 0 And loResult.Counters.RelationshipsCreated = 0 Then
-                            lrRecordset.ErrorString = "No changes/no records."
-                        End If
-                End Select
+                Call Me.GO(asSQLQuery)
 
                 Return lrRecordset
-
             Catch ex As Exception
                 lrRecordset.ErrorString = ex.Message
                 Return lrRecordset

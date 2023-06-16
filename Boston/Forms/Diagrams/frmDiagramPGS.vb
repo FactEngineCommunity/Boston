@@ -130,9 +130,10 @@ Public Class frmDiagramPGS
 
             Dim lrNode As PGS.Node = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Id = asSelectModelElementId)
             If lrNode IsNot Nothing Then
-                lrNode.shape.Selected = True
+                If lrNode.Shape IsNot Nothing Then
+                    lrNode.Shape.Selected = True
+                End If
             End If
-
         End If
 
     End Sub
@@ -802,7 +803,8 @@ Public Class frmDiagramPGS
 
             If asSelectModelElementId IsNot Nothing Then
                 Dim lrNode As PGS.Node = Me.zrPage.ERDiagram.Entity.Find(Function(x) x.Id = asSelectModelElementId)
-                If lrNode IsNot Nothing Then
+
+                If lrNode IsNot Nothing AndAlso lrNode.Shape IsNot Nothing Then
                     lrNode.Shape.Selected = True
                 End If
             End If

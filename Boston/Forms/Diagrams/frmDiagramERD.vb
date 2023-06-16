@@ -1770,11 +1770,18 @@ SkipORMReadingEditor:
                 lrNode = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
 
                 If lrNode IsNot Nothing Then
-                    Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
-                                                              lrNode.Y,
-                                                              lrNode.Shape.Bounds.Width,
-                                                              lrNode.Shape.Bounds.Height)
-                    Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+
+                    Try
+                        Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
+                                                                  lrNode.Y,
+                                                                  lrNode.Shape.Bounds.Width,
+                                                                  lrNode.Shape.Bounds.Height)
+                        Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                    Catch ex As Exception
+                        '20230613-Remove if not needed. See below.
+                        'Not a biggie. See below.
+                    End Try
+
 
                     If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
                         Dim lrRelation As ERD.Relation
@@ -2773,6 +2780,19 @@ SkipORMReadingEditor:
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Call lrToolboxForm.VerbaliseRelation(lrERDLink.Relation.RDSRelation.ResponsibleFactType, lrERDLink.Relation.RDSRelation, ModifierKeys.HasFlag(Keys.Control))
             End If
+
+            '--------------------------------------
+            'Set the PropertiesGrid.SeletedObject
+            '--------------------------------------
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            If IsSomething(lrPropertyGridForm) Then
+                Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+                lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
+                Dim lrFactTypeInstance As FBM.FactTypeInstance = lrERDLink.Relation.RDSRelation.ResponsibleFactType.CloneInstance(New FBM.Page(Me.zrPage.Model, Nothing, "DummyPage"), False)
+                lrPropertyGridForm.PropertyGrid.SelectedObject = lrFactTypeInstance
+            End If
+
 
             '-------------------------------------------------------
             'Highlighting

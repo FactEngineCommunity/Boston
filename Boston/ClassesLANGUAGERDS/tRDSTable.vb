@@ -560,6 +560,26 @@ Namespace RDS
 
         End Function
 
+        Public Function getForeignKeyColumns() As List(Of RDS.Column)
+
+            Try
+                Dim larForeignKeyColumn = From Column In Me.Column
+                                          Where Column.OutgoingRelation.Count > 0
+                                          Select Column
+
+                Return larForeignKeyColumn.ToList
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Function
+
         Public Function getIncomingRelations() As List(Of RDS.Relation)
 
             Try

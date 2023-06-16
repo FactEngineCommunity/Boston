@@ -2823,7 +2823,12 @@ NextWord:
                 lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsQuery)
 
                 If lrRecordset.Query IsNot Nothing Then
-                    Me.TextBoxQuery.Text = lrRecordset.Query
+                    If Me.ToolStripComboBoxQueryLanguage.Text = "Cypher" Then
+                        Me.TextBoxQuery.Text.AppendDoubleLineBreak(lrRecordset.Query)
+                    Else
+                        Me.TextBoxQuery.Text = lrRecordset.Query
+                    End If
+
                 End If
 
                 If lrRecordset.ErrorString IsNot Nothing Then
@@ -2876,7 +2881,9 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            'prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            Me.LabelError.Text = lsMessage
+            Me.TabPageResults.Show()
         End Try
 
     End Sub

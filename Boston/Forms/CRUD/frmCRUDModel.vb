@@ -151,6 +151,9 @@ Public Class frmCRUDModel
                             Case Is = pcenumDatabaseType.Neo4j
                                 Me.zrModel.TreeNode.ImageIndex = 14
                                 Me.zrModel.TreeNode.SelectedImageIndex = 14
+                            Case Is = pcenumDatabaseType.KuzuDB
+                                Me.zrModel.TreeNode.ImageIndex = 22
+                                Me.zrModel.TreeNode.SelectedImageIndex = 22
                             Case Is = pcenumDatabaseType.RelationalAI
                                 Me.zrModel.TreeNode.ImageIndex = 21
                                 Me.zrModel.TreeNode.SelectedImageIndex = 21
@@ -327,6 +330,29 @@ Public Class frmCRUDModel
                             Me.LabelOpenSuccessfull.ForeColor = Color.Green
                             Me.LabelOpenSuccessfull.Text = "Success"
                         End If
+
+                    Case Is = pcenumDatabaseType.KuzuDB
+#Region "KuzuDB"
+                        Dim lsReturnMessage As String = Nothing
+
+                        Me.LabelOpenSuccessfull.Visible = True
+
+                        Try
+                            Dim lrConnection = New FactEngine.KuzuDBConnection(Me.zrModel,
+                                                                               Trim(Me.TextBoxDatabaseConnectionString.Text),
+                                                                               0,
+                                                                               False)
+                            Me.LabelOpenSuccessfull.ForeColor = Color.Green
+                            Me.LabelOpenSuccessfull.Text = "Success"
+                            Return True
+
+                        Catch ex As Exception
+                            GoTo ConnectionFailedKuzuDB
+                        End Try
+ConnectionFailedKuzuDB:
+                        Me.LabelOpenSuccessfull.ForeColor = Color.Red
+                        Me.LabelOpenSuccessfull.Text = "Fail"
+#End Region
 
                     Case Is = pcenumDatabaseType.Neo4j
                         Dim lsReturnMessage As String = Nothing
@@ -735,6 +761,9 @@ ConnectionFailed:
                                 Case Is = pcenumDatabaseType.RelationalAI
                                     Me.zrModel.TreeNode.ImageIndex = 21
                                     Me.zrModel.TreeNode.SelectedImageIndex = 21
+                                Case Is = pcenumDatabaseType.KuzuDB
+                                    Me.zrModel.TreeNode.ImageIndex = 22
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 22
                                 Case Is = pcenumDatabaseType.None
                                     Me.zrModel.TreeNode.ImageIndex = 1
                                     Me.zrModel.TreeNode.SelectedImageIndex = 1

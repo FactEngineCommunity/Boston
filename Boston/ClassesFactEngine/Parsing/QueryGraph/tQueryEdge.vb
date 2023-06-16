@@ -758,27 +758,32 @@ PartialFactTypeMatch:
                 lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateNearSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList)
 
                 If lrFactType IsNot Nothing Then
-                    Dim lrModelElement As FBM.ModelObject = arBaseNode.FBMModelObject
-                    Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
-                                             Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrModelElement.Id
-                                             Select FactTypeReading
+                    Try
+                        Dim lrModelElement As FBM.ModelObject = arBaseNode.FBMModelObject
+                        Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
+                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrModelElement.Id
+                                                 Select FactTypeReading
 
-                    lrFactTypeReading = larFactTypeReading.First
+                        lrFactTypeReading = larFactTypeReading.First
 
-                    If Me.TargetNode.FBMModelObject.isSubtypeOfModelElement(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject) Then
+                        If Me.TargetNode.FBMModelObject.isSubtypeOfModelElement(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject) Then
 
-                        Me.FBMFactType = lrFactTypeReading.FactType
-                        Me.FBMFactTypeReading = lrFactTypeReading
-                        Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
-                    Else
-                        Me.FBMFactType = Nothing
-                        Me.FBMFactTypeReading = Nothing
-                        Me.FBMPredicatePart = Nothing
-                    End If
+                            Me.FBMFactType = lrFactTypeReading.FactType
+                            Me.FBMFactTypeReading = lrFactTypeReading
+                            Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
+                        Else
+                            Me.FBMFactType = Nothing
+                            Me.FBMFactTypeReading = Nothing
+                            Me.FBMPredicatePart = Nothing
+                        End If
+
+                    Catch ex As Exception
+                        Throw New Exception("Nearside Model ElementPredicate: " & ex.Message)
+                    End Try
                 End If
 
-                    'Return if successful
-                    If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
+                'Return if successful
+                If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
                     Return Nothing
                 End If
 #End Region
@@ -1003,7 +1008,8 @@ FinalCleanup:
                         If prApplication.WorkingModel.DatabaseConnection IsNot Nothing Then
 
                             Select Case prApplication.WorkingModel.TargetDatabaseType
-                                Case Is = pcenumDatabaseType.Neo4j
+                                Case Is = pcenumDatabaseType.Neo4j,
+                                          pcenumDatabaseType.KuzuDB
                                     Return " =~ "
                                 Case Else
                                     Return " LIKE "

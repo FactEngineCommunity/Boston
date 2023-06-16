@@ -52,7 +52,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>Boston.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -165,6 +165,9 @@
     <Reference Include="ICSharpCode.TextEditor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\ICSharpCode.TextEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="KuzuDB">
+      <HintPath>..\Dependencies\KuzuDB.dll</HintPath>
     </Reference>
     <Reference Include="LinFu.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -479,6 +482,7 @@
     <Compile Include="ClassesDataLineage\tDataLineageItemModelElement.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageItem.vb" />
     <Compile Include="ClassesFactEngine\Constants.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tKuzuDB.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tODBCDb.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMSAccess.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tMongoDb.vb" />

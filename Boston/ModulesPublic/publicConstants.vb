@@ -98,6 +98,7 @@ Public Module publicConstants
         NORMA = 110
         Neo4j = 111
         RelationalAI = 112
+        KuzuDB = 113
     End Enum
 
     Public Enum pcenumDebugMode
