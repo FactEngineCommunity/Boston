@@ -1003,6 +1003,8 @@ Namespace FactEngine
                 ' this will auto set the query type for you, this method can handle both Read/Write queries
                 Dim loResult As kuzu_query_result = kuzu_connection_query(Me.conn, asQuery)
 
+                Dim lsErrorMessage As String = kuzu_query_result_get_error_message(loResult)
+
                 ' Just peek to check if any value available.
                 ' Getting count here will consume all the records
                 ' Use loResult.ToList() if you need all the record in separate list

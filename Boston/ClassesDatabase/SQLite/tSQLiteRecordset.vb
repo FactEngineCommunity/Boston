@@ -178,6 +178,7 @@ Namespace SQLite
 
             Try
                 Dim sqlite_cmd As SQLiteCommand
+
                 sqlite_cmd = Me.ActiveConnection.Connection.CreateCommand()
                 sqlite_cmd.CommandText = asQuery
 
@@ -185,10 +186,19 @@ Namespace SQLite
 
             Catch ex As Exception
                 Dim lsMessage As String
+
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
+                lsMessage.AppendDoubleLineBreak(asQuery)
+                lsMessage.AppendDoubleLineBreak("ActiveConnection IsNot Nothing: " & (Me.ActiveConnection IsNot Nothing).ToString)
+                Try
+                    lsMessage.AppendLine("ActiveConnection.Connection IsNot Nothing: " & (Me.ActiveConnection.Connection IsNot Nothing).ToString)
+                Catch ex1 As Exception
+                    lsMessage.AppendLine("Error returning ActiveConnection.Connection")
+                End Try
+
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 

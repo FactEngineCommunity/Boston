@@ -66,7 +66,7 @@ Namespace FactEngine
 
                 Select Case aiDatabaseType
                     Case Is = pcenumDatabaseType.SQLite
-                        Me.Connection = New FactEngine.SQLiteConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
+                        Me.Connection = New FactEngine.SQLiteConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit, False)
                     Case Is = pcenumDatabaseType.MongoDB
                         Me.Connection = New FactEngine.MongoDbConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                     Case Is = pcenumDatabaseType.PostgreSQL

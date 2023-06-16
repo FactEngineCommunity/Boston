@@ -223,10 +223,11 @@ Namespace FactEngine
             Throw New NotImplementedException()
         End Function
 
-        Public Overrides Sub Open(Optional ByVal asDatabaseConnectionString As String = Nothing)
+        Public Overrides Function Open(Optional ByVal asDatabaseConnectionString As String = Nothing) As Boolean
 
             Try
                 Call Me._DbConnection.Open(asDatabaseConnectionString)
+                Return True
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -234,9 +235,10 @@ Namespace FactEngine
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Return False
             End Try
 
-        End Sub
+        End Function
 
     End Class
 

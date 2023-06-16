@@ -13,7 +13,7 @@ Namespace FactEngine
 
         Private ReadOnly _activeTransactions As List(Of IDbTransaction) = New List(Of IDbTransaction)()
 
-        Private _Connection As Data.SQLite.SQLiteConnection
+        Private _Connection As Data.SQLite.SQLiteConnection = Nothing
         Public Property Connection As Data.SQLite.SQLiteConnection
             Get
                 Return Me._Connection
@@ -36,8 +36,10 @@ Namespace FactEngine
 
             Try
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-                Me.Connected = True 'Connections are actually made for each Query.
-                'lrSQLiteConnection.Close() 'Keep open for Boston. I.e. When SQLite is the database type for Boston itself.
+
+                If lrSQLiteConnection Is Nothing Then Throw New Exception("Failed to create SQLiteConnection")
+
+                Me.Connected = True 'Connections can actually be made for each Query. Keep open for Boston. E.g. When SQLite is the database type for Boston itself.
                 Me._Connection = lrSQLiteConnection
                 Me.State = 1
             Catch ex As Exception
@@ -1436,7 +1438,7 @@ Namespace FactEngine
 
         End Sub
 
-        Public Overrides Sub Open(Optional ByVal asDatabaseConnectionString As String = Nothing)
+        Public Overrides Function Open(Optional ByVal asDatabaseConnectionString As String = Nothing) As Boolean
 
             Try
                 If asDatabaseConnectionString IsNot Nothing Then
@@ -1448,15 +1450,19 @@ Namespace FactEngine
                 End If
 
                 Try
-                    Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-                    Me.Connected = True 'Connections are actually made for each Query.
-                    Me._Connection = lrSQLiteConnection
-                    Me.State = 1
+                    If Me.Connection IsNot Nothing Then
+                        Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                        Me.Connected = True 'Connections are actually made for each Query.
+                        Me._Connection = lrSQLiteConnection
+                        Me.State = 1
+                    End If
                 Catch ex As Exception
                     Me.Connected = False
                     Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
                 End Try
 
+
+                Return True
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1465,9 +1471,11 @@ Namespace FactEngine
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         ''' <summary>
         ''' Creates or Recreates the Table in the database.

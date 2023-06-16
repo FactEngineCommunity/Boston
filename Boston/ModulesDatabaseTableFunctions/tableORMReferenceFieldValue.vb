@@ -158,6 +158,8 @@ Namespace TableReferenceFieldValue
                 lRecordset.ActiveConnection = pdbConnection
                 lRecordset.CursorType = pcOpenStatic
 
+                If pbLogStartup Then prApplication.ThrowErrorMessage("lRecordset.ActiveConnection IsNot Nothing: " & (lRecordset.ActiveConnection IsNot Nothing).ToString, pcenumErrorType.Warning)
+
                 lsSQLQuery = "SELECT Data"
                 lsSQLQuery &= " FROM ReferenceFieldValue"
                 lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId

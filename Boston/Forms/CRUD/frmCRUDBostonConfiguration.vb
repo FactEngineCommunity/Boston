@@ -7,7 +7,9 @@ Imports System.ComponentModel
 
 Public Class frmCRUDBostonConfiguration
 
-    Dim mbSuperUserModeClicks As Integer = 0
+    Public mbSuperUserModeClicks As Integer = 0
+    Public msConnectionString As String = My.Settings.DatabaseConnectionString
+    Public msDatabaseType As String = My.Settings.DatabaseType
 
     Sub LoadDebugModes()
 
@@ -745,6 +747,8 @@ TestConnectionString:
                             Dim lsConnectionString = "Data Source=" & lrOpenFileDialog.FileName & ";Version=3;"
                             If Me.checkDatabaseConnectionString(lsReturnMessage, lsConnectionString) Then
                                 Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                                Me.msConnectionString = lsConnectionString
+                                Me.msDatabaseType = Me.ComboBoxDatabaseType.Text
                             Else
                                 MsgBox("The file you selected is not a SQLite database.")
                             End If

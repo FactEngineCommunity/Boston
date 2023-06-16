@@ -50,7 +50,7 @@ Namespace FactEngine
 
         End Sub
 
-        Public Overrides Sub Open(Optional ByVal asDatabaseConnectionString As String = Nothing)
+        Public Overrides Function Open(Optional ByVal asDatabaseConnectionString As String = Nothing) As Boolean
 
             Try
                 If asDatabaseConnectionString IsNot Nothing Then
@@ -75,6 +75,7 @@ Namespace FactEngine
                     Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
                 End Try
 
+                Return True
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -83,9 +84,11 @@ Namespace FactEngine
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
 
 

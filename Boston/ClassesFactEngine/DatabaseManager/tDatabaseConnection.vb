@@ -243,8 +243,9 @@ Namespace FactEngine
         Public Overridable Sub IndexUpdate(ByRef arIndex As RDS.Index)
         End Sub
 
-        Public Overridable Sub Open(Optional ByVal asDatabaseConnectionString As String = Nothing)
-        End Sub
+        Public Overridable Function Open(Optional ByVal asDatabaseConnectionString As String = Nothing) As Boolean
+            Return False
+        End Function
 
         ''' <summary>
         ''' Creates or Recreates the Table in the database.

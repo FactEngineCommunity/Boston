@@ -235,8 +235,10 @@ Namespace Boston
                 'Construct the connection string
                 '------------------------------------------------                 
                 Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                Dim lsDatabaseType As String = My.Settings.DatabaseType
 
-                If My.Settings.DatabaseType = pcenumDatabaseType.PostgreSQL.ToString Then
+TestDatabase:
+                If lsDatabaseType = pcenumDatabaseType.PostgreSQL.ToString Then
 #Region "Postgres"
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
@@ -247,9 +249,13 @@ Namespace Boston
 #Region "SQLite"
                     lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-                    pdbConnection = New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
-                    pdb_OLEDB_connection = New FactEngine.SQLiteConnection(Nothing, "", 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
+                    pdbConnection = New FactEngine.SQLiteConnection(Nothing, lsConnectionString, 1000, False)
+                    pdb_OLEDB_connection = New FactEngine.SQLiteConnection(Nothing, lsConnectionString, 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
 
+                    If pbLogStartup Then
+                        Call prApplication.ThrowErrorMessage("pdbConnection IsNot Nothing: " & (pdbConnection IsNot Nothing).ToString, pcenumErrorType.Warning)
+                        Call prApplication.ThrowErrorMessage("pdbConnection.Connection IsNot Nothing: " & (pdbConnection.Connection IsNot Nothing).ToString, pcenumErrorType.Warning)
+                    End If
 
 #Region "SHIFT KEY DOWN - User Points to database"
                     If My.Computer.Keyboard.ShiftKeyDown Then
@@ -378,6 +384,7 @@ CheckExistsDatabaseLocation:
                         Try
                             lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
                             If lsDatabaseLocation IsNot Nothing Then
+                                If My.Computer.Keyboard.CtrlKeyDown Then GoTo LastDitch : 
                                 If System.IO.File.Exists(lsDatabaseLocation) Then
                                     lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
 
@@ -386,6 +393,16 @@ CheckExistsDatabaseLocation:
                                     My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
                                     lsConnectionString = My.Settings.DatabaseConnectionString
                                     GoTo OpenConnection
+                                Else
+LastDitch:
+                                    MsgBox("Cannot find the Boston Database. Set the Database Type and Connection String and restart Boston.")
+                                    Dim lfrmCRUDBostonConfiguration As New frmCRUDBostonConfiguration
+                                    Call lfrmCRUDBostonConfiguration.ShowDialog()
+                                    My.Settings.DatabaseConnectionString = lfrmCRUDBostonConfiguration.msConnectionString
+                                    My.Settings.DatabaseType = lfrmCRUDBostonConfiguration.msDatabaseType
+                                    lsConnectionString = My.Settings.DatabaseConnectionString
+                                    lsDatabaseType = My.Settings.DatabaseType
+                                    GoTo TestDatabase
                                 End If
                             End If
                         Catch ex As Exception
@@ -464,7 +481,16 @@ OpenConnection:
                 'Open the (database) connection
                 '------------------------------------------------
                 lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                pdbConnection.Open(lsConnectionString)
+                If pbLogStartup Then prApplication.ThrowErrorMessage("pdbConnection Opening", pcenumErrorType.Warning)
+
+                If pdbConnection.Open(lsConnectionString) Then
+
+                    If pbLogStartup Then
+                        prApplication.ThrowErrorMessage("pdbConnection Opened", pcenumErrorType.Warning)
+                    End If
+                Else
+                    Throw New Exception("Failed to Open database. Method: Open.")
+                End If
 
 #Region "OLEDB"
                 Select Case My.Settings.DatabaseType
@@ -482,11 +508,15 @@ OpenConnection:
                 Return True
 
             Catch lo_ex As Exception
-                lsMessage = "Error: There was an error opening Boston database: "
-                lsMessage &= vbCrLf & vbCrLf
+
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & lo_ex.Message
+                lsMessage.AppendDoubleLineBreak("Error: There was an error opening Boston database: ")
                 lsMessage.AppendDoubleLineBreak(lsConnectionString)
                 lsMessage.AppendDoubleLineBreak("'" & Trim(lo_ex.Message) & "'" & vbCrLf & lo_ex.StackTrace)
-                MsgBox(lsMessage)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
                 Return False
             End Try
 

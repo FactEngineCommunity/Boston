@@ -84,7 +84,7 @@ Public Class frmMain
             '---------------------------------------------------------------------------
             'Check if the user wants to log the startup process
             '----------------------------------------------------
-            If My.Computer.Keyboard.ShiftKeyDown Then
+            If My.Computer.Keyboard.CtrlKeyDown Then
                 pbLogStartup = True
             End If
 
@@ -294,6 +294,10 @@ ConfigurationOK:
 
 #Region "Open the database & Upgrade If necessary"
             Me.StatusLabelGeneralStatus.Text = "Opening Database"
+
+            'Force Save of Settings (such that in Debug Mode in Visual Studio we can at least modify default setting on the machine)
+            My.Settings.Save()
+
             If Boston.OpenDatabase() Then
 
                 If pbLogStartup Then
@@ -314,7 +318,7 @@ ConfigurationOK:
                 lsDatabaseVersionNumber = TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
                 If CDbl(prApplication.DatabaseVersionNr) <> CDbl(lsDatabaseVersionNumber) Then
                     '--------------------------------------------------------------------------------------
-                    'The Richmond application requires a different DatabaseVersion than the one installed
+                    'The Boston application requires a different DatabaseVersion than the one installed
                     '--------------------------------------------------------------------------------------
                     If CDbl(prApplication.DatabaseVersionNr) > CDbl(lsDatabaseVersionNumber) Then
                         If Me.PerformDatabaseUpgrade() Then
