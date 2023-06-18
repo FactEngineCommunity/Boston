@@ -157,6 +157,9 @@ Public Class frmCRUDModel
                             Case Is = pcenumDatabaseType.RelationalAI
                                 Me.zrModel.TreeNode.ImageIndex = 21
                                 Me.zrModel.TreeNode.SelectedImageIndex = 21
+                            Case Is = pcenumDatabaseType.EdgeDB
+                                Me.zrModel.TreeNode.ImageIndex = 23
+                                Me.zrModel.TreeNode.SelectedImageIndex = 23
                             Case Is = pcenumDatabaseType.None
                                 Me.zrModel.TreeNode.ImageIndex = 1
                                 Me.zrModel.TreeNode.SelectedImageIndex = 1
@@ -330,6 +333,9 @@ Public Class frmCRUDModel
                             Me.LabelOpenSuccessfull.ForeColor = Color.Green
                             Me.LabelOpenSuccessfull.Text = "Success"
                         End If
+
+                    Case Is = pcenumDatabaseType.EdgeDB
+                        Throw New NotImplementedException("Need to set up tester for EdgeDB")
 
                     Case Is = pcenumDatabaseType.KuzuDB
 #Region "KuzuDB"
@@ -764,6 +770,9 @@ ConnectionFailed:
                                 Case Is = pcenumDatabaseType.KuzuDB
                                     Me.zrModel.TreeNode.ImageIndex = 22
                                     Me.zrModel.TreeNode.SelectedImageIndex = 22
+                                Case Is = pcenumDatabaseType.EdgeDB
+                                    Me.zrModel.TreeNode.ImageIndex = 23
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 23
                                 Case Is = pcenumDatabaseType.None
                                     Me.zrModel.TreeNode.ImageIndex = 1
                                     Me.zrModel.TreeNode.SelectedImageIndex = 1

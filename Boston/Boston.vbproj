@@ -501,6 +501,7 @@
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tPostgreSQL.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSnowflake.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tNeo4j.vb" />
+    <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tEdgeDB.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tSQLite.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\QueryResultClasses.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\TypeDB\publicTypeDBConstants.vb" />

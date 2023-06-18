@@ -83,6 +83,8 @@ Namespace FactEngine
                         'Me.Connection = New FactEngine.RelationalAIConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                     Case Is = pcenumDatabaseType.KuzuDB
                         Me.Connection = New FactEngine.KuzuDBConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
+                    Case Is = pcenumDatabaseType.EdgeDB
+                        Me.Connection = New FactEngine.EdgeDBConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                 End Select
 
                 Me.FBMModel.DatabaseConnection = Me.Connection

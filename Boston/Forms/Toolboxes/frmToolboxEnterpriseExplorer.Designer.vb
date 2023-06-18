@@ -236,6 +236,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImageList.Images.SetKeyName(20, "DatabaseXML16x16.jpg")
         Me.ImageList.Images.SetKeyName(21, "RelationalAI16x16.png")
         Me.ImageList.Images.SetKeyName(22, "Kuzu16x16.png")
+        Me.ImageList.Images.SetKeyName(23, "EdgeDB16x16.png")
         '
         'CircularProgressBar
         '

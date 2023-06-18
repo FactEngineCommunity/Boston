@@ -1000,10 +1000,82 @@ Namespace FactEngine
                 'Works for: MATCH (p:Person)-[r:ACTED_IN]-(m:Movie {title:"The Matrix"}) RETURN p.name, m.title
                 'NB Kuzu is case sensitive.
 
-                ' this will auto set the query type for you, this method can handle both Read/Write queries
-                Dim loResult As kuzu_query_result = kuzu_connection_query(Me.conn, asQuery)
+                Dim loResult As kuzu_query_result
+                Dim lsErrorMessage As String = Nothing
 
-                Dim lsErrorMessage As String = kuzu_query_result_get_error_message(loResult)
+                Try
+                    loResult = kuzu_connection_query(Me.conn, asQuery)
+
+                    lsErrorMessage = kuzu_query_result_get_error_message(loResult)
+                Catch ex As Exception
+
+                End Try
+
+                If lsErrorMessage IsNot Nothing Then
+                    Try
+                        Dim preparedStatement As kuzu_prepared_statement = kuzu_connection_prepare(Me.conn, asQuery)
+
+                        loResult = kuzu_connection_execute(Me.conn, preparedStatement)
+                    Catch ave As AccessViolationException
+                        Throw New Exception("Access violation trying to run: " & asQuery)
+                    Catch ex As Exception
+
+                    End Try
+
+                End If
+
+#Region "Notes"
+                '                Hey, I want to ask about what are the default values of the prepared statements. The queries work when we dont bind them values.
+                'output:
+                '                [RESULT] 1
+                'code:
+                '                Int main()
+                '{
+                '    kuzu_database * db = kuzu_database_init("test_me" /* fill db path */, 0);
+                '    kuzu_connection * connection = kuzu_connection_init(db);
+
+                '    kuzu_query_result * result = kuzu_connection_query(
+                '        connection,
+                '        "CREATE NODE TABLE Person(name STRING, age INT64, isStudent BOOLEAN, PRIMARY KEY(name));");
+
+                '    If (result == NULL) Then
+                '                        {
+                '        printf("[NULL]: CREATE NODE TABLE\n");
+                '        Return 1;
+                '    }
+
+                '/* ---------------- HERE -------------
+                '    Char * query = "MATCH (a:Person) WHERE a.isStudent = $1 AND a.age > $2 RETURN COUNT(*)";
+
+                '    kuzu_prepared_statement * preparedStatement = kuzu_connection_prepare(connection, query);
+
+                '   ---------------- HERE ------------- */
+                '    If (query == NULL) Then
+                '                            {
+                '        printf("[NULL]: MATCH (a:Person) WHERE\n");
+                '        Return 1;
+                '    }
+
+                '    kuzu_query_result * c_result = kuzu_connection_execute(connection, preparedStatement);
+
+                '    If (c_result == NULL) Then
+                '                                {
+                '        printf("[NULL] kuzu_connection_execute\n");
+                '        Return 1;
+                '    }
+
+                '    printf("[RESULT] %d\n", kuzu_query_result_is_success(c_result));
+
+                '    Return 0;
+                '}
+                '(edited)
+
+                '1 reply
+
+                'Xiyang
+                '5 days ago
+                'Hi Margerette, the default value of a parameter Is NULL . So the query Is executed as MATCH (a: Person) WHERE a.isStudent = NULL And a.age > NULL RETURN COUNT(*) which leads to success execution but empty output
+#End Region
 
                 ' Just peek to check if any value available.
                 ' Getting count here will consume all the records

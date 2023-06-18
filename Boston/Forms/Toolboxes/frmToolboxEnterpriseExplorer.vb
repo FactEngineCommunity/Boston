@@ -280,6 +280,9 @@ Public Class frmToolboxEnterpriseExplorer
                 Case Is = pcenumDatabaseType.RelationalAI
                     loNode.ImageIndex = 21
                     loNode.SelectedImageIndex = 21
+                Case Is = pcenumDatabaseType.EdgeDB
+                    loNode.ImageIndex = 23
+                    loNode.SelectedImageIndex = 23
                 Case Is = pcenumDatabaseType.None
                     If arModel.StoreAsXML Then
                         loNode.ImageIndex = 20

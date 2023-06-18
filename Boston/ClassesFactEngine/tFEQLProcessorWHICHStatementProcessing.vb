@@ -21,6 +21,8 @@
                 End If
 
                 Select Case Me.Model.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.EdgeDB
+                        Throw New NotImplementedException("Need to set up EdgeQL generator")
                     Case Is = pcenumDatabaseType.TypeDB
                         lsSQLQuery = lrQueryGraph.generateTypeQL(Me.WHICHSELECTStatement)
                     Case Is = pcenumDatabaseType.Neo4j,

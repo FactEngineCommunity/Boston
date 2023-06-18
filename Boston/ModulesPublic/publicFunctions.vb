@@ -237,6 +237,18 @@ Namespace Boston
                 Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
                 Dim lsDatabaseType As String = My.Settings.DatabaseType
 
+#Region "User Intervention on Startup"
+                If My.Computer.Keyboard.AltKeyDown Then
+                    Dim lfrmCRUDBostonConfiguration As New frmCRUDBostonConfiguration
+                    Call lfrmCRUDBostonConfiguration.ShowDialog()
+                    My.Settings.DatabaseConnectionString = lfrmCRUDBostonConfiguration.msConnectionString
+                    My.Settings.DatabaseType = lfrmCRUDBostonConfiguration.msDatabaseType
+                    lfrmCRUDBostonConfiguration.Dispose()
+                    lsConnectionString = My.Settings.DatabaseConnectionString
+                    lsDatabaseType = My.Settings.DatabaseType
+                End If
+#End Region
+
 TestDatabase:
                 If lsDatabaseType = pcenumDatabaseType.PostgreSQL.ToString Then
 #Region "Postgres"

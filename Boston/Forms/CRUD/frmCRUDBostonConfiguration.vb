@@ -19,7 +19,7 @@ Public Class frmCRUDBostonConfiguration
         Dim liInd As Integer = 0
         Dim liNewIndex As Integer = 0
 
-        If pdbConnection.State <> 0 Then
+        If pdbConnection IsNot Nothing AndAlso pdbConnection.State <> 0 Then
             liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DebugMode")
             lloDebugModes = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
 
@@ -413,7 +413,7 @@ TestConnectionString:
         Dim liInd As Integer = 0
         Dim liNewIndex As Integer = 0
 
-        If pdbConnection.State <> 0 Then
+        If pdbConnection IsNot Nothing AndAlso pdbConnection.State <> 0 Then
             liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
             larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
 
@@ -763,6 +763,8 @@ TestConnectionString:
                             Dim lsConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & lrOpenFileDialog.FileName
                             If Me.checkDatabaseConnectionString(lsReturnMessage, lsConnectionString) Then
                                 Me.TextBoxDatabaseConnectionString.Text = lsConnectionString
+                                Me.msConnectionString = lsConnectionString
+                                Me.msDatabaseType = Me.ComboBoxDatabaseType.Text
                             Else
                                 MsgBox("The file you selected is not a MSJet database.")
                             End If

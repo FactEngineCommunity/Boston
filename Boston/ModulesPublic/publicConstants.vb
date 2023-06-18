@@ -99,6 +99,7 @@ Public Module publicConstants
         Neo4j = 111
         RelationalAI = 112
         KuzuDB = 113
+        EdgeDB = 114
     End Enum
 
     Public Enum pcenumDebugMode
