@@ -82,11 +82,12 @@ Partial Class frmCSVLoader
         Me.txtExt = New System.Windows.Forms.TextBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.Panel5 = New System.Windows.Forms.Panel()
-        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.LabelPromptModel = New System.Windows.Forms.Label()
-        Me.LabelModelName = New System.Windows.Forms.Label()
-        Me.LabelPromptTable = New System.Windows.Forms.Label()
         Me.LabelTableName = New System.Windows.Forms.Label()
+        Me.LabelPromptTable = New System.Windows.Forms.Label()
+        Me.LabelModelName = New System.Windows.Forms.Label()
+        Me.LabelPromptModel = New System.Windows.Forms.Label()
+        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.ButtonFinish = New System.Windows.Forms.Button()
         Me.Panel2.SuspendLayout()
         CType(Me.numMax, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.numDataRow, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -111,7 +112,7 @@ Partial Class frmCSVLoader
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel2.Location = New System.Drawing.Point(3, 38)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(763, 34)
+        Me.Panel2.Size = New System.Drawing.Size(737, 34)
         Me.Panel2.TabIndex = 7
         '
         'txtFileName
@@ -204,7 +205,7 @@ Partial Class frmCSVLoader
         Me.Panel3.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel3.Location = New System.Drawing.Point(3, 3)
         Me.Panel3.Name = "Panel3"
-        Me.Panel3.Size = New System.Drawing.Size(749, 87)
+        Me.Panel3.Size = New System.Drawing.Size(723, 87)
         Me.Panel3.TabIndex = 3
         '
         'label17
@@ -298,7 +299,7 @@ Partial Class frmCSVLoader
         '
         'txtFileNameOut
         '
-        Me.txtFileNameOut.Location = New System.Drawing.Point(108, 9)
+        Me.txtFileNameOut.Location = New System.Drawing.Point(15, 12)
         Me.txtFileNameOut.Name = "txtFileNameOut"
         Me.txtFileNameOut.Size = New System.Drawing.Size(234, 20)
         Me.txtFileNameOut.TabIndex = 16
@@ -306,7 +307,7 @@ Partial Class frmCSVLoader
         '
         'txtDelimiterOUT
         '
-        Me.txtDelimiterOUT.Location = New System.Drawing.Point(106, 62)
+        Me.txtDelimiterOUT.Location = New System.Drawing.Point(14, 62)
         Me.txtDelimiterOUT.Name = "txtDelimiterOUT"
         Me.txtDelimiterOUT.Size = New System.Drawing.Size(25, 20)
         Me.txtDelimiterOUT.TabIndex = 15
@@ -325,7 +326,7 @@ Partial Class frmCSVLoader
         '
         Me.chkIncludeTitle.Checked = True
         Me.chkIncludeTitle.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkIncludeTitle.Location = New System.Drawing.Point(107, 38)
+        Me.chkIncludeTitle.Location = New System.Drawing.Point(15, 35)
         Me.chkIncludeTitle.Name = "chkIncludeTitle"
         Me.chkIncludeTitle.Size = New System.Drawing.Size(190, 24)
         Me.chkIncludeTitle.TabIndex = 7
@@ -343,7 +344,7 @@ Partial Class frmCSVLoader
         '
         'Label19
         '
-        Me.Label19.Location = New System.Drawing.Point(135, 62)
+        Me.Label19.Location = New System.Drawing.Point(45, 61)
         Me.Label19.Name = "Label19"
         Me.Label19.Size = New System.Drawing.Size(181, 20)
         Me.Label19.TabIndex = 8
@@ -361,12 +362,12 @@ Partial Class frmCSVLoader
         Me.Panel4.Dock = System.Windows.Forms.DockStyle.Top
         Me.Panel4.Location = New System.Drawing.Point(0, 0)
         Me.Panel4.Name = "Panel4"
-        Me.Panel4.Size = New System.Drawing.Size(755, 150)
+        Me.Panel4.Size = New System.Drawing.Size(729, 135)
         Me.Panel4.TabIndex = 4
         '
         'txtDestination
         '
-        Me.txtDestination.Location = New System.Drawing.Point(186, 90)
+        Me.txtDestination.Location = New System.Drawing.Point(95, 93)
         Me.txtDestination.Name = "txtDestination"
         Me.txtDestination.ReadOnly = True
         Me.txtDestination.Size = New System.Drawing.Size(520, 20)
@@ -374,7 +375,7 @@ Partial Class frmCSVLoader
         '
         'btnExport
         '
-        Me.btnExport.Location = New System.Drawing.Point(105, 89)
+        Me.btnExport.Location = New System.Drawing.Point(14, 92)
         Me.btnExport.Name = "btnExport"
         Me.btnExport.Size = New System.Drawing.Size(75, 23)
         Me.btnExport.TabIndex = 6
@@ -395,7 +396,7 @@ Partial Class frmCSVLoader
         Me.TabPageExportCSVData.Controls.Add(Me.Panel4)
         Me.TabPageExportCSVData.Location = New System.Drawing.Point(4, 22)
         Me.TabPageExportCSVData.Name = "TabPageExportCSVData"
-        Me.TabPageExportCSVData.Size = New System.Drawing.Size(755, 351)
+        Me.TabPageExportCSVData.Size = New System.Drawing.Size(729, 356)
         Me.TabPageExportCSVData.TabIndex = 2
         Me.TabPageExportCSVData.Text = "Export CSV Data"
         Me.TabPageExportCSVData.UseVisualStyleBackColor = True
@@ -416,7 +417,7 @@ Partial Class frmCSVLoader
         Me.TabPageImportCSV.Location = New System.Drawing.Point(4, 22)
         Me.TabPageImportCSV.Name = "TabPageImportCSV"
         Me.TabPageImportCSV.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageImportCSV.Size = New System.Drawing.Size(755, 351)
+        Me.TabPageImportCSV.Size = New System.Drawing.Size(729, 356)
         Me.TabPageImportCSV.TabIndex = 1
         Me.TabPageImportCSV.Text = "Get CSV Data"
         Me.TabPageImportCSV.UseVisualStyleBackColor = True
@@ -427,7 +428,7 @@ Partial Class frmCSVLoader
         Me.DataGridView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.DataGridView1.Location = New System.Drawing.Point(3, 90)
         Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.Size = New System.Drawing.Size(749, 258)
+        Me.DataGridView1.Size = New System.Drawing.Size(723, 263)
         Me.DataGridView1.TabIndex = 2
         '
         'txtLength
@@ -475,7 +476,7 @@ Partial Class frmCSVLoader
         'btnClose
         '
         Me.btnClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnClose.Location = New System.Drawing.Point(681, 11)
+        Me.btnClose.Location = New System.Drawing.Point(574, 10)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(75, 23)
         Me.btnClose.TabIndex = 1
@@ -491,7 +492,7 @@ Partial Class frmCSVLoader
         Me.TabControl.Location = New System.Drawing.Point(3, 78)
         Me.TabControl.Name = "TabControl"
         Me.TabControl.SelectedIndex = 0
-        Me.TabControl.Size = New System.Drawing.Size(763, 377)
+        Me.TabControl.Size = New System.Drawing.Size(737, 382)
         Me.TabControl.TabIndex = 8
         '
         'TabPage1
@@ -594,11 +595,12 @@ Partial Class frmCSVLoader
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.ButtonFinish)
         Me.Panel1.Controls.Add(Me.btnClose)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel1.Location = New System.Drawing.Point(3, 461)
+        Me.Panel1.Location = New System.Drawing.Point(3, 466)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(763, 42)
+        Me.Panel1.Size = New System.Drawing.Size(737, 42)
         Me.Panel1.TabIndex = 6
         '
         'Panel5
@@ -610,8 +612,44 @@ Partial Class frmCSVLoader
         Me.Panel5.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel5.Location = New System.Drawing.Point(3, 3)
         Me.Panel5.Name = "Panel5"
-        Me.Panel5.Size = New System.Drawing.Size(763, 29)
+        Me.Panel5.Size = New System.Drawing.Size(737, 29)
         Me.Panel5.TabIndex = 2
+        '
+        'LabelTableName
+        '
+        Me.LabelTableName.AutoSize = True
+        Me.LabelTableName.Location = New System.Drawing.Point(259, 6)
+        Me.LabelTableName.Name = "LabelTableName"
+        Me.LabelTableName.Size = New System.Drawing.Size(74, 13)
+        Me.LabelTableName.TabIndex = 3
+        Me.LabelTableName.Text = "<TableName>"
+        '
+        'LabelPromptTable
+        '
+        Me.LabelPromptTable.AutoSize = True
+        Me.LabelPromptTable.Location = New System.Drawing.Point(216, 6)
+        Me.LabelPromptTable.Name = "LabelPromptTable"
+        Me.LabelPromptTable.Size = New System.Drawing.Size(37, 13)
+        Me.LabelPromptTable.TabIndex = 2
+        Me.LabelPromptTable.Text = "Table:"
+        '
+        'LabelModelName
+        '
+        Me.LabelModelName.AutoSize = True
+        Me.LabelModelName.Location = New System.Drawing.Point(42, 6)
+        Me.LabelModelName.Name = "LabelModelName"
+        Me.LabelModelName.Size = New System.Drawing.Size(76, 13)
+        Me.LabelModelName.TabIndex = 1
+        Me.LabelModelName.Text = "<ModelName>"
+        '
+        'LabelPromptModel
+        '
+        Me.LabelPromptModel.AutoSize = True
+        Me.LabelPromptModel.Location = New System.Drawing.Point(4, 6)
+        Me.LabelPromptModel.Name = "LabelPromptModel"
+        Me.LabelPromptModel.Size = New System.Drawing.Size(39, 13)
+        Me.LabelPromptModel.TabIndex = 0
+        Me.LabelPromptModel.Text = "Model:"
         '
         'TableLayoutPanel1
         '
@@ -629,50 +667,23 @@ Partial Class frmCSVLoader
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 48.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(769, 506)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(743, 511)
         Me.TableLayoutPanel1.TabIndex = 33
         '
-        'LabelPromptModel
+        'ButtonFinish
         '
-        Me.LabelPromptModel.AutoSize = True
-        Me.LabelPromptModel.Location = New System.Drawing.Point(4, 6)
-        Me.LabelPromptModel.Name = "LabelPromptModel"
-        Me.LabelPromptModel.Size = New System.Drawing.Size(39, 13)
-        Me.LabelPromptModel.TabIndex = 0
-        Me.LabelPromptModel.Text = "Model:"
-        '
-        'LabelModelName
-        '
-        Me.LabelModelName.AutoSize = True
-        Me.LabelModelName.Location = New System.Drawing.Point(42, 6)
-        Me.LabelModelName.Name = "LabelModelName"
-        Me.LabelModelName.Size = New System.Drawing.Size(76, 13)
-        Me.LabelModelName.TabIndex = 1
-        Me.LabelModelName.Text = "<ModelName>"
-        '
-        'LabelPromptTable
-        '
-        Me.LabelPromptTable.AutoSize = True
-        Me.LabelPromptTable.Location = New System.Drawing.Point(216, 6)
-        Me.LabelPromptTable.Name = "LabelPromptTable"
-        Me.LabelPromptTable.Size = New System.Drawing.Size(37, 13)
-        Me.LabelPromptTable.TabIndex = 2
-        Me.LabelPromptTable.Text = "Table:"
-        '
-        'LabelTableName
-        '
-        Me.LabelTableName.AutoSize = True
-        Me.LabelTableName.Location = New System.Drawing.Point(259, 6)
-        Me.LabelTableName.Name = "LabelTableName"
-        Me.LabelTableName.Size = New System.Drawing.Size(74, 13)
-        Me.LabelTableName.TabIndex = 3
-        Me.LabelTableName.Text = "<TableName>"
+        Me.ButtonFinish.Location = New System.Drawing.Point(656, 9)
+        Me.ButtonFinish.Name = "ButtonFinish"
+        Me.ButtonFinish.Size = New System.Drawing.Size(74, 23)
+        Me.ButtonFinish.TabIndex = 2
+        Me.ButtonFinish.Text = "&Finish"
+        Me.ButtonFinish.UseVisualStyleBackColor = True
         '
         'frmCSVLoader
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(769, 506)
+        Me.ClientSize = New System.Drawing.Size(743, 511)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Name = "frmCSVLoader"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
@@ -760,6 +771,7 @@ Partial Class frmCSVLoader
     Friend WithEvents LabelPromptTable As Label
     Friend WithEvents LabelModelName As Label
     Friend WithEvents LabelPromptModel As Label
+    Friend WithEvents ButtonFinish As Button
 End Class
 
 

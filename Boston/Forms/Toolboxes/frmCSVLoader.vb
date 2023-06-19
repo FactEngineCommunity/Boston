@@ -14,9 +14,13 @@ Public Class frmCSVLoader
 
 	Public mrModel As FBM.Model
 	Public mrTable As RDS.Table
+	Public mrRecordset As ORMQL.Recordset
+
+	'Returned to frmToolboxTableData if Importing CSV data.
+	Public mdtData As DataTable
 
 	Private Shared mrFileHandler As CSD.clsFileHandler = New CSD.clsFileHandler()
-	Private mdtData As DataTable
+
 
 	Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -66,18 +70,37 @@ Public Class frmCSVLoader
 
 	Private Sub btnGetFile_Click(sender As Object, e As EventArgs) Handles btnGetFile.Click
 
-		Dim lrOpenFileDialog As New OpenFileDialog()
+		Select Case Me.miFormFunction
+			Case Is = pcenumCSVFormFunction.ExportCSVData
 
-		lrOpenFileDialog.Filter = "(*.csv)|*.csv|*.txt)|*.txt|All files (*.*)|*.*"
-		lrOpenFileDialog.FilterIndex = 0
+				' Create an instance of the SaveFileDialog
+				Dim lrSaveFileDialog As New SaveFileDialog()
 
-		If lrOpenFileDialog.ShowDialog(Me) = DialogResult.OK Then
+				' Set the initial directory and default file name
+				lrSaveFileDialog.InitialDirectory = "C:\"
+				lrSaveFileDialog.FileName = Me.mrTable.Name & ".csv"
 
-			txtFileName.Text = lrOpenFileDialog.FileName
+				' Display the dialog box and wait for the user's response
+				If lrSaveFileDialog.ShowDialog() = DialogResult.OK Then
 
-			Call Me.GetFileDetails(txtFileName.Text)
+					' Get the selected file name and path
+					txtFileName.Text = lrSaveFileDialog.FileName
+				End If
+			Case Is = pcenumCSVFormFunction.ImportCSVData
 
-		End If
+				Dim lrOpenFileDialog As New OpenFileDialog()
+
+				lrOpenFileDialog.Filter = "(*.csv)|*.csv|*.txt)|*.txt|All files (*.*)|*.*"
+				lrOpenFileDialog.FilterIndex = 0
+
+				If lrOpenFileDialog.ShowDialog(Me) = DialogResult.OK Then
+
+					txtFileName.Text = lrOpenFileDialog.FileName
+
+					Call Me.GetFileDetails(txtFileName.Text)
+
+				End If
+		End Select
 
 	End Sub
 
@@ -85,17 +108,17 @@ Public Class frmCSVLoader
 
 		mrFileHandler = New CSD.clsFileHandler(asFilePath)
 
-		If mrFileHandler.FileInf.Exists Then
+		If mrFileHandler.mrFileInfo.Exists Then
 
-			txtCreationTime.Text = Convert.ToString(mrFileHandler.FileInf.CreationTime)
-			txtDirectoryPath.Text = mrFileHandler.FileInf.DirectoryName
-			txtExists.Text = Convert.ToString(mrFileHandler.FileInf.Exists)
-			txtExt.Text = mrFileHandler.FileInf.Extension
-			txtFullName.Text = mrFileHandler.FileInf.FullName
-			txtLastAccessTime.Text = Convert.ToString(mrFileHandler.FileInf.LastAccessTime)
-			txtLastWriteTime.Text = Convert.ToString(mrFileHandler.FileInf.LastWriteTime)
-			txtLength.Text = Convert.ToString(mrFileHandler.FileInf.Length)
-			txtName.Text = mrFileHandler.FileInf.Name
+			txtCreationTime.Text = Convert.ToString(mrFileHandler.mrFileInfo.CreationTime)
+			txtDirectoryPath.Text = mrFileHandler.mrFileInfo.DirectoryName
+			txtExists.Text = Convert.ToString(mrFileHandler.mrFileInfo.Exists)
+			txtExt.Text = mrFileHandler.mrFileInfo.Extension
+			txtFullName.Text = mrFileHandler.mrFileInfo.FullName
+			txtLastAccessTime.Text = Convert.ToString(mrFileHandler.mrFileInfo.LastAccessTime)
+			txtLastWriteTime.Text = Convert.ToString(mrFileHandler.mrFileInfo.LastWriteTime)
+			txtLength.Text = Convert.ToString(mrFileHandler.mrFileInfo.Length)
+			txtName.Text = mrFileHandler.mrFileInfo.Name
 			txtNameOnly.Text = mrFileHandler.NameOnly
 			txtUNCPath.Text = mrFileHandler.UNCPath
 
@@ -122,7 +145,7 @@ Public Class frmCSVLoader
 	Private Sub GetDataFromCSV(ByVal asFilePath As String)
 
 		Try
-			mrFileHandler.Delimiter = txtDelimiter.Text
+			mrFileHandler.msDelimiter = txtDelimiter.Text
 			mrFileHandler.DataRow1 = Convert.ToInt32(numDataRow.Value)
 			mrFileHandler.HeaderRow = Convert.ToInt32(numTitleRow.Value)
 			mrFileHandler.MaxRows = CInt(Math.Truncate(numMax.Value))
@@ -147,14 +170,36 @@ Public Class frmCSVLoader
 
 		lsFilePath = Path.Combine(lsFilePath, txtFileNameOut.Text)
 
-		mrFileHandler.Delimiter = txtDelimiterOUT.Text
-		mrFileHandler.FileInf = New FileInfo(lsFilePath)
+		mrFileHandler.msDelimiter = txtDelimiterOUT.Text
+		mrFileHandler.mrFileInfo = New FileInfo(lsFilePath)
 
-		If mrFileHandler.TableToCSV(mdtData.DefaultView, Not chkIncludeTitle.Checked) Then
+		If mrFileHandler.ExportORMQLRecordsetToCSV(Me.mrRecordset, Not chkIncludeTitle.Checked) Then
 			txtDestination.Text = lsFilePath
 		Else
 			txtDestination.Text = "Export failed"
 		End If
+	End Sub
+
+	Private Sub ButtonFinish_Click(sender As Object, e As EventArgs) Handles ButtonFinish.Click
+
+		Try
+
+			Select Case Me.miFormFunction
+				Case Is = pcenumCSVFormFunction.ExportCSVData
+
+				Case Is = pcenumCSVFormFunction.ImportCSVData
+					'DataView Returned to frmToolboxTableData
+			End Select
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
 	End Sub
 
 End Class

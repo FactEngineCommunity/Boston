@@ -295,6 +295,7 @@ Public Class frmToolboxTableData
 
                         Dim lrColumn As RDS.Column
                         Dim larColumn As New List(Of RDS.Column)
+                        liInd = 0
                         For Each lsColumn In Me.mrRecordset.Columns
                             If liInd > 0 Then lsSQLQuery &= ","
                             lsSQLQuery &= lsColumn
@@ -530,6 +531,12 @@ Public Class frmToolboxTableData
 
     End Sub
 
+    ''' <summary>
+    ''' NB If we have allowed column reordering in the DataGridView, the displayed column order may differ from the actual column index.
+    ''' In such cases, you can use the DisplayIndex property instead of ColumnIndex to retrieve the correct column index based on the current display order.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub AdvancedDataGridView1_CellEndEdit(sender As Object, e As DataGridViewCellEventArgs) Handles AdvancedDataGridView.CellEndEdit
 
         Dim lsMessage As String
@@ -538,7 +545,8 @@ Public Class frmToolboxTableData
             Dim lsColumnName As String
 
 #Region "Get the Column"
-            Dim lsColumn As String = Me.mrRecordset.Columns(e.ColumnIndex)
+            Dim liIndex = Me.AdvancedDataGridView.Columns(e.ColumnIndex).DisplayIndex
+            Dim lsColumn As String = Me.mrRecordset.Columns(liIndex) 'e.ColumnIndex)
 
             Select Case Me.mrModel.TargetDatabaseType
                 Case Is = pcenumDatabaseType.Neo4j,
@@ -565,7 +573,7 @@ Public Class frmToolboxTableData
                 lsMessage = "A column with the name, " & lsColumnName & ", does not exist in the Entity, " & Me.mrTable.Name & ", in the Model you are working on."
                 Me.ToolStripStatusLabel.Text = lsMessage
                 Me.ToolStripStatusLabel.ForeColor = Color.Red
-                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
+                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liIndex)).Data = Me.OldValue 'Was e.ColumnIndex
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True)
                 Exit Sub
             End If
@@ -581,7 +589,7 @@ Public Class frmToolboxTableData
             End Select
 #End Region
 
-            Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+            Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liIndex)).Data 'Was e.ColumnIndex
 
             '------------------------------------------------
             'CodeSafe - Exit if no change
@@ -593,7 +601,7 @@ Public Class frmToolboxTableData
 
             '==========================================================================================
             'Update the FactData for the Fact
-            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
+            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liIndex)).Data = Me.NewValue 'Was e.ColumnIndex 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
             '==========================================================================================
 
             '============================================================
@@ -1138,6 +1146,87 @@ Public Class frmToolboxTableData
 
             Call lfrmCSVLoader.ShowDialog()
 
+            If lfrmCSVLoader.mdtData IsNot Nothing Then
+
+                '=====================================================================
+                'Import the CSV Data to the Recordset
+                '======================================
+                Try
+                    Dim lrDummyFactType As New FBM.FactType(Me.mrModel, "DummyFactType", True)
+                    Dim liInd As Integer = 0
+                    Dim larColumn As List(Of RDS.Column)
+
+                    Select Case Me.mrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j,
+                          pcenumDatabaseType.KuzuDB
+                            If Me.mrTable.isPGSRelation Then
+                                larColumn = Me.mrDataGridList.mrTable.Column
+                            Else
+                                larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+                            End If
+
+                        Case Else
+                            larColumn = Me.mrTable.Column.ToList
+                    End Select
+
+                    For Each lrColumn In larColumn
+
+                        Select Case Me.mrModel.TargetDatabaseType
+                            Case Is = pcenumDatabaseType.Neo4j,
+                                  pcenumDatabaseType.KuzuDB
+
+                                lrColumn.TemporaryData = LCase(Me.mrTable.Name) & "." & lrColumn.Name
+                            Case Else
+                                lrColumn.TemporaryData = lrColumn.Name
+                        End Select
+
+                        If lrColumn IsNot Nothing Then
+                            Dim lrRole = New FBM.Role(lrDummyFactType, lrColumn.TemporaryData, True, Nothing)
+                            lrDummyFactType.RoleGroup.AddUnique(lrRole)
+                        End If
+                    Next
+
+                    For Each lrRow As DataRow In lfrmCSVLoader.mdtData.Rows
+
+                        Dim lrFact = New FBM.Fact(lrDummyFactType, False)
+                        lrFact.Id = System.Guid.NewGuid.ToString
+                        lrFact.IsNewFact = True
+
+                        liInd = 0
+                        For Each loColumnValue In lrRow.ItemArray
+
+                            Dim lsType = loColumnValue.GetType().ToString
+
+                            Dim lrRole = New FBM.Role(lrDummyFactType, larColumn(liInd).TemporaryData, True, Nothing)
+                            lrDummyFactType.RoleGroup.AddUnique(lrRole)
+                            lrRole.SequenceNr = Me.mrRecordset.Columns.FindIndex(Function(x) x = larColumn(liInd).TemporaryData) + 1
+
+                            Dim lrFactData = New FBM.FactData(lrRole, New FBM.Concept(""), lrFact)
+                            lrFactData.setData(loColumnValue.ToString, pcenumConceptType.Value, False)
+                            lrFact.Data.Add(lrFactData)
+
+                            liInd += 1
+                        Next
+
+                        lrFact.Data = lrFact.Data.OrderBy(Function(f) f.Role.SequenceNr).ToList()
+
+                        Me.mrRecordset.Facts.Add(lrFact)
+                    Next
+
+                    Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+                    Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+
+                Catch ex As Exception
+                    Dim lsMessage As String
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                End Try
+
+            End If
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1157,6 +1246,7 @@ Public Class frmToolboxTableData
             lfrmCSVLoader.miFormFunction = pcenumCSVFormFunction.ExportCSVData
             lfrmCSVLoader.mrModel = Me.mrModel
             lfrmCSVLoader.mrTable = Me.mrTable
+            lfrmCSVLoader.mrRecordset = Me.mrRecordset
 
             Call lfrmCSVLoader.ShowDialog()
 

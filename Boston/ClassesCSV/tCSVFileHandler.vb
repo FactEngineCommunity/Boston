@@ -10,7 +10,8 @@ Imports System.Reflection
 Namespace CSD
     Public Class clsFileHandler
 
-        Public Property FileInf As FileInfo
+        Public Property mrFileInfo As FileInfo
+
         Private mvHeaderRow As Integer = -1
 
         Public Property HeaderRow As Integer
@@ -23,12 +24,12 @@ Namespace CSD
         End Property
 
         Public Property DataRow1 As Integer
-        Public Property Delimiter As String
+        Public Property msDelimiter As String
         Public Property MaxRows As Integer
 
         Public ReadOnly Property NameOnly As String
             Get
-                Return FileInf.Name.Substring(0, (FileInf.Name.Length - FileInf.Extension.Length))
+                Return mrFileInfo.Name.Substring(0, (mrFileInfo.Name.Length - mrFileInfo.Extension.Length))
             End Get
         End Property
 
@@ -42,13 +43,13 @@ Namespace CSD
         End Sub
 
         Public Sub New(ByVal sFilename As String)
-            FileInf = New FileInfo(sFilename)
+            mrFileInfo = New FileInfo(sFilename)
         End Sub
 
         Private Function GetUNCPath() As String
             Dim sPath As StringBuilder = New StringBuilder()
             Dim sNetLtr As String
-            Dim sLtr As String = FileInf.FullName.Substring(0, 2)
+            Dim sLtr As String = mrFileInfo.FullName.Substring(0, 2)
             Dim query As SelectQuery = New SelectQuery("select name, ProviderName from win32_logicaldisk where drivetype=4")
             Dim searcher As ManagementObjectSearcher = New ManagementObjectSearcher(query)
 
@@ -56,7 +57,7 @@ Namespace CSD
                 sNetLtr = Convert.ToString(mo("name"))
 
                 If sNetLtr = sLtr Then
-                    sPath.AppendFormat("{0}{1}", mo("ProviderName"), FileInf.DirectoryName.Substring(2))
+                    sPath.AppendFormat("{0}{1}", mo("ProviderName"), mrFileInfo.DirectoryName.Substring(2))
                 End If
             Next
 
@@ -66,12 +67,13 @@ Namespace CSD
         Public Function CSVToDataTable() As DataTable
 
             Try
-                If FileInf Is Nothing Then
+                If mrFileInfo Is Nothing Then
                     Return Nothing
                 End If
 
-                Dim dtData As DataTable = New DataTable()
-                Dim oTR As TextReader = File.OpenText(FileInf.FullName)
+                Dim ldtData As DataTable = New DataTable()
+
+                Dim oTR As TextReader = File.OpenText(mrFileInfo.FullName)
                 Dim sLine As String = Nothing
                 Dim arData As String()
                 Dim drData As DataRow
@@ -86,24 +88,24 @@ Namespace CSD
                     sLine = Me.CleanString(oTR.ReadLine())
                 End If
 
-                Me.CreateColumns(dtData, sLine)
+                Me.CreateColumns(ldtData, sLine)
 
-                If dtData.Columns.Count = 0 Then
+                If ldtData.Columns.Count = 0 Then
                     Return Nothing
                 End If
 
                 oTR.Close()
-                oTR = File.OpenText(FileInf.FullName)
+                oTR = File.OpenText(mrFileInfo.FullName)
 
                 For i As Integer = 0 To (DataRow1 + 1) - 1
                     sLine = Me.CleanString(oTR.ReadLine())
                 Next
 
                 While True
-                    arData = sLine.Split(New String() {Delimiter}, StringSplitOptions.None)
-                    drData = dtData.NewRow()
+                    arData = sLine.Split(New String() {msDelimiter}, StringSplitOptions.None)
+                    drData = ldtData.NewRow()
 
-                    For i As Integer = 0 To dtData.Columns.Count - 1
+                    For i As Integer = 0 To ldtData.Columns.Count - 1
 
                         If i < arData.Length Then
                             drData(i) = arData(i)
@@ -116,7 +118,7 @@ Namespace CSD
                         Exit While
                     End If
 
-                    dtData.Rows.Add(drData)
+                    ldtData.Rows.Add(drData)
                     sLine = CleanString(oTR.ReadLine())
 
                     If sLine Is Nothing Then
@@ -126,9 +128,9 @@ Namespace CSD
 
                 oTR.Close()
                 oTR.Dispose()
-                dtData.AcceptChanges()
+                ldtData.AcceptChanges()
 
-                Return dtData
+                Return ldtData
 
             Catch ex As Exception
 
@@ -173,7 +175,7 @@ Namespace CSD
                 Dim lsTemp As String
                 Dim liColumnCount As Integer = 0
 
-                Dim lasData As String() = sLine.Split(New String() {Delimiter}, StringSplitOptions.None)
+                Dim lasData As String() = sLine.Split(New String() {msDelimiter}, StringSplitOptions.None)
 
                 For i As Integer = 0 To lasData.Length - 1
                     lsTemp = String.Empty
@@ -209,36 +211,38 @@ Namespace CSD
 
         End Sub
 
-        Public Function TableToCSV(ByVal dvData As DataView, ByVal bExcludeTitles As Boolean) As Boolean
-            Try
+        Public Function ExportORMQLRecordsetToCSV(ByRef arRecordset As ORMQL.Recordset, ByVal abExcludeTitles As Boolean) As Boolean
 
-                If dvData Is Nothing Then
+            Try
+                If arRecordset Is Nothing Then
                     Return False
                 End If
 
                 Dim sLine As StringBuilder = New StringBuilder()
 
-                If FileInf.Exists Then
-                    FileInf.Delete()
+                If mrFileInfo.Exists Then
+                    mrFileInfo.Delete()
                 End If
 
-                Dim oSW As StreamWriter = New StreamWriter(New FileStream(FileInf.FullName, FileMode.Create))
+                Dim oSW As StreamWriter = New StreamWriter(New FileStream(mrFileInfo.FullName, FileMode.Create))
 
-                If Not bExcludeTitles Then
+                Dim liColumnCount As Integer = arRecordset.Columns.Count
 
-                    For Each oCol As DataColumn In dvData.Table.Columns
-                        sLine.AppendFormat("{0}{1}", oCol.Caption, Delimiter)
+                If Not abExcludeTitles Then
+
+                    For Each lsColumnName As String In arRecordset.Columns
+                        sLine.AppendFormat("{0}{1}", lsColumnName, msDelimiter)
                     Next
 
                     sLine.Length = sLine.Length - 1
                     oSW.WriteLine(sLine.ToString())
                 End If
 
-                For i As Integer = 0 To dvData.Count - 1
+                For Each lrFact In arRecordset.Facts
                     sLine.Length = 0
 
-                    For j As Integer = 0 To dvData.Table.Columns.Count - 1
-                        sLine.AppendFormat("{0}{1}", Convert.ToString(dvData(i)(j)), Delimiter)
+                    For liColumnInd As Integer = 0 To arRecordset.Columns.Count - 1
+                        sLine.AppendFormat("{0}{1}", Convert.ToString(lrFact.Data(liColumnInd).Data), If(liColumnInd + 1 < liColumnCount, msDelimiter, ""))
                     Next
 
                     oSW.WriteLine(sLine.ToString())
@@ -247,6 +251,60 @@ Namespace CSD
                 oSW.Flush()
                 oSW.Close()
                 Return True
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
+
+        End Function
+
+        Public Function ExportDataViewToCSV(ByVal advData As DataView, ByVal abExcludeTitles As Boolean) As Boolean
+            Try
+
+                If advData Is Nothing Then
+                    Return False
+                End If
+
+                Dim sLine As StringBuilder = New StringBuilder()
+
+                If mrFileInfo.Exists Then
+                    mrFileInfo.Delete()
+                End If
+
+                Dim oSW As StreamWriter = New StreamWriter(New FileStream(mrFileInfo.FullName, FileMode.Create))
+
+                If Not abExcludeTitles Then
+
+                    For Each oCol As DataColumn In advData.Table.Columns
+                        sLine.AppendFormat("{0}{1}", oCol.Caption, msDelimiter)
+                    Next
+
+                    sLine.Length = sLine.Length - 1
+                    oSW.WriteLine(sLine.ToString())
+                End If
+
+                For i As Integer = 0 To advData.Count - 1
+                    sLine.Length = 0
+
+                    For j As Integer = 0 To advData.Table.Columns.Count - 1
+                        sLine.AppendFormat("{0}{1}", Convert.ToString(advData(i)(j)), msDelimiter)
+                    Next
+
+                    oSW.WriteLine(sLine.ToString())
+                Next
+
+                oSW.Flush()
+                oSW.Close()
+
+                Return True
+
             Catch Exc As Exception
                 Throw Exc
             End Try
