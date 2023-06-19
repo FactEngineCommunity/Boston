@@ -155,6 +155,9 @@
     <Reference Include="Fastenshtein, Version=1.0.0.7, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fastenshtein.1.0.0.7\lib\net452\Fastenshtein.dll</HintPath>
     </Reference>
+    <Reference Include="FileHandler">
+      <HintPath>..\Dependencies\FileHandler.dll</HintPath>
+    </Reference>
     <Reference Include="FilteredPropertyGrid, Version=1.0.5547.36338, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\FilteredPropertyGrid.dll</HintPath>
@@ -354,6 +357,7 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -481,6 +485,7 @@
     <Compile Include="ClassesClientServer\tProjectUserPermission.vb" />
     <Compile Include="ClassesClientServer\tRole.vb" />
     <Compile Include="ClassesClientServer\tUser.vb" />
+    <Compile Include="ClassesCSV\tCSVFileHandler.vb" />
     <Compile Include="ClassesDatabase\Postgres\tPostgresRecordset.vb" />
     <Compile Include="ClassesDatabase\SQLite\Database.vb" />
     <Compile Include="ClassesDatabase\SQLite\tSQLiteRecordset.vb" />
@@ -1646,6 +1651,12 @@
     <Compile Include="Forms\frmPluginViewer.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Toolboxes\frmCSVLoader.Designer.vb">
+      <DependentUpon>frmCSVLoader.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmCSVLoader.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Toolboxes\frmAutoComplete.Designer.vb">
       <DependentUpon>frmAutoComplete.vb</DependentUpon>
     </Compile>
@@ -2525,6 +2536,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmPluginViewer.resx">
       <DependentUpon>frmPluginViewer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmCSVLoader.resx">
+      <DependentUpon>frmCSVLoader.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmAutoComplete.resx">
       <DependentUpon>frmAutoComplete.vb</DependentUpon>

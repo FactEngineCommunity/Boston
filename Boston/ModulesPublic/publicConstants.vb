@@ -29,6 +29,14 @@ Public Module publicConstants
         Professional
     End Enum
 
+    ''' <summary>
+    ''' Used for the CSV form to say whether it is used to import or export CSV data.
+    ''' </summary>
+    Public Enum pcenumCSVFormFunction
+        ImportCSVData
+        ExportCSVData
+    End Enum
+
     Public Enum pcenumRDSColumnType
         StandardRDSColumn
         ReturnFunctionColumn 'As used in Functions returned as a Column in a SQL Query etc.

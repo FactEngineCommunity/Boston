@@ -31,6 +31,9 @@ Partial Class frmToolboxTableData
         Me.ToolStripButtonCommit = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButtonUndo = New System.Windows.Forms.ToolStripButton()
         Me.ButtonAddRow = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripButtonCSVImport = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButtonCSVExport = New System.Windows.Forms.ToolStripButton()
         Me.GroupBox1.SuspendLayout()
         CType(Me.AdvancedDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
@@ -87,7 +90,7 @@ Partial Class frmToolboxTableData
         '
         'ToolStrip1
         '
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonCommit, Me.ToolStripButtonUndo, Me.ButtonAddRow})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonCommit, Me.ToolStripButtonUndo, Me.ButtonAddRow, Me.ToolStripSeparator1, Me.ToolStripButtonCSVImport, Me.ToolStripButtonCSVExport})
         Me.ToolStrip1.Location = New System.Drawing.Point(2, 15)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Size = New System.Drawing.Size(815, 25)
@@ -124,6 +127,31 @@ Partial Class frmToolboxTableData
         Me.ButtonAddRow.Size = New System.Drawing.Size(23, 22)
         Me.ButtonAddRow.Text = "ToolStripButton1"
         '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(6, 25)
+        '
+        'ToolStripButtonCSVImport
+        '
+        Me.ToolStripButtonCSVImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButtonCSVImport.Image = CType(resources.GetObject("ToolStripButtonCSVImport.Image"), System.Drawing.Image)
+        Me.ToolStripButtonCSVImport.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButtonCSVImport.Name = "ToolStripButtonCSVImport"
+        Me.ToolStripButtonCSVImport.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButtonCSVImport.Text = "ToolStripButton1"
+        Me.ToolStripButtonCSVImport.ToolTipText = "Import CSV Data"
+        '
+        'ToolStripButtonCSVExport
+        '
+        Me.ToolStripButtonCSVExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButtonCSVExport.Image = CType(resources.GetObject("ToolStripButtonCSVExport.Image"), System.Drawing.Image)
+        Me.ToolStripButtonCSVExport.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButtonCSVExport.Name = "ToolStripButtonCSVExport"
+        Me.ToolStripButtonCSVExport.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButtonCSVExport.Text = "ToolStripButton2"
+        Me.ToolStripButtonCSVExport.ToolTipText = "Export CSV Data"
+        '
         'frmToolboxTableData
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -152,4 +180,7 @@ Partial Class frmToolboxTableData
     Friend WithEvents ToolStripButtonUndo As ToolStripButton
     Friend WithEvents AdvancedDataGridView As ADGV.AdvancedDataGridView
     Friend WithEvents ButtonAddRow As ToolStripButton
+    Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
+    Friend WithEvents ToolStripButtonCSVImport As ToolStripButton
+    Friend WithEvents ToolStripButtonCSVExport As ToolStripButton
 End Class

@@ -1127,6 +1127,50 @@ Public Class frmToolboxTableData
         'Debugger.Break()
     End Sub
 
+    Private Sub ToolStripButtonCSVImport_Click(sender As Object, e As EventArgs) Handles ToolStripButtonCSVImport.Click
+
+        Try
+            Dim lfrmCSVLoader As New frmCSVLoader
+
+            lfrmCSVLoader.miFormFunction = pcenumCSVFormFunction.ImportCSVData
+            lfrmCSVLoader.mrModel = Me.mrModel
+            lfrmCSVLoader.mrTable = Me.mrTable
+
+            Call lfrmCSVLoader.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripButtonCSVExport_Click(sender As Object, e As EventArgs) Handles ToolStripButtonCSVExport.Click
+
+        Try
+            Dim lfrmCSVLoader As New frmCSVLoader
+
+            lfrmCSVLoader.miFormFunction = pcenumCSVFormFunction.ExportCSVData
+            lfrmCSVLoader.mrModel = Me.mrModel
+            lfrmCSVLoader.mrTable = Me.mrTable
+
+            Call lfrmCSVLoader.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
     Private Function AllDataGridCulumnsPopulatedByRow(ByVal aiRowIndex As Integer)
 
         Try
