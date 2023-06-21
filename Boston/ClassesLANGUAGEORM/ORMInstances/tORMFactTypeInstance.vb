@@ -2016,6 +2016,7 @@ ReattachRoles:
                             Dim larModelElementInstance = From ModelElementInstance In Me.Page.GetAllPageObjects(False, False, lrRoleInstance.JoinedORMObject)
                                                           Where ModelElementInstance.Visible = True
                                                           Where ModelElementInstance.Id <> Me.Id
+                                                          Where ModelElementInstance.Id = lrRoleInstance.JoinedORMObject.Id
                                                           Select ModelElementInstance
 
                             If larModelElementInstance.Count > 1 Then

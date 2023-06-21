@@ -435,6 +435,7 @@ TestConnectionString:
         Else
             Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.MSJet, pcenumDatabaseType.MSJet.ToString, pcenumDatabaseType.MSJet))
             Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.SQLite, pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.SQLite))
+            Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.PostgreSQL, pcenumDatabaseType.PostgreSQL.ToString, pcenumDatabaseType.PostgreSQL))
 
             Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(My.Settings.DatabaseType)
 

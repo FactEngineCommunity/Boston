@@ -92,9 +92,13 @@ Partial Class frmDiagramERD
         Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CloseAllButThisPageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
+        Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
+        Me.ViewInGlossaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ViewInModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ShowInDiagramSpyToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.CircularProgressBar = New CircularProgressBar.CircularProgressBar()
         Me.ContextMenuStrip_Entity.SuspendLayout()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStripAttribute.SuspendLayout()
@@ -111,9 +115,9 @@ Partial Class frmDiagramERD
         '
         'ContextMenuStrip_Entity
         '
-        Me.ContextMenuStrip_Entity.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator2, Me.AddRelatedEntitiesToThisPageToolStripMenuItem, Me.ToolStripMenuItemDisplayDataIndexRelationInformation, Me.ToolStripMenuItemEntityIndexEditor, Me.ToolStripMenuItemEntityModelErrors, Me.ToolStripSeparator8, Me.ToolStripMenuItemAddAttribute, Me.ToolStripMenuItemIndexManager, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator10, Me.RemoveFromPageToolStripMenuItem, Me.ToolStripSeparator7, Me.ViewTableDataToolStripMenuItem, Me.ToolStripMenuItemReCreateDatabaseTable, Me.ToolStripSeparatorReCreateTable, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip_Entity.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator2, Me.AddRelatedEntitiesToThisPageToolStripMenuItem, Me.ToolStripMenuItemDisplayDataIndexRelationInformation, Me.ToolStripMenuItemEntityIndexEditor, Me.ToolStripMenuItemEntityModelErrors, Me.ToolStripSeparator8, Me.ShowInDiagramSpyToolStripMenuItem1, Me.ViewInGlossaryToolStripMenuItem, Me.ViewInModelDictionaryToolStripMenuItem, Me.ToolStripSeparator11, Me.ToolStripMenuItemAddAttribute, Me.ToolStripMenuItemIndexManager, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator10, Me.RemoveFromPageToolStripMenuItem, Me.ToolStripSeparator7, Me.ViewTableDataToolStripMenuItem, Me.ToolStripMenuItemReCreateDatabaseTable, Me.ToolStripSeparatorReCreateTable, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Entity.Name = "ContextMenuStrip_Actor"
-        Me.ContextMenuStrip_Entity.Size = New System.Drawing.Size(315, 304)
+        Me.ContextMenuStrip_Entity.Size = New System.Drawing.Size(315, 376)
         '
         'MorphToToolStripMenuItem
         '
@@ -369,7 +373,7 @@ Partial Class frmDiagramERD
         Me.LanguageToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.ConvertToPropertyGraphSchemaToolStripMenuItem})
         Me.LanguageToolStripMenuItem.Image = CType(resources.GetObject("LanguageToolStripMenuItem.Image"), System.Drawing.Image)
         Me.LanguageToolStripMenuItem.Name = "LanguageToolStripMenuItem"
-        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.LanguageToolStripMenuItem.Size = New System.Drawing.Size(150, 22)
         Me.LanguageToolStripMenuItem.Text = "To &Language..."
         '
         'PropertyGraphSchemaToolStripMenuItem
@@ -544,6 +548,64 @@ Partial Class frmDiagramERD
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
+        'CircularProgressBar
+        '
+        Me.CircularProgressBar.AnimationFunction = Nothing
+        Me.CircularProgressBar.AnimationSpeed = 100
+        Me.CircularProgressBar.BackColor = System.Drawing.Color.White
+        Me.CircularProgressBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CircularProgressBar.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.CircularProgressBar.InnerColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.CircularProgressBar.InnerMargin = 2
+        Me.CircularProgressBar.InnerWidth = -1
+        Me.CircularProgressBar.Location = New System.Drawing.Point(418, 228)
+        Me.CircularProgressBar.MarqueeAnimationSpeed = 1000
+        Me.CircularProgressBar.Name = "CircularProgressBar"
+        Me.CircularProgressBar.OuterColor = System.Drawing.Color.LightGray
+        Me.CircularProgressBar.OuterMargin = -25
+        Me.CircularProgressBar.OuterWidth = 26
+        Me.CircularProgressBar.ProgressColor = System.Drawing.Color.SteelBlue
+        Me.CircularProgressBar.ProgressWidth = 6
+        Me.CircularProgressBar.SecondaryFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CircularProgressBar.Size = New System.Drawing.Size(50, 50)
+        Me.CircularProgressBar.StartAngle = 270
+        Me.CircularProgressBar.SubscriptColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.CircularProgressBar.SubscriptMargin = New System.Windows.Forms.Padding(-5, -27, 0, 0)
+        Me.CircularProgressBar.SubscriptText = ""
+        Me.CircularProgressBar.SuperscriptColor = System.Drawing.Color.FromArgb(CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer))
+        Me.CircularProgressBar.SuperscriptMargin = New System.Windows.Forms.Padding(12, 25, 0, 0)
+        Me.CircularProgressBar.SuperscriptText = ""
+        Me.CircularProgressBar.TabIndex = 17
+        Me.CircularProgressBar.Text = "0"
+        Me.CircularProgressBar.TextMargin = New System.Windows.Forms.Padding(2, 2, 0, 0)
+        Me.CircularProgressBar.Value = 68
+        '
+        'ViewInGlossaryToolStripMenuItem
+        '
+        Me.ViewInGlossaryToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Glossary16x16
+        Me.ViewInGlossaryToolStripMenuItem.Name = "ViewInGlossaryToolStripMenuItem"
+        Me.ViewInGlossaryToolStripMenuItem.Size = New System.Drawing.Size(314, 22)
+        Me.ViewInGlossaryToolStripMenuItem.Text = "Show in Glossary"
+        '
+        'ViewInModelDictionaryToolStripMenuItem
+        '
+        Me.ViewInModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.dictionary16x16
+        Me.ViewInModelDictionaryToolStripMenuItem.Name = "ViewInModelDictionaryToolStripMenuItem"
+        Me.ViewInModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(314, 22)
+        Me.ViewInModelDictionaryToolStripMenuItem.Text = "Show in Model Dictionary"
+        '
+        'ToolStripSeparator11
+        '
+        Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
+        Me.ToolStripSeparator11.Size = New System.Drawing.Size(311, 6)
+        '
+        'ShowInDiagramSpyToolStripMenuItem1
+        '
+        Me.ShowInDiagramSpyToolStripMenuItem1.Image = Global.Boston.My.Resources.Resources.spyglass_icon
+        Me.ShowInDiagramSpyToolStripMenuItem1.Name = "ShowInDiagramSpyToolStripMenuItem1"
+        Me.ShowInDiagramSpyToolStripMenuItem1.Size = New System.Drawing.Size(314, 22)
+        Me.ShowInDiagramSpyToolStripMenuItem1.Text = "Show in Diagram Spy"
+        '
         'DiagramView
         '
         Me.DiagramView.AllowDrop = True
@@ -580,38 +642,6 @@ Partial Class frmDiagramERD
         Me.HiddenDiagramView.Size = New System.Drawing.Size(938, 524)
         Me.HiddenDiagramView.TabIndex = 11
         Me.HiddenDiagramView.Text = "DiagramView1"
-        '
-        'CircularProgressBar
-        '
-        Me.CircularProgressBar.AnimationFunction = Nothing
-        Me.CircularProgressBar.AnimationSpeed = 100
-        Me.CircularProgressBar.BackColor = System.Drawing.Color.White
-        Me.CircularProgressBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CircularProgressBar.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.CircularProgressBar.InnerColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
-        Me.CircularProgressBar.InnerMargin = 2
-        Me.CircularProgressBar.InnerWidth = -1
-        Me.CircularProgressBar.Location = New System.Drawing.Point(418, 228)
-        Me.CircularProgressBar.MarqueeAnimationSpeed = 1000
-        Me.CircularProgressBar.Name = "CircularProgressBar"
-        Me.CircularProgressBar.OuterColor = System.Drawing.Color.LightGray
-        Me.CircularProgressBar.OuterMargin = -25
-        Me.CircularProgressBar.OuterWidth = 26
-        Me.CircularProgressBar.ProgressColor = System.Drawing.Color.SteelBlue
-        Me.CircularProgressBar.ProgressWidth = 6
-        Me.CircularProgressBar.SecondaryFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CircularProgressBar.Size = New System.Drawing.Size(50, 50)
-        Me.CircularProgressBar.StartAngle = 270
-        Me.CircularProgressBar.SubscriptColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.CircularProgressBar.SubscriptMargin = New System.Windows.Forms.Padding(-5, -27, 0, 0)
-        Me.CircularProgressBar.SubscriptText = ""
-        Me.CircularProgressBar.SuperscriptColor = System.Drawing.Color.FromArgb(CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer), CType(CType(166, Byte), Integer))
-        Me.CircularProgressBar.SuperscriptMargin = New System.Windows.Forms.Padding(12, 25, 0, 0)
-        Me.CircularProgressBar.SuperscriptText = ""
-        Me.CircularProgressBar.TabIndex = 17
-        Me.CircularProgressBar.Text = "0"
-        Me.CircularProgressBar.TextMargin = New System.Windows.Forms.Padding(2, 2, 0, 0)
-        Me.CircularProgressBar.Value = 68
         '
         'frmDiagramERD
         '
@@ -704,4 +734,8 @@ Partial Class frmDiagramERD
     Friend WithEvents ConvertToPropertyGraphSchemaToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator12 As ToolStripSeparator
     Friend WithEvents CircularProgressBar As CircularProgressBar.CircularProgressBar
+    Friend WithEvents ViewInGlossaryToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ViewInModelDictionaryToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator11 As ToolStripSeparator
+    Friend WithEvents ShowInDiagramSpyToolStripMenuItem1 As ToolStripMenuItem
 End Class

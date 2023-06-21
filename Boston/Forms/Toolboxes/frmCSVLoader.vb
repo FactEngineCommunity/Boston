@@ -85,6 +85,8 @@ Public Class frmCSVLoader
 
 					' Get the selected file name and path
 					txtFileName.Text = lrSaveFileDialog.FileName
+					txtDestination.Text = txtFileName.Text
+					txtFileNameOut.Text = System.IO.Path.GetFileName(txtFileName.Text)
 				End If
 			Case Is = pcenumCSVFormFunction.ImportCSVData
 
@@ -166,9 +168,9 @@ Public Class frmCSVLoader
 
 	Private Sub btnExport_Click(sender As Object, e As EventArgs) Handles btnExport.Click
 
-		Dim lsFilePath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+		Dim lsFilePath As String = Trim(txtDestination.Text)
 
-		lsFilePath = Path.Combine(lsFilePath, txtFileNameOut.Text)
+		'lsFilePath = Path.Combine(lsFilePath, txtFileNameOut.Text)
 
 		mrFileHandler.msDelimiter = txtDelimiterOUT.Text
 		mrFileHandler.mrFileInfo = New FileInfo(lsFilePath)

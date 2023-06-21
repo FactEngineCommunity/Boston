@@ -387,7 +387,7 @@ Public Class frmDiagramORMForGlossary
                 '20230306-VM-Removed for now. ObjectifyingEntityType
                 'Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
             End If
-            Call Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False,,,,,,, True)
+            Call Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False,,,, True,,, True)
         Next
 
     End Sub

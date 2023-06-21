@@ -143,7 +143,7 @@ Public Module tableDataLineageItemProperty
             lRecordset.ActiveConnection = pdbConnection
             lRecordset.CursorType = pcOpenStatic
 
-            lsSQLQuery = "SELECT MAX(LineageSetNr)"
+            lsSQLQuery = "SELECT MAX(LineageSetNumber)"
             lsSQLQuery &= " FROM DataLineageItemProperty"
             lsSQLQuery &= " WHERE ModelId = '" & arModel.ModelId & "'"
             lsSQLQuery &= " AND DataLineageItemName = '" & Trim(asDataLineageItemName) & "'"
@@ -184,6 +184,7 @@ Public Module tableDataLineageItemProperty
             lsSQLQuery &= " AND DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
             lsSQLQuery &= " AND DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
             lsSQLQuery &= " AND DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
+            lsSQLQuery &= " AND LineageSetNumber = " & Trim(arDataLineageItemProperty.LineageSetNumber)
 
             lRecordset.Open(lsSQLQuery)
 
@@ -284,7 +285,7 @@ Public Module tableDataLineageItemProperty
             lsSQLQuery &= "   AND DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
             lsSQLQuery &= "   AND DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
             lsSQLQuery &= "   AND DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
-            lsSQLQuery &= "   AND LineageSetNumber = '" & Trim(arDataLineageItemProperty.LineageSetNumber) & "'"
+            lsSQLQuery &= "   AND LineageSetNumber = " & Trim(arDataLineageItemProperty.LineageSetNumber)
 
             pdbConnection.BeginTrans()
             pdbConnection.Execute(lsSQLQuery)

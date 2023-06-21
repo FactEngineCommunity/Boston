@@ -3,6 +3,7 @@ Imports System.Data.SQLite
 Imports System.Reflection
 Imports System.Threading.Tasks
 Imports kuzunet
+Imports System.Text.RegularExpressions
 
 Namespace FactEngine
 
@@ -327,9 +328,13 @@ Namespace FactEngine
             Dim lsSQLCommand As String
 
             Try
-                lsSQLCommand = "CREATE TABLE [" & arTable.Name & "]"
+                '=========E.g. From Kuzu website==========================================================
+                '// create the schema
+                'connection.query("CREATE NODE TABLE User(name STRING, age INT64, PRIMARY KEY (name))");
+                '=========================================================================================
+                lsSQLCommand = "CREATE NODE TABLE [" & arTable.Name & "]"
                 lsSQLCommand &= " ("
-                lsSQLCommand &= arColumn.Name & " " & "TEXT(100)" '& arColumn.DataTypeName
+                lsSQLCommand &= arColumn.Name & " " & arColumn.DataType.DataType & If(arColumn.IsMandatory, ", PRIMARY KEY (" & arColumn.Name & ")", "")
                 lsSQLCommand &= ")"
 
                 Me.GONonQuery(lsSQLCommand)
@@ -630,30 +635,58 @@ Namespace FactEngine
 
             Dim larColumn As New List(Of RDS.Column)
             Try
-                Dim lsSQL As String = "PRAGMA table_info('" & arTable.Name & "')"
-                Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
+                Dim loColumns = kuzu_connection_get_node_property_names(Me.conn, arTable.Name)
+                Dim lasColumnDescription As List(Of String) = loColumns.Split(vbLf).ToList.Select(Function(s) s.Replace(vbTab, "")).ToList
+                lasColumnDescription.RemoveAt(0)
+                lasColumnDescription.RemoveAt(lasColumnDescription.Count - 1)
+
+                '=========NB=============
+                'Dim input As String = "Hello" & vbCrLf & "World" & vbTab & "Test"
+                'Dim separators As String() = {vbCrLf, vbTab}
+                'Dim result As String() = input.Split(separators, StringSplitOptions.RemoveEmptyEntries)
+                '=========NB=============
+
+                Debugger.Break()
 
                 Dim lsColumnName As String
+                Dim lsDataType As String
                 Dim lbIsMandatory As Boolean
+                Dim lbIsPrimaryKey As Boolean
                 Dim lrColumn As New RDS.Column
 
-                While Not lrRecordset.EOF
-                    'name
-                    'type
-                    'notnull
-                    'dflt_value
-                    'pk  (0 if not part of the PK, else integer value)
-                    lsColumnName = lrRecordset("name").Data
-                    lbIsMandatory = CInt(NullVal(lrRecordset("notnull").Data, 0)) > 0
-                    lrColumn = New RDS.Column(arTable, lsColumnName, Nothing, Nothing, lbIsMandatory)
-                    lrColumn.DataType = New RDS.DataType
-                    lrColumn.DataType.DataType = lrRecordset("type").Data
-                    lrColumn.DatabaseName = lrColumn.Name
+                For Each lsColumnDescription In lasColumnDescription
 
-                    larColumn.Add(lrColumn)
+                    '==================================
+                    'E.g. For/From Kuzu database: kuzu_connection_get_node_property_names
+                    '"name STRING(PRIMARY KEY)"
+                    '"population INT64"
+                    '==================================
 
-                    lrRecordset.MoveNext()
-                End While
+                    Dim regexPattern As String = "^(.*?)\s+(\w+)(?:\s*\((PRIMARY KEY)\))?$"
+
+                    Dim regex As New Regex(regexPattern)
+
+                    'Extracting information from the description
+                    Dim match1 As Match = regex.Match(lsColumnDescription)
+
+                    If match1.Success Then
+                        lsColumnName = match1.Groups(1).Value.Trim()
+                        lsDataType = match1.Groups(2).Value.Trim()
+                        lbIsPrimaryKey = match1.Groups(3).Success
+                        lbIsMandatory = lbIsPrimaryKey
+
+                        lrColumn = New RDS.Column(arTable, lsColumnName, Nothing, Nothing, lbIsMandatory)
+                        lrColumn.DataType = New RDS.DataType
+                        lrColumn.DataType.DataType = lsDataType
+                        lrColumn.DatabaseName = lrColumn.Name
+
+                        larColumn.Add(lrColumn)
+                    Else
+                        GoTo SkipColumn
+                    End If
+
+SkipColumn:
+                Next
 
                 Return larColumn
 
@@ -941,21 +974,20 @@ Namespace FactEngine
 
             Dim larTable As New List(Of RDS.Table)
             Try
-                Dim lsSQL As String = "SELECT name FROM sqlite_master WHERE type='table'"
-                Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
+
+                Dim lsTableNames = kuzu_connection_get_node_table_names(Me.conn)
+                Dim lasTableNames As List(Of String) = lsTableNames.Split(vbLf).ToList.Select(Function(s) s.Replace(vbTab, "")).ToList
+                lasTableNames.RemoveAt(0)
+                lasTableNames.RemoveAt(lasTableNames.Count - 1)
 
                 Dim lsTableName As String
                 Dim lrTable As New RDS.Table
 
-                While Not lrRecordset.EOF
+                For Each lsTableName In lasTableNames
 
-                    lsTableName = lrRecordset("name").Data
                     lrTable = New RDS.Table(Me.FBMModel.RDS, lsTableName, Nothing)
-
                     larTable.Add(lrTable)
-
-                    lrRecordset.MoveNext()
-                End While
+                Next
 
                 Return larTable
 

@@ -1474,7 +1474,8 @@ SkipRegistrationChecking:
 
     End Sub
 
-    Public Function LoadToolboxModelDictionary(Optional abRefreshModelDictionary As Boolean = False) As frmToolboxModelDictionary
+    Public Function LoadToolboxModelDictionary(Optional abRefreshModelDictionary As Boolean = False,
+                                               Optional ByRef arModelElement As FBM.ModelObject = Nothing) As frmToolboxModelDictionary
 
         Dim child As New frmToolboxModelDictionary
 
@@ -1506,6 +1507,10 @@ SkipRegistrationChecking:
                     child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockRight)
                 End If
                 prApplication.RightToolboxForms.Add(child)
+            End If
+
+            If arModelElement IsNot Nothing Then
+                Call child.FindTreeNode(arModelElement.Id)
             End If
 
             Return child

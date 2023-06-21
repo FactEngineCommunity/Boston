@@ -4165,4 +4165,84 @@ Aborted:
 
     End Sub
 
+    Private Sub ViewInGlossaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewInGlossaryToolStripMenuItem.Click
+
+        Try
+            Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
+            Dim lrEntity As New ERD.Entity
+
+            Me.Cursor = Cursors.WaitCursor
+
+            ''---------------------------------------------------------
+            ''Get the EntityType represented by the (selected) Entity
+            ''---------------------------------------------------------
+            lrEntity = lrTableNode.Tag '(above) = Me.Diagram.Selection.Items(0)
+
+            Call frmMain.LoadGlossaryForm(lrEntity.RDSTable.FBMModelElement)
+
+        Catch ex As Exception
+
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+        End Try
+    End Sub
+
+    Private Sub ViewInModelDictionaryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewInModelDictionaryToolStripMenuItem.Click
+
+        Try
+            Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
+            Dim lrEntity As New ERD.Entity
+
+            Me.Cursor = Cursors.WaitCursor
+
+            ''---------------------------------------------------------
+            ''Get the EntityType represented by the (selected) Entity
+            ''---------------------------------------------------------
+            lrEntity = lrTableNode.Tag '(above) = Me.Diagram.Selection.Items(0)
+
+            Call frmMain.LoadToolboxModelDictionary(True, lrEntity.RDSTable.FBMModelElement)
+
+        Catch ex As Exception
+
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+        End Try
+
+    End Sub
+
+    Private Sub ShowInDiagramSpyToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ShowInDiagramSpyToolStripMenuItem1.Click
+
+        Try
+            Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
+            Dim lrEntity As New ERD.Entity
+
+            Me.Cursor = Cursors.WaitCursor
+
+            ''---------------------------------------------------------
+            ''Get the EntityType represented by the (selected) Entity
+            ''---------------------------------------------------------
+            lrEntity = lrTableNode.Tag '(above) = Me.Diagram.Selection.Items(0)
+
+            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrPage.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+            Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrEntity.RDSTable.FBMModelElement, Control.ModifierKeys = Keys.Control)
+
+        Catch ex As Exception
+
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+        End Try
+
+    End Sub
 End Class

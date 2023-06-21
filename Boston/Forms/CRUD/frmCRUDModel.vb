@@ -543,7 +543,7 @@ ConnectionFailed:
 
             '------------------------------------------------------------------------------------------
             'Check to see that Reverse Engineering is supported for the datatabase type of the model.
-            Dim larSupportedDatabases = {pcenumDatabaseType.SQLite, pcenumDatabaseType.Snowflake, pcenumDatabaseType.TypeDB}
+            Dim larSupportedDatabases = {pcenumDatabaseType.SQLite, pcenumDatabaseType.Snowflake, pcenumDatabaseType.TypeDB, pcenumDatabaseType.KuzuDB}
 
             If Not larSupportedDatabases.Contains(Me.zrModel.TargetDatabaseType) Then
                 MsgBox("The database type of this model is not supported. Please contact support.")
