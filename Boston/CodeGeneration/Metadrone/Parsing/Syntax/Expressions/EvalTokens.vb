@@ -44,172 +44,175 @@ Namespace Parser.Syntax
         End Function
 
         Private Function Evaluate(ByVal TokenIdxStart As Integer, ByVal TokenIdxEnd As Integer) As List(Of Object)
-            'Don't bother parsing if range invalid..
-            If TokenIdxStart > Me.Tokens.Count - 1 Or _
-               TokenIdxEnd > Me.Tokens.Count - 1 Or _
+
+            Try
+                'Don't bother parsing if range invalid..
+                If TokenIdxStart > Me.Tokens.Count - 1 Or
+               TokenIdxEnd > Me.Tokens.Count - 1 Or
                TokenIdxStart > TokenIdxEnd Then
-                Return New List(Of Object)
-            End If
-
-            'Don't bother parsing if only one token..
-            If TokenIdxStart = TokenIdxEnd Then Return Me.GetLiteral(TokenIdxStart, TokenIdxEnd)
-
-            ' If we find + or - now, it is a unary operator.
-            Dim is_unary As Boolean = True
-
-            ' So far we have nothing.
-            Dim best_prec As Precedence = Precedence.None
-            Dim best_pos As Integer = TokenIdxStart
-
-            ' Find the operator with the lowest precedence.
-            ' Look for places where there are no open
-            ' parentheses.
-            Dim parens As Integer = 0
-            Dim next_unary As Boolean = False
-            For tokenIdx As Integer = TokenIdxStart To TokenIdxEnd
-                ' Assume we will not find an operator. In
-                ' that case, the next operator will not
-                ' be unary.
-                next_unary = False
-
-                ' Examine the next character.
-                If Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.LeftParen Then
-                    ' Increase the open parentheses count.
-                    parens = parens + 1
-
-                    ' A + or - after "(" is unary.
-                    next_unary = True
-
-                ElseIf Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.RightParen Then
-                    ' Decrease the open parentheses count.
-                    parens = parens - 1
-
-                    ' An operator after ")" is not unary.
-                    next_unary = False
-
-                    ' If parens < 0, too many ')'s.
-                    If parens < 0 Then
-                        Throw New NotSupportedException("Too many " & ")s in expression '" & Strings.TokensToString(Me.Tokens, TokenIdxStart, TokenIdxEnd) & "'")
-                    End If
-
-                ElseIf parens = 0 Then
-                    ' See if this is an operator.
-                    If Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.Operator Then
-                        ' An operator after an operator
-                        ' is unary.
-                        next_unary = True
-
-                        ' See if this operator has higher
-                        ' precedence than the current one.
-                        Select Case Me.Tokens(tokenIdx).Text
-                            Case "^"
-                                If best_prec >= Precedence.Power Then
-                                    best_prec = Precedence.Power
-                                    best_pos = tokenIdx
-                                End If
-
-                            Case "*", "/"
-                                If best_prec >= Precedence.Times Then
-                                    best_prec = Precedence.Times
-                                    best_pos = tokenIdx
-                                End If
-
-                            Case "\"
-                                If best_prec >= Precedence.IntDiv Then
-                                    best_prec = Precedence.IntDiv
-                                    best_pos = tokenIdx
-                                End If
-
-                            Case "%"
-                                If best_prec >= Precedence.Modulus Then
-                                    best_prec = Precedence.Modulus
-                                    best_pos = tokenIdx
-                                End If
-
-                            Case "+", "-"
-                                ' Ignore unary operators
-                                ' for now.
-                                If (Not is_unary) And _
-                                    best_prec >= Precedence.Plus Then
-                                    best_prec = Precedence.Plus
-                                    best_pos = tokenIdx
-                                End If
-
-                            Case "&" 'include string concats
-                                If best_prec >= Precedence.Plus Then
-                                    best_prec = Precedence.Plus
-                                    best_pos = tokenIdx
-                                End If
-
-                        End Select
-
-                    ElseIf Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.EqualSign Or _
-                           Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.Comparison Then
-                        If best_prec >= Precedence.Comparison Then
-                            best_prec = Precedence.Comparison
-                            best_pos = tokenIdx
-                        End If
-
-                    ElseIf Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.LogicOperator Then
-                        If best_prec >= Precedence.Logic Then
-                            best_prec = Precedence.Logic
-                            best_pos = tokenIdx
-                        End If
-
-                    ElseIf Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.ParamSep Then
-                        If best_prec >= Precedence.ParamSep Then
-                            best_prec = Precedence.ParamSep
-                            best_pos = tokenIdx
-                        End If
-
-                    End If
-
+                    Return New List(Of Object)
                 End If
 
-                is_unary = next_unary
-            Next
+                'Don't bother parsing if only one token..
+                If TokenIdxStart = TokenIdxEnd Then Return Me.GetLiteral(TokenIdxStart, TokenIdxEnd)
 
-            ' If the parentheses count is not zero,
-            ' there's a ')' missing.
-            If parens <> 0 Then
-                Throw New NotSupportedException("Missing ) in " & "expression '" & Strings.TokensToString(Me.Tokens, TokenIdxStart, TokenIdxEnd) & "'")
-            End If
+                ' If we find + or - now, it is a unary operator.
+                Dim is_unary As Boolean = True
 
-            ' Hopefully we have the operator.
-            If best_prec < Precedence.None Then
-                Dim lexpr As List(Of Object) = Me.Evaluate(TokenIdxStart, best_pos - 1)
-                Dim rexpr As List(Of Object) = Me.Evaluate(best_pos + 1, TokenIdxEnd)
-                Dim ret As New List(Of Object)
+                ' So far we have nothing.
+                Dim best_prec As Precedence = Precedence.None
+                Dim best_pos As Integer = TokenIdxStart
 
-                Select Case Me.Tokens(best_pos).Text.ToLower
-                    Case "^"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(CDbl(lexpr(0)) ^ CDbl(rexpr(0)))
+                ' Find the operator with the lowest precedence.
+                ' Look for places where there are no open
+                ' parentheses.
+                Dim parens As Integer = 0
+                Dim next_unary As Boolean = False
+                For tokenIdx As Integer = TokenIdxStart To TokenIdxEnd
+                    ' Assume we will not find an operator. In
+                    ' that case, the next operator will not
+                    ' be unary.
+                    next_unary = False
 
-                    Case "*"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(CDbl(lexpr(0)) * CDbl(rexpr(0)))
+                    ' Examine the next character.
+                    If Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.LeftParen Then
+                        ' Increase the open parentheses count.
+                        parens = parens + 1
 
-                    Case "/"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(CDbl(lexpr(0)) / CDbl(rexpr(0)))
+                        ' A + or - after "(" is unary.
+                        next_unary = True
 
-                    Case "\"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(CLng(lexpr(0)) \ CLng(rexpr(0)))
+                    ElseIf Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.RightParen Then
+                        ' Decrease the open parentheses count.
+                        parens = parens - 1
 
-                    Case "%"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(CDbl(lexpr(0)) Mod CDbl(rexpr(0)))
+                        ' An operator after ")" is not unary.
+                        next_unary = False
 
-                    Case "+" ' Determine if concat string or addition on numerics
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-
-                        If IsNumeric(lexpr(0)) And IsNumeric(rexpr(0)) Then
-                            ret.Add(CDbl(lexpr(0)) + CDbl(rexpr(0)))
-                        Else
-                            ret.Add(lexpr(0).ToString & rexpr(0).ToString)
+                        ' If parens < 0, too many ')'s.
+                        If parens < 0 Then
+                            Throw New NotSupportedException("Too many " & ")s in expression '" & Strings.TokensToString(Me.Tokens, TokenIdxStart, TokenIdxEnd) & "'")
                         End If
+
+                    ElseIf parens = 0 Then
+                        ' See if this is an operator.
+                        If Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.Operator Then
+                            ' An operator after an operator
+                            ' is unary.
+                            next_unary = True
+
+                            ' See if this operator has higher
+                            ' precedence than the current one.
+                            Select Case Me.Tokens(tokenIdx).Text
+                                Case "^"
+                                    If best_prec >= Precedence.Power Then
+                                        best_prec = Precedence.Power
+                                        best_pos = tokenIdx
+                                    End If
+
+                                Case "*", "/"
+                                    If best_prec >= Precedence.Times Then
+                                        best_prec = Precedence.Times
+                                        best_pos = tokenIdx
+                                    End If
+
+                                Case "\"
+                                    If best_prec >= Precedence.IntDiv Then
+                                        best_prec = Precedence.IntDiv
+                                        best_pos = tokenIdx
+                                    End If
+
+                                Case "%"
+                                    If best_prec >= Precedence.Modulus Then
+                                        best_prec = Precedence.Modulus
+                                        best_pos = tokenIdx
+                                    End If
+
+                                Case "+", "-"
+                                    ' Ignore unary operators
+                                    ' for now.
+                                    If (Not is_unary) And
+                                        best_prec >= Precedence.Plus Then
+                                        best_prec = Precedence.Plus
+                                        best_pos = tokenIdx
+                                    End If
+
+                                Case "&" 'include string concats
+                                    If best_prec >= Precedence.Plus Then
+                                        best_prec = Precedence.Plus
+                                        best_pos = tokenIdx
+                                    End If
+
+                            End Select
+
+                        ElseIf Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.EqualSign Or
+                               Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.Comparison Then
+                            If best_prec >= Precedence.Comparison Then
+                                best_prec = Precedence.Comparison
+                                best_pos = tokenIdx
+                            End If
+
+                        ElseIf Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.LogicOperator Then
+                            If best_prec >= Precedence.Logic Then
+                                best_prec = Precedence.Logic
+                                best_pos = tokenIdx
+                            End If
+
+                        ElseIf Me.Tokens(tokenIdx).Type = SyntaxToken.ElementTypes.ParamSep Then
+                            If best_prec >= Precedence.ParamSep Then
+                                best_prec = Precedence.ParamSep
+                                best_pos = tokenIdx
+                            End If
+
+                        End If
+
+                    End If
+
+                    is_unary = next_unary
+                Next
+
+                ' If the parentheses count is not zero,
+                ' there's a ')' missing.
+                If parens <> 0 Then
+                    Throw New NotSupportedException("Missing ) in " & "expression '" & Strings.TokensToString(Me.Tokens, TokenIdxStart, TokenIdxEnd) & "'")
+                End If
+
+                ' Hopefully we have the operator.
+                If best_prec < Precedence.None Then
+                    Dim lexpr As List(Of Object) = Me.Evaluate(TokenIdxStart, best_pos - 1)
+                    Dim rexpr As List(Of Object) = Me.Evaluate(best_pos + 1, TokenIdxEnd)
+                    Dim ret As New List(Of Object)
+
+                    Select Case Me.Tokens(best_pos).Text.ToLower
+                        Case "^"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(CDbl(lexpr(0)) ^ CDbl(rexpr(0)))
+
+                        Case "*"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(CDbl(lexpr(0)) * CDbl(rexpr(0)))
+
+                        Case "/"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(CDbl(lexpr(0)) / CDbl(rexpr(0)))
+
+                        Case "\"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(CLng(lexpr(0)) \ CLng(rexpr(0)))
+
+                        Case "%"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(CDbl(lexpr(0)) Mod CDbl(rexpr(0)))
+
+                        Case "+" ' Determine if concat string or addition on numerics
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+
+                            If IsNumeric(lexpr(0)) And IsNumeric(rexpr(0)) Then
+                                ret.Add(CDbl(lexpr(0)) + CDbl(rexpr(0)))
+                            Else
+                                'CodeSafe
+                                ret.Add(lexpr(0).ToString & If(rexpr(0) Is Nothing, "", rexpr(0)).ToString)
+                            End If
 
                         'If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
                         '    ret.Add(lexpr(0).ToString & rexpr(0).ToString)
@@ -217,180 +220,186 @@ Namespace Parser.Syntax
                         '    ret.Add(CDbl(lexpr(0)) + CDbl(rexpr(0)))
                         'End If
 
-                    Case "&" ' Concat string
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(lexpr(0).ToString & rexpr(0).ToString)
+                        Case "&" ' Concat string
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(lexpr(0).ToString & If(rexpr(0) Is Nothing, "", rexpr(0)).ToString)
 
-                    Case "-"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(CDbl(lexpr(0)) - CDbl(rexpr(0)))
+                        Case "-"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(CDbl(lexpr(0)) - CDbl(rexpr(0)))
 
-                    Case "="
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(StrEq(lexpr(0).ToString, rexpr(0).ToString))
+                        Case "="
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(StrEq(lexpr(0).ToString, rexpr(0).ToString))
 
-                    Case ">"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
-                            ret.Add(lexpr(0).ToString > rexpr(0).ToString)
-                        Else
-                            ret.Add(CDbl(lexpr(0)) > CDbl(rexpr(0)))
-                        End If
+                        Case ">"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
+                                ret.Add(lexpr(0).ToString > rexpr(0).ToString)
+                            Else
+                                ret.Add(CDbl(lexpr(0)) > CDbl(rexpr(0)))
+                            End If
 
-                    Case ">="
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
-                            ret.Add(lexpr(0).ToString >= rexpr(0).ToString)
-                        Else
-                            ret.Add(CDbl(lexpr(0)) >= CDbl(rexpr(0)))
-                        End If
+                        Case ">="
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
+                                ret.Add(lexpr(0).ToString >= rexpr(0).ToString)
+                            Else
+                                ret.Add(CDbl(lexpr(0)) >= CDbl(rexpr(0)))
+                            End If
 
-                    Case "<"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
-                            ret.Add(lexpr(0).ToString < rexpr(0).ToString)
-                        Else
-                            ret.Add(CDbl(lexpr(0)) < CDbl(rexpr(0)))
-                        End If
+                        Case "<"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
+                                ret.Add(lexpr(0).ToString < rexpr(0).ToString)
+                            Else
+                                ret.Add(CDbl(lexpr(0)) < CDbl(rexpr(0)))
+                            End If
 
-                    Case "<="
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
-                            ret.Add(lexpr(0).ToString <= rexpr(0).ToString)
-                        Else
-                            ret.Add(CDbl(lexpr(0)) <= CDbl(rexpr(0)))
-                        End If
+                        Case "<="
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            If TypeOf lexpr(0) Is String Or TypeOf rexpr(0) Is String Then
+                                ret.Add(lexpr(0).ToString <= rexpr(0).ToString)
+                            Else
+                                ret.Add(CDbl(lexpr(0)) <= CDbl(rexpr(0)))
+                            End If
 
-                    Case "<>"
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(Not StrEq(lexpr(0).ToString, rexpr(0).ToString))
+                        Case "<>"
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(Not StrEq(lexpr(0).ToString, rexpr(0).ToString))
 
-                    Case RESERVED_AND.ToLower
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(CBool(lexpr(0)) And CBool(rexpr(0)))
+                        Case RESERVED_AND.ToLower
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(CBool(lexpr(0)) And CBool(rexpr(0)))
 
-                    Case RESERVED_OR.ToLower
-                        If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
-                        ret.Add(CBool(lexpr(0)) Or CBool(rexpr(0)))
+                        Case RESERVED_OR.ToLower
+                            If lexpr.Count <> 1 Or rexpr.Count <> 1 Then Throw New Exception("Syntax error.")
+                            ret.Add(CBool(lexpr(0)) Or CBool(rexpr(0)))
 
-                    Case "," ' Add to argument list
-                        For i As Integer = 0 To lexpr.Count - 1
-                            ret.Add(lexpr(i))
-                        Next
-                        For i As Integer = 0 To rexpr.Count - 1
-                            ret.Add(rexpr(i))
-                        Next
+                        Case "," ' Add to argument list
+                            For i As Integer = 0 To lexpr.Count - 1
+                                ret.Add(lexpr(i))
+                            Next
+                            For i As Integer = 0 To rexpr.Count - 1
+                                ret.Add(rexpr(i))
+                            Next
 
-                    Case Else ' This shouldn't happen.
-                        Throw New NotSupportedException("Error evaluating expression '" & Strings.TokensToString(Me.Tokens, TokenIdxStart, TokenIdxEnd) & "'")
+                        Case Else ' This shouldn't happen.
+                            Throw New NotSupportedException("Error evaluating expression '" & Strings.TokensToString(Me.Tokens, TokenIdxStart, TokenIdxEnd) & "'")
 
-                End Select
-                Return ret
+                    End Select
+                    Return ret
 
-            End If
-
-            ' If we do not yet have an operator, there
-            ' are several possibilities:
-            '
-            ' 1. expr is (expr2) for some expr2.
-            ' 2. expr is -expr2 or +expr2 for some expr2.
-            ' 3. expr is not
-            ' 4. expr is Fun(expr2) for a function Fun.
-            ' 5. expr is a primitive.
-            ' 6. It's a literal like "3.14159".
-
-            ' Look for (expr2).
-            If Me.Tokens(TokenIdxStart).Type = SyntaxToken.ElementTypes.LeftParen And Me.Tokens(TokenIdxEnd).Type = SyntaxToken.ElementTypes.RightParen Then
-                ' Eval within parentheses.
-                If TokenIdxStart + 1 > TokenIdxEnd - 1 Then
-                    'Empty brackets 
-                    Dim ret As New List(Of Object) : ret.Add(Nothing) : Return ret
-                Else
-                    Return Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd - 1)
                 End If
-            End If
 
-            ' Look for -expr2.
-            If Me.Tokens(TokenIdxStart).Text.Equals("-") Then
-                Dim ret As List(Of Object) = Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd)
-                If ret.Count <> 1 Then Throw New Exception("Syntax error.")
-                ret(0) = -CDbl(ret(0))
-                Return ret
-            End If
+                ' If we do not yet have an operator, there
+                ' are several possibilities:
+                '
+                ' 1. expr is (expr2) for some expr2.
+                ' 2. expr is -expr2 or +expr2 for some expr2.
+                ' 3. expr is not
+                ' 4. expr is Fun(expr2) for a function Fun.
+                ' 5. expr is a primitive.
+                ' 6. It's a literal like "3.14159".
 
-            ' Look for +expr2.
-            If Me.Tokens(TokenIdxStart).Text.Equals("+") Then
-                Dim ret As List(Of Object) = Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd)
-                If ret.Count <> 1 Then Throw New Exception("Syntax error.")
-                ret(0) = CDbl(ret(0))
-                Return ret
-            End If
+                ' Look for (expr2).
+                If Me.Tokens(TokenIdxStart).Type = SyntaxToken.ElementTypes.LeftParen And Me.Tokens(TokenIdxEnd).Type = SyntaxToken.ElementTypes.RightParen Then
+                    ' Eval within parentheses.
+                    If TokenIdxStart + 1 > TokenIdxEnd - 1 Then
+                        'Empty brackets 
+                        Dim ret As New List(Of Object) : ret.Add(Nothing) : Return ret
+                    Else
+                        Return Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd - 1)
+                    End If
+                End If
 
-            ' Look for not expr2.
-            If StrEq(Me.Tokens(TokenIdxStart).Text, RESERVED_NOT) Then
-                Dim ret As List(Of Object) = Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd)
-                If ret.Count <> 1 Then Throw New Exception("Syntax error.")
-                ret(0) = Not CBool(ret(0))
-                Return ret
-            End If
+                ' Look for -expr2.
+                If Me.Tokens(TokenIdxStart).Text.Equals("-") Then
+                    Dim ret As List(Of Object) = Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd)
+                    If ret.Count <> 1 Then Throw New Exception("Syntax error.")
+                    ret(0) = -CDbl(ret(0))
+                    Return ret
+                End If
 
-            ' Look for Func(expr2).
-            'TODO, may need to optimise text comparison later (enum to symbol table)
-            If TokenIdxStart < TokenIdxEnd AndAlso _
-               Me.Tokens(TokenIdxStart + 1).Type = SyntaxToken.ElementTypes.LeftParen And Me.Tokens(TokenIdxEnd).Type = SyntaxToken.ElementTypes.RightParen Then
-                Dim args As List(Of Object) = Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd)
-                Dim ret As New List(Of Object)
-                Select Case Me.Tokens(TokenIdxStart).Text.ToLower
-                    Case SYS_MATHS_SIN.ToLower
-                        If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
-                        If args.Count > 1 Then Throw New Exception("Too many arguments.")
-                        ret.Add(Math.Sin(CDbl(args(0))))
+                ' Look for +expr2.
+                If Me.Tokens(TokenIdxStart).Text.Equals("+") Then
+                    Dim ret As List(Of Object) = Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd)
+                    If ret.Count <> 1 Then Throw New Exception("Syntax error.")
+                    ret(0) = CDbl(ret(0))
+                    Return ret
+                End If
 
-                    Case SYS_MATHS_COS.ToLower
-                        If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
-                        If args.Count > 1 Then Throw New Exception("Too many arguments.")
-                        ret.Add(Math.Cos(CDbl(args(0))))
+                ' Look for not expr2.
+                If StrEq(Me.Tokens(TokenIdxStart).Text, RESERVED_NOT) Then
+                    Dim ret As List(Of Object) = Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd)
+                    If ret.Count <> 1 Then Throw New Exception("Syntax error.")
+                    ret(0) = Not CBool(ret(0))
+                    Return ret
+                End If
 
-                    Case SYS_MATHS_TAN.ToLower
-                        If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
-                        If args.Count > 1 Then Throw New Exception("Too many arguments.")
-                        ret.Add(Math.Tan(CDbl(args(0))))
+                ' Look for Func(expr2).
+                'TODO, may need to optimise text comparison later (enum to symbol table)
+                If TokenIdxStart < TokenIdxEnd AndAlso
+                   Me.Tokens(TokenIdxStart + 1).Type = SyntaxToken.ElementTypes.LeftParen And Me.Tokens(TokenIdxEnd).Type = SyntaxToken.ElementTypes.RightParen Then
+                    Dim args As List(Of Object) = Me.Evaluate(TokenIdxStart + 1, TokenIdxEnd)
+                    Dim ret As New List(Of Object)
+                    Select Case Me.Tokens(TokenIdxStart).Text.ToLower
+                        Case SYS_MATHS_SIN.ToLower
+                            If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
+                            If args.Count > 1 Then Throw New Exception("Too many arguments.")
+                            ret.Add(Math.Sin(CDbl(args(0))))
 
-                    Case SYS_MATHS_SQRT.ToLower
-                        If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
-                        If args.Count > 1 Then Throw New Exception("Too many arguments.")
-                        ret.Add(Math.Sqrt(CDbl(args(0))))
+                        Case SYS_MATHS_COS.ToLower
+                            If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
+                            If args.Count > 1 Then Throw New Exception("Too many arguments.")
+                            ret.Add(Math.Cos(CDbl(args(0))))
 
-                    Case SYS_CNUM.ToLower
-                        If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
-                        If args.Count > 1 Then Throw New Exception("Too many arguments.")
-                        ret.Add(CDbl(args(0)))
+                        Case SYS_MATHS_TAN.ToLower
+                            If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
+                            If args.Count > 1 Then Throw New Exception("Too many arguments.")
+                            ret.Add(Math.Tan(CDbl(args(0))))
 
-                    Case SYS_RUNVB.ToLower
-                        If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
-                        If args.Count > 1 Then Throw New Exception("Too many arguments.")
-                        ret.Add(PackageBuilder.CodeDOM.RunVB(args(0).ToString))
+                        Case SYS_MATHS_SQRT.ToLower
+                            If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
+                            If args.Count > 1 Then Throw New Exception("Too many arguments.")
+                            ret.Add(Math.Sqrt(CDbl(args(0))))
 
-                    Case SYS_RUNCS.ToLower
-                        If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
-                        If args.Count > 1 Then Throw New Exception("Too many arguments.")
-                        ret.Add(PackageBuilder.CodeDOM.RunCS(args(0).ToString))
+                        Case SYS_CNUM.ToLower
+                            If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
+                            If args.Count > 1 Then Throw New Exception("Too many arguments.")
+                            ret.Add(CDbl(args(0)))
 
-                    Case Else
-                        'User defined
-                        Return Me.GetVar(Me.Tokens(TokenIdxStart).Text, TokenIdxStart, args)
+                        Case SYS_RUNVB.ToLower
+                            If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
+                            If args.Count > 1 Then Throw New Exception("Too many arguments.")
+                            ret.Add(PackageBuilder.CodeDOM.RunVB(args(0).ToString))
 
-                End Select
+                        Case SYS_RUNCS.ToLower
+                            If args.Count = 0 Then Throw New Exception("Expecting argument expression.")
+                            If args.Count > 1 Then Throw New Exception("Too many arguments.")
+                            ret.Add(PackageBuilder.CodeDOM.RunCS(args(0).ToString))
 
-                Return ret
-            End If
+                        Case Else
+                            'User defined
+                            Return Me.GetVar(Me.Tokens(TokenIdxStart).Text, TokenIdxStart, args)
 
-            'Unknown syntax
-            If TokenIdxStart <> TokenIdxEnd Then Throw New Exception("Syntax error.")
+                    End Select
 
-            ' It must be a literal like "2.71828".
-            ' Try to return it and let any errors throw.
-            Return Me.GetLiteral(TokenIdxStart, TokenIdxEnd)
+                    Return ret
+                End If
+
+                'Unknown syntax
+                If TokenIdxStart <> TokenIdxEnd Then Throw New Exception("Syntax error.")
+
+                ' It must be a literal like "2.71828".
+                ' Try to return it and let any errors throw.
+                Return Me.GetLiteral(TokenIdxStart, TokenIdxEnd)
+
+            Catch ex As Exception
+                Throw New Exception("Error evaluating token. " & ex.Message)
+                Return Nothing
+            End Try
+
         End Function
 
         Private Function GetLiteral(ByVal TokenIdxStart As Integer, ByVal TokenIdxEnd As Integer) As List(Of Object)

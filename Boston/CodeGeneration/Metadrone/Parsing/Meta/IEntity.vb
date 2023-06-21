@@ -2,6 +2,8 @@
 
     Friend Interface IEntity
 
+        Property Relations As List(Of IEntity)
+
         Function GetConnectionString() As String
         Sub SetAttributeValue(ByVal AttribName As String, ByVal value As Object)
         Function GetAttributeValue(ByVal AttribName As String, ByVal Params As List(Of Object), _

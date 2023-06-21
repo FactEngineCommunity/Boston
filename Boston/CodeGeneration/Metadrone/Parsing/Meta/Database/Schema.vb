@@ -21,6 +21,16 @@ Namespace Parser.Meta.Database
         Private FilteredProcedures As New List(Of IEntity)
         Private FilteredFunctions As New List(Of IEntity)
 
+        Private ReadOnly Property FilteredRelations As List(Of IEntity)
+            Get
+                Dim larRelations = From Entity In Me.FilteredTables
+                                   From Relation In Entity.Relations
+                                   Select Relation
+
+                Return larRelations.ToList
+            End Get
+        End Property
+
         Private Transforms As Syntax.SourceTransforms = Nothing
 
         Public Sub New(ByVal Source As Parser.Source.Source)
@@ -321,6 +331,10 @@ Namespace Parser.Meta.Database
             Select Case Entity
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_TABLE
                     Return Me.FilteredTables
+
+                Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATIONS
+
+                    Return Me.FilteredRelations
 
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_VIEW
                     Return Me.FilteredViews

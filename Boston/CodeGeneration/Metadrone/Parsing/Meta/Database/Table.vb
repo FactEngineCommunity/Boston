@@ -22,7 +22,18 @@ Namespace Parser.Meta.Database
         Private IgnoreList As New List(Of String)
 
         Friend Indexes As New List(Of IEntity) 'Boston specific.
-        Friend Relations As New List(Of IEntity) 'Boston specific I think.
+
+        Private _Relations As New List(Of IEntity) 'Boston specific I think.
+        Friend Property Relations As List(Of IEntity) Implements IEntity.Relations
+            Get
+                Return Me._Relations
+            End Get
+            Set(value As List(Of IEntity))
+                Me._Relations = value
+            End Set
+        End Property
+
+        'Friend Relations As New List(Of IEntity) 'Boston specific I think. '20230621-VM-Was. Putting Relations at he MainConn level.
         Friend IncomingRelations As New List(Of IEntity) 'Boston specific.
 
         Private FilteredRelations As New List(Of IEntity) 'Boston specific. For stepping through Relations for the Table.
@@ -867,7 +878,7 @@ Namespace Parser.Meta.Database
                     Return Me.FilteredColumns
 
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_RELATIONS 'Boston specific. Not part of original Metadrone.
-                    Return Me.Relations
+                    Return Me.FilteredRelations '20230621-VM-Was
 
                 Case Syntax.SyntaxNode.ExecForEntities.OBJECT_INCOMINGRELATIONS 'Boston specific. Not part of original Metadrone.
                     Return Me.IncomingRelations

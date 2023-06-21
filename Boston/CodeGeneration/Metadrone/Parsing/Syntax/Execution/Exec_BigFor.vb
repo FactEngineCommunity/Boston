@@ -53,6 +53,8 @@ Namespace Parser.Syntax
                     ForEntity = SyntaxNode.ExecForEntities.OBJECT_PROCEDURE
                 Case Exec_Header.MethodType.ForFunction
                     ForEntity = SyntaxNode.ExecForEntities.OBJECT_FUNCTION
+                Case Exec_Header.MethodType.ForRelation
+                    ForEntity = SyntaxNode.ExecForEntities.OBJECT_RELATIONS
             End Select
 
             'Set up entities first

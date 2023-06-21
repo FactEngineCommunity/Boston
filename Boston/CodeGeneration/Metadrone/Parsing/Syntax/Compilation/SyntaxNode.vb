@@ -237,7 +237,12 @@ Namespace Parser.Syntax
                         Me.ForEntity = ExecForEntities.OBJECT_INCOMINGRELATIONS
 
                     ElseIf StrEq(tokObject, OBJECT_RELATION) Then 'Boston specific. Not part of original Metadrone.
-                        Me.ForEntity = ExecForEntities.OBJECT_RELATION
+                        If Me.Tokens(4).Text = "MainConn" Then '20230621-VM-Added.
+                            Me.ForEntity = ExecForEntities.OBJECT_RELATIONS
+                        Else
+                            Me.ForEntity = ExecForEntities.OBJECT_RELATION
+                        End If
+
 
                     ElseIf StrEq(tokObject, OBJECT_STRING) Then 'Boston specific. Not part of original Metadrone.
                         Me.ForEntity = ExecForEntities.OBJECT_STRING

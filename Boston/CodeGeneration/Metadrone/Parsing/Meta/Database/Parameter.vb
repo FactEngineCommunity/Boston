@@ -177,6 +177,15 @@ Namespace Parser.Meta.Database
             End Set
         End Property
 
+        Public Property Relations As List(Of IEntity) Implements IEntity.Relations
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As List(Of IEntity))
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public Sub SetAttributeValue(ByVal AttribName As String, ByVal value As Object) Implements IEntity.SetAttributeValue
             If AttribName Is Nothing Then AttribName = ""
             If AttribName.Length = 0 Or StrEq(AttribName, VARIABLE_ATTRIBUTE_VALUE) Then

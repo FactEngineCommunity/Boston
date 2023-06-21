@@ -135,6 +135,15 @@ Namespace Parser.Meta.Database
             End Get
         End Property
 
+        Public Property Relations As List(Of IEntity) Implements IEntity.Relations
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As List(Of IEntity))
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         'This will return index based on 1 (like listpos)
         Public Function IndexOfParam(ByVal ParamName As String) As Integer
             'Best to warn user of empty param schema (may be using it incorrectly such as indexofparam on a parameter variable).

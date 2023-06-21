@@ -408,6 +408,14 @@ Namespace Parser.Meta.Database
             End Set
         End Property
 
+        Public Property Relations As List(Of IEntity) Implements IEntity.Relations
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As List(Of IEntity))
+                Throw New NotImplementedException()
+            End Set
+        End Property
     End Class
 
 End Namespace

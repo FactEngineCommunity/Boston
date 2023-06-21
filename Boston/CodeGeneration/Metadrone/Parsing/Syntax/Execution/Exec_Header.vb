@@ -26,6 +26,7 @@ Namespace Parser.Syntax
             ForProcedure = 3
             ForFunction = 4
             ForFile = 5
+            ForRelation = 6
         End Enum
 
         Public TemplateName As String = ""
@@ -89,6 +90,8 @@ Namespace Parser.Syntax
                                 Me.mMethod = MethodType.ForFunction
                             Case SyntaxNode.ExecForEntities.OBJECT_FILE
                                 Me.mMethod = MethodType.ForFile
+                            Case SyntaxNode.ExecForEntities.OBJECT_RELATION
+                                Me.mMethod = MethodType.ForRelation
                             Case Else
                                 Throw New Exception("Unsupported entity '" & node.Tokens(1).Text & "'. Line: " & node.LineNumber.ToString)
                         End Select

@@ -17,7 +17,17 @@ Namespace Parser.Meta.Database
 
         Private ReplaceAllList As New ReplaceAllList()
 
-        Friend Relations As New List(Of IEntity)
+        Private _Relations As New List(Of IEntity)
+        Friend Property Relations As List(Of IEntity) Implements IEntity.Relations
+            Get
+                Return Me._Relations
+            End Get
+            Set(value As List(Of IEntity))
+                Me._Relations = value
+            End Set
+        End Property
+        'Friend Relations As New List(Of IEntity) '20230621-VM-Was - Need Relations at the MainConn level.
+
         Friend IncomingRelations As New List(Of IEntity)
 
         Private FilteredRelations As New List(Of IEntity) 'Boston specific. For stepping through Relations for the Column.
