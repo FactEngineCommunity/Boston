@@ -18,6 +18,10 @@ Imports edu.stanford.nlp.trees
 Imports edu.stanford.nlp.util
 Imports edu.stanford.nlp.ling.CoreAnnotations
 Imports edu.stanford.nlp.trees.GrammaticalRelation
+Imports edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations
+Imports edu.stanford.nlp.semgraph.SemanticGraph
+Imports edu.stanford.nlp.semgraph.SemanticGraphEdge
+Imports edu.stanford.nlp.ling.IndexedWord
 Imports java.util
 
 
@@ -993,8 +997,162 @@ Public Class frmKeywordExtraction
 			' Get the sentences from the annotation
 			Dim sentences As java.util.ArrayList = CType(annotation.get(GetType(CoreAnnotations.SentencesAnnotation)), java.util.ArrayList)
 
-			' Extract Fact Type Readings from each sentence
-			Dim factTypeReadings As New List(Of String)()
+			Dim lasFactTypeReading As New List(Of String)()
+
+			'================Noun Phrases revised=====================================
+			For Each sentence As CoreMap In sentences
+				Dim tokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
+				Dim numTokens As Integer = tokens.size()
+
+				Dim nounPhrase As StringBuilder = Nothing ' Variable to store the current noun phrase
+				Dim subject As String = Nothing ' Variable to store the subject
+				Dim verb As String = Nothing ' Variable to store the verb
+				Dim [object] As String = Nothing ' Variable to store the object
+
+				For i As Integer = 0 To numTokens - 1
+					Dim token As CoreLabel = CType(tokens.get(i), CoreLabel)
+					Dim pos As String = token.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+
+					If pos.StartsWith("NN") Then
+						If nounPhrase Is Nothing Then
+							nounPhrase = New StringBuilder()
+						End If
+
+						nounPhrase.Append(token.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
+
+						' Check if the next token is a verb
+						If i + 1 < numTokens Then
+							Dim nextToken As CoreLabel = CType(tokens.get(i + 1), CoreLabel)
+							Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+
+							If nextPos.StartsWith("VB") Then
+								verb = nextToken.get(GetType(CoreAnnotations.TextAnnotation)).ToString()
+							End If
+						End If
+					ElseIf nounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(nounPhrase.ToString()) Then
+						' A noun phrase has been captured, save it as the subject
+						subject = nounPhrase.ToString().Trim()
+						nounPhrase = Nothing ' Reset nounPhrase for the next noun phrase
+
+						' Find the object related to the subject
+						Dim objectNounPhrase As StringBuilder = Nothing ' Variable to store the current object noun phrase
+
+						For j As Integer = i To numTokens - 1
+							Dim nextToken As CoreLabel = CType(tokens.get(j), CoreLabel)
+							Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+
+							If nextPos.StartsWith("NN") Then
+								If objectNounPhrase Is Nothing Then
+									objectNounPhrase = New StringBuilder()
+								End If
+
+								objectNounPhrase.Append(nextToken.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
+							ElseIf objectNounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(objectNounPhrase.ToString()) Then
+								' A noun phrase has been captured, save it as the object
+								[object] = objectNounPhrase.ToString().Trim()
+								Exit For
+							End If
+						Next
+
+						If Not String.IsNullOrEmpty([object]) Then
+							' Add the SVO triple with noun phrase object
+							lasFactTypeReading.Add(subject & " - " & verb & " - " & [object])
+						Else
+							' No noun phrase found for the object, fallback to the singular word noun
+							lasFactTypeReading.Add(subject & " - " & verb & " - " & tokens.get(i).get(GetType(CoreAnnotations.TextAnnotation)).ToString())
+						End If
+					End If
+				Next
+			Next            '=========================================
+
+
+
+			'============Noun Phrases===============================
+			For Each sentence As CoreMap In sentences
+				Dim tokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
+				Dim numTokens As Integer = tokens.size()
+
+				For i As Integer = 0 To numTokens - 1
+					Dim token As CoreLabel = CType(tokens.get(i), CoreLabel)
+					Dim pos As String = token.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+
+					' Check if the token is a noun
+					If pos.StartsWith("NN") Then
+						Dim nounPhrase As String = GetNounPhrase(tokens, i)
+						Dim subject As String = nounPhrase
+						Dim verb As String = Nothing
+						Dim [object] As String = Nothing
+
+						' Find the verb and object related to the subject
+						For j As Integer = i + 1 To numTokens - 1
+							Dim nextToken As CoreLabel = CType(tokens.get(j), CoreLabel)
+							Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+
+							' Check if the next token is a verb
+							If nextPos.StartsWith("VB") Then
+								verb = nextToken.get(GetType(CoreAnnotations.TextAnnotation)).ToString()
+							End If
+
+							' Check if the next token is a noun
+							If nextPos.StartsWith("NN") Then
+								nounPhrase = GetNounPhrase(tokens, j)
+								[object] = nounPhrase
+								Exit For
+							End If
+						Next
+
+						' Add the SVO triple if both verb and object are present
+						If Not String.IsNullOrEmpty(verb) AndAlso Not String.IsNullOrEmpty([object]) Then
+							lasFactTypeReading.Add(subject & " - " & verb & " - " & [object])
+						End If
+					End If
+				Next
+			Next
+			'=============================================================================
+
+
+
+			For Each sentence As CoreMap In sentences
+				Dim tokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
+				Dim numTokens As Integer = tokens.size()
+
+				For i As Integer = 0 To numTokens - 1
+					Dim token As CoreLabel = CType(tokens.get(i), CoreLabel)
+					Dim pos As String = token.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+
+					' Check if the token is a noun
+					If pos.StartsWith("NN") Then
+						Dim subject As String = token.get(GetType(CoreAnnotations.TextAnnotation)).ToString()
+						Dim verb As String = Nothing
+						Dim [object] As String = Nothing
+
+						' Find the verb and object related to the subject
+						For j As Integer = i + 1 To numTokens - 1
+							Dim nextToken As CoreLabel = CType(tokens.get(j), CoreLabel)
+							Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+
+							' Check if the next token is a verb
+							If nextPos.StartsWith("VB") Then
+								verb = nextToken.get(GetType(CoreAnnotations.TextAnnotation)).ToString()
+							End If
+
+							' Check if the next token is a noun
+							If nextPos.StartsWith("NN") Then
+								[object] = nextToken.get(GetType(CoreAnnotations.TextAnnotation)).ToString()
+								Exit For
+							End If
+						Next
+
+						' Add the SVO triple if both verb and object are present
+						If Not String.IsNullOrEmpty(verb) AndAlso Not String.IsNullOrEmpty([object]) Then
+							lasFactTypeReading.Add(subject & " - " & verb & " - " & [object])
+						End If
+					End If
+				Next
+			Next
+
+
+			' Extract Fact Type Readings from each sentence			
 			For Each sentence As CoreMap In sentences
 				' Get the GrammaticalStructure from the sentence
 				Dim gs As GrammaticalStructure = CType(sentence.get(GetType(edu.stanford.nlp.trees.TypedDependency)), GrammaticalStructure)
@@ -1017,102 +1175,14 @@ Public Class frmKeywordExtraction
 						Dim noun As String = FindNoun(dependency.gov().index(), typedDependencies)
 						If noun IsNot Nothing Then
 							Dim factTypeReading As String = $"{noun} {dependent} {governor}"
-							factTypeReadings.Add(factTypeReading)
+							lasFactTypeReading.Add(factTypeReading)
 						End If
 					End If
 				Next
-
-				'For Each dependency As TypedDependency In typedDependencies
-				'	Dim relation As String = dependency.reln().getShortName()
-				'	Dim governor As String = dependency.gov().originalText()
-				'	Dim dependent As String = dependency.dep().originalText()
-
-				'	Dim governorPOS As String = dependency.gov().get(GetType(PartOfSpeechAnnotation))
-				'	Dim dependentPOS As String = dependency.dep().get(GetType(PartOfSpeechAnnotation))
-
-				'	If governorPOS IsNot Nothing AndAlso dependentPOS IsNot Nothing AndAlso governorPOS.StartsWith("NN") AndAlso dependentPOS.StartsWith("VB") Then
-				'		Dim factTypeReading As String = $"{governor} {dependent}"
-				'		factTypeReadings.Add(factTypeReading)
-				'	End If
-
-
-				'	'' Replace named entities with their types
-				'	'If dependency.dep().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "PRP" Then
-				'	'	Dim namedEntity As String = ""
-				'	'	If namedEntities.ContainsKey(governor) Then
-				'	'		namedEntity = namedEntities(governor)
-				'	'	End If
-				'	'	If namedEntity IsNot Nothing Then
-				'	'		dependent = namedEntity
-				'	'	End If
-				'	'ElseIf dependency.gov().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "PRP" Then
-				'	'	Dim namedEntity As String = ""
-				'	'	If namedEntities.ContainsKey(dependent) Then
-				'	'		namedEntity = namedEntities(dependent)
-				'	'	End If
-				'	'	If namedEntity IsNot Nothing Then
-				'	'		governor = namedEntity
-				'	'	End If
-				'	'End If
-
-				'	'' Store named entities
-				'	'If dependency.dep().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "NNP" Then
-				'	'	namedEntities(dependent) = governor
-				'	'End If
-
-				'	'' Extract binary, ternary, and n-ary relations
-				'	'Select Case relation
-				'	'	Case "nsubj", "nsubjpass", "dobj", "iobj", "pobj", "amod"
-				'	'		Dim factTypeReading As String = $"{dependent} {relation} {governor}"
-				'	'		factTypeReadings.Add(factTypeReading)
-				'	'End Select
-				'Next
-
-
-				'' Process the dependencies to extract Fact Type Readings
-				'For Each dependency As TypedDependency In typedDependencies
-
-				'	Dim relation As String = dependency.reln().getShortName
-				'	Dim governor As String = dependency.gov().originalText()
-				'		Dim dependent As String = dependency.dep().originalText()
-
-				'		' Replace named entities with their types
-				'		If dependency.dep().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "PRP" Then
-				'		Dim namedEntity As String = Nothing
-				'		If namedEntities.ContainsKey(governor) Then
-				'			namedEntity = namedEntities(governor)
-				'		End If
-				'		If namedEntity IsNot Nothing Then
-				'			dependent = namedEntity
-				'		End If
-				'	ElseIf dependency.gov().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "PRP" Then
-				'		Dim namedEntity As String = Nothing
-				'		If namedEntities.ContainsKey(dependent) Then
-				'			namedEntity = namedEntities(dependent)
-				'		End If
-				'		If namedEntity IsNot Nothing Then
-				'			governor = namedEntity
-				'		End If
-				'	End If
-
-				'		' Store named entities
-				'		If dependency.dep().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "NNP" Then
-				'			namedEntities(dependent) = governor
-				'		End If
-
-				'		' Extract binary, ternary, and n-ary relations
-				'		If dependency.reln().getShortName() = "dep" Then
-				'			Dim factTypeReading As String = $"{dependent} {relation} {governor}"
-				'			factTypeReadings.Add(factTypeReading)
-				'		ElseIf dependency.reln().getShortName() = "nsubjpass" Then
-				'			Dim factTypeReading As String = $"{dependent} {relation} {governor}"
-				'			factTypeReadings.Add(factTypeReading)
-				'		End If
-				'	Next
 NextSentence:
 			Next
 
-			Return factTypeReadings
+			Return lasFactTypeReading
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -1126,6 +1196,215 @@ NextSentence:
 		End Try
 	End Function
 
+
+	' Function to get the noun phrase by combining consecutive tokens with the same named entity tag
+	Function GetNounPhrase(tokens As java.util.ArrayList, startIndex As Integer) As String
+
+		Try
+			Dim nounPhrase As New StringBuilder()
+			Dim numTokens As Integer = tokens.size()
+			Dim foundNounPhrase As Boolean = False
+
+			For i As Integer = startIndex To numTokens - 1
+				Dim token As CoreLabel = CType(tokens.get(i), CoreLabel)
+				Dim pos As String = token.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+
+				If token.get(GetType(CoreAnnotations.NamedEntityTagAnnotation)) IsNot Nothing Then
+					Dim namedEntityTag As String = token.get(GetType(CoreAnnotations.NamedEntityTagAnnotation)).ToString()
+
+					If pos.StartsWith("NN") AndAlso namedEntityTag <> "O" Then
+						nounPhrase.Append(token.get(GetType(CoreAnnotations.TextAnnotation)).ToString()).Append(" ")
+						foundNounPhrase = True
+					ElseIf pos.StartsWith("NN") Then
+						nounPhrase.Append(token.get(GetType(CoreAnnotations.TextAnnotation)).ToString()).Append(" ")
+					Else
+						Exit For
+					End If
+				Else
+					' Handle case when NamedEntityTagAnnotation is null
+					If pos.StartsWith("NN") Then
+						nounPhrase.Append(token.get(GetType(CoreAnnotations.TextAnnotation)).ToString()).Append(" ")
+						foundNounPhrase = True
+					Else
+						Exit For
+					End If
+				End If
+			Next
+
+			' If no noun phrase is found, use the singular word noun
+			If Not foundNounPhrase AndAlso nounPhrase.Length > 0 Then
+				nounPhrase.Length -= 1 ' Remove the trailing space
+			End If
+
+			Return nounPhrase.ToString().Trim()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+			Return "Error"
+		End Try
+	End Function
+
+#Region "Old ExtractFTRs"
+	'	Public Function ExtractFactTypeReadingsOld(text As String) As List(Of String)
+
+	'		Try
+	'			' Create a new StanfordCoreNLP pipeline with the required annotators
+	'			Dim pipelineProps As New java.util.Properties()
+	'			pipelineProps.setProperty("annotators", "tokenize, ssplit, pos, lemma, depparse")
+	'			pipelineProps.setProperty("pos.model", "CoreNLP\models\english-caseless-left3words-distsim.tagger") ' Specify the path to the tagger properties file
+	'			pipelineProps.setProperty("depparse.model", "CoreNLP\models\parser\nndep\english_UD.gz")
+
+
+	'			Dim pipeline As New StanfordCoreNLP(pipelineProps)
+
+	'			' Create an Annotation object with the input text
+	'			Dim annotation As New Annotation(text)
+
+	'			' Process the annotation through the pipeline
+	'			pipeline.annotate(annotation)
+
+	'			' Get the sentences from the annotation
+	'			Dim sentences As java.util.ArrayList = CType(annotation.get(GetType(CoreAnnotations.SentencesAnnotation)), java.util.ArrayList)
+
+	'			' Extract Fact Type Readings from each sentence
+	'			Dim factTypeReadings As New List(Of String)()
+	'			For Each sentence As CoreMap In sentences
+	'				' Get the GrammaticalStructure from the sentence
+	'				Dim gs As GrammaticalStructure = CType(sentence.get(GetType(edu.stanford.nlp.trees.TypedDependency)), GrammaticalStructure)
+
+	'				Dim dependencies As SemanticGraph = sentence.get(GetType(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation))
+	'				Dim typedDependencies As java.util.ArrayList = CType(dependencies.typedDependencies(), java.util.ArrayList)
+
+	'				' Create a map to store the named entities
+	'				Dim namedEntities As New Dictionary(Of String, String)()
+
+
+	'				For Each dependency As TypedDependency In typedDependencies
+	'					Dim governor As String = dependency.gov().originalText()
+	'					Dim dependent As String = dependency.dep().originalText()
+
+	'					' Check if the governor is a noun and the dependent is a verb
+	'					Dim governorPOS As String = dependency.gov().get(GetType(PartOfSpeechAnnotation))
+	'					Dim dependentPOS As String = dependency.dep().get(GetType(PartOfSpeechAnnotation))
+	'					If governorPOS IsNot Nothing AndAlso dependentPOS IsNot Nothing AndAlso governorPOS.StartsWith("NN") AndAlso dependentPOS.StartsWith("VB") Then
+	'						Dim noun As String = FindNoun(dependency.gov().index(), typedDependencies)
+	'						If noun IsNot Nothing Then
+	'							Dim factTypeReading As String = $"{noun} {dependent} {governor}"
+	'							factTypeReadings.Add(factTypeReading)
+	'						End If
+	'					End If
+	'				Next
+
+	'				'For Each dependency As TypedDependency In typedDependencies
+	'				'	Dim relation As String = dependency.reln().getShortName()
+	'				'	Dim governor As String = dependency.gov().originalText()
+	'				'	Dim dependent As String = dependency.dep().originalText()
+
+	'				'	Dim governorPOS As String = dependency.gov().get(GetType(PartOfSpeechAnnotation))
+	'				'	Dim dependentPOS As String = dependency.dep().get(GetType(PartOfSpeechAnnotation))
+
+	'				'	If governorPOS IsNot Nothing AndAlso dependentPOS IsNot Nothing AndAlso governorPOS.StartsWith("NN") AndAlso dependentPOS.StartsWith("VB") Then
+	'				'		Dim factTypeReading As String = $"{governor} {dependent}"
+	'				'		factTypeReadings.Add(factTypeReading)
+	'				'	End If
+
+
+	'				'	'' Replace named entities with their types
+	'				'	'If dependency.dep().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "PRP" Then
+	'				'	'	Dim namedEntity As String = ""
+	'				'	'	If namedEntities.ContainsKey(governor) Then
+	'				'	'		namedEntity = namedEntities(governor)
+	'				'	'	End If
+	'				'	'	If namedEntity IsNot Nothing Then
+	'				'	'		dependent = namedEntity
+	'				'	'	End If
+	'				'	'ElseIf dependency.gov().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "PRP" Then
+	'				'	'	Dim namedEntity As String = ""
+	'				'	'	If namedEntities.ContainsKey(dependent) Then
+	'				'	'		namedEntity = namedEntities(dependent)
+	'				'	'	End If
+	'				'	'	If namedEntity IsNot Nothing Then
+	'				'	'		governor = namedEntity
+	'				'	'	End If
+	'				'	'End If
+
+	'				'	'' Store named entities
+	'				'	'If dependency.dep().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "NNP" Then
+	'				'	'	namedEntities(dependent) = governor
+	'				'	'End If
+
+	'				'	'' Extract binary, ternary, and n-ary relations
+	'				'	'Select Case relation
+	'				'	'	Case "nsubj", "nsubjpass", "dobj", "iobj", "pobj", "amod"
+	'				'	'		Dim factTypeReading As String = $"{dependent} {relation} {governor}"
+	'				'	'		factTypeReadings.Add(factTypeReading)
+	'				'	'End Select
+	'				'Next
+
+
+	'				'' Process the dependencies to extract Fact Type Readings
+	'				'For Each dependency As TypedDependency In typedDependencies
+
+	'				'	Dim relation As String = dependency.reln().getShortName
+	'				'	Dim governor As String = dependency.gov().originalText()
+	'				'		Dim dependent As String = dependency.dep().originalText()
+
+	'				'		' Replace named entities with their types
+	'				'		If dependency.dep().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "PRP" Then
+	'				'		Dim namedEntity As String = Nothing
+	'				'		If namedEntities.ContainsKey(governor) Then
+	'				'			namedEntity = namedEntities(governor)
+	'				'		End If
+	'				'		If namedEntity IsNot Nothing Then
+	'				'			dependent = namedEntity
+	'				'		End If
+	'				'	ElseIf dependency.gov().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "PRP" Then
+	'				'		Dim namedEntity As String = Nothing
+	'				'		If namedEntities.ContainsKey(dependent) Then
+	'				'			namedEntity = namedEntities(dependent)
+	'				'		End If
+	'				'		If namedEntity IsNot Nothing Then
+	'				'			governor = namedEntity
+	'				'		End If
+	'				'	End If
+
+	'				'		' Store named entities
+	'				'		If dependency.dep().get(GetType(CoreAnnotations.PartOfSpeechAnnotation)) = "NNP" Then
+	'				'			namedEntities(dependent) = governor
+	'				'		End If
+
+	'				'		' Extract binary, ternary, and n-ary relations
+	'				'		If dependency.reln().getShortName() = "dep" Then
+	'				'			Dim factTypeReading As String = $"{dependent} {relation} {governor}"
+	'				'			factTypeReadings.Add(factTypeReading)
+	'				'		ElseIf dependency.reln().getShortName() = "nsubjpass" Then
+	'				'			Dim factTypeReading As String = $"{dependent} {relation} {governor}"
+	'				'			factTypeReadings.Add(factTypeReading)
+	'				'		End If
+	'				'	Next
+	'NextSentence:
+	'			Next
+
+	'			Return factTypeReadings
+
+	'		Catch ex As Exception
+	'			Dim lsMessage As String
+	'			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+	'			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+	'			lsMessage &= vbCrLf & vbCrLf & ex.Message
+	'			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+	'			Return New List(Of String)
+	'		End Try
+	'	End Function
+#End Region
 	Private Function FindNoun(governorIndex As Integer, dependencies As java.util.ArrayList) As String
 		For Each dependency As TypedDependency In dependencies
 			If dependency.reln().getShortName() = "nsubj" OrElse dependency.reln().getShortName() = "nsubjpass" Then
@@ -1139,6 +1418,10 @@ NextSentence:
 
 	Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
 
-		Call Me.ExtractFactTypeReadings(Me.TextRichTextBox.Text)
+		Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.TextRichTextBox.Text)
+
+		Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
+		Me.RichTextBoxResults.Show()
+
 	End Sub
 End Class
