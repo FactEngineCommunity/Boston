@@ -19,7 +19,16 @@ Namespace ORMQL
             Me.mrTable = arTable
 
             Me.DynamicClass = New tClass
-            For Each lsColumn In arTable.Column.Select(Function(x) x.Name).ToList  '20230525-VM-Was Me.mrRecordset.Columns....but for concat Columns was not working. FirstName + ' ' + LastName
+            Dim larColumn() As RDS.Column
+
+            Select Case arTable.Model.Model.TargetDatabaseType
+                Case Is = pcenumDatabaseType.Neo4j,
+                          pcenumDatabaseType.KuzuDB
+                    larColumn = arTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).ToArray
+                Case Else
+                    larColumn = arTable.Column.ToArray
+            End Select
+            For Each lsColumn In larColumn.Select(Function(x) x.Name).ToList  '20230525-VM-Was Me.mrRecordset.Columns....but for concat Columns was not working. FirstName + ' ' + LastName
 
                 Dim lsColumnName As String
                 Try

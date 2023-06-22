@@ -210,6 +210,7 @@ Public Class frmToolboxTableData
                 lrTable.Column = aarColumn
             Else
                 lrTable = arTable.Clone
+                lrTable.Model = arTable.Model
                 Select Case Me.mrModel.TargetDatabaseType
                     Case Is = pcenumDatabaseType.KuzuDB
                         Dim lrPKColumn As RDS.Column = lrTable.getPrimaryKeyColumns(0)

@@ -47,6 +47,7 @@ Partial Class frmKeywordExtraction
         Me.ToolStripMenuItemViewInORMVerbaliser = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripTextbox = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.FindToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.LabelPromptModel = New System.Windows.Forms.Label()
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.ContextMenuStripTextboxSelection = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -54,7 +55,7 @@ Partial Class frmKeywordExtraction
         Me.ToolStripMenuItemSelectionAddEntity = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemSelectionAddValueType = New System.Windows.Forms.ToolStripMenuItem()
         Me.AsGeneralConceptToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SaveAsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.ContextMenuStripKeyword.SuspendLayout()
         Me.ContextMenuStripTextbox.SuspendLayout()
         Me.ContextMenuStripTextboxSelection.SuspendLayout()
@@ -244,14 +245,20 @@ Partial Class frmKeywordExtraction
         '
         Me.ContextMenuStripTextbox.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FindToolStripMenuItem, Me.SaveAsToolStripMenuItem})
         Me.ContextMenuStripTextbox.Name = "ContextMenuStripTextbox"
-        Me.ContextMenuStripTextbox.Size = New System.Drawing.Size(181, 70)
+        Me.ContextMenuStripTextbox.Size = New System.Drawing.Size(138, 48)
         '
         'FindToolStripMenuItem
         '
         Me.FindToolStripMenuItem.Name = "FindToolStripMenuItem"
         Me.FindToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
-        Me.FindToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.FindToolStripMenuItem.Size = New System.Drawing.Size(137, 22)
         Me.FindToolStripMenuItem.Text = "&Find"
+        '
+        'SaveAsToolStripMenuItem
+        '
+        Me.SaveAsToolStripMenuItem.Name = "SaveAsToolStripMenuItem"
+        Me.SaveAsToolStripMenuItem.Size = New System.Drawing.Size(137, 22)
+        Me.SaveAsToolStripMenuItem.Text = "Save as..."
         '
         'LabelPromptModel
         '
@@ -302,17 +309,21 @@ Partial Class frmKeywordExtraction
         Me.AsGeneralConceptToolStripMenuItem.Size = New System.Drawing.Size(185, 22)
         Me.AsGeneralConceptToolStripMenuItem.Text = "...as &General Concept"
         '
-        'SaveAsToolStripMenuItem
+        'Button1
         '
-        Me.SaveAsToolStripMenuItem.Name = "SaveAsToolStripMenuItem"
-        Me.SaveAsToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.SaveAsToolStripMenuItem.Text = "Save as..."
+        Me.Button1.Location = New System.Drawing.Point(885, 327)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(115, 40)
+        Me.Button1.TabIndex = 55
+        Me.Button1.Text = "Button1"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'frmKeywordExtraction
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1022, 564)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.LabelModelName)
         Me.Controls.Add(Me.LabelPromptModel)
         Me.Controls.Add(Me.HelpButton)
@@ -370,4 +381,5 @@ Partial Class frmKeywordExtraction
     Friend WithEvents ToolStripMenuItemSelectionAddValueType As ToolStripMenuItem
     Friend WithEvents AsGeneralConceptToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SaveAsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents Button1 As Button
 End Class

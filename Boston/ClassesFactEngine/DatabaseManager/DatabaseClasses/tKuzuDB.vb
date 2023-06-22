@@ -1040,19 +1040,21 @@ SkipColumn:
 
                     lsErrorMessage = kuzu_query_result_get_error_message(loResult)
                 Catch ex As Exception
-
+                    Throw New Exception(ex.Message.AppendDoubleLineBreak(lsErrorMessage))
                 End Try
 
                 If lsErrorMessage IsNot Nothing Then
-                    Try
-                        Dim preparedStatement As kuzu_prepared_statement = kuzu_connection_prepare(Me.conn, asQuery)
 
-                        loResult = kuzu_connection_execute(Me.conn, preparedStatement)
-                    Catch ave As AccessViolationException
-                        Throw New Exception("Access violation trying to run: " & asQuery)
-                    Catch ex As Exception
+                    Throw New Exception(lsErrorMessage)
+                    '    Try
+                    '        Dim preparedStatement As kuzu_prepared_statement = kuzu_connection_prepare(Me.conn, asQuery)
 
-                    End Try
+                    '        loResult = kuzu_connection_execute(Me.conn, preparedStatement)
+                    '    Catch ave As AccessViolationException
+                    '        Throw New Exception("Access violation trying to run: " & asQuery)
+                    '    Catch ex As Exception
+
+                    '    End Try
 
                 End If
 
