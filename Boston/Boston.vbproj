@@ -372,6 +372,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\SvgExport.dll</HintPath>
     </Reference>
+    <Reference Include="Syn.WordNet, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Syn.WordNet.1.0.5\lib\net46\Syn.WordNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>

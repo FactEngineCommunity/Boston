@@ -13,6 +13,7 @@ Imports System.Xml.Serialization
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
+Imports System.Globalization
 
 Namespace Boston
 
@@ -1069,6 +1070,21 @@ OpenConnection:
 
             Return adblDegrees * (Math.PI / 180)
 
+        End Function
+
+        Function ConvertToPascalCase(ByVal input As String) As String
+            ' Split the input string into words
+            Dim words As String() = input.Split({" "c, "_"c}, StringSplitOptions.RemoveEmptyEntries)
+
+            ' Capitalize the first letter of each word
+            For i As Integer = 0 To words.Length - 1
+                words(i) = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(words(i).ToLower())
+            Next
+
+            ' Join the words together
+            Dim pascalCase As String = String.Concat(words)
+
+            Return pascalCase
         End Function
 
     End Module

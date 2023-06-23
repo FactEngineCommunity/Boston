@@ -55,7 +55,7 @@ Partial Class frmKeywordExtraction
         Me.ToolStripMenuItemSelectionAddEntity = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemSelectionAddValueType = New System.Windows.Forms.ToolStripMenuItem()
         Me.AsGeneralConceptToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.ButtonExtractFactTypeReadings = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabDocumentText = New System.Windows.Forms.TabPage()
         Me.TabPageResults = New System.Windows.Forms.TabPage()
@@ -80,7 +80,7 @@ Partial Class frmKeywordExtraction
         'KeywordExtractionNormalButton
         '
         Me.KeywordExtractionNormalButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.KeywordExtractionNormalButton.Location = New System.Drawing.Point(832, 199)
+        Me.KeywordExtractionNormalButton.Location = New System.Drawing.Point(875, 199)
         Me.KeywordExtractionNormalButton.Name = "KeywordExtractionNormalButton"
         Me.KeywordExtractionNormalButton.Size = New System.Drawing.Size(115, 53)
         Me.KeywordExtractionNormalButton.TabIndex = 49
@@ -99,7 +99,7 @@ Partial Class frmKeywordExtraction
         'progressBar1
         '
         Me.progressBar1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.progressBar1.Location = New System.Drawing.Point(12, 477)
+        Me.progressBar1.Location = New System.Drawing.Point(12, 462)
         Me.progressBar1.Name = "progressBar1"
         Me.progressBar1.Size = New System.Drawing.Size(809, 25)
         Me.progressBar1.TabIndex = 47
@@ -107,7 +107,7 @@ Partial Class frmKeywordExtraction
         'KeywordExtractionMaxButton
         '
         Me.KeywordExtractionMaxButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.KeywordExtractionMaxButton.Location = New System.Drawing.Point(832, 258)
+        Me.KeywordExtractionMaxButton.Location = New System.Drawing.Point(875, 258)
         Me.KeywordExtractionMaxButton.Name = "KeywordExtractionMaxButton"
         Me.KeywordExtractionMaxButton.Size = New System.Drawing.Size(115, 53)
         Me.KeywordExtractionMaxButton.TabIndex = 45
@@ -117,7 +117,7 @@ Partial Class frmKeywordExtraction
         'RemoveStopButton
         '
         Me.RemoveStopButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.RemoveStopButton.Location = New System.Drawing.Point(832, 140)
+        Me.RemoveStopButton.Location = New System.Drawing.Point(875, 140)
         Me.RemoveStopButton.Name = "RemoveStopButton"
         Me.RemoveStopButton.Size = New System.Drawing.Size(115, 53)
         Me.RemoveStopButton.TabIndex = 44
@@ -127,7 +127,7 @@ Partial Class frmKeywordExtraction
         'StandardizationButton
         '
         Me.StandardizationButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.StandardizationButton.Location = New System.Drawing.Point(832, 81)
+        Me.StandardizationButton.Location = New System.Drawing.Point(875, 81)
         Me.StandardizationButton.Name = "StandardizationButton"
         Me.StandardizationButton.Size = New System.Drawing.Size(115, 53)
         Me.StandardizationButton.TabIndex = 43
@@ -142,9 +142,9 @@ Partial Class frmKeywordExtraction
         Me.ResultListView.FullRowSelect = True
         Me.ResultListView.GridLines = True
         Me.ResultListView.HideSelection = False
-        Me.ResultListView.Location = New System.Drawing.Point(509, 81)
+        Me.ResultListView.Location = New System.Drawing.Point(552, 81)
         Me.ResultListView.Name = "ResultListView"
-        Me.ResultListView.Size = New System.Drawing.Size(303, 321)
+        Me.ResultListView.Size = New System.Drawing.Size(303, 306)
         Me.ResultListView.TabIndex = 48
         Me.ResultListView.UseCompatibleStateImageBehavior = False
         Me.ResultListView.View = System.Windows.Forms.View.Details
@@ -187,7 +187,7 @@ Partial Class frmKeywordExtraction
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TextRichTextBox.Location = New System.Drawing.Point(6, 6)
         Me.TextRichTextBox.Name = "TextRichTextBox"
-        Me.TextRichTextBox.Size = New System.Drawing.Size(471, 353)
+        Me.TextRichTextBox.Size = New System.Drawing.Size(514, 338)
         Me.TextRichTextBox.TabIndex = 46
         Me.TextRichTextBox.Text = ""
         '
@@ -211,7 +211,7 @@ Partial Class frmKeywordExtraction
         '
         Me.StatusLabel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.StatusLabel.AutoSize = True
-        Me.StatusLabel.Location = New System.Drawing.Point(12, 461)
+        Me.StatusLabel.Location = New System.Drawing.Point(12, 446)
         Me.StatusLabel.Name = "StatusLabel"
         Me.StatusLabel.Size = New System.Drawing.Size(35, 13)
         Me.StatusLabel.TabIndex = 51
@@ -316,24 +316,27 @@ Partial Class frmKeywordExtraction
         Me.AsGeneralConceptToolStripMenuItem.Size = New System.Drawing.Size(185, 22)
         Me.AsGeneralConceptToolStripMenuItem.Text = "...as &General Concept"
         '
-        'Button1
+        'ButtonExtractFactTypeReadings
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Location = New System.Drawing.Point(832, 327)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(115, 40)
-        Me.Button1.TabIndex = 55
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.ButtonExtractFactTypeReadings.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ButtonExtractFactTypeReadings.Location = New System.Drawing.Point(875, 327)
+        Me.ButtonExtractFactTypeReadings.Name = "ButtonExtractFactTypeReadings"
+        Me.ButtonExtractFactTypeReadings.Size = New System.Drawing.Size(115, 40)
+        Me.ButtonExtractFactTypeReadings.TabIndex = 55
+        Me.ButtonExtractFactTypeReadings.Text = "Extract &Fact Type Readings"
+        Me.ButtonExtractFactTypeReadings.UseVisualStyleBackColor = True
         '
         'TabControl1
         '
+        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.TabDocumentText)
         Me.TabControl1.Controls.Add(Me.TabPageResults)
         Me.TabControl1.Location = New System.Drawing.Point(12, 67)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(491, 391)
+        Me.TabControl1.Size = New System.Drawing.Size(534, 376)
         Me.TabControl1.TabIndex = 56
         '
         'TabDocumentText
@@ -342,7 +345,7 @@ Partial Class frmKeywordExtraction
         Me.TabDocumentText.Location = New System.Drawing.Point(4, 22)
         Me.TabDocumentText.Name = "TabDocumentText"
         Me.TabDocumentText.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabDocumentText.Size = New System.Drawing.Size(483, 365)
+        Me.TabDocumentText.Size = New System.Drawing.Size(526, 350)
         Me.TabDocumentText.TabIndex = 0
         Me.TabDocumentText.Text = "Document Text"
         Me.TabDocumentText.UseVisualStyleBackColor = True
@@ -373,9 +376,9 @@ Partial Class frmKeywordExtraction
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(969, 564)
+        Me.ClientSize = New System.Drawing.Size(1012, 549)
         Me.Controls.Add(Me.TabControl1)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.ButtonExtractFactTypeReadings)
         Me.Controls.Add(Me.LabelModelName)
         Me.Controls.Add(Me.LabelPromptModel)
         Me.Controls.Add(Me.HelpButton)
@@ -435,7 +438,7 @@ Partial Class frmKeywordExtraction
     Friend WithEvents ToolStripMenuItemSelectionAddValueType As ToolStripMenuItem
     Friend WithEvents AsGeneralConceptToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SaveAsToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents Button1 As Button
+    Friend WithEvents ButtonExtractFactTypeReadings As Button
     Friend WithEvents TabControl1 As TabControl
     Friend WithEvents TabDocumentText As TabPage
     Friend WithEvents TabPageResults As TabPage

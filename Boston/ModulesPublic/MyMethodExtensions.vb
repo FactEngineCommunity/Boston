@@ -7,8 +7,23 @@ Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.IO
 Imports System.Runtime.Serialization
 Imports System.Runtime.InteropServices
+Imports System.Globalization
 
 Module MyMethodExtensions
+
+    <Extension()>
+    Function ToPascalCase(ByVal input As String) As String
+        Dim words As String() = input.Split({" "c, "_"c}, StringSplitOptions.None)
+
+        For i As Integer = 0 To words.Length - 1
+            words(i) = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(words(i).ToLower())
+        Next
+
+        Dim pascalCase As String = String.Join(" ", words)
+
+        Return pascalCase
+    End Function
+
 
     <Extension()>
     Public Sub ReplaceWith(Of T As Class)(ByRef obj As T, other As T)

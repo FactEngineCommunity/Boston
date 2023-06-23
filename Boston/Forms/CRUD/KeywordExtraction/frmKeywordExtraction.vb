@@ -23,13 +23,15 @@ Imports edu.stanford.nlp.semgraph.SemanticGraph
 Imports edu.stanford.nlp.semgraph.SemanticGraphEdge
 Imports edu.stanford.nlp.ling.IndexedWord
 Imports java.util
-
+Imports Syn.WordNet
 
 Public Class frmKeywordExtraction
 
 	Private lvwColumnSorter As ListViewColumnSorter
 	Public WithEvents mrModel As FBM.Model
-	Dim mfrmFindDialog As New frmTextboxFind()
+	Private mfrmFindDialog As New frmTextboxFind()
+
+	Private wordNet As New WordNetEngine()
 
 	''' <summary>
 	''' Changed with the user clicks on a keyword.
@@ -152,6 +154,9 @@ Public Class frmKeywordExtraction
 		KeywordExtractionNormalButton.Enabled = False
 		StatusLabel.Text = "Welcome to keyword extraction software, which is based on the entropy difference."
 		MessageBox.Show("The process of document keyword extraction:" & vbLf & vbLf & "Step 1: Open the document: Click ""Open"" button, select the target document. (File should be ""*. Txt "" file)" & vbLf & vbLf & "Step 2: Document standardization: Click ""Document Standardization"" button to remove the document punctuation, line breaks, and other useless symbols, and text replaces lowercase letters. (If the above operations have been completed, you can skip this step.)" & vbLf & vbLf & "Step 3: Stop word removal: Click ""Remove Stop"" button and follow the list of stop words, removing stop words in the document. (This step is optional, remove stop words, it may improve the accuracy of keyword extraction.)" & vbLf & vbLf & "Step 4: Here are two method to extract the keyword, you can choose one of them to finish the Keyword extraction work." & vbLf & "    4.1: Keyword extraction (normal entropy): Click ""Keyword Extraction (Entropy)"" button to extract keywords." & vbLf & "    4.2: Keyword extraction (maximum entropy): Click ""Keyword Extraction (Maximum Entropy)"" button and follow the maximum entropy method to extract keywords.", "Help")
+
+		'Wordnet
+		Call Me.wordNet.LoadFromDirectory(My.Settings.WordNetDictionaryEnglishPath)
 	End Sub
 
 	Private Sub SetupForm()
@@ -1054,12 +1059,19 @@ Public Class frmKeywordExtraction
 							End If
 						Next
 
+						subject = Singularize(subject)
+						[object] = Singularize([object])
+						verb = ConjugateVerbWN(verb, subject)
+
+						'CodeSafe
+						If verb Is Nothing Then verb = "has"
+
 						If Not String.IsNullOrEmpty([object]) Then
 							' Add the SVO triple with noun phrase object
-							lasFactTypeReading.Add(subject & " - " & verb & " - " & [object])
+							lasFactTypeReading.Add(subject.ToPascalCase & " " & verb & " " & [object].ToPascalCase)
 						Else
 							' No noun phrase found for the object, fallback to the singular word noun
-							lasFactTypeReading.Add(subject & " - " & verb & " - " & tokens.get(i).get(GetType(CoreAnnotations.TextAnnotation)).ToString())
+							lasFactTypeReading.Add(subject.ToPascalCase & " " & verb & " " & tokens.get(i).get(GetType(CoreAnnotations.TextAnnotation)).ToString().ToPascalCase)
 						End If
 					End If
 				Next
@@ -1416,12 +1428,148 @@ NextSentence:
 		Return Nothing
 	End Function
 
-	Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+	Private Sub Button1_Click(sender As Object, e As EventArgs) Handles ButtonExtractFactTypeReadings.Click
 
-		Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.TextRichTextBox.Text)
+		With New WaitCursor
 
-		Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
-		Me.RichTextBoxResults.Show()
+			Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.TextRichTextBox.Text)
+
+			Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
+			Me.TabPageResults.Show()
+
+		End With
 
 	End Sub
+
+	Function Singularize(ByVal asWord As String) As String
+
+		Try
+			Dim pipelineProps As New java.util.Properties()
+			pipelineProps.setProperty("annotators", "tokenize, ssplit, pos, lemma, depparse")
+			pipelineProps.setProperty("pos.model", "CoreNLP\models\english-caseless-left3words-distsim.tagger") ' Specify the path to the tagger properties file
+			pipelineProps.setProperty("depparse.model", "CoreNLP\models\parser\nndep\english_UD.gz")
+
+			Dim pipeline As New StanfordCoreNLP(pipelineProps)
+			Dim document As New Annotation(asWord)
+			pipeline.annotate(document)
+
+			Dim sentences As java.util.ArrayList = CType(document.get(GetType(CoreAnnotations.SentencesAnnotation)), java.util.ArrayList)
+
+			If sentences IsNot Nothing AndAlso Not sentences.isEmpty Then
+				Dim tokens As java.util.ArrayList = sentences(0).get(GetType(TokensAnnotation))
+
+				If tokens IsNot Nothing AndAlso Not tokens.isEmpty Then
+					Dim singularWords As New List(Of String)()
+
+					For Each token As CoreLabel In tokens
+						Dim word As String = token.get(GetType(TextAnnotation))
+						Dim lemma As String = token.get(GetType(LemmaAnnotation))
+
+						If word IsNot Nothing AndAlso lemma IsNot Nothing Then
+							If word.Trim().Length > 0 AndAlso lemma.Trim().Length > 0 Then
+								Dim singularWord As String = lemma.ToLower()
+								singularWords.Add(singularWord)
+							End If
+						End If
+					Next
+
+					Dim singularizedText As String = String.Join(" ", singularWords)
+					Return singularizedText
+				End If
+			End If
+
+			Return asWord
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+
+			Return asWord
+		End Try
+	End Function
+
+	Function ConjugateVerb(ByVal asVerb As String, ByVal subject As String) As String
+
+		Try
+
+			If String.IsNullOrEmpty(asVerb) Then Return asVerb
+
+			Dim normalizedSubject As String = subject.ToLower()
+			Dim normalizedVerb As String = asVerb.ToLower()
+
+			' Check for common subject-verb agreement patterns
+			If normalizedSubject.EndsWith("s") AndAlso Not normalizedVerb.EndsWith("s") Then
+				Return asVerb & "s" ' Third-person singular form
+			ElseIf normalizedVerb = "have" AndAlso normalizedSubject.EndsWith("s") Then
+				Return "has" ' "have" to "has" in third-person singular
+			End If
+
+			' Add more rules for subject-verb agreement here if needed
+
+			Return asVerb ' Default case, return the original verb
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+
+			Return asVerb
+		End Try
+
+	End Function
+
+
+	Function ConjugateVerbWN(ByVal asVerb As String, ByVal asSubject As String) As String
+
+		Try
+			'CodeSafe
+			If asVerb Is Nothing Then Return asVerb
+
+			Dim loPOS = New PartOfSpeech
+
+			Dim synSets As IEnumerable(Of SynSet) = wordNet.GetSynSets(asVerb, PartOfSpeech.Verb)
+
+			If synSets IsNot Nothing AndAlso synSets.Any() Then
+				Dim normalizedSubject As String = asSubject.ToLower()
+
+				' Check for irregular verbs
+				Dim irregularVerbs As New Dictionary(Of String, String)()
+				irregularVerbs.Add("have", "has")
+				irregularVerbs.Add("be", "is")
+
+				If irregularVerbs.ContainsKey(asVerb) Then
+					Return irregularVerbs(asVerb)
+				End If
+
+				For Each synSet In synSets
+					For Each wordForm In synSet.Words
+						If wordForm = asVerb AndAlso normalizedSubject.EndsWith("s") Then
+							Return asVerb
+						End If
+					Next
+				Next
+			End If
+
+			Return asVerb ' Default case, return the original verb
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+
+			Return asVerb
+		End Try
+
+	End Function
+
 End Class
