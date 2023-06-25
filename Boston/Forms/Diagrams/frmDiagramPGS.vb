@@ -3483,7 +3483,7 @@ SkipORMReadingEditor:
 
             Me.ToolStripSeparator8.Visible = My.Settings.SuperuserMode
             Me.ToolStripMenuItemRelationRemoveFromPage.Visible = lrRelation.IsPGSRelationNode
-            Me.ToolStripMenuItemViewEdgeTableData.Enabled = lrRelation.IsPGSRelationNode
+            Me.ToolStripMenuItemViewEdgeTableData.Enabled = True 'lrRelation.IsPGSRelationNode
 
             '=============================================================================================
             'Morphing
@@ -5195,7 +5195,13 @@ EndProcessing:
 
             '-------------------------
             'Get the selected PGS Node            
-            lrPGSNode = lrPGSRelation.ActualPGSNode
+            Dim lrTable As RDS.Table = Nothing
+            Try
+                lrPGSNode = lrPGSRelation.ActualPGSNode
+                lrTable = lrPGSNode.RDSTable
+            Catch ex As Exception
+                'Is not a PGSNodeTable
+            End Try
 
             prApplication.WorkingModel = Me.zrPage.Model
             prApplication.WorkingPage = Me.zrPage
@@ -5206,8 +5212,15 @@ EndProcessing:
 
             Dim lfrmToolboxTableData = frmMain.loadToolboxTableDataForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
 
-            lfrmToolboxTableData.mrTable = lrPGSNode.RDSTable
+            lfrmToolboxTableData.mrTable = lrTable
+            lfrmToolboxTableData.mrRDSRelation = lrPGSRelation.RDSRelation
             lfrmToolboxTableData.mrModel = prApplication.WorkingModel
+            Try
+                lfrmToolboxTableData.mrFactType = lrPGSRelation.RDSRelation.ResponsibleFactType
+            Catch ex As Exception
+                'We tried.
+            End Try
+
             Call lfrmToolboxTableData.SetupForm()
 
         Catch ex As Exception

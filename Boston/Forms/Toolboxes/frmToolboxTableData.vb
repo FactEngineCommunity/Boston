@@ -115,7 +115,7 @@ Public Class frmToolboxTableData
                             Dim lsFirstColumnName As String = String.Join("", lrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Name))
                             Dim lsSecondColumnName As String = String.Join("", lrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Name))
 
-                            larColumn.Add(New RDS.Column(lrRDSRelation.OriginTable, lsFirstColumnName, Nothing, Nothing, False, Nothing))
+                            larColumn.Add(New RDS.Column(lrRDSRelation.DestinationTable, lsFirstColumnName, Nothing, Nothing, False, Nothing))
                             larColumn.Add(New RDS.Column(lrRDSRelation.DestinationTable, lsSecondColumnName, Nothing, Nothing, False, Nothing))
 
                             lsSQLQuery = "MATCH "
@@ -138,7 +138,7 @@ Public Class frmToolboxTableData
 
                             'lsSQLQuery &= "get " & lsColumnList & ";"
                         Case Else
-                            larColumn.AddRange(lrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns.ConvertAll(Function(x) x.Clone(Nothing, Nothing)))
+                            larColumn.AddRange(lrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns.ConvertAll(Function(x) x.Clone(Nothing, Nothing)))
                             larColumn.AddRange(lrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns.ConvertAll(Function(x) x.Clone(Nothing, Nothing)))
                             lsSQLQuery = "SELECT "
                             Dim liInd = 0
@@ -147,11 +147,11 @@ Public Class frmToolboxTableData
                                 lsSQLQuery &= lrColumn.Table.DatabaseName & "." & lrColumn.Name
                                 liInd += 1
                             Next
-                            lsSQLQuery.AppendLine("FROM " & lrRDSRelation.OriginTable.DatabaseName & vbCrLf & ", " & lrRDSRelation.DestinationTable.DatabaseName)
+                            lsSQLQuery.AppendLine("FROM " & lrRDSRelation.DestinationTable.DatabaseName & vbCrLf & ", " & lrRDSRelation.DestinationTable.DatabaseName)
                             lsSQLQuery.AppendLine(" WHERE ")
-                            For liInd = 0 To lrRDSRelation.OriginColumns.Count - 1
+                            For liInd = 0 To lrRDSRelation.DestinationColumns.Count - 1
                                 If liInd > 0 Then lsSQLQuery.AppendLine("AND ")
-                                lsSQLQuery &= lrRDSRelation.OriginTable.DatabaseName & "." & lrRDSRelation.OriginColumns(liInd).Name
+                                lsSQLQuery &= lrRDSRelation.DestinationTable.DatabaseName & "." & lrRDSRelation.DestinationColumns(liInd).Name
                                 lsSQLQuery &= " = " & lrRDSRelation.DestinationTable.DatabaseName & "." & lrRDSRelation.DestinationColumns(liInd).Name
                             Next
                             lsSQLQuery.AppendLine(" LIMIT 100")
@@ -176,6 +176,8 @@ Public Class frmToolboxTableData
 
             If Me.mrTable IsNot Nothing Then
                 Me.GroupBox1.Text = "Table Name: " & Me.mrTable.Name
+            ElseIf Me.mrRDSRelation IsNot Nothing Then
+                Me.GroupBox1.Text = "Table Name: " & Me.mrRDSRelation.ResponsibleFactType.Id
             End If
 
             'AddHandler Me.AdvancedDataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
@@ -202,7 +204,9 @@ Public Class frmToolboxTableData
                                                   Optional aarColumn As List(Of RDS.Column) = Nothing)
 
         Try
-            Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(asDatabaseQuery)
+            If asDatabaseQuery IsNot Nothing Then
+                Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(asDatabaseQuery)
+            End If
 
             Dim lrTable As RDS.Table
             If arTable Is Nothing And aarColumn IsNot Nothing Then
@@ -325,7 +329,7 @@ Public Class frmToolboxTableData
                     Case Is = pcenumDatabaseType.Neo4j,
                               pcenumDatabaseType.KuzuDB
 #Region "Cypher"
-                        If Me.mrTable.isPGSRelation Then
+                        If Me.mrTable IsNot Nothing AndAlso Me.mrTable.isPGSRelation Then
 #Region "PGS Relation - Propery Graph Schema Relation, Table is relation, rather than a Foreign Key Relationship"
                             '=======================================================================================
                             'Example
@@ -364,26 +368,55 @@ Public Class frmToolboxTableData
                             lsSQLQuery &= LCase(larRelation(0).DestinationTable.Name) & ")-[:" & Me.mrTable.DBName & "]->(" & LCase(larRelation(1).DestinationTable.Name) & ")"
 #End Region
                         Else
-                            lsSQLQuery = "CREATE (" & LCase(Me.mrTable.Name) & ":" & Me.mrTable.Name & " {"
+                            Dim lsTableName As String
+                            Dim larColumn As List(Of RDS.Column) = Nothing
+                            If Me.mrTable IsNot Nothing Then
+                                lsTableName = Me.mrTable.Name
+                                larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not x.isPartOfPrimaryKey And Not x.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter)
 
-                            liInd = 0
-                            For Each lrColumn In Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not x.isPartOfPrimaryKey And Not x.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter)
-                                If liInd > 0 Then lsSQLQuery &= ","
-                                lsSQLQuery &= lrColumn.Name & ":"
-                                lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
-                                Select Case lrColumn.getMetamodelDataType
-                                    Case Is = pcenumORMDataType.TemporalDate,
+                                lsSQLQuery = "CREATE (" & LCase(lsTableName) & ":" & lsTableName & " {"
+
+                                liInd = 0
+                                For Each lrColumn In larColumn
+                                    If liInd > 0 Then lsSQLQuery &= ","
+                                    lsSQLQuery &= lrColumn.Name & ":"
+                                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                                    Select Case lrColumn.getMetamodelDataType
+                                        Case Is = pcenumORMDataType.TemporalDate,
                                   pcenumORMDataType.TemporalDateAndTime
-                                        lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
-                                    Case Else
-                                        lsSQLQuery &= lrFact.Data(liInd).Data
-                                End Select
+                                            lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
+                                        Case Else
+                                            lsSQLQuery &= lrFact.Data(liInd).Data
+                                    End Select
 
-                                lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
-                                liInd += 1
-                            Next
+                                    lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")
+                                    liInd += 1
+                                Next
 
-                            lsSQLQuery &= "})"
+                                lsSQLQuery &= "})"
+                            Else
+                                lsTableName = Me.mrRDSRelation.ResponsibleFactType.Id
+
+                                'MATCH (fromNode:FromNode), (toNode:ToNode)
+                                'WHERE fromNode.id = 1 And toNode.id = 2
+                                'CREATE(fromNode)-[:EDGELABEL]->(toNode)
+
+                                Dim lsFromColumnName = Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0).Name
+                                Dim lsToColumnName = Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).Name
+
+                                Dim lsDataWrapper = Me.mrRDSRelation.Model.Model.DatabaseConnection.DataTypeWrapper(Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0).getMetamodelDataType)
+                                Dim lsData = lsDataWrapper & lrFact.Data(0).Data & lsDataWrapper
+                                lsSQLQuery = "MATCH (" & Me.mrRDSRelation.OriginTable.Name.LCase & ":" & Me.mrRDSRelation.OriginTable.Name & ")"
+                                lsSQLQuery.AppendLine("WHERE " & Me.mrRDSRelation.OriginTable.Name.LCase & "." & lsFromColumnName & "=" & lsData)
+                                lsDataWrapper = Me.mrRDSRelation.Model.Model.DatabaseConnection.DataTypeWrapper(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).getMetamodelDataType)
+                                lsData = lsDataWrapper & lrFact.Data(1).Data & lsDataWrapper
+                                lsSQLQuery.AppendLine("MATCH (" & Me.mrRDSRelation.DestinationTable.Name.LCase & ":" & Me.mrRDSRelation.DestinationTable.Name & ")")
+                                lsSQLQuery.AppendLine("WHERE " & Me.mrRDSRelation.DestinationTable.Name.LCase & "." & lsToColumnName & "=" & lsData)
+                                lsSQLQuery.AppendLine("CREATE (" & Me.mrRDSRelation.OriginTable.Name.LCase & ")-[:" & lsTableName & "]->(" & Me.mrRDSRelation.DestinationTable.Name.LCase & ")")
+                            End If
+
+
+
                         End If
 #End Region
                     Case Else
@@ -454,9 +487,99 @@ Public Class frmToolboxTableData
                 'Create ComboBox Cell
                 Dim cmbcell As New DataGridViewComboBoxCell
                 If e.ColumnIndex = 0 Then
+
+                    Select Case Me.mrModel.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j,
+                                  pcenumDatabaseType.KuzuDB
+
+                            Dim lsOriginTableName = Me.mrRDSRelation.OriginTable.DatabaseName
+
+                            lsDatabaseQuery = "MATCH "
+                            lsDatabaseQuery.AppendString("(" & lsOriginTableName.LCase & ":" & Me.mrRDSRelation.OriginTable.DatabaseName & ") RETURN ")
+
+                            Dim liInd = 0
+                            Dim larPKColumn = Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns
+                            If larPKColumn.Count > 1 Then lsDatabaseQuery &= "{"
+                            For Each lrColumn In larPKColumn
+                                If liInd > 0 Then lsDatabaseQuery &= ","
+                                lsDatabaseQuery &= lrColumn.Table.DatabaseName.LCase & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            If larPKColumn.Count > 1 Then lsDatabaseQuery &= "}"
+                            lsDatabaseQuery &= " AS ItemData, "
+                            Dim larUCColumn = Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns
+                            If larUCColumn.Count > 1 Then lsDatabaseQuery &= "{"
+                            liInd = 0
+                            For Each lrColumn In larUCColumn
+                                If liInd > 0 Then lsDatabaseQuery &= ","
+                                lsDatabaseQuery &= lrColumn.Table.DatabaseName.LCase & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            If larUCColumn.Count > 1 Then lsDatabaseQuery &= "}"
+                            lsDatabaseQuery &= " AS Text"
+
+                            lsDatabaseQuery.AppendLine("LIMIT 100")
+
+                        Case Is = pcenumDatabaseType.TypeDB
+                        Case Else
+                            lsDatabaseQuery = "SELECT "
+                            Dim liInd = 0
+                            Dim larPKColumn = Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns
+                            If larPKColumn.Count > 1 Then lsDatabaseQuery &= "{"
+                            For Each lrColumn In larPKColumn
+                                If liInd > 0 Then lsDatabaseQuery &= ","
+                                lsDatabaseQuery &= lrColumn.Table.DatabaseName & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            If larPKColumn.Count > 1 Then lsDatabaseQuery &= "}"
+                            lsDatabaseQuery &= " AS ItemData, "
+                            Dim larUCColumn = Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns
+                            If larUCColumn.Count > 1 Then lsDatabaseQuery &= "{"
+                            liInd = 0
+                            For Each lrColumn In larUCColumn
+                                If liInd > 0 Then lsDatabaseQuery &= ","
+                                lsDatabaseQuery &= lrColumn.Table.DatabaseName & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            If larUCColumn.Count > 1 Then lsDatabaseQuery &= "}"
+                            lsDatabaseQuery &= " AS Text"
+                            lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.OriginTable.DatabaseName)
+                            lsDatabaseQuery.AppendLine("LIMIT 100")
+                    End Select
+
                 Else
                     Select Case Me.mrModel.TargetDatabaseType
-                        Case Is = pcenumDatabaseType.Neo4j
+                        Case Is = pcenumDatabaseType.Neo4j,
+                                  pcenumDatabaseType.KuzuDB
+
+                            Dim lsDestinationTableName = Me.mrRDSRelation.DestinationTable.DatabaseName
+
+                            lsDatabaseQuery = "MATCH "
+                            lsDatabaseQuery.AppendString("(" & lsDestinationTableName.LCase & ":" & Me.mrRDSRelation.DestinationTable.DatabaseName & ") RETURN ")
+
+                            Dim liInd = 0
+                            Dim larPKColumn = Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns
+                            If larPKColumn.Count > 1 Then lsDatabaseQuery &= "{"
+                            For Each lrColumn In larPKColumn
+                                If liInd > 0 Then lsDatabaseQuery &= ","
+                                lsDatabaseQuery &= lrColumn.Table.DatabaseName.LCase & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            If larPKColumn.Count > 1 Then lsDatabaseQuery &= "}"
+                            lsDatabaseQuery &= " AS ItemData, "
+                            Dim larUCColumn = Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns
+                            If larUCColumn.Count > 1 Then lsDatabaseQuery &= "{"
+                            liInd = 0
+                            For Each lrColumn In larUCColumn
+                                If liInd > 0 Then lsDatabaseQuery &= ","
+                                lsDatabaseQuery &= lrColumn.Table.DatabaseName.LCase & "." & lrColumn.Name
+                                liInd += 1
+                            Next
+                            If larUCColumn.Count > 1 Then lsDatabaseQuery &= "}"
+                            lsDatabaseQuery &= " AS Text"
+
+                            lsDatabaseQuery.AppendLine("LIMIT 100")
+
                         Case Is = pcenumDatabaseType.TypeDB
                         Case Else
                             lsDatabaseQuery = "SELECT "
@@ -484,17 +607,25 @@ Public Class frmToolboxTableData
                             lsDatabaseQuery.AppendLine("LIMIT 100")
                     End Select
                 End If
+
                 Dim lrTable As New RDS.Table(Me.mrModel.RDS, "DummyTable", Nothing)
                 lrTable.Column.Add(New RDS.Column(lrTable, "ItemData", Nothing, Nothing, True))
                 lrTable.Column.Add(New RDS.Column(lrTable, "Text", Nothing, Nothing, True))
+
                 Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(lsDatabaseQuery)
+
                 Dim lrDataGridList = New ORMQL.RecordsetDataGridList(lrRecordset, lrTable)
 
                 cmbcell.DataSource = lrDataGridList
                 cmbcell.DisplayMember = "Text"
                 cmbcell.ValueMember = "Text"
 
-                Me.AdvancedDataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex) = cmbcell
+                If lrRecordset.Facts.Count = 0 Then
+                    Me.ToolStripStatusLabel.Text = "There are no rows to reference."
+                Else
+                    Me.AdvancedDataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex) = cmbcell
+                End If
+
 
                 'Dim normalcell As DataGridViewCell = New DataGridViewTextBoxCell()
                 'normalcell.Value = "Name"
@@ -504,7 +635,14 @@ Public Class frmToolboxTableData
 
 
             If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
-                Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data
+                Dim lsColumnName = Me.mrRecordset.Columns(e.ColumnIndex)
+                Try
+                    Me.OldValue = mrRecordset.Facts(e.RowIndex).Data(e.ColumnIndex).Data
+                    'Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(lsColumnName.Substring(lsColumnName.IndexOf(".") + 1)).Data
+                Catch ex As Exception
+
+                End Try
+
             Else
                 Dim lrNewFact As FBM.Fact = Me.mrRecordset.Facts(0).Clone(Me.mrRecordset.Facts(0).FactType, True)
                 lrNewFact.Id = System.Guid.NewGuid.ToString
@@ -563,7 +701,7 @@ Public Class frmToolboxTableData
 
             Dim lrTable As RDS.Table = Me.mrTable
 
-            If Me.mrTable.isPGSRelation Then
+            If (Me.mrTable IsNot Nothing AndAlso Me.mrTable.isPGSRelation) Or Me.mrRDSRelation IsNot Nothing Then
                 'Dummy Table used for PGS Relations, especially for Neo4J (Because show Unique Key values, rather than PK Values on many-to-many tables etc.
                 lrTable = Me.mrDataGridList.mrTable
             End If
@@ -589,8 +727,13 @@ Public Class frmToolboxTableData
                     'Nothing to do.
             End Select
 #End Region
-
-            Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liIndex)).Data 'Was e.ColumnIndex
+            lsColumnName = Me.mrRecordset.Columns(liIndex)
+            If Me.mrRecordset.Facts(0).FactType.RoleGroup(0).Name.Contains(".") Then
+                If Me.mrTable Is Nothing Then
+                    lsColumnName = "dummytable." & lsColumnName
+                End If
+            End If
+            Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).Data 'Was e.ColumnIndex
 
             '------------------------------------------------
             'CodeSafe - Exit if no change
@@ -598,11 +741,11 @@ Public Class frmToolboxTableData
 
             '------------------------------------------------
             'Get a clone of the Fact for PGSRelations
-            Dim lrOriginalFact As FBM.Fact = Me.mrRecordset.Facts(e.RowIndex).Clone(New FBM.FactType(Me.mrModel, "DummyFactType", True), True)
+            Dim lrDestinationalFact As FBM.Fact = Me.mrRecordset.Facts(e.RowIndex).Clone(New FBM.FactType(Me.mrModel, "DummyFactType", True), True)
 
             '==========================================================================================
             'Update the FactData for the Fact
-            Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liIndex)).Data = Me.NewValue 'Was e.ColumnIndex 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
+            Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).Data = Me.NewValue 'Was Me.mrRecordset.Columns(liIndex), and before that e.ColumnIndex 'Delimits the Fact by its RoleName. E.g. Fact("DateTime"). Boston gets the appropriate RoleData.
             '==========================================================================================
 
             '============================================================
@@ -689,7 +832,7 @@ Public Class frmToolboxTableData
                     lsMatchClause &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
 
                     lsQuery.AppendString(lsMatchClause)
-                    Dim lsDeleteWhereClause = String.Format(lsWhereClause, lrOriginalFact.Data(0).Data, lrOriginalFact.Data(1).Data)
+                    Dim lsDeleteWhereClause = String.Format(lsWhereClause, lrDestinationalFact.Data(0).Data, lrDestinationalFact.Data(1).Data)
                     lsQuery.AppendLine(lsDeleteWhereClause)
 
                     '==DELETE======================================
@@ -738,9 +881,9 @@ Public Class frmToolboxTableData
                         Case Is = pcenumDatabaseType.Neo4j,
                                   pcenumDatabaseType.KuzuDB
 
-                            larPKColumn = Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns
+                            larPKColumn = Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns
                         Case Else
-                            larPKColumn = Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns
+                            larPKColumn = Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
                     End Select
 
                     If larPKColumn.Count = 0 Then
@@ -748,25 +891,25 @@ Public Class frmToolboxTableData
                         prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
                     End If
 
-                    If Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns.Count = 1 Then
+                    If Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns.Count = 1 Then
 
                         lsDatabaseQuery = "SELECT "
                         Dim liInd = 0
-                        For Each lrColumn In Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns
+                        For Each lrColumn In Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
                             If liInd > 0 Then lsDatabaseQuery &= ","
                             lsDatabaseQuery.AppendString(lrColumn.Table.DatabaseName & "." & lrColumn.Name)
                             liInd += 1
                         Next
-                        lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.OriginTable.DatabaseName)
+                        lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.DestinationTable.DatabaseName)
                         lsDatabaseQuery.AppendLine("WHERE ")
-                        lsDatabaseQuery.AppendString(Me.mrRDSRelation.OriginTable.DatabaseName & "." & Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0).Name)
+                        lsDatabaseQuery.AppendString(Me.mrRDSRelation.DestinationTable.DatabaseName & "." & Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).Name)
                         lsDatabaseQuery.AppendString(" = ")
-                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
                         lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(0)).Data))
-                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
 
 
-                        Dim lsValue As String = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.OriginTable.getPrimaryKeyColumns(0).Name).Data
+                        Dim lsValue As String = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns(0).Name).Data
 
                         larPKColumn(0).TemporaryData = lsValue
                     End If
@@ -791,8 +934,8 @@ Public Class frmToolboxTableData
 
                     Dim lsNewValue = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns(0).Name).Data
 
-                    Dim lrRecordset = Me.mrModel.DatabaseConnection.UpdateAttributeValue(Me.mrRDSRelation.OriginTable.DatabaseName,
-                                                                                         Me.mrRDSRelation.OriginColumns(0),
+                    Dim lrRecordset = Me.mrModel.DatabaseConnection.UpdateAttributeValue(Me.mrRDSRelation.DestinationTable.DatabaseName,
+                                                                                         Me.mrRDSRelation.DestinationColumns(0),
                                                                                          lsNewValue,
                                                                                          larPKColumn)
                 End If
@@ -902,13 +1045,19 @@ Public Class frmToolboxTableData
             Dim liInd As Integer = 0
             Dim larColumn As List(Of RDS.Column)
 
+            Dim lsTableName As String = "DummyTable"
+
             Select Case Me.mrModel.TargetDatabaseType
                 Case Is = pcenumDatabaseType.Neo4j,
                           pcenumDatabaseType.KuzuDB
-                    If Me.mrTable.isPGSRelation Then
+                    If Me.mrTable IsNot Nothing AndAlso Me.mrTable.isPGSRelation Then
                         larColumn = Me.mrDataGridList.mrTable.Column
-                    Else
+                        lsTableName = Me.mrTable.Name
+                    ElseIf Me.mrTable IsNot Nothing Then
                         larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
+                        lsTableName = Me.mrTable.Name
+                    Else
+                        larColumn = Me.mrDataGridList.mrTable.Column
                     End If
 
                 Case Else
@@ -921,7 +1070,7 @@ Public Class frmToolboxTableData
                     Case Is = pcenumDatabaseType.Neo4j,
                               pcenumDatabaseType.KuzuDB
 
-                        lrColumn.TemporaryData = LCase(Me.mrTable.Name) & "." & lrColumn.Name
+                        lrColumn.TemporaryData = LCase(lsTableName) & "." & lrColumn.Name
                     Case Else
                         lrColumn.TemporaryData = lrColumn.Name
                 End Select
@@ -937,9 +1086,12 @@ Public Class frmToolboxTableData
 
             Me.mrRecordset.Facts.Add(lrFact)
 
-            Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
-
-            Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+            If Me.mrTable Is Nothing Then
+                Call Me.PopulateDataGridFromDatabaseQuery(Nothing,, larColumn)
+            Else
+                Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
+                Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
+            End If
 
             Me.ButtonAddRow.Enabled = False
 

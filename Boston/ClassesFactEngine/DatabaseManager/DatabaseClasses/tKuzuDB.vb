@@ -115,41 +115,16 @@ Namespace FactEngine
 
             Try
                 Dim lsSQL As String
+                Dim lrRecordset As ORMQL.Recordset
 
-                lsSQL = "PRAGMA foreign_keys=OFF"
-                Me.GONonQuery(lsSQL)
+                'E.g. CREATE REL TABLE Follows(FROM User TO User, since DATE)
+                lsSQL = "CREATE REL TABLE " & arRelation.ResponsibleFactType.Id & " (FROM " & arRelation.OriginTable.Name & " TO " & arRelation.DestinationTable.Name & ")"
 
-                Dim lrRelation As RDS.Relation = arRelation
-                Dim lasColumnNames = From Column In lrRelation.OriginTable.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
+                lrRecordset = Me.GONonQuery(lsSQL)
 
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
-
-                    Try
-                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
-                            cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arRelation.OriginTable, arRelation.OriginTable.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arRelation.OriginTable.Name & "_temp SELECT " & lsColumnList & " FROM [" & arRelation.OriginTable.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "DROP TABLE [" & arRelation.OriginTable.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arRelation.OriginTable.Name & "_temp RENAME TO [" & arRelation.OriginTable.Name & "]"
-                            cmd.ExecuteNonQuery()
-                        End Using
-
-                        tr.Commit()
-                    Catch ex As Exception
-                        MsgBox(ex.Message)
-                        tr.Rollback()
-                    End Try
-                End Using
-
-                lsSQL = "PRAGMA foreign_keys=ON"
-                Me.GONonQuery(lsSQL)
-
+                If lrRecordset.ErrorReturned Then
+                    Throw New Exception(lrRecordset.ErrorString)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -871,11 +846,55 @@ SkipColumn:
             End Try
         End Function
 
+        Public Overrides Function getRelationLabels() As List(Of String)
+
+            Dim lasRelationName As New List(Of String)
+
+            Try
+                Dim lsTableNames = kuzu_connection_get_rel_table_names(Me.conn)
+                Dim lasTableNames As List(Of String) = lsTableNames.Split(vbLf).ToList.Select(Function(s) s.Replace(vbTab, "")).ToList
+                lasTableNames.RemoveAt(0)
+                lasTableNames.RemoveAt(lasTableNames.Count - 1)
+
+                Dim lsTableName As String
+                Dim lrTable As New RDS.Table
+
+                For Each lsTableName In lasTableNames
+                    lasRelationName.Add(lsTableName)
+                Next
+
+                Return lasRelationName
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of String)
+            End Try
+
+        End Function
+
+
         Public Overrides Function getRelationsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
 
             Dim larRelation As New List(Of RDS.Relation)
 
             Try
+                Dim lsTableNames = kuzu_connection_get_rel_table_names(Me.conn)
+                Dim lasTableNames As List(Of String) = lsTableNames.Split(vbLf).ToList.Select(Function(s) s.Replace(vbTab, "")).ToList
+                lasTableNames.RemoveAt(0)
+                lasTableNames.RemoveAt(lasTableNames.Count - 1)
+
+                Dim lsTableName As String
+                Dim lrTable As New RDS.Table
+
+                For Each lsTableName In lasTableNames
+
+                Next
+
                 Return larRelation
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1035,24 +1054,24 @@ SkipColumn:
                 'Hi Margerette, the default value of a parameter Is NULL . So the query Is executed as MATCH (a: Person) WHERE a.isStudent = NULL And a.age > NULL RETURN COUNT(*) which leads to success execution but empty output
 #End Region
 
+                Dim liFieldCount As Integer = kuzu_query_result_get_num_columns(loResult)
+
+                '==================================================================
+                'Column Names   
+                Dim lsColumnName As String
+                For liInd = 0 To liFieldCount - 1
+                    lsColumnName = kuzu_query_result_get_column_name(loResult, liInd)
+                    '                        lsColumnName = lrFactType.CreateUniqueRoleName(loResult(0).Keys(liFieldInd), 0)
+                    Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
+                    lrFactType.RoleGroup.AddUnique(lrRole)
+                    lrRecordset.Columns.Add(lsColumnName)
+                Next
+                '==================================================================
+
                 ' Just peek to check if any value available.
                 ' Getting count here will consume all the records
                 ' Use loResult.ToList() if you need all the record in separate list
                 If kuzu_query_result_has_next(loResult) Then
-
-                    Dim liFieldCount As Integer = kuzu_query_result_get_num_columns(loResult)
-
-                    '==================================================================
-                    'Column Names   
-                    Dim lsColumnName As String
-                    For liInd = 0 To liFieldCount - 1
-                        lsColumnName = kuzu_query_result_get_column_name(loResult, liInd)
-                        '                        lsColumnName = lrFactType.CreateUniqueRoleName(loResult(0).Keys(liFieldInd), 0)
-                        Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
-                        lrFactType.RoleGroup.AddUnique(lrRole)
-                        lrRecordset.Columns.Add(lsColumnName)
-                    Next
-                    '==================================================================
 
                     ' looping each record will consume the record from list
                     ' consumed record will be removed from the list

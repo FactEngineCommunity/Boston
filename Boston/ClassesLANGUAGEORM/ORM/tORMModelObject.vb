@@ -116,7 +116,11 @@ Namespace FBM
         DescriptionAttribute("A unique Name for the model object in the underlying target database.")>
         Public Overridable Property DBName() As String
             Get
-                Return _DBName
+                Dim lsDBName As String = _DBName
+                If lsDBName Is Nothing Or lsDBName = "" Then
+                    lsDBName = Me.Name
+                End If
+                Return lsDBName
             End Get
             Set(ByVal value As String)
                 '------------------------------------------------------

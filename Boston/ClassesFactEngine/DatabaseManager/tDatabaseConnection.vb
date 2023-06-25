@@ -220,6 +220,10 @@ Namespace FactEngine
             Return New List(Of RDS.Relation)
         End Function
 
+        Public Overridable Function getRelationLabels() As List(Of String)
+            Return New List(Of String)
+        End Function
+
         ''' <summary>
         ''' Returns a list of the Tables in the database. As used in Reverse Engineering a database.
         ''' </summary>
