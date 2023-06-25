@@ -367,7 +367,7 @@ Public Class frmToolboxTableData
                             lsSQLQuery = "CREATE (" & LCase(Me.mrTable.Name) & ":" & Me.mrTable.Name & " {"
 
                             liInd = 0
-                            For Each lrColumn In Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not x.isPartOfPrimaryKey)
+                            For Each lrColumn In Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not x.isPartOfPrimaryKey And Not x.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter)
                                 If liInd > 0 Then lsSQLQuery &= ","
                                 lsSQLQuery &= lrColumn.Name & ":"
                                 lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(lrColumn.getMetamodelDataType) ' Was DataTypeIsText, "'", "")

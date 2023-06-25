@@ -80,6 +80,7 @@ Partial Class frmMain
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemUnifiedOntologyBrowser = New System.Windows.Forms.ToolStripMenuItem()
+        Me.JupyterNotebookToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemBoston = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfigurationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator14 = New System.Windows.Forms.ToolStripSeparator()
@@ -340,7 +341,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemView
         '
-        Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.ToolStripMenuItemCodeGenerator, Me.ToolStripMenuItemFactEngine, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy, Me.ToolStripMenuItemUnifiedOntologyBrowser})
+        Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.ToolStripMenuItemCodeGenerator, Me.ToolStripMenuItemFactEngine, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy, Me.ToolStripMenuItemUnifiedOntologyBrowser, Me.JupyterNotebookToolStripMenuItem})
         Me.ToolStripMenuItemView.Name = "ToolStripMenuItemView"
         Me.ToolStripMenuItemView.Size = New System.Drawing.Size(44, 22)
         Me.ToolStripMenuItemView.Text = "&View"
@@ -444,6 +445,12 @@ Partial Class frmMain
         Me.ToolStripMenuItemUnifiedOntologyBrowser.Name = "ToolStripMenuItemUnifiedOntologyBrowser"
         Me.ToolStripMenuItemUnifiedOntologyBrowser.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemUnifiedOntologyBrowser.Text = "&Unified Ontology Browser"
+        '
+        'JupyterNotebookToolStripMenuItem
+        '
+        Me.JupyterNotebookToolStripMenuItem.Name = "JupyterNotebookToolStripMenuItem"
+        Me.JupyterNotebookToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
+        Me.JupyterNotebookToolStripMenuItem.Text = "Jupyter Notebook"
         '
         'ToolStripMenuItemBoston
         '
@@ -1133,4 +1140,5 @@ Partial Class frmMain
     Friend WithEvents BroadcastMessageToUsersToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BackgroundWorkerStatusBar As System.ComponentModel.BackgroundWorker
     Friend WithEvents ToolStripMenuItemLogInAs As ToolStripMenuItem
+    Friend WithEvents JupyterNotebookToolStripMenuItem As ToolStripMenuItem
 End Class

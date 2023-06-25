@@ -475,7 +475,22 @@ Namespace RDS
                 'Database Synchronisation Code
                 If abAddToDatabase Then
                     Call Me.Model.Model.connectToDatabase()
-                    If Me.Column.Count = 1 Then
+
+                    Dim liColumnCount As Integer = 0
+
+                    Select Case Me.Model.Model.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j,
+                                  pcenumDatabaseType.KuzuDB
+
+                            liColumnCount = (From Index In Me.Index
+                                             Where Index.Type = pcenumODBCIndexType.Unique
+                                             Select Index).Count
+
+                        Case Else
+                            liColumnCount = Me.Column.Count
+                    End Select
+
+                    If liColumnCount = 1 Then
                         'Create the Table/Column combination, because can't create the Column without the Table and is first Column in Table.
                         Call Me.Model.Model.DatabaseConnection.createTable(Me, arColumn)
                     Else
@@ -528,6 +543,30 @@ Namespace RDS
             'Database synchronisation
             If Me.Model.Model.IsDatabaseSynchronised Then
                 Call Me.Model.Model.connectToDatabase()
+
+                'Database Specific Functionality
+#Region "Database Specific Functionality"
+
+                Dim liColumnCount As Integer = 0
+
+                Select Case Me.Model.Model.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.Neo4j,
+                              pcenumDatabaseType.KuzuDB
+
+                        liColumnCount = (From Index In Me.Index
+                                         Where Not Index.IsPrimaryKey
+                                         Select Index).Count
+
+                    Case Else
+                        'N/A At this stage.
+                End Select
+
+                If Not arIndex.IsPrimaryKey And liColumnCount = 1 Then
+                    'Create the Table/Column combination, because can't create the Column without the Table and is first Column in Table.
+                    Call Me.Model.Model.DatabaseConnection.createTable(Me, arIndex.Column(0))
+                End If
+#End Region
+
                 Call Me.Model.Model.DatabaseConnection.addIndex(arIndex)
             End If
 

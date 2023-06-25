@@ -1,4 +1,6 @@
-<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Imports Boston
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmToolboxEnterpriseExplorer
     Inherits WeifenLuo.WinFormsUI.Docking.DockContent
 
@@ -27,7 +29,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxEnterpriseExplorer))
         Me.GroupBox_main = New System.Windows.Forms.GroupBox()
-        Me.SearchTextbox = New SearchTextbox()
+        Me.SearchTextbox = New CustomSearchTextbox()
         Me.ButtonNewModel = New System.Windows.Forms.Button()
         Me.ComboBoxNamespace = New System.Windows.Forms.ComboBox()
         Me.LabelPromptNamespace = New System.Windows.Forms.Label()
@@ -104,6 +106,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
+        Me.ViewDatabaseSchemaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -321,9 +324,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 490)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 534)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -704,6 +707,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
         '
+        'ViewDatabaseSchemaToolStripMenuItem
+        '
+        Me.ViewDatabaseSchemaToolStripMenuItem.Name = "ViewDatabaseSchemaToolStripMenuItem"
+        Me.ViewDatabaseSchemaToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.ViewDatabaseSchemaToolStripMenuItem.Text = "View Database Schema"
+        '
         'frmToolboxEnterpriseExplorer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -802,5 +811,6 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ToolStripMenuItemMoveModel As ToolStripMenuItem
     Friend WithEvents FEKLUploaderToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents EditAITrainingDataEditorToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents SearchTextbox As SearchTextbox
+    Friend WithEvents SearchTextbox As CustomSearchTextbox
+    Friend WithEvents ViewDatabaseSchemaToolStripMenuItem As ToolStripMenuItem
 End Class

@@ -63,16 +63,25 @@ Namespace FactEngine
         Public Overrides Sub addColumn(ByRef arColumn As RDS.Column)
 
             Dim lsSQLCommand As String
-
+            Dim lrRecordset As ORMQL.Recordset
             Try
-                lsSQLCommand = "ALTER TABLE [" & arColumn.Table.Name & "]"
-                lsSQLCommand &= " ADD COLUMN "
+                lsSQLCommand = "ALTER TABLE " & arColumn.Table.Name
+                lsSQLCommand &= " ADD "
                 lsSQLCommand &= Me.generateSQLColumnDefinition(arColumn)
 
-                Me.GONonQuery(lsSQLCommand)
+                lrRecordset = Me.GONonQuery(lsSQLCommand)
+
+                If lrRecordset.ErrorString IsNot Nothing Then
+                    Throw New Exception(lrRecordset.ErrorString)
+                End If
 
             Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -84,41 +93,7 @@ Namespace FactEngine
         Public Overrides Sub addIndex(ByRef arIndex As RDS.Index)
 
             Try
-                Dim lsSQL As String
-
-                lsSQL = "PRAGMA foreign_keys=OFF"
-                Me.GONonQuery(lsSQL)
-
-                Dim lrIndex As RDS.Index = arIndex
-                Dim lasColumnNames = From Column In lrIndex.Table.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
-
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
-
-                    Try
-                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
-                            cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "DROP TABLE [" & arIndex.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arIndex.Table.Name & "_temp RENAME TO [" & arIndex.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                        End Using
-
-                        tr.Commit()
-                    Catch ex As Exception
-                        MsgBox(ex.Message)
-                        tr.Rollback()
-                    End Try
-                End Using
-
-                lsSQL = "PRAGMA foreign_keys=ON"
-                Me.GONonQuery(lsSQL)
+                Dim lsSQL As String = ""
 
 
             Catch ex As Exception
@@ -199,42 +174,24 @@ Namespace FactEngine
                                                     ByVal asLength As Integer,
                                                     ByRef arPrecision As Integer)
             Try
-                Dim lsSQL As String
+                Dim lsSQL As String = ""
+                Dim lrRecordset As ORMQL.Recordset
 
-                lsSQL = "PRAGMA foreign_keys=OFF"
-                Me.GONonQuery(lsSQL)
+                Try
+                    lsSQL = "ALTER TABLE `" & arColumn.Table.Name & "` DROP " & arColumn.Name
 
-                Dim lrColumn As RDS.Column = arColumn
-                Dim lasColumnNames = From Column In lrColumn.Table.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
+                    lrRecordset = Me.GONonQuery(lsSQL)
 
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
+                    If lrRecordset.ErrorString IsNot Nothing Then
+                        Throw New Exception(lrRecordset.ErrorString)
+                    End If
+                Catch ex As Exception
+                    'Not a biggie. Didn't want the Column anyway.
+                End Try
 
-                    Try
-                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
-                            cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "DROP TABLE [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arColumn.Table.Name & "_temp RENAME TO [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                        End Using
 
-                        tr.Commit()
-                    Catch ex As Exception
-                        MsgBox(ex.Message)
-                        tr.Rollback()
-                    End Try
-                End Using
-
-                lsSQL = "PRAGMA foreign_keys=ON"
-                Me.GONonQuery(lsSQL)
-
+                Dim lrColumn = arColumn
+                Call Me.addColumn(arColumn)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -254,41 +211,7 @@ Namespace FactEngine
         Public Overrides Sub columnSetMandatory(ByRef arColumn As RDS.Column,
                                                   ByVal abIsMandatory As Boolean)
             Try
-                Dim lsSQL As String
-
-                lsSQL = "PRAGMA foreign_keys=OFF"
-                Me.GONonQuery(lsSQL)
-
-                Dim lrColumn As RDS.Column = arColumn
-                Dim lasColumnNames = From Column In lrColumn.Table.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
-
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
-
-                    Try
-                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
-                            cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "DROP TABLE [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arColumn.Table.Name & "_temp RENAME TO [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                        End Using
-
-                        tr.Commit()
-                    Catch ex As Exception
-                        MsgBox(ex.Message)
-                        tr.Rollback()
-                    End Try
-                End Using
-
-                lsSQL = "PRAGMA foreign_keys=ON"
-                Me.GONonQuery(lsSQL)
+                Dim lsSQL As String = ""
 
 
             Catch ex As Exception
@@ -326,21 +249,32 @@ Namespace FactEngine
         Public Overrides Sub createTable(ByRef arTable As RDS.Table, ByRef arColumn As RDS.Column)
 
             Dim lsSQLCommand As String
-
+            Dim lrTable As RDS.Table = arTable
             Try
-                '=========E.g. From Kuzu website==========================================================
-                '// create the schema
-                'connection.query("CREATE NODE TABLE User(name STRING, age INT64, PRIMARY KEY (name))");
-                '=========================================================================================
-                lsSQLCommand = "CREATE NODE TABLE [" & arTable.Name & "]"
-                lsSQLCommand &= " ("
-                lsSQLCommand &= arColumn.Name & " " & arColumn.DataType.DataType & If(arColumn.IsMandatory, ", PRIMARY KEY (" & arColumn.Name & ")", "")
-                lsSQLCommand &= ")"
+                Dim larColumn = From Column In lrTable.Column
+                                Where Not Column.isPartOfPrimaryKey
+                                Select Column
 
-                Me.GONonQuery(lsSQLCommand)
+                For Each lrColumn In larColumn
+                    '=========E.g. From Kuzu website==========================================================
+                    '// create the schema
+                    'connection.query("CREATE NODE TABLE User(name STRING, age INT64, PRIMARY KEY (name))");
+                    '=========================================================================================
+                    lsSQLCommand = "CREATE NODE TABLE `" & arTable.Name & "`"
+                    lsSQLCommand &= " ("
+                    lsSQLCommand &= lrColumn.Name & " " & lrColumn.DBDataType & If(lrColumn.Index.Count > 0, ", PRIMARY KEY (" & lrColumn.Name & ")", "")
+                    lsSQLCommand &= ")"
+
+                    Me.GONonQuery(lsSQLCommand)
+                Next
 
             Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -413,25 +347,17 @@ Namespace FactEngine
 
                 lsSQLColumnDefinition = arColumn.Name
                 lsSQLColumnDefinition &= " " & arColumn.ActiveRole.JoinsValueType.DBDataType
-                If arColumn.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
-                    If arColumn.DataTypeIsText Then
-                        lsSQLColumnDefinition &= "(" & arColumn.ActiveRole.JoinsValueType.DataTypeLength.ToString
-                        If arColumn.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
-                            lsSQLColumnDefinition &= arColumn.ActiveRole.JoinsValueType.DataTypePrecision.ToString
-                        End If
-                        lsSQLColumnDefinition &= ")"
-                    End If
-                End If
 
-                Dim larOutgoingRelation = arColumn.Relation.FindAll(Function(x) x.OriginTable Is lrColumn.Table)
-                If larOutgoingRelation.Count > 0 Then
-                    If larOutgoingRelation(0).OriginColumns.Count = 1 Then
-                        lsSQLColumnDefinition &= " REFERENCES [" & larOutgoingRelation(0).DestinationTable.Name & "]"
-                    End If
-                    If arColumn.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
-                ElseIf arColumn.Role.Mandatory Then
-                    lsSQLColumnDefinition &= " NOT NULL"
-                End If
+                '20230623-VM-ToDo: Check if KuzuDB has Length and/or Precision
+                'If arColumn.ActiveRole.JoinsValueType.DataTypeLength > 0 Then
+                '    If arColumn.DataTypeIsText Then
+                '        lsSQLColumnDefinition &= "(" & arColumn.ActiveRole.JoinsValueType.DataTypeLength.ToString
+                '        If arColumn.ActiveRole.JoinsValueType.DataTypePrecision > 0 Then
+                '            lsSQLColumnDefinition &= arColumn.ActiveRole.JoinsValueType.DataTypePrecision.ToString
+                '        End If
+                '        lsSQLColumnDefinition &= ")"
+                '    End If
+                'End If
 
                 Return lsSQLColumnDefinition
 
@@ -645,8 +571,6 @@ Namespace FactEngine
                 'Dim separators As String() = {vbCrLf, vbTab}
                 'Dim result As String() = input.Split(separators, StringSplitOptions.RemoveEmptyEntries)
                 '=========NB=============
-
-                Debugger.Break()
 
                 Dim lsColumnName As String
                 Dim lsDataType As String
@@ -1169,6 +1093,10 @@ SkipColumn:
                                     Else
                                         loFieldValue = ""
                                     End If
+                                Case Is = "KUZU_INT16"
+
+                                    Dim llTempValue As Long = kuzu_value_get_int16(value)
+                                    loFieldValue = llTempValue
                                 Case Is = "KUZU_INT64"
 
                                     Dim llTempValue As Long = kuzu_value_get_int64(value)
@@ -1326,9 +1254,14 @@ FinishedProcessing:
             Dim lrRecordset As New ORMQL.Recordset
 
             Try
-                Call Me.GO(asSQLQuery)
+                lrRecordset = Me.GO(asSQLQuery)
+
+                If lrRecordset.ErrorString IsNot Nothing Then
+                    Throw New Exception(lrRecordset.ErrorString)
+                End If
 
                 Return lrRecordset
+
             Catch ex As Exception
                 lrRecordset.ErrorString = ex.Message
                 Return lrRecordset
@@ -1399,42 +1332,7 @@ FinishedProcessing:
         Public Overrides Sub IndexUpdate(ByRef arIndex As RDS.Index)
 
             Try
-                Dim lsSQL As String
-
-                lsSQL = "PRAGMA foreign_keys=OFF"
-                Me.GONonQuery(lsSQL)
-
-                Dim lrIndex As RDS.Index = arIndex
-                Dim lasColumnNames = From Column In lrIndex.Table.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
-
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
-
-                    Try
-                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
-                            cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "DROP TABLE [" & arIndex.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arIndex.Table.Name & "_temp RENAME TO [" & arIndex.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                        End Using
-
-                        tr.Commit()
-                    Catch ex As Exception
-                        MsgBox(ex.Message)
-                        tr.Rollback()
-                    End Try
-                End Using
-
-                lsSQL = "PRAGMA foreign_keys=ON"
-                Me.GONonQuery(lsSQL)
-
+                Dim lsSQL As String = ""
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1500,38 +1398,8 @@ FinishedProcessing:
             Try
                 Dim lsSQL As String
 
-                lsSQL = "PRAGMA foreign_keys=OFF"
-                Me.GONonQuery(lsSQL)
+                lsSQL = "ALTER TABLE " & arColumn.Table.Name & " DROP " & arColumn.Name
 
-                Dim lrColumn As RDS.Column = arColumn
-                Dim lasColumnNames = From Column In lrColumn.Table.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
-
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
-                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
-
-                    Try
-                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
-                            cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "DROP TABLE [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE " & arColumn.Table.Name & "_temp RENAME TO [" & arColumn.Table.Name & "]"
-                            cmd.ExecuteNonQuery()
-                        End Using
-
-                        tr.Commit()
-                    Catch ex As Exception
-                        MsgBox(ex.Message)
-                        tr.Rollback()
-                    End Try
-                End Using
-
-                lsSQL = "PRAGMA foreign_keys=ON"
                 Me.GONonQuery(lsSQL)
 
 
@@ -1552,7 +1420,7 @@ FinishedProcessing:
         Public Overrides Sub removeTable(ByRef arTable As RDS.Table)
 
             Try
-                Dim lsSQLCommand = "DROP TABLE [" & arTable.Name & "]"
+                Dim lsSQLCommand = "DROP TABLE " & arTable.Name
 
                 Me.GONonQuery(lsSQLCommand)
 
@@ -1575,10 +1443,16 @@ FinishedProcessing:
         Public Overrides Sub renameColumn(ByRef arColumn As RDS.Column, ByVal asNewColumnName As String)
 
             Try
-                Dim lsSQLCommmand = "ALTER TABLE [" & arColumn.Table.Name & "]"
-                lsSQLCommmand &= " RENAME COLUMN " & arColumn.Name & " TO " & asNewColumnName
+                Dim lrRecordset As ORMQL.Recordset
 
-                Me.GONonQuery(lsSQLCommmand)
+                Dim lsSQLCommmand = "ALTER TABLE " & arColumn.Table.Name
+                lsSQLCommmand &= " RENAME " & arColumn.Name & " TO " & asNewColumnName
+
+                lrRecordset = Me.GONonQuery(lsSQLCommmand)
+
+                If lrRecordset.ErrorString IsNot Nothing Then
+                    Throw New Exception(lrRecordset.ErrorString)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1599,8 +1473,8 @@ FinishedProcessing:
         Public Overrides Sub RenameTable(ByRef arTable As RDS.Table, ByVal asNewName As String)
 
             Try
-                Dim lsSQLCommmand = "ALTER TABLE [" & arTable.Name & "]"
-                lsSQLCommmand &= " RENAME TO [" & asNewName & "]"
+                Dim lsSQLCommmand = "ALTER TABLE " & arTable.Name
+                lsSQLCommmand &= " RENAME TO " & asNewName
 
                 Me.GONonQuery(lsSQLCommmand)
 
@@ -1625,9 +1499,7 @@ FinishedProcessing:
             Try
                 Dim lsSQLQuery As String
 
-                lsSQLQuery = "SELECT * FROM sqlite_master"
-                lsSQLQuery &= " WHERE Type ='table'"
-                lsSQLQuery &= " AND name ='" & asTableName & "'"
+                lsSQLQuery = "MATCH (a:" & asTableName & ") RETURN ID(a) AS ID LIMIT 1"
 
                 Dim lrRecordset As ORMQL.Recordset
 

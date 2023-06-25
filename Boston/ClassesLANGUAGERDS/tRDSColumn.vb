@@ -70,6 +70,17 @@ Namespace RDS
             End Get
         End Property
 
+        <XmlIgnore()>
+        Public ReadOnly Property DBDataType As String
+            Get
+                Try
+                    Return Me.ActiveRole.JoinsValueType.DBDataType
+                Catch ex As Exception
+                    Return "STRING"
+                End Try
+            End Get
+        End Property
+
         ''' <summary>
         ''' As when "SELECT Horse.Id AS Horse_Id"
         ''' </summary>

@@ -5552,4 +5552,33 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub ViewDatabaseSchemaToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ViewDatabaseSchemaToolStripMenuItem.Click
+
+        Try
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
+            'CodeSafe
+            If lrModel.TargetDatabaseType = pcenumDatabaseType.None Or lrModel.TargetDatabaseConnectionString Is Nothing Or lrModel.TargetDatabaseConnectionString = "" Then
+                Exit Sub
+            End If
+
+            Dim lfrmToolboxDatabaseSchemaViewer As frmToolboxDatabaseSchemaViewer = frmMain.LoadToolboxDatabaseSchemaView
+            lfrmToolboxDatabaseSchemaViewer.mrModel = lrModel
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

@@ -4164,6 +4164,9 @@ SkipORMReadingEditor:
 
                         lrValueType = lrTempValueType
 
+                        'CodeSafe-Hit the database if need be.
+                        Call lrTempValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)
+
                     Else
                         lrValueType.SetName(lfrmAddAttributeForm.zsValueTypeName, True)
                         lrValueType.SetDataType(lfrmAddAttributeForm.zbDataType, 0, 0, True)

@@ -24,7 +24,7 @@ Partial Class frmGlossary
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.TextboxSearch = New SearchTextbox()
+        Me.TextboxSearch = New CustomSearchTextbox()
         Me.ButtonGenerateHTMLGlossary = New System.Windows.Forms.Button()
         Me.CheckBoxShowGeneralConcepts = New System.Windows.Forms.CheckBox()
         Me.LabelModelName = New System.Windows.Forms.Label()
@@ -38,7 +38,7 @@ Partial Class frmGlossary
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.CheckBoxHideFadedFactTypeNamesVerbalisationView = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.SearchTextbox = New SearchTextbox()
+        Me.SearchTextbox = New CustomSearchTextbox()
         Me.LabelModelElement = New System.Windows.Forms.Label()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
@@ -367,8 +367,8 @@ Partial Class frmGlossary
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents ToolStripDropDownButton1 As ToolStripDropDownButton
     Friend WithEvents CopyToClipboardToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents TextboxSearch As SearchTextbox
-    Friend WithEvents SearchTextbox As SearchTextbox
+    Friend WithEvents TextboxSearch As CustomSearchTextbox
+    Friend WithEvents SearchTextbox As CustomSearchTextbox
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
     Friend WithEvents LabelModelElement As Label
     Friend WithEvents ToolStripDropDownButton2 As ToolStripDropDownButton

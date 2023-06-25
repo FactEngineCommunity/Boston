@@ -10,8 +10,24 @@ Imports System.ServiceModel
 Imports AutoUpdaterDotNET
 Imports System.Configuration
 Imports System.ComponentModel
+Imports System.Runtime.InteropServices
 
 Public Class frmMain
+
+    ''' <summary>
+    ''' To dynamically load the JupyterNet.exe
+    ''' </summary>
+    ''' <param name="hWndChild"></param>
+    ''' <param name="hWndNewParent"></param>
+    ''' <returns></returns>
+    <DllImport("user32.dll")>
+    Private Shared Function SetParent(ByVal hWndChild As IntPtr, ByVal hWndNewParent As IntPtr) As IntPtr
+    End Function
+
+    <DllImport("user32.dll", SetLastError:=True)>
+    Private Shared Function MoveWindow(ByVal hwnd As IntPtr, ByVal x As Integer, ByVal y As Integer, ByVal cx As Integer, ByVal cy As Integer, ByVal repaint As Boolean) As Boolean
+    End Function
+
 
     Private ltThread As Thread
     Private ltSplashThread As Thread
@@ -388,163 +404,163 @@ ConfigurationOK:
                 If My.Settings.UseClientServer _
                 And My.Settings.RequireLoginAtStartup _
                 And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
-                        If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                    If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
 
-                            '------------------------------------------------------------------
-                            'LogIn from populates prApplication.User
-                            Call Me.logInUser(prApplication.User)
-                        Else
-                            Me.Close()
-                            Me.Dispose()
-                        End If
-                    ElseIf My.Settings.RequireLoginAtStartup _
-                And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
-                        If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                        '------------------------------------------------------------------
+                        'LogIn from populates prApplication.User
+                        Call Me.logInUser(prApplication.User)
+                    Else
+                        Me.Close()
+                        Me.Dispose()
+                    End If
+                ElseIf My.Settings.RequireLoginAtStartup _
+            And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
+                    If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
 
-                            '------------------------------------------------------------------
-                            'LogIn from populates prApplication.User
-                            Call Me.logInUser(prApplication.User)
-                        Else
-                            Me.Close()
-                            Me.Dispose()
-                        End If
+                        '------------------------------------------------------------------
+                        'LogIn from populates prApplication.User
+                        Call Me.logInUser(prApplication.User)
+                    Else
+                        Me.Close()
+                        Me.Dispose()
+                    End If
+                End If
+
+                If My.Settings.UseClientServer = True Then
+                    If My.Settings.InitialiseClient Then
+                        Call Me.InitializeClient() 'Connects to the Boston Server Host
                     End If
 
-                    If My.Settings.UseClientServer = True Then
-                        If My.Settings.InitialiseClient Then
-                            Call Me.InitializeClient() 'Connects to the Boston Server Host
-                        End If
-
-                        If prUser IsNot Nothing Then
-                            Call Me.logInUser(prUser)
-                        End If
+                    If prUser IsNot Nothing Then
+                        Call Me.logInUser(prUser)
                     End If
+                End If
 #End Region
 
-                    Call Me.SetupForm()
+                Call Me.SetupForm()
 
-                    '=======================================================================================================================
-                    '-----------------------
-                    'Load the Startup Page
-                    '-----------------------
-                    Dim lrChildForm As New frmStartup
-                    lrChildForm.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
-                    Me.zfrmStartup = lrChildForm
+                '=======================================================================================================================
+                '-----------------------
+                'Load the Startup Page
+                '-----------------------
+                Dim lrChildForm As New frmStartup
+                lrChildForm.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+                Me.zfrmStartup = lrChildForm
 
-                    If pbLogStartup Then
-                        prApplication.ThrowErrorMessage("Successfully loaded the Startup page", pcenumErrorType.Information)
-                    End If
-                    '=======================================================================================================================
+                If pbLogStartup Then
+                    prApplication.ThrowErrorMessage("Successfully loaded the Startup page", pcenumErrorType.Information)
+                End If
+                '=======================================================================================================================
 
-                    If pbLogStartup Then
-                        prApplication.ThrowErrorMessage("Finished loading the Main form.", pcenumErrorType.Information)
-                    End If
+                If pbLogStartup Then
+                    prApplication.ThrowErrorMessage("Finished loading the Main form.", pcenumErrorType.Information)
+                End If
 
-                    Cursor.Current = Cursors.Default
+                Cursor.Current = Cursors.Default
 
-                    While (Not prApplication.CMML.Core.Loaded) And Not My.Settings.ModelingUseThreadedXMLPageLoading
-                        'Stay here until threading is done.
-                    End While
+                While (Not prApplication.CMML.Core.Loaded) And Not My.Settings.ModelingUseThreadedXMLPageLoading
+                    'Stay here until threading is done.
+                End While
 
-                    '----------------------------------------------------------------------------
-                    'Housekeeping
-                    '-------------------------
-                    Dim lrReferenceTable As New ReferenceTable(34, "Registration")
-                    TableReferenceTable.CreateReferenceTableIfNotExists(lrReferenceTable)
-                    Dim lrReferenceField As New tReferenceField(34, 1, "ApplicationKey", 3, 50, False, False)
-                    tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
-                    lrReferenceField = New tReferenceField(34, 2, "RegistrationKey", 3, 50, False, False)
-                    tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
-                    Dim lrDefaultReferenceField As New tReferenceField(34, 3, "DefaultRegistrationKey", 3, 50, False, False)
-                    tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
+                '----------------------------------------------------------------------------
+                'Housekeeping
+                '-------------------------
+                Dim lrReferenceTable As New ReferenceTable(34, "Registration")
+                TableReferenceTable.CreateReferenceTableIfNotExists(lrReferenceTable)
+                Dim lrReferenceField As New tReferenceField(34, 1, "ApplicationKey", 3, 50, False, False)
+                tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
+                lrReferenceField = New tReferenceField(34, 2, "RegistrationKey", 3, 50, False, False)
+                tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
+                Dim lrDefaultReferenceField As New tReferenceField(34, 3, "DefaultRegistrationKey", 3, 50, False, False)
+                tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
 
-                    'Set the ApplicationKey
-                    Dim lrReferenceFieldValue As New tReferenceFieldValue(34, 1, 1, publicRegistration.GenerateApplicationKey)
-                    Call TableReferenceFieldValue.CreateReferenceFieldValueIfNotExists(lrReferenceFieldValue)
-                    If lbFirstRun Then
-                        TableReferenceFieldValue.UpdateReferenceFieldValue(lrReferenceFieldValue)
-                    End If
+                'Set the ApplicationKey
+                Dim lrReferenceFieldValue As New tReferenceFieldValue(34, 1, 1, publicRegistration.GenerateApplicationKey)
+                Call TableReferenceFieldValue.CreateReferenceFieldValueIfNotExists(lrReferenceFieldValue)
+                If lbFirstRun Then
+                    TableReferenceFieldValue.UpdateReferenceFieldValue(lrReferenceFieldValue)
+                End If
 
-                    '----------------------------------------------------------------------------
-                    'Registration Checking
-                    '-------------------------
+                '----------------------------------------------------------------------------
+                'Registration Checking
+                '-------------------------
 #Region "Registration Checking"
-                    Dim lbCanCheckForUpdates As Boolean = False
-                    Try
-                        Dim lsApplicationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 1, True)
-                        Dim lsRegistrationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 2, True)
-                        Dim lsDefaultRegistrationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 3, True)
+                Dim lbCanCheckForUpdates As Boolean = False
+                Try
+                    Dim lsApplicationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 1, True)
+                    Dim lsRegistrationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 2, True)
+                    Dim lsDefaultRegistrationKey As String = TableReferenceFieldValue.GetReferenceFieldValue(34, 3, True)
 
-                        If lsApplicationKey = "a" Then 'Initial value, but should have been covered by FirstRun (lbFirstRun)
-                            'No Applicatipon Key exists in the database. Create one.
-                            lsApplicationKey = publicRegistration.GenerateApplicationKey
-                            lrReferenceFieldValue = New tReferenceFieldValue(34, 1, 1, lsApplicationKey)
-                            Call lrReferenceFieldValue.Save()
-                        End If
+                    If lsApplicationKey = "a" Then 'Initial value, but should have been covered by FirstRun (lbFirstRun)
+                        'No Applicatipon Key exists in the database. Create one.
+                        lsApplicationKey = publicRegistration.GenerateApplicationKey
+                        lrReferenceFieldValue = New tReferenceFieldValue(34, 1, 1, lsApplicationKey)
+                        Call lrReferenceFieldValue.Save()
+                    End If
 
-                        If lsRegistrationKey = "" Then
-                            'No Registration Key exists in the database. Create one. Product won't be registered.
-                            lsRegistrationKey = "1A66-067A-B9A2-5D7A-CE1F-0A38-EAB6"
-                            lrReferenceFieldValue = New tReferenceFieldValue(34, 2, 1, lsRegistrationKey)
-                            Call lrReferenceFieldValue.Save()
-                        End If
+                    If lsRegistrationKey = "" Then
+                        'No Registration Key exists in the database. Create one. Product won't be registered.
+                        lsRegistrationKey = "1A66-067A-B9A2-5D7A-CE1F-0A38-EAB6"
+                        lrReferenceFieldValue = New tReferenceFieldValue(34, 2, 1, lsRegistrationKey)
+                        Call lrReferenceFieldValue.Save()
+                    End If
 
-                        If lsDefaultRegistrationKey = "" Then
-                            'No Default Registration Key exists in the database. Create one. Product won't be registered.                        
-                            lrReferenceFieldValue = New tReferenceFieldValue(34, 3, 1, lsRegistrationKey)
-                            Call lrReferenceFieldValue.Save()
-                        End If
+                    If lsDefaultRegistrationKey = "" Then
+                        'No Default Registration Key exists in the database. Create one. Product won't be registered.                        
+                        lrReferenceFieldValue = New tReferenceFieldValue(34, 3, 1, lsRegistrationKey)
+                        Call lrReferenceFieldValue.Save()
+                    End If
 
-                        Dim lrRegistrationResult As New tRegistrationResult
+                    Dim lrRegistrationResult As New tRegistrationResult
 
-                        If prSoftwareCategory = pcenumSoftwareCategory.Student Then
-                            GoTo SkipRegistrationChecking
-                        End If
+                    If prSoftwareCategory = pcenumSoftwareCategory.Student Then
+                        GoTo SkipRegistrationChecking
+                    End If
 
-                        If publicRegistration.CheckRegistration(lsApplicationKey, lsRegistrationKey, lrRegistrationResult, lsDefaultRegistrationKey) Then
-                            If lrRegistrationResult.SubscriptionType = "Subscription" Then lbCanCheckForUpdates = True
-                        Else
-                            'The Trial must be up, or new install of Boston.
-                            lsMessage = "Please contact FactEngine to obtain a registration key for Boston."
-                            lsMessage.AppendDoubleLineBreak("Either")
-                            lsMessage.AppendLine("1. You have installed a New copy of Boston Professional;")
-                            lsMessage.AppendLine("2. Your trial of Boston has expired; Or")
-                            lsMessage.AppendLine("3. Your registration key Is invalid.")
-                            MsgBox(lsMessage)
+                    If publicRegistration.CheckRegistration(lsApplicationKey, lsRegistrationKey, lrRegistrationResult, lsDefaultRegistrationKey) Then
+                        If lrRegistrationResult.SubscriptionType = "Subscription" Then lbCanCheckForUpdates = True
+                    Else
+                        'The Trial must be up, or new install of Boston.
+                        lsMessage = "Please contact FactEngine to obtain a registration key for Boston."
+                        lsMessage.AppendDoubleLineBreak("Either")
+                        lsMessage.AppendLine("1. You have installed a New copy of Boston Professional;")
+                        lsMessage.AppendLine("2. Your trial of Boston has expired; Or")
+                        lsMessage.AppendLine("3. Your registration key Is invalid.")
+                        MsgBox(lsMessage)
 
-                            Dim lrRegistrationForm As New frmRegistration
-                            If Not lrRegistrationForm.ShowDialog() Then
-                                Call Me.Close()
-                                Exit Sub
-                            End If
-                        End If
-
-                        'Me.LabelRegistrationStatus.Text = lrRegistrationResult.SoftwareType & " " & lrRegistrationResult.SubscriptionType & lrRegistrationResult.RegisteredToDate
-                    Catch ex As Exception
                         Dim lrRegistrationForm As New frmRegistration
-                        Call lrRegistrationForm.ShowDialog()
-                        Call Me.Close()
-                        Exit Sub
-                    End Try
+                        If Not lrRegistrationForm.ShowDialog() Then
+                            Call Me.Close()
+                            Exit Sub
+                        End If
+                    End If
+
+                    'Me.LabelRegistrationStatus.Text = lrRegistrationResult.SoftwareType & " " & lrRegistrationResult.SubscriptionType & lrRegistrationResult.RegisteredToDate
+                Catch ex As Exception
+                    Dim lrRegistrationForm As New frmRegistration
+                    Call lrRegistrationForm.ShowDialog()
+                    Call Me.Close()
+                    Exit Sub
+                End Try
 #End Region
 
 SkipRegistrationChecking:
-                    '-----------------------------------------------------------
-                    'Automatic Update Checker
-                    '-------------------------
-                    If My.Settings.UseAutoUpdateChecker And lbCanCheckForUpdates Then
-                        AutoUpdater.InstalledVersion = New Version(psAssemblyFileVersionNumber)
-                        AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
-                    End If
+                '-----------------------------------------------------------
+                'Automatic Update Checker
+                '-------------------------
+                If My.Settings.UseAutoUpdateChecker And lbCanCheckForUpdates Then
+                    AutoUpdater.InstalledVersion = New Version(psAssemblyFileVersionNumber)
+                    AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
+                End If
 
-                Else
-                    '-------------------------------------------------------------------
-                    'The database wasn't opened successfully, so close the application.
-                    '-------------------------------------------------------------------
+            Else
+                '-------------------------------------------------------------------
+                'The database wasn't opened successfully, so close the application.
+                '-------------------------------------------------------------------
 
-                    'Call Me.LoadCRUDRichmondConfiguration()
+                'Call Me.LoadCRUDRichmondConfiguration()
 
-                    Me.Close()
+                Me.Close()
                 Me.Dispose()
             End If
 
@@ -1528,6 +1544,60 @@ SkipRegistrationChecking:
 
     End Function
 
+    Public Function LoadToolboxDatabaseSchemaView(Optional abRefreshModelDictionary As Boolean = False,
+                                                  Optional ByRef arModelElement As FBM.ModelObject = Nothing) As frmToolboxDatabaseSchemaViewer
+
+        Dim child As New frmToolboxDatabaseSchemaViewer
+
+        Try
+            If prApplication.RightToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+                '-------------------------------------------------------------
+                'Form is already loaded. Bring it to the front of the ZOrder
+                '-------------------------------------------------------------            
+                child = prApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
+                Call child.Show()
+
+                If abRefreshModelDictionary Then
+                    Call child.SetupForm()
+                End If
+            Else
+                '----------------------------------------------
+                'Create a new instance of the ModelDictionary form.
+                '----------------------------------------------
+                If prApplication.RightToolboxForms.Count > 0 Then
+                    '----------------------------------------------------------------------------------------
+                    'Add the ErrorList form to the Panel of a form already loaded at the bottom of the Page
+                    '----------------------------------------------------------------------------------------                
+                    child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockRight)
+
+                Else
+                    '--------------------------------------------------
+                    'Add the ErrorList form to the bottom of the Page
+                    '--------------------------------------------------                
+                    child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockRight)
+                End If
+                prApplication.RightToolboxForms.Add(child)
+            End If
+
+            'If arModelElement IsNot Nothing Then
+            '    Call child.FindTreeNode(arModelElement.Id)
+            'End If
+
+            Return child
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
+
+    End Function
+
     Sub focusFactTypeReadingToolbox()
 
         Try
@@ -2132,6 +2202,39 @@ SkipRegistrationChecking:
         End If
 
     End Sub
+
+    ''' <summary>
+    ''' Loads the Jupyter Notebook toolbox.
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Function LoadjupyterNotebook() As frmToolboxJupyterForBoston
+
+        Dim child As New frmToolboxJupyterForBoston
+
+        Try
+            child.MdiParent = Me
+            child.Show(Me.DockPanel)
+
+            Dim p As Process = Process.Start(Boston.MyPath & "\Jupyter\JupiterNet.exe")
+            Threading.Thread.Sleep(5000)
+            p.WaitForInputIdle()
+            SetParent(p.MainWindowHandle, child.Panel.Handle)
+
+            MoveWindow(p.MainWindowHandle, 0, 0, Me.Width - 90, Me.Height, True)
+
+            Return Nothing
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
+
+    End Function
 
 
     ''' <summary>
@@ -5971,6 +6074,22 @@ SaveModel:
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
+    End Sub
+
+    Private Sub JupyterNotebookToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles JupyterNotebookToolStripMenuItem.Click
+
+        Try
+            Call Me.LoadjupyterNotebook()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
     End Sub
 
 End Class

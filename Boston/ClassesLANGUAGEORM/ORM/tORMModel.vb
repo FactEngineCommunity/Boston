@@ -1019,6 +1019,7 @@ Namespace FBM
                                         lrColumn.IsMandatory = True
                                     End If
 
+                                    lrColumn.ActiveRole.JoinsValueType.DataType = pcenumORMDataType.TextVariableLength
                                     lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                 End If
 

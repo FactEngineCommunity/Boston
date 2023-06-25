@@ -214,6 +214,12 @@
     <Reference Include="jollyday, Version=0.4.9.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Stanford.NLP.CoreNLP.4.5.0\lib\net461\jollyday.dll</HintPath>
     </Reference>
+    <Reference Include="JupiterNet">
+      <HintPath>..\Dependencies\JupiterNet.exe</HintPath>
+    </Reference>
+    <Reference Include="JupyterNetClient">
+      <HintPath>..\Dependencies\JupyterNetClient.dll</HintPath>
+    </Reference>
     <Reference Include="KuzuDB">
       <HintPath>..\Dependencies\KuzuDB.dll</HintPath>
     </Reference>
@@ -333,6 +339,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\PdfExport.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="protobuf-java-3.19.2, Version=3.19.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Stanford.NLP.CoreNLP.4.5.0\lib\net461\protobuf-java-3.19.2.dll</HintPath>
@@ -478,6 +485,7 @@
       <HintPath>..\Dependencies\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
     <Reference Include="WinFormAnimation, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\WinFormAnimation.dll</HintPath>
@@ -488,6 +496,9 @@
     </Reference>
     <Reference Include="xom, Version=1.3.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Stanford.NLP.CoreNLP.4.5.0\lib\net461\xom.dll</HintPath>
+    </Reference>
+    <Reference Include="ZeroMQ">
+      <HintPath>..\Dependencies\ZeroMQ.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -668,10 +679,10 @@
     <Compile Include="ClassesGeneral\ProjectUserDetails.vb">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ClassesGeneral\SearchTextbox\SearchTextbox.Designer.vb">
-      <DependentUpon>SearchTextbox.vb</DependentUpon>
+    <Compile Include="ClassesGeneral\SearchTextbox\CustomSearchTextbox.Designer.vb">
+      <DependentUpon>CustomSearchTextbox.vb</DependentUpon>
     </Compile>
-    <Compile Include="ClassesGeneral\SearchTextbox\SearchTextbox.vb">
+    <Compile Include="ClassesGeneral\SearchTextbox\CustomSearchTextbox.vb">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ClassesGeneral\tCommonApplicationData.vb" />
@@ -1714,6 +1725,18 @@
     <Compile Include="Forms\Toolboxes\frmAutoComplete.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxDatabaseSchemaViewer.Designer.vb">
+      <DependentUpon>frmToolboxDatabaseSchemaViewer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxDatabaseSchemaViewer.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxJupyterForBoston.Designer.vb">
+      <DependentUpon>frmToolboxJupyterForBoston.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxJupyterForBoston.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Toolboxes\frmToolboxAIPretrainingDataEditor.Designer.vb">
       <DependentUpon>frmToolboxAIPretrainingDataEditor.vb</DependentUpon>
     </Compile>
@@ -2256,8 +2279,8 @@
     <EmbeddedResource Include="ClassesGeneral\ProjectUserDetails.resx">
       <DependentUpon>ProjectUserDetails.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ClassesGeneral\SearchTextbox\SearchTextbox.resx">
-      <DependentUpon>SearchTextbox.vb</DependentUpon>
+    <EmbeddedResource Include="ClassesGeneral\SearchTextbox\CustomSearchTextbox.resx">
+      <DependentUpon>CustomSearchTextbox.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ClassesGeneral\tRichtextEditingControl.resx">
       <DependentUpon>tRichtextEditingControl.vb</DependentUpon>
@@ -2597,6 +2620,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxAIPretrainingDataEditor.resx">
       <DependentUpon>frmToolboxAIPretrainingDataEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxDatabaseSchemaViewer.resx">
+      <DependentUpon>frmToolboxDatabaseSchemaViewer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxJupyterForBoston.resx">
+      <DependentUpon>frmToolboxJupyterForBoston.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxTaxonomyTree.resx">
       <DependentUpon>frmToolboxTaxonomyTree.vb</DependentUpon>

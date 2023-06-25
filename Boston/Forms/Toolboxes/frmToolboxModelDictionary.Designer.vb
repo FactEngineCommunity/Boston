@@ -1,4 +1,6 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+﻿Imports Boston
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmToolboxModelDictionary
     Inherits WeifenLuo.WinFormsUI.Docking.DockContent
 
@@ -26,7 +28,6 @@ Partial Class frmToolboxModelDictionary
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxModelDictionary))
         Me.GroupBox_Main = New System.Windows.Forms.GroupBox()
-        Me.SearchTextbox1 = New SearchTextbox()
         Me.LabelPromptViewAs = New System.Windows.Forms.Label()
         Me.ComboBoxView = New System.Windows.Forms.ComboBox()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
@@ -54,6 +55,7 @@ Partial Class frmToolboxModelDictionary
         Me.ContextMenuStripGeneralConcept = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ConvertToEntityTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConvertToValueTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SearchTextbox = New CustomSearchTextbox()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStripMain.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -66,7 +68,7 @@ Partial Class frmToolboxModelDictionary
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox_Main.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-        Me.GroupBox_Main.Controls.Add(Me.SearchTextbox1)
+        Me.GroupBox_Main.Controls.Add(Me.SearchTextbox)
         Me.GroupBox_Main.Controls.Add(Me.LabelPromptViewAs)
         Me.GroupBox_Main.Controls.Add(Me.ComboBoxView)
         Me.GroupBox_Main.Controls.Add(Me.ButtonRefresh)
@@ -82,15 +84,6 @@ Partial Class frmToolboxModelDictionary
         Me.GroupBox_Main.TabIndex = 0
         Me.GroupBox_Main.TabStop = False
         Me.GroupBox_Main.Text = "Model Dictionary:"
-        '
-        'SearchTextbox1
-        '
-        Me.SearchTextbox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SearchTextbox1.Location = New System.Drawing.Point(6, 71)
-        Me.SearchTextbox1.Name = "SearchTextbox1"
-        Me.SearchTextbox1.Size = New System.Drawing.Size(351, 26)
-        Me.SearchTextbox1.TabIndex = 9
         '
         'LabelPromptViewAs
         '
@@ -323,6 +316,15 @@ Partial Class frmToolboxModelDictionary
         Me.ConvertToValueTypeToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
         Me.ConvertToValueTypeToolStripMenuItem.Text = "convert to &Value Type"
         '
+        'CustomSearchTextbox1
+        '
+        Me.SearchTextbox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.SearchTextbox.Location = New System.Drawing.Point(3, 71)
+        Me.SearchTextbox.Name = "CustomSearchTextbox1"
+        Me.SearchTextbox.Size = New System.Drawing.Size(357, 26)
+        Me.SearchTextbox.TabIndex = 9
+        '
         'frmToolboxModelDictionary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -344,6 +346,7 @@ Partial Class frmToolboxModelDictionary
         Me.PerformLayout()
 
     End Sub
+    Friend WithEvents SearchTextbox As CustomSearchTextbox
     Friend WithEvents GroupBox_Main As System.Windows.Forms.GroupBox
     Friend WithEvents TreeView1 As System.Windows.Forms.TreeView
     Friend WithEvents ImageList As System.Windows.Forms.ImageList
@@ -367,7 +370,6 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents LabelPromptViewAs As Label
     Friend WithEvents ComboBoxView As ComboBox
     Friend WithEvents ToolStripMenuItemMakeMDAModelElement As ToolStripMenuItem
-    Friend WithEvents SearchTextbox1 As SearchTextbox
     Friend WithEvents ContextMenuStripGeneralConcept As ContextMenuStrip
     Friend WithEvents ConvertToEntityTypeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ConvertToValueTypeToolStripMenuItem As ToolStripMenuItem

@@ -1,4 +1,4 @@
-﻿Public Class SearchTextbox
+﻿Public Class CustomSearchTextbox
 
     Public Event InitiateSearch(ByVal asSearchString As String)
     Public Event TextBoxCleared()

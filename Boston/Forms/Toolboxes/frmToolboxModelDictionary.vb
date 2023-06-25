@@ -1642,10 +1642,10 @@ Public Class frmToolboxModelDictionary
                     Case Is = GetType(FBM.EntityType),
                               GetType(FBM.ValueType),
                               GetType(FBM.FactType)
-                        Me.SearchTextbox1.TextBox.Text = arModelElement.Id
+                        Me.SearchTextbox.TextBox.Text = arModelElement.Id
                         asSearchString = arModelElement.Id
                     Case Is = GetType(RDS.Table)
-                        Me.SearchTextbox1.TextBox.Text = arModelElement.Name
+                        Me.SearchTextbox.TextBox.Text = arModelElement.Name
                         asSearchString = arModelElement.Name
                     Case Else
                         asSearchString = Nothing
@@ -1707,7 +1707,7 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub SearchTextbox1_InitiateSearch(asSearchString As String) Handles SearchTextbox1.InitiateSearch
+    Private Sub SearchTextbox1_InitiateSearch(asSearchString As String) Handles SearchTextbox.InitiateSearch
 
         Try
             Call Me.LoadTree(asSearchString)
@@ -1779,7 +1779,7 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub SearchTextbox1_TextBoxCleared() Handles SearchTextbox1.TextBoxCleared
+    Private Sub SearchTextbox1_TextBoxCleared() Handles SearchTextbox.TextBoxCleared
 
         Try
             Call Me.LoadTree()

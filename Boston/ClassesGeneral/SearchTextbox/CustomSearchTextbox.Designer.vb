@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class SearchTextbox
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+Partial Public Class CustomSearchTextbox
     Inherits System.Windows.Forms.UserControl
 
     'UserControl overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class SearchTextbox
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.TextBox = New System.Windows.Forms.TextBox()
         Me.ButtonClear = New System.Windows.Forms.Button()
@@ -56,14 +56,14 @@ Partial Class SearchTextbox
         Me.Button1.TabIndex = 1
         Me.Button1.UseVisualStyleBackColor = True
         '
-        'SearchTextbox
+        'CustomSearchTextbox
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.Controls.Add(Me.ButtonClear)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.TextBox)
-        Me.Name = "SearchTextbox"
+        Me.Name = "CustomSearchTextbox"
         Me.Size = New System.Drawing.Size(260, 26)
         Me.ResumeLayout(False)
         Me.PerformLayout()

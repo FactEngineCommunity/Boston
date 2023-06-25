@@ -1041,6 +1041,10 @@ Skip: 'Because is not a ValueType
 
     End Sub
 
+
+    ''' <summary>
+    ''' Used Predominantly with ODBC Connections where can retrieve the Data Types of a Database.
+    ''' </summary>
     Private Sub GetDataTypes()
 
         Try
