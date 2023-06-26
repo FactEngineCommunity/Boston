@@ -730,7 +730,7 @@ Public Class frmToolboxTableData
             lsColumnName = Me.mrRecordset.Columns(liIndex)
             If Me.mrRecordset.Facts(0).FactType.RoleGroup(0).Name.Contains(".") Then
                 If Me.mrTable Is Nothing Then
-                    lsColumnName = "dummytable." & lsColumnName
+                    lsColumnName = Me.mrRecordset.Facts(e.RowIndex).FactType.RoleGroup(liIndex).Name
                 End If
             End If
             Dim lsOldValue = Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).Data 'Was e.ColumnIndex
@@ -741,7 +741,7 @@ Public Class frmToolboxTableData
 
             '------------------------------------------------
             'Get a clone of the Fact for PGSRelations
-            Dim lrDestinationalFact As FBM.Fact = Me.mrRecordset.Facts(e.RowIndex).Clone(New FBM.FactType(Me.mrModel, "DummyFactType", True), True)
+            Dim lrOriginalFact As FBM.Fact = Me.mrRecordset.Facts(e.RowIndex).Clone(New FBM.FactType(Me.mrModel, "DummyFactType", True), True)
 
             '==========================================================================================
             'Update the FactData for the Fact
@@ -752,7 +752,7 @@ Public Class frmToolboxTableData
             'No need to continue if is new Record/Row.
             If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
 
-            If Me.mrRDSRelation Is Nothing And Not Me.mrTable.isPGSRelation Then
+            If Me.mrRDSRelation Is Nothing AndAlso Me.mrTable IsNot Nothing AndAlso Not Me.mrTable.isPGSRelation Then
 #Region "Table - Straight/Standard Table"
                 '---------------------------------------------
                 'Straight Table. I.e. mrTable isnot Nothing.
@@ -797,7 +797,7 @@ Public Class frmToolboxTableData
                     Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
                 End If
 #End Region
-            ElseIf Me.mrTable.isPGSRelation Then
+            ElseIf Me.mrTable IsNot Nothing AndAlso Me.mrTable.isPGSRelation Then
 #Region "PGS Relation - Property Graph Schema Relation Table, as opposed Foreign Key Relationship."
                 'Special handling of a PGS Relation, especially if is a Neo4j database
 
@@ -832,7 +832,7 @@ Public Class frmToolboxTableData
                     lsMatchClause &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
 
                     lsQuery.AppendString(lsMatchClause)
-                    Dim lsDeleteWhereClause = String.Format(lsWhereClause, lrDestinationalFact.Data(0).Data, lrDestinationalFact.Data(1).Data)
+                    Dim lsDeleteWhereClause = String.Format(lsWhereClause, lrOriginalFact.Data(0).Data, lrOriginalFact.Data(1).Data)
                     lsQuery.AppendLine(lsDeleteWhereClause)
 
                     '==DELETE======================================
@@ -869,78 +869,129 @@ Public Class frmToolboxTableData
                 'RDS Relation
                 '20230523-VM-I don't understand this code. Need to look at it more.
                 '  E.g. Why would e.ColumnIndex have to be 1?
-                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.NewValue
+                Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).Data = Me.NewValue '20230627-VM-Was: Me.mrRecordset.Columns(e.ColumnIndex)
+                Me.mrRecordset.Facts(e.RowIndex)(lsColumnName).isDirty = True
 
-                If e.ColumnIndex = 1 Then
+                'Rework this code for Neo4j/Kuzu to Delete the Previous Edge and Add the New Edge.
+                Select Case Me.mrModel.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.Neo4j,
+                              pcenumDatabaseType.KuzuDB
 
-                    Dim lsDatabaseQuery As String = ""
+                        Dim lrRDSRelation As RDS.Relation = Me.mrRDSRelation
+                        Dim lrFact As FBM.Fact = Me.mrRecordset.Facts(e.RowIndex)
+                        Dim lsWrapper As String = ""
 
-                    Dim larPKColumn As List(Of RDS.Column)
+                        Dim lsSQLQuery = "MATCH "
+                        lsSQLQuery &= "(" & LCase(lrRDSRelation.OriginTable.Name) & ":" & lrRDSRelation.OriginTable.Name & ")"
+                        lsSQLQuery &= "-[rl:" & Me.mrRDSRelation.ResponsibleFactType.DBName & "]->"
+                        lsSQLQuery &= "(" & LCase(lrRDSRelation.DestinationTable.Name) & ":" & lrRDSRelation.DestinationTable.Name & ")"
+                        Dim lrFromColumn As RDS.Column = lrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns(0)
+                        lsWrapper = Me.mrModel.DatabaseConnection.DataTypeWrapper(lrFromColumn.getMetamodelDataType)
+                        lsSQLQuery.AppendLine("WHERE " & lrRDSRelation.OriginTable.Name.LCase & "." & lrFromColumn.Name & " = " & lsWrapper & lrOriginalFact.Data(0).Data & lsWrapper)
+                        Dim lrToColumn As RDS.Column = lrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0)
+                        lsWrapper = Me.mrModel.DatabaseConnection.DataTypeWrapper(lrToColumn.getMetamodelDataType)
+                        lsSQLQuery.AppendLine("AND " & lrRDSRelation.DestinationTable.Name.LCase & "." & lrToColumn.Name & " = " & lsWrapper & lrOriginalFact.Data(1).Data & lsWrapper)
+                        lsSQLQuery.AppendLine("DELETE rl")
 
-                    Select Case Me.mrModel.TargetDatabaseType
-                        Case Is = pcenumDatabaseType.Neo4j,
-                                  pcenumDatabaseType.KuzuDB
+                        Dim lrRecordset = Me.mrModel.DatabaseConnection.GO(lsSQLQuery)
 
-                            larPKColumn = Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns
-                        Case Else
-                            larPKColumn = Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
-                    End Select
+                        If lrRecordset.ErrorReturned Then Throw New Exception(lrRecordset.ErrorString)
 
-                    If larPKColumn.Count = 0 Then
-                        lsMessage = "Please ensure that your table/node-type has a primary key/uniqueness constraint."
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
-                    End If
+                        lsSQLQuery = "MATCH (" & LCase(lrRDSRelation.OriginTable.Name) & ":" & lrRDSRelation.OriginTable.Name & ")"
+                        lsWrapper = Me.mrModel.DatabaseConnection.DataTypeWrapper(lrFromColumn.getMetamodelDataType)
+                        lsSQLQuery.AppendLine("WHERE " & lrRDSRelation.OriginTable.Name.LCase & "." & lrFromColumn.Name & " = " & lsWrapper & lrFact.Data(0).Data & lsWrapper)
+                        lsSQLQuery.AppendLine("MATCH (" & LCase(lrRDSRelation.DestinationTable.Name) & ":" & lrRDSRelation.DestinationTable.Name & ")")
+                        lsWrapper = Me.mrModel.DatabaseConnection.DataTypeWrapper(lrToColumn.getMetamodelDataType)
+                        lsSQLQuery.AppendLine("WHERE " & lrRDSRelation.DestinationTable.Name.LCase & "." & lrToColumn.Name & " = " & lsWrapper & lrFact.Data(1).Data & lsWrapper)
+                        lsSQLQuery.AppendLine("CREATE (" & lrRDSRelation.OriginTable.Name.LCase & ")" & "-[rl:" & Me.mrRDSRelation.ResponsibleFactType.DBName & "]->" & "(" & lrRDSRelation.DestinationTable.Name.LCase & ")")
 
-                    If Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns.Count = 1 Then
+                        lrRecordset = Me.mrModel.DatabaseConnection.GO(lsSQLQuery)
 
-                        lsDatabaseQuery = "SELECT "
-                        Dim liInd = 0
-                        For Each lrColumn In Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
-                            If liInd > 0 Then lsDatabaseQuery &= ","
-                            lsDatabaseQuery.AppendString(lrColumn.Table.DatabaseName & "." & lrColumn.Name)
-                            liInd += 1
-                        Next
-                        lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.DestinationTable.DatabaseName)
-                        lsDatabaseQuery.AppendLine("WHERE ")
-                        lsDatabaseQuery.AppendString(Me.mrRDSRelation.DestinationTable.DatabaseName & "." & Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).Name)
-                        lsDatabaseQuery.AppendString(" = ")
-                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
-                        lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(0)).Data))
-                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                        If lrRecordset.ErrorReturned Then Throw New Exception(lrRecordset.ErrorString)
+
+                    Case Else
+#Region "Case Other"
+                        If e.ColumnIndex = 1 Then
+
+                            Dim lsDatabaseQuery As String = ""
+
+                            Dim larPKColumn As List(Of RDS.Column)
+
+                            Select Case Me.mrModel.TargetDatabaseType
+                                Case Is = pcenumDatabaseType.Neo4j,
+                                          pcenumDatabaseType.KuzuDB
+
+                                    larPKColumn = Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns
+                                Case Else
+                                    larPKColumn = Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
+                            End Select
+
+                            If larPKColumn.Count = 0 Then
+                                lsMessage = "Please ensure that your table/node-type has a primary key/uniqueness constraint."
+                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
+                            End If
+
+                            If Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns.Count = 1 Then
+
+                                lsDatabaseQuery = "SELECT "
+                                Dim liInd = 0
+                                For Each lrColumn In Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
+                                    If liInd > 0 Then lsDatabaseQuery &= ","
+                                    lsDatabaseQuery.AppendString(lrColumn.Table.DatabaseName & "." & lrColumn.Name)
+                                    liInd += 1
+                                Next
+                                lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.DestinationTable.DatabaseName)
+                                lsDatabaseQuery.AppendLine("WHERE ")
+                                lsDatabaseQuery.AppendString(Me.mrRDSRelation.DestinationTable.DatabaseName & "." & Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).Name)
+                                lsDatabaseQuery.AppendString(" = ")
+                                lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                                lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(0)).Data))
+                                lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
 
 
-                        Dim lsValue As String = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns(0).Name).Data
+                                Dim lsValue As String = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns(0).Name).Data
 
-                        larPKColumn(0).TemporaryData = lsValue
-                    End If
+                                larPKColumn(0).TemporaryData = lsValue
+                            End If
 
-                    If Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns.Count = 1 Then
+                            If Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns.Count = 1 Then
 
-                        lsDatabaseQuery = "SELECT "
-                        Dim liInd = 0
-                        For Each lrColumn In Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
-                            If liInd > 0 Then lsDatabaseQuery &= ","
-                            lsDatabaseQuery.AppendString(lrColumn.Table.DatabaseName & "." & lrColumn.Name)
-                            liInd += 1
-                        Next
-                        lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.DestinationTable.DatabaseName)
-                        lsDatabaseQuery.AppendLine("WHERE ")
-                        lsDatabaseQuery.AppendString(Me.mrRDSRelation.DestinationTable.DatabaseName & "." & Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).Name)
-                        lsDatabaseQuery.AppendString(" = ")
-                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
-                        lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.NewValue))
-                        lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
-                    End If
+                                lsDatabaseQuery = "SELECT "
+                                Dim liInd = 0
+                                For Each lrColumn In Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns
+                                    If liInd > 0 Then lsDatabaseQuery &= ","
+                                    lsDatabaseQuery.AppendString(lrColumn.Table.DatabaseName & "." & lrColumn.Name)
+                                    liInd += 1
+                                Next
+                                lsDatabaseQuery.AppendLine("FROM " & Me.mrRDSRelation.DestinationTable.DatabaseName)
+                                lsDatabaseQuery.AppendLine("WHERE ")
+                                lsDatabaseQuery.AppendString(Me.mrRDSRelation.DestinationTable.DatabaseName & "." & Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).Name)
+                                lsDatabaseQuery.AppendString(" = ")
+                                lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                                lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.NewValue))
+                                lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
+                            End If
 
-                    Dim lsNewValue = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns(0).Name).Data
+                            Dim lsNewValue = Me.mrModel.DatabaseConnection.GO(lsDatabaseQuery).Facts(0)(Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns(0).Name).Data
 
-                    Dim lrRecordset = Me.mrModel.DatabaseConnection.UpdateAttributeValue(Me.mrRDSRelation.DestinationTable.DatabaseName,
-                                                                                         Me.mrRDSRelation.DestinationColumns(0),
-                                                                                         lsNewValue,
-                                                                                         larPKColumn)
-                End If
+                            Dim lrRecordset = Me.mrModel.DatabaseConnection.UpdateAttributeValue(Me.mrRDSRelation.DestinationTable.DatabaseName,
+                                                                                                 Me.mrRDSRelation.DestinationColumns(0),
+                                                                                                 lsNewValue,
+                                                                                                 larPKColumn)
+                        End If
+#End Region
+                End Select
 #End Region
             End If
+
+            BeginInvoke(Sub()
+                            ' Create a new TextBox cell and set its value
+                            Dim textBoxCell As New DataGridViewTextBoxCell()
+                            textBoxCell.Value = Me.NewValue
+
+                            ' Replace the ComboBox cell with the TextBox cell
+                            Me.AdvancedDataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex) = textBoxCell
+                        End Sub)
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
