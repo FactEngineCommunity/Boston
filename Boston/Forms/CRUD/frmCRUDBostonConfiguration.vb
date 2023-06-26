@@ -699,6 +699,8 @@ TestConnectionString:
                             Call TableReferenceFieldValue.AddReferenceFieldValue(lrReferenceFieldValue, True)
                         Next
                     Next
+
+                    prApplication.ThrowErrorMessage("Configuration loaded successfully. Reference Table Name: " & lrReferenceTable.Name, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
                 End If
 
             End If

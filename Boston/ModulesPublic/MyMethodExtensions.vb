@@ -234,6 +234,12 @@ Module MyMethodExtensions
     End Function
 
     <Extension()>
+    Public Function GetEnumValue(Of TEnum)(ByVal value As Integer) As TEnum
+
+        Return CType(System.Enum.ToObject(GetType(TEnum), value), TEnum)
+    End Function
+
+    <Extension()>
     Public Function DescriptionAttr(Of T)(ByVal source As T) As String
         Dim fi As FieldInfo = source.[GetType]().GetField(source.ToString())
         Dim attributes As DescriptionAttribute() = CType(fi.GetCustomAttributes(GetType(DescriptionAttribute), False), DescriptionAttribute())

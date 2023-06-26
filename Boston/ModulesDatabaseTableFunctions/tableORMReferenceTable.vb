@@ -187,7 +187,7 @@ Namespace TableReferenceTable
 
         End Sub
 
-        Public Sub UpSert(referenceTableId As Integer, aoObject As Object, aarKeyFields() As Object)
+        Public Sub UpSert(aiReferenceTableId As Integer, aoObject As Object, aarKeyFields() As Object)
 
             Try
                 Dim larKeyValuePairs() As Object = {}
@@ -202,7 +202,8 @@ Namespace TableReferenceTable
 
                     Dim fieldName As String = propertyInfo.Name
                     Dim value As Object = propertyInfo.GetValue(aoObject)
-                    Dim liFieldId = tableReferenceField.GetReferenceTableFieldIdByLabel(referenceTableId, fieldName)
+                    Dim liFieldId = tableReferenceField.GetReferenceTableFieldIdByLabel(aiReferenceTableId, fieldName, True)
+
                     Dim lbIsKey As Boolean = aarKeyFields.Where(Function(x) x.FieldName = fieldName).Count > 0
 
                     Dim lrFieldKeyValue = New With {.FieldId = liFieldId, .FieldName = fieldName, .IsKey = lbIsKey, .Value = value}
@@ -211,14 +212,14 @@ Namespace TableReferenceTable
                 Next
 
                 ' Check if the virtual row already exists based on the key fields
-                Dim larObject = TableReferenceFieldValue.GetReferenceFieldValueTuples(referenceTableId, Nothing,, aarKeyFields)
+                Dim larObject = TableReferenceFieldValue.GetReferenceFieldValueTuples(aiReferenceTableId, Nothing,, aarKeyFields)
                 If larObject.Count = 0 Then
                     ' Insert the reference_field_value rows to represent the virtual row
-                    InsertVirtualRow(referenceTableId, larKeyValuePairs)
+                    InsertVirtualRow(aiReferenceTableId, larKeyValuePairs)
                 Else
                     larKeyValuePairs = larKeyValuePairs.Where(Function(x) x.IsKey = False).ToArray
                     For Each lrKeyValue In larKeyValuePairs
-                        Dim lrReferenceFieldValue = New tReferenceFieldValue(referenceTableId, lrKeyValue.FieldId, larObject(0).row_id, lrKeyValue.Value)
+                        Dim lrReferenceFieldValue = New tReferenceFieldValue(aiReferenceTableId, lrKeyValue.FieldId, larObject(0).row_id, lrKeyValue.Value)
                         Call TableReferenceFieldValue.UpdateReferenceFieldValue(lrReferenceFieldValue)
                     Next
                 End If
@@ -228,6 +229,7 @@ Namespace TableReferenceTable
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage.AppendDoubleLineBreak("Contact FactEngine. ReferenceTable with Id, " & aiReferenceTableId & ", may not be configured in your database.")
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try

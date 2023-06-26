@@ -222,29 +222,52 @@ Module tableReferenceField
     End Function
 
 
-    Function GetReferenceTableFieldIdByLabel(ByVal aiReferenceTableId As Integer, ByVal as_reference_field_label As String) As Integer
+    Function GetReferenceTableFieldIdByLabel(ByVal aiReferenceTableId As Integer,
+                                             ByVal asReferenceFieldLabel As String,
+                                             Optional ByVal abThrowErrorBackUpChain As Boolean = False) As Integer
 
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New RecordsetProxy
+        Dim lsMessage As String
 
-        lREcordset.ActiveConnection = pdbConnection
-        lREcordset.CursorType = pcOpenStatic
+        Try
 
-        lsSQLQuery = "SELECT * "
-        lsSQLQuery &= "  FROM ReferenceField"
-        lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId
-        lsSQLQuery &= "   AND reference_field_label = '" & Trim(as_reference_field_label) & "'"
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic.GetEnumValue(Of ADODB.CursorTypeEnum)
 
-        lREcordset.Open(lsSQLQuery, , , pc_cmd_table)
+            lsSQLQuery = "SELECT * "
+            lsSQLQuery &= "  FROM ReferenceField"
+            lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId
+            lsSQLQuery &= "   AND reference_field_label = '" & Trim(asReferenceFieldLabel) & "'"
 
-        If Not lREcordset.EOF Then
-            GetReferenceTableFieldIdByLabel = lREcordset("reference_field_id").Value
-        Else
-            MsgBox("Error: get_reference_table_field_by_label: No row returned")
-        End If
+            lREcordset.Open(lsSQLQuery, , , pc_cmd_table.GetEnumValue(Of ADODB.LockTypeEnum))
 
-        lREcordset.Close()
-        lREcordset = Nothing
+            If Not lREcordset.EOF Then
+                GetReferenceTableFieldIdByLabel = lREcordset("reference_field_id").Value
+            Else
+                lsMessage = "Error: get_reference_table_field_by_label: No row returned"
+                lsMessage.AppendDoubleLineBreak("ReferenceTableId: " & aiReferenceTableId)
+                lsMessage.AppendDoubleLineBreak("ReferenceFieldLabel: " & asReferenceFieldLabel)
+                Throw New Exception(lsMessage)
+            End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+
+            If abThrowErrorBackUpChain Then
+                Throw New Exception(lsMessage)
+            Else
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End If
+
+            Return 0
+        Finally
+
+            lREcordset.Close()
+            lREcordset = Nothing
+        End Try
 
     End Function
 

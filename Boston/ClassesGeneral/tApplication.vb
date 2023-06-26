@@ -479,7 +479,8 @@ Public Class tApplication
                                       Optional ByVal abThrowtoMSGBox As Boolean = False,
                                       Optional ByRef aiMessageBoxButtons As MessageBoxButtons = MessageBoxButtons.OK,
                                       Optional ByVal abUseFlashCard As Boolean = False,
-                                      Optional arException As Exception = Nothing) As DialogResult
+                                      Optional arException As Exception = Nothing,
+                                      Optional abSuppressLogging As Boolean = False) As DialogResult
 
         Dim lsStackTrace As String = ""
         Dim lsErrorMessage As String = Nothing
@@ -665,7 +666,7 @@ Public Class tApplication
 #End Region
                     Case Is = pcenumErrorType.Warning
 #Region "Warning"
-                        Call prLogger.WriteToErrorLog(asErrorMessage, "", "Warning")
+                        If Not abSuppressLogging Then Call prLogger.WriteToErrorLog(asErrorMessage, "", "Warning")
 
                         If abThrowtoMSGBox Then
 
