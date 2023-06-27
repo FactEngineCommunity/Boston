@@ -78,9 +78,10 @@ Public Class frmCRUDModel
             End If
 
             '===Model Settings - From ReferenceFieldTable/Value=======================================================================
-            'UseNeo4jStyleEdgeLabels
+            'UseNeo4jStyleEdgeLabels etc
             Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked = Me.zrModel.UseNeo4jStyleEdgeLabels
-
+            Me.CheckBoxAutomaticallyCreateReferenceMode.Checked = Me.zrModel.AutomaticallyCreateReferenceMode
+            Me.TextBoxDefaultReferenceMode.Text = Trim(Me.zrModel.DefaultReferenceMode)
 
 
         Catch ex As Exception
@@ -122,12 +123,36 @@ Public Class frmCRUDModel
 #Region "UseNeo4jStyleEdgeLabels"
             Me.zrModel.UseNeo4jStyleEdgeLabels = Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked
 
-            Dim loSetting As New With {.ModelId = Me.zrModel.ModelId, .SettingName = "UseNeo4jStyleEdgeLabels", .Setting = Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked}
+            Dim loSetting As New With {.ModelId = Me.zrModel.ModelId, .SettingName = "UseNeo4jStyleEdgeLabels", .Setting = Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked.ToString}
             Dim larKeyFields() As Object = {}
             larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})
             larKeyFields.Add(New With {.FieldId = 2, .FieldName = "SettingName", .Value = "UseNeo4jStyleEdgeLabels"})
             Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
 #End Region
+
+            'AutomaticallyCreateReferenceMode
+#Region "AutomaticallyCreateReferenceMode"
+            Me.zrModel.AutomaticallyCreateReferenceMode = Me.CheckBoxAutomaticallyCreateReferenceMode.Checked
+
+            loSetting = New With {.ModelId = Me.zrModel.ModelId, .SettingName = "AutomaticallyCreateReferenceMode", .Setting = Me.CheckBoxAutomaticallyCreateReferenceMode.Checked.ToString}
+            larKeyFields = {}
+            larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})
+            larKeyFields.Add(New With {.FieldId = 2, .FieldName = "SettingName", .Value = "AutomaticallyCreateReferenceMode"})
+            Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
+#End Region
+
+            'DefaultReferenceMode
+#Region "DefaultReferenceMode"
+            Me.zrModel.DefaultReferenceMode = Trim(Me.TextBoxDefaultReferenceMode.Text)
+
+            loSetting = New With {.ModelId = Me.zrModel.ModelId, .SettingName = "DefaultReferenceMode", .Setting = Me.zrModel.DefaultReferenceMode}
+            larKeyFields = {}
+            larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})
+            larKeyFields.Add(New With {.FieldId = 2, .FieldName = "SettingName", .Value = "DefaultReferenceMode"})
+            Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
+#End Region
+
+            '================================================================================================
 
             Try
                 If Me.zrModel.TreeNode IsNot Nothing Then

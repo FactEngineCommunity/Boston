@@ -79,11 +79,14 @@ Partial Class frmCRUDModel
         Me.LabelPromptDatabaseName = New System.Windows.Forms.Label()
         Me.TextBoxServerName = New System.Windows.Forms.TextBox()
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
+        Me.GraphModeling = New System.Windows.Forms.TabPage()
+        Me.CheckBoxUseNeo4jStyleEdgeLabels = New System.Windows.Forms.CheckBox()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.GraphModeling = New System.Windows.Forms.TabPage()
-        Me.CheckBoxUseNeo4jStyleEdgeLabels = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxAutomaticallyCreateReferenceMode = New System.Windows.Forms.CheckBox()
+        Me.TextBoxDefaultReferenceMode = New System.Windows.Forms.TextBox()
+        Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -675,22 +678,11 @@ Partial Class frmCRUDModel
         Me.LabelPromptServerName.TabIndex = 0
         Me.LabelPromptServerName.Text = "Server Name:"
         '
-        'ButtonApply
-        '
-        Me.ButtonApply.Enabled = False
-        Me.ButtonApply.Location = New System.Drawing.Point(649, 89)
-        Me.ButtonApply.Name = "ButtonApply"
-        Me.ButtonApply.Size = New System.Drawing.Size(70, 23)
-        Me.ButtonApply.TabIndex = 10
-        Me.ButtonApply.Text = "&Apply"
-        Me.ButtonApply.UseVisualStyleBackColor = True
-        '
-        'BackgroundWorker
-        '
-        Me.BackgroundWorker.WorkerReportsProgress = True
-        '
         'GraphModeling
         '
+        Me.GraphModeling.Controls.Add(Me.TextBoxDefaultReferenceMode)
+        Me.GraphModeling.Controls.Add(Me.LabelPromptDefaultReferenceMode)
+        Me.GraphModeling.Controls.Add(Me.CheckBoxAutomaticallyCreateReferenceMode)
         Me.GraphModeling.Controls.Add(Me.CheckBoxUseNeo4jStyleEdgeLabels)
         Me.GraphModeling.Location = New System.Drawing.Point(4, 22)
         Me.GraphModeling.Name = "GraphModeling"
@@ -708,6 +700,46 @@ Partial Class frmCRUDModel
         Me.CheckBoxUseNeo4jStyleEdgeLabels.TabIndex = 0
         Me.CheckBoxUseNeo4jStyleEdgeLabels.Text = "Use Neo4j Style Edge Labels"
         Me.CheckBoxUseNeo4jStyleEdgeLabels.UseVisualStyleBackColor = True
+        '
+        'ButtonApply
+        '
+        Me.ButtonApply.Enabled = False
+        Me.ButtonApply.Location = New System.Drawing.Point(649, 89)
+        Me.ButtonApply.Name = "ButtonApply"
+        Me.ButtonApply.Size = New System.Drawing.Size(70, 23)
+        Me.ButtonApply.TabIndex = 10
+        Me.ButtonApply.Text = "&Apply"
+        Me.ButtonApply.UseVisualStyleBackColor = True
+        '
+        'BackgroundWorker
+        '
+        Me.BackgroundWorker.WorkerReportsProgress = True
+        '
+        'CheckBoxAutomaticallyCreateReferenceMode
+        '
+        Me.CheckBoxAutomaticallyCreateReferenceMode.AutoSize = True
+        Me.CheckBoxAutomaticallyCreateReferenceMode.Location = New System.Drawing.Point(20, 38)
+        Me.CheckBoxAutomaticallyCreateReferenceMode.Name = "CheckBoxAutomaticallyCreateReferenceMode"
+        Me.CheckBoxAutomaticallyCreateReferenceMode.Size = New System.Drawing.Size(204, 17)
+        Me.CheckBoxAutomaticallyCreateReferenceMode.TabIndex = 1
+        Me.CheckBoxAutomaticallyCreateReferenceMode.Text = "&Automatically create Reference Mode"
+        Me.CheckBoxAutomaticallyCreateReferenceMode.UseVisualStyleBackColor = True
+        '
+        'TextBoxDefaultReferenceMode
+        '
+        Me.TextBoxDefaultReferenceMode.Location = New System.Drawing.Point(251, 61)
+        Me.TextBoxDefaultReferenceMode.Name = "TextBoxDefaultReferenceMode"
+        Me.TextBoxDefaultReferenceMode.Size = New System.Drawing.Size(100, 20)
+        Me.TextBoxDefaultReferenceMode.TabIndex = 4
+        '
+        'LabelPromptDefaultReferenceMode
+        '
+        Me.LabelPromptDefaultReferenceMode.AutoSize = True
+        Me.LabelPromptDefaultReferenceMode.Location = New System.Drawing.Point(19, 64)
+        Me.LabelPromptDefaultReferenceMode.Name = "LabelPromptDefaultReferenceMode"
+        Me.LabelPromptDefaultReferenceMode.Size = New System.Drawing.Size(226, 13)
+        Me.LabelPromptDefaultReferenceMode.TabIndex = 3
+        Me.LabelPromptDefaultReferenceMode.Text = "Default Reference Mode for new Entity Types:"
         '
         'frmCRUDModel
         '
@@ -807,4 +839,7 @@ Partial Class frmCRUDModel
     Friend WithEvents LabelPromptProject As Label
     Friend WithEvents GraphModeling As TabPage
     Friend WithEvents CheckBoxUseNeo4jStyleEdgeLabels As CheckBox
+    Friend WithEvents CheckBoxAutomaticallyCreateReferenceMode As CheckBox
+    Friend WithEvents TextBoxDefaultReferenceMode As TextBox
+    Friend WithEvents LabelPromptDefaultReferenceMode As Label
 End Class

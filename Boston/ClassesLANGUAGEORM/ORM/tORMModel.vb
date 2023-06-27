@@ -440,6 +440,10 @@ Namespace FBM
         ''' </summary>
         Public UseNeo4jStyleEdgeLabels As Boolean
 
+        Public AutomaticallyCreateReferenceMode As Boolean = False
+
+        Public DefaultReferenceMode As String = ".Id"
+
         <NonSerialized()>
         Public Event Deleting()
         <NonSerialized()>
@@ -7031,15 +7035,34 @@ XMLDeserialisation:
         Public Sub GetReferenceTableModelSettings()
 
             Try
-                Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                Dim loSetting As Object = New System.Dynamic.ExpandoObject
+
+                'UseNeo4jStyleEdgeLabels
                 Dim larExpandoFields() As Object = {}
                 larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.ModelId})
                 larExpandoFields.Add(New With {.FieldName = "SettingName", .Value = "UseNeo4jStyleEdgeLabels"})
-                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loTransformation,, larExpandoFields)
-                If larTransformationTuples.Count > 0 Then
-                    Me.UseNeo4jStyleEdgeLabels = larTransformationTuples(0).Setting
+                Dim larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loSetting,, larExpandoFields)
+                If larSettingTuples.Count > 0 Then
+                    Me.UseNeo4jStyleEdgeLabels = larSettingTuples(0).Setting
                 End If
 
+                'AutomaticallyCreateReferenceMode
+                larExpandoFields = {}
+                larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.ModelId})
+                larExpandoFields.Add(New With {.FieldName = "SettingName", .Value = "AutomaticallyCreateReferenceMode"})
+                larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loSetting,, larExpandoFields)
+                If larSettingTuples.Count > 0 Then
+                    Me.AutomaticallyCreateReferenceMode = larSettingTuples(0).Setting
+                End If
+
+                'DefaultReferenceMode
+                larExpandoFields = {}
+                larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.ModelId})
+                larExpandoFields.Add(New With {.FieldName = "SettingName", .Value = "DefaultReferenceMode"})
+                larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loSetting,, larExpandoFields)
+                If larSettingTuples.Count > 0 Then
+                    Me.DefaultReferenceMode = larSettingTuples(0).Setting
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
