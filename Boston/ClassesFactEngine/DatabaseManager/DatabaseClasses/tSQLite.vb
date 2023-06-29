@@ -625,7 +625,11 @@ Namespace FactEngine
                         lsSQLCommand &= "[" & lrColumn.Name & "]"
                         liInd += 1
                     Next
-                    lsSQLCommand &= ")" & vbCrLf
+                    lsSQLCommand &= ")"
+                    If arTable.isPGSRelation Then
+                        lsSQLCommand &= " /* { Label:""" & arTable.DBName & """} */"
+                    End If
+                    lsSQLCommand &= vbCrLf
                 End If
                 'Unique Indexes
                 If arTable.Index.FindAll(Function(x) Not x.IsPrimaryKey).Count > 0 Then
@@ -658,7 +662,9 @@ Namespace FactEngine
                         liInd += 1
                     Next
                     lsSQLCommand &= ")"
-                    lsSQLCommand &= " ON DELETE CASCADE ON UPDATE CASCADE" & vbCrLf
+                    lsSQLCommand &= " ON DELETE CASCADE ON UPDATE CASCADE"
+                    lsSQLCommand &= " /* { Label:""" & lrRelation.ResponsibleFactType.DBName & """} */" & vbCrLf
+                    lsSQLCommand &= vbCrLf
                 Next
                 lsSQLCommand &= ")"
 
@@ -1100,6 +1106,10 @@ Namespace FactEngine
             Try
                 Dim lsSQL As String = "SELECT name FROM sqlite_master WHERE type='table'"
                 Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
+
+                If lrRecordset.ErrorReturned Then
+                    Throw New Exception(lrRecordset.ErrorString)
+                End If
 
                 Dim lsTableName As String
                 Dim lrTable As New RDS.Table

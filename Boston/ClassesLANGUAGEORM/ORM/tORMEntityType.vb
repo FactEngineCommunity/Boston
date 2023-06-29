@@ -2736,7 +2736,7 @@ FailsafeContinue:
         End Sub
 
         ''' <summary>
-        ''' 
+        ''' Sets the Reference Mode for the Entity Type.
         ''' </summary>
         ''' <param name="asReferenceMode">The ReferenceMode for the EntityType</param>
         ''' <param name="abSimpleAssignment">True if just setting the ReferenceMode without creating references or changing anything, else False</param>

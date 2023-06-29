@@ -918,8 +918,6 @@ Namespace FBM
             Return False
         End Function
 
-
-
         ''' <summary>
         ''' Creates a SubtypeRelationship for the Model Element.
         ''' </summary>

@@ -701,7 +701,6 @@ Namespace FBM
         '        lsMessage &= vbCrLf & vbCrLf & ex.Message
         '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,,ex)
         '    End Try
-
         'End Sub
 
         Private Sub update_from_concept() Handles _Concept.ConceptSymbolUpdated
