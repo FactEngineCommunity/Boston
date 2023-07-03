@@ -30,6 +30,8 @@ Public Class frmKeywordExtraction
 	Private lvwColumnSorter As ListViewColumnSorter
 	Public WithEvents mrModel As FBM.Model
 	Private mfrmFindDialog As New frmTextboxFind()
+	Private mbAbort As Boolean = False 'To abort a process
+	Dim mrOpenAIAPI As OpenAI_API.OpenAIAPI
 
 	Private wordNet As New WordNetEngine()
 
@@ -140,7 +142,7 @@ Public Class frmKeywordExtraction
 
 	Private Sub KeywordExtractionForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-		Call Me.SetupForm
+		Call Me.SetupForm()
 
 		' Create an instance of a ListView column sorter and assign it to the ListView control.
 		lvwColumnSorter = New ListViewColumnSorter()
@@ -153,16 +155,22 @@ Public Class frmKeywordExtraction
 		KeywordExtractionMaxButton.Enabled = False
 		KeywordExtractionNormalButton.Enabled = False
 		StatusLabel.Text = "Welcome to keyword extraction software, which is based on the entropy difference."
-		MessageBox.Show("The process of document keyword extraction:" & vbLf & vbLf & "Step 1: Open the document: Click ""Open"" button, select the target document. (File should be ""*. Txt "" file)" & vbLf & vbLf & "Step 2: Document standardization: Click ""Document Standardization"" button to remove the document punctuation, line breaks, and other useless symbols, and text replaces lowercase letters. (If the above operations have been completed, you can skip this step.)" & vbLf & vbLf & "Step 3: Stop word removal: Click ""Remove Stop"" button and follow the list of stop words, removing stop words in the document. (This step is optional, remove stop words, it may improve the accuracy of keyword extraction.)" & vbLf & vbLf & "Step 4: Here are two method to extract the keyword, you can choose one of them to finish the Keyword extraction work." & vbLf & "    4.1: Keyword extraction (normal entropy): Click ""Keyword Extraction (Entropy)"" button to extract keywords." & vbLf & "    4.2: Keyword extraction (maximum entropy): Click ""Keyword Extraction (Maximum Entropy)"" button and follow the maximum entropy method to extract keywords.", "Help")
+		'Help Text
+		'MessageBox.Show("The process of document keyword extraction:" & vbLf & vbLf & "Step 1: Open the document: Click ""Open"" button, select the target document. (File should be ""*. Txt "" file)" & vbLf & vbLf & "Step 2: Document standardization: Click ""Document Standardization"" button to remove the document punctuation, line breaks, and other useless symbols, and text replaces lowercase letters. (If the above operations have been completed, you can skip this step.)" & vbLf & vbLf & "Step 3: Stop word removal: Click ""Remove Stop"" button and follow the list of stop words, removing stop words in the document. (This step is optional, remove stop words, it may improve the accuracy of keyword extraction.)" & vbLf & vbLf & "Step 4: Here are two method to extract the keyword, you can choose one of them to finish the Keyword extraction work." & vbLf & "    4.1: Keyword extraction (normal entropy): Click ""Keyword Extraction (Entropy)"" button to extract keywords." & vbLf & "    4.2: Keyword extraction (maximum entropy): Click ""Keyword Extraction (Maximum Entropy)"" button and follow the maximum entropy method to extract keywords.", "Help")
 
 		'Wordnet
 		Call Me.wordNet.LoadFromDirectory(My.Settings.WordNetDictionaryEnglishPath)
 	End Sub
 
+
 	Private Sub SetupForm()
 
 		Try
 			Me.LabelModelName.Text = Me.mrModel.Name
+
+			'Status Tool Strip
+			Me.ToolStripStatusLabel.Text = ""
+			Me.ToolStripStatusLabelChunkCount.Text = ""
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -312,7 +320,7 @@ Public Class frmKeywordExtraction
 			PathTextBox.Text = path
 			Dim encode As Encoding = Encoding.GetEncoding("GB2312")
 			MyData.TheDoc = File.ReadAllText(path, encode)
-			TextRichTextBox.Text = MyData.TheDoc
+			RichTextBoxText.Text = MyData.TheDoc
 			SaveButton.Enabled = False
 			ResultListView.Items.Clear()
 			StandardizationButton.Enabled = True
@@ -457,7 +465,7 @@ Public Class frmKeywordExtraction
 		MessageBox.Show("The process of document keyword extraction:" & vbLf & vbLf & "Step 1: Open the document: Click ""Open"" button, select the target document. (File should be ""*. Txt "" file)" & vbLf & vbLf & "Step 2: Document standardization: Click ""Document Standardization"" button to remove the document punctuation, line breaks, and other useless symbols, and text replaces lowercase letters. (If the above operations have been completed, you can skip this step.)" & vbLf & vbLf & "Step 3: Stop word removal: Click ""Remove Stop"" button and follow the list of stop words, removing stop words in the document. (This step is optional, remove stop words, it may improve the accuracy of keyword extraction.)" & vbLf & vbLf & "Step 4: Here are two method to extract the keyword, you can choose one of them to finish the Keyword extraction work." & vbLf & "    4.1: Keyword extraction (normal entropy): Click ""Keyword Extraction (Entropy)"" button to extract keywords." & vbLf & "    4.2: Keyword extraction (maximum entropy): Click ""Keyword Extraction (Maximum Entropy)"" button and follow the maximum entropy method to extract keywords.", "Help")
 	End Sub
 
-	Private Sub TextRichTextBox_KeyPress(sender As Object, e As KeyPressEventArgs) Handles TextRichTextBox.KeyPress
+	Private Sub TextRichTextBox_KeyPress(sender As Object, e As KeyPressEventArgs) Handles RichTextBoxText.KeyPress
 		'e.Handled = True
 	End Sub
 
@@ -498,7 +506,7 @@ Public Class frmKeywordExtraction
 				PathTextBox.Text = ofd.FileName
 				Dim encode As Encoding = Encoding.GetEncoding("GB2312")
 				MyData.TheDoc = File.ReadAllText(ofd.FileName, encode)
-				TextRichTextBox.Text = MyData.TheDoc
+				RichTextBoxText.Text = MyData.TheDoc
 				SaveButton.Enabled = False
 				ResultListView.Items.Clear()
 				StandardizationButton.Enabled = True
@@ -507,27 +515,7 @@ Public Class frmKeywordExtraction
 				KeywordExtractionNormalButton.Enabled = True
 				StatusLabel.Text = ofd.FileName & " file open finish."
 
-#Region "Highlight existing ModelElements"
-				For Each lrModelElement In Me.mrModel.getModelObjects
-					Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.RoyalBlue)
-				Next
-
-				For Each lrModelElement In Me.mrModel.ValueType
-					Call Me.HighlightText(Me.TextRichTextBox, lrModelElement.Id, Color.DarkGreen)
-				Next
-
-				Dim lasValueConstraint = From ValueType In Me.mrModel.ValueType
-										 From ValueConstraint In ValueType.ValueConstraint
-										 Select ValueConstraint
-
-				For Each lsValueConstraint In lasValueConstraint
-					Call Me.HighlightText(Me.TextRichTextBox, lsValueConstraint, Color.Maroon)
-				Next
-
-				For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
-					Call Me.HighlightText(Me.TextRichTextBox, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
-				Next
-#End Region
+				Call Me.HighlightText()
 
 			End If
 
@@ -668,13 +656,13 @@ Public Class frmKeywordExtraction
 
 	End Sub
 
-	Private Sub TextRichTextBox_MouseDown(sender As Object, e As MouseEventArgs) Handles TextRichTextBox.MouseDown
+	Private Sub TextRichTextBox_MouseDown(sender As Object, e As MouseEventArgs) Handles RichTextBoxText.MouseDown
 
 		Try
-			If Me.TextRichTextBox.SelectionLength > 0 Then
-				Me.TextRichTextBox.ContextMenuStrip = Me.ContextMenuStripTextboxSelection
+			If Me.RichTextBoxText.SelectionLength > 0 Then
+				Me.RichTextBoxText.ContextMenuStrip = Me.ContextMenuStripTextboxSelection
 			Else
-				Me.TextRichTextBox.ContextMenuStrip = Me.ContextMenuStripTextbox
+				Me.RichTextBoxText.ContextMenuStrip = Me.ContextMenuStripTextbox
 			End If
 
 
@@ -693,10 +681,10 @@ Public Class frmKeywordExtraction
 
 		Try
 			If mfrmFindDialog Is Nothing Then mfrmFindDialog = New frmTextboxFind()
-			mfrmFindDialog.mRichTextBox = Me.TextRichTextBox
-			Me.TextRichTextBox.HideSelection = False
+			mfrmFindDialog.mRichTextBox = Me.RichTextBoxText
+			Me.RichTextBoxText.HideSelection = False
 			mfrmFindDialog.ShowDialog()
-			Me.TextRichTextBox.Focus()
+			Me.RichTextBoxText.Focus()
 		Catch ex As Exception
 			Dim lsMessage As String
 			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -775,9 +763,9 @@ Public Class frmKeywordExtraction
 		Dim lsMessage As String
 
 		Try
-			If Me.TextRichTextBox.SelectionLength > 0 Then
+			If Me.RichTextBoxText.SelectionLength > 0 Then
 
-				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
+				Dim lsModelElementName As String = Trim(Me.RichTextBoxText.SelectedText)
 
 				If Me.mrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
 					lsMessage = lsModelElementName & " is already in the model."
@@ -785,7 +773,7 @@ Public Class frmKeywordExtraction
 					Exit Sub
 				End If
 
-				Dim lsEntityTypeName As String = Trim(Me.TextRichTextBox.SelectedText)
+				Dim lsEntityTypeName As String = Trim(Me.RichTextBoxText.SelectedText)
 				lsEntityTypeName = Viev.Strings.MakeCapCamelCase(lsEntityTypeName)
 
 				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
@@ -808,7 +796,7 @@ Public Class frmKeywordExtraction
 
 				End If
 
-				Me.TextRichTextBox.SelectionColor = Color.RoyalBlue
+				Me.RichTextBoxText.SelectionColor = Color.RoyalBlue
 
 				'-------------------------------------------------------
 				'ORM Verbalisation
@@ -839,9 +827,9 @@ Public Class frmKeywordExtraction
 		Dim lsMessage As String
 
 		Try
-			If Me.TextRichTextBox.SelectionLength > 0 Then
+			If Me.RichTextBoxText.SelectionLength > 0 Then
 
-				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
+				Dim lsModelElementName As String = Trim(Me.RichTextBoxText.SelectedText)
 
 				If Me.mrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
 					lsMessage = lsModelElementName & " is already in the model."
@@ -851,7 +839,7 @@ Public Class frmKeywordExtraction
 
 
 
-				Dim lsValueTypeName As String = Trim(Me.TextRichTextBox.SelectedText)
+				Dim lsValueTypeName As String = Trim(Me.RichTextBoxText.SelectedText)
 				lsValueTypeName = Viev.Strings.MakeCapCamelCase(lsValueTypeName)
 
 				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
@@ -861,7 +849,7 @@ Public Class frmKeywordExtraction
 				Dim lrValueType As FBM.ValueType
 				lrValueType = Me.mrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
 
-				Me.TextRichTextBox.SelectionColor = Color.DarkSeaGreen
+				Me.RichTextBoxText.SelectionColor = Color.DarkSeaGreen
 
 				'-------------------------------------------------------
 				'ORM Verbalisation
@@ -891,9 +879,9 @@ Public Class frmKeywordExtraction
 		Dim lsMessage As String
 		Try
 
-			If Me.TextRichTextBox.SelectionLength > 0 Then
+			If Me.RichTextBoxText.SelectionLength > 0 Then
 
-				Dim lsModelElementName As String = Trim(Me.TextRichTextBox.SelectedText)
+				Dim lsModelElementName As String = Trim(Me.RichTextBoxText.SelectedText)
 
 				Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.mrModel, lsModelElementName, pcenumConceptType.GeneralConcept)
 
@@ -912,7 +900,7 @@ Public Class frmKeywordExtraction
 					lrDictionaryEntry = Me.mrModel.AddModelDictionaryEntry(lrDictionaryEntry, False, False,,,, True)
 				End If
 
-				Me.TextRichTextBox.SelectionColor = Color.DarkOrange
+				Me.RichTextBoxText.SelectionColor = Color.DarkOrange
 
 			End If
 
@@ -933,7 +921,7 @@ Public Class frmKeywordExtraction
 			sfd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
 			If sfd.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
 
-				System.IO.File.WriteAllText(sfd.FileName, Me.TextRichTextBox.Text)
+				System.IO.File.WriteAllText(sfd.FileName, Me.RichTextBoxText.Text)
 
 			End If
 
@@ -958,13 +946,13 @@ Public Class frmKeywordExtraction
 
 						Dim lrValueType As FBM.ValueType = arModelElement
 
-						Call Me.HighlightText(Me.TextRichTextBox, lrValueType.Id, Color.DarkGreen)
+						Call Me.HighlightText(Me.RichTextBoxText, lrValueType.Id, Color.DarkGreen)
 
 						Dim lasValueConstraint = From ValueConstraint In lrValueType.ValueConstraint
 												 Select ValueConstraint
 
 						For Each lsValueConstraint In lasValueConstraint
-							Call Me.HighlightText(Me.TextRichTextBox, lsValueConstraint, Color.Maroon)
+							Call Me.HighlightText(Me.RichTextBoxText, lsValueConstraint, Color.Maroon)
 						Next
 
 				End Select
@@ -1432,7 +1420,7 @@ NextSentence:
 
 		With New WaitCursor
 
-			Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.TextRichTextBox.Text)
+			Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.RichTextBoxText.Text)
 
 			Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
 			Me.TabPageResults.Show()
@@ -1571,5 +1559,479 @@ NextSentence:
 		End Try
 
 	End Function
+
+	Private Sub ButtonExecuteLLMGenerativeAI_Click(sender As Object, e As EventArgs) Handles ButtonExecuteLLMGenerativeAI.Click
+
+		'CodeSafe
+		'If msSingleFilePath Is Nothing Then
+		'	MsgBox("Please select a file to search.")
+		'	Exit Sub
+		'End If
+		If Trim(Me.TextBoxAILLMPrompt.Text) = "" Then
+			MsgBox("Please enter a LLM Prompt to operate over the document.")
+			Exit Sub
+		End If
+		If Trim(My.Settings.FactEngineOpenAIAPIKey) = "" Then
+			prApplication.ThrowErrorMessage("Set the OpenAI API Key in configuration", pcenumErrorType.Warning,, False,, True,, True)
+			Exit Sub
+		End If
+
+		'Clear the Results textbox.
+		Me.RichTextBoxResults.Clear()
+
+		'Reset the Progress Bar
+		Me.ProgressBar.Value = 0
+		Me.ProgressBar.Visible = True
+
+		'Show the Abort button
+		Me.ButtonAbort.Visible = True
+		Me.mbAbort = False
+
+		Me.ButtonExecuteLLMGenerativeAI.Enabled = False
+
+		Dim liChunkCounter As Integer = 1
+
+		Try
+			Dim lsDocumentText As String = ""
+
+			lsDocumentText = MyData.TheDoc
+
+
+			If lsDocumentText Is Nothing Then
+				lsDocumentText = Me.RichTextBoxText.Text
+			End If
+
+			Dim words As String() = lsDocumentText.ToString.Split(" "c)
+
+			Dim chunkSize As Integer = My.Settings.LLMChunkSize
+			Dim overlapSize As Integer = 100
+			Dim startIndex As Integer = 0
+
+			ToolStripStatusLabel.Text = "Processing search"
+
+			'Loop through each chunk of the current page         
+			While startIndex < words.Count
+				Dim endIndex As Integer = Math.Min(startIndex + chunkSize - 1, words.Length - 1)
+				Dim chunkText As String = String.Join(" ", words, startIndex, endIndex - startIndex + 1)
+
+				'Display the Chunk Number in the status bar.
+				Me.ToolStripStatusLabelChunkCount.Text = "Chunk#: " & liChunkCounter
+
+				'Do something with the current 500-word chunk, such as write it to a file or process it in some way             
+				Me.mrOpenAIAPI = New OpenAI_API.OpenAIAPI(New OpenAI_API.APIAuthentication(My.Settings.FactEngineOpenAIAPIKey))
+
+				If mbAbort Then Exit While
+
+				Try
+
+					Dim lsPrompt As String = ""
+
+					'lsPrompt = My.Settings.PromptPreText
+					lsPrompt &= Trim(Me.TextBoxAILLMPrompt.Text)
+					'lsPrompt &= My.Settings.PromptPostText
+
+					'---------------------------------------------------
+					'ChatGPT - Tested, but not very good for this task.
+					'---------------------------------------------------
+					'Dim lrCompletionResult = Me.GetGPT3ChatResult(chunkText & vbCrLf & vbCrLf & lsPrompt)
+					'Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
+					'---------------------------------------------------
+
+					'=====================================================================================
+					'Farm out to OpenAI via the OpenAI API
+					Dim lsModifiedPrompt As String = chunkText & vbCrLf & vbCrLf & lsPrompt
+					Dim lrCompletionResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsModifiedPrompt)
+					Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
+					'=====================================================================================
+
+					Dim liIndex As Integer
+					Try
+						liIndex = Math.Max(lsGPT3ReturnString.IndexOf(vbCrLf), lsGPT3ReturnString.Length)
+					Catch ex As Exception
+						liIndex = lsGPT3ReturnString.Length
+					End Try
+
+					Dim loColor As Color = Color.Black
+
+					Dim start As Integer = Me.RichTextBoxResults.TextLength
+
+					If Not (lsGPT3ReturnString.Replace(vbLf, "").Replace(vbCrLf, "").Replace(Chr(24), "") = "I don't know.") And Not lsGPT3ReturnString.Contains("I don't know") Then
+						Me.RichTextBoxResults.AppendText(lsGPT3ReturnString.Substring(0, liIndex) & vbCrLf & "==========================" & vbCrLf)
+					End If
+
+					Dim li_end As Integer = Me.RichTextBoxResults.TextLength
+
+					' Textbox may transform chars, so (end-start) != text.Length
+					Me.RichTextBoxResults.Select(start, li_end - start)
+					Me.RichTextBoxResults.SelectionColor = loColor
+					Me.RichTextBoxResults.SelectionLength = 0 ' // clear                    
+
+				Catch ex As Exception
+					Throw New Exception(ex.Message)
+				End Try
+
+				'Move the start index forward by 400 words to create a 100-word overlap with the next chunk             
+				startIndex += chunkSize - overlapSize
+
+				If startIndex < words.Count Then
+					Me.ProgressBar.Value = (startIndex / words.Count) * 100
+				Else
+					Me.ProgressBar.Value = 100
+				End If
+
+				Application.DoEvents()
+
+				If Me.mbAbort Then
+					Me.ProgressBar.Value = 0
+					Me.ProgressBar.Visible = False
+					Me.ButtonAbort.Visible = False
+					Exit Sub
+				End If
+
+				liChunkCounter += 1
+			End While
+
+			'Hide the ProgressBar
+			Me.ProgressBar.Visible = False
+			'Hide the Abort button
+			Me.ButtonAbort.Visible = False
+
+			Me.ButtonExecuteLLMGenerativeAI.Enabled = True
+
+			ToolStripStatusLabel.Text = "Completed search successfully"
+
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+			Me.ToolStripStatusLabel.Text = "An error occurred during the search process"
+		Finally
+			'Hide the ProgressBar
+			Me.ProgressBar.Visible = False
+			'Hide the Abort button
+			Me.ButtonAbort.Visible = False
+
+			Me.ButtonExecuteLLMGenerativeAI.Enabled = True
+
+			'Clear the Chunk Number in the status bar.
+			Me.ToolStripStatusLabelChunkCount.Text = ""
+		End Try
+
+	End Sub
+
+	Private Sub PlaceInTheVirtualAnalystToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PlaceInTheVirtualAnalystToolStripMenuItem.Click
+
+		Try
+			With New WaitCursor
+
+				If Me.RichTextBoxText.SelectionLength > 0 Then
+
+					Dim lsSelectedText As String = Trim(Me.RichTextBoxText.SelectedText)
+
+					'-------------------------------------------------------
+					'ORM Verbalisation
+					'-------------------------------------------------------
+					Dim lrToolboxForm As frmToolboxBrainBox = Nothing
+					lrToolboxForm = frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
+
+					If IsSomething(lrToolboxForm) Then
+						lrToolboxForm.TextBoxInput.Text = lsSelectedText
+					End If
+				End If
+			End With
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
+
+	End Sub
+
+	Private Sub ToolStripMenuItem6_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem6.Click
+
+		Try
+			With New WaitCursor
+
+				If Me.RichTextBoxResults.SelectionLength > 0 Then
+
+					Dim lsSelectedText As String = Trim(Me.RichTextBoxResults.SelectedText)
+
+					'-------------------------------------------------------
+					'ORM Verbalisation
+					'-------------------------------------------------------
+					Dim lrToolboxForm As frmToolboxBrainBox = Nothing
+					lrToolboxForm = frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
+
+					If IsSomething(lrToolboxForm) Then
+						lrToolboxForm.TextBoxInput.Text = lsSelectedText
+					End If
+				End If
+			End With
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
+
+	End Sub
+
+	Private Sub ToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem3.Click
+
+		Dim lsMessage As String
+
+		Try
+			If Me.RichTextBoxResults.SelectionLength > 0 Then
+
+				Dim lsModelElementName As String = Trim(Me.RichTextBoxResults.SelectedText)
+
+				If Me.mrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
+					lsMessage = lsModelElementName & " is already in the model."
+					MsgBox(lsMessage)
+					Exit Sub
+				End If
+
+				Dim lsEntityTypeName As String = Trim(Me.RichTextBoxResults.SelectedText)
+				lsEntityTypeName = Viev.Strings.MakeCapCamelCase(lsEntityTypeName)
+
+				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
+				Dim liDataTypeLength As Integer = 50
+				Dim liDataTypePrecision As Integer = 0
+
+				Dim lrEntityType As FBM.EntityType
+				lrEntityType = Me.mrModel.CreateEntityType(lsEntityTypeName, True, True)
+
+				If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+
+					Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode, False, Nothing, True, liDataType, False, False)
+
+					If lrEntityType.getDataType = pcenumORMDataType.DataTypeNotSet Then
+						Call lrEntityType.ReferenceModeValueType.SetDataType(liDataType)
+					End If
+
+					Call lrEntityType.ReferenceModeValueType.SetDataTypeLength(liDataTypeLength)
+					Call lrEntityType.ReferenceModeValueType.SetDataTypePrecision(liDataTypePrecision)
+
+				End If
+
+				Me.RichTextBoxResults.SelectionColor = Color.RoyalBlue
+
+				'-------------------------------------------------------
+				'ORM Verbalisation
+				'-------------------------------------------------------
+				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
+
+				If IsSomething(lrToolboxForm) Then
+					lrToolboxForm.zrModel = Me.mrModel
+					Call lrToolboxForm.verbaliseModelElement(lrEntityType)
+				End If
+
+				Call Me.HighlightText()
+
+			End If
+
+		Catch ex As Exception
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ToolStripMenuItem4_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem4.Click
+
+		Dim lsMessage As String
+
+		Try
+			If Me.RichTextBoxResults.SelectionLength > 0 Then
+
+				Dim lsModelElementName As String = Trim(Me.RichTextBoxResults.SelectedText)
+
+				If Me.mrModel.GetModelObjectByName(lsModelElementName, True, False) IsNot Nothing Then
+					lsMessage = lsModelElementName & " is already in the model."
+					MsgBox(lsMessage)
+					Exit Sub
+				End If
+
+
+
+				Dim lsValueTypeName As String = Trim(Me.RichTextBoxResults.SelectedText)
+				lsValueTypeName = Viev.Strings.MakeCapCamelCase(lsValueTypeName)
+
+				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
+				Dim liDataTypeLength As Integer = 50
+				Dim liDataTypePrecision As Integer = 0
+
+				Dim lrValueType As FBM.ValueType
+				lrValueType = Me.mrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
+
+				Me.RichTextBoxResults.SelectionColor = Color.DarkSeaGreen
+
+				'-------------------------------------------------------
+				'ORM Verbalisation
+				'-------------------------------------------------------
+				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
+				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
+
+				If IsSomething(lrToolboxForm) Then
+					lrToolboxForm.zrModel = Me.mrModel
+					Call lrToolboxForm.verbaliseModelElement(lrValueType)
+				End If
+
+			End If
+
+		Catch ex As Exception
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ToolStripMenuItem5_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem5.Click
+
+		Dim lsMessage As String
+		Try
+
+			If Me.RichTextBoxText.SelectionLength > 0 Then
+
+				Dim lsModelElementName As String = Trim(Me.RichTextBoxText.SelectedText)
+
+				Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.mrModel, lsModelElementName, pcenumConceptType.GeneralConcept)
+
+				If Me.mrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+
+					lrDictionaryEntry = Me.mrModel.ModelDictionary.Find(AddressOf lrDictionaryEntry.Equals)
+
+					If lrDictionaryEntry.isGeneralConcept Then
+						MsgBox(lsModelElementName & " is already a General Concept within the Model.")
+						Exit Sub
+					Else
+						lrDictionaryEntry.AddConceptType(pcenumConceptType.GeneralConcept)
+						Me.mrModel.MakeDirty(False, False)
+					End If
+				Else
+					lrDictionaryEntry = Me.mrModel.AddModelDictionaryEntry(lrDictionaryEntry, False, False,,,, True)
+				End If
+
+				Me.RichTextBoxText.SelectionColor = Color.DarkOrange
+
+			End If
+
+		Catch ex As Exception
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ButtonAbort_Click(sender As Object, e As EventArgs) Handles ButtonAbort.Click
+		Me.mbAbort = True
+	End Sub
+
+	Private Sub RichTextBoxResults_MouseDown(sender As Object, e As MouseEventArgs) Handles RichTextBoxResults.MouseDown
+
+		Try
+			If Me.RichTextBoxResults.SelectionLength > 0 Then
+				Me.RichTextBoxResults.ContextMenuStrip = Me.ContextMenuStripResultsSelection
+			Else
+				Me.RichTextBoxResults.ContextMenuStrip = Me.ContextMenuStripTextbox
+			End If
+
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
+
+	End Sub
+
+	Private Sub HighlightText()
+
+		Try
+
+#Region "Highlight existing ModelElements"
+
+			For Each lrFactType In Me.mrModel.FactType
+				For Each lrFactTypeReading In lrFactType.FactTypeReading
+					Dim lsFactTypeReading As String = lrFactTypeReading.GetReadingText
+					Call Me.HighlightText(Me.RichTextBoxText, lsFactTypeReading, Color.Purple)
+					Call Me.HighlightText(Me.RichTextBoxResults, lsFactTypeReading, Color.Purple)
+				Next
+			Next
+
+			For Each lrModelElement In Me.mrModel.getModelObjects
+				Call Me.HighlightText(Me.RichTextBoxText, lrModelElement.Id, Color.RoyalBlue)
+				Call Me.HighlightText(Me.RichTextBoxResults, lrModelElement.Id, Color.RoyalBlue)
+			Next
+
+			For Each lrModelElement In Me.mrModel.ValueType
+				Call Me.HighlightText(Me.RichTextBoxText, lrModelElement.Id, Color.DarkGreen)
+				Call Me.HighlightText(Me.RichTextBoxResults, lrModelElement.Id, Color.DarkGreen)
+			Next
+
+			Dim lasValueConstraint = From ValueType In Me.mrModel.ValueType
+									 From ValueConstraint In ValueType.ValueConstraint
+									 Select ValueConstraint
+
+			For Each lsValueConstraint In lasValueConstraint
+				Call Me.HighlightText(Me.RichTextBoxText, lsValueConstraint, Color.Maroon)
+				Call Me.HighlightText(Me.RichTextBoxResults, lsValueConstraint, Color.Maroon)
+			Next
+
+			For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
+				Call Me.HighlightText(Me.RichTextBoxText, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
+				Call Me.HighlightText(Me.RichTextBoxResults, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
+			Next
+#End Region
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ButtonRefereshResults_Click(sender As Object, e As EventArgs) Handles ButtonRefereshResults.Click
+
+		Try
+			Call Me.HighlightText()
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
 
 End Class

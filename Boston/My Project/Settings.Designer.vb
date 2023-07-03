@@ -1145,6 +1145,18 @@ Namespace My
                 Me("DatabaseStoreModelsAsBLOBsParallelToXML") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("500")>  _
+        Public Property LLMChunkSize() As Integer
+            Get
+                Return CType(Me("LLMChunkSize"),Integer)
+            End Get
+            Set
+                Me("LLMChunkSize") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

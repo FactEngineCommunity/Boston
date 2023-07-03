@@ -172,8 +172,8 @@ Namespace FactEngine
         ''' <param name="arTable">The RDS Table for which the SQL CREATE statement is to be generated.</param>
         ''' <param name="asTableName">Optional table name for the table in the CREATE statement.</param>
         ''' <returns></returns>
-        Public Overridable Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table,
-                                                                     Optional asTableName As String = Nothing) As String
+        Public Overridable Function generateCREATETABLEStatement(ByRef arTable As RDS.Table,
+                                                                Optional asTableName As String = Nothing) As String
             Return ""
         End Function
 

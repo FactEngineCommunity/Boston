@@ -3415,29 +3415,33 @@ SkipORMReadingEditor:
         Me.Cursor = Cursors.WaitCursor
 
         Try
-            ''---------------------------------------------------------
-            ''Get the EntityType represented by the (selected) Entity
-            ''---------------------------------------------------------
-            lrEntity = lrTableNode.Tag
+            If MsgBox("Are you sure you want to recreate the Table/NodeType in the database?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
 
-            If Not Me.zrPage.Model.IsDatabaseSynchronised Then
-                MsgBox("Set the Model's configuration to 'Is Database Synchronised before creating tables.")
-                Exit Sub
-            End If
+                ''---------------------------------------------------------
+                ''Get the EntityType represented by the (selected) Entity
+                ''---------------------------------------------------------
+                lrEntity = lrTableNode.Tag
 
-            Me.zrPage.Model.connectToDatabase()
-
-            For Each lrRelation In lrEntity.RDSTable.getOutgoingRelations
-                If Not lrEntity.Model.DatabaseConnection.TableExists(lrRelation.DestinationTable.Name) Then
-                    Dim lsMessage As String
-                    lsMessage = "Referenced table '" & lrRelation.DestinationTable.Name & "' does not exist in the database."
-                    lsMessage &= vbCrLf & vbCrLf & "Create the referenced tables for table, '" & lrEntity.Name & "', and then try again."
-                    MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                If Not Me.zrPage.Model.IsDatabaseSynchronised Then
+                    MsgBox("Set the Model's configuration to 'Is Database Synchronised before creating tables.")
                     Exit Sub
                 End If
-            Next
 
-            Call lrEntity.Model.DatabaseConnection.recreateTable(lrEntity.RDSTable)
+                Me.zrPage.Model.connectToDatabase()
+
+                For Each lrRelation In lrEntity.RDSTable.getOutgoingRelations
+                    If Not lrEntity.Model.DatabaseConnection.TableExists(lrRelation.DestinationTable.Name) Then
+                        Dim lsMessage As String
+                        lsMessage = "Referenced table '" & lrRelation.DestinationTable.Name & "' does not exist in the database."
+                        lsMessage &= vbCrLf & vbCrLf & "Create the referenced tables for table, '" & lrEntity.Name & "', and then try again."
+                        MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                        Exit Sub
+                    End If
+                Next
+
+                Call lrEntity.Model.DatabaseConnection.recreateTable(lrEntity.RDSTable)
+
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String

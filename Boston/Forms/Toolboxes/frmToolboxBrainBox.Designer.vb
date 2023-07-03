@@ -54,7 +54,7 @@ Partial Class frmToolboxBrainBox
         Me.TextBox_Output.HideSelection = False
         Me.TextBox_Output.Location = New System.Drawing.Point(0, 0)
         Me.TextBox_Output.Name = "TextBox_Output"
-        Me.TextBox_Output.Size = New System.Drawing.Size(542, 149)
+        Me.TextBox_Output.Size = New System.Drawing.Size(687, 154)
         Me.TextBox_Output.TabIndex = 1
         Me.TextBox_Output.Text = ""
         '
@@ -75,8 +75,8 @@ Partial Class frmToolboxBrainBox
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.ListBoxEnterpriseAware)
         Me.SplitContainer1.Panel2.Controls.Add(Me.TextBox_Output)
-        Me.SplitContainer1.Size = New System.Drawing.Size(542, 188)
-        Me.SplitContainer1.SplitterDistance = 35
+        Me.SplitContainer1.Size = New System.Drawing.Size(687, 194)
+        Me.SplitContainer1.SplitterDistance = 36
         Me.SplitContainer1.TabIndex = 2
         '
         'TextBoxInput
@@ -88,7 +88,7 @@ Partial Class frmToolboxBrainBox
         Me.TextBoxInput.MinimumSize = New System.Drawing.Size(4, 34)
         Me.TextBoxInput.Multiline = False
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(542, 35)
+        Me.TextBoxInput.Size = New System.Drawing.Size(687, 36)
         Me.TextBoxInput.TabIndex = 1
         Me.TextBoxInput.Text = ""
         '
@@ -128,9 +128,9 @@ Partial Class frmToolboxBrainBox
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StatusLabelMain})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 202)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 208)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(562, 22)
+        Me.StatusStrip1.Size = New System.Drawing.Size(707, 22)
         Me.StatusStrip1.TabIndex = 4
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -158,7 +158,7 @@ Partial Class frmToolboxBrainBox
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(562, 224)
+        Me.ClientSize = New System.Drawing.Size(707, 230)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)

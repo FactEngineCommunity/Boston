@@ -443,73 +443,83 @@ Namespace VAQL
         ''' </summary>
         ''' <returns></returns>
         Public Function LookAhead(ByVal ParamArray expectedtokens As TokenType()) As Token
+
             Dim i As Integer
             Dim start As Integer = StartPos
             Dim tok As Token = Nothing
             Dim scantokens As List(Of TokenType)
 
-            ' this prevents double scanning and matching
-            ' increased performance
-            If LookAheadToken IsNot Nothing AndAlso LookAheadToken.Type <> TokenType._UNDETERMINED_ AndAlso LookAheadToken.Type <> TokenType._NONE_ Then
-                Return LookAheadToken
-            End If
+            Try
 
-            If expectedtokens.Length = 0 Then
-                scantokens = Tokens
-            Else
-                scantokens = New List(Of TokenType)(expectedtokens)
-                scantokens.AddRange(SkipList)
-            End If
-
-            Do
-                Dim len As Integer = -1
-                Dim index As TokenType = Integer.MaxValue
-                Dim m_input As String
-
-                If start > Input.Length Then
-                    tok = New Token(start, start)
-                    tok.Type = TokenType._UNDETERMINED_
-                    Exit Do
+                ' this prevents double scanning and matching
+                ' increased performance
+                If LookAheadToken IsNot Nothing AndAlso LookAheadToken.Type <> TokenType._UNDETERMINED_ AndAlso LookAheadToken.Type <> TokenType._NONE_ Then
+                    Return LookAheadToken
                 End If
 
-                m_input = Input.Substring(start)
-
-                tok = New Token(start, EndPos)
-
-
-                For i = 0 To scantokens.Count - 1
-                    Dim r As Regex = Patterns(scantokens(i))
-                    Dim m As Match = r.Match(m_input)
-                    If m.Success AndAlso m.Index = 0 AndAlso ((m.Length > len) OrElse (scantokens(i) < index AndAlso m.Length = len)) Then
-                        len = m.Length
-                        index = scantokens(i)
-                        Exit For
-                    End If
-                Next i
-
-                If index >= 0 AndAlso len >= 0 Then
-                    tok.EndPos = start + len
-                    If tok.StartPos + len <= Input.Length Then
-                        tok.Text = Input.Substring(tok.StartPos, len)
-                    End If
-                    tok.Type = index
+                If expectedtokens.Length = 0 Then
+                    scantokens = Tokens
                 Else
-                    If tok.StartPos < tok.EndPos - 1 Then
-                        tok.Text = Input.Substring(tok.StartPos, 1)
+                    scantokens = New List(Of TokenType)(expectedtokens)
+                    scantokens.AddRange(SkipList)
+                End If
+
+                Do
+                    Dim len As Integer = -1
+                    Dim index As TokenType = Integer.MaxValue
+                    Dim m_input As String
+
+                    If start > Input.Length Then
+                        tok = New Token(start, start)
+                        tok.Type = TokenType._UNDETERMINED_
+                        Exit Do
                     End If
-                End If
 
-                If SkipList.Contains(tok.Type) Then
-                    start = tok.EndPos
-                    Skipped.Add(tok)
-                Else
-                    tok.Skipped = Skipped
-                    Skipped = New List(Of Token)
-                End If
-            Loop While SkipList.Contains(tok.Type)
+                    m_input = Input.Substring(start)
 
-            LookAheadToken = tok
-            Return tok
+                    tok = New Token(start, EndPos)
+
+
+                    For i = 0 To scantokens.Count - 1
+                        Dim r As Regex = Patterns(scantokens(i))
+                        Dim m As Match = r.Match(m_input)
+                        If m.Success AndAlso m.Index = 0 AndAlso ((m.Length > len) OrElse (scantokens(i) < index AndAlso m.Length = len)) Then
+                            len = m.Length
+                            index = scantokens(i)
+                            Exit For
+                        End If
+                    Next i
+
+                    If index >= 0 AndAlso len >= 0 Then
+                        tok.EndPos = start + len
+                        If tok.StartPos + len <= Input.Length Then
+                            tok.Text = Input.Substring(tok.StartPos, len)
+                        End If
+                        tok.Type = index
+                    Else
+                        If tok.StartPos < tok.EndPos - 1 Then
+                            tok.Text = Input.Substring(tok.StartPos, 1)
+                        End If
+                    End If
+
+                    If SkipList.Contains(tok.Type) Then
+                        start = tok.EndPos
+                        Skipped.Add(tok)
+                    Else
+                        tok.Skipped = Skipped
+                        Skipped = New List(Of Token)
+                    End If
+                Loop While SkipList.Contains(tok.Type)
+
+                LookAheadToken = tok
+                Return tok
+
+            Catch ex As Exception
+                Throw New Exception(ex.Message)
+
+                Return Nothing
+            End Try
+
         End Function
     End Class
 #End Region

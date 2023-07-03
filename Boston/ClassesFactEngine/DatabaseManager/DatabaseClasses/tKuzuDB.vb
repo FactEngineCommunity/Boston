@@ -355,72 +355,36 @@ Namespace FactEngine
         ''' <param name="arTable">The RDS Table for which the SQL CREATE statement is to be generated.</param>
         ''' <param name="asTableName">Optional table name for the table in the CREATE statement.</param>
         ''' <returns></returns>
-        Public Overrides Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table,
-                                                                  Optional asTableName As String = Nothing) As String
+        Public Overrides Function generateCREATETABLEStatement(ByRef arTable As RDS.Table,
+                                                               Optional asTableName As String = Nothing) As String
 
             Try
-                Dim lsSQLCommand As String
+                Dim lsSQLCommand As String = ""
 
-                If asTableName Is Nothing Then
-                    lsSQLCommand = "CREATE TABLE [" & arTable.Name & "]"
-                Else
-                    lsSQLCommand = "CREATE TABLE [" & asTableName & "]"
-                End If
+                Dim lrTable As RDS.Table = arTable
+                Dim lrPrimaryKeyColumn As RDS.Column = Nothing
+
+                Dim larColumn = (From Column In lrTable.Column
+                                 Where Not Column.isPartOfPrimaryKey
+                                 Select Column).ToList
+
+                lrPrimaryKeyColumn = larColumn.find(Function(x) x.index.count > 0)
+
+                Dim lsColumnDefinitions As String = ""
+                lsColumnDefinitions = String.Join(", ", larColumn.Select(Function(lrColumn) lrColumn.Name & " " & lrColumn.DBDataType))
+
+                '=========E.g. From Kuzu website==========================================================
+                'connection.query("CREATE NODE TABLE User(name STRING, age INT64, PRIMARY KEY (name))");
+                '=========================================================================================
+                lsSQLCommand = "CREATE NODE TABLE `" & arTable.Name & "`"
                 lsSQLCommand &= " ("
-                'Column defs
-                Dim liInd = 0
-                For Each lrColumn In arTable.Column
-                    If liInd > 0 Then lsSQLCommand &= ","
-                    lsSQLCommand &= Me.generateSQLColumnDefinition(lrColumn) & vbCrLf
-                    liInd += 1
-                Next
-                'Primary Key
-                If arTable.getPrimaryKeyColumns.Count > 0 Then
-                    lsSQLCommand &= ", CONSTRAINT " & arTable.Name & "_PK PRIMARY KEY ("
-                    liInd = 0
-                    For Each lrColumn In arTable.getPrimaryKeyColumns
-                        If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= lrColumn.Name
-                        liInd += 1
-                    Next
-                    lsSQLCommand &= ")" & vbCrLf
-                End If
-                'Unique Indexes
-                If arTable.Index.FindAll(Function(x) Not x.IsPrimaryKey).Count > 0 Then
-                    liInd = 1
-                    For Each lrIndex In arTable.Index.FindAll(Function(x) Not x.IsPrimaryKey)
-                        lsSQLCommand &= ", CONSTRAINT " & lrIndex.Name & " UNIQUE ("
-                        Dim liInd2 = 0
-                        For Each lrColumn In lrIndex.Column
-                            If liInd2 > 0 Then lsSQLCommand &= ","
-                            lsSQLCommand &= lrColumn.Name
-                            liInd2 += 1
-                        Next
-                        lsSQLCommand &= ")" & vbCrLf
-                    Next
-                End If
-                'Foreign Keys
-                For Each lrRelation In arTable.getOutgoingRelations '.FindAll(Function(x) x.OriginColumns.Count > 1)
-                    lsSQLCommand &= ", FOREIGN KEY ("
-                    liInd = 0
-                    For Each lrColumn In lrRelation.OriginColumns
-                        If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= lrColumn.Name
-                        liInd += 1
-                    Next
-                    lsSQLCommand &= ") REFERENCES [" & lrRelation.DestinationTable.Name & "] ("
-                    liInd = 0
-                    For Each lrColumn In lrRelation.OriginColumns
-                        If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= lrColumn.getReferencedColumn.Name
-                        liInd += 1
-                    Next
-                    lsSQLCommand &= ")"
-                    lsSQLCommand &= " ON DELETE CASCADE ON UPDATE CASCADE" & vbCrLf
-                Next
+                lsSQLCommand &= lsColumnDefinitions & If(lrPrimaryKeyColumn IsNot Nothing, ", PRIMARY KEY (" & lrPrimaryKeyColumn.Name & ")", "")
                 lsSQLCommand &= ")"
 
+                Me.GONonQuery(lsSQLCommand)
+
                 Return lsSQLCommand
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1312,7 +1276,7 @@ FinishedProcessing:
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
@@ -1372,33 +1336,41 @@ FinishedProcessing:
 
             Try
 
-                Dim lsSQL As String
+                'Legacy SQLite...may Not be possible in Kuzu
+                'lsSQL = "PRAGMA foreign_keys=OFF"
+                'Me.GONonQuery(lsSQL)
 
-                lsSQL = "PRAGMA foreign_keys=OFF"
-                Me.GONonQuery(lsSQL)
+                '20230702-VM-Check if there are Transactions in Kuzu.
+                'Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
+                'Try
 
-                Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                Dim loResult As kuzu_query_result
+                Dim lsErrorMessage As String = Nothing
 
-                Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
+                Try
+                    Dim lsQuery As String = Me.generateCREATETABLEStatement(arTable, arTable.Name)
 
-                    Try
-                        Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
-                            cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arTable, arTable.Name)
-                            cmd.ExecuteNonQuery()
-                        End Using
+                    loResult = kuzu_connection_query(Me.conn, lsQuery)
 
-                        tr.Commit()
-                    Catch ex As Exception
-                        MsgBox(ex.Message)
-                        tr.Rollback()
-                    End Try
-                End Using
+                    lsErrorMessage = kuzu_query_result_get_error_message(loResult)
+                Catch ex As Exception
+                    Throw New Exception(ex.Message.AppendDoubleLineBreak(lsErrorMessage))
+                End Try
 
-                lsSQL = "PRAGMA foreign_keys=ON"
-                Me.GONonQuery(lsSQL)
+                '20230702-VM-Check if there are Transactions in Kuzu.
+                '    tr.Commit()
+                'Catch ex As Exception
+                '    MsgBox(ex.Message)
+                '        tr.Rollback()
+                '    End Try
+                'End Using
+
+                'Legacy SQLite...may not be possible in Kuzu
+                'lsSQL = "PRAGMA foreign_keys=ON"
+                'Me.GONonQuery(lsSQL)
 
             Catch ex As Exception
+
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 

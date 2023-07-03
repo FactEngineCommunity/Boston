@@ -14,6 +14,7 @@ Imports System.Drawing
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Globalization
+Imports System.Threading.Tasks
 
 Namespace Boston
 
@@ -1085,6 +1086,36 @@ OpenConnection:
             Dim pascalCase As String = String.Concat(words)
 
             Return pascalCase
+        End Function
+
+        Public Function GetGPT3Result(ByRef arOpenAIAPI As OpenAI_API.OpenAIAPI, ByVal asNLQuery As String, Optional ByVal asActualNLQuery As String = "") As OpenAI_API.Completions.CompletionResult
+
+            Try
+                Dim liMaxTokens As Integer = Math.Max(300, CInt(asActualNLQuery.Split(" ").Length * 3.5))
+
+                Dim _timeout As Integer = 5000 ' 5 seconds
+                Dim _cancellationTokenSource As New System.Threading.CancellationTokenSource
+
+                Dim lrOpenAIAPI = arOpenAIAPI
+
+                Return Task.Run(Function() lrOpenAIAPI.Completions.CreateCompletionAsync(
+                                           New OpenAI_API.Completions.CompletionRequest(prompt:=asNLQuery,
+                                                                                         model:=OpenAI_API.Models.Model.DavinciText,
+                                                                                         temperature:=0,
+                                                                                         max_tokens:=liMaxTokens)
+                                ), _cancellationTokenSource.Token).Result
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return Nothing
+            End Try
+
         End Function
 
     End Module

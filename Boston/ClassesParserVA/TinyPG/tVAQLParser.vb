@@ -1408,7 +1408,7 @@ Namespace VAQL
                       Return False
                    End If
                 tok = m_scanner.LookAhead(TokenType.PREDICATEPART) ' OneOrMore Rule
-            Loop While tok.Type = TokenType.PREDICATEPART ' OneOrMore Rule
+            Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.PREDICATEPART ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                         Return False
             End If
@@ -4422,7 +4422,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                       Return False
                    End If
                 tok = m_scanner.LookAhead(TokenType.COMMA) ' OneOrMore Rule
-            Loop While tok.Type = TokenType.COMMA ' OneOrMore Rule
+            Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.COMMA ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                         Return False
             End If
@@ -6530,7 +6530,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                               Return False
                            End If
                         tok = m_scanner.LookAhead(TokenType.COMMA) ' OneOrMore Rule
-                    Loop While tok.Type = TokenType.COMMA ' OneOrMore Rule
+                    Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.COMMA ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                                 Return False
             End If
@@ -6610,7 +6610,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                 End If
 
                 tok = m_scanner.LookAhead(TokenType.PREDICATEPART) ' OneOrMore Rule
-            Loop While tok.Type = TokenType.PREDICATEPART ' OneOrMore Rule
+            Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.PREDICATEPART ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                         Return False
             End If
@@ -6854,7 +6854,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                 End If
 
                 tok = m_scanner.LookAhead(TokenType.UNARYPREDICATEPART) ' OneOrMore Rule
-            Loop While tok.Type = TokenType.UNARYPREDICATEPART ' OneOrMore Rule
+            Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.UNARYPREDICATEPART ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                         Return False
             End If
@@ -9413,7 +9413,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                               Return False
                            End If
                         tok = m_scanner.LookAhead(TokenType.COMMA) ' OneOrMore Rule
-                    Loop While tok.Type = TokenType.COMMA ' OneOrMore Rule
+                    Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.COMMA ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                                 Return False
             End If
