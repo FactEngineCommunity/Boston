@@ -1564,6 +1564,7 @@ SkipRegistrationChecking:
                 '----------------------------------------------
                 'Create a new instance of the ModelDictionary form.
                 '----------------------------------------------
+                child.mrModel = prApplication.WorkingModel
                 If prApplication.RightToolboxForms.Count > 0 Then
                     '----------------------------------------------------------------------------------------
                     'Add the ErrorList form to the Panel of a form already loaded at the bottom of the Page

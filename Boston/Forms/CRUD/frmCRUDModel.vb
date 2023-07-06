@@ -82,6 +82,7 @@ Public Class frmCRUDModel
             Me.CheckBoxUseNeo4jStyleEdgeLabels.Checked = Me.zrModel.UseNeo4jStyleEdgeLabels
             Me.CheckBoxAutomaticallyCreateReferenceMode.Checked = Me.zrModel.AutomaticallyCreateReferenceMode
             Me.TextBoxDefaultReferenceMode.Text = Trim(Me.zrModel.DefaultReferenceMode)
+            Me.CheckBoxHideOtherwiseForeignKeyColumns.Checked = Me.zrModel.HideOtherwiseForeignKeyColumns
 
 
         Catch ex As Exception
@@ -149,6 +150,17 @@ Public Class frmCRUDModel
             larKeyFields = {}
             larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})
             larKeyFields.Add(New With {.FieldId = 2, .FieldName = "SettingName", .Value = "DefaultReferenceMode"})
+            Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
+#End Region
+
+            'AutomaticallyCreateReferenceMode
+#Region "HideOtherwiseForeignKeyColumns"
+            Me.zrModel.HideOtherwiseForeignKeyColumns = Me.CheckBoxHideOtherwiseForeignKeyColumns.Checked
+
+            loSetting = New With {.ModelId = Me.zrModel.ModelId, .SettingName = "HideOtherwiseForeignKeyColumns", .Setting = Me.CheckBoxHideOtherwiseForeignKeyColumns.Checked.ToString}
+            larKeyFields = {}
+            larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})
+            larKeyFields.Add(New With {.FieldId = 2, .FieldName = "SettingName", .Value = "HideOtherwiseForeignKeyColumns"})
             Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
 #End Region
 

@@ -166,6 +166,10 @@ Namespace FactEngine
             Return ""
         End Function
 
+        Public Overridable Function generateCREATERELATIONSHIPTABLE(ByRef arRDSRelation As RDS.Relation, Optional ByRef arTable As RDS.Table = Nothing) As String
+            Return ""
+        End Function
+
         ''' <summary>
         ''' Generates a CREATE TABLE Statement for the given Table, specific to the database type.
         ''' </summary>
@@ -250,6 +254,14 @@ Namespace FactEngine
         Public Overridable Function Open(Optional ByVal asDatabaseConnectionString As String = Nothing) As Boolean
             Return False
         End Function
+
+        ''' <summary>
+        ''' Creates or Recreates the Relation in the database.
+        '''   NB For those databases that have a table for Relations, such as KuzuDB which is an otherwise Graph Database that has RELATION TABLES for Edge Types.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        Public Overridable Sub recreateRelation(ByRef arRDSRelation As RDS.Relation)
+        End Sub
 
         ''' <summary>
         ''' Creates or Recreates the Table in the database.

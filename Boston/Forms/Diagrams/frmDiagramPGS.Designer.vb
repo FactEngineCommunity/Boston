@@ -122,7 +122,7 @@ Partial Class frmDiagramPGS
         '
         'ContextMenuStrip_Node
         '
-        Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator15, Me.ViewPropertiesToolStripMenuItem, Me.AddAttributeToolStripMenuItem1, Me.ToolStripSeparator17, Me.RenameToolStripMenuItem, Me.ToolStripSeparator12, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.DisplayAsEdgeTypeToolStripMenuItem, Me.ToolStripSeparator18, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator11, Me.ToolStripMenuItemViewNodeTableData, Me.ToolStripMenuItemNodeTypeShowInModelDictionary, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStrip_Node.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MorphToToolStripMenuItem, Me.ToolStripSeparator4, Me.ToolStripMenuItemEntityTypeModelErrors, Me.ToolStripSeparator15, Me.AddAttributeToolStripMenuItem1, Me.ViewPropertiesToolStripMenuItem, Me.ToolStripSeparator17, Me.RenameToolStripMenuItem, Me.ToolStripSeparator12, Me.IndexManagerToolStripMenuItem, Me.ToolStripSeparator2, Me.DisplayAsEdgeTypeToolStripMenuItem, Me.ToolStripSeparator18, Me.ToolStripMenuItem_RemoveFromPage, Me.ToolStripSeparator9, Me.ConvertToFactTypeToolStripMenuItem, Me.ToolStripSeparator11, Me.ToolStripMenuItemViewNodeTableData, Me.ToolStripMenuItemNodeTypeShowInModelDictionary, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStrip_Node.Name = "ContextMenuStrip_Actor"
         Me.ContextMenuStrip_Node.Size = New System.Drawing.Size(211, 316)
         '
@@ -271,7 +271,6 @@ Partial Class frmDiagramPGS
         'HiddenDiagram
         '
         Me.HiddenDiagram.AdjustmentHandlesSize = 1.0!
-        Me.HiddenDiagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         '
         'MorphTimer
         '
@@ -635,8 +634,6 @@ Partial Class frmDiagramPGS
         '
         'Diagram
         '
-        Me.Diagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
-        Me.Diagram.DefaultShape = MindFusion.Diagramming.Shape.FromId("Ellipse")
         Me.Diagram.DynamicLinks = True
         Me.Diagram.LinkBaseShapeSize = 4.0!
         Me.Diagram.LinkHeadShape = MindFusion.Diagramming.ArrowHead.PointerArrow
@@ -644,8 +641,6 @@ Partial Class frmDiagramPGS
         Me.Diagram.LinksSnapToBorders = True
         Me.Diagram.LinkStyle = MindFusion.Diagramming.LinkStyle.Bezier
         Me.Diagram.LinkTextStyle = MindFusion.Diagramming.LinkTextStyle.Rotate
-        Me.Diagram.ShapeBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
-        Me.Diagram.TableBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFF0")
         Me.Diagram.TextColor = System.Drawing.Color.DarkGray
         '
         'ContextMenuStripTab

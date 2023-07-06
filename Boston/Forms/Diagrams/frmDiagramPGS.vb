@@ -3802,7 +3802,7 @@ SkipORMReadingEditor:
 
             Dim lrRDSTable As RDS.Table = Me.zrPage.Model.RDS.Table.Find(Function(x) x.Name = lrNode.Id)
 
-            Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList
+            Dim larColumn = lrRDSTable.Column.ToList.OrderBy(Function(x) x.OrdinalPosition).ToList.FindAll(Function(x) Not (lrRDSTable.Model.Model.HideOtherwiseForeignKeyColumns And x.OutgoingRelation.Count > 0))
 
             '--------------------------------------------------------------------
             'Refined sort of Columns based on Supertype Column ordering and Subtype ordering

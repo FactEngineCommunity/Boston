@@ -444,6 +444,8 @@ Namespace FBM
 
         Public DefaultReferenceMode As String = ".Id"
 
+        Public HideOtherwiseForeignKeyColumns As Boolean = False
+
         <NonSerialized()>
         Public Event Deleting()
         <NonSerialized()>
@@ -7062,6 +7064,15 @@ XMLDeserialisation:
                 larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loSetting,, larExpandoFields)
                 If larSettingTuples.Count > 0 Then
                     Me.DefaultReferenceMode = larSettingTuples(0).Setting
+                End If
+
+                'HideOtherwiseForeignKeyColumns
+                larExpandoFields = {}
+                larExpandoFields.Add(New With {.FieldName = "ModelId", .Value = Me.ModelId})
+                larExpandoFields.Add(New With {.FieldName = "SettingName", .Value = "HideOtherwiseForeignKeyColumns"})
+                larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(39, loSetting,, larExpandoFields)
+                If larSettingTuples.Count > 0 Then
+                    Me.HideOtherwiseForeignKeyColumns = larSettingTuples(0).Setting
                 End If
 
             Catch ex As Exception

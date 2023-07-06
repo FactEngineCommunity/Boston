@@ -3409,37 +3409,42 @@ SkipORMReadingEditor:
 
     Private Sub ToolStripMenuItemReCreateDatabaseTable_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemReCreateDatabaseTable.Click
 
-        Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
-        Dim lrEntity As New ERD.Entity
-
-        Me.Cursor = Cursors.WaitCursor
-
         Try
+            Dim lrTableNode As ERD.TableNode = Me.Diagram.Selection.Items(0)
+            Dim lrEntity As New ERD.Entity
+
+
+
             If MsgBox("Are you sure you want to recreate the Table/NodeType in the database?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
 
-                ''---------------------------------------------------------
-                ''Get the EntityType represented by the (selected) Entity
-                ''---------------------------------------------------------
-                lrEntity = lrTableNode.Tag
+                With New WaitCursor
 
-                If Not Me.zrPage.Model.IsDatabaseSynchronised Then
-                    MsgBox("Set the Model's configuration to 'Is Database Synchronised before creating tables.")
-                    Exit Sub
-                End If
 
-                Me.zrPage.Model.connectToDatabase()
+                    ''---------------------------------------------------------
+                    ''Get the EntityType represented by the (selected) Entity
+                    ''---------------------------------------------------------
+                    lrEntity = lrTableNode.Tag
 
-                For Each lrRelation In lrEntity.RDSTable.getOutgoingRelations
-                    If Not lrEntity.Model.DatabaseConnection.TableExists(lrRelation.DestinationTable.Name) Then
-                        Dim lsMessage As String
-                        lsMessage = "Referenced table '" & lrRelation.DestinationTable.Name & "' does not exist in the database."
-                        lsMessage &= vbCrLf & vbCrLf & "Create the referenced tables for table, '" & lrEntity.Name & "', and then try again."
-                        MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                    If Not Me.zrPage.Model.IsDatabaseSynchronised Then
+                        MsgBox("Set the Model's configuration to 'Is Database Synchronised before creating tables.")
                         Exit Sub
                     End If
-                Next
 
-                Call lrEntity.Model.DatabaseConnection.recreateTable(lrEntity.RDSTable)
+                    Me.zrPage.Model.connectToDatabase()
+
+                    For Each lrRelation In lrEntity.RDSTable.getOutgoingRelations
+                        If Not lrEntity.Model.DatabaseConnection.TableExists(lrRelation.DestinationTable.Name) Then
+                            Dim lsMessage As String
+                            lsMessage = "Referenced table '" & lrRelation.DestinationTable.Name & "' does not exist in the database."
+                            lsMessage &= vbCrLf & vbCrLf & "Create the referenced tables for table, '" & lrEntity.Name & "', and then try again."
+                            MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                            Exit Sub
+                        End If
+                    Next
+
+                    Call lrEntity.Model.DatabaseConnection.recreateTable(lrEntity.RDSTable)
+
+                End With
 
             End If
 
@@ -4249,4 +4254,60 @@ Aborted:
         End Try
 
     End Sub
+
+    Private Sub ToolStripMenuItem4_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem4.Click
+
+        Try
+            ''---------------------------------------------------------
+            ''Get the RDSRelation represented by the (selected) Relation
+            ''---------------------------------------------------------
+            Dim lrRDSRelation As RDS.Relation = Me.zrPage.SelectedObject(0)
+
+
+            If MsgBox("Are you sure you want to recreate the Relationship Table in the database?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                With New WaitCursor
+
+                    If Not Me.zrPage.Model.IsDatabaseSynchronised Then
+                        MsgBox("Set the Model's configuration to 'Is Database Synchronised before creating tables.")
+                        Exit Sub
+                    End If
+
+                    Me.zrPage.Model.connectToDatabase()
+
+                    For liInd = 1 To 2
+                        Dim lrTable As RDS.Table
+                        Select Case liInd
+                            Case Is = 1
+                                lrTable = lrRDSRelation.OriginTable
+                            Case Else
+                                lrTable = lrRDSRelation.DestinationTable
+                        End Select
+                        If Not Me.zrPage.Model.DatabaseConnection.TableExists(lrTable.Name) Then
+                            Dim lsMessage As String
+                            lsMessage = "Referenced table '" & lrTable.Name & "' does not exist in the database."
+                            lsMessage &= vbCrLf & vbCrLf & "Create the referenced tables for table, '" & lrTable.Name & "', and then try again."
+                            MsgBox(lsMessage, MsgBoxStyle.Exclamation)
+                            Exit Sub
+                        End If
+                    Next liInd
+
+                    Call Me.zrPage.Model.DatabaseConnection.recreateRelation(lrRDSRelation)
+
+                End With
+
+            End If
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

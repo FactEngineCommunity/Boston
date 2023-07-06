@@ -80,13 +80,14 @@ Partial Class frmCRUDModel
         Me.TextBoxServerName = New System.Windows.Forms.TextBox()
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
         Me.GraphModeling = New System.Windows.Forms.TabPage()
+        Me.TextBoxDefaultReferenceMode = New System.Windows.Forms.TextBox()
+        Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
+        Me.CheckBoxAutomaticallyCreateReferenceMode = New System.Windows.Forms.CheckBox()
         Me.CheckBoxUseNeo4jStyleEdgeLabels = New System.Windows.Forms.CheckBox()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.CheckBoxAutomaticallyCreateReferenceMode = New System.Windows.Forms.CheckBox()
-        Me.TextBoxDefaultReferenceMode = New System.Windows.Forms.TextBox()
-        Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
+        Me.CheckBoxHideOtherwiseForeignKeyColumns = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -680,6 +681,7 @@ Partial Class frmCRUDModel
         '
         'GraphModeling
         '
+        Me.GraphModeling.Controls.Add(Me.CheckBoxHideOtherwiseForeignKeyColumns)
         Me.GraphModeling.Controls.Add(Me.TextBoxDefaultReferenceMode)
         Me.GraphModeling.Controls.Add(Me.LabelPromptDefaultReferenceMode)
         Me.GraphModeling.Controls.Add(Me.CheckBoxAutomaticallyCreateReferenceMode)
@@ -690,6 +692,32 @@ Partial Class frmCRUDModel
         Me.GraphModeling.TabIndex = 4
         Me.GraphModeling.Text = "Graph Modeling"
         Me.GraphModeling.UseVisualStyleBackColor = True
+        '
+        'TextBoxDefaultReferenceMode
+        '
+        Me.TextBoxDefaultReferenceMode.Location = New System.Drawing.Point(251, 61)
+        Me.TextBoxDefaultReferenceMode.Name = "TextBoxDefaultReferenceMode"
+        Me.TextBoxDefaultReferenceMode.Size = New System.Drawing.Size(100, 20)
+        Me.TextBoxDefaultReferenceMode.TabIndex = 4
+        '
+        'LabelPromptDefaultReferenceMode
+        '
+        Me.LabelPromptDefaultReferenceMode.AutoSize = True
+        Me.LabelPromptDefaultReferenceMode.Location = New System.Drawing.Point(19, 64)
+        Me.LabelPromptDefaultReferenceMode.Name = "LabelPromptDefaultReferenceMode"
+        Me.LabelPromptDefaultReferenceMode.Size = New System.Drawing.Size(226, 13)
+        Me.LabelPromptDefaultReferenceMode.TabIndex = 3
+        Me.LabelPromptDefaultReferenceMode.Text = "Default Reference Mode for new Entity Types:"
+        '
+        'CheckBoxAutomaticallyCreateReferenceMode
+        '
+        Me.CheckBoxAutomaticallyCreateReferenceMode.AutoSize = True
+        Me.CheckBoxAutomaticallyCreateReferenceMode.Location = New System.Drawing.Point(20, 38)
+        Me.CheckBoxAutomaticallyCreateReferenceMode.Name = "CheckBoxAutomaticallyCreateReferenceMode"
+        Me.CheckBoxAutomaticallyCreateReferenceMode.Size = New System.Drawing.Size(204, 17)
+        Me.CheckBoxAutomaticallyCreateReferenceMode.TabIndex = 1
+        Me.CheckBoxAutomaticallyCreateReferenceMode.Text = "&Automatically create Reference Mode"
+        Me.CheckBoxAutomaticallyCreateReferenceMode.UseVisualStyleBackColor = True
         '
         'CheckBoxUseNeo4jStyleEdgeLabels
         '
@@ -715,31 +743,15 @@ Partial Class frmCRUDModel
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
-        'CheckBoxAutomaticallyCreateReferenceMode
+        'CheckBoxHideOtherwiseForeignKeyColumns
         '
-        Me.CheckBoxAutomaticallyCreateReferenceMode.AutoSize = True
-        Me.CheckBoxAutomaticallyCreateReferenceMode.Location = New System.Drawing.Point(20, 38)
-        Me.CheckBoxAutomaticallyCreateReferenceMode.Name = "CheckBoxAutomaticallyCreateReferenceMode"
-        Me.CheckBoxAutomaticallyCreateReferenceMode.Size = New System.Drawing.Size(204, 17)
-        Me.CheckBoxAutomaticallyCreateReferenceMode.TabIndex = 1
-        Me.CheckBoxAutomaticallyCreateReferenceMode.Text = "&Automatically create Reference Mode"
-        Me.CheckBoxAutomaticallyCreateReferenceMode.UseVisualStyleBackColor = True
-        '
-        'TextBoxDefaultReferenceMode
-        '
-        Me.TextBoxDefaultReferenceMode.Location = New System.Drawing.Point(251, 61)
-        Me.TextBoxDefaultReferenceMode.Name = "TextBoxDefaultReferenceMode"
-        Me.TextBoxDefaultReferenceMode.Size = New System.Drawing.Size(100, 20)
-        Me.TextBoxDefaultReferenceMode.TabIndex = 4
-        '
-        'LabelPromptDefaultReferenceMode
-        '
-        Me.LabelPromptDefaultReferenceMode.AutoSize = True
-        Me.LabelPromptDefaultReferenceMode.Location = New System.Drawing.Point(19, 64)
-        Me.LabelPromptDefaultReferenceMode.Name = "LabelPromptDefaultReferenceMode"
-        Me.LabelPromptDefaultReferenceMode.Size = New System.Drawing.Size(226, 13)
-        Me.LabelPromptDefaultReferenceMode.TabIndex = 3
-        Me.LabelPromptDefaultReferenceMode.Text = "Default Reference Mode for new Entity Types:"
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.AutoSize = True
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.Location = New System.Drawing.Point(22, 92)
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.Name = "CheckBoxHideOtherwiseForeignKeyColumns"
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.Size = New System.Drawing.Size(204, 17)
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.TabIndex = 5
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.Text = "&Hide (otherwise) Foreign Key Columns"
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.UseVisualStyleBackColor = True
         '
         'frmCRUDModel
         '
@@ -842,4 +854,5 @@ Partial Class frmCRUDModel
     Friend WithEvents CheckBoxAutomaticallyCreateReferenceMode As CheckBox
     Friend WithEvents TextBoxDefaultReferenceMode As TextBox
     Friend WithEvents LabelPromptDefaultReferenceMode As Label
+    Friend WithEvents CheckBoxHideOtherwiseForeignKeyColumns As CheckBox
 End Class

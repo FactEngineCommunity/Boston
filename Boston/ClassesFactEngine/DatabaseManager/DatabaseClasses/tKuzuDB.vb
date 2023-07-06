@@ -349,6 +349,54 @@ Namespace FactEngine
 
         End Function
 
+        Public Overrides Function generateCREATERELATIONSHIPTABLE(ByRef arRDSRelation As RDS.Relation, Optional ByRef arTable As RDS.Table = Nothing) As String
+
+            Dim lsCommand As String = ""
+            Dim lsColumnDefinitions As String = Nothing
+
+            Try
+                Dim lrTable As RDS.Table = arTable
+
+                If lrTable IsNot Nothing Then
+                    Dim larColumn = (From Column In lrTable.Column
+                                     Where Not (Column.isPartOfPrimaryKey And Not Column.Role.JoinedORMObject.GetType = GetType(FBM.ValueType))
+                                     Select Column).ToList
+
+                    If Me.FBMModel.HideOtherwiseForeignKeyColumns Then
+                        larColumn.RemoveAll(Function(x) x.hasOutboundRelation = True)
+                    End If
+
+                    'Order
+                    larColumn = larColumn.OrderByDescending(Function(x) x.Index.Count > 0).ToList
+                    larColumn = larColumn.OrderBy(Function(x) x.getMetamodelDataType <> pcenumORMDataType.NumericAutoCounter).ToList
+
+
+                    lsColumnDefinitions = String.Join(", ", larColumn.Select(Function(lrColumn) lrColumn.Name & " " & lrColumn.DBDataType))
+                End If
+
+                '=========E.g. From Kuzu website==========================================================
+                'connection.query("CREATE REL TABLE Follows(FROM User TO User, since INT64)");
+                '=========================================================================================
+                lsCommand = "CREATE REL TABLE `" & arRDSRelation.ResponsibleFactType.Id & "`"
+                lsCommand &= " (FROM " & arRDSRelation.OriginTable.Name & " TO " & arRDSRelation.DestinationTable.Name
+                lsCommand &= If(lsColumnDefinitions Is Nothing, "", "," & lsColumnDefinitions)
+                lsCommand &= ")"
+
+                Return lsCommand
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return lsCommand
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Generates a CREATE TABLE Statement for the given Table, specific to the database type.
         ''' </summary>
@@ -365,10 +413,22 @@ Namespace FactEngine
                 Dim lrPrimaryKeyColumn As RDS.Column = Nothing
 
                 Dim larColumn = (From Column In lrTable.Column
-                                 Where Not Column.isPartOfPrimaryKey
+                                 Where Not (Column.isPartOfPrimaryKey And Not Column.Role.JoinedORMObject.GetType = GetType(FBM.ValueType))
                                  Select Column).ToList
 
-                lrPrimaryKeyColumn = larColumn.find(Function(x) x.index.count > 0)
+                lrPrimaryKeyColumn = larColumn.Find(Function(x) x.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter)
+                If lrPrimaryKeyColumn Is Nothing Then
+                    lrPrimaryKeyColumn = larColumn.Find(Function(x) x.Index.Count > 0)
+                End If
+
+
+                If Me.FBMModel.HideOtherwiseForeignKeyColumns Then
+                    larColumn.RemoveAll(Function(x) x.hasOutboundRelation = True)
+                End If
+
+                'Order
+                larColumn = larColumn.OrderByDescending(Function(x) x.Index.Count > 0).ToList
+                larColumn = larColumn.OrderBy(Function(x) x.getMetamodelDataType <> pcenumORMDataType.NumericAutoCounter).ToList
 
                 Dim lsColumnDefinitions As String = ""
                 lsColumnDefinitions = String.Join(", ", larColumn.Select(Function(lrColumn) lrColumn.Name & " " & lrColumn.DBDataType))
@@ -1329,6 +1389,41 @@ FinishedProcessing:
         End Sub
 
         ''' <summary>
+        ''' Creates or Recreates the Relation in the database.
+        '''   NB For those databases that have a table for Relations, such as KuzuDB which is an otherwise Graph Database that has RELATION TABLES for Edge Types.
+        ''' </summary>
+        ''' <param name="arTable"></param>
+        Public Overrides Sub recreateRelation(ByRef arRDSRelation As RDS.Relation)
+
+            Try
+                Dim loResult As kuzu_query_result
+                Dim lsErrorMessage As String = Nothing
+
+                Try
+                    Dim lsQuery As String = Me.generateCREATERELATIONSHIPTABLE(arRDSRelation)
+
+                    loResult = kuzu_connection_query(Me.conn, lsQuery)
+
+                    lsErrorMessage = kuzu_query_result_get_error_message(loResult)
+
+                    If lsErrorMessage IsNot Nothing Then Throw New Exception(lsErrorMessage)
+
+                Catch ex As Exception
+                    Throw New Exception(ex.Message.AppendDoubleLineBreak(lsErrorMessage))
+                End Try
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+
+        ''' <summary>
         ''' Creates or Recreates the Table in the database.
         ''' </summary>
         ''' <param name="arTable"></param>
@@ -1353,6 +1448,7 @@ FinishedProcessing:
                     loResult = kuzu_connection_query(Me.conn, lsQuery)
 
                     lsErrorMessage = kuzu_query_result_get_error_message(loResult)
+
                 Catch ex As Exception
                     Throw New Exception(ex.Message.AppendDoubleLineBreak(lsErrorMessage))
                 End Try
@@ -1496,7 +1592,13 @@ FinishedProcessing:
 
                 lrRecordset = Me.GO(lsSQLQuery)
 
-                Return lrRecordset.Facts.Count > 0
+                If lrRecordset.Facts.Count = 0 Then
+
+                    Return Me.getTables.Find(Function(x) x.Name = asTableName) IsNot Nothing
+
+                Else
+                    Return True
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

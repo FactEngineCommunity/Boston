@@ -90,7 +90,7 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
@@ -145,7 +145,7 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arRelation.OriginTable, arRelation.OriginTable.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arRelation.OriginTable, arRelation.OriginTable.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "INSERT INTO " & arRelation.OriginTable.Name & "_temp SELECT " & lsColumnList & " FROM [" & arRelation.OriginTable.Name & "]"
                             cmd.ExecuteNonQuery()
@@ -205,7 +205,7 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
@@ -260,7 +260,7 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
@@ -405,7 +405,7 @@ Namespace FactEngine
         ''' <param name="arTable">The RDS Table for which the SQL CREATE statement is to be generated.</param>
         ''' <param name="asTableName">Optional table name for the table in the CREATE statement.</param>
         ''' <returns></returns>
-        Public Overrides Function generateSQLCREATETABLEStatement(ByRef arTable As RDS.Table,
+        Public Overrides Function generateCREATETABLEStatement(ByRef arTable As RDS.Table,
                                                                   Optional asTableName As String = Nothing) As String
 
             Try
@@ -1076,7 +1076,7 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
@@ -1131,7 +1131,7 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arIndex.Table, arIndex.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "INSERT INTO " & arIndex.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arIndex.Table.Name & "]"
                             cmd.ExecuteNonQuery()
@@ -1183,7 +1183,7 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arTable, arTable.Name)
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arTable, arTable.Name)
                             cmd.ExecuteNonQuery()
                         End Using
 
@@ -1230,7 +1230,7 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateSQLCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
                             cmd.CommandText = "INSERT INTO " & arColumn.Table.Name & "_temp SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
                             cmd.ExecuteNonQuery()
