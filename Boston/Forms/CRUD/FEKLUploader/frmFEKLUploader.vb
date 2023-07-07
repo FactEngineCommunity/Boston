@@ -25,6 +25,8 @@ Public Class frmFEKLUploader
         Try
             Me.LabelModelName.Text = Me.mrModel.Name
 
+            Call Me.LoadDatabaseTypes()
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -35,6 +37,28 @@ Public Class frmFEKLUploader
         End Try
 
     End Sub
+
+    Private Sub LoadDatabaseTypes()
+
+        Try
+            Dim lrComboboxItem = New tComboboxItem(pcenumDatabaseType.None, pcenumDatabaseType.None.ToString, pcenumDatabaseType.None)
+            Me.ToolStripComboBoxDatabaseType.Items.Add(lrComboboxItem)
+            lrComboboxItem = New tComboboxItem(pcenumDatabaseType.SQLite, pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.SQLite)
+            Me.ToolStripComboBoxDatabaseType.Items.Add(lrComboboxItem)
+
+            Me.ToolStripComboBoxDatabaseType.SelectedIndex = 0
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 
     Private Sub ButtonOpenFEKLFile_Click(sender As Object, e As EventArgs) Handles ButtonOpenFEKLFile.Click
 
@@ -235,6 +259,40 @@ Public Class frmFEKLUploader
             Me.Hide()
             Me.Close()
             Me.Dispose()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripButtonDDLExtractFEKL_Click(sender As Object, e As EventArgs) Handles ToolStripButtonDDLExtractFEKL.Click
+
+        Try
+            'CodeSafe
+            If Me.TextBoxDDL.Text.Trim = "" Then
+                MsgBox("Add some DDL to the text box.")
+                Exit Sub
+            End If
+
+            Dim lrDatabaseConnection As FactEngine.DatabaseConnection = Nothing
+
+            Select Case CType(Me.ToolStripComboBoxDatabaseType.SelectedItem.ItemData, pcenumDatabaseType)
+                Case Is = pcenumDatabaseType.SQLite
+                    lrDatabaseConnection = New FactEngine.SQLiteConnection
+                Case Else
+                    Exit Sub
+            End Select
+
+            Dim larTable As List(Of RDS.Table) = lrDatabaseConnection.ParseDDL(Me.TextBoxDDL.Text.Trim)
+
+            Debugger.Break()
+
 
         Catch ex As Exception
             Dim lsMessage As String

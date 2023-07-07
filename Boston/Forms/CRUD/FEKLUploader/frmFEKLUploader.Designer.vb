@@ -22,18 +22,33 @@ Partial Class frmFEKLUploader
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFEKLUploader))
         Me.GroupBox = New System.Windows.Forms.GroupBox()
+        Me.LabelErrorMessage = New System.Windows.Forms.Label()
+        Me.LabelPromptErrorMessage = New System.Windows.Forms.Label()
+        Me.LabelErrorType = New System.Windows.Forms.Label()
+        Me.LabelPromptErrorType = New System.Windows.Forms.Label()
+        Me.RichTextBoxFEKLDocument = New System.Windows.Forms.RichTextBox()
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelPromptModelName = New System.Windows.Forms.Label()
         Me.ButtonLoadIntoModel = New System.Windows.Forms.Button()
         Me.ButtonOpenFEKLFile = New System.Windows.Forms.Button()
         Me.ButtonClose = New System.Windows.Forms.Button()
-        Me.RichTextBoxFEKLDocument = New System.Windows.Forms.RichTextBox()
-        Me.LabelPromptErrorType = New System.Windows.Forms.Label()
-        Me.LabelErrorType = New System.Windows.Forms.Label()
-        Me.LabelPromptErrorMessage = New System.Windows.Forms.Label()
-        Me.LabelErrorMessage = New System.Windows.Forms.Label()
+        Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.TabPageFEKL = New System.Windows.Forms.TabPage()
+        Me.TabPageDDL2FEKL = New System.Windows.Forms.TabPage()
+        Me.TextBoxDDL = New System.Windows.Forms.TextBox()
+        Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStripButtonDDLExtractFEKL = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripLabelPromptDatabaseType = New System.Windows.Forms.ToolStripLabel()
+        Me.ToolStripComboBoxDatabaseType = New System.Windows.Forms.ToolStripComboBox()
         Me.GroupBox.SuspendLayout()
+        Me.TabControl1.SuspendLayout()
+        Me.TabPageFEKL.SuspendLayout()
+        Me.TabPageDDL2FEKL.SuspendLayout()
+        Me.TableLayoutPanel1.SuspendLayout()
+        Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox
@@ -41,11 +56,11 @@ Partial Class frmFEKLUploader
         Me.GroupBox.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox.Controls.Add(Me.TabControl1)
         Me.GroupBox.Controls.Add(Me.LabelErrorMessage)
         Me.GroupBox.Controls.Add(Me.LabelPromptErrorMessage)
         Me.GroupBox.Controls.Add(Me.LabelErrorType)
         Me.GroupBox.Controls.Add(Me.LabelPromptErrorType)
-        Me.GroupBox.Controls.Add(Me.RichTextBoxFEKLDocument)
         Me.GroupBox.Controls.Add(Me.LabelModelName)
         Me.GroupBox.Controls.Add(Me.LabelPromptModelName)
         Me.GroupBox.Controls.Add(Me.ButtonLoadIntoModel)
@@ -55,6 +70,54 @@ Partial Class frmFEKLUploader
         Me.GroupBox.Size = New System.Drawing.Size(494, 496)
         Me.GroupBox.TabIndex = 0
         Me.GroupBox.TabStop = False
+        '
+        'LabelErrorMessage
+        '
+        Me.LabelErrorMessage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.LabelErrorMessage.Location = New System.Drawing.Point(92, 457)
+        Me.LabelErrorMessage.Name = "LabelErrorMessage"
+        Me.LabelErrorMessage.Size = New System.Drawing.Size(393, 36)
+        Me.LabelErrorMessage.TabIndex = 9
+        Me.LabelErrorMessage.Text = "N/A"
+        '
+        'LabelPromptErrorMessage
+        '
+        Me.LabelPromptErrorMessage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.LabelPromptErrorMessage.AutoSize = True
+        Me.LabelPromptErrorMessage.Location = New System.Drawing.Point(7, 457)
+        Me.LabelPromptErrorMessage.Name = "LabelPromptErrorMessage"
+        Me.LabelPromptErrorMessage.Size = New System.Drawing.Size(78, 13)
+        Me.LabelPromptErrorMessage.TabIndex = 8
+        Me.LabelPromptErrorMessage.Text = "Error Message:"
+        '
+        'LabelErrorType
+        '
+        Me.LabelErrorType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.LabelErrorType.AutoSize = True
+        Me.LabelErrorType.Location = New System.Drawing.Point(72, 434)
+        Me.LabelErrorType.Name = "LabelErrorType"
+        Me.LabelErrorType.Size = New System.Drawing.Size(27, 13)
+        Me.LabelErrorType.TabIndex = 7
+        Me.LabelErrorType.Text = "N/A"
+        '
+        'LabelPromptErrorType
+        '
+        Me.LabelPromptErrorType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.LabelPromptErrorType.AutoSize = True
+        Me.LabelPromptErrorType.Location = New System.Drawing.Point(7, 434)
+        Me.LabelPromptErrorType.Name = "LabelPromptErrorType"
+        Me.LabelPromptErrorType.Size = New System.Drawing.Size(59, 13)
+        Me.LabelPromptErrorType.TabIndex = 6
+        Me.LabelPromptErrorType.Text = "Error Type:"
+        '
+        'RichTextBoxFEKLDocument
+        '
+        Me.RichTextBoxFEKLDocument.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.RichTextBoxFEKLDocument.Location = New System.Drawing.Point(3, 3)
+        Me.RichTextBoxFEKLDocument.Name = "RichTextBoxFEKLDocument"
+        Me.RichTextBoxFEKLDocument.Size = New System.Drawing.Size(465, 319)
+        Me.RichTextBoxFEKLDocument.TabIndex = 5
+        Me.RichTextBoxFEKLDocument.Text = ""
         '
         'LabelModelName
         '
@@ -102,55 +165,91 @@ Partial Class frmFEKLUploader
         Me.ButtonClose.Text = "&Close"
         Me.ButtonClose.UseVisualStyleBackColor = True
         '
-        'RichTextBoxFEKLDocument
+        'TabControl1
         '
-        Me.RichTextBoxFEKLDocument.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.RichTextBoxFEKLDocument.Location = New System.Drawing.Point(6, 80)
-        Me.RichTextBoxFEKLDocument.Name = "RichTextBoxFEKLDocument"
-        Me.RichTextBoxFEKLDocument.Size = New System.Drawing.Size(480, 347)
-        Me.RichTextBoxFEKLDocument.TabIndex = 5
-        Me.RichTextBoxFEKLDocument.Text = ""
+        Me.TabControl1.Controls.Add(Me.TabPageFEKL)
+        Me.TabControl1.Controls.Add(Me.TabPageDDL2FEKL)
+        Me.TabControl1.Location = New System.Drawing.Point(6, 80)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(479, 351)
+        Me.TabControl1.TabIndex = 10
         '
-        'LabelPromptErrorType
+        'TabPageFEKL
         '
-        Me.LabelPromptErrorType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.LabelPromptErrorType.AutoSize = True
-        Me.LabelPromptErrorType.Location = New System.Drawing.Point(7, 434)
-        Me.LabelPromptErrorType.Name = "LabelPromptErrorType"
-        Me.LabelPromptErrorType.Size = New System.Drawing.Size(59, 13)
-        Me.LabelPromptErrorType.TabIndex = 6
-        Me.LabelPromptErrorType.Text = "Error Type:"
+        Me.TabPageFEKL.Controls.Add(Me.RichTextBoxFEKLDocument)
+        Me.TabPageFEKL.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageFEKL.Name = "TabPageFEKL"
+        Me.TabPageFEKL.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageFEKL.Size = New System.Drawing.Size(471, 325)
+        Me.TabPageFEKL.TabIndex = 0
+        Me.TabPageFEKL.Text = "FEKL"
+        Me.TabPageFEKL.UseVisualStyleBackColor = True
         '
-        'LabelErrorType
+        'TabPageDDL2FEKL
         '
-        Me.LabelErrorType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.LabelErrorType.AutoSize = True
-        Me.LabelErrorType.Location = New System.Drawing.Point(72, 434)
-        Me.LabelErrorType.Name = "LabelErrorType"
-        Me.LabelErrorType.Size = New System.Drawing.Size(27, 13)
-        Me.LabelErrorType.TabIndex = 7
-        Me.LabelErrorType.Text = "N/A"
+        Me.TabPageDDL2FEKL.Controls.Add(Me.TableLayoutPanel1)
+        Me.TabPageDDL2FEKL.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageDDL2FEKL.Name = "TabPageDDL2FEKL"
+        Me.TabPageDDL2FEKL.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageDDL2FEKL.Size = New System.Drawing.Size(471, 325)
+        Me.TabPageDDL2FEKL.TabIndex = 1
+        Me.TabPageDDL2FEKL.Text = "DDL-2-FEKL"
+        Me.TabPageDDL2FEKL.UseVisualStyleBackColor = True
         '
-        'LabelPromptErrorMessage
+        'TextBoxDDL
         '
-        Me.LabelPromptErrorMessage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.LabelPromptErrorMessage.AutoSize = True
-        Me.LabelPromptErrorMessage.Location = New System.Drawing.Point(7, 457)
-        Me.LabelPromptErrorMessage.Name = "LabelPromptErrorMessage"
-        Me.LabelPromptErrorMessage.Size = New System.Drawing.Size(78, 13)
-        Me.LabelPromptErrorMessage.TabIndex = 8
-        Me.LabelPromptErrorMessage.Text = "Error Message:"
+        Me.TextBoxDDL.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TextBoxDDL.Location = New System.Drawing.Point(3, 31)
+        Me.TextBoxDDL.Multiline = True
+        Me.TextBoxDDL.Name = "TextBoxDDL"
+        Me.TextBoxDDL.Size = New System.Drawing.Size(459, 285)
+        Me.TextBoxDDL.TabIndex = 0
         '
-        'LabelErrorMessage
+        'TableLayoutPanel1
         '
-        Me.LabelErrorMessage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.LabelErrorMessage.Location = New System.Drawing.Point(92, 457)
-        Me.LabelErrorMessage.Name = "LabelErrorMessage"
-        Me.LabelErrorMessage.Size = New System.Drawing.Size(393, 36)
-        Me.LabelErrorMessage.TabIndex = 9
-        Me.LabelErrorMessage.Text = "N/A"
+        Me.TableLayoutPanel1.ColumnCount = 1
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel1.Controls.Add(Me.ToolStrip1, 0, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.TextBoxDDL, 0, 1)
+        Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(3, 3)
+        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
+        Me.TableLayoutPanel1.RowCount = 2
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909!))
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 90.90909!))
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(465, 319)
+        Me.TableLayoutPanel1.TabIndex = 1
+        '
+        'ToolStrip1
+        '
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonDDLExtractFEKL, Me.ToolStripLabelPromptDatabaseType, Me.ToolStripComboBoxDatabaseType})
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.ToolStrip1.Name = "ToolStrip1"
+        Me.ToolStrip1.Size = New System.Drawing.Size(465, 25)
+        Me.ToolStrip1.TabIndex = 0
+        Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'ToolStripButtonDDLExtractFEKL
+        '
+        Me.ToolStripButtonDDLExtractFEKL.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.ToolStripButtonDDLExtractFEKL.Image = CType(resources.GetObject("ToolStripButtonDDLExtractFEKL.Image"), System.Drawing.Image)
+        Me.ToolStripButtonDDLExtractFEKL.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButtonDDLExtractFEKL.Name = "ToolStripButtonDDLExtractFEKL"
+        Me.ToolStripButtonDDLExtractFEKL.Size = New System.Drawing.Size(75, 22)
+        Me.ToolStripButtonDDLExtractFEKL.Text = "&Extract FEKL"
+        '
+        'ToolStripLabelPromptDatabaseType
+        '
+        Me.ToolStripLabelPromptDatabaseType.Name = "ToolStripLabelPromptDatabaseType"
+        Me.ToolStripLabelPromptDatabaseType.Size = New System.Drawing.Size(85, 22)
+        Me.ToolStripLabelPromptDatabaseType.Text = "Database Type:"
+        '
+        'ToolStripComboBoxDatabaseType
+        '
+        Me.ToolStripComboBoxDatabaseType.Name = "ToolStripComboBoxDatabaseType"
+        Me.ToolStripComboBoxDatabaseType.Size = New System.Drawing.Size(121, 25)
         '
         'frmFEKLUploader
         '
@@ -163,6 +262,13 @@ Partial Class frmFEKLUploader
         Me.Text = "FEKL Uploader"
         Me.GroupBox.ResumeLayout(False)
         Me.GroupBox.PerformLayout()
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPageFEKL.ResumeLayout(False)
+        Me.TabPageDDL2FEKL.ResumeLayout(False)
+        Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.TableLayoutPanel1.PerformLayout()
+        Me.ToolStrip1.ResumeLayout(False)
+        Me.ToolStrip1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -178,4 +284,13 @@ Partial Class frmFEKLUploader
     Friend WithEvents LabelPromptErrorMessage As Label
     Friend WithEvents LabelErrorType As Label
     Friend WithEvents LabelPromptErrorType As Label
+    Friend WithEvents TabControl1 As TabControl
+    Friend WithEvents TabPageFEKL As TabPage
+    Friend WithEvents TabPageDDL2FEKL As TabPage
+    Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
+    Friend WithEvents ToolStrip1 As ToolStrip
+    Friend WithEvents ToolStripButtonDDLExtractFEKL As ToolStripButton
+    Friend WithEvents ToolStripLabelPromptDatabaseType As ToolStripLabel
+    Friend WithEvents ToolStripComboBoxDatabaseType As ToolStripComboBox
+    Friend WithEvents TextBoxDDL As TextBox
 End Class

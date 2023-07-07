@@ -255,6 +255,10 @@ Namespace FactEngine
             Return False
         End Function
 
+        Public Overridable Function ParseDDL(ByVal asDDL As String) As List(Of RDS.Table)
+            Return New List(Of RDS.Table)
+        End Function
+
         ''' <summary>
         ''' Creates or Recreates the Relation in the database.
         '''   NB For those databases that have a table for Relations, such as KuzuDB which is an otherwise Graph Database that has RELATION TABLES for Edge Types.

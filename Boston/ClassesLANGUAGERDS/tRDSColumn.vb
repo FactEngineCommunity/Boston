@@ -70,13 +70,20 @@ Namespace RDS
             End Get
         End Property
 
+
+        Public _DBDataType As String = "STRING"
+
+        ''' <summary>
+        ''' Gets the Value Type's DBDataType, else _DBDataType, Default "STRING"
+        ''' </summary>
+        ''' <returns></returns>
         <XmlIgnore()>
         Public ReadOnly Property DBDataType As String
             Get
                 Try
                     Return Me.ActiveRole.JoinsValueType.DBDataType
                 Catch ex As Exception
-                    Return "STRING"
+                    Return _DBDataType
                 End Try
             End Get
         End Property

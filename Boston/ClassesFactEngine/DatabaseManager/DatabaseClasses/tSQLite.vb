@@ -2,6 +2,7 @@
 Imports System.Data.SQLite
 Imports System.Reflection
 Imports System.Threading.Tasks
+Imports System.Text.RegularExpressions
 
 Namespace FactEngine
 
@@ -22,6 +23,12 @@ Namespace FactEngine
                 Me._Connection = value
             End Set
         End Property
+
+        ''' <summary>
+        ''' Parameterless Constructor
+        ''' </summary>
+        Public Sub New()
+        End Sub
 
         Public Sub New(ByRef arFBMModel As FBM.Model,
                        ByVal asDatabaseConnectionString As String,
@@ -1486,6 +1493,126 @@ Namespace FactEngine
             End Try
 
         End Function
+
+        Public Overrides Function ParseDDL(ByVal asDDL As String) As List(Of RDS.Table)
+
+            Dim larTable As New List(Of RDS.Table)()
+            Dim ddlStatements() As String = asDDL.Split(New String() {";"}, StringSplitOptions.RemoveEmptyEntries)
+
+            For Each statement As String In ddlStatements
+
+                Dim lrTable As RDS.Table = ParseTableDefinition(larTable, statement)
+                If lrTable IsNot Nothing Then
+                    larTable.Add(lrTable)
+                End If
+
+            Next
+
+            Return larTable
+        End Function
+
+        Private Function ParseTableDefinition(ByRef aarTable As List(Of RDS.Table), ByVal asDDL As String) As RDS.Table
+
+            Dim lrTable As New RDS.Table
+
+            Dim tablePattern As String = "CREATE\s+TABLE\s+\[([^\]]+)\]"
+            Dim tableName As String = String.Empty
+            Dim columns As New List(Of RDS.Column)()
+            Dim primaryKeys As New List(Of String)()
+            Dim foreignKeys As New List(Of RDS.Relation)()
+
+            Dim match As Match = Regex.Match(asDDL, tablePattern, RegexOptions.IgnoreCase)
+
+            If match.Success Then
+                tableName = match.Groups(1).Value.Trim()
+                Dim columnStatements() As String = asDDL.Substring(match.Length).Split(New String() {","}, StringSplitOptions.RemoveEmptyEntries)
+
+                For Each columnStatement As String In columnStatements
+                    Dim columnDefinition As RDS.Column = ParseColumnDefinition(columnStatement)
+                    If columnDefinition IsNot Nothing Then
+                        columns.Add(columnDefinition)
+                    End If
+
+                    Dim primaryKey As String = ParsePrimaryKey(columnStatement)
+                    If primaryKey IsNot Nothing Then
+                        primaryKeys.Add(primaryKey)
+                    End If
+
+                    Dim foreignKey As RDS.Relation = ParseForeignKey(lrTable, aarTable, columnStatement)
+                    If foreignKey IsNot Nothing Then
+                        foreignKeys.Add(foreignKey)
+                    End If
+                Next
+            End If
+
+            If tableName <> String.Empty AndAlso columns.Count > 0 Then
+                lrTable.Name = tableName
+                lrTable.Column = columns
+                'tableDefinition.PrimaryKeys = primaryKeys
+                'tableDefinition.ForeignKeys = foreignKeys
+                Return lrTable
+            End If
+
+            Return Nothing
+        End Function
+
+        Private Function ParseColumnDefinition(ByVal columnStatement As String) As RDS.Column
+
+            Dim columnPattern As String = "\s*([^\s]+)\s+([^\s]+)\s*.*"
+
+            Dim match As Match = Regex.Match(columnStatement, columnPattern, RegexOptions.IgnoreCase)
+
+            If match.Success Then
+                Dim columnName As String = match.Groups(1).Value.Trim()
+                Dim dataType As String = match.Groups(2).Value.Trim()
+
+                Dim lrColumn As New RDS.Column
+                lrColumn.Name = columnName
+                lrColumn._DBDataType = dataType
+
+                Return lrColumn
+            End If
+
+            Return Nothing
+        End Function
+
+        Private Function ParsePrimaryKey(ByVal columnStatement As String) As String
+
+            Dim primaryKeyPattern As String = "PRIMARY KEY\s*\((.+)\)"
+            Dim match As Match = Regex.Match(columnStatement, primaryKeyPattern, RegexOptions.IgnoreCase)
+
+            If match.Success Then
+                Return match.Groups(1).Value.Trim()
+            End If
+
+            Return Nothing
+
+        End Function
+
+        Private Function ParseForeignKey(ByRef arOriginTable As RDS.Table, ByRef aarTable As List(Of RDS.Table), ByVal columnStatement As String) As RDS.Relation
+
+            Dim foreignKeyPattern As String = "FOREIGN KEY\s*\((.+)\)\s*REFERENCES\s*([^\(]+)\s*\((.+)\)"
+            Dim match As Match = Regex.Match(columnStatement, foreignKeyPattern, RegexOptions.IgnoreCase)
+
+            If match.Success Then
+                Dim columnName As String = match.Groups(1).Value.Trim()
+                Dim referencedTable As String = match.Groups(2).Value.Trim()
+                Dim referencedColumn As String = match.Groups(3).Value.Trim()
+
+                Dim foreignKeyDefinition As New RDS.Relation
+
+                foreignKeyDefinition.OriginTable = arOriginTable
+                'foreignKeyDefinition.ColumnName = columnName
+                foreignKeyDefinition.DestinationTable = aarTable.Find(Function(x) x.Name = referencedTable)
+                'foreignKeyDefinition.ReferencedColumn = referencedColumn
+
+                Return foreignKeyDefinition
+            End If
+
+            Return Nothing
+
+        End Function
+
 
         ''' <summary>
         ''' Creates or Recreates the Table in the database.
