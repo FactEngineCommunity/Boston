@@ -192,28 +192,30 @@ Partial Public Class tBrain
         Try
             Me.Model = prApplication.WorkingModel
 
-            Dim lrFactType As FBM.FactType
+            Dim lrFactType As FBM.FactType = Nothing
+            Dim lrEntityType As FBM.EntityType = Nothing
             Dim lrFactTypeInstance As FBM.FactTypeInstance = Nothing
 
             Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT = New List(Of VAQL.ModelElementClause)
 
             Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement, Me.VAQLParsetree.Nodes(0))
 
-            Dim lsFactTypeName As String = Trim(Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT(0).MODELELEMENTNAME)
+            Dim lsObjectTypeName As String = Trim(Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT(0).MODELELEMENTNAME)
             Dim lsActualModelElementName As String = ""
 
-            Dim lrModelObject = Me.Model.GetModelObjectByName(lsFactTypeName)
+            Dim lrModelObject = Me.Model.GetModelObjectByName(lsObjectTypeName)
 
-            If Me.Model.GetConceptTypeByNameFuzzy(lsFactTypeName, lsActualModelElementName) = pcenumConceptType.FactType Then
+            If Me.Model.GetConceptTypeByNameFuzzy(lsObjectTypeName, lsActualModelElementName) = pcenumConceptType.FactType Then
                 '---------------------------------------------------------
                 'Great! The name identified by the user is an EntityType
                 '---------------------------------------------------------
 
-                lsFactTypeName = lsActualModelElementName
-                lrModelObject = Me.Model.GetModelObjectByName(lsFactTypeName)
+                lsObjectTypeName = lsActualModelElementName
+                lrModelObject = Me.Model.GetModelObjectByName(lsObjectTypeName)
+                lrFactType = lrModelObject
 
             ElseIf lrModelObject Is Nothing Then
-                lsMessage = lsFactTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
+                lsMessage = lsObjectTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
                 If arDSCError IsNot Nothing Then
                     arDSCError.Success = False
                     arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
@@ -221,9 +223,13 @@ Partial Public Class tBrain
                 End If
                 Me.send_data(lsMessage)
                 Return False
+            ElseIf lrModelObject.GetType Is GetType(FBM.EntityType) Then
+
+                lsObjectTypeName = lsActualModelElementName
+                lrEntityType = lrModelObject
 
             ElseIf lrModelObject.GetType IsNot GetType(FBM.FactType) Then
-                lsMessage = lsFactTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
+                lsMessage = lsObjectTypeName & " is not a Fact Type. You need to either create the Fact Type or make sure the name does not conflict with the name of another Object Type."
                 If arDSCError IsNot Nothing Then
                     arDSCError.Success = False
                     arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
@@ -234,30 +240,49 @@ Partial Public Class tBrain
 
             End If
 
-            lrFactType = lrModelObject
 
             '=========================================================================
             'Create the Internal Uniqueness Constraint
 
             Dim larRole As New List(Of FBM.Role)
 
+            If lrFactType IsNot Nothing Then
+#Region "Internal Uniqueness Constraint"
+                For liInd = 1 To Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT.Count - 1
 
-            For liInd = 1 To Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT.Count - 1
+                    Dim lsModelElementName = Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT(liInd).MODELELEMENTNAME
+                    lrModelObject = Me.Model.GetModelObjectByName(lsModelElementName)
 
-                Dim lsModelElementName = Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT(liInd).MODELELEMENTNAME
-                lrModelObject = Me.Model.GetModelObjectByName(lsModelElementName)
-
-                If lrModelObject Is Nothing Then
-                    lsMessage = lsModelElementName & " is not a Object Type in the Model."
-                    If arDSCError IsNot Nothing Then
-                        arDSCError.Success = False
-                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                        arDSCError.ErrorString = lsMessage
+                    If lrModelObject Is Nothing Then
+                        lsMessage = lsModelElementName & " is not a Object Type in the Model."
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDSCError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
+                    ElseIf lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementName) Is Nothing Then
+                        lsMessage = lsModelElementName & " is not a Object Type that plays any Role in the Fact Type, " & lrFactType.Id & "."
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDSCError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
+                    Else
+                        larRole.Add(lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementName))
                     End If
-                    Me.send_data(lsMessage)
-                    Return False
-                ElseIf lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementName) Is Nothing Then
-                    lsMessage = lsModelElementName & " is not a Object Type that plays any Role in the Fact Type, " & lrFactType.Id & "."
+                Next
+
+#Region "Checks before creating Internal Uniqueness Constraint"
+
+                Dim lbRemoveExistingRoleConstraint As Boolean = False
+
+                If larRole.Count < lrFactType.RoleGroup.Count - 1 Then
+
+                    lsMessage = "The number of Object Types played by Roles in the Internal Uniqueness Constraint need to be at least the number of Roles in the Fact Type minus one."
                     If arDSCError IsNot Nothing Then
                         arDSCError.Success = False
                         arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
@@ -266,42 +291,103 @@ Partial Public Class tBrain
                     Me.send_data(lsMessage)
                     Return False
                 Else
-                    larRole.Add(lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementName))
+
+                    If lrFactType.InternalUniquenessConstraint.Count > 0 Then
+                        '---------------------------------------------------
+                        'The FactType already has an InternalRoleConstraint
+                        '---------------------------------------------------
+                        '------------------------------------------------------------------------
+                        'If the SelectedRoles spans 'All' the Roles within the FactType, then
+                        '  remove all existing InternalUniquenessConstraints from the FactType
+                        '  before adding the TotalInternalUniquenessConstraint (because when a
+                        '  TotalInternalUniquenessConstraint is on a FactType, it is the 'only'
+                        '  InternalUniquenessConstraint allowed. 
+                        '  NB Granted, a TotalInternalUniquenessConstraint may already exist on 
+                        '  the FactType, but deleting it causes no harm if it is immediately replaced.
+                        '------------------------------------------------------------------------                        
+                        If larRole.Count = lrFactType.Arity Then
+                            If lrFactType.InternalUniquenessConstraint(0).RoleConstraintRole.Count = lrFactType.Arity Then
+                                lsMessage = "The Fact Type, '" & lrFactType.Id & "', already has a total internal uniqueness constraint."
+                                If arDSCError IsNot Nothing Then
+                                    arDSCError.Success = False
+                                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                                    arDSCError.ErrorString = lsMessage
+                                End If
+                                Me.send_data(lsMessage)
+                                Return False
+                            Else
+                                Call lrFactType.RemoveInternalUniquenessConstraints(True)  'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
+                            End If
+                        ElseIf lrFactType.InternalUniquenessConstraint(0).RoleConstraintRole.Count = lrFactType.Arity Then
+                            lbRemoveExistingRoleConstraint = True 'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
+                        End If
+
+                    End If
+
+                    '------------------------------------------------------------------------------
+                    'Create a dummy RoleConstraint for the InternalUniquenessConstraint
+                    '  so that we can check if it already exists for the FactType.
+                    '  NB This is only a dummy RoleConstraint and is not added to 
+                    '  the model (Parameter: abAddToModel is False).
+                    '  Once we confirm that the InternalUniquenssConstraint does not
+                    '  already exist, we create the InternalUniquenessConstraint/RoleConstraint
+                    '  via the FactTypeInstance (see futher below).
+                    '------------------------------------------------------------------------------
+
+                    Dim lrRoleConstraint As New FBM.RoleConstraint(lrFactType.Model, pcenumRoleConstraintType.InternalUniquenessConstraint, larRole)
+
+                    If lrFactType.exists_InternalUniquenessConstraint_by_role_span(lrRoleConstraint) Then
+                        '----------------------------------------------------------------
+                        'InternalUniquenessConstraint already exists for Roles selected
+                        '----------------------------------------------------------------
+                        lsMessage = "The Fact Type, " & lrFactType.Id & " already has an Internal Uniqueness Constraint plays by the Roles that link the nominated Object Types."
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDSCError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
+                    End If
+
+                    If lbRemoveExistingRoleConstraint Then
+                        Call lrFactType.RemoveInternalUniquenessConstraints(True, True)
+                    End If
+#End Region
+
+                    Call lrFactType.CreateInternalUniquenessConstraint(larRole, False, True, True, False, Nothing, abBroadcastInterfaceEvent, False)
+
                 End If
-            Next
+#End Region
+            Else 'EntityType
+#Region "External Uniqueness Constraint"
 
-#Region "Checks before creating Internal Uniqueness Constraint"
+                For liInd = 1 To Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT.Count - 1
 
-            Dim lbRemoveExistingRoleConstraint As Boolean = False
+                    Dim lsModelElementName = Me.VAQLProcessor.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement.MODELELEMENT(liInd).MODELELEMENTNAME
+                    lrModelObject = Me.Model.GetModelObjectByName(lsModelElementName)
 
-            If larRole.Count < lrFactType.RoleGroup.Count - 1 Then
+                    If lrModelObject Is Nothing Then
+                        lsMessage = lsModelElementName & " is not a Object Type in the Model."
+                        If arDSCError IsNot Nothing Then
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                            arDSCError.ErrorString = lsMessage
+                        End If
+                        Me.send_data(lsMessage)
+                        Return False
+                    Else
 
-                lsMessage = "The number of Object Types played by Roles in the Internal Uniqueness Constraint need to be at least the number of Roles in the Fact Type minus one."
-                If arDSCError IsNot Nothing Then
-                    arDSCError.Success = False
-                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                    arDSCError.ErrorString = lsMessage
-                End If
-                Me.send_data(lsMessage)
-                Return False
-            Else
+                        Dim larFactType = From FactType In Me.Model.FactType
+                                          Where FactType.Arity = 2
+                                          Where FactType.RoleGroup.Any(Function(rg) rg.JoinedORMObject.Id = lrEntityType.Id)
+                                          Where FactType.RoleGroup.Any(Function(rg) rg.JoinedORMObject.Id = lsModelElementName)
+                                          Select FactType
 
-                If lrFactType.InternalUniquenessConstraint.Count > 0 Then
-                    '---------------------------------------------------
-                    'The FactType already has an InternalRoleConstraint
-                    '---------------------------------------------------
-                    '------------------------------------------------------------------------
-                    'If the SelectedRoles spans 'All' the Roles within the FactType, then
-                    '  remove all existing InternalUniquenessConstraints from the FactType
-                    '  before adding the TotalInternalUniquenessConstraint (because when a
-                    '  TotalInternalUniquenessConstraint is on a FactType, it is the 'only'
-                    '  InternalUniquenessConstraint allowed. 
-                    '  NB Granted, a TotalInternalUniquenessConstraint may already exist on 
-                    '  the FactType, but deleting it causes no harm if it is immediately replaced.
-                    '------------------------------------------------------------------------                        
-                    If larRole.Count = lrFactType.Arity Then
-                        If lrFactType.InternalUniquenessConstraint(0).RoleConstraintRole.Count = lrFactType.Arity Then
-                            lsMessage = "The Fact Type, '" & lrFactType.Id & "', already has a total internal uniqueness constraint."
+                        If larFactType.Count = 1 Then
+                            larRole.Add(larFactType.First.GetRoleByJoinedObjectTypeId(lsModelElementName))
+                        Else
+                            lsMessage = "There is not one Fact Type between " & lrEntityType.Id & " and " & lsModelElementName & "."
                             If arDSCError IsNot Nothing Then
                                 arDSCError.Success = False
                                 arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
@@ -309,63 +395,38 @@ Partial Public Class tBrain
                             End If
                             Me.send_data(lsMessage)
                             Return False
-                        Else
-                            Call lrFactType.RemoveInternalUniquenessConstraints(True)  'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
                         End If
-                    ElseIf lrFactType.InternalUniquenessConstraint(0).RoleConstraintRole.Count = lrFactType.Arity Then
-                        lbRemoveExistingRoleConstraint = True 'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
                     End If
 
-                End If
+                Next
 
-                '------------------------------------------------------------------------------
-                'Create a dummy RoleConstraint for the InternalUniquenessConstraint
-                '  so that we can check if it already exists for the FactType.
-                '  NB This is only a dummy RoleConstraint and is not added to 
-                '  the model (Parameter: abAddToModel is False).
-                '  Once we confirm that the InternalUniquenssConstraint does not
-                '  already exist, we create the InternalUniquenessConstraint/RoleConstraint
-                '  via the FactTypeInstance (see futher below).
-                '------------------------------------------------------------------------------
+                Dim lrRoleConstraint = Me.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExternalUniquenessConstraint, larRole, Nothing, , True, True)
 
-                Dim lrRoleConstraint As New FBM.RoleConstraint(lrFactType.Model, pcenumRoleConstraintType.InternalUniquenessConstraint, larRole)
+                Call lrRoleConstraint.SetIsPreferredIdentifier(True)
 
-                If lrFactType.exists_InternalUniquenessConstraint_by_role_span(lrRoleConstraint) Then
-                    '----------------------------------------------------------------
-                    'InternalUniquenessConstraint already exists for Roles selected
-                    '----------------------------------------------------------------
-                    lsMessage = "The Fact Type, " & lrFactType.Id & " already has an Internal Uniqueness Constraint plays by the Roles that link the nominated Object Types."
-                    If arDSCError IsNot Nothing Then
-                        arDSCError.Success = False
-                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                        arDSCError.ErrorString = lsMessage
-                    End If
-                    Me.send_data(lsMessage)
-                    Return False
-                End If
-
-                If lbRemoveExistingRoleConstraint Then
-                    Call lrFactType.RemoveInternalUniquenessConstraints(True, True)
-                End If
 #End Region
-
-                Call lrFactType.CreateInternalUniquenessConstraint(larRole, False, True, True, False, Nothing, abBroadcastInterfaceEvent, False)
-
             End If
 
             If Me.Page IsNot Nothing Then
                 Select Case Me.Page.Language
                     Case Is = pcenumLanguage.ORMModel
-                        If Me.Page.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) Is Nothing Then
-                            lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False,, abBroadcastInterfaceEvent,, True, False, True)
+                        If lrFactType IsNot Nothing Then
+                            If Me.Page.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) Is Nothing Then
+                                lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False,, abBroadcastInterfaceEvent,, True, False, True)
+                            End If
+                        ElseIf lrEntityType IsNot Nothing Then
+                            If Me.Page.EntityTypeInstance.Find(Function(x) x.Id = lrEntityType.Id) Is Nothing Then
+                                Dim lrEntityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 100), False, True)
+                            End If
                         End If
+
                     Case Is = pcenumLanguage.PropertyGraphSchema
                         lrPGSNodeType = Me.Page.LoadPGSNodeTypeFromRDSTable(lrFactType.getCorrespondingRDSTable, New PointF(50, 50), True)
                 End Select
             End If
 
             If Not Me.Model.StoreAsXML Then
-                Call lrFactType.Save()
+                Call Me.Model.Save()
             End If
 
             If Me.Page IsNot Nothing Then

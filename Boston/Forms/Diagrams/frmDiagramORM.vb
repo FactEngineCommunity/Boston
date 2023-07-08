@@ -5352,9 +5352,9 @@ SkipPopup:
                     lo_table_node.TextColor = Color.Black
                     DeleteRowToolStripMenuItem.Enabled = False
                     Me.DeleteRowFactFromPageAndModelToolStripMenuItem.Enabled = False
-                Case Is = GetType(FBM.ValueType)
+                Case Is = GetType(FBM.ValueTypeInstance)
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ValueType
-                Case Is = GetType(FBM.RoleConstraintInstance)
+                Case Is = GetType(FBM.RoleConstraintInstance), GetType(FBM.tUniquenessConstraint)
                     Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                     lrRoleConstraintInstance = e.Node.Tag
                     Select Case lrRoleConstraintInstance.RoleConstraintType

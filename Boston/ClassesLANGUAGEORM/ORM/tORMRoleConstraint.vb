@@ -2704,6 +2704,14 @@ RemoveAnyway:
                             End If
                         End If
                     End If
+                ElseIf Me.RoleConstraintType = pcenumRoleConstraintType.ExternalUniquenessConstraint Then
+                    Dim lrRole = Me.RoleConstraintRole(0).Role.FactType.GetOtherRoleOfBinaryFactType(Me.RoleConstraintRole(0).Role.Id)
+
+                    If lrRole.JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then
+                        Dim lrEntityType As FBM.EntityType = lrRole.JoinedORMObject
+
+                        Call lrEntityType.SetCompoundReferenceSchemeRoleConstraint(Me)
+                    End If
                 End If
 
                 Me.IsPreferredIdentifier = abIsPreferredIdentifier
