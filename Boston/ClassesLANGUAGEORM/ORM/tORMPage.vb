@@ -3055,7 +3055,10 @@ NextY:
                                                           Where FactTypeInstance.Y = lrFactTypeInstance.Y
                                                           Select FactTypeInstance).ToList
 
-                    larOverlappingFactTypeInstances.AddRange(larOverlappingFactTypeInstance)
+                    For Each lrOverlappingFactTypeInstance In larOverlappingFactTypeInstance
+                        larOverlappingFactTypeInstances.AddUnique(lrOverlappingFactTypeInstance)
+                    Next
+
                 Next
 
                 For Each lrFactTypeInstance In larOverlappingFactTypeInstances.ToArray

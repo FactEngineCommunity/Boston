@@ -3823,15 +3823,15 @@ ReattachRoles:
                 For Each lrPageObject In larPageObject
 
                     If (Me.X - lrPageObject.X >= 0) And (Math.Abs(Me.X - lrPageObject.X) < liRepellDistance) Then
-                        liNewX = Me.X + 1
+                        liNewX = Me.X + Boston.RandomInteger(1, 10)
                     Else
-                        liNewX = Me.X - 1
+                        liNewX = Me.X - Boston.RandomInteger(1, 10)
                     End If
 
                     If Me.Y - lrPageObject.Y >= 0 And (Math.Abs(Me.Y - lrPageObject.Y) < liRepellDistance) Then
-                        liNewY = Me.Y + 1
+                        liNewY = Me.Y + Boston.RandomInteger(1, 10)
                     Else
-                        liNewY = Me.Y - 1
+                        liNewY = Me.Y - Boston.RandomInteger(1, 10)
                     End If
 
                     Call Me.Move(liNewX, liNewY, abBroadcastInterfaceEvent)
