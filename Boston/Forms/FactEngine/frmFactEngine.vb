@@ -1202,6 +1202,21 @@ NextWord:
                     End Select
                 End If
 
+
+                If Me.ToolStripMenuItemNaturalLanguageAnswers.Checked And Me.TextBoxInput.Text.Trim <> "" And lrRecordset.Facts.Count < 10 Then
+
+                    Dim lsPrompt As String = "Convert the following result/s to natural language only:"
+                    lsPrompt.AppendDoubleLineBreak(Me.LabelError.Text.Trim)
+                    lsPrompt.AppendDoubleLineBreak("...given the following query...")
+                    lsPrompt.AppendDoubleLineBreak(Me.TextBoxInput.Text.Trim)
+                    lsPrompt.AppendDoubleLineBreak("Return only the natural language results without any narrative of anything else. If there is an error, show the error though.")
+                    lsPrompt.AppendLine("If you are returning sets of data, put each result on a new line, and make dates easy for people to read. E.g. 1st May 2023.")
+
+                    Dim lrGPTResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsPrompt)
+
+                    Me.LabelError.Text = lrGPTResult.Completions(0).Text.Trim
+
+                End If
                 If Me.TabControl1.SelectedTab.Name = Me.TabPageGraph.Name Then
                 Else
                     Me.TabControl1.SelectedTab = Me.TabPageResults
