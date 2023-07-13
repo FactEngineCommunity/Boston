@@ -1,83 +1,104 @@
+Imports System.Reflection
+
 Public Class frmGenericSelect
 
     Public zoGenericSelection As New tGenericSelection
 
     Private Sub generic_select_frm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-        '-------------------------------
-        'Centre the form
-        '-------------------------------
-        Me.Left = (Screen.PrimaryScreen.WorkingArea.Width / 2) - (Me.Width / 2)
-        Me.Top = (2 * (Screen.PrimaryScreen.WorkingArea.Height / 5)) - (Me.Height / 2)
+        Try
+            '-------------------------------
+            'Centre the form
+            '-------------------------------
+            Me.Left = (Screen.PrimaryScreen.WorkingArea.Width / 2) - (Me.Width / 2)
+            Me.Top = (2 * (Screen.PrimaryScreen.WorkingArea.Height / 5)) - (Me.Height / 2)
 
-        Call SetupForm()
+            Call SetupForm()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
     Private Sub SetupForm()
 
         Dim lsSQLQuery As String
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
-        Select Case zoGenericSelection.Type
-            Case Is = pcenumGenericSelectionType.SelectFromList
+        Try
+            Select Case zoGenericSelection.Type
+                Case Is = pcenumGenericSelectionType.SelectFromList
 
-                If Me.zoGenericSelection.TupleList.Count > 0 Then
-                    Dim lr_object As tComboboxItem
-                    For Each lr_object In Me.zoGenericSelection.TupleList
-                        Me.combobox_selection.Items.Insert(0, lr_object)
-                    Next
-                End If
+                    If Me.zoGenericSelection.TupleList.Count > 0 Then
+                        Dim lr_object As tComboboxItem
+                        For Each lr_object In Me.zoGenericSelection.TupleList
+                            Me.combobox_selection.Items.Insert(0, lr_object)
+                        Next
+                    End If
 
-            Case Is = pcenumGenericSelectionType.SelectFromDatabase
-
-
-                lREcordset.ActiveConnection = pdbConnection
-                lREcordset.CursorType = pcOpenStatic
-
-                lsSQLQuery = "SELECT " & zoGenericSelection.SelectField & ", " & zoGenericSelection.IndexField
-                lsSQLQuery &= " FROM " & zoGenericSelection.TableName
-                lsSQLQuery &= " " & zoGenericSelection.WhereClause
-                If IsSomething(zoGenericSelection.OrderByFields) Then
-                    lsSQLQuery &= " ORDER BY " & zoGenericSelection.OrderByFields & " ASC"
-                End If
-
-                lREcordset.Open(lsSQLQuery)
-
-                If lREcordset.RecordCount = 0 Then
-                    MsgBox("There is/are no " & Me.zoGenericSelection.FormTitle)
-                    Me.Hide()
-                    Me.Close()
-                    Me.Dispose()
-                End If
-
-                If Not lREcordset.EOF Then
-                    While Not lREcordset.EOF
-                        combobox_selection.Items.Add(New tComboboxItem(lREcordset(zoGenericSelection.IndexField).Value, lREcordset(0).Value))
-                        lREcordset.MoveNext()
-                    End While
-                End If
-
-                lREcordset.Close()
-
-                'TupleList
-                If Me.zoGenericSelection.TupleList.Count > 0 Then
-                    Dim lr_object As tComboboxItem
-                    For Each lr_object In Me.zoGenericSelection.TupleList
-                        Me.combobox_selection.Items.Insert(0, lr_object)
-                    Next
-                End If
-
-        End Select
-
-        If combobox_selection.Items.Count > 0 Then
-            combobox_selection.SelectedIndex = 0
-        End If
+                Case Is = pcenumGenericSelectionType.SelectFromDatabase
 
 
-        'groupbox_main.Text = "Select " & zoGenericSelection.select_field
-        Me.Text = "Select " & zoGenericSelection.FormTitle
+                    lREcordset.ActiveConnection = pdbConnection
+                    lREcordset.CursorType = pcOpenStatic
 
+                    lsSQLQuery = "SELECT " & zoGenericSelection.SelectField & ", " & zoGenericSelection.IndexField
+                    lsSQLQuery &= " FROM " & zoGenericSelection.TableName
+                    lsSQLQuery &= " " & zoGenericSelection.WhereClause
+                    If IsSomething(zoGenericSelection.OrderByFields) Then
+                        lsSQLQuery &= " ORDER BY " & zoGenericSelection.OrderByFields & " ASC"
+                    End If
+
+                    lREcordset.Open(lsSQLQuery)
+
+                    If lREcordset.EOF Then '20230713-VM-Was RecordCount = 0
+                        MsgBox("There is/are no " & Me.zoGenericSelection.FormTitle)
+                        Me.Hide()
+                        Me.Close()
+                        Me.Dispose()
+                    End If
+
+                    If Not lREcordset.EOF Then
+                        While Not lREcordset.EOF
+                            combobox_selection.Items.Add(New tComboboxItem(lREcordset(zoGenericSelection.IndexField).Value, lREcordset(0).Value))
+                            lREcordset.MoveNext()
+                        End While
+                    End If
+
+                    lREcordset.Close()
+
+                    'TupleList
+                    If Me.zoGenericSelection.TupleList.Count > 0 Then
+                        Dim lr_object As tComboboxItem
+                        For Each lr_object In Me.zoGenericSelection.TupleList
+                            Me.combobox_selection.Items.Insert(0, lr_object)
+                        Next
+                    End If
+
+            End Select
+
+            If combobox_selection.Items.Count > 0 Then
+                combobox_selection.SelectedIndex = 0
+            End If
+
+
+            'groupbox_main.Text = "Select " & zoGenericSelection.select_field
+            Me.Text = "Select " & zoGenericSelection.FormTitle
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -85,12 +106,25 @@ Public Class frmGenericSelect
 
         Dim lbFieldsOk As Boolean = False
 
-        If Me.combobox_selection.Text = "" Then
-        Else
-            lbFieldsOk = True
-        End If
+        Try
 
-        Return lbFieldsOk
+            If Me.combobox_selection.Text = "" Then
+            Else
+                lbFieldsOk = True
+            End If
+
+            Return lbFieldsOk
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
 
     End Function
 
@@ -132,7 +166,17 @@ Public Class frmGenericSelect
 
     Private Sub button_cancel_Click(sender As Object, e As EventArgs) Handles button_cancel.Click
 
-        Me.DialogResult = DialogResult.Cancel
+        Try
+            Me.DialogResult = DialogResult.Cancel
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

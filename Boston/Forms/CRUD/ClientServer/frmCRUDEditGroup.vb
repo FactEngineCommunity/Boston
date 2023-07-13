@@ -158,7 +158,7 @@ Public Class frmCRUDEditGroup
         Dim lrUser As ClientServer.User
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -210,7 +210,7 @@ Public Class frmCRUDEditGroup
         Dim lrUser As ClientServer.User
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -323,7 +323,7 @@ Public Class frmCRUDEditGroup
 
         Dim lsMessage As String = ""
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         'Watermark on KeyDown and Leave
         If Me.TextBoxUserName.Text = "" Then

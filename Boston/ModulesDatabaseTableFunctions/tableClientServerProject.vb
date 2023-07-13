@@ -65,18 +65,31 @@ Public Module tableClientServerProject
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New RecordsetProxy
 
-        lREcordset.ActiveConnection = pdbConnection
-        lREcordset.CursorType = pcOpenStatic
+        Try
 
-        lsSQLQuery = " SELECT COUNT(*)"
-        lsSQLQuery &= "  FROM ClientServerProject"
-        lsSQLQuery &= " WHERE CreatedByUserId = '" & Trim(arUser.Id) & "'"
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic
 
-        lREcordset.Open(lsSQLQuery)
+            lsSQLQuery = " SELECT COUNT(*)"
+            lsSQLQuery &= "  FROM ClientServerProject"
+            lsSQLQuery &= " WHERE CreatedByUserId = '" & Trim(arUser.Id) & "'"
 
-        GetProjectCountByCreatedByUser = lREcordset(0).Value
+            lREcordset.Open(lsSQLQuery)
 
-        lREcordset.Close()
+            GetProjectCountByCreatedByUser = lREcordset(0).Value
+
+            lREcordset.Close()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return 0
+        End Try
 
     End Function
 

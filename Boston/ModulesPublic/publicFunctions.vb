@@ -636,58 +636,70 @@ OpenConnection:
             arGenericSelection.ColumnWidthString = asColumnWidthString
             arGenericSelection.FieldList = asFieldList
 
-            If IsSomething(asOrderByFields) Then
-                arGenericSelection.OrderByFields = asOrderByFields
-            Else
-                arGenericSelection.OrderByFields = as_select_field
-            End If
-            If Not IsNothing(as_where_clause) Then
-                arGenericSelection.WhereClause = as_where_clause
-            Else
-                arGenericSelection.WhereClause = ""
-            End If
+            Try
 
-            If IsSomething(ao_combobox_item) Then
-                arGenericSelection.TupleList.Add(ao_combobox_item)
-            End If
+                If IsSomething(asOrderByFields) Then
+                    arGenericSelection.OrderByFields = asOrderByFields
+                Else
+                    arGenericSelection.OrderByFields = as_select_field
+                End If
+                If Not IsNothing(as_where_clause) Then
+                    arGenericSelection.WhereClause = as_where_clause
+                Else
+                    arGenericSelection.WhereClause = ""
+                End If
 
-            Select Case aiSelectColumn
-                Case Is = 1
-                    Dim lfrm_generic_select_frm As New frmGenericSelect
-                    If IsSomething(aiComboboxStyle) Then
-                        Select Case aiComboboxStyle
-                            Case Is = pcenumComboBoxStyle.Dropdown
-                                lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDown
-                            Case Is = pcenumComboBoxStyle.DropdownList
-                                lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDownList
-                            Case Is = pcenumComboBoxStyle.Simple
-                                lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.Simple
-                        End Select
-                    Else
-                        lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDown
-                    End If
+                If IsSomething(ao_combobox_item) Then
+                    arGenericSelection.TupleList.Add(ao_combobox_item)
+                End If
 
-                    lfrm_generic_select_frm.zoGenericSelection = arGenericSelection
-                    DisplayGenericSelectForm = lfrm_generic_select_frm.ShowDialog()
-                Case Is > 1
-                    Dim lfrm_generic_select_frm As New frmGenericSelectMultiColumn
-                    If IsSomething(aiComboboxStyle) Then
-                        Select Case aiComboboxStyle
-                            Case Is = pcenumComboBoxStyle.Dropdown
-                                lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDown
-                            Case Is = pcenumComboBoxStyle.DropdownList
-                                lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDownList
-                            Case Is = pcenumComboBoxStyle.Simple
-                                lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.Simple
-                        End Select
-                    Else
-                        lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDown
-                    End If
+                Select Case aiSelectColumn
+                    Case Is = 1
+                        Dim lfrm_generic_select_frm As New frmGenericSelect
+                        If IsSomething(aiComboboxStyle) Then
+                            Select Case aiComboboxStyle
+                                Case Is = pcenumComboBoxStyle.Dropdown
+                                    lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDown
+                                Case Is = pcenumComboBoxStyle.DropdownList
+                                    lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDownList
+                                Case Is = pcenumComboBoxStyle.Simple
+                                    lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.Simple
+                            End Select
+                        Else
+                            lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDown
+                        End If
 
-                    lfrm_generic_select_frm.zoGenericSelection = arGenericSelection
-                    DisplayGenericSelectForm = lfrm_generic_select_frm.ShowDialog()
-            End Select
+                        lfrm_generic_select_frm.zoGenericSelection = arGenericSelection
+                        DisplayGenericSelectForm = lfrm_generic_select_frm.ShowDialog()
+                    Case Is > 1
+                        Dim lfrm_generic_select_frm As New frmGenericSelectMultiColumn
+                        If IsSomething(aiComboboxStyle) Then
+                            Select Case aiComboboxStyle
+                                Case Is = pcenumComboBoxStyle.Dropdown
+                                    lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDown
+                                Case Is = pcenumComboBoxStyle.DropdownList
+                                    lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDownList
+                                Case Is = pcenumComboBoxStyle.Simple
+                                    lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.Simple
+                            End Select
+                        Else
+                            lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDown
+                        End If
 
+                        lfrm_generic_select_frm.zoGenericSelection = arGenericSelection
+                        DisplayGenericSelectForm = lfrm_generic_select_frm.ShowDialog()
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return DialogResult.Abort
+            End Try
 
         End Function
 

@@ -24,7 +24,7 @@ Public Class frmCRUDEditNamespace
         Dim lrProject As ClientServer.Project
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic

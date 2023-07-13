@@ -35,9 +35,10 @@ Public Module tableClientServerProjectUser
     ''' <remarks></remarks>
     Public Function getProjectCountByAllocatedUser(ByRef arUser As ClientServer.User) As Integer
 
-        Try
-            Dim lsSQLQuery As String = ""
+        Dim lsSQLQuery As String = ""
             Dim lREcordset As New RecordsetProxy
+
+        Try
 
             lREcordset.ActiveConnection = pdbConnection
             lREcordset.CursorType = pcOpenStatic
@@ -56,9 +57,12 @@ Public Module tableClientServerProjectUser
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return 0
         End Try
 
     End Function

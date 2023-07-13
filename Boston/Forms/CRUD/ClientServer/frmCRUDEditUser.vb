@@ -136,7 +136,7 @@ Public Class frmCRUDEditUser
         Dim lrRole As ClientServer.Role
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -186,7 +186,7 @@ Public Class frmCRUDEditUser
         Dim lrRole As ClientServer.Role
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -271,7 +271,7 @@ Public Class frmCRUDEditUser
         Dim lrGroup As ClientServer.Group
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -321,7 +321,7 @@ Public Class frmCRUDEditUser
         Dim lrProject As ClientServer.Project
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic

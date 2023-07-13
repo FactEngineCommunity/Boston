@@ -73,7 +73,7 @@ Public Class frmCRUDAddUser
     Sub load_employees()
 
         'Dim ls_sql_query As String
-        'Dim lrecordset As New ADODB.Recordset
+        'Dim lREcordset As New RecordsetProxy
 
         'lrecordset.ActiveConnection = pdb_connection
         'lrecordset.CursorType = pc_open_static
@@ -96,7 +96,7 @@ Public Class frmCRUDAddUser
     Sub load_roles()
 
         'Dim ls_sql_query As String
-        'Dim lrecordset As New ADODB.Recordset
+        'Dim lREcordset As New RecordsetProxy
 
         'lrecordset.ActiveConnection = pdb_connection
         'lrecordset.CursorType = pc_open_static

@@ -629,25 +629,25 @@ Partial Class frmMain
         'AddProjectToolStripMenuItem
         '
         Me.AddProjectToolStripMenuItem.Name = "AddProjectToolStripMenuItem"
-        Me.AddProjectToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.AddProjectToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.AddProjectToolStripMenuItem.Text = "&Add Project"
         '
         'EditProjectToolStripMenuItem
         '
         Me.EditProjectToolStripMenuItem.Name = "EditProjectToolStripMenuItem"
-        Me.EditProjectToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.EditProjectToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.EditProjectToolStripMenuItem.Text = "&Edit Project"
         '
         'ToolStripSeparator16
         '
         Me.ToolStripSeparator16.Name = "ToolStripSeparator16"
-        Me.ToolStripSeparator16.Size = New System.Drawing.Size(133, 6)
+        Me.ToolStripSeparator16.Size = New System.Drawing.Size(177, 6)
         '
         'NamespaceToolStripMenuItem
         '
         Me.NamespaceToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddNamespaceToolStripMenuItem, Me.EditNamespaceToolStripMenuItem})
         Me.NamespaceToolStripMenuItem.Name = "NamespaceToolStripMenuItem"
-        Me.NamespaceToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.NamespaceToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
         Me.NamespaceToolStripMenuItem.Text = "&Namespace"
         '
         'AddNamespaceToolStripMenuItem

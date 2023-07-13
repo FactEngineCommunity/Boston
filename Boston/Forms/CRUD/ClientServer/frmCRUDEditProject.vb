@@ -232,7 +232,7 @@ Public Class frmCRUDEditProject
         Dim lrUser As ClientServer.User
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -382,7 +382,7 @@ Public Class frmCRUDEditProject
         Dim lrUser As ClientServer.User
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -519,7 +519,7 @@ Public Class frmCRUDEditProject
     Private Sub LoadPermissionsUsers(ByRef arProject As ClientServer.Project)
 
         Dim lsSQLQuery As String
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -569,7 +569,7 @@ Public Class frmCRUDEditProject
     Private Sub LoadPermissionsGroups(ByRef arProject As ClientServer.Project)
 
         Dim lsSQLQuery As String
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -807,7 +807,7 @@ Public Class frmCRUDEditProject
         Dim lrGroup As ClientServer.Group
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -857,7 +857,7 @@ Public Class frmCRUDEditProject
         Dim lrGroup As ClientServer.Group
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -1243,7 +1243,7 @@ Public Class frmCRUDEditProject
         Dim lrNamespace As ClientServer.Namespace
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -1421,7 +1421,7 @@ Public Class frmCRUDEditProject
 
         Dim lsMessage As String = ""
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         'Watermark        
         If Me.TextBoxUserName.Text = "" Then 'Display the Watermark
@@ -1552,7 +1552,7 @@ Public Class frmCRUDEditProject
 
         Dim lsMessage As String = ""
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         'Watermark
         If Me.TextBoxGroupInvite.Text = "" Then 'Display the Watermark

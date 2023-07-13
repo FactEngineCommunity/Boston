@@ -858,6 +858,9 @@ Partial Public Class tBrain
                             lsMessage &= vbCrLf & "Objectify the Fact Type and try again."
                             Me.OutputBuffer = lsMessage
                             Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                            arDSCError.ErrorString = lsMessage
+                            arDSCError.Success = False
+                            arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
                             Return False
                             Exit Function
                         End If

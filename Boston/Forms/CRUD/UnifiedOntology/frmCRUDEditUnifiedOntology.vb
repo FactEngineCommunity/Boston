@@ -54,7 +54,7 @@ Public Class frmCRUDEditUnifiedOntology
         Dim lrModel As FBM.Model
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
@@ -104,7 +104,7 @@ Public Class frmCRUDEditUnifiedOntology
         Dim lrModel As FBM.Model
 
         Dim lsSQLQuery As String = ""
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic

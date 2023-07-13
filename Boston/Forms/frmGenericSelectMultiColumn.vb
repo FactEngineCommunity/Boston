@@ -1,3 +1,5 @@
+Imports System.Reflection
+
 Public Class frmGenericSelectMultiColumn
 
     Public zoGenericSelection As tGenericSelection
@@ -17,85 +19,95 @@ Public Class frmGenericSelectMultiColumn
     Private Sub SetupForm()
 
         Dim lsSQLQuery As String
-        Dim lREcordset As New ADODB.Recordset
+        Dim lREcordset As New RecordsetProxy
 
-        lREcordset.ActiveConnection = pdbConnection
-        lREcordset.CursorType = pcOpenStatic
+        Try
 
-        lsSQLQuery = "SELECT " & zoGenericSelection.SelectField & ", " & zoGenericSelection.IndexField
-        lsSQLQuery &= " FROM " & zoGenericSelection.TableName
-        lsSQLQuery &= " " & zoGenericSelection.WhereClause
-        If IsSomething(zoGenericSelection.OrderByFields) Then
-            lsSQLQuery &= " ORDER BY " & zoGenericSelection.OrderByFields & " ASC"
-        End If
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic
 
-        lREcordset.Open(lsSQLQuery)
+            lsSQLQuery = "SELECT " & zoGenericSelection.SelectField & ", " & zoGenericSelection.IndexField
+            lsSQLQuery &= " FROM " & zoGenericSelection.TableName
+            lsSQLQuery &= " " & zoGenericSelection.WhereClause
+            If IsSomething(zoGenericSelection.OrderByFields) Then
+                lsSQLQuery &= " ORDER BY " & zoGenericSelection.OrderByFields & " ASC"
+            End If
 
-        'If Not lREcordset.EOF Then
-        '    While Not lREcordset.EOF
-        '        comboboxSelection.Items.Add(New tComboboxItem(lREcordset(zoGenericSelection.IndexField).Value, lREcordset(0).Value))
-        '        lREcordset.MoveNext()
-        '    End While
-        'End If
+            lREcordset.Open(lsSQLQuery)
 
-        Dim lasFields() As String
+            'If Not lREcordset.EOF Then
+            '    While Not lREcordset.EOF
+            '        comboboxSelection.Items.Add(New tComboboxItem(lREcordset(zoGenericSelection.IndexField).Value, lREcordset(0).Value))
+            '        lREcordset.MoveNext()
+            '    End While
+            'End If
 
-        If zoGenericSelection.FieldList <> "" Then
-            lasFields = Viev.Strings.RemoveWhiteSpace(zoGenericSelection.FieldList).Split(",")
-        Else
-            lasFields = Viev.Strings.RemoveWhiteSpace(zoGenericSelection.SelectField).Split(",")
-        End If
+            Dim lasFields() As String
+
+            If zoGenericSelection.FieldList <> "" Then
+                lasFields = Viev.Strings.RemoveWhiteSpace(zoGenericSelection.FieldList).Split(",")
+            Else
+                lasFields = Viev.Strings.RemoveWhiteSpace(zoGenericSelection.SelectField).Split(",")
+            End If
 
 
-        '=================================================================================================================
-        Dim dtLoading As New DataTable("UsStates")
-
-        For Each lsField In lasFields
-            dtLoading.Columns.Add(lsField, System.Type.GetType("System.String"))
-        Next
-
-        While Not lREcordset.EOF
-            Dim dr As DataRow
-            dr = dtLoading.NewRow
+            '=================================================================================================================
+            Dim dtLoading As New DataTable("UsStates")
 
             For Each lsField In lasFields
-                dr(lsField) = lREcordset(lsField).Value
+                dtLoading.Columns.Add(lsField, System.Type.GetType("System.String"))
             Next
 
-            dtLoading.Rows.Add(dr)
-            lREcordset.MoveNext()
-        End While
+            While Not lREcordset.EOF
+                Dim dr As DataRow
+                dr = dtLoading.NewRow
 
-        comboboxSelection.ColumnNum = lasFields.Count
-        comboboxSelection.ColumnWidth = Me.zoGenericSelection.ColumnWidthString
-        comboboxSelection.SelectedIndex = -1
-        comboboxSelection.Items.Clear()
-        comboboxSelection.LoadingType = MTGCComboBox.CaricamentoCombo.DataTable
-        comboboxSelection.SourceDataString = New String(lasFields.Count - 1) {}
-        Dim liInd As Integer = 0
-        For Each lsField In lasFields
-            comboboxSelection.SourceDataString.SetValue(lsField, liInd)
-            liInd += 1
-        Next
-        comboboxSelection.SourceDataTable = dtLoading
-        '=================================================================================================================
+                For Each lsField In lasFields
+                    dr(lsField) = lREcordset(lsField).Value
+                Next
 
-        If Me.zoGenericSelection.TupleList.Count > 0 Then
-            Dim lr_object As tComboboxItem
-            For Each lr_object In Me.zoGenericSelection.TupleList
-                Me.comboboxSelection.Items.Insert(0, lr_object)
+                dtLoading.Rows.Add(dr)
+                lREcordset.MoveNext()
+            End While
+
+            comboboxSelection.ColumnNum = lasFields.Count
+            comboboxSelection.ColumnWidth = Me.zoGenericSelection.ColumnWidthString
+            comboboxSelection.SelectedIndex = -1
+            comboboxSelection.Items.Clear()
+            comboboxSelection.LoadingType = MTGCComboBox.CaricamentoCombo.DataTable
+            comboboxSelection.SourceDataString = New String(lasFields.Count - 1) {}
+            Dim liInd As Integer = 0
+            For Each lsField In lasFields
+                comboboxSelection.SourceDataString.SetValue(lsField, liInd)
+                liInd += 1
             Next
-        End If
+            comboboxSelection.SourceDataTable = dtLoading
+            '=================================================================================================================
 
-        comboboxSelection.SelectedIndex = 0
+            If Me.zoGenericSelection.TupleList.Count > 0 Then
+                Dim lr_object As tComboboxItem
+                For Each lr_object In Me.zoGenericSelection.TupleList
+                    Me.comboboxSelection.Items.Insert(0, lr_object)
+                Next
+            End If
 
-        'groupbox_main.Text = "Select " & zoGenericSelection.select_field
-        Me.Text = "Select " & zoGenericSelection.FormTitle
+            comboboxSelection.SelectedIndex = 0
 
-        lREcordset.Close()
+            'groupbox_main.Text = "Select " & zoGenericSelection.select_field
+            Me.Text = "Select " & zoGenericSelection.FormTitle
 
-        Me.comboboxSelection.Select()
+            lREcordset.Close()
 
+            Me.comboboxSelection.Select()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

@@ -1449,14 +1449,24 @@ SkipRegistrationChecking:
 
         Dim child As New frmCRUDEditProject
 
-        child.zrProject = arProject
-        child.MdiParent = Me
+        Try
+            child.zrProject = arProject
+            child.MdiParent = Me
 
-        zfrmCRUDEditProject = child
+            zfrmCRUDEditProject = child
 
-        Me.Cursor = Cursors.WaitCursor
-        child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
-        Me.Cursor = Cursors.Default
+            Me.Cursor = Cursors.WaitCursor
+            child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            Me.Cursor = Cursors.Default
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -4986,40 +4996,49 @@ SaveModel:
         Dim lsWhereClause As String = ""
         Dim lsMessage As String = ""
 
-        If prApplication.User.IsSuperuser Then
-            'Can edit any Project
-        Else
-            If tableClientServerProject.GetProjectCountByCreatedByUser(prApplication.User) = 0 _
-                And tableClientServerProjectUser.getProjectCountByAllocatedUser(prApplication.User) = 0 Then
-                lsMessage = "You have not created any Projects to edit, or you are not included in any Projects.".AppendString(vbCrLf).AppendString(vbCrLf)
-                lsMessage.AppendString("You can only edit/view Projects that you have created or in which you are included.")
-
-                MsgBox(lsMessage)
-                Exit Sub
+        Try
+            If prApplication.User.IsSuperuser Then
+                'Can edit any Project
             Else
-                'Can only edit the Projects that the User has created, or that they are included in (ReadOnly)
-                lsWhereClause = " WHERE CreatedByUserId = '" & Trim(prApplication.User.Id) & "'"
-                If prApplication.User.Function.Contains(pcenumFunction.ReadProjectsIncludedIn) Then
-                    lsWhereClause &= " OR Id IN (SELECT ProjectId"
-                    lsWhereClause &= "              FROM ClientServerProjectUser"
-                    lsWhereClause &= "             WHERE ProjectId = Id"
-                    lsWhereClause &= "               AND UserId = '" & prApplication.User.Id & "')"
+                If tableClientServerProject.GetProjectCountByCreatedByUser(prApplication.User) = 0 _
+                    And tableClientServerProjectUser.getProjectCountByAllocatedUser(prApplication.User) = 0 Then
+                    lsMessage = "You have not created any Projects to edit, or you are not included in any Projects.".AppendString(vbCrLf).AppendString(vbCrLf)
+                    lsMessage.AppendString("You can only edit/view Projects that you have created or in which you are included.")
+
+                    MsgBox(lsMessage)
+                    Exit Sub
+                Else
+                    'Can only edit the Projects that the User has created, or that they are included in (ReadOnly)
+                    lsWhereClause = " WHERE CreatedByUserId = '" & Trim(prApplication.User.Id) & "'"
+                    If prApplication.User.Function.Contains(pcenumFunction.ReadProjectsIncludedIn) Then
+                        lsWhereClause &= " OR Id IN (SELECT ProjectId"
+                        lsWhereClause &= "              FROM ClientServerProjectUser"
+                        lsWhereClause &= "             WHERE ProjectId = Id"
+                        lsWhereClause &= "               AND UserId = '" & prApplication.User.Id & "')"
+                    End If
                 End If
             End If
-        End If
 
-        If Boston.DisplayGenericSelectForm(lrGenericSelection,
-                                               "Projects",
-                                               "ClientServerProject",
-                                               "ProjectName",
-                                               "Id",
-                                               lsWhereClause) = Windows.Forms.DialogResult.OK Then
+            If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                                   "Projects",
+                                                   "ClientServerProject",
+                                                   "ProjectName",
+                                                   "Id",
+                                                   lsWhereClause) = Windows.Forms.DialogResult.OK Then
 
-            lrProject.Id = lrGenericSelection.SelectIndex
-            Call tableClientServerProject.getProjectDetailsById(lrProject.Id, lrProject)
+                lrProject.Id = lrGenericSelection.SelectIndex
+                Call tableClientServerProject.getProjectDetailsById(lrProject.Id, lrProject)
 
-            Call Me.LoadCRUDEditProject(lrProject)
-        End If
+                Call Me.LoadCRUDEditProject(lrProject)
+            End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
