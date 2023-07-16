@@ -52,7 +52,7 @@ Public Class frmToolboxTableData
                                     'Return ID(person) As personId, person.FirstName As firstName, person.LastName As lastName, ID(carType) As carTypeId, carType.CarTypeName As carTypeName
                                     lsSQLQuery = "MATCH "
                                     lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")"
-                                    lsSQLQuery &= "-[:" & Me.mrTable.DBName & "]-"
+                                    lsSQLQuery &= "-[:" & Me.mrTable.DBName & "]->"
                                     lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
                                     lsSQLQuery &= "RETURN "
                                     Dim lsColumnList As String = String.Join(" + ' ' + ", larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(0).DestinationTable.Name) & "." & x.Name))
@@ -65,7 +65,8 @@ Public Class frmToolboxTableData
                                 lsSQLQuery = "MATCH (" & LCase(mrTable.DatabaseName) & ":" & mrTable.DatabaseName & ")" & vbCrLf
                                 '20230525-VM-Move on this. Make Model store Setting ShowPrimaryKeyColumns in TableDataEditForm...then check on isPartOfPrimaryKey accordingly.
                                 '  The reason why is that if we are creating the table then we might not want to see that data. But if is a database like Northwind NEO4j, we might want to see OrderId for instance.
-                                Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not (x.isPartOfPrimaryKey Or x.isForeignKey)).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.DBName))
+                                Dim larReturnColumn = Me.mrTable.Column.FindAll(Function(x) Not (x.isPartOfPrimaryKey Or x.isForeignKey)).OrderBy(Function(x) x.OrdinalPosition).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.DBName)
+                                Dim lsColumnList As String = String.Join(",", larReturnColumn)
                                 lsSQLQuery &= "RETURN " & lsColumnList & ";"
                             End If
                         Case Is = pcenumDatabaseType.TypeDB
@@ -120,7 +121,7 @@ Public Class frmToolboxTableData
 
                             lsSQLQuery = "MATCH "
                             lsSQLQuery &= "(" & LCase(lrRDSRelation.OriginTable.Name) & ":" & lrRDSRelation.OriginTable.Name & ")"
-                            lsSQLQuery &= "-[:" & Me.mrFactType.DBName & "]-"
+                            lsSQLQuery &= "-[:" & Me.mrFactType.Id & "]->"
                             lsSQLQuery &= "(" & LCase(lrRDSRelation.DestinationTable.Name) & ":" & lrRDSRelation.DestinationTable.Name & ")" & vbCrLf
                             lsSQLQuery &= "RETURN "
                             lsFirstColumnName = String.Join(" + ' ' + ", lrRDSRelation.OriginTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(lrRDSRelation.OriginTable.Name) & "." & x.Name))
@@ -219,13 +220,17 @@ Public Class frmToolboxTableData
                     Case Is = pcenumDatabaseType.KuzuDB
                         Dim lrPKColumn As RDS.Column = lrTable.getPrimaryKeyColumns(0)
                         lrTable.Column.RemoveAt(lrTable.Column.IndexOf(lrPKColumn))
+                        If Me.mrModel.HideOtherwiseForeignKeyColumns Then
+                            lrTable.Column.RemoveAll(Function(x) arTable.Column.FindAll(Function(y) y.isForeignKey).Select(Function(z) z.Id).Contains(x.Id))
+                        End If
                 End Select
             End If
 
             If aarColumn IsNot Nothing Then
                 Dim liInd = 0
+                Me.mrRecordset.Columns.Clear() '20270717-VM-Wasn't here.
                 For Each lrColumn In aarColumn
-                    Me.mrRecordset.Columns(liInd) = lrColumn.Name
+                    Me.mrRecordset.Columns.Add(lrColumn.Name)
                     liInd += 1
                 Next
             End If
@@ -372,7 +377,7 @@ Public Class frmToolboxTableData
                             Dim larColumn As List(Of RDS.Column) = Nothing
                             If Me.mrTable IsNot Nothing Then
                                 lsTableName = Me.mrTable.Name
-                                larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not x.isPartOfPrimaryKey And Not x.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter)
+                                larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived And Not (x.isPartOfPrimaryKey Or x.isForeignKey) And Not x.getMetamodelDataType = pcenumORMDataType.NumericAutoCounter)
 
                                 lsSQLQuery = "CREATE (" & LCase(lsTableName) & ":" & lsTableName & " {"
 
@@ -828,7 +833,7 @@ Public Class frmToolboxTableData
 
                     lsMatchClause = "MATCH "
                     lsMatchClause &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")"
-                    lsMatchClause.AppendString("-[r:" & Me.mrTable.DBName & "]-")
+                    lsMatchClause.AppendString("-[r:" & Me.mrTable.DBName & "]->")
                     lsMatchClause &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
 
                     lsQuery.AppendString(lsMatchClause)
@@ -1107,6 +1112,9 @@ Public Class frmToolboxTableData
                     ElseIf Me.mrTable IsNot Nothing Then
                         larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
                         lsTableName = Me.mrTable.Name
+                        If Me.mrModel.HideOtherwiseForeignKeyColumns Then
+                            larColumn.RemoveAll(Function(x) Me.mrTable.Column.FindAll(Function(y) y.isForeignKey).Select(Function(z) z.Id).Contains(x.Id))
+                        End If
                     Else
                         larColumn = Me.mrDataGridList.mrTable.Column
                     End If
@@ -1227,7 +1235,7 @@ Public Class frmToolboxTableData
 
                                 lsSQLQuery.AppendLine("MATCH ")
                                 lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")"
-                                lsSQLQuery &= "-[:" & Me.mrTable.DBName & "]-"
+                                lsSQLQuery &= "-[:" & Me.mrTable.DBName & "]->"
                                 lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
                                 lsSQLQuery.AppendLine("RETURN ")
                                 Dim lsColumnList As String = String.Join(" + ' ' + ", larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(0).DestinationTable.Name) & "." & x.Name))

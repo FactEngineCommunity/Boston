@@ -21,10 +21,15 @@ Namespace ORMQL
             Me.DynamicClass = New tClass
             Dim larColumn() As RDS.Column
 
+            Dim lrTable = arTable
+
             Select Case arTable.Model.Model.TargetDatabaseType
                 Case Is = pcenumDatabaseType.Neo4j,
                           pcenumDatabaseType.KuzuDB
-                    larColumn = arTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).ToArray
+
+                    Dim lbIgnoreForeignKeys As Boolean = arTable.Model.Model.HideOtherwiseForeignKeyColumns
+
+                    larColumn = arTable.Column.FindAll(Function(x) Not (x.isPartOfPrimaryKey Or (lbIgnoreForeignKeys And x.isForeignKey))).OrderBy(Function(x) x.OrdinalPosition).ToArray
                 Case Else
                     larColumn = arTable.Column.ToArray
             End Select
