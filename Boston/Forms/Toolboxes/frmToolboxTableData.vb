@@ -218,8 +218,13 @@ Public Class frmToolboxTableData
                 lrTable.Model = arTable.Model
                 Select Case Me.mrModel.TargetDatabaseType
                     Case Is = pcenumDatabaseType.KuzuDB
-                        Dim lrPKColumn As RDS.Column = lrTable.getPrimaryKeyColumns(0)
-                        lrTable.Column.RemoveAt(lrTable.Column.IndexOf(lrPKColumn))
+                        Try
+                            Dim larPKColumn As List(Of RDS.Column) = lrTable.getPrimaryKeyColumns
+                            lrTable.Column.RemoveAll(Function(x) larPKColumn.Contains(x))
+                        Catch ex As Exception
+                            'May not have a PrimaryKeyColumn...at this stage. Should have, but may not.
+                        End Try
+
                         If Me.mrModel.HideOtherwiseForeignKeyColumns Then
                             lrTable.Column.RemoveAll(Function(x) arTable.Column.FindAll(Function(y) y.isForeignKey).Select(Function(z) z.Id).Contains(x.Id))
                         End If

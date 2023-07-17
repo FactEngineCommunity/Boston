@@ -2279,8 +2279,17 @@ SkipORMReadingEditor:
                                 lrEntityType = Me.zrPage.Model.CreateEntityType(lsNodeTypeName, True, True, False)
 
                                 If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
-                                    Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode)
-                                    Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+                                    Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
+                                    Select Case Me.zrPage.Model.TargetDatabaseType
+                                        Case Is = pcenumDatabaseType.KuzuDB
+                                            'DataType of PK cannot be changes, must set when creating the Column
+                                            liDataType = pcenumORMDataType.NumericAutoCounter
+                                            Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode,,,, liDataType)
+                                        Case Else
+                                            Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode,,,, liDataType)
+                                            Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+                                    End Select
+
                                 Else
                                     Dim lsErrorMessage As String = "Entity Type Requires Reference Scheme Error - Entity Type '" & lrEntityType.Id & "'."
                                     Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError,

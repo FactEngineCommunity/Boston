@@ -273,7 +273,7 @@ Namespace RDS
             Try
                 With Me
                     lrTable.Name = .Name
-
+                    lrTable.FBMModelElement = .FBMModelElement
                     For Each lrColumn In Me.Column
                         Dim lrNewColumn = lrColumn.Clone(lrTable, Nothing, False, False)
                         lrTable.Column.Add(lrNewColumn)
@@ -476,25 +476,21 @@ Namespace RDS
                 If abAddToDatabase Then
                     Call Me.Model.Model.connectToDatabase()
 
-                    Dim liColumnCount As Integer = 0
-
-                    Select Case Me.Model.Model.TargetDatabaseType
-                        Case Is = pcenumDatabaseType.Neo4j,
-                                  pcenumDatabaseType.KuzuDB
-
-                            liColumnCount = (From Index In Me.Index
-                                             Where Index.Type = pcenumODBCIndexType.Unique
-                                             Select Index).Count
-
-                        Case Else
-                            liColumnCount = Me.Column.Count
-                    End Select
+                    Dim liColumnCount = Me.Column.Count
 
                     If liColumnCount = 1 Then
                         'Create the Table/Column combination, because can't create the Column without the Table and is first Column in Table.
                         Call Me.Model.Model.DatabaseConnection.createTable(Me, arColumn)
                     Else
-                        Call Me.Model.Model.DatabaseConnection.addColumn(arColumn)
+                        Select Case Me.Model.Model.TargetDatabaseType
+                            Case Is = pcenumDatabaseType.KuzuDB
+                                If liColumnCount > 1 Then
+                                    Call Me.Model.Model.DatabaseConnection.addColumn(arColumn)
+                                End If
+                            Case Else
+                                Call Me.Model.Model.DatabaseConnection.addColumn(arColumn)
+                        End Select
+
                     End If
                 End If
 
@@ -1456,7 +1452,7 @@ Namespace RDS
         Public Function IsPartOfPrimarySubtypeRelationshipPath(ByRef arTable As RDS.Table) As Boolean
 
             Try
-                If arTable Is Me Then
+                If (arTable Is Me) Or (arTable.Name = Me.Name And arTable.Model.Model.ModelId = Me.Model.Model.ModelId) Then
                     Return True
                 Else
                     For Each lrSubtypeRelationship In arTable.FBMModelElement.SubtypeRelationship.FindAll(Function(x) x.IsPrimarySubtypeRelationship)
@@ -1976,6 +1972,10 @@ Namespace RDS
             Try
                 Call Me.Model.Model.updateCMMLTableName(Me.Name, asNewName)
                 Me.Name = asNewName
+
+                If Me.Model.Model.IsDatabaseSynchronised Then
+                    Call Me.Model.Model.DatabaseConnection.RenameTable(Me, asNewName)
+                End If
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

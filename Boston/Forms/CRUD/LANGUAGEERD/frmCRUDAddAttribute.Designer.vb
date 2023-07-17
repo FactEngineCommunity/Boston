@@ -163,7 +163,7 @@ Partial Class frmCRUDAddAttribute
         '
         'BindingSourceAttribute
         '
-        Me.BindingSourceAttribute.DataSource = GetType(ERD.Attribute)
+        'Me.BindingSourceAttribute.DataSource = GetType(ERD.Attribute)
         '
         'CheckBoxIsMandatory
         '

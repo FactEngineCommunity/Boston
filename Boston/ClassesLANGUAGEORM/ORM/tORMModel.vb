@@ -1025,9 +1025,12 @@ Namespace FBM
                                         lrColumn.IsMandatory = True
                                     End If
 
-                                    lrColumn.ActiveRole.JoinsValueType.DataType = pcenumORMDataType.TextVariableLength
+                                    If lrColumn.ActiveRole.JoinsValueType.DataType = pcenumORMDataType.DataTypeNotSet Then
+                                        lrColumn.ActiveRole.JoinsValueType.DataType = pcenumORMDataType.TextVariableLength
+                                    End If
                                     lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                 End If
+
 
                                 'There may be a case where an Index should have already contained the columns.
 #Region "Check...An Index should have already contained the New Columns."

@@ -65,7 +65,7 @@ Namespace FactEngine
             Dim lsSQLCommand As String
             Dim lrRecordset As ORMQL.Recordset
             Try
-                lsSQLCommand = "ALTER TABLE " & arColumn.Table.Name
+                lsSQLCommand = "ALTER TABLE `" & arColumn.Table.Name & "`"
                 lsSQLCommand &= " ADD "
                 lsSQLCommand &= Me.generateSQLColumnDefinition(arColumn)
 
@@ -230,18 +230,28 @@ Namespace FactEngine
                                 Where Not Column.isPartOfPrimaryKey
                                 Select Column
 
-                For Each lrColumn In larColumn
-                    '=========E.g. From Kuzu website==========================================================
-                    '// create the schema
-                    'connection.query("CREATE NODE TABLE User(name STRING, age INT64, PRIMARY KEY (name))");
-                    '=========================================================================================
+                If arColumn IsNot Nothing Then
                     lsSQLCommand = "CREATE NODE TABLE `" & arTable.Name & "`"
                     lsSQLCommand &= " ("
-                    lsSQLCommand &= lrColumn.Name & " " & lrColumn.DBDataType & If(lrColumn.Index.Count > 0, ", PRIMARY KEY (" & lrColumn.Name & ")", "")
+                    lsSQLCommand &= arColumn.Name & " " & arColumn.DBDataType & If(arColumn.Index.Count > 0 Or arTable.Column.Count = 1, ", PRIMARY KEY (" & arColumn.Name & ")", "")
                     lsSQLCommand &= ")"
 
                     Me.GONonQuery(lsSQLCommand)
-                Next
+                Else
+                    For Each lrColumn In larColumn
+                        '=========E.g. From Kuzu website==========================================================
+                        '// create the schema
+                        'connection.query("CREATE NODE TABLE User(name STRING, age INT64, PRIMARY KEY (name))");
+                        '=========================================================================================
+                        lsSQLCommand = "CREATE NODE TABLE `" & arTable.Name & "`"
+                        lsSQLCommand &= " ("
+                        lsSQLCommand &= lrColumn.Name & " " & lrColumn.DBDataType & If(lrColumn.Index.Count > 0, ", PRIMARY KEY (" & lrColumn.Name & ")", "")
+                        lsSQLCommand &= ")"
+
+                        Me.GONonQuery(lsSQLCommand)
+                        Exit For
+                    Next
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -602,6 +612,16 @@ Namespace FactEngine
                         lrColumn.DataType = New RDS.DataType
                         lrColumn.DataType.DataType = lsDataType
                         lrColumn.DatabaseName = lrColumn.Name
+
+                        'PrimaryKey
+                        Try
+                            If match1.Groups(3).Value.LCase = "primary key" Then
+                                lrColumn.TemporaryData = "PK" 'Use TemporaryData for now. See frmToolboxDatabaseSchemaViewer
+                            End If
+                        Catch ex As Exception
+                            'We tried
+                        End Try
+
 
                         larColumn.Add(lrColumn)
                     Else
@@ -1485,7 +1505,7 @@ FinishedProcessing:
             Try
                 Dim lsSQL As String
 
-                lsSQL = "ALTER TABLE " & arColumn.Table.Name & " DROP " & arColumn.Name
+                lsSQL = "ALTER TABLE `" & arColumn.Table.Name & "` DROP " & arColumn.Name
 
                 Me.GONonQuery(lsSQL)
 
@@ -1507,9 +1527,13 @@ FinishedProcessing:
         Public Overrides Sub removeTable(ByRef arTable As RDS.Table)
 
             Try
-                Dim lsSQLCommand = "DROP TABLE " & arTable.Name
+                Dim lsSQLCommand = "DROP TABLE `" & arTable.Name & "`"
 
-                Me.GONonQuery(lsSQLCommand)
+                Dim lrRecordset = Me.GONonQuery(lsSQLCommand)
+
+                If lrRecordset.ErrorReturned Then
+                    Throw New Exception(lrRecordset.ErrorString)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1532,7 +1556,10 @@ FinishedProcessing:
             Try
                 Dim lrRecordset As ORMQL.Recordset
 
-                Dim lsSQLCommmand = "ALTER TABLE " & arColumn.Table.Name
+                'CodeSafe
+                If arColumn.Name = asNewColumnName Then Exit Sub
+
+                Dim lsSQLCommmand = "ALTER TABLE `" & arColumn.Table.Name & "`"
                 lsSQLCommmand &= " RENAME " & arColumn.Name & " TO " & asNewColumnName
 
                 lrRecordset = Me.GONonQuery(lsSQLCommmand)
@@ -1560,8 +1587,8 @@ FinishedProcessing:
         Public Overrides Sub RenameTable(ByRef arTable As RDS.Table, ByVal asNewName As String)
 
             Try
-                Dim lsSQLCommmand = "ALTER TABLE " & arTable.Name
-                lsSQLCommmand &= " RENAME TO " & asNewName
+                Dim lsSQLCommmand = "ALTER TABLE `" & arTable.Name & "`"
+                lsSQLCommmand &= " RENAME TO `" & asNewName & "`"
 
                 Me.GONonQuery(lsSQLCommmand)
 

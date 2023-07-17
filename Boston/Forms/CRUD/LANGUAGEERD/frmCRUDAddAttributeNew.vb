@@ -255,8 +255,8 @@ OkayToProceed:
             Me.zsValueTypeName = Viev.Strings.MakeCapCamelCase(Trim(Me.ComboBoxAttribute.Text))
             Me.zbAttributeIsMandatory = Me.CheckBoxIsMandatory.Checked
             Me.zbDataType = Me.ComboBoxDataType.SelectedItem
-            Me.ziDataTypeLength = CInt(NullVal(Me.TextBoxDataTypeLength.Text, "0"))
-            Me.ziDataTypePrecision = CInt(NullVal(Me.TextBoxDataTypePrecision.Text, "0"))
+            Me.ziDataTypeLength = CInt(If(Me.TextBoxDataTypeLength.Text.Trim = "", "0", Me.TextBoxDataTypeLength.Text.Trim))
+            Me.ziDataTypePrecision = CInt(If(Me.TextBoxDataTypePrecision.Text.Trim = "", "0", Me.TextBoxDataTypePrecision.Text.Trim))
             Me.DialogResult = Windows.Forms.DialogResult.OK
 
             Me.Close()
