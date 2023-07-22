@@ -44,6 +44,7 @@ Partial Class frmFactEngine
         Me.ToolStripMenuItemDefaultToQueryTab = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemAutoCapitalise = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemNaturalLanguage = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemNaturalLanguageAnswers = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripNaturalLanguage = New System.Windows.Forms.ToolStrip()
         Me.ToolStripLabelPromptNaturalLanguage = New System.Windows.Forms.ToolStripLabel()
         Me.TextBoxNaturalLanguage = New System.Windows.Forms.ToolStripTextBox()
@@ -81,7 +82,6 @@ Partial Class frmFactEngine
         Me.Diagram2 = New MindFusion.Diagramming.Diagram()
         Me.Diagram3 = New MindFusion.Diagramming.Diagram()
         Me.Diagram4 = New MindFusion.Diagramming.Diagram()
-        Me.ToolStripMenuItemNaturalLanguageAnswers = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -144,7 +144,7 @@ Partial Class frmFactEngine
         '
         Me.ContextMenuStripFactEngine.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ToolStripSeparator1, Me.BackgroundColourToolStripMenuItem, Me.ToolStripMenuItemHelpTips, Me.DefaultAfterQueryToToolStripMenuItem, Me.ToolStripMenuItemAutoCapitalise, Me.ToolStripMenuItemNaturalLanguage, Me.ToolStripMenuItemNaturalLanguageAnswers})
         Me.ContextMenuStripFactEngine.Name = "ContextMenuStripFactEngine"
-        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(221, 194)
+        Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(221, 172)
         '
         'ViewToolStripMenuItem
         '
@@ -272,6 +272,15 @@ Partial Class frmFactEngine
         Me.ToolStripMenuItemNaturalLanguage.Name = "ToolStripMenuItemNaturalLanguage"
         Me.ToolStripMenuItemNaturalLanguage.Size = New System.Drawing.Size(220, 22)
         Me.ToolStripMenuItemNaturalLanguage.Text = "Natural Language Tool Strip"
+        '
+        'ToolStripMenuItemNaturalLanguageAnswers
+        '
+        Me.ToolStripMenuItemNaturalLanguageAnswers.Checked = True
+        Me.ToolStripMenuItemNaturalLanguageAnswers.CheckOnClick = True
+        Me.ToolStripMenuItemNaturalLanguageAnswers.CheckState = System.Windows.Forms.CheckState.Indeterminate
+        Me.ToolStripMenuItemNaturalLanguageAnswers.Name = "ToolStripMenuItemNaturalLanguageAnswers"
+        Me.ToolStripMenuItemNaturalLanguageAnswers.Size = New System.Drawing.Size(220, 22)
+        Me.ToolStripMenuItemNaturalLanguageAnswers.Text = "Natural Language Answers"
         '
         'ToolStripNaturalLanguage
         '
@@ -496,7 +505,7 @@ Partial Class frmFactEngine
         'ToolStripComboBoxQueryLanguage
         '
         Me.ToolStripComboBoxQueryLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ToolStripComboBoxQueryLanguage.Items.AddRange(New Object() {"SQL", "TypeQL", "Cypher"})
+        Me.ToolStripComboBoxQueryLanguage.Items.AddRange(New Object() {"SQL", "TypeQL", "Cypher", "openCypher"})
         Me.ToolStripComboBoxQueryLanguage.MergeIndex = 0
         Me.ToolStripComboBoxQueryLanguage.Name = "ToolStripComboBoxQueryLanguage"
         Me.ToolStripComboBoxQueryLanguage.Size = New System.Drawing.Size(121, 31)
@@ -567,15 +576,6 @@ Partial Class frmFactEngine
         'BackgroundWorker
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
-        '
-        'ToolStripMenuItemNaturalLanguageAnswers
-        '
-        Me.ToolStripMenuItemNaturalLanguageAnswers.Checked = True
-        Me.ToolStripMenuItemNaturalLanguageAnswers.CheckOnClick = True
-        Me.ToolStripMenuItemNaturalLanguageAnswers.CheckState = System.Windows.Forms.CheckState.Indeterminate
-        Me.ToolStripMenuItemNaturalLanguageAnswers.Name = "ToolStripMenuItemNaturalLanguageAnswers"
-        Me.ToolStripMenuItemNaturalLanguageAnswers.Size = New System.Drawing.Size(220, 22)
-        Me.ToolStripMenuItemNaturalLanguageAnswers.Text = "Natural Language Answers"
         '
         'frmFactEngine
         '

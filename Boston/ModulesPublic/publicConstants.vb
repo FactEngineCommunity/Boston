@@ -105,6 +105,7 @@ Public Module publicConstants
         Cypher
         TypeQL
         EdgeQL
+        openCypher
     End Enum
 
 
@@ -137,7 +138,7 @@ Public Module publicConstants
         Neo4j = 111
         <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         RelationalAI = 112
-        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.Cypher)>
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.openCypher)>
         KuzuDB = 113
         <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.EdgeQL)>
         EdgeDB = 114

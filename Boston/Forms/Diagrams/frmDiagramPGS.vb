@@ -1652,7 +1652,7 @@ SkipORMReadingEditor:
                 Dim lrEntity As ERD.Entity
                 Select Case Me.zrPage.SelectedObject(0).GetType
                     Case Is = GetType(ERD.Relation)
-
+#Region "ERD.Relation"
                         Dim lrERDRelation As ERD.Relation = Me.zrPage.SelectedObject(0)
                         Dim lrRDSRelation = lrERDRelation.RDSRelation
 
@@ -1686,7 +1686,7 @@ SkipORMReadingEditor:
                                 GoTo EndVectorsSet
                             End If
                         End If
-
+#End Region
                     Case Else
 PGSRelationNode:
                         lrEntity = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)

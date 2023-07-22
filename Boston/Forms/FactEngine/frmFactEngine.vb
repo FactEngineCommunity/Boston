@@ -1294,6 +1294,18 @@ NextWord:
                 Me.LabelError.Text = ex.Message
             End Try
 
+            Dim liDatabaseQueryLanguage As pcenumDatabaseQueryLanguage = pcenumDatabaseQueryLanguage.SQL
+            Select Case prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
+                Case Is = pcenumDatabaseQueryLanguage.SQL
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 0
+                Case Is = pcenumDatabaseQueryLanguage.TypeQL
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 1
+                Case Is = pcenumDatabaseQueryLanguage.Cypher
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 2
+                Case Is = pcenumDatabaseQueryLanguage.openCypher
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 3
+            End Select
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2655,6 +2667,23 @@ NextWord:
         Try
             Me.ToolStripMenuItemAutoCapitalise.Checked = False
 
+
+            'Sql
+            'TypeQL
+            'Cypher
+            'openCypher
+            Dim liDatabaseQueryLanguage As pcenumDatabaseQueryLanguage = pcenumDatabaseQueryLanguage.SQL
+            Select Case prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
+                Case Is = pcenumDatabaseQueryLanguage.SQL
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 0
+                Case Is = pcenumDatabaseQueryLanguage.TypeQL
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 1
+                Case Is = pcenumDatabaseQueryLanguage.Cypher
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 2
+                Case Is = pcenumDatabaseQueryLanguage.openCypher
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 3
+            End Select
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2788,7 +2817,10 @@ NextWord:
         Try
             Dim lsQuery As String = Me.TextBoxQuery.Text
 
-            If Me.ToolStripComboBoxQueryLanguage.Text = "Cypher" Then
+            Dim lbIsSQLDatabase = prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage) = pcenumDatabaseQueryLanguage.SQL
+
+            If {"Cypher", "openCypher"}.Contains(Me.ToolStripComboBoxQueryLanguage.Text) And lbIsSQLDatabase Then
+
                 'Debugger.Break()
 
                 Dim graphDef = New RDS.GraphProvider(prApplication.WorkingModel.RDS)

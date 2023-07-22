@@ -5,13 +5,14 @@ Imports MindFusion.Diagramming.WinForms
 Imports MindFusion.Drawing
 Imports MindFusion.Diagramming.Layout
 Imports System.Reflection
+Imports System.ComponentModel
 
 Public Class frmDiagramERD
 
     Public zrPage As FBM.Page = Nothing
     Public zoTreeNode As TreeNode = Nothing
 
-    Private morph_vector As tmorphvector
+    Private morph_vector As tMorphVector
     Private morph_shape As New ShapeNode
     Private MorphVector As New List(Of tMorphVector)
 
@@ -155,7 +156,6 @@ Public Class frmDiagramERD
         Me.ToolStripMenuItemDeleteAttribute.Visible = My.Settings.SuperuserMode
 
         Me.ToolStripMenuItemDeleteRelation.Enabled = My.Settings.SuperuserMode
-        Me.ToolStripMenuItemEditRelation.Enabled = My.Settings.SuperuserMode
 
     End Sub
 
@@ -1485,6 +1485,11 @@ SkipORMReadingEditor:
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Me.DiagramView.BringToFront()
+            Me.Diagram.Invalidate()
+            Me.MorphStepTimer.Enabled = False
+            Me.MorphTimer.Enabled = False
         End Try
 
     End Sub
@@ -1643,6 +1648,11 @@ SkipORMReadingEditor:
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Me.DiagramView.BringToFront()
+            Me.Diagram.Invalidate()
+            Me.MorphStepTimer.Enabled = False
+            Me.MorphTimer.Enabled = False
         End Try
     End Sub
 
@@ -1666,9 +1676,15 @@ SkipORMReadingEditor:
             lrShapeNode = lrPageObject.Shape.Clone(True)
             lrShapeNode = New ShapeNode(lrPageObject.Shape)
             lrShapeNode.Shape = Shapes.RoundRect
-            lrShapeNode.SetRect(Me.zrPage.SelectedObject(0).TableShape.Bounds, False)
             lrShapeNode.Pen.Width = 0.5
-            lrShapeNode.Text = lrPageObject.Name
+            lrShapeNode.Text = ""
+            Select Case Me.zrPage.SelectedObject(0).GetType
+                Case Is = GetType(ERD.Relation)
+                Case Else
+                    lrShapeNode.SetRect(Me.zrPage.SelectedObject(0).TableShape.Bounds, False)
+                    lrShapeNode.Text = lrPageObject.Name
+            End Select
+
 
             Me.MorphVector(0).ModelElementId = Me.zrPage.SelectedObject(0).Id
             Me.MorphVector(0).Shape = lrShapeNode
@@ -1740,47 +1756,91 @@ SkipORMReadingEditor:
                 Next
 #End Region
 
-
-                Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
-                                          From FactInstance In FactTypeInstance.Fact
-                                          From FactDataInstance In FactInstance.Data
-                                          Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
-                                   And FactDataInstance.Role.Name = pcenumCMML.Element.ToString _
-                                   And FactDataInstance.Concept.Symbol = lrPageObject.Name
-                                          Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
-
-                Dim lrFactDataInstance As New FBM.FactDataInstance
-                For Each lrFactDataInstance In larFactDataInstance
-                    Exit For
-                Next
-
-                If lrFactDataInstance.Shape IsNot Nothing Then
-                    Me.MorphVector(0).EndSize = New Rectangle(lrFactDataInstance.X,
-                                                              lrFactDataInstance.Y,
-                                                              lrFactDataInstance.Shape.Bounds.Width,
-                                                              lrFactDataInstance.Shape.Bounds.Height)
-                Else
-                    Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
-                End If
+                'End Size (initial/default)
+                Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
 
                 'Start size
                 Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
-                '===========================================
 
-                lrNode = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
+                '===========================================
+                Select Case Me.zrPage.SelectedObject(0).GetType
+                    Case Is = GetType(ERD.Relation)
+#Region "ERD.Relation"
+                        Dim lrERDRelation As ERD.Relation = Me.zrPage.SelectedObject(0)
+                        Dim lrRDSRelation = lrERDRelation.RDSRelation
+
+                        If lrERDRelation.IsPGSRelationNode Then GoTo PGSRelationNode
+
+                        Me.MorphVector(0).TargetText = ""
+                        Me.MorphVector(0).Shape.Text = ""
+
+                        lrNode = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRDSRelation.OriginTable.Name)
+
+                        If lrNode.RDSTable.isPGSRelation Then GoTo PGSRelationNode
+
+                        If lrNode IsNot Nothing Then
+                            Dim lrTargetEntity As PGS.Node = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRDSRelation.DestinationTable.Name)
+                            If lrTargetEntity IsNot Nothing Then
+
+                                Dim lrTargetERDRelation As ERD.Relation = Nothing
+                                Try
+                                    lrTargetERDRelation = (From ERDRelation In lrPage.ERDiagram.Relation
+                                                           Where ERDRelation.RDSRelation.Equals(lrRDSRelation)
+                                                           Select ERDRelation).First
+                                Catch ex As Exception
+                                    GoTo UnkownEndVector
+                                End Try
+
+                                Dim liX = lrTargetERDRelation.Link.Link.Bounds.X
+                                Dim liY = lrTargetERDRelation.Link.Link.Bounds.Y
+                                Dim liWidth = lrTargetERDRelation.Link.Link.Bounds.Width
+                                Dim liHeight = lrTargetERDRelation.Link.Link.Bounds.Height
+                                Me.MorphVector(0).EndSize = New Rectangle(liX, liY, liWidth, liHeight)
+                                Me.MorphVector(0).EndPoint = New Point(liX, liY)
+                                Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrNode.Shape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrNode.Shape.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
+                                GoTo EndVectorsSet
+                            End If
+                        End If
+#End Region
+                    Case Else
+#Region "Node Type"
+PGSRelationNode:
+                        lrNode = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
+#End Region
+                End Select
 
                 If lrNode IsNot Nothing Then
+#Region "Default Vector Setting"
+                    'Try
+                    '    Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
+                    '                                              lrNode.Y,
+                    '                                              lrNode.Shape.Bounds.Width,
+                    '                                              lrNode.Shape.Bounds.Height)
+                    '    Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
+                    'Catch ex As Exception
+                    '    '20230613-Remove if not needed. See below.
+                    '    'Not a biggie. See below.
+                    'End Try
 
-                    Try
-                        Me.MorphVector(0).EndSize = New Rectangle(lrNode.X,
-                                                                  lrNode.Y,
-                                                                  lrNode.Shape.Bounds.Width,
-                                                                  lrNode.Shape.Bounds.Height)
-                        Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X, lrNode.Shape.Bounds.Y) ' (lrFactDataInstance.x, lrFactDataInstance.y)
-                    Catch ex As Exception
-                        '20230613-Remove if not needed. See below.
-                        'Not a biggie. See below.
-                    End Try
+                    Dim larFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
+                                              From FactInstance In FactTypeInstance.Fact
+                                              From FactDataInstance In FactInstance.Data
+                                              Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
+                                           And FactDataInstance.Role.Name = pcenumCMML.Element.ToString _
+                                           And FactDataInstance.Concept.Symbol = lrNode.Name
+                                              Select New FBM.FactDataInstance(lrPage, FactInstance, FactDataInstance.Role, FactDataInstance.Concept, FactDataInstance.X, FactDataInstance.Y)
+
+                    Dim lrFactDataInstance As FBM.FactDataInstance = Nothing
+                    For Each lrFactDataInstance In larFactDataInstance
+                        Exit For
+                    Next
+
+                    If lrFactDataInstance.Shape IsNot Nothing Then
+                        Me.MorphVector(0).EndSize = New Rectangle(lrFactDataInstance.X,
+                                                              lrFactDataInstance.Y,
+                                                              lrFactDataInstance.Shape.Bounds.Width,
+                                                              lrFactDataInstance.Shape.Bounds.Height)
+                    End If
 
 
                     If lrNode.NodeType = pcenumPGSEntityType.Relationship Then
@@ -1794,6 +1854,8 @@ SkipORMReadingEditor:
                             lrRelation = Nothing
                         End If
 
+                        Me.MorphVector(0).Shape.Text = ""
+
                         If lrRelation IsNot Nothing Then
                             Dim lrPGSLink As PGS.Link = lrRelation.Link
                             Me.MorphVector(0).EndSize = New Rectangle(lrPGSLink.Link.Bounds.X, lrPGSLink.Link.Bounds.Y, lrPGSLink.Link.Bounds.Width, Viev.Greater(1, lrPGSLink.Link.Bounds.Height))
@@ -1803,7 +1865,7 @@ SkipORMReadingEditor:
                             Me.MorphVector(0).EndPoint = New Point(liLesserX - lrPage.DiagramView.ScrollX, liLesserY - lrPage.DiagramView.ScrollY)
                             'Me.MorphVector(0).EndPoint = New Point(lrRelation.Link.Link.Bounds.X - lrPage.DiagramView.ScrollX, lrRelation.Link.Link.bounds.Y - lrPage.DiagramView.ScrollY)
 
-                            Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                            Me.MorphVector(0).VectorSteps = Math.Min(25, (Math.Abs(lrRelation.Link.Link.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrRelation.Link.Link.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
                         Else
                             Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
                             Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X - lrPage.DiagramView.ScrollX, lrNode.Shape.Bounds.Y - lrPage.DiagramView.ScrollY) 'lrFactDataInstance.X, lrFactDataInstance.Y)
@@ -1811,16 +1873,22 @@ SkipORMReadingEditor:
                     Else
                         Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
                         Me.MorphVector(0).EndPoint = New Point(lrNode.Shape.Bounds.X - lrPage.DiagramView.ScrollX, lrNode.Shape.Bounds.Y - lrPage.DiagramView.ScrollY) 'lrFactDataInstance.X, lrFactDataInstance.Y)
+                        Me.MorphVector(0).Shape.Text = lrShapeNode.Text
                     End If
+#End Region
                 Else
+UnkownEndVector:
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 20)
-                    Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X, lrFactDataInstance.Y)
-                    Me.MorphVector(0).VectorSteps = Viev.Greater(15, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                    Me.MorphVector(0).EndPoint = New Point(50, 50)
+                    Me.MorphVector(0).VectorSteps = 15 'Viev.Greater(15, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1)) / 3
+                    Me.MorphVector(0).Shape.Text = lrShapeNode.Text
                 End If
 
+EndVectorsSet:
                 '===========================================
+
                 Me.MorphVector(0).Shape.Font = Me.zrPage.Diagram.Font
-                Me.MorphVector(0).Shape.Text = Me.MorphVector(0).ModelElementId
+                'Me.MorphVector(0).Shape.Text = lrShapeNode.Text '20230723-VM-Was Me.MorphVector(0).ModelElementId
                 Me.MorphVector(0).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
                 Me.MorphVector(0).Shape.TextFormat.Alignment = StringAlignment.Center
                 Me.MorphVector(0).Shape.TextFormat.LineAlignment = StringAlignment.Center
@@ -1846,6 +1914,9 @@ SkipORMReadingEditor:
             prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.DiagramView.BringToFront()
+            Me.Diagram.Invalidate()
+            Me.MorphStepTimer.Enabled = False
+            Me.MorphTimer.Enabled = False
         End Try
 
     End Sub
@@ -2767,7 +2838,7 @@ SkipORMReadingEditor:
 
                 lrORMReadingEditor.zrPage = Me.zrPage
                 lrORMReadingEditor.zrFactTypeInstance = lrERDLink.Relation.RelationFactType.CloneInstance(New FBM.Page(Me.zrPage.Model), False)
-                Me.zrPage.SelectedObject.Add(lrERDLink.Relation.RDSRelation) '20220315-VM-Was (lrORMReadingEditor.zrFactTypeInstance)
+                Me.zrPage.SelectedObject.Add(lrERDLink.Relation) '20220315-VM-Was (lrORMReadingEditor.zrFactTypeInstance)
                 Call lrORMReadingEditor.SetupForm()
 
             End If
@@ -3198,7 +3269,7 @@ SkipORMReadingEditor:
 
     End Sub
 
-    Private Sub ToolStripMenuItemEditRelation_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemEditRelation.Click
+    Private Sub ToolStripMenuItemEditRelation_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
         Dim lfrmEditRelationship As New frmCRUDEditRelationship
 
@@ -3705,9 +3776,10 @@ SkipORMReadingEditor:
 
             If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel + MsgBoxStyle.Critical) = MsgBoxResult.Yes Then
 
-                Dim lrRelation As RDS.Relation = Me.zrPage.SelectedObject(0)
+                Dim lrERDRelation As ERD.Relation = Me.zrPage.SelectedObject(0)
+                Dim lrRDSRelation As RDS.Relation = lrERDRelation.RDSRelation
 
-                Call lrRelation.Model.removeRelation(lrRelation)
+                Call lrRDSRelation.Model.removeRelation(lrRDSRelation)
             End If
 
         Catch ex As Exception
@@ -3930,7 +4002,8 @@ Aborted:
     Private Sub ToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem3.Click
 
         Try
-            Dim lrRDSRelation As RDS.Relation = Me.zrPage.SelectedObject(0)
+            Dim lrERDRelation As ERD.Relation = Me.zrPage.SelectedObject(0)
+            Dim lrRDSRelation As RDS.Relation = lrERDRelation.RDSRelation
 
             prApplication.WorkingModel = Me.zrPage.Model
             prApplication.WorkingPage = Me.zrPage
@@ -4261,8 +4334,8 @@ Aborted:
             ''---------------------------------------------------------
             ''Get the RDSRelation represented by the (selected) Relation
             ''---------------------------------------------------------
-            Dim lrRDSRelation As RDS.Relation = Me.zrPage.SelectedObject(0)
-
+            Dim lrERDRelation As ERD.Relation = Me.zrPage.SelectedObject(0)
+            Dim lrRDSRelation As RDS.Relation = lrERDRelation.RDSRelation
 
             If MsgBox("Are you sure you want to recreate the Relationship Table in the database?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
 
@@ -4309,5 +4382,146 @@ Aborted:
         End Try
 
     End Sub
+
+    Private Sub ContextMenuStrip_Relation_Opening(sender As Object, e As CancelEventArgs) Handles ContextMenuStrip_Relation.Opening
+
+        Dim lrPage As FBM.Page
+        Dim lrPageList As New List(Of FBM.Page)
+        Dim lrDestinationTablePageList As New List(Of FBM.Page)
+
+        Dim lrERDRelation As ERD.Relation = Nothing
+        Dim lrRDSRelation As New RDS.Relation
+
+        Try
+            Me.ContextMenuStrip_Relation.ImageScalingSize = New Drawing.Size(16, 16)
+
+            If Me.zrPage.SelectedObject.Count = 0 Then
+                Exit Sub
+            End If
+
+            Try
+                lrERDRelation = Me.zrPage.SelectedObject(0)
+                lrRDSRelation = lrERDRelation.RDSRelation
+            Catch ex As Exception
+                MsgBox("No relation selected. Try again.")
+                Exit Sub
+            End Try
+
+
+            '=============================================================================================
+            'Morphing
+            '---------------------------------------------------------------------------------------------
+            'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
+            '  shape, and to/into another diagram starts at the MorphVector.
+            '---------------------------------------------------------------------------------------------
+            Me.MorphVector.Clear()
+            Dim liX = 10
+            Dim liY = 10
+            Try
+                liX = lrERDRelation.Link.Link.Bounds.X
+                liY = lrERDRelation.Link.Link.Bounds.Y
+            Catch
+                liX = 0
+                liY = 0
+            End Try
+
+            Me.MorphVector.Add(New tMorphVector(liX, liY, 0, 0, 40))
+
+            '====================================================
+            '--------------------------------------------------------------
+            'Clear the list of ORMDiagrams that may relate to the EntityType
+            '--------------------------------------------------------------
+            Me.ORMDiagramToolStripMenuItem1.DropDownItems.Clear()
+            Me.ToolStripMenuItemERDDiagram1.DropDownItems.Clear()
+            Me.PGSDiagramToolStripMenuItem1.DropDownItems.Clear()
+
+            Dim loMenuOption As ToolStripItem
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+
+            '--------------------------------------------------------------------------------------------------------
+            'Get the ORM Diagrams for the selected Node.
+            lrPageList = prApplication.CMML.getORMDiagramPagesForModelElementName(lrRDSRelation.Model.Model, lrRDSRelation.ResponsibleFactType.Id)
+
+            For Each lrPage In lrPageList
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ORMDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ORM16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToORMDiagram
+                End If
+            Next
+
+            '--------------------------------------------------------------------------------------------------------
+            'Get the ER Diagrams for the selected Node.
+            lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRDSRelation.Model.Model, lrRDSRelation.OriginTable.Name)
+            lrDestinationTablePageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRDSRelation.Model.Model, lrRDSRelation.DestinationTable.Name)
+
+            For Each lrPage In lrPageList.Union(lrDestinationTablePageList)
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ToolStripMenuItemERDDiagram1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.ERD16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.MorphToERDiagram
+                End If
+            Next
+
+            '--------------------------------------------------------------------------------------------------------
+            'Get the PGS Diagrams for the selected Node.
+            lrPageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRDSRelation.Model.Model, lrRDSRelation.OriginTable.Name)
+            lrDestinationTablePageList.Clear()
+
+            If lrRDSRelation.OriginTable.isPGSRelation Then
+                lrDestinationTablePageList = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrRDSRelation.Model.Model, lrRDSRelation.OriginTable.Name)
+            End If
+
+            For Each lrPage In lrPageList.Union(lrDestinationTablePageList)
+                '---------------------------------------------------------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is not added for those hidden Pages.
+                '----------------------------------------------------------
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
+
+                If IsSomething(lrEnterpriseView) Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.PGSDiagramToolStripMenuItem1.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morphToPGSDiagram
+                End If
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            Me.Cursor = Cursors.Default
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 
 End Class
