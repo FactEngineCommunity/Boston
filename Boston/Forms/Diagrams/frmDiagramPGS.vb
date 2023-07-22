@@ -249,10 +249,20 @@ Public Class frmDiagramPGS
 
     Public Sub EnableSaveButton()
 
-        '-------------------------------------
-        'Raised from ModelObjects themselves
-        '-------------------------------------
-        frmMain.ToolStripButton_Save.Enabled = True
+        Try
+            '-------------------------------------
+            'Raised from ModelObjects themselves
+            '-------------------------------------
+            frmMain.ToolStripButton_Save.Enabled = True
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+        End Try
+
     End Sub
 
     Private Function GetCommonLinks(ByVal node1 As DiagramNode, ByVal node2 As DiagramNode) As DiagramLinkCollection
@@ -1639,26 +1649,69 @@ SkipORMReadingEditor:
                 Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.MorphVector(0).Shape.Bounds.Width, Me.MorphVector(0).Shape.Bounds.Height)
 
                 '===========================================
-                Dim lrEntity As ERD.Entity = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
+                Dim lrEntity As ERD.Entity
+                Select Case Me.zrPage.SelectedObject(0).GetType
+                    Case Is = GetType(ERD.Relation)
+
+                        Dim lrERDRelation As ERD.Relation = Me.zrPage.SelectedObject(0)
+                        Dim lrRDSRelation = lrERDRelation.RDSRelation
+
+                        If lrERDRelation.IsPGSRelationNode Then GoTo PGSRelationNode
+
+                        Me.MorphVector(0).TargetText = ""
+                        Me.MorphVector(0).Shape.Text = ""
+
+                        lrEntity = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRDSRelation.OriginTable.Name)
+
+                        If lrEntity IsNot Nothing Then
+                            Dim lrTargetEntity As ERD.Entity = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrRDSRelation.DestinationTable.Name)
+                            If lrTargetEntity IsNot Nothing Then
+
+                                Dim lrTargetERDRelation As ERD.Relation = Nothing
+                                Try
+                                    lrTargetERDRelation = (From ERDRelation In lrPage.ERDiagram.Relation
+                                                           Where ERDRelation.RDSRelation.Equals(lrRDSRelation)
+                                                           Select ERDRelation).First
+                                Catch ex As Exception
+                                    GoTo UnkownEndVector
+                                End Try
+
+                                Dim liX = lrTargetERDRelation.Link.Link.Bounds.X
+                                Dim liY = lrTargetERDRelation.Link.Link.Bounds.Y
+                                Dim liWidth = lrTargetERDRelation.Link.Link.Bounds.Width
+                                Dim liHeight = lrTargetERDRelation.Link.Link.Bounds.Height
+                                Me.MorphVector(0).EndSize = New Rectangle(liX, liY, liWidth, liHeight)
+                                Me.MorphVector(0).EndPoint = New Point(liX, liY)
+                                Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntity.TableShape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntity.TableShape.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
+                                GoTo EndVectorsSet
+                            End If
+                        End If
+
+                    Case Else
+PGSRelationNode:
+                        lrEntity = lrPage.ERDiagram.Entity.Find(Function(x) x.Name = lrPageObject.Name)
+                        Me.MorphVector(0).Shape.Font = Me.zrPage.Diagram.Font
+                        Me.MorphVector(0).Shape.Text = Me.MorphVector(0).ModelElementId
+                        Me.MorphVector(0).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
+                        Me.MorphVector(0).Shape.TextFormat.Alignment = StringAlignment.Center
+                        Me.MorphVector(0).Shape.TextFormat.LineAlignment = StringAlignment.Center
+                End Select
+
                 If lrEntity IsNot Nothing Then
                     Me.MorphVector(0).EndSize = New Rectangle(lrEntity.X,
-                                                              lrEntity.Y,
-                                                              lrEntity.TableShape.Bounds.Width,
-                                                              lrEntity.TableShape.Bounds.Height)
+                                                        lrEntity.Y,
+                                                        lrEntity.TableShape.Bounds.Width,
+                                                        lrEntity.TableShape.Bounds.Height)
                     Me.MorphVector(0).EndPoint = New Point(lrEntity.TableShape.Bounds.X - lrPage.DiagramView.ScrollX, lrEntity.TableShape.Bounds.Y - lrPage.DiagramView.ScrollY)
                     Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrEntity.TableShape.Bounds.X - lrShapeNode.Bounds.X) + Math.Abs(lrEntity.TableShape.Bounds.Y - lrShapeNode.Bounds.Y) + 1))
                 Else
+UnkownEndVector:
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                     Me.MorphVector(0).EndPoint = New Point(lrFactDataInstance.X, lrFactDataInstance.Y)
                     Me.MorphVector(0).VectorSteps = Viev.Lesser(25, (Math.Abs(lrFactDataInstance.X - lrShapeNode.Bounds.X) + Math.Abs(lrFactDataInstance.Y - lrShapeNode.Bounds.Y) + 1))
                 End If
+EndVectorsSet:
                 '===========================================
-                Me.MorphVector(0).Shape.Font = Me.zrPage.Diagram.Font
-                Me.MorphVector(0).Shape.Text = Me.MorphVector(0).ModelElementId
-                Me.MorphVector(0).Shape.TextFormat = New StringFormat(StringFormatFlags.NoFontFallback)
-                Me.MorphVector(0).Shape.TextFormat.Alignment = StringAlignment.Center
-                Me.MorphVector(0).Shape.TextFormat.LineAlignment = StringAlignment.Center
-
                 Me.MorphVector(0).Shape.SetRect(New RectangleF(lrPageObject.X, lrPageObject.Y, 20, 20), False)
                 Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
 
@@ -3554,6 +3607,8 @@ SkipORMReadingEditor:
             'Get the ER Diagrams for the selected Node.
             If lrRelation.IsPGSRelationNode Then
                 lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.ActualPGSNode.Id)
+            ElseIf lrRelation.RDSRelation.ResponsibleFactType.IsManyTo1BinaryFactType Then
+                lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RDSRelation.OriginTable.Name)
             Else
                 lrPageList = prApplication.CMML.getERDiagramPagesForModelElementName(lrRelation.Model, lrRelation.RelationFactType.Id)
             End If

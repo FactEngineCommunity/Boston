@@ -271,6 +271,7 @@ Partial Class frmDiagramPGS
         'HiddenDiagram
         '
         Me.HiddenDiagram.AdjustmentHandlesSize = 1.0!
+        Me.HiddenDiagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         '
         'MorphTimer
         '

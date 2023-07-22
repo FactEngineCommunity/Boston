@@ -65,8 +65,10 @@ Public Class tMorphVector
 
             Me.VectorStep += Viev.Greater(liHypotenuse / Me.VectorSteps, 1)
 
-            li_vector_x = Int((li_vector_x / Me.VectorSteps) * Me.VectorStep)
-            li_vector_y = Int((li_vector_y / Me.VectorSteps) * Me.VectorStep)
+            Dim liVectorStep = Math.Min(Me.VectorSteps, Me.VectorStep)
+
+            li_vector_x = Int((li_vector_x / Me.VectorSteps) * liVectorStep)
+            li_vector_y = Int((li_vector_y / Me.VectorSteps) * liVectorStep)
 
             If Me.EndPoint.X > Me.StartPoint.X Then
                 li_vector_x = Me.StartPoint.X + li_vector_x

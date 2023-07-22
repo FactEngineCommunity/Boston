@@ -50,6 +50,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ContextMenuStrip_ORMModel = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ViewModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ViewGlossaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ViewDatabaseSchemaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GenerateDocumentationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemCodeGenerator = New System.Windows.Forms.ToolStripMenuItem()
         Me.FactEngineToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -106,7 +107,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
-        Me.ViewDatabaseSchemaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -342,6 +342,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ViewGlossaryToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.ViewGlossaryToolStripMenuItem.Text = "View &Glossary"
         '
+        'ViewDatabaseSchemaToolStripMenuItem
+        '
+        Me.ViewDatabaseSchemaToolStripMenuItem.Name = "ViewDatabaseSchemaToolStripMenuItem"
+        Me.ViewDatabaseSchemaToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.ViewDatabaseSchemaToolStripMenuItem.Text = "View Database Schema"
+        '
         'GenerateDocumentationToolStripMenuItem
         '
         Me.GenerateDocumentationToolStripMenuItem.Image = CType(resources.GetObject("GenerateDocumentationToolStripMenuItem.Image"), System.Drawing.Image)
@@ -399,7 +405,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.AddPageToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.PageAdd16x16
         Me.AddPageToolStripMenuItem1.Name = "AddPageToolStripMenuItem1"
         Me.AddPageToolStripMenuItem1.Size = New System.Drawing.Size(207, 22)
-        Me.AddPageToolStripMenuItem1.Text = "&Add Page"
+        Me.AddPageToolStripMenuItem1.Text = "&Add ORM Page"
         '
         'ToolStripMenuItemPastePage
         '
@@ -706,12 +712,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.SelectedNode = Nothing
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
-        '
-        'ViewDatabaseSchemaToolStripMenuItem
-        '
-        Me.ViewDatabaseSchemaToolStripMenuItem.Name = "ViewDatabaseSchemaToolStripMenuItem"
-        Me.ViewDatabaseSchemaToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.ViewDatabaseSchemaToolStripMenuItem.Text = "View Database Schema"
         '
         'frmToolboxEnterpriseExplorer
         '

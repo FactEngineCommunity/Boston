@@ -379,7 +379,7 @@ Namespace FBM
                 Dim TempString As String = ""
                 'Holds our selected option for return
 
-                If Me.IsObjectified Then
+                If Me.IsObjectified And Me.ObjectifyingEntityType IsNot Nothing Then
                     If Me.ObjectifyingEntityType.ReferenceMode = Nothing Then
                         'If an option has not already been selected
                         If tGlobalForTypeConverter.OptionStringArray.GetUpperBound(0) > 0 Then
@@ -396,6 +396,7 @@ Namespace FBM
                 Else
                     TempString = ""
                 End If
+
                 Return TempString
 
             End Get
@@ -1970,7 +1971,7 @@ ReattachRoles:
 #End Region
                 End If
 
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing AndAlso Me.Shape.Visible = True Then
                     If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Or (Me.RoleGroup.Count = 0) Then
                         '----------------------------------------------------------------------------------------------
                         'Likely that the user has dragged a multiRole FactType onto the canvas and hasn't
@@ -3958,42 +3959,53 @@ ReattachRoles:
 
         Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
 
-            If aiNewX < 0 Then aiNewX = 0
-            If aiNewY < 0 Then aiNewY = 0
+            Try
 
-            If Me.Shape IsNot Nothing Then
-                Me.Shape.Move(aiNewX, aiNewY)
-            End If
+                If aiNewX < 0 Then aiNewX = 0
+                If aiNewY < 0 Then aiNewY = 0
 
-            Me.X = aiNewX
-            Me.Y = aiNewY
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Move(aiNewX, aiNewY)
+                End If
 
-            '==============================================================================
-            'Broadcast the moving of the Object
-            '  NB See also: SelectionMoved. Need this code in both places for some reason VM-20180316
-            If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
+                Me.X = aiNewX
+                Me.Y = aiNewY
 
-                Dim lrModel As New Viev.FBM.Interface.Model
-                Dim lrPage As New Viev.FBM.Interface.Page()
+                '==============================================================================
+                'Broadcast the moving of the Object
+                '  NB See also: SelectionMoved. Need this code in both places for some reason VM-20180316
+                If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent And Me.Shape IsNot Nothing Then
 
-                lrModel.ModelId = Me.Page.Model.ModelId
-                lrPage.Id = Me.Page.PageId
-                lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
-                lrPage.ConceptInstance.X = Me.Shape.Bounds.X
-                lrPage.ConceptInstance.Y = Me.Shape.Bounds.Y
-                lrPage.ConceptInstance.ModelElementId = Me.Id
-                lrModel.Page = lrPage
+                    Dim lrModel As New Viev.FBM.Interface.Model
+                    Dim lrPage As New Viev.FBM.Interface.Page()
 
-                Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                lrBroadcast.Model = lrModel
-                Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
+                    lrModel.ModelId = Me.Page.Model.ModelId
+                    lrPage.Id = Me.Page.PageId
+                    lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
+                    lrPage.ConceptInstance.X = Me.Shape.Bounds.X
+                    lrPage.ConceptInstance.Y = Me.Shape.Bounds.Y
+                    lrPage.ConceptInstance.ModelElementId = Me.Id
+                    lrModel.Page = lrPage
 
-            End If
-            '==============================================================================
-            Me.isDirty = True
-            Me.Page.IsDirty = True
-            Me.Model.IsDirty = True
+                    Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                    lrBroadcast.Model = lrModel
+                    Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
 
+                End If
+                '==============================================================================
+                Me.isDirty = True
+                Me.Page.IsDirty = True
+                Me.Model.IsDirty = True
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+            End Try
 
         End Sub
 

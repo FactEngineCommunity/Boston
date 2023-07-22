@@ -237,7 +237,12 @@ Namespace FBM
                 '---------------------------------
                 Me.MakeDirty()
                 lrPage.MakeDirty()
-                Call Me.Form.EnableSaveButton()
+
+                Try
+                    Call Me.Form.EnableSaveButton()
+                Catch ex As Exception
+                    'Has been known to fail
+                End Try
 
                 Return lrPage
 
@@ -383,7 +388,13 @@ Namespace FBM
                 '---------------------------------
                 Me.MakeDirty()
                 lrPage.MakeDirty()
-                Call Me.Form.EnableSaveButton()
+
+                Try
+                    Call Me.Form.EnableSaveButton()
+                Catch ex As Exception
+                    'Has been known to fail.
+                End Try
+
 
                 Return lrPage
 
@@ -482,6 +493,7 @@ Namespace FBM
 
                 Dim larFactTypeInstance = From FactTypeInstance In lrPage.FactTypeInstance
                                           Where FactTypeInstance.IsObjectified
+                                          Where FactTypeInstance.Shape IsNot Nothing
                                           Select FactTypeInstance
 
                 For Each lrFactTypeInstance In larFactTypeInstance

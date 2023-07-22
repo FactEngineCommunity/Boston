@@ -771,6 +771,29 @@ Namespace FBM
 
         End Function
 
+        Public Sub CreateObjectifyingEntityType()
+
+            Try
+                'CodeSafe
+                If Me.ObjectifyingEntityType IsNot Nothing Then Exit Sub 'No need for an error message really.
+
+                Me.ObjectifyingEntityType = Me.Model.CreateEntityType(Me.Id, False,,, True)
+                Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                Me.ObjectifyingEntityType.ObjectifiedFactType = Me
+                Me.Model.AddEntityType(Me.ObjectifyingEntityType, True, True, Nothing)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+
         Public Function DoesAtLeastTwoRolesReferenceTheSameModelObject() As Boolean
 
             Dim lrRole As FBM.Role

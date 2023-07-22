@@ -440,6 +440,8 @@ Public Class frmToolboxTableData
                     Me.ToolStripButtonCommit.Enabled = False
                     Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
                     Me.ToolStripStatusLabel.ForeColor = Color.Black
+
+                    lrFact.IsNewFact = False
                 Else
                     Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
                     Me.ToolStripStatusLabel.ForeColor = Color.Red

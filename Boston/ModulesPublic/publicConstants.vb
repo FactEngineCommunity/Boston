@@ -1,6 +1,16 @@
 Imports System.Runtime.Serialization
 Imports System.ComponentModel
-Imports System.Reflection 
+Imports System.Reflection
+
+Public Class DefaultQueryLanguageAttribute
+    Inherits Attribute
+
+    Public Property Language As pcenumDatabaseQueryLanguage
+
+    Public Sub New(language As pcenumDatabaseQueryLanguage)
+        Me.Language = language
+    End Sub
+End Class
 
 Public Module publicConstants
 
@@ -90,23 +100,46 @@ Public Module publicConstants
         Simple
     End Enum
 
+    Public Enum pcenumDatabaseQueryLanguage
+        SQL
+        Cypher
+        TypeQL
+        EdgeQL
+    End Enum
+
+
+    'E.g.: PrintLine(pcenumDatabaseType.KuzuDB.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage))
 
     <Serializable()>
     Public Enum pcenumDatabaseType
         None = 100
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         MSJet = 101
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         SQLServer = 102
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         ORACLE = 103
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         SQLite = 104
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)> 'For Boston
         MongoDB = 105
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         ODBC = 106
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         PostgreSQL = 107
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         Snowflake = 108
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.TypeQL)>
         TypeDB = 109
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         NORMA = 110
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.Cypher)>
         Neo4j = 111
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
         RelationalAI = 112
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.Cypher)>
         KuzuDB = 113
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.EdgeQL)>
         EdgeDB = 114
     End Enum
 

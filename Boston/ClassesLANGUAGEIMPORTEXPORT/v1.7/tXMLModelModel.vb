@@ -734,7 +734,7 @@ SkipModelLevelRoleConstraint:
 
                     lrValueType.Concept = lrDictionaryEntry.Concept
 
-                    lrModel.ValueType.Add(lrValueType)
+                    lrModel.ValueType.AddUnique(lrValueType)
 SkipValueType:
                 Next
 
@@ -797,7 +797,7 @@ SkipValueType:
 
                     lrEntityType.Concept = lrDictionaryEntry.Concept
 
-                    lrModel.EntityType.Add(lrEntityType)
+                    lrModel.EntityType.AddUnique(lrEntityType)
 SkipEntityType:
                 Next
 
@@ -1080,7 +1080,7 @@ SkipRoleConstraintRole:
 
                     'CodeSafe-RoleConstraint must have Roles
                     If lrRoleConstraint.Role.Count > 0 Then
-                        lrModel.RoleConstraint.Add(lrRoleConstraint)
+                        lrModel.RoleConstraint.AddUnique(lrRoleConstraint)
                     End If
 
                     For Each lsValueTypeConstraintValue In lrXMLRoleConstraint.ValueConstraint

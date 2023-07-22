@@ -25,6 +25,21 @@ Module MyMethodExtensions
     End Function
 
 
+    <System.Runtime.CompilerServices.Extension>
+    Public Function GetAttributeValue(Of TAttribute As Attribute, TValue)(source As [Enum]) As TValue
+        Dim memberInfo As MemberInfo = source.GetType().GetMember(source.ToString()).FirstOrDefault()
+        If memberInfo IsNot Nothing Then
+            Dim attribute As TAttribute = memberInfo.GetCustomAttribute(Of TAttribute)()
+            If attribute IsNot Nothing Then
+                Dim valueProperty As PropertyInfo = attribute.GetType().GetProperty("Value")
+                If valueProperty IsNot Nothing Then
+                    Return DirectCast(valueProperty.GetValue(attribute), TValue)
+                End If
+            End If
+        End If
+        Return Nothing
+    End Function
+
     <Extension()>
     Public Sub ReplaceWith(Of T As Class)(ByRef obj As T, other As T)
         Dim size = Marshal.SizeOf(GetType(T))
