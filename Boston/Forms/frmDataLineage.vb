@@ -40,6 +40,26 @@ Public Class frmDataLineage
 
 #End Region
 
+
+            '==========================================================
+            'Load the Properties
+            Call Me.LoadProperties(True)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub LoadProperties(ByVal abHideHidden As Boolean)
+
+        Try
+
             '==Categories==============================================
 #Region "Lineage Categories"
             'Get the set of Lineage Categories.
@@ -57,7 +77,7 @@ Public Class frmDataLineage
 
                 '==Data Lineage Category Property Type=====================
 #Region "Data Lineage Category Property Type"
-                For Each loDataLineageCategoryPropertyType In larDataLineageCategoryPropertyType.Where(Function(x) x.DataLineageCategory = lrDataLineagaeCategory.Name).OrderBy(Function(x) x.SequenceNr)
+                For Each loDataLineageCategoryPropertyType In larDataLineageCategoryPropertyType.Where(Function(x) x.DataLineageCategory = lrDataLineagaeCategory.Name And Not CBool(x.Hidden) = abHideHidden).OrderBy(Function(x) x.SequenceNr)
 
                     Dim lrDataLineageCategoryPropertyType As New DataLineage.DataLineageCategoryPropertyType(Me.mrModel, lrDataLineagaeCategory.Name, loDataLineageCategoryPropertyType.PropertyType, loDataLineageCategoryPropertyType.SequenceNr)
 
@@ -73,6 +93,7 @@ Public Class frmDataLineage
 
             Dim liCategoryGroupboxTop = 35
 
+#Region "Load the Properties"
             For Each lrDataLineageCategory In Me.marLineageCategory
 
                 Dim loGroupBox As New Windows.Forms.GroupBox
@@ -93,7 +114,7 @@ Public Class frmDataLineage
 
                 'For each set of Properties for the Data Lineage Category
                 For liInd = 1 To liLineageSetNumber
-                    For Each lrDataLineageCategoryPropertyType In lrDataLineageCategory.DataLineagaeCategoryPropertyType
+                    For Each lrDataLineageCategoryPropertyType In lrDataLineageCategory.DataLineagaeCategoryPropertyType.FindAll(Function(x) Not x.Hidden = abHideHidden)
 
                         Dim loLabelPrompt As New Windows.Forms.Label
 #Region "Data Lineage Category Property Type"
@@ -150,7 +171,7 @@ Public Class frmDataLineage
 
                 liCategoryGroupboxTop = loGroupBox.Top + loGroupBox.Height + 10
             Next
-
+#End Region
 
         Catch ex As Exception
             Dim lsMessage As String

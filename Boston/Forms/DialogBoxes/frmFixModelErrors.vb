@@ -59,6 +59,10 @@ Public Class frmFixModelErrors
                                                                   "RDS Column. Ordinal Positions. Reset Where Out Of Synchronous Order.",
                                                                   pcenumModelFixType.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder))
 
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesWithMissingBooleanColumns,
+                                                                  "RDS Tables With Missing Boolean Columns.",
+                                                                  pcenumModelFixType.RDSTablesWithMissingBooleanColumns))
+
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesWithNoColumnsRemoveThoseTables,
                                                                   "RDS Tables With No Columns. Remove Those Tables.",
                                                                   pcenumModelFixType.RDSTablesWithNoColumnsRemoveThoseTables))

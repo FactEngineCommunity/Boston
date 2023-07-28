@@ -47,6 +47,7 @@
         RolesWithoutJoinedORMObject
         RDSColumnsThatShouldBeMandatoryMakeMandatory
         RDSColumnsWithoutActiveRoles
+        RDSTablesWithMissingBooleanColumns
         RDSRelationsThatHaveNoOriginColumnsRemoveRelation
         RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
         RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount

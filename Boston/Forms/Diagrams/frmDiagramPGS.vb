@@ -1473,6 +1473,8 @@ SkipORMReadingEditor:
                 'End If
                 '============================================================
             Next
+
+            Me.PropertyTableNode.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
             Me.PropertyTableNode.ResizeToFitText(True)
 
         Catch ex As Exception

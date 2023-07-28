@@ -13,6 +13,8 @@ Namespace DataLineage
 
         Public SequenceNr As Integer 'The sequence within the Category as displayed within a page.
 
+        Public Hidden As Boolean 'Whether the user can see the Property Type or not.
+
         'Parameterless Constructor
         Public Sub New()
         End Sub

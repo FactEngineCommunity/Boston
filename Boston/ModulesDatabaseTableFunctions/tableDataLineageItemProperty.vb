@@ -151,7 +151,11 @@ Public Module tableDataLineageItemProperty
 
             lRecordset.Open(lsSQLQuery)
 
-            getHighestLineageSetNrForDataLineageItemCategory = NullVal(lRecordset(0).Value, 0)
+            If Not lRecordset.EOF Then
+                getHighestLineageSetNrForDataLineageItemCategory = NullVal(lRecordset(0).Value, 0)
+            Else
+                Return 0
+            End If
 
             lRecordset.Close()
 
@@ -207,6 +211,7 @@ Public Module tableDataLineageItemProperty
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
+            lsMessage.AppendDoubleLineBreak(lsSQLQuery)
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing

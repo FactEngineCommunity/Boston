@@ -32,7 +32,9 @@ Namespace FBM
                             Case Is = pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory
                                 Call Me.RDSColumnsThatShouldBeMandatoryMakeMandatory()
                             Case Is = pcenumModelFixType.RDSColumnsWithoutActiveRoles
-                                Call Me.RDSColumnsWithoutActiveRoles
+                                Call Me.RDSColumnsWithoutActiveRoles()
+                            Case Is = pcenumModelFixType.RDSTablesWithMissingBooleanColumns
+                                Call Me.RDSTablesWithMissingBooleanColumns()
                             Case Is = pcenumModelFixType.RDSTablesWithNoColumnsRemoveThoseTables
                                 Call Me.RDSTablesWithNoColumnsRemoveThoseTables()
                             Case Is = pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing
@@ -296,6 +298,43 @@ Namespace FBM
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Private Sub RDSTablesWithMissingBooleanColumns()
+
+            Try
+                Dim larUnaryFactType = From FactType In Me.FactType
+                                       Where FactType.Arity = 1
+                                       Select FactType
+
+                Dim larAffectedTable = Me.RDS.Table.Where(Function(table) Not table.Column.Any(Function(col) larUnaryFactType.Contains(col.FactType)))
+
+
+
+                For Each lrTable In larAffectedTable
+
+                    Dim larTableUnaryFactType = From FactType In larUnaryFactType
+                                                Where FactType.RoleGroup(0).JoinedORMObject.Id = lrTable.Name
+                                                Select FactType
+
+                    For Each lrFactType In larTableUnaryFactType
+                        Dim lsColumnName As String = Viev.Strings.MakeCapCamelCase(lrFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText)
+                        lsColumnName = lsColumnName.RemoveDoubleWhiteSpace.RemoveWhitespace
+                        Dim lrColumn As New RDS.Column(lrTable, lsColumnName, lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), True)
+                        Call lrTable.addColumn(lrColumn)
+                    Next
+
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
         End Sub
 
         ''' <summary>

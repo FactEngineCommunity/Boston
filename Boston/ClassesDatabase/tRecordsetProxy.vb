@@ -178,6 +178,7 @@ Public Class RecordsetProxy
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
+            lsMessage.AppendDoubleLineBreak(Source.ToString)
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
