@@ -15,6 +15,9 @@ Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Globalization
 Imports System.Threading.Tasks
+Imports OpenAI_API
+Imports OpenAI_API.Completions
+Imports OpenAI_API.Models
 
 Namespace Boston
 
@@ -1103,7 +1106,7 @@ OpenConnection:
         Public Function GetGPT3Result(ByRef arOpenAIAPI As OpenAI_API.OpenAIAPI, ByVal asNLQuery As String, Optional ByVal asActualNLQuery As String = "") As OpenAI_API.Completions.CompletionResult
 
             Try
-                Dim liMaxTokens As Integer = Math.Max(300, CInt(asActualNLQuery.Split(" ").Length * 3.5))
+                Dim liMaxTokens As Integer = Math.Max(2000, CInt(asActualNLQuery.Split(" ").Length * 3.5))
 
                 Dim _timeout As Integer = 5000 ' 5 seconds
                 Dim _cancellationTokenSource As New System.Threading.CancellationTokenSource
@@ -1129,6 +1132,77 @@ OpenConnection:
             End Try
 
         End Function
+
+        Public Function GetGPTChatResponse(ByVal arOpenAIAPI As OpenAI_API.OpenAIAPI, ByVal asPrompt As String, Optional ByVal asActualNLQuery As String = "") As OpenAI_API.Chat.ChatResult
+            Try
+                Dim _timeout As Integer = 30000 ' 5 seconds
+
+                ' Task to execute the main operation
+                Dim chatTask = Task.Run(Function() arOpenAIAPI.Chat.CreateChatCompletionAsync(
+            New OpenAI_API.Chat.ChatRequest() With {
+                .Model = Model.GPT4,
+                .Temperature = 0,
+                .MaxTokens = 1500,
+                .TopP = 1,
+                .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asPrompt)}
+            }
+        ))
+
+                ' Wait for either the main task to complete or the timeout task to complete
+                Dim completedTask = Task.WhenAny(chatTask, Task.Delay(_timeout)).Result
+
+                ' Check if the main task completed or timed out
+                If completedTask Is chatTask Then
+                    ' Main task completed successfully
+                    Return chatTask.Result
+                Else
+                    ' Main task timed out, handle this scenario (e.g., log an error or return a default result)
+                    Return New OpenAI_API.Chat.ChatResult()
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return Nothing
+            End Try
+        End Function
+
+        'Public Function GetGPTChatResponse(ByVal arOpenAIAPI As OpenAI_API.OpenAIAPI, ByVal asPrompt As String, Optional ByVal asActualNLQuery As String = "") As OpenAI_API.Chat.ChatResult
+
+        '    Try
+        '        Dim _timeout As Integer = 5000 ' 5 seconds
+        '        Dim _cancellationTokenSource As New System.Threading.CancellationTokenSource
+
+        '        Try
+
+        '            'Return Task.Run(Function() Me.mrOpenAIAPI.Chat.CreateChatCompletionAsync(ByVal request As ChatRequest) As Task(Of ChatResult)
+        '            Return Task.Run(Function() arOpenAIAPI.Chat.CreateChatCompletionAsync(
+        '                            New OpenAI_API.Chat.ChatRequest() With {.Model = Model.GPT4,
+        '                                                                    .Temperature = 0,
+        '                                                                    .MaxTokens = 1500,
+        '                                                                    .TopP = 1,
+        '                                                                    .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asPrompt)}})).Result
+
+        '        Catch ex As Exception
+        '            Return New OpenAI_API.Chat.ChatResult()
+        '        End Try
+
+        '    Catch ex As Exception
+        '        Dim lsMessage As String
+        '        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+        '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+        '        lsMessage &= vbCrLf & vbCrLf & ex.Message
+        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        '        Return Nothing
+        '    End Try
+
+        'End Function
 
     End Module
 

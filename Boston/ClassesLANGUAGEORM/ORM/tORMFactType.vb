@@ -2730,6 +2730,48 @@ Namespace FBM
 
         End Function
 
+        Public Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False) As String
+
+            Try
+                Dim lsReturnString As String = ""
+
+                If Me.FactTypeReading.Count = 0 Then Return "" & vbCrLf
+
+                If Me.IsObjectified Then
+
+                    lsReturnString = Me.Id & " IS WHERE " & Me.FactTypeReading(0).GetReadingText(True)
+
+                Else
+                    Select Case Me.Arity
+                        Case Is = 1
+                            lsReturnString = Me.FactTypeReading(0).GetReadingText
+                        Case Is = 2
+                            lsReturnString = Me.FactTypeReading(0).GetReadingText(True)
+                        Case Else
+                            lsReturnString = Me.FactTypeReading(0).GetReadingText()
+                    End Select
+                End If
+
+                If Not abDontAddNewLine Then
+                    lsReturnString &= vbCrLf
+                End If
+
+                Return lsReturnString
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return ""
+            End Try
+
+        End Function
+
+
         Public Overrides Function getCorrespondingCMMLActor() As CMML.Actor
             Throw New NotImplementedException("FBM.FactType does not have a getCorrespondingCMMLActor function yet.")
         End Function

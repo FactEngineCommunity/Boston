@@ -804,6 +804,36 @@ Namespace FBM
 
         End Function
 
+        Public Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False) As String
+
+            Try
+                Dim lsReturnString As String
+
+                lsReturnString = Me.Id & " IS AN ENTITY TYPE" & vbCrLf
+
+                If Me.HasSimpleReferenceScheme Then
+                    lsReturnString &= Me.Id & " IS IDENTIFIED BY ITS " & Me.ReferenceMode.TrimStart(".")
+                End If
+
+                If Not abDontAddNewLine Then
+                    lsReturnString &= vbCrLf
+                End If
+
+                Return lsReturnString
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return ""
+            End Try
+
+        End Function
+
         Public Function getAssociatedCMMLProcesses() As List(Of CMML.Process)
 
             Try

@@ -1210,6 +1210,55 @@ Namespace FBM
 
         End Function
 
+        Public Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False) As String
+
+            Dim lsReturnString As String = ""
+
+            Try
+
+                Select Case Me.RoleConstraintType
+                    Case Is = pcenumRoleConstraintType.FrequencyConstraint
+
+                        If Me.Role.Count = 1 Then
+
+                            'CodeSafe
+                            If Me.Role(0).FactType.FactTypeReading.Count = 0 Then Return ""
+
+                            If Me.MinimumFrequencyCount = 0 And Me.MaximumFrequencyCount And Me.Cardinality > 0 Then
+                                lsReturnString = Me.Role(0).JoinedORMObject.Id & " CAN APPEAR <=" & Me.Cardinality & " TIMES IN " & Me.Role(0).FactType.FactTypeReading(0).GetReadingText
+                                GoTo ReturnString
+                            End If
+
+                            If Me.MinimumFrequencyCount = 0 And Me.MaximumFrequencyCount > 0 Then
+                                lsReturnString = Me.Role(0).JoinedORMObject.Id & " CAN APPEAR <=" & Me.MaximumValue & " TIMES IN " & Me.Role(0).FactType.FactTypeReading(0).GetReadingText
+                            Else
+                                lsReturnString = Me.Role(0).JoinedORMObject.Id & " CAN APPEAR BETWEEN " & Me.MinimumValue & " AND " & Me.MaximumValue & " TIMES IN " & Me.Role(0).FactType.FactTypeReading(0).GetReadingText
+                            End If
+                        End If
+
+                End Select
+ReturnString:
+
+                If Not abDontAddNewLine And lsReturnString.Trim <> "" Then
+                    lsReturnString &= vbCrLf
+                End If
+
+                Return lsReturnString
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return ""
+            End Try
+
+        End Function
+
+
         Public Function getArgument(ByVal aiArgumentNr As Integer) As FBM.RoleConstraintArgument
 
             Try

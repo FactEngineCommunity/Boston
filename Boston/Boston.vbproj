@@ -1653,6 +1653,12 @@
     <Compile Include="Forms\DialogBoxes\frmFixModelErrors.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DialogBoxes\frmVirtualBusinessAnalyst.Designer.vb">
+      <DependentUpon>frmVirtualBusinessAnalyst.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\frmVirtualBusinessAnalyst.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\FactEngine\frmFactEngine.Designer.vb">
       <DependentUpon>frmFactEngine.vb</DependentUpon>
     </Compile>
@@ -2568,6 +2574,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmFixModelErrors.resx">
       <DependentUpon>frmFixModelErrors.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DialogBoxes\frmVirtualBusinessAnalyst.resx">
+      <DependentUpon>frmVirtualBusinessAnalyst.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FactEngine\frmFactEngine.resx">
       <DependentUpon>frmFactEngine.vb</DependentUpon>
@@ -3624,6 +3633,7 @@
     <None Include="Images\MenuImages\email16x16.jpg" />
     <None Include="Images\MenuImages\Down16x16.jpg" />
     <None Include="Images\MenuImages\ERD16x16.png" />
+    <None Include="Images\MenuImages\Eraser-16x16.png" />
     <Content Include="Images\MenuImages\ErrorList.png" />
     <None Include="Images\MenuImages\Export16x16.png" />
     <None Include="Images\MenuImages\FactEngine16x16.png" />

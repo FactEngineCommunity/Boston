@@ -833,7 +833,7 @@ Namespace FBM
 
         End Function
 
-        Public Function GetReadingText() As String
+        Public Function GetReadingText(Optional ByRef abIncludeCardinality As Boolean = False) As String
 
             '----------------------------------------------------
             'Create the dotted reading from the PredicateParts
@@ -856,6 +856,32 @@ Namespace FBM
                         'Can happen when loading a NORMA file for instance.
                         GetReadingText &= "[Missing Model Element]"
                     End Try
+
+#Region "Cardinality"
+                    If abIncludeCardinality Then
+
+                        If liSequenceNr = 0 Then
+                            If Me.FactType.Arity = 2 Then
+
+                                Dim lrOtherRoleOfRoleGroup As FBM.Role = Me.FactType.GetOtherRoleOfBinaryFactType(lrPredicatePart.Role.Id)
+
+                                If Me.FactType.HasTotalRoleConstraint Then
+                                    'do nothing
+                                Else
+                                    If lrPredicatePart.Role.HasInternalUniquenessConstraint Then
+                                        If lrPredicatePart.Role.Mandatory And Not lrOtherRoleOfRoleGroup.HasInternalUniquenessConstraint Then
+                                            GetReadingText &= " ONE "
+                                        Else
+                                            GetReadingText &= " AT MOST ONE"
+                                        End If
+                                    ElseIf lrOtherRoleOfRoleGroup.HasInternalUniquenessConstraint Then
+                                        GetReadingText &= " AT LEAST ONE "
+                                    End If
+                                End If
+                            End If
+                        End If
+                    End If
+#End Region
 
                     GetReadingText &= lrPredicatePart.PostBoundText
                     If (liSequenceNr < Me.PredicatePart.Count) Or (lrPredicatePart.PredicatePartText <> "") Then

@@ -5581,4 +5581,28 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub VirtualBusinessAnalystToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles VirtualBusinessAnalystToolStripMenuItem.Click
+
+        Try
+            Dim lrModel As FBM.Model
+
+
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+
+            Call frmMain.LoadVirtualBusinessAnalyst(lrModel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

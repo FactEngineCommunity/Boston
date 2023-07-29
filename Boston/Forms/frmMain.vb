@@ -1864,6 +1864,29 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Public Sub LoadVirtualBusinessAnalyst(ByRef arModel As FBM.Model)
+
+        Dim child As New frmVirtualBusinessAnalyst
+
+        Try
+
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
     Public Function loadERDiagramView(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode) As Object
 
         Dim child As New frmDiagramERD

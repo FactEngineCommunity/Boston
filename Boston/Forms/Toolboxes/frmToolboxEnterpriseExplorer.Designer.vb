@@ -107,6 +107,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TreeView = New BostonTreeView()
+        Me.VirtualBusinessAnalystToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -324,9 +325,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.VirtualBusinessAnalystToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 534)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 556)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -713,6 +714,13 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
         '
+        'VirtualBusinessAnalystToolStripMenuItem
+        '
+        Me.VirtualBusinessAnalystToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.VirtualAnalyst16x16
+        Me.VirtualBusinessAnalystToolStripMenuItem.Name = "VirtualBusinessAnalystToolStripMenuItem"
+        Me.VirtualBusinessAnalystToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.VirtualBusinessAnalystToolStripMenuItem.Text = "&Virtual Business Analyst"
+        '
         'frmToolboxEnterpriseExplorer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -813,4 +821,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents EditAITrainingDataEditorToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SearchTextbox As CustomSearchTextbox
     Friend WithEvents ViewDatabaseSchemaToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents VirtualBusinessAnalystToolStripMenuItem As ToolStripMenuItem
 End Class
