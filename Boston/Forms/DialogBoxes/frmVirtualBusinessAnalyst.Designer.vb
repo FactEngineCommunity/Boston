@@ -22,6 +22,7 @@ Partial Class frmVirtualBusinessAnalyst
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.LabelPromptModel = New System.Windows.Forms.Label()
         Me.LabelModel = New System.Windows.Forms.Label()
         Me.GroupBoxMain = New System.Windows.Forms.GroupBox()
@@ -34,8 +35,11 @@ Partial Class frmVirtualBusinessAnalyst
         Me.NumericUpDownQuestionCountLimit = New System.Windows.Forms.NumericUpDown()
         Me.LabelPromptAskQuestions = New System.Windows.Forms.Label()
         Me.ButtonEraser = New System.Windows.Forms.Button()
+        Me.ContextMenuStripBusinessAnalyst = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.SpeakSelectedTextToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBoxMain.SuspendLayout()
         CType(Me.NumericUpDownQuestionCountLimit, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ContextMenuStripBusinessAnalyst.SuspendLayout()
         Me.SuspendLayout()
         '
         'LabelPromptModel
@@ -73,6 +77,7 @@ Partial Class frmVirtualBusinessAnalyst
         Me.TextBoxResponse.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBoxResponse.ContextMenuStrip = Me.ContextMenuStripBusinessAnalyst
         Me.TextBoxResponse.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxResponse.Location = New System.Drawing.Point(6, 15)
         Me.TextBoxResponse.Multiline = True
@@ -162,6 +167,18 @@ Partial Class frmVirtualBusinessAnalyst
         Me.ButtonEraser.TabIndex = 10
         Me.ButtonEraser.UseVisualStyleBackColor = True
         '
+        'ContextMenuStripBusinessAnalyst
+        '
+        Me.ContextMenuStripBusinessAnalyst.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SpeakSelectedTextToolStripMenuItem})
+        Me.ContextMenuStripBusinessAnalyst.Name = "ContextMenuStripBusinessAnalyst"
+        Me.ContextMenuStripBusinessAnalyst.Size = New System.Drawing.Size(175, 26)
+        '
+        'SpeakSelectedTextToolStripMenuItem
+        '
+        Me.SpeakSelectedTextToolStripMenuItem.Name = "SpeakSelectedTextToolStripMenuItem"
+        Me.SpeakSelectedTextToolStripMenuItem.Size = New System.Drawing.Size(174, 22)
+        Me.SpeakSelectedTextToolStripMenuItem.Text = "Speak selected text"
+        '
         'frmVirtualBusinessAnalyst
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -183,6 +200,7 @@ Partial Class frmVirtualBusinessAnalyst
         Me.GroupBoxMain.ResumeLayout(False)
         Me.GroupBoxMain.PerformLayout()
         CType(Me.NumericUpDownQuestionCountLimit, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ContextMenuStripBusinessAnalyst.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -200,4 +218,6 @@ Partial Class frmVirtualBusinessAnalyst
     Friend WithEvents NumericUpDownQuestionCountLimit As NumericUpDown
     Friend WithEvents LabelPromptAskQuestions As Label
     Friend WithEvents ButtonEraser As Button
+    Friend WithEvents ContextMenuStripBusinessAnalyst As ContextMenuStrip
+    Friend WithEvents SpeakSelectedTextToolStripMenuItem As ToolStripMenuItem
 End Class

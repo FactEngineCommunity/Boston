@@ -2746,10 +2746,29 @@ Namespace FBM
                         Case Is = 1
                             lsReturnString = Me.FactTypeReading(0).GetReadingText
                         Case Is = 2
-                            lsReturnString = Me.FactTypeReading(0).GetReadingText(True)
+                            If Me.Is1To1BinaryFactType And Me.FactTypeReading.Count >= 2 Then
+                                Dim lrFactTypeReading = Me.getFactTypeReadingByModelElementOrder(New List(Of ModelObject) From {Me.RoleGroup(0).JoinedORMObject, Me.RoleGroup(1).JoinedORMObject})
+                                If lrFactTypeReading IsNot Nothing Then lsReturnString = lrFactTypeReading.GetReadingText(True)
+                                lrFactTypeReading = Me.getFactTypeReadingByModelElementOrder(New List(Of ModelObject) From {Me.RoleGroup(1).JoinedORMObject, Me.RoleGroup(0).JoinedORMObject})
+                                If lrFactTypeReading IsNot Nothing Then lsReturnString &= vbCrLf & lrFactTypeReading.GetReadingText(True)
+                            Else
+                                lsReturnString = Me.FactTypeReading(0).GetReadingText(True)
+                            End If
+
                         Case Else
                             lsReturnString = Me.FactTypeReading(0).GetReadingText()
                     End Select
+                End If
+
+                If Me.RoleGroup(0).HasInternalUniquenessConstraint Then
+                    lsReturnString.AppendLine(Me.Id & " IS IDENTIFIED BY ITS")
+
+                    Dim liInd = 0
+                    For Each lrROle In Me.RoleGroup
+                        If liInd > 0 Then lsReturnString &= ","
+                        lsReturnString &= " " & lrROle.JoinsModelElementId
+                        liInd += 1
+                    Next
                 End If
 
                 If Not abDontAddNewLine Then

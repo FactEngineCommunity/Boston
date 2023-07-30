@@ -857,10 +857,18 @@ Namespace FBM
                         GetReadingText &= "[Missing Model Element]"
                     End Try
 
+                    GetReadingText &= lrPredicatePart.PostBoundText
+                    If (liSequenceNr < Me.PredicatePart.Count) Or (lrPredicatePart.PredicatePartText <> "") Then
+                        GetReadingText &= " "
+                    End If
+
+                    GetReadingText &= lrPredicatePart.PredicatePartText
+
+
 #Region "Cardinality"
                     If abIncludeCardinality Then
 
-                        If liSequenceNr = 0 Then
+                        If liSequenceNr = 1 Then
                             If Me.FactType.Arity = 2 Then
 
                                 Dim lrOtherRoleOfRoleGroup As FBM.Role = Me.FactType.GetOtherRoleOfBinaryFactType(lrPredicatePart.Role.Id)
@@ -882,12 +890,6 @@ Namespace FBM
                         End If
                     End If
 #End Region
-
-                    GetReadingText &= lrPredicatePart.PostBoundText
-                    If (liSequenceNr < Me.PredicatePart.Count) Or (lrPredicatePart.PredicatePartText <> "") Then
-                        GetReadingText &= " "
-                    End If
-                    GetReadingText &= lrPredicatePart.PredicatePartText
 
                     If liSequenceNr < Me.PredicatePart.Count Then
                         GetReadingText &= " "

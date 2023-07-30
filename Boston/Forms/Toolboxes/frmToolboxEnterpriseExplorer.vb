@@ -3550,11 +3550,15 @@ Public Class frmToolboxEnterpriseExplorer
                 frmMain.Refresh()
             End If
 
-            Do While lrPage.Loading Or ((lrPage.Language <> pcenumLanguage.ORMModel) And (lrPage.Model.RDSLoading Or lrPage.Model.STMLoading))
+            Dim stopwatch As New Stopwatch()
+            stopwatch.Start()
+            While lrPage.Loading Or ((lrPage.Language <> pcenumLanguage.ORMModel) And (lrPage.Model.RDSLoading Or lrPage.Model.STMLoading))
                 '---------------------------------------------
                 'Wait for threads to finish loading the Page
                 '---------------------------------------------
-            Loop
+                If stopwatch.ElapsedMilliseconds > 20000 Then Exit While
+            End While
+            stopwatch.Stop()
 
             '-------------------------------------------------------
             'Check if the page has already been opened for editing

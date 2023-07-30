@@ -1295,19 +1295,23 @@ NextWord:
             End Try
 
             Dim liDatabaseQueryLanguage As pcenumDatabaseQueryLanguage = pcenumDatabaseQueryLanguage.SQL
-            Select Case prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
-                Case Is = pcenumDatabaseQueryLanguage.SQL
-                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 0
-                Case Is = pcenumDatabaseQueryLanguage.TypeQL
-                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 1
-                Case Is = pcenumDatabaseQueryLanguage.Cypher
-                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 2
-                Case Is = pcenumDatabaseQueryLanguage.openCypher
-                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 3
-            End Select
+            Try
+                Select Case prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
+                    Case Is = pcenumDatabaseQueryLanguage.SQL
+                        Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 0
+                    Case Is = pcenumDatabaseQueryLanguage.TypeQL
+                        Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 1
+                    Case Is = pcenumDatabaseQueryLanguage.Cypher
+                        Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 2
+                    Case Is = pcenumDatabaseQueryLanguage.openCypher
+                        Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 3
+                End Select
+            Catch ex As Exception
+                'Known to fail.
+            End Try
 
         Catch ex As Exception
-            Dim lsMessage As String
+                Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

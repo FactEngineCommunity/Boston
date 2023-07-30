@@ -18,6 +18,9 @@ Imports System.Threading.Tasks
 Imports OpenAI_API
 Imports OpenAI_API.Completions
 Imports OpenAI_API.Models
+Imports System.Net
+Imports NAudio.Wave
+Imports Newtonsoft.Json
 
 Namespace Boston
 
@@ -1165,6 +1168,7 @@ OpenConnection:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
+                lsMessage.AppendDoubleLineBreak(ex.InnerException.Message)
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
@@ -1203,6 +1207,101 @@ OpenConnection:
         '    End Try
 
         'End Function
+
+        Public Sub GetElevenLabsSpeech(ByVal asTextToSpeak As String,
+                                       ByVal arVoice As BackCast.Voice,
+                                       Optional ByRef arUtterance As BackCast.Utterance = Nothing,
+                                       Optional ByVal abSuppressPlaying As Boolean = False)
+
+            Try
+
+                Dim CHUNK_SIZE As Integer = 1024
+                Dim url As String = "https://api.elevenlabs.io/v1/text-to-speech/" & arVoice.VoiceId
+
+                Dim request As HttpWebRequest = DirectCast(WebRequest.Create(url), HttpWebRequest)
+                request.Method = "POST"
+                request.ContentType = "application/json"
+                request.Headers("xi-api-key") = "5bf9e5dd50a7c5a519ecb8249cd097b3"
+                request.Accept = "audio/mpeg"
+
+                Dim data As String = "{""text"": """ & asTextToSpeak & """, ""model_id"": ""eleven_monolingual_v1"", ""voice_settings"": {""stability"": " & arVoice.Stability & ", ""similarity_boost"": " & arVoice.SimilarityBoost & "}}"
+
+                Dim byteArray As Byte() = Encoding.UTF8.GetBytes(data)
+                request.ContentLength = byteArray.Length
+
+                Using dataStream As Stream = request.GetRequestStream()
+                    dataStream.Write(byteArray, 0, byteArray.Length)
+                End Using
+
+                Dim response As HttpWebResponse = DirectCast(request.GetResponse(), HttpWebResponse)
+                Dim responseStream As Stream = response.GetResponseStream()
+
+                Using memoryStream As New MemoryStream()
+                    Dim buffer As Byte() = New Byte(CHUNK_SIZE - 1) {}
+                    Dim bytesRead As Integer = responseStream.Read(buffer, 0, CHUNK_SIZE)
+                    While bytesRead > 0
+                        memoryStream.Write(buffer, 0, bytesRead)
+                        bytesRead = responseStream.Read(buffer, 0, CHUNK_SIZE)
+                    End While
+
+                    ' Convert the memory stream to byte array
+                    Dim lrTTSResult As Byte() = memoryStream.ToArray()
+
+                    ' Save the byte array to a file if needed
+                    'File.WriteAllBytes("output.mp3", lrTTSResult)
+
+                    If arUtterance IsNot Nothing Then
+                        arUtterance.Bytes = lrTTSResult
+                    End If
+
+                    ' Play the audio from the byte array
+                    If Not abSuppressPlaying Then
+                        Using inputStream As New MemoryStream(lrTTSResult)
+                            Using waveStream As WaveStream = New Mp3FileReader(inputStream)
+                                Using outputDevice As IWavePlayer = New WaveOutEvent()
+                                    outputDevice.Init(waveStream)
+                                    outputDevice.Play()
+                                    While outputDevice.PlaybackState = PlaybackState.Playing
+                                        System.Threading.Thread.Sleep(100)
+                                    End While
+                                End Using
+                            End Using
+                        End Using
+                    End If
+                End Using
+
+                responseStream.Close()
+                response.Close()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
+        Public Function GetElevenLabsVoices(xiApiKey As String) As List(Of BackCast.Voice)
+
+            Dim Voices As New List(Of BackCast.Voice)()
+
+            Dim url As String = "https://api.elevenlabs.io/v1/voices"
+            Dim headers As New WebHeaderCollection()
+            headers.Add("Accept", "application/json")
+            headers.Add("xi-api-key", xiApiKey)
+
+            Using client As New WebClient()
+                client.Headers = headers
+                Dim responseJson As String = client.DownloadString(url)
+                Dim wrapper As BackCast.RootObjectWrapper = JsonConvert.DeserializeObject(Of BackCast.RootObjectWrapper)(responseJson)
+                Voices = wrapper?.Voices
+            End Using
+
+
+            Return Voices
+        End Function
 
     End Module
 

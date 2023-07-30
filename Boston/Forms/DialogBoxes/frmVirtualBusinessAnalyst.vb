@@ -21,9 +21,9 @@ Public Class frmVirtualBusinessAnalyst
 
             Me.LabelModel.Text = Me.mrModel.Name
 
-            Me.TextBoxResponse.Text = "Click [Ask Questions abot the Model] and I'll interact with you to improve the model."
-            Me.TextBoxResponse.Text.AppendLine("Or, ask me questions about the model.")
-            Me.TextBoxResponse.Text.AppendLine("Or, tell me to do other Business Analysis type work.")
+            Me.TextBoxResponse.Text = "Click on [Ask Questions abot the Model] and I'll interact with you to improve the model."
+            Me.TextBoxResponse.Text.AppendLine("Or ask me questions about the model.")
+            Me.TextBoxResponse.Text.AppendLine("Or tell me to do other Business Analysis type work with the model.")
 
             Me.TextBoxResponse.DeselectAll()
             Me.TextBoxResponse.SelectionStart = Me.TextBoxResponse.Text.Length
@@ -160,8 +160,8 @@ Public Class frmVirtualBusinessAnalyst
                         lsPrompt = Me.mrModel.GenerateFEKL
 
 #Region "Previous Questions"
-                        Dim lsInterimPrompt = lsPrompt & vbCrLf & vbCrLf & "Does this look like I am asking you specifically to ask questions about the model when I ask?: "
-                        lsInterimPrompt.AppendDoubleLineBreak("""" & Me.TextBoxPrompt.Text.Trim & """. Answer ""No"" if I am asking questions 'about' the model.")
+                    Dim lsInterimPrompt = lsPrompt & vbCrLf & vbCrLf & "Does this sentence look like I am asking you specifically to ""ask questions"" about the model, rather than telling you to do something, when I say: "
+                    lsInterimPrompt.AppendDoubleLineBreak("""" & Me.TextBoxPrompt.Text.Trim & """. Answer ""No"" if I am asking questions 'about' the model.")
                         lsInterimPrompt.AppendDoubleLineBreak("Just answer ""Yes"" or ""No"". Don't add any embelishments or comments or narrative or explanation. Just answer ""Yes"" or ""No"".")
 
                         Dim lrCompletionResult As OpenAI_API.Chat.ChatResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsInterimPrompt)
@@ -172,15 +172,22 @@ Public Class frmVirtualBusinessAnalyst
                             Call Me.AskQuestionsAboutTheModel()
                         End If
 #End Region
+                    lsPrompt.AppendLine("Please don't make up anything. Be strict and professional about your response.")
+                    lsPrompt.AppendLine("Limit your response explicitly to the text provided to you hear about the model.")
 
-                        lsPrompt.AppendDoubleLineBreak("IMPORTANT: If the above does not look like a question or instruction about the model, just say 'I only really talk about the " & Me.mrModel.Name & " Model.'")
+                    lsPrompt.AppendDoubleLineBreak("IMPORTANT: If the above does not look like a question or instruction about the model, just say 'I only really talk about the " & Me.mrModel.Name & " Model.'")
 
                         lsPrompt.AppendDoubleLineBreak("Here's what I want from you: " & vbCrLf & Me.TextBoxPrompt.Text.Trim)
 
+                    Try
 
                         lrCompletionResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsPrompt)
 
                         lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content  'lrCompletionResult.Completions(0).Text
+
+                    Catch ex As Exception
+                        lsGPT3ReturnString = ""
+                    End Try
 
                     Me.TextBoxResponse.Text.AppendDoubleLineBreak("--------------" & vbCrLf & vbCrLf & lsGPT3ReturnString.Replace(vbLf, vbCrLf))
                     Me.TextBoxResponse.Text &= vbCrLf
@@ -229,4 +236,49 @@ Public Class frmVirtualBusinessAnalyst
 
     End Sub
 
+    Private Sub SpeakSelectedTextToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SpeakSelectedTextToolStripMenuItem.Click
+
+        Try
+            Dim larVoice As List(Of BackCast.Voice) = Boston.GetElevenLabsVoices("5bf9e5dd50a7c5a519ecb8249cd097b3")
+
+            Dim lrUtterance As New BackCast.Utterance()
+
+            Dim lrVoice As BackCast.Voice = larVoice.Find(Function(x) x.name = "Aaron")
+            lrUtterance.Voice = lrVoice
+            lrUtterance.Text = Me.TextBoxResponse.SelectedText.Trim.Replace("""", "'").Replace("[", "").Replace("]", "").Replace(vbCrLf, " ")
+            lrUtterance.Voice.SimilarityBoost = 0.5
+            lrUtterance.Voice.Stability = 0.5
+
+            Call Boston.GetElevenLabsSpeech(lrUtterance.Text, lrUtterance.Voice, lrUtterance, False)
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextBoxResponse_MouseDown(sender As Object, e As MouseEventArgs) Handles TextBoxResponse.MouseDown
+
+        Try
+            ' Check if the [Alt] key is pressed and there is selected text
+            If Control.ModifierKeys = Keys.Alt AndAlso e.Button = MouseButtons.Left Then
+                ' Display your custom ContextMenuStripBusinessAnalyst context menu
+                Me.TextBoxResponse.ContextMenu.Show(Me.TextBoxResponse, e.Location)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class
