@@ -816,6 +816,7 @@
     <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelFacts.vb" />
     <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelObjectifiedType.vb" />
     <Compile Include="ClassesLANGUAGENORMA\ClassesNORMA\ORMModel\ORMModelValueType.vb" />
+    <Compile Include="ClassesLANGUAGEORM\ORMClassification\tORMConceptClassificationValue.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMFactTypeReading.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMModel.vb" />
     <Compile Include="ClassesLANGUAGEORM\ORMHTMLVerbalisation\tORMRoleConstraint.vb" />
@@ -1804,6 +1805,12 @@
     <Compile Include="Forms\Toolboxes\frmToolboxDatabaseSchemaViewer.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxClassification.Designer.vb">
+      <DependentUpon>frmToolboxClassification.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxClassification.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\Toolboxes\frmToolboxJupyterForBoston.Designer.vb">
       <DependentUpon>frmToolboxJupyterForBoston.vb</DependentUpon>
     </Compile>
@@ -2704,6 +2711,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxDatabaseSchemaViewer.resx">
       <DependentUpon>frmToolboxDatabaseSchemaViewer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxClassification.resx">
+      <DependentUpon>frmToolboxClassification.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxJupyterForBoston.resx">
       <DependentUpon>frmToolboxJupyterForBoston.vb</DependentUpon>

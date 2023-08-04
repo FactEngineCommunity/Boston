@@ -313,6 +313,7 @@ Partial Class frmDiagramORM
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
+        Me.ConceptClassificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -552,11 +553,11 @@ Partial Class frmDiagramORM
         '
         Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem1, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemConvert, Me.ToolStripSeparator19Convert, Me.ToolStripMenuItemCopyMultiple, Me.ToolStripMenuItemPaste, Me.ToolStripSeparator34, Me.AutoLayoutToolStripMenuItem, Me.mnuOption_CopyImageToClipboard})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
-        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 176)
+        Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 198)
         '
         'ViewToolStripMenuItem1
         '
-        Me.ViewToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_Toolbox, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator18, Me.ErrorListToolStripMenuItem, Me.ToolStripMenuItem8, Me.ORMVerbalisationViewToolStripMenuItem, Me.RichmondBrainBoxToolStripMenuItem})
+        Me.ViewToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_Toolbox, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator18, Me.ErrorListToolStripMenuItem, Me.ToolStripMenuItem8, Me.ORMVerbalisationViewToolStripMenuItem, Me.RichmondBrainBoxToolStripMenuItem, Me.ConceptClassificationToolStripMenuItem})
         Me.ViewToolStripMenuItem1.Name = "ViewToolStripMenuItem1"
         Me.ViewToolStripMenuItem1.Size = New System.Drawing.Size(207, 22)
         Me.ViewToolStripMenuItem1.Text = "&View"
@@ -2246,6 +2247,12 @@ Partial Class frmDiagramORM
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
+        'ConceptClassificationToolStripMenuItem
+        '
+        Me.ConceptClassificationToolStripMenuItem.Name = "ConceptClassificationToolStripMenuItem"
+        Me.ConceptClassificationToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.ConceptClassificationToolStripMenuItem.Text = "&Concept Classification"
+        '
         'frmDiagramORM
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2575,4 +2582,5 @@ Partial Class frmDiagramORM
     Friend WithEvents ShowInGlossaryToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem18 As ToolStripMenuItem
     Friend WithEvents RemoveFromPageToolStripMenuItem2 As ToolStripMenuItem
+    Friend WithEvents ConceptClassificationToolStripMenuItem As ToolStripMenuItem
 End Class

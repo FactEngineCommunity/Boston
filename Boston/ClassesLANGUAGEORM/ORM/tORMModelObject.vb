@@ -43,6 +43,8 @@ Namespace FBM
             End Set
         End Property
 
+        Public ClassificationValue As New List(Of KnowledgeGraph.ConceptClassificationValue)
+
         <JsonIgnore()>
         <XmlIgnore()>
         Public _ModelError As New List(Of FBM.ModelError)

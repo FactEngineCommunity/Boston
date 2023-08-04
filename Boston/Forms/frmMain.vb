@@ -1144,6 +1144,54 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Sub loadToolboxConceptClassification(ByRef aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
+
+        Dim child As New frmToolboxConceptClassification
+
+        Try
+            If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+                '-------------------------------------------------------------
+                'Form is already loaded. Bring it to the front of the ZOrder
+                '-------------------------------------------------------------            
+                child = prApplication.ToolboxForms.Find(AddressOf child.EqualsByName)
+                child.BringToFront()
+            Else
+                '----------------------------------------------------------
+                'Create a new instance of the FactTypeReadingEditor form.
+                '----------------------------------------------------------
+                If prApplication.ToolboxForms.Count > 0 Then
+                    '----------------------------------------------------------------------------------------------------
+                    'Add the FactTypeReadingEditor form to the Panel of a form already loaded at the bottom of the Page
+                    '----------------------------------------------------------------------------------------------------    
+                    Dim lrPane As WeifenLuo.WinFormsUI.Docking.DockPane
+
+                    prApplication.ToolboxForms(0).Focus()
+                    lrPane = prApplication.ToolboxForms(0).Pane
+                    child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
+                    child.DockTo(lrPane, DockStyle.Fill, 0)
+                    prApplication.ToolboxForms.Add(child)
+                Else
+                    '--------------------------------------------------
+                    'Add the ORMReadingEditor form to the bottom of the Page
+                    '--------------------------------------------------
+                    child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
+
+                End If
+                prApplication.ToolboxForms.Add(child)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+
     Sub loadToolboxDescriptions(ByRef aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
 
         Dim child As New frmToolboxDescriptions

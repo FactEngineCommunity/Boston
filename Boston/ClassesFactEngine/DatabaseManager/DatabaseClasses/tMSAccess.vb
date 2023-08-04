@@ -107,7 +107,7 @@ Namespace FactEngine
         Public Overloads Function Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False) As ORMQL.Recordset
 
             Try
-                Return Me.Connection.Execute(asQuery)
+                Me.Connection.Execute(asQuery)
             Catch ex As Exception
                 If abIgnoreErrors Then Return New ORMQL.Recordset
                 Dim lsMessage As String

@@ -6579,13 +6579,24 @@ SkipPopup:
         'Setup the Descriptions toolbox
         Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
         lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
-
         If IsSomething(lrModelElementDescriptionsEditor) Then
             Select Case Me.zrPage.SelectedObject.Count
                 Case Is = 0
                     Call lrModelElementDescriptionsEditor.setDescriptions(Nothing)
                 Case Else
                     Call lrModelElementDescriptionsEditor.setDescriptions(Me.zrPage.SelectedObject(0))
+            End Select
+        End If
+
+        'Setup the Concept Classificaations toolbox
+        Dim lfrmToolboxConceptClassication As frmToolboxConceptClassification
+        lfrmToolboxConceptClassication = prApplication.GetToolboxForm(frmToolboxConceptClassification.Name)
+        If lfrmToolboxConceptClassication IsNot Nothing Then
+            Select Case Me.zrPage.SelectedObject.Count
+                Case Is = 0
+                    Call lfrmToolboxConceptClassication.SetupForm()
+                Case Else
+                    Call lfrmToolboxConceptClassication.SetupForm(CType(Me.zrPage.SelectedObject(0), FBM.EntityTypeInstance).EntityType)
             End Select
         End If
 
@@ -13418,4 +13429,18 @@ SkipRemovalFromModel:
 
     End Sub
 
+    Private Sub ConceptClassificationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConceptClassificationToolStripMenuItem.Click
+
+        Try
+            prApplication.WorkingPage = Me.zrPage
+            Call frmMain.loadToolboxConceptClassification(Me.DockPanel.ActivePane)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
 End Class

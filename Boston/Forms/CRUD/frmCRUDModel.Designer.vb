@@ -80,6 +80,7 @@ Partial Class frmCRUDModel
         Me.TextBoxServerName = New System.Windows.Forms.TextBox()
         Me.LabelPromptServerName = New System.Windows.Forms.Label()
         Me.GraphModeling = New System.Windows.Forms.TabPage()
+        Me.CheckBoxHideOtherwiseForeignKeyColumns = New System.Windows.Forms.CheckBox()
         Me.TextBoxDefaultReferenceMode = New System.Windows.Forms.TextBox()
         Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
         Me.CheckBoxAutomaticallyCreateReferenceMode = New System.Windows.Forms.CheckBox()
@@ -87,7 +88,6 @@ Partial Class frmCRUDModel
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.CheckBoxHideOtherwiseForeignKeyColumns = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -693,6 +693,16 @@ Partial Class frmCRUDModel
         Me.GraphModeling.Text = "Graph Modeling"
         Me.GraphModeling.UseVisualStyleBackColor = True
         '
+        'CheckBoxHideOtherwiseForeignKeyColumns
+        '
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.AutoSize = True
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.Location = New System.Drawing.Point(22, 92)
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.Name = "CheckBoxHideOtherwiseForeignKeyColumns"
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.Size = New System.Drawing.Size(204, 17)
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.TabIndex = 5
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.Text = "&Hide (otherwise) Foreign Key Columns"
+        Me.CheckBoxHideOtherwiseForeignKeyColumns.UseVisualStyleBackColor = True
+        '
         'TextBoxDefaultReferenceMode
         '
         Me.TextBoxDefaultReferenceMode.Location = New System.Drawing.Point(251, 61)
@@ -742,16 +752,6 @@ Partial Class frmCRUDModel
         'BackgroundWorker
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
-        '
-        'CheckBoxHideOtherwiseForeignKeyColumns
-        '
-        Me.CheckBoxHideOtherwiseForeignKeyColumns.AutoSize = True
-        Me.CheckBoxHideOtherwiseForeignKeyColumns.Location = New System.Drawing.Point(22, 92)
-        Me.CheckBoxHideOtherwiseForeignKeyColumns.Name = "CheckBoxHideOtherwiseForeignKeyColumns"
-        Me.CheckBoxHideOtherwiseForeignKeyColumns.Size = New System.Drawing.Size(204, 17)
-        Me.CheckBoxHideOtherwiseForeignKeyColumns.TabIndex = 5
-        Me.CheckBoxHideOtherwiseForeignKeyColumns.Text = "&Hide (otherwise) Foreign Key Columns"
-        Me.CheckBoxHideOtherwiseForeignKeyColumns.UseVisualStyleBackColor = True
         '
         'frmCRUDModel
         '

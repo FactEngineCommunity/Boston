@@ -30,7 +30,8 @@ Namespace DataStore
                 ' Create the custom JSON serializer settings
                 Dim settings As New JsonSerializerSettings With {
                     .Formatting = Formatting.Indented,
-                   .TypeNameHandling = TypeNameHandling.Objects
+                   .TypeNameHandling = TypeNameHandling.Objects,
+                   .ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                    }
 
                 ' Serialize the object into JSON with custom settings
@@ -169,7 +170,8 @@ Namespace DataStore
                     ' Create the custom JSON serializer settings
                     Dim settings As New JsonSerializerSettings With {
                                 .Formatting = Formatting.Indented,
-                                .TypeNameHandling = TypeNameHandling.Objects
+                                .TypeNameHandling = TypeNameHandling.Objects,
+                                .ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                             }
 
                     ' Serialize the object into JSON with custom settings
@@ -198,6 +200,49 @@ Namespace DataStore
             End Try
         End Sub
 
+        ''' <summary>
+        ''' Upsert method to either update or insert a record in the DataStore table
+        ''' </summary>
+        ''' <typeparam name="T"></typeparam>
+        ''' <param name="arObject"></param>
+        ''' <param name="whereClause"></param>
+        Public Sub Upsert(Of T)(arObject As Object, whereClause As Expression(Of Func(Of T, Boolean)))
+            Try
+                ' Get the record that matches the provided whereClause using GetData function
+                Dim asID As String = Nothing
+                Dim dataList As List(Of T) = Me.Get(Of T)(whereClause, asID)
+
+                ' Serialize the object into JSON with custom settings
+                Dim settings As New JsonSerializerSettings With {
+                    .Formatting = Formatting.Indented,
+                    .TypeNameHandling = TypeNameHandling.Objects,
+                    .ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }
+                Dim jsonData As String = JsonConvert.SerializeObject(arObject, settings)
+
+                If dataList.Count = 1 AndAlso asID IsNot Nothing Then
+                    ' If the record exists, update it in the database
+                    Dim lsSQLQuery As String = "UPDATE DataStore SET Data = '" & jsonData & "' WHERE ID = '" & asID & "'"
+                    Dim lrRecordset As ORMQL.Recordset = pdbConnection.Execute(lsSQLQuery)
+
+                    If lrRecordset.ErrorReturned Then
+                        Throw New Exception(lrRecordset.ErrorString)
+                    End If
+                Else
+                    ' If the record doesn't exist, insert it into the database
+                    Dim lrData As New DataStore.Data(jsonData, GetType(T).FullName, Now, "", "", "", "", "")
+                    Call tableDataStore.AddData(lrData)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
 
     End Class
 

@@ -132,6 +132,7 @@ Partial Class frmMain
         Me.DoNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemSuperuser = New System.Windows.Forms.ToolStripMenuItem()
         Me.ThrowTestErrorMessageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GenericTestFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStrip_main = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton_Save = New System.Windows.Forms.ToolStripButton()
@@ -161,7 +162,6 @@ Partial Class frmMain
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorkerStatusBar = New System.ComponentModel.BackgroundWorker()
-        Me.GenericTestFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -778,6 +778,12 @@ Partial Class frmMain
         Me.ThrowTestErrorMessageToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
         Me.ThrowTestErrorMessageToolStripMenuItem.Text = "Throw test &Error Message"
         '
+        'GenericTestFormToolStripMenuItem
+        '
+        Me.GenericTestFormToolStripMenuItem.Name = "GenericTestFormToolStripMenuItem"
+        Me.GenericTestFormToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
+        Me.GenericTestFormToolStripMenuItem.Text = "Generic Test Form"
+        '
         'ToolStrip_main
         '
         Me.ToolStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton_Save, Me.ToolStripSeparator4, Me.ToolStripButtonNewModel, Me.ToolStripButtonNew, Me.ToolStripButtonPrint, Me.ToolStripButtonCopy, Me.ToolStripButtonPaste, Me.toolStripSeparator12, Me.ToolStripLabelPrompt_zoom, Me.ToolStripComboBox_zoom, Me.toolStripSeparator, Me.ToolStripButtonHelp, Me.ToolStripSeparator3, Me.ToolStripButtonProfile, Me.ToolStripButtonNotifications})
@@ -991,12 +997,6 @@ Partial Class frmMain
         'BackgroundWorkerStatusBar
         '
         Me.BackgroundWorkerStatusBar.WorkerReportsProgress = True
-        '
-        'GenericTestFormToolStripMenuItem
-        '
-        Me.GenericTestFormToolStripMenuItem.Name = "GenericTestFormToolStripMenuItem"
-        Me.GenericTestFormToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
-        Me.GenericTestFormToolStripMenuItem.Text = "Generic Test Form"
         '
         'frmMain
         '

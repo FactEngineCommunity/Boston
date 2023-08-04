@@ -86,7 +86,7 @@ Public Class frmToolboxTableData
                     If Me.mrTable Is Nothing Then
                         Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery,, larColumn)
                     Else
-                        If Me.mrTable.isPGSRelation Then
+                        If Me.mrTable.isPGSRelation And Not Me.mrModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage) = pcenumDatabaseQueryLanguage.SQL Then
                             Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery,, larColumn)
                         Else
                             Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Me.mrTable)
