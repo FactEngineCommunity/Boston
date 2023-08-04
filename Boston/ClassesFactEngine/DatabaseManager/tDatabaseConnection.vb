@@ -147,8 +147,9 @@ Namespace FactEngine
             Return ""
         End Function
 
-        Public Overridable Sub Execute(asQuery As String)
-        End Sub
+        Public Overridable Function Execute(asQuery As String) As ORMQL.Recordset
+            Return New ORMQL.Recordset
+        End Function
 
 
         Public Overridable Function FormatDate(ByVal asOriginalDate As String,

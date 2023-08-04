@@ -1,0 +1,45 @@
+// SQLite DDL Grammar
+<% @TinyPG Namespace="FEQL" Language="vb"%>
+<% @TextHighlighter Generate="true" %>
+
+// Terminals
+EOF           -> @"^$";
+IDENTIFIER  -> @"\[?[\w\d_]+\]?";
+KEYWDNUMBER      -> @"NUMBER";
+TEXT        -> @"TEXT\(\d+\)";
+DATETIME    -> @"DATETIME";
+KEYWDCONSTRAINT  -> @"CONSTRAINT";
+PRIMARY     -> @"PRIMARY";
+KEY         -> @"KEY";
+REFERENCES  -> @"REFERENCES";
+LPAREN      -> @"\(";
+RPAREN      -> @"\)";
+COMMA	-> ",";
+SEMICOLON -> ";";
+
+CREATE -> "CREATE";
+TABLE -> "TABLE";
+
+// Rules
+ddl              -> (createTableStatement SEMICOLON)*;
+
+createTableStatement -> CREATE TABLE IDENTIFIER LPAREN (CONSTRAINTDEFINITION | COLUMNDEFINITION) (COMMA (CONSTRAINTDEFINITION | COLUMNDEFINITION))* RPAREN;
+
+COLUMNDEFINITION -> IDENTIFIER dataType (REFERENCES IDENTIFIER LPAREN IDENTIFIER (COMMA IDENTIFIER)* RPAREN)?;
+
+dataType -> KEYWDNUMBER | TEXT | DATETIME;
+
+CONSTRAINTDEFINITION  -> KEYWDCONSTRAINT IDENTIFIER primaryKeyConstraint | foreignKeyConstraint;
+
+primaryKeyConstraint -> PRIMARY KEY LPAREN primaryKeyColumnList RPAREN;
+
+primaryKeyColumnList -> IDENTIFIER (COMMA IDENTIFIER)*;
+
+foreignKeyConstraint -> REFERENCES IDENTIFIER LPAREN foreignKeyColumnList RPAREN;
+
+foreignKeyColumnList -> IDENTIFIER (COMMA IDENTIFIER)*;
+
+[Skip] WHITESPACE    -> @"\s+";
+
+Start 		-> ddl
+		| EOF;

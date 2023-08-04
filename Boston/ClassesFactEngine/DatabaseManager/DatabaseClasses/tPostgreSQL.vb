@@ -386,20 +386,22 @@ Namespace FactEngine
             Return "::text"
         End Function
 
-        Public Overloads Sub Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False)
+        Public Overloads Function Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False) As ORMQL.Recordset
 
             Try
-                Call Me.GONonQuery(asQuery)
+                Return Me.GONonQuery(asQuery)
             Catch ex As Exception
-                If abIgnoreErrors Then Exit Sub
+                If abIgnoreErrors Then Return New ORMQL.Recordset
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return New ORMQL.Recordset
             End Try
-        End Sub
+        End Function
 
         Public Overrides Function FormatDateTime(ByVal asOriginalDate As String,
                                                  Optional ByVal abIgnoreError As Boolean = False,

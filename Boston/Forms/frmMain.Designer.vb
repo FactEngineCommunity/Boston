@@ -161,6 +161,7 @@ Partial Class frmMain
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorkerStatusBar = New System.ComponentModel.BackgroundWorker()
+        Me.GenericTestFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -765,7 +766,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemSuperuser
         '
-        Me.ToolStripMenuItemSuperuser.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ThrowTestErrorMessageToolStripMenuItem})
+        Me.ToolStripMenuItemSuperuser.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ThrowTestErrorMessageToolStripMenuItem, Me.GenericTestFormToolStripMenuItem})
         Me.ToolStripMenuItemSuperuser.Name = "ToolStripMenuItemSuperuser"
         Me.ToolStripMenuItemSuperuser.Size = New System.Drawing.Size(71, 22)
         Me.ToolStripMenuItemSuperuser.Text = "Superuse&r"
@@ -991,6 +992,12 @@ Partial Class frmMain
         '
         Me.BackgroundWorkerStatusBar.WorkerReportsProgress = True
         '
+        'GenericTestFormToolStripMenuItem
+        '
+        Me.GenericTestFormToolStripMenuItem.Name = "GenericTestFormToolStripMenuItem"
+        Me.GenericTestFormToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
+        Me.GenericTestFormToolStripMenuItem.Text = "Generic Test Form"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1141,4 +1148,5 @@ Partial Class frmMain
     Friend WithEvents BackgroundWorkerStatusBar As System.ComponentModel.BackgroundWorker
     Friend WithEvents ToolStripMenuItemLogInAs As ToolStripMenuItem
     Friend WithEvents JupyterNotebookToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents GenericTestFormToolStripMenuItem As ToolStripMenuItem
 End Class

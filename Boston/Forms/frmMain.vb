@@ -6135,4 +6135,23 @@ SaveModel:
 
     End Sub
 
+    Private Sub GenericTestFormToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GenericTestFormToolStripMenuItem.Click
+
+
+        Try
+            Dim lfrmGenericTestForm As New frmGenericTestForm
+
+            lfrmGenericTestForm.ShowDialog()
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class

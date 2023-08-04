@@ -104,20 +104,21 @@ Namespace FactEngine
 
         End Function
 
-        Public Overloads Sub Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False)
+        Public Overloads Function Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False) As ORMQL.Recordset
 
             Try
-                Call Me.Connection.Execute(asQuery)
+                Return Me.Connection.Execute(asQuery)
             Catch ex As Exception
-                If abIgnoreErrors Then Exit Sub
+                If abIgnoreErrors Then Return New ORMQL.Recordset
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Return New ORMQL.Recordset
             End Try
-        End Sub
+        End Function
 
         ''' <summary>
         ''' Returns a list of the Relations/ForeignKeys in the database. As used in Reverse Engineering a database.

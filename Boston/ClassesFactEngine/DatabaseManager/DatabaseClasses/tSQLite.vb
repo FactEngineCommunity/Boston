@@ -486,12 +486,12 @@ Namespace FactEngine
             Return "yyyy-MM-dd HH:mm:ss"
         End Function
 
-        Public Overloads Sub Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False)
+        Public Overloads Function Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False) As Recordset
 
             Try
-                Call Me.GONonQuery(asQuery)
+                Return Me.GONonQuery(asQuery)
             Catch ex As Exception
-                If abIgnoreErrors Then Exit Sub
+                If abIgnoreErrors Then Return New ORMQL.Recordset
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
@@ -499,7 +499,7 @@ Namespace FactEngine
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
-        End Sub
+        End Function
 
 
         Public Overrides Function FormatDate(ByVal asOriginalDate As String,
@@ -1478,6 +1478,8 @@ Namespace FactEngine
                     Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
                 End Try
 
+                Me.Connection.EnableExtensions(True)
+                Me.Connection.LoadExtension("SQLite.Interop.dll", "sqlite3_json_init")
 
                 Return True
 

@@ -1,0 +1,1 @@
+For Highlighting and Parsing DDL, for different databases.

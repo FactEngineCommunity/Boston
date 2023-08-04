@@ -620,6 +620,7 @@
     <Compile Include="ClassesDataLineage\tDataLineageItemProperty.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageItemModelElement.vb" />
     <Compile Include="ClassesDataLineage\tDataLineageItem.vb" />
+    <Compile Include="ClassesDataStore\tData.vb" />
     <Compile Include="ClassesFactEngine\Constants.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tKuzuDB.vb" />
     <Compile Include="ClassesFactEngine\DatabaseManager\DatabaseClasses\tODBCDb.vb" />
@@ -1737,6 +1738,12 @@
     <Compile Include="Forms\frmGenericSelect.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\frmGenericTestForm.Designer.vb">
+      <DependentUpon>frmGenericTestForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmGenericTestForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\frmRegistration.Designer.vb">
       <DependentUpon>frmRegistration.vb</DependentUpon>
     </Compile>
@@ -1857,6 +1864,7 @@
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerNotifications.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProject.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectGroup.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableDataStore.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableGeneric.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableUnifiedOntologyModel.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectUserRole.vb" />
@@ -2312,6 +2320,7 @@
       <DependentUpon>Splash.resx</DependentUpon>
     </Compile>
     <Compile Include="Settings.vb" />
+    <Compile Include="ClassesDataStore\tDataStore.vb" />
     <Compile Include="Thinfinity.VirtualUI.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -2644,6 +2653,9 @@
     <EmbeddedResource Include="Forms\frmGenericSelect.resx">
       <DependentUpon>frmGenericSelect.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmGenericTestForm.resx">
+      <DependentUpon>frmGenericTestForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmRegistration.resx">
       <DependentUpon>frmRegistration.vb</DependentUpon>

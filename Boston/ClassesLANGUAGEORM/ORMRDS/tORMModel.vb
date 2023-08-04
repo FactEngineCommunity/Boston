@@ -650,38 +650,6 @@ Namespace FBM
 
         End Sub
 
-        Public Function GenerateFEKL() As String
-
-            Dim lsFEKL As String = ""
-
-            Try
-                For Each lrEntityType In Me.EntityType.FindAll(Function(x) Not x.IsMDAModelElement)
-                    lsFEKL &= lrEntityType.GenerateFEKLLine
-                Next
-
-                For Each lrFactType In Me.FactType.FindAll(Function(x) Not x.IsMDAModelElement And Not x.IsPreferredReferenceMode)
-                    lsFEKL &= lrFactType.GenerateFEKLLine
-                Next
-
-                For Each lrRoleConstraint In Me.RoleConstraint.FindAll(Function(x) Not x.IsMDAModelElement)
-                    lsFEKL &= lrRoleConstraint.GenerateFEKLLine
-                Next
-
-                Return lsFEKL
-
-            Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-
-                Return lsFEKL
-            End Try
-
-        End Function
-
         Public Sub generateIndexesForCompoundReferenceSchemes()
 
             Dim lrColumn As RDS.Column
@@ -979,6 +947,41 @@ Namespace FBM
             End Try
 
         End Sub
+
+        Public Function GenerateFEKL() As String
+
+            Dim lsFEKL As String = ""
+
+            Try
+                'CodeSafe | Organic Computing. Load the model if it isn't already loaded.
+                If Not Me.Loaded Then Call Me.Load(True, False, Nothing, True, False)
+
+                For Each lrEntityType In Me.EntityType.FindAll(Function(x) Not x.IsMDAModelElement)
+                    lsFEKL &= lrEntityType.GenerateFEKLLine
+                Next
+
+                For Each lrFactType In Me.FactType.FindAll(Function(x) Not x.IsMDAModelElement And Not x.IsPreferredReferenceMode)
+                    lsFEKL &= lrFactType.GenerateFEKLLine
+                Next
+
+                For Each lrRoleConstraint In Me.RoleConstraint.FindAll(Function(x) Not x.IsMDAModelElement)
+                    lsFEKL &= lrRoleConstraint.GenerateFEKLLine
+                Next
+
+                Return lsFEKL
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return lsFEKL
+            End Try
+
+        End Function
 
         Public Sub generateRelationForReassignedRole(ByRef arRole As FBM.Role)
 
