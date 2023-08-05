@@ -25,12 +25,12 @@ Partial Class frmToolboxConceptClassification
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxConceptClassification))
         Me.LabelPromptModelElement = New System.Windows.Forms.Label()
         Me.LabelModelElementName = New System.Windows.Forms.Label()
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.DataGridView = New System.Windows.Forms.DataGridView()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
@@ -57,29 +57,35 @@ Partial Class frmToolboxConceptClassification
         Me.LabelModelElementName.TabIndex = 13
         Me.LabelModelElementName.Text = " <No Model Element Selected>"
         '
-        'DataGridView1
+        'DataGridView
         '
-        Me.DataGridView1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.DataGridView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView1.Location = New System.Drawing.Point(16, 45)
-        Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.Size = New System.Drawing.Size(698, 202)
-        Me.DataGridView1.TabIndex = 14
+        Me.DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DataGridView.Location = New System.Drawing.Point(16, 45)
+        Me.DataGridView.Name = "DataGridView"
+        Me.DataGridView.Size = New System.Drawing.Size(691, 180)
+        Me.DataGridView.TabIndex = 14
         '
         'Panel1
         '
+        Me.Panel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Panel1.Controls.Add(Me.LabelModelElementName)
-        Me.Panel1.Controls.Add(Me.DataGridView1)
+        Me.Panel1.Controls.Add(Me.DataGridView)
         Me.Panel1.Controls.Add(Me.LabelPromptModelElement)
-        Me.Panel1.Location = New System.Drawing.Point(3, 28)
+        Me.Panel1.Location = New System.Drawing.Point(3, 26)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(726, 254)
+        Me.Panel1.Size = New System.Drawing.Size(719, 232)
         Me.Panel1.TabIndex = 15
         '
         'TableLayoutPanel1
         '
+        Me.TableLayoutPanel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TableLayoutPanel1.ColumnCount = 1
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.Panel1, 0, 1)
@@ -89,7 +95,7 @@ Partial Class frmToolboxConceptClassification
         Me.TableLayoutPanel1.RowCount = 2
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.122807!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 90.87719!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(732, 285)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(725, 261)
         Me.TableLayoutPanel1.TabIndex = 16
         '
         'ToolStrip1
@@ -97,29 +103,29 @@ Partial Class frmToolboxConceptClassification
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(732, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(725, 23)
         Me.ToolStrip1.TabIndex = 16
         Me.ToolStrip1.Text = "ToolStrip1"
         '
         'ToolStripButton1
         '
         Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.Image = Global.Boston.My.Resources.Resources.Add16x16
         Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(23, 22)
+        Me.ToolStripButton1.Size = New System.Drawing.Size(23, 20)
         Me.ToolStripButton1.Text = "ToolStripButton1"
         '
         'frmToolboxConceptClassification
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(756, 299)
+        Me.ClientSize = New System.Drawing.Size(749, 275)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmToolboxConceptClassification"
         Me.Text = "Concept Classification"
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DataGridView, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel1.ResumeLayout(False)
         Me.Panel1.PerformLayout()
         Me.TableLayoutPanel1.ResumeLayout(False)
@@ -132,7 +138,7 @@ Partial Class frmToolboxConceptClassification
 
     Friend WithEvents LabelPromptModelElement As Label
     Friend WithEvents LabelModelElementName As Label
-    Friend WithEvents DataGridView1 As DataGridView
+    Friend WithEvents DataGridView As DataGridView
     Friend WithEvents Panel1 As Panel
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
     Friend WithEvents ToolStrip1 As ToolStrip

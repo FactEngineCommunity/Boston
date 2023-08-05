@@ -45,6 +45,21 @@ Namespace FBM
 
         Public ClassificationValue As New List(Of KnowledgeGraph.ConceptClassificationValue)
 
+        Public ReadOnly Property ModelLevelElement As FBM.ModelObject
+            Get
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.ValueTypeInstance)
+                        Return CType(Me, Object).ValueType
+                    Case Is = GetType(FBM.EntityTypeInstance)
+                        Return CType(Me, Object).EntityType
+                    Case Is = GetType(FBM.FactTypeInstance)
+                        Return CType(Me, Object).FactType
+                    Case Else
+                        Return Nothing
+                End Select
+            End Get
+        End Property
+
         <JsonIgnore()>
         <XmlIgnore()>
         Public _ModelError As New List(Of FBM.ModelError)

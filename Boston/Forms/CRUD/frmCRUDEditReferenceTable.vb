@@ -1,6 +1,7 @@
 ﻿Imports System.Reflection
 Imports System.Xml.Serialization
 Imports System.IO
+Imports System.Text.RegularExpressions
 
 Public Class frmCRUDEditReferenceTable
 
@@ -9,8 +10,13 @@ Public Class frmCRUDEditReferenceTable
     Private zlo_display_list As New List(Of Object)
     Private zb_grid_data_dirty As Boolean = False 'True if a user has modified any cell contents.
     Private mrReferenceTable As New ReferenceTable
+    ''' <summary>
+    ''' For Filtering Columns
+    ''' </summary>
+    Private msFilterString As String = ""
 
     Dim zls_field_list As New List(Of Object)
+    Dim msSortOrder As String = "Ascending"
 
     Private Sub frm_edit_reference_table_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
 
@@ -26,7 +32,7 @@ Public Class frmCRUDEditReferenceTable
         End If
 
         Me.ComboBox1.Items.Clear()
-        Me.DataGridView1.DataSource = Nothing
+        Me.AdvancedDataGridView.DataSource = Nothing
 
     End Sub
 
@@ -83,25 +89,33 @@ Public Class frmCRUDEditReferenceTable
 
     End Sub
 
-    Sub populate_data_grid_for_selected_reference_table()
+    Sub populate_data_grid_for_selected_reference_table(Optional aarReferenceTableTuples As List(Of Object) = Nothing)
 
         Try
             '--------------------------------------------
             'Get the list of Tuples as a List(Of Object)
             '--------------------------------------------
-            zlo_display_list = TableReferenceFieldValue.GetReferenceFieldValueTuples(ComboBox1.SelectedItem.tag.ReferenceTableId, Me.zo_working_class, mrReferenceTable)
+            If aarReferenceTableTuples Is Nothing Then
+                zlo_display_list = TableReferenceFieldValue.GetReferenceFieldValueTuples(ComboBox1.SelectedItem.tag.ReferenceTableId, Me.zo_working_class, mrReferenceTable)
+            Else
+                zlo_display_list = aarReferenceTableTuples
+            End If
 
             '---------------------------------
             'Bind the tuples to the DataGrid
             '---------------------------------       
-            DataGridView1.DataSource = Nothing
-            DataGridView1.DataSource = zlo_display_list 'lrObjectList ' New DefensiveDatasource(zlo_display_list, Nothing)
+            AdvancedDataGridView.DataSource = Nothing
+            AdvancedDataGridView.DataSource = zlo_display_list 'lrObjectList ' New DefensiveDatasource(zlo_display_list, Nothing)
 
-            cManager = CType(DataGridView1.BindingContext(zlo_display_list), CurrencyManager)
+            cManager = CType(AdvancedDataGridView.BindingContext(zlo_display_list), CurrencyManager)
 
             If zlo_display_list.Count > 0 Then
-                Me.DataGridView1.Columns(0).Visible = False
+                Me.AdvancedDataGridView.Columns(0).Visible = False
             End If
+
+            For Each lrColumn As DataGridViewColumn In Me.AdvancedDataGridView.Columns
+                lrColumn.SortMode = DataGridViewColumnSortMode.Automatic
+            Next
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -131,11 +145,11 @@ Public Class frmCRUDEditReferenceTable
         '---------------------------------
         'Bind the tuples to the DataGrid
         '---------------------------------               
-        DataGridView1.DataSource = Nothing
-        DataGridView1.DataSource = zlo_display_list
-        cManager = CType(DataGridView1.BindingContext(zlo_display_list), CurrencyManager)
+        AdvancedDataGridView.DataSource = Nothing
+        AdvancedDataGridView.DataSource = zlo_display_list
+        cManager = CType(AdvancedDataGridView.BindingContext(zlo_display_list), CurrencyManager)
 
-        Me.DataGridView1.Columns(0).Visible = False
+        Me.AdvancedDataGridView.Columns(0).Visible = False
 
         '-----------------------------------
         'Clear the values in the new tuple
@@ -143,7 +157,7 @@ Public Class frmCRUDEditReferenceTable
         Dim lo_row As DataGridViewRow
         Dim liInd As Integer = 1
 
-        lo_row = Me.DataGridView1.Rows.Item(Me.DataGridView1.Rows.Count - 1)
+        lo_row = Me.AdvancedDataGridView.Rows.Item(Me.AdvancedDataGridView.Rows.Count - 1)
 
         For liInd = 1 To lo_row.Cells.Count - 1
             lo_row.Cells.Item(liInd).Value = ""
@@ -170,11 +184,11 @@ Public Class frmCRUDEditReferenceTable
         Dim ls_message As String
         Dim li_selected_row_count As Integer = 0
 
-        If IsSomething(DataGridView1.CurrentRow.DataBoundItem) Then
+        If IsSomething(AdvancedDataGridView.CurrentRow.DataBoundItem) Then
 
-            loObject = DataGridView1.CurrentRow.DataBoundItem.clone
+            loObject = AdvancedDataGridView.CurrentRow.DataBoundItem.clone
 
-            li_selected_row_count = Me.DataGridView1.SelectedRows.Count
+            li_selected_row_count = Me.AdvancedDataGridView.SelectedRows.Count
             If li_selected_row_count = 0 Then li_selected_row_count = 1
             '-------------------------------------------------------------
             'Delete the respective ReferenceFieldValue tuples within the 
@@ -194,7 +208,7 @@ Public Class frmCRUDEditReferenceTable
                 Exit Sub
             End If
 
-            For Each lo_row In Me.DataGridView1.SelectedRows
+            For Each lo_row In Me.AdvancedDataGridView.SelectedRows
                 loObject = lo_row.DataBoundItem
                 prReferenceFieldValue = New tReferenceFieldValue
                 prReferenceFieldValue.RowId = loObject.row_id
@@ -207,12 +221,12 @@ Public Class frmCRUDEditReferenceTable
                 Next
             Next
 
-            zlo_display_list.Remove(DataGridView1.CurrentRow.DataBoundItem)
-            Me.DataGridView1.DataSource = Nothing
-            Me.DataGridView1.DataSource = zlo_display_list
+            zlo_display_list.Remove(AdvancedDataGridView.CurrentRow.DataBoundItem)
+            Me.AdvancedDataGridView.DataSource = Nothing
+            Me.AdvancedDataGridView.DataSource = zlo_display_list
 
-            If Me.DataGridView1.RowCount > 0 Then
-                Me.DataGridView1.Columns(0).Visible = False
+            If Me.AdvancedDataGridView.RowCount > 0 Then
+                Me.AdvancedDataGridView.Columns(0).Visible = False
             End If
         End If
 
@@ -224,18 +238,18 @@ Public Class frmCRUDEditReferenceTable
 
     End Sub
 
-    Private Sub DataGridView1_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridView1.CellEndEdit
+    Private Sub AdvancedDataGridView_CellEndEdit(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles AdvancedDataGridView.CellEndEdit
 
         Me.zb_grid_data_dirty = True
 
     End Sub
 
-    Private Sub DataGridView1_CellEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridView1.CellEnter
+    Private Sub AdvancedDataGridView_CellEnter(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles AdvancedDataGridView.CellEnter
 
         Button_delete.Enabled = False
     End Sub
 
-    Private Sub DataGridView1_RowHeaderMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles DataGridView1.RowHeaderMouseClick
+    Private Sub AdvancedDataGridView_RowHeaderMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles AdvancedDataGridView.RowHeaderMouseClick
 
         Button_delete.Enabled = True
 
@@ -248,7 +262,7 @@ Public Class frmCRUDEditReferenceTable
         Dim ls_attribute_value As String = ""
         Dim liInd As Integer = 1
 
-        For Each lo_row In Me.DataGridView1.Rows
+        For Each lo_row In Me.AdvancedDataGridView.Rows
 
             loObject = lo_row.DataBoundItem
             prReferenceFieldValue = New tReferenceFieldValue
@@ -258,7 +272,7 @@ Public Class frmCRUDEditReferenceTable
                 prReferenceFieldValue.Data = CStr(lo_row.Cells.Item(liInd).Value).Replace("'", "''")
                 prReferenceFieldValue.ReferenceFieldId = liInd
                 prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.ReferenceTableId
-                prReferenceFieldValue.save()
+                prReferenceFieldValue.Save()
             Next
         Next
 
@@ -269,6 +283,8 @@ Public Class frmCRUDEditReferenceTable
     Private Sub ComboBox1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBox1.SelectedIndexChanged
 
         Call Me.Populate_data_grid_for_selected_reference_table()
+
+        Me.msFilterString = ""
 
     End Sub
 
@@ -340,6 +356,141 @@ Public Class frmCRUDEditReferenceTable
 
         Catch ex As Exception
 
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub AdvancedDataGridView_FilterStringChanged(sender As Object, e As EventArgs) Handles AdvancedDataGridView.FilterStringChanged
+
+        Dim lsSQLQuery As String = ""
+
+        Try
+            Dim lsFilterString As String
+            Dim larColumn As List(Of RDS.Column) = Nothing
+
+            If Me.mrReferenceTable.Column.Count > 0 Then
+                Debugger.Break()
+            End If
+
+            'lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
+
+            For liInd = 0 To Me.mrReferenceTable.Column.Count - 1
+                For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+                    If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrReferenceTable.Column(liInd).label Then
+                        Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                    End If
+                Next
+            Next
+
+            lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+
+            'Expanto fields contain the where clausee
+            Dim larExpandoFields() As Object = {}
+
+            If lsFilterString = "" Then
+                Me.msFilterString = ""
+                Me.AdvancedDataGridView.ClearFilter()
+            Else
+                Me.msFilterString = lsFilterString
+            End If
+
+            lsFilterString = Me.msFilterString
+
+
+            Dim fieldPattern As String = "(\w+)\s+(IN\s+\([^)]+\))"
+            Dim matches As MatchCollection = Regex.Matches(lsFilterString, fieldPattern)
+
+            For Each match As Match In matches
+                Dim fieldName As String = match.Groups(1).Value
+                Dim inComponent As String = match.Groups(2).Value
+                Dim inValues As String() = inComponent.Split(","c)
+
+                For i As Integer = 0 To inValues.Length - 1
+                    inValues(i) = inValues(i).Trim()
+                    inValues(i) = $"'{inValues(i)}'"
+                Next
+
+                larExpandoFields.Add(New With {.FieldName = fieldName, .Value = inComponent, .IsINComparitor = True})
+            Next
+
+            Dim loSetting As Object = New System.Dynamic.ExpandoObject 'Dummy
+            Dim larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(Me.mrReferenceTable.ReferenceTableId, loSetting,, larExpandoFields)
+
+            Call Me.populate_data_grid_for_selected_reference_table(larSettingTuples)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub AdvancedDataGridView_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles AdvancedDataGridView.ColumnHeaderMouseClick
+
+        Try
+            Dim lrColumn As DataGridViewColumn
+            ' Check if the clicked column index is valid
+            If e.ColumnIndex >= 0 AndAlso e.ColumnIndex < Me.AdvancedDataGridView.Columns.Count Then
+                ' Get the column clicked
+                For Each lrColumn In Me.AdvancedDataGridView.Columns
+                    lrColumn.SortMode = DataGridViewColumnSortMode.Automatic
+                Next
+
+                lrColumn = Me.AdvancedDataGridView.Columns(e.ColumnIndex)
+
+                ' Check if the column is sortable
+                If lrColumn.SortMode = DataGridViewColumnSortMode.Automatic Then
+                    ' Determine the sort order (ascending or descending)
+
+                    If msSortOrder = "Ascending" Then
+                        msSortOrder = "Descending"
+                    Else
+                        msSortOrder = "Ascending"
+                    End If
+
+                    ' Get the column name to sort (assuming the DataPropertyName is set properly)
+                    Dim columnName As String = lrColumn.DataPropertyName
+
+                    ' Sort the data in the List using LINQ
+                    If msSortOrder = "Ascending" Then
+                        zlo_display_list = zlo_display_list.OrderBy(Function(obj) obj.GetType().GetProperty(columnName).GetValue(obj, Nothing)).ToList()
+                    Else
+                        zlo_display_list = zlo_display_list.OrderByDescending(Function(obj) obj.GetType().GetProperty(columnName).GetValue(obj, Nothing)).ToList()
+                    End If
+
+                    ' Re-bind the sorted List to the DataGridView
+                    Me.AdvancedDataGridView.DataSource = zlo_display_list
+                End If
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub ClearFiltersToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ClearFiltersToolStripMenuItem.Click
+
+        Try
+            Call Me.AdvancedDataGridView.ClearFilter()
+
+            Call Me.populate_data_grid_for_selected_reference_table()
+        Catch ex As Exception
+            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

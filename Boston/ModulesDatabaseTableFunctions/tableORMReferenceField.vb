@@ -150,6 +150,62 @@ Module tableReferenceField
 
     End Function
 
+    Function GetReferenceFieldsByReferenceTableId(ByVal aiReferenceTableId As Integer) As List(Of tReferenceField)
+
+        Dim larReferenceField As New List(Of tReferenceField)
+
+        Dim laa_reference_field As New List(Of String)
+        Dim lsSQLQuery As String
+        Dim lREcordset As New RecordsetProxy
+
+        lREcordset.ActiveConnection = pdbConnection
+        lREcordset.CursorType = pcOpenStatic
+
+        Try
+            ' Create the recordset
+            lsSQLQuery = "SELECT *"
+            lsSQLQuery &= " FROM ReferenceField"
+            lsSQLQuery &= " WHERE reference_table_id = " & aiReferenceTableId
+            lsSQLQuery &= " ORDER BY reference_field_id"
+
+            lREcordset.Open(lsSQLQuery)
+
+            Dim lrReferenceField As tReferenceField = Nothing
+
+            If Not lREcordset.EOF Then
+                While Not lREcordset.EOF
+                    lrReferenceField = New tReferenceField
+
+                    lrReferenceField.ReferenceTableId = aiReferenceTableId
+                    lrReferenceField.reference_field_id = lREcordset("reference_field_id").Value
+                    lrReferenceField.label = lREcordset("reference_field_label").Value
+                    lrReferenceField.required = lREcordset("required").Value
+                    lrReferenceField.cardinality = lREcordset("cardinality").Value
+                    lrReferenceField.system = lREcordset("system").Value
+                    lrReferenceField.data_type = lREcordset("reference_data_type").Value
+
+                    larReferenceField.Add(lrReferenceField)
+
+                    lREcordset.MoveNext()
+                End While
+                lREcordset.Close()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+        Return larReferenceField
+
+    End Function
+
+
+
     Function GetReferenceFieldListByReferenceTableId(ByVal aiReferenceTableId As Integer) As List(Of String)
 
         Dim laa_reference_field As New List(Of String)

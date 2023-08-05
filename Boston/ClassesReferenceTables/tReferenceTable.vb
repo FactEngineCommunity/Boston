@@ -11,6 +11,17 @@ Public Class ReferenceTable
 
     Public ReferenceTuple As New List(Of ReferenceTuple)
 
+    <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+    Private _Column As New List(Of tReferenceField)
+    Public ReadOnly Property Column As List(Of tReferenceField)
+        Get
+            If Me._Column.Count = 0 Then
+                Call tableReferenceField.GetReferenceFieldListByReferenceTableId(Me.ReferenceTableId)
+            End If
+            Return Me._Column
+        End Get
+    End Property
+
     ''' <summary>
     ''' Parameterless Constructor
     ''' </summary>

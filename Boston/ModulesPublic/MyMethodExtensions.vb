@@ -8,6 +8,7 @@ Imports System.IO
 Imports System.Runtime.Serialization
 Imports System.Runtime.InteropServices
 Imports System.Globalization
+Imports System.Dynamic
 
 Module MyMethodExtensions
 
@@ -24,6 +25,21 @@ Module MyMethodExtensions
         Return pascalCase
     End Function
 
+    ''' <summary>
+    ''' Limit to use with ExpandoObjects please.
+    ''' </summary>
+    ''' <param name="expando"></param>
+    ''' <param name="fieldName"></param>
+    ''' <returns></returns>
+    <System.Runtime.CompilerServices.Extension()>
+    Public Function HasField(expando As Object, fieldName As String) As Boolean
+        Try
+            Dim value As Object = CallByName(expando, fieldName, CallType.Get)
+            Return True
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
 
     <System.Runtime.CompilerServices.Extension>
     Public Function GetAttributeValue(Of TAttribute As Attribute, TValue)(source As [Enum]) As TValue

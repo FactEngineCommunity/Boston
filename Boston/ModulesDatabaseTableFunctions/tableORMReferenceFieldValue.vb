@@ -279,7 +279,12 @@ Namespace TableReferenceFieldValue
                         Try
                             For Each loExpandoField As Object In aarExpandoFieldValue
                                 If laaReferenceFieldList(liInd - 1) = loExpandoField.FieldName Then
-                                    lsSQLQuery &= " AND rfv" & Trim(CStr(liInd)) & ".Data = '" & loExpandoField.Value & "'"
+
+                                    If Boston.ObjectHasProperty(loExpandoField, "IsINComparitor") AndAlso loExpandoField.IsINComparitor = True Then
+                                        lsSQLQuery &= " AND rfv" & Trim(CStr(liInd)) & ".Data " & loExpandoField.Value
+                                    Else
+                                        lsSQLQuery &= " AND rfv" & Trim(CStr(liInd)) & ".Data = '" & loExpandoField.Value & "'"
+                                    End If
                                 End If
                             Next
                         Catch ex As Exception

@@ -220,7 +220,7 @@ Namespace DataStore
                 }
                 Dim jsonData As String = JsonConvert.SerializeObject(arObject, settings)
 
-                If dataList.Count = 1 AndAlso asID IsNot Nothing Then
+                If dataList.Count >= 1 AndAlso asID IsNot Nothing Then
                     ' If the record exists, update it in the database
                     Dim lsSQLQuery As String = "UPDATE DataStore SET Data = '" & jsonData & "' WHERE ID = '" & asID & "'"
                     Dim lrRecordset As ORMQL.Recordset = pdbConnection.Execute(lsSQLQuery)

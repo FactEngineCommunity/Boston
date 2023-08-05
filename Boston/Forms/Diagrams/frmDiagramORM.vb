@@ -6542,97 +6542,108 @@ SkipPopup:
 
         Dim loObject As New Object
 
-        '---------------------------------------------------------------------------
-        'If the ORM(FactType)ReadingEditor is loaded, then
-        '  do the appropriate processing so that the data in the ReadingEditor grid
-        '  matches the selected FactType (if a FactType is selected by the user)
-        '---------------------------------------------------------------------------
-        Dim lrORMReadingEditor As frmToolboxORMReadingEditor
-        lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+        Try
 
-        If IsSomething(lrORMReadingEditor) Then
+            '---------------------------------------------------------------------------
+            'If the ORM(FactType)ReadingEditor is loaded, then
+            '  do the appropriate processing so that the data in the ReadingEditor grid
+            '  matches the selected FactType (if a FactType is selected by the user)
+            '---------------------------------------------------------------------------
+            Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+            lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+
+            If IsSomething(lrORMReadingEditor) Then
+                Select Case Me.zrPage.SelectedObject.Count
+                    Case Is = 0
+                        lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance
+                        lrORMReadingEditor.zrFactTypeInstance = Nothing
+                        lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                        lrORMReadingEditor.DataGrid_Readings.Refresh()
+                        lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                        lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                    Case Else
+                        lrORMReadingEditor.zrPage = Me.zrPage
+                        Select Case Me.zrPage.SelectedObject(0).ConceptType
+                            Case Is = pcenumConceptType.FactType
+                                If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0) Then
+                                    lrORMReadingEditor.zrFactTypeInstance = Me.zrPage.SelectedObject(0)
+                                    Call lrORMReadingEditor.SetupForm()
+                                End If
+                            Case Is = pcenumConceptType.Role
+                                If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0).FactType Then
+                                    lrORMReadingEditor.zrFactTypeInstance = Me.zrPage.SelectedObject(0).FactType
+                                    Call lrORMReadingEditor.SetupForm()
+                                End If
+                        End Select
+                End Select
+            End If
+
+            'Setup the Descriptions toolbox
+            Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
+            lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
+            If IsSomething(lrModelElementDescriptionsEditor) Then
+                Select Case Me.zrPage.SelectedObject.Count
+                    Case Is = 0
+                        Call lrModelElementDescriptionsEditor.setDescriptions(Nothing)
+                    Case Else
+                        Call lrModelElementDescriptionsEditor.setDescriptions(Me.zrPage.SelectedObject(0))
+                End Select
+            End If
+
+            'Setup the Concept Classificaations toolbox
+            Dim lfrmToolboxConceptClassication As frmToolboxConceptClassification
+            lfrmToolboxConceptClassication = prApplication.GetToolboxForm(frmToolboxConceptClassification.Name)
+            If lfrmToolboxConceptClassication IsNot Nothing Then
+                Select Case Me.zrPage.SelectedObject.Count
+                    Case Is = 0
+                        Call lfrmToolboxConceptClassication.SetupForm()
+                    Case Else
+                        Call lfrmToolboxConceptClassication.SetupForm(Me.zrPage.SelectedObject(0).ModelLevelElement)
+                End Select
+            End If
+
             Select Case Me.zrPage.SelectedObject.Count
                 Case Is = 0
-                    lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance
-                    lrORMReadingEditor.zrFactTypeInstance = Nothing
-                    lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
-                    lrORMReadingEditor.DataGrid_Readings.Refresh()
-                    lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
-                    lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
-                Case Else
-                    lrORMReadingEditor.zrPage = Me.zrPage
-                    Select Case Me.zrPage.SelectedObject(0).ConceptType
-                        Case Is = pcenumConceptType.FactType
-                            If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0) Then
-                                lrORMReadingEditor.zrFactTypeInstance = Me.zrPage.SelectedObject(0)
-                                Call lrORMReadingEditor.SetupForm()
-                            End If
-                        Case Is = pcenumConceptType.Role
-                            If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0).FactType Then
-                                lrORMReadingEditor.zrFactTypeInstance = Me.zrPage.SelectedObject(0).FactType
-                                Call lrORMReadingEditor.SetupForm()
-                            End If
-                    End Select
+                    '------------------------
+                    'Reset ShapeNode.Colors
+                    '------------------------
+                    'Call Me.ResetNodeAndLinkColors()
+                    Me.zrPage.MultiSelectionPerformed = False
+                Case Is = 1
+                    '-------------------------------------
+                    'A MultiSelection has NOT taken place
+                    '-------------------------------------
+                    Me.zrPage.MultiSelectionPerformed = False
+                Case Is > 1
+                    '----------------------------------
+                    'A MultiSelection has taken place
+                    '----------------------------------
+                    If IsSomething(Me.zrPage) Then
+                        '---------------------------------------------------------------
+                        'WorkingPage exists. Sometimes, if the user 'closes' the form
+                        '  the SelectionChanged gets triggered, but the WorkingPage
+                        '  no longer exists.
+                        '---------------------------------------------------------------
+                        Me.zrPage.MultiSelectionPerformed = True
+                    End If
             End Select
-        End If
 
-        'Setup the Descriptions toolbox
-        Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
-        lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
-        If IsSomething(lrModelElementDescriptionsEditor) Then
-            Select Case Me.zrPage.SelectedObject.Count
-                Case Is = 0
-                    Call lrModelElementDescriptionsEditor.setDescriptions(Nothing)
-                Case Else
-                    Call lrModelElementDescriptionsEditor.setDescriptions(Me.zrPage.SelectedObject(0))
-            End Select
-        End If
+            If Me.zrPage.SelectedObject.Count = 0 Then
+                frmMain.ToolStripButtonCopy.Enabled = False
+                'frmMain.ToolStripButtonCut.Enabled = False
+            Else
+                frmMain.ToolStripButtonCopy.Enabled = True
+                'frmMain.ToolStripButtonCut.Enabled = True
+            End If
 
-        'Setup the Concept Classificaations toolbox
-        Dim lfrmToolboxConceptClassication As frmToolboxConceptClassification
-        lfrmToolboxConceptClassication = prApplication.GetToolboxForm(frmToolboxConceptClassification.Name)
-        If lfrmToolboxConceptClassication IsNot Nothing Then
-            Select Case Me.zrPage.SelectedObject.Count
-                Case Is = 0
-                    Call lfrmToolboxConceptClassication.SetupForm()
-                Case Else
-                    Call lfrmToolboxConceptClassication.SetupForm(CType(Me.zrPage.SelectedObject(0), FBM.EntityTypeInstance).EntityType)
-            End Select
-        End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        Select Case Me.zrPage.SelectedObject.Count
-            Case Is = 0
-                '------------------------
-                'Reset ShapeNode.Colors
-                '------------------------
-                'Call Me.ResetNodeAndLinkColors()
-                Me.zrPage.MultiSelectionPerformed = False
-            Case Is = 1
-                '-------------------------------------
-                'A MultiSelection has NOT taken place
-                '-------------------------------------
-                Me.zrPage.MultiSelectionPerformed = False
-            Case Is > 1
-                '----------------------------------
-                'A MultiSelection has taken place
-                '----------------------------------
-                If IsSomething(Me.zrPage) Then
-                    '---------------------------------------------------------------
-                    'WorkingPage exists. Sometimes, if the user 'closes' the form
-                    '  the SelectionChanged gets triggered, but the WorkingPage
-                    '  no longer exists.
-                    '---------------------------------------------------------------
-                    Me.zrPage.MultiSelectionPerformed = True
-                End If
-        End Select
-
-        If Me.zrPage.SelectedObject.Count = 0 Then
-            frmMain.ToolStripButtonCopy.Enabled = False
-            'frmMain.ToolStripButtonCut.Enabled = False
-        Else
-            frmMain.ToolStripButtonCopy.Enabled = True
-            'frmMain.ToolStripButtonCut.Enabled = True
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -6645,91 +6656,93 @@ SkipPopup:
 
         Dim lsCommonTransaction As String = System.Guid.NewGuid.ToString
 
-        For Each loORMObject In Me.zrPage.SelectedObject.ToArray
-            Select Case loORMObject.GetType
-                Case Is = GetType(FBM.RoleConstraintRoleInstance),
-                          GetType(FBM.RoleInstance),
-                          GetType(FBM.SubtypeRelationshipInstance)
-                    Me.zrPage.SelectedObject.Remove(loORMObject)
-            End Select
-        Next
+        Try
 
-        For Each loORMObject In Me.zrPage.SelectedObject.ToArray
+            For Each loORMObject In Me.zrPage.SelectedObject.ToArray
+                Select Case loORMObject.GetType
+                    Case Is = GetType(FBM.RoleConstraintRoleInstance),
+                              GetType(FBM.RoleInstance),
+                              GetType(FBM.SubtypeRelationshipInstance)
+                        Me.zrPage.SelectedObject.Remove(loORMObject)
+                End Select
+            Next
 
-            Dim lrUserAction As New tUserAction(loORMObject, pcenumUserAction.MoveModelObject, Me.zrPage, lsCommonTransaction)
-            lrUserAction.PreActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
+            For Each loORMObject In Me.zrPage.SelectedObject.ToArray
 
-            '---------------------------------------------
-            'Set the X,Y Co-Ordinates of the ORM Object
-            '---------------------------------------------
-            Select Case loORMObject.ConceptType
-                Case Is = pcenumConceptType.FactTable
-                    loORMObject.x = loORMObject.TableShape.bounds.x
-                    loORMObject.y = loORMObject.TableShape.bounds.y
-                Case Else
-                    Try
-                        loORMObject.x = loORMObject.shape.bounds.x
-                        loORMObject.y = loORMObject.shape.bounds.y
+                Dim lrUserAction As New tUserAction(loORMObject, pcenumUserAction.MoveModelObject, Me.zrPage, lsCommonTransaction)
+                lrUserAction.PreActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
 
-                        Select Case loORMObject.ConceptType
-                            Case Is = pcenumConceptType.Role
-                                lrFactTypeInstance = loORMObject.FactType
-                                lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
-                                lrFactTypeInstance.Y = loORMObject.Shape.Bounds.Y
-                            Case Is = pcenumConceptType.FactType
-                                lrFactTypeInstance = loORMObject
-                                lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
-                                lrFactTypeInstance.Y = loORMObject.Shape.Bounds.Y
+                '---------------------------------------------
+                'Set the X,Y Co-Ordinates of the ORM Object
+                '---------------------------------------------
+                Select Case loORMObject.ConceptType
+                    Case Is = pcenumConceptType.FactTable
+                        loORMObject.x = loORMObject.TableShape.bounds.x
+                        loORMObject.y = loORMObject.TableShape.bounds.y
+                    Case Else
+                        Try
+                            loORMObject.x = loORMObject.shape.bounds.x
+                            loORMObject.y = loORMObject.shape.bounds.y
 
-                                Try
-                                    lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFactTypeInstance.FactTypeReadingShape.Shape.Bounds.X,
-                                                                                        lrFactTypeInstance.FactTypeReadingShape.Shape.Bounds.Y)
-                                    lrFactTypeInstance.FactTypeReadingShape.Move(lrFactTypeInstance.FactTypeReadingPoint.X, lrFactTypeInstance.FactTypeReadingPoint.Y, True)
-                                Catch ex As Exception
+                            Select Case loORMObject.ConceptType
+                                Case Is = pcenumConceptType.Role
+                                    lrFactTypeInstance = loORMObject.FactType
+                                    lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
+                                    lrFactTypeInstance.Y = loORMObject.Shape.Bounds.Y
+                                Case Is = pcenumConceptType.FactType
+                                    lrFactTypeInstance = loORMObject
+                                    lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
+                                    lrFactTypeInstance.Y = loORMObject.Shape.Bounds.Y
 
-                                End Try
-                        End Select
+                                    Try
+                                        lrFactTypeInstance.FactTypeReadingPoint = New Point(lrFactTypeInstance.FactTypeReadingShape.Shape.Bounds.X,
+                                                                                            lrFactTypeInstance.FactTypeReadingShape.Shape.Bounds.Y)
+                                        lrFactTypeInstance.FactTypeReadingShape.Move(lrFactTypeInstance.FactTypeReadingPoint.X, lrFactTypeInstance.FactTypeReadingPoint.Y, True)
+                                    Catch ex As Exception
 
-                        '==============================================================================
-                        'Broadcast the moving of the Object
-                        Dim lrModel As New Viev.FBM.Interface.Model
-                        Dim lrPage As New Viev.FBM.Interface.Page()
+                                    End Try
+                            End Select
 
-                        lrModel.ModelId = Me.zrPage.Model.ModelId
-                        lrPage.Id = Me.zrPage.PageId
-                        lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
-                        lrPage.ConceptInstance.X = loORMObject.Shape.Bounds.X
-                        lrPage.ConceptInstance.Y = loORMObject.Shape.Bounds.Y
-                        lrPage.ConceptInstance.ModelElementId = loORMObject.Id
-                        lrModel.Page = lrPage
+                            '==============================================================================
+                            'Broadcast the moving of the Object
+                            Dim lrModel As New Viev.FBM.Interface.Model
+                            Dim lrPage As New Viev.FBM.Interface.Page()
 
-                        If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
-                            Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
-                            lrBroadcast.Model = lrModel
-                            Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
-                        End If
-                        '==============================================================================
-                    Catch ex As Exception
-                    End Try
-            End Select
+                            lrModel.ModelId = Me.zrPage.Model.ModelId
+                            lrPage.Id = Me.zrPage.PageId
+                            lrPage.ConceptInstance = New Viev.FBM.Interface.ConceptInstance
+                            lrPage.ConceptInstance.X = loORMObject.Shape.Bounds.X
+                            lrPage.ConceptInstance.Y = loORMObject.Shape.Bounds.Y
+                            lrPage.ConceptInstance.ModelElementId = loORMObject.Id
+                            lrModel.Page = lrPage
 
-            lrUserAction.PostActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
-            prApplication.AddUndoAction(lrUserAction)
-            frmMain.ToolStripMenuItemUndo.Enabled = True
-        Next
+                            If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                                Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                                lrBroadcast.Model = lrModel
+                                Call prDuplexServiceClient.SendBroadcast([Interface].pcenumBroadcastType.PageMovePageObject, lrBroadcast)
+                            End If
+                            '==============================================================================
+                        Catch ex As Exception
+                        End Try
+                End Select
 
-        '20221009-Need to be here otherwise FactTypeReadings get moved back to where they came from (if called above).
-        For Each loORMObject In Me.zrPage.SelectedObject.ToArray
-            Select Case loORMObject.ConceptType
-                Case pcenumConceptType.EntityType, pcenumConceptType.ValueType
+                lrUserAction.PostActionModelObject = New tUndoRedoObject(loORMObject.X, loORMObject.Y)
+                prApplication.AddUndoAction(lrUserAction)
+                frmMain.ToolStripMenuItemUndo.Enabled = True
+            Next
 
-                    Call loORMObject.Moved()
+            '20221009-Need to be here otherwise FactTypeReadings get moved back to where they came from (if called above).
+            For Each loORMObject In Me.zrPage.SelectedObject.ToArray
+                Select Case loORMObject.ConceptType
+                    Case pcenumConceptType.EntityType, pcenumConceptType.ValueType
 
-                    '--------------------------------------------------------------------------------------------
-                    'Resort the RoleGroup of any FactType associated with the ObjectTypes for asthetic reasons.
-                    '  i.e. So the Links from the Roles in the FactType are visually appealling on the Page.
-                    '------------------------------------------------------------
-                    Call Me.SortJoiningFactTypes(loORMObject, False)
+                        Call loORMObject.Moved()
+
+                        '--------------------------------------------------------------------------------------------
+                        'Resort the RoleGroup of any FactType associated with the ObjectTypes for asthetic reasons.
+                        '  i.e. So the Links from the Roles in the FactType are visually appealling on the Page.
+                        '------------------------------------------------------------
+                        Call Me.SortJoiningFactTypes(loORMObject, False)
 
                     '20220713-VM-Commented out because should be handled by the above.
                     'For Each loLink In loORMObject.shape.IncomingLinks
@@ -6737,25 +6750,34 @@ SkipPopup:
                     '        loLink.Origin.Tag.FactType.SortRoleGroup()
                     '    End If
                     'Next
-                Case pcenumConceptType.FactType
-                    lrFactTypeInstance = loORMObject
-                    Call lrFactTypeInstance.Moved()
+                    Case pcenumConceptType.FactType
+                        lrFactTypeInstance = loORMObject
+                        Call lrFactTypeInstance.Moved()
 
-            End Select
-        Next
+                End Select
+            Next
 
-        '--------------------------------
-        'clear the Selection (as a whole)
-        '--------------------------------
-        Diagram.Selection.Clear()
-        Me.zrPage.SelectedObject.Clear()
-        Me.zrPage.MultiSelectionPerformed = False
+            '--------------------------------
+            'clear the Selection (as a whole)
+            '--------------------------------
+            Diagram.Selection.Clear()
+            Me.zrPage.SelectedObject.Clear()
+            Me.zrPage.MultiSelectionPerformed = False
 
-        Call Me.ResetNodeAndLinkColors()
+            Call Me.ResetNodeAndLinkColors()
 
-        Call Me.zrPage.MakeDirty()
+            Call Me.zrPage.MakeDirty()
 
-        Call Me.EnableSaveButton()
+            Call Me.EnableSaveButton()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

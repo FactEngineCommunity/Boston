@@ -274,10 +274,14 @@ Public Module publicConstants
         subject_area = 2
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumShapeDropTarget
         Canvas
         OtherShapeObject
+    End Enum
+
+    Public Enum pcenumReferenceTable
+        ConceptClassification = 40
     End Enum
 
     Public Enum pcenumReferenceMode

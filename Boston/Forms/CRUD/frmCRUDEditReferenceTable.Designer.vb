@@ -22,21 +22,26 @@ Partial Class frmCRUDEditReferenceTable
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.AdvancedDataGridView = New ADGV.AdvancedDataGridView()
+        Me.ButtonDeleteReferenceTable = New System.Windows.Forms.Button()
         Me.ButtonExportConfigurationItems = New System.Windows.Forms.Button()
         Me.Button_delete = New System.Windows.Forms.Button()
         Me.Button_add_new = New System.Windows.Forms.Button()
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.button_save = New System.Windows.Forms.Button()
         Me.LabelPrompt_ConfigurationItem = New System.Windows.Forms.Label()
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
-        Me.ButtonDeleteReferenceTable = New System.Windows.Forms.Button()
+        Me.ContextMenuStripDataGrid = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ClearFiltersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox1.SuspendLayout()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.AdvancedDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ContextMenuStripDataGrid.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.AdvancedDataGridView)
         Me.GroupBox1.Controls.Add(Me.ButtonDeleteReferenceTable)
         Me.GroupBox1.Controls.Add(Me.ButtonExportConfigurationItems)
         Me.GroupBox1.Controls.Add(Me.Button_delete)
@@ -44,12 +49,32 @@ Partial Class frmCRUDEditReferenceTable
         Me.GroupBox1.Controls.Add(Me.ComboBox1)
         Me.GroupBox1.Controls.Add(Me.button_save)
         Me.GroupBox1.Controls.Add(Me.LabelPrompt_ConfigurationItem)
-        Me.GroupBox1.Controls.Add(Me.DataGridView1)
         Me.GroupBox1.Location = New System.Drawing.Point(9, 3)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(569, 328)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
+        '
+        'AdvancedDataGridView
+        '
+        Me.AdvancedDataGridView.AutoGenerateContextFilters = True
+        Me.AdvancedDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.AdvancedDataGridView.ContextMenuStrip = Me.ContextMenuStripDataGrid
+        Me.AdvancedDataGridView.DateWithTime = False
+        Me.AdvancedDataGridView.Location = New System.Drawing.Point(17, 51)
+        Me.AdvancedDataGridView.Name = "AdvancedDataGridView"
+        Me.AdvancedDataGridView.Size = New System.Drawing.Size(530, 233)
+        Me.AdvancedDataGridView.TabIndex = 8
+        Me.AdvancedDataGridView.TimeFilter = False
+        '
+        'ButtonDeleteReferenceTable
+        '
+        Me.ButtonDeleteReferenceTable.Location = New System.Drawing.Point(408, 290)
+        Me.ButtonDeleteReferenceTable.Name = "ButtonDeleteReferenceTable"
+        Me.ButtonDeleteReferenceTable.Size = New System.Drawing.Size(139, 23)
+        Me.ButtonDeleteReferenceTable.TabIndex = 7
+        Me.ButtonDeleteReferenceTable.Text = "&Delete Reference Table"
+        Me.ButtonDeleteReferenceTable.UseVisualStyleBackColor = True
         '
         'ButtonExportConfigurationItems
         '
@@ -106,23 +131,17 @@ Partial Class frmCRUDEditReferenceTable
         Me.LabelPrompt_ConfigurationItem.TabIndex = 1
         Me.LabelPrompt_ConfigurationItem.Text = "Configuration Item :"
         '
-        'DataGridView1
+        'ContextMenuStripDataGrid
         '
-        Me.DataGridView1.AllowUserToResizeRows = False
-        Me.DataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridView1.Location = New System.Drawing.Point(17, 64)
-        Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.Size = New System.Drawing.Size(530, 211)
-        Me.DataGridView1.TabIndex = 0
+        Me.ContextMenuStripDataGrid.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ClearFiltersToolStripMenuItem})
+        Me.ContextMenuStripDataGrid.Name = "ContextMenuStripDataGrid"
+        Me.ContextMenuStripDataGrid.Size = New System.Drawing.Size(181, 48)
         '
-        'ButtonDeleteReferenceTable
+        'ClearFiltersToolStripMenuItem
         '
-        Me.ButtonDeleteReferenceTable.Location = New System.Drawing.Point(408, 290)
-        Me.ButtonDeleteReferenceTable.Name = "ButtonDeleteReferenceTable"
-        Me.ButtonDeleteReferenceTable.Size = New System.Drawing.Size(139, 23)
-        Me.ButtonDeleteReferenceTable.TabIndex = 7
-        Me.ButtonDeleteReferenceTable.Text = "&Delete Reference Table"
-        Me.ButtonDeleteReferenceTable.UseVisualStyleBackColor = True
+        Me.ClearFiltersToolStripMenuItem.Name = "ClearFiltersToolStripMenuItem"
+        Me.ClearFiltersToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.ClearFiltersToolStripMenuItem.Text = "&Clear Filters"
         '
         'frmCRUDEditReferenceTable
         '
@@ -136,7 +155,8 @@ Partial Class frmCRUDEditReferenceTable
         Me.Text = "Maintain Configuration Reference Items"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.AdvancedDataGridView, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ContextMenuStripDataGrid.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -146,7 +166,9 @@ Partial Class frmCRUDEditReferenceTable
     Friend WithEvents button_save As System.Windows.Forms.Button
     Friend WithEvents Button_add_new As System.Windows.Forms.Button
     Friend WithEvents Button_delete As System.Windows.Forms.Button
-    Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
     Friend WithEvents ButtonExportConfigurationItems As Button
     Friend WithEvents ButtonDeleteReferenceTable As Button
+    Friend WithEvents AdvancedDataGridView As ADGV.AdvancedDataGridView
+    Friend WithEvents ContextMenuStripDataGrid As ContextMenuStrip
+    Friend WithEvents ClearFiltersToolStripMenuItem As ToolStripMenuItem
 End Class

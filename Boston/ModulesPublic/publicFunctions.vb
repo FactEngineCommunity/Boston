@@ -211,6 +211,12 @@ Namespace Boston
 
         End Function
 
+        Public Function ObjectHasProperty(obj As Object, propertyName As String) As Boolean
+            Dim type As Type = obj.GetType()
+            Dim propertyInfo As PropertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase Or BindingFlags.Public Or BindingFlags.Instance)
+            Return propertyInfo IsNot Nothing
+        End Function
+
         Public Function OpenDatabase(Optional ByVal asDatabaseLocationFile As String = Nothing) As Boolean
 
             Dim lsMessage As String = ""
