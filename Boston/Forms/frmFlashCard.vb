@@ -5,6 +5,25 @@ Public Class frmFlashCard
     Public zsText As String = ""
     Public ziIntervalMilliseconds As Nullable(Of Integer) = Nothing
 
+    Public Overloads Function Show(ByVal asOwner As IWin32Window)
+
+        Try
+            Dim loColor As Color = Color.LightGray
+            Me.Label1.BackColor = loColor
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+        Return MyBase.ShowDialog()
+
+    End Function
+
     Public Overloads Function Show(ByVal asOwner As IWin32Window, Optional ByVal asColor As String = "Gray")
 
         Try
@@ -31,6 +50,28 @@ Public Class frmFlashCard
 
         Return MyBase.ShowDialog()
 
+    End Function
+
+    Public Overloads Function Show(ByVal asOwner As IWin32Window, Optional ByVal asColor As Color? = Nothing) As DialogResult
+        Try
+            Dim loColor As Color
+            If asColor.HasValue Then
+                loColor = asColor.Value
+            Else
+                loColor = Color.LightGray
+            End If
+
+            Me.Label1.BackColor = loColor
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+        Return MyBase.ShowDialog()
     End Function
 
     Public Overloads Function ShowDialog(ByVal asOwner As IWin32Window, Optional ByVal asColor As String = "Gray")

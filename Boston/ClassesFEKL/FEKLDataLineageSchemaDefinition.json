@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "FEKL4JSON": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string",
+            "description": "Unique id of the FEKL"
+          },
+          "DocumentName": {
+            "type": "string",
+            "description": "Title or Name of the document in which the FEKL was found"
+          },
+          "DocumentLocation": {
+            "type": "string",
+            "description": "path to the original PDF document in the machine"
+          },
+          "DocumentLocationJson": {
+            "type": "string",
+            "description": "path to the document after conversion (Structured Json document from which the FEKLS were extracted)"
+          },
+          "ObjectType": {
+            "type": "string",
+            "description": "The Fact Engine Knowledge Language"
+          },
+          "FEKLStatement": {
+            "type": "string",
+            "description": "The Fact Engine Knowledge Language"
+          },
+          "PageNumber": {
+            "type": "integer",
+            "description": "The page number of the FEKL in the PDF document"
+          },
+          "LineNumber": {
+            "type": "integer",
+            "description": "The line number of the FEKL in the given page in the PDF document"
+          },
+          "SectionId": {
+            "type": "string",
+            "description": "The number of the section that contains the FEKL. Retrievable from the structure Json document"
+          },
+          "SectionName": {
+            "type": "string",
+            "description": "The Name or Title of said section"
+          },
+          "RequirementId": {
+            "type": "string",
+            "description": "The id of the requirement if the FEKL was found in a requirement"
+          },
+          "StartOffset": {
+            "type": "integer",
+            "description": "the character offset which starts the segment containing the FEKL within the lowest-level section or requirement"
+          },
+          "EndOffset": {
+            "type": "integer",
+            "description": "the character offset which ends the segment containing the FEKL within the lowest-level section or requirement"
+          }
+        },
+        "required": ["Id", "DocumentName", "DocumentLocation", "DocumentLocationJson", "SectionId", "StartOffset", "EndOffset"]
+      }
+    }
+  },
+  "required": [ "FEKL4JSON"]
+}

@@ -881,10 +881,16 @@ ConnectionFailed:
             If Me.CheckBoxSaveToXML.Checked Then
                 lsMessage = "Are you sure you want to store the Model as an XML file? If the Model is already saved in the database it may take a moment to remove the Model from the database."
                 If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                    'CodeSafe - Make sure the Pages are loaded.
+                    For Each lrPage In Me.zrModel.Page.Where(Function(page) Not page.Loaded).ToList()
+                        Call lrPage.Load(False)
+                    Next
+
                     With New WaitCursor
                         Call Me.zrModel.RapidEmpty(True)
                         Call Me.zrModel.SaveToXMLDocument()
-                        Me.zrModel.SetStoreAsXMl(True, True)
+                        Me.zrModel.SetStoreAsXML(True, True)
                     End With
                 Else
                     RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged

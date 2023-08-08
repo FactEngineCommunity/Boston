@@ -2261,6 +2261,7 @@ Public Class frmToolboxEnterpriseExplorer
             '-----------------------------------------
             lrModel = Me.TreeView.SelectedNode.Tag.Tag
 
+
             lsMessage = "Are you sure you want to delete the Model, '" & lrModel.Name & "' ?"
 
             If MsgBox(lsMessage, MsgBoxStyle.Critical + MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
@@ -2273,8 +2274,9 @@ Public Class frmToolboxEnterpriseExplorer
                     While lrModel.RDSLoading
                     End While
 
-                    'Call lrModel.Save()
                     Dim lrTempNode As TreeNode = Me.TreeView.SelectedNode
+
+                    Call lrModel.TriggerEventDeleting()
 
                     Application.DoEvents()
 

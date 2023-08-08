@@ -732,6 +732,32 @@ OpenConnection:
         End Function
 
         ''' <summary>
+        ''' Displays a FlashCard on the screen.
+        ''' </summary>
+        ''' <param name="asText">Text to display.</param>
+        ''' <param name="aoColor">The color of the FlashCard</param>
+        ''' <param name="aiInterval">The interval, in milliseconds, to display the FlashCard for.</param>
+        Public Sub ShowFlashCard(ByVal asText As String,
+                                 ByVal aoColor? As Color,
+                                 ByVal aiInterval As Integer,
+                                 Optional ByVal aiFontSize As Single = 8.25)
+
+            Try
+                Dim lfrmFlashCard As New frmFlashCard
+                lfrmFlashCard.ziIntervalMilliseconds = aiInterval
+                lfrmFlashCard.zsText = asText
+                lfrmFlashCard.Show(frmMain, aoColor)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
+        ''' <summary>
         '''  Encrypts/decrypts the passed string using a simple ASCII value-swapping algorithm
         ''' </summary>
         ''' <param name="Text"></param>
