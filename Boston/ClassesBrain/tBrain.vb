@@ -2681,7 +2681,8 @@ SkipOutputChannel:
                                           ByVal aoTokenType As VAQL.TokenType,
                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                           Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                          Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         ProcessVAQLStatement = False
 
@@ -2701,40 +2702,40 @@ SkipOutputChannel:
                     Return Me.ProcessFactStatement(abBroadcastInterfaceEvent, arDSCError)
                 Case Is = VAQL.TokenType.KEYWDISANENTITYTYPE
                     'Is StraightToAction
-                    Return Me.ProcessISANENTITYTYPECLAUSE(abBroadcastInterfaceEvent, arDSCError)
+                    Return Me.ProcessISANENTITYTYPECLAUSE(abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.KEYWDISAVALUETYPE
                     'Is StraightToAction
-                    Return Me.ProcessISAVALUETYPECLAUSE(abBroadcastInterfaceEvent, arDSCError)
+                    Return Me.ProcessISAVALUETYPECLAUSE(abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.VALUECONSTRAINTCLAUSE
                     'Is StraightToAction
                     Return Me.ProcessVALUECONSTRAINTCLAUSE(abBroadcastInterfaceEvent, arDSCError)
                 Case Is = VAQL.TokenType.VALUETYPEISWRITTENASCLAUSE
                     'Is StraightToAction
-                    Return Me.ProcessVALUETYPEISWRITTENASStatement(abBroadcastInterfaceEvent, arDSCError)
+                    Return Me.ProcessVALUETYPEISWRITTENASStatement(abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE
                     'Is StraightToAction
                     Return Me.ProcessOBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent, arDSCError)
                 Case Is = VAQL.TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                     'Is StraightToAction
-                    Return Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent, arDSCError)
+                    Return Me.ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.FACTTYPECLAUSE
-                    Return Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
+                    Return Me.FormulateQuestionsFACTTYPEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.KEYWDANYNUMBEROF
-                    Call Me.FormulateQuestionsANYNUMBEROFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
+                    Call Me.FormulateQuestionsANYNUMBEROFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject)
                     Return True
                 Case Is = VAQL.TokenType.KEYWDATLEASTONE
-                    Return Me.FormulateQuestionsATLEASTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
+                    Return Me.FormulateQuestionsATLEASTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.KEYWDATMOSTONE
-                    Return Me.FormulateQuestionsATMOSTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
+                    Return Me.FormulateQuestionsATMOSTONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.KEYWDONE
-                    Return Me.FormulateQuestionsONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
+                    Return Me.FormulateQuestionsONEStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.KEYWDISACONCEPT
                     'Is StraightToAction
-                    Return Me.ProcessISACONCEPTStatement(arDSCError)
+                    Return Me.ProcessISACONCEPTStatement(arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.KEYWDISWHERE
-                    Return Me.FormulateQuestionsISWHEREStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
+                    Return Me.FormulateQuestionsISWHEREStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.KEYWDISAKINDOF
-                    Return Me.FormulateQuestionsISAKINDOFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
+                    Return Me.FormulateQuestionsISAKINDOFStatement(asOriginalSentence, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject)
             End Select
 
         Catch ex As Exception
@@ -3804,7 +3805,8 @@ SkipOutputChannel:
 
     End Sub
 
-    Public Function ProcessFBMInterfaceFEKLStatement(ByVal asFEKLStatement As String) As DuplexServiceClient.DuplexServiceClientError
+    Public Function ProcessFBMInterfaceFEKLStatement(ByVal asFEKLStatement As String,
+                                                     Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As DuplexServiceClient.DuplexServiceClientError
 
         Dim loTokenType As VAQL.TokenType
         Dim lrDuplexServiceClientError As New DuplexServiceClient.DuplexServiceClientError(True, [Interface].publicConstants.pcenumErrorType.None, "")
@@ -3817,7 +3819,7 @@ SkipOutputChannel:
 
             'Get the TokenType
             If Me.VAQLProcessor.ProcessVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree) Then
-                Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False, True, lrDuplexServiceClientError)
+                Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False, True, lrDuplexServiceClientError, arFEKLLineageObject)
             Else
                 Dim lsErrorMessage = ""
                 If Me.VAQLParsetree.Errors.Count > 0 Then

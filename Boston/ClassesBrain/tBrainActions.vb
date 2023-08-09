@@ -3,7 +3,8 @@
 Partial Public Class tBrain
 
     Private Function ProcessENTITYTYPEISIDENTIFIEDBYITSStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                                 Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
         Dim lsReferenceMode As String
@@ -671,7 +672,8 @@ Partial Public Class tBrain
     End Function 'Fact Statement
 
 
-    Private Function ProcessISACONCEPTStatement(Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+    Private Function ProcessISACONCEPTStatement(Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -1442,7 +1444,8 @@ EndProcessing:
     End Sub
 
     Private Function ProcessISANENTITYTYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                 Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -1486,6 +1489,19 @@ EndProcessing:
                     Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")
                     Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError, "", Nothing, lrEntityType, True)
                 End If
+
+#Region "Metadata Lineage"
+                If arFEKLLineageObject IsNot Nothing Then
+
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrEntityType.Id)
+
+                    'lrDataLineageItem.DataLineageCategory = 
+                    'lrDataLineageItem.DataLineageItemProperty.Add
+                    'Call lrDataLineageItem.DataLineageItemProperty(0).Save(False)
+
+
+                End If
+#End Region
 
                 Try
                     Select Case prApplication.WorkingPage.Language
@@ -1866,7 +1882,8 @@ EndProcessing:
 
 
     Private Function ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                               Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                               Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                               Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -2151,7 +2168,8 @@ EndProcessing:
     End Sub
 
     Private Function ProcessVALUETYPEISWRITTENASStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                          Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
 

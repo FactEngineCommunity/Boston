@@ -12,7 +12,8 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsANYNUMBEROFStatement(ByVal asOriginalSentence As String,
                                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                             Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                            Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                            Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                            Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -280,7 +281,8 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsATLEASTONEStatement(ByVal asOriginalSentence As String,
                                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                            Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                           Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                           Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                           Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -540,9 +542,10 @@ Partial Public Class tBrain
     End Function
 
     Private Function FormulateQuestionsATMOSTONEStatement(ByVal asOriginalSentence As String,
-                                                     Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                     Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                     Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                          Optional ByVal abStraightToActionProcessing As Boolean = False,
+                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                          Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -775,12 +778,12 @@ Partial Public Class tBrain
                 'Get the PredicatePartWords from the PredicateClause of the statement
                 '----------------------------------------------------------------------
                 Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
-                    Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
-                    Me.VAQLProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
-                    Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.MODELELEMENTClause, Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENT(liInd - 1))
+                Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
+                Me.VAQLProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.MODELELEMENTClause, Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENT(liInd - 1))
 
 
-                    Dim lrPredicatePart As New Language.PredicatePart
+                Dim lrPredicatePart As New Language.PredicatePart
 
                 lrPredicatePart.PreboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT)
                 lrPredicatePart.PostboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT)
@@ -887,7 +890,8 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsFACTTYPEStatement(ByVal asOriginalSentence As String,
                                                          Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                          Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                         Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                         Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                         Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Try
             Dim lrFactTypeReading As New FBM.FactTypeReading
@@ -1106,7 +1110,8 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsONEStatement(ByVal asOriginalSentence As String,
                                                     Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                     Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                    Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                    Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                    Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lsMessage As String
 
@@ -1518,7 +1523,8 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsISWHEREStatement(ByVal asOriginalSentence As String,
                                                         Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                         Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                        Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                        Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                        Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Try
             Dim lsMessage As String = ""
@@ -1694,7 +1700,8 @@ Partial Public Class tBrain
     Private Function FormulateQuestionsISAKINDOFStatement(ByVal asOriginalSentence As String,
                                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                           Optional ByVal abStraightToActionProcessing As Boolean = False,
-                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                          Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Try
             Dim lsMessage As String = ""

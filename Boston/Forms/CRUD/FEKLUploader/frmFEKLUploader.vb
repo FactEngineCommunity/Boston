@@ -10,6 +10,9 @@ Public Class frmFEKLUploader
     Public WithEvents mrModel As FBM.Model
 
     Private mrFEKL4JSON As New FEKL.FEKL4JSON
+    Private mrFEKL4JSONCopy As FEKL.FEKL4JSON
+
+    Private mbProcessingPaused As Boolean = False
 
     Private Sub frmFEKLUploader_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -319,6 +322,8 @@ Public Class frmFEKLUploader
 
             If openFileDialog.ShowDialog() = DialogResult.OK Then
                 Try
+                    Me.LabelFEKLJSON.Text = openFileDialog.FileName
+
                     Dim jsonContent As String = File.ReadAllText(openFileDialog.FileName)
 
                     ' Load JSON schema
@@ -334,21 +339,30 @@ Public Class frmFEKLUploader
                     Dim isValid As Boolean = jsonData.IsValid(schema, validationResults)
 
                     If isValid Then
+                        'Button
+                        Me.ButtonOpenFEKLJSONFile.Enabled = False
+                        Me.ButtonStopContinueProcessing.Enabled = True
+                        Me.ButtonStopContinueProcessing.Visible = True
+
                         ' Deserialize JSON into RootObject
                         Me.mrFEKL4JSON = JsonConvert.DeserializeObject(Of FEKL.FEKL4JSON)(jsonContent)
 
+                        Me.mrFEKL4JSON.FEKLStatement.ForEach(Sub(item) item.ErrorType = [Interface].publicConstants.pcenumErrorType.None)
+
                         ' Assign RootObject as DataSource to DataGridView
-                        DataGridView1.DataSource = Me.mrFEKL4JSON.FEKLStatement
+                        DataGridViewFEKLStatements.DataSource = Me.mrFEKL4JSON.FEKLStatement
+
+                        Me.mrFEKL4JSONCopy = Me.mrFEKL4JSON.Clone
 
                         ' Find the index of the FEKLStatement column
-                        Dim feklStatementColumnIndex As Integer = DataGridView1.Columns("FEKLStatement").Index
+                        Dim feklStatementColumnIndex As Integer = DataGridViewFEKLStatements.Columns("FEKLStatement").Index
 
                         ' Move the FEKLStatement column to the first position
-                        DataGridView1.Columns(feklStatementColumnIndex).DisplayIndex = 0
+                        DataGridViewFEKLStatements.Columns(feklStatementColumnIndex).DisplayIndex = 0
 
                         ' Reorder the display indices of the remaining columns
                         Dim columnIndex As Integer = 1
-                        For Each column As DataGridViewColumn In DataGridView1.Columns
+                        For Each column As DataGridViewColumn In DataGridViewFEKLStatements.Columns
                             If column.Index <> feklStatementColumnIndex Then
                                 column.DisplayIndex = columnIndex
                                 columnIndex += 1
@@ -379,26 +393,173 @@ Public Class frmFEKLUploader
 
     End Sub
 
-    Private Sub ButtonLoadJSONFEKL_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    Private Sub DataGridView1_RowPrePaint(sender As Object, e As DataGridViewRowPrePaintEventArgs) Handles DataGridViewFEKLStatements.RowPrePaint
+
+        Try
+
+            If Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DataBoundItem.Processing Then
+                Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.LightBlue
+            Else
+                If Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DataBoundItem.InError Then
+                    Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.Orange
+
+                ElseIf Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DataBoundItem.Processed Then
+                    Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230)
+
+                Else
+                    Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.White
+                End If
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DataGridView1_SelectionChanged(sender As Object, e As EventArgs) Handles DataGridViewFEKLStatements.SelectionChanged
+
+        Try
+            If DataGridViewFEKLStatements.SelectedRows.Count > 0 Then
+                ' At least one row is selected
+                Dim selectedRow As DataGridViewRow = DataGridViewFEKLStatements.SelectedRows(0)
+
+                ' Access the data or perform actions based on the selected row
+                If selectedRow.DataBoundItem.InError Then
+                    Me.LabelFEKLJSONErrorType.Text = selectedRow.DataBoundItem.ErrorType.ToString
+                    Me.LabelFEKLJSONErrorString.Text = selectedRow.DataBoundItem.ErrorString
+                Else
+                    Me.LabelFEKLJSONErrorType.Text = "N/A"
+                    Me.LabelFEKLJSONErrorString.Text = "N/A"
+                End If
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub HideProcessedFEKLStatementsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HideProcessedFEKLStatementsToolStripMenuItem.Click
+
+        Try
+            If Me.ExportErrorerFEKLStatementsToolStripMenuItem.Tag = "Hidden" Then
+                'Unhide Processed FEKL Statements
+
+                Me.mrFEKL4JSON = Me.mrFEKL4JSONCopy.Clone
+                Me.DataGridViewFEKLStatements.DataSource = Me.mrFEKL4JSON.FEKLStatement
+                Me.DataGridViewFEKLStatements.Refresh()
+
+                Me.ExportErrorerFEKLStatementsToolStripMenuItem.Tag = "UnHidden"
+                Me.HideProcessedFEKLStatementsToolStripMenuItem.Text = "Hide Processed FEKL Statements"
+            Else
+                'Hide Processed Statements
+                Me.mrFEKL4JSON.FEKLStatement = Me.mrFEKL4JSON.FEKLStatement.Where(Function(x) Not x.Processed Or x.InError).ToList
+
+                Me.DataGridViewFEKLStatements.DataSource = Me.mrFEKL4JSON.FEKLStatement
+                Me.DataGridViewFEKLStatements.Refresh()
+
+                Me.ExportErrorerFEKLStatementsToolStripMenuItem.Tag = "Hidden"
+                Me.HideProcessedFEKLStatementsToolStripMenuItem.Text = "Show All FEKL Statements"
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ExportErrorerFEKLStatementsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExportErrorerFEKLStatementsToolStripMenuItem.Click
+
+        Try
+            Dim saveFileDialog As New SaveFileDialog()
+            saveFileDialog.Filter = "JSON Files (*.json)|*.json"
+            saveFileDialog.FileName = "ErroredFEKLStatements.json" ' Set default file name
+
+            If saveFileDialog.ShowDialog() = DialogResult.OK Then
+                Dim selectedFilePath As String = saveFileDialog.FileName
+
+                ' Filter and select items
+                Dim larErrorerFEKLStatement = Me.mrFEKL4JSON.FEKLStatement.Where(Function(x) x.InError).ToList
+
+                Dim lrExportFEKL4JSON As New FEKL.FEKL4JSON
+                lrExportFEKL4JSON.FEKLStatement = larErrorerFEKLStatement
+
+                ' Serialize the selected items to JSON
+                Dim json As String = JsonConvert.SerializeObject(lrExportFEKL4JSON, Formatting.Indented)
+
+                ' Write the JSON to the selected file
+                Try
+                    File.WriteAllText(selectedFilePath, json)
+                    MessageBox.Show("JSON data exported successfully.", "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Catch ex As Exception
+                    MessageBox.Show("An error occurred while exporting JSON data: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            End If
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="abIgnoreProcessed">True if you want to ignore previously processed FEKL Statements.</param>
+    Private Sub LoadFEKLStatementsIntoModelJSON(Optional ByVal abIgnoreProcessed As Boolean = True)
 
         Try
             Dim lrDuplexServiceClientError As DuplexServiceClient.DuplexServiceClientError = Nothing
             Dim lbErrorThrown As Boolean = False
 
+            'Stop|Continue Processing
+            Me.ButtonStopContinueProcessing.Visible = True
+
             'Set the Brain's Model
             prApplication.Brain.Model = Me.mrModel
             prApplication.Brain.Page = Nothing
 
+            Dim larFEKLStatementsToProcess As List(Of FEKL.FEKL4JSONObject) = Nothing
+
+            If abIgnoreProcessed Then
+                larFEKLStatementsToProcess = Me.mrFEKL4JSON.FEKLStatement.FindAll(Function(x) x.Processed = False)
+            Else
+                larFEKLStatementsToProcess = Me.mrFEKL4JSON.FEKLStatement
+            End If
+
             Dim liInd = 0
-            For Each lrFEKLObject As FEKL.FEKL4JSONObject In Me.mrFEKL4JSON.FEKLStatement
+            For Each lrFEKLObject As FEKL.FEKL4JSONObject In larFEKLStatementsToProcess
+
+                liInd = Me.mrFEKL4JSON.FEKLStatement.IndexOf(lrFEKLObject)
 
                 '===============================
                 'Make Row Visisble
-                Dim displayedRowCount As Integer = DataGridView1.DisplayedRowCount(False)
+                Dim displayedRowCount As Integer = DataGridViewFEKLStatements.DisplayedRowCount(False)
                 Try
                     ' Calculate the new first displayed row index to show the target row at the bottom
                     Dim newFirstRowIndex As Integer = Math.Max(0, liInd - displayedRowCount + 1)
-                    DataGridView1.FirstDisplayedScrollingRowIndex = newFirstRowIndex
+                    DataGridViewFEKLStatements.FirstDisplayedScrollingRowIndex = newFirstRowIndex
                 Catch ex As Exception
                     'Well, we tried.
                 End Try
@@ -406,32 +567,56 @@ Public Class frmFEKLUploader
                 '===============================
 
 
-                lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lrFEKLObject.FEKLStatement)
+                lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lrFEKLObject.FEKLStatement, lrFEKLObject)
 
-                DataGridView1.Rows(liInd).DataBoundItem.Processing = True
-                DataGridView1.InvalidateRow(liInd)
+                DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processing = True
+                DataGridViewFEKLStatements.InvalidateRow(liInd)
                 Application.DoEvents()
 
                 If lrDuplexServiceClientError.ErrorType = [Interface].publicConstants.pcenumErrorType.None Then
                     'No Error
-                    DataGridView1.Rows(liInd).DataBoundItem.ErrorType = [Interface].publicConstants.pcenumErrorType.None
+                    DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorType = [Interface].publicConstants.pcenumErrorType.None
                 Else
                     'Error in FEKL or Execution of FEKL
 
                     lbErrorThrown = True
 
                     'Report the Error
-                    DataGridView1.Rows(liInd).DataBoundItem.ErrorType = lrDuplexServiceClientError.ErrorType
-                    DataGridView1.Rows(liInd).DataBoundItem.ErrorString = lrDuplexServiceClientError.ErrorString
+                    DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorType = lrDuplexServiceClientError.ErrorType
+                    DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorString = lrDuplexServiceClientError.ErrorString
 
                 End If
 
-                DataGridView1.Rows(liInd).DataBoundItem.Processing = False
-                DataGridView1.InvalidateRow(liInd)
+                Dim liId = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Id
+
+                DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processing = False
+                DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processed = True
+
+                Dim lrFEKLStatementCopy = Me.mrFEKL4JSONCopy.FEKLStatement.Find(Function(x) x.Id = liId)
+                lrFEKLStatementCopy.ErrorType = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorType
+                lrFEKLStatementCopy.ErrorString = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorString
+                lrFEKLStatementCopy.Processing = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processing
+                lrFEKLStatementCopy.Processed = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processed
+
+                DataGridViewFEKLStatements.InvalidateRow(liInd)
                 Application.DoEvents()
 
-                liInd += 1
+#Region "Pause Processing?"
+                If Me.mbProcessingPaused Then
+                    'CodeSafe
+                    'Pause Processing
+                    Me.ButtonStopContinueProcessing.BackColor = Color.DarkSeaGreen
+                    Me.ButtonStopContinueProcessing.Text = "Continue Processing"
+                    Me.ButtonStopContinueProcessing.Tag = "Paused"
+                    Exit Sub
+                End If
+#End Region
+
+                'liInd += 1
             Next
+
+            'Buttons
+            Me.ButtonStopContinueProcessing.Visible = False
 
             Dim lsFlashText = "Success. FEKL loaded."
             Dim liErrorCount = Me.mrFEKL4JSON.FEKLStatement.Where(Function(x) x.InError).Count
@@ -451,47 +636,54 @@ Public Class frmFEKLUploader
 
     End Sub
 
-    Private Sub DataGridView1_RowPrePaint(sender As Object, e As DataGridViewRowPrePaintEventArgs) Handles DataGridView1.RowPrePaint
+    Private Sub ButtonStopContinueProcessing_Click(sender As Object, e As EventArgs) Handles ButtonStopContinueProcessing.Click
 
-        Try
+        Dim lbHasProcessedFEKLStatements = Me.mrFEKL4JSON.FEKLStatement.FindAll(Function(x) x.Processed).Count > 0
 
-            If Me.DataGridView1.Rows(e.RowIndex).DataBoundItem.Processing Then
-                Me.DataGridView1.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.LightBlue
-            Else
-                If Me.DataGridView1.Rows(e.RowIndex).DataBoundItem.InError Then
-                    Me.DataGridView1.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.Orange
+        Dim larContinuePromptStatus = {"Paused", "NotYetStarted"}
+
+        If larContinuePromptStatus.Contains(Me.ButtonStopContinueProcessing.Tag) Then
+            'Start Processing, but show Red Pause Button
+            Me.ButtonStopContinueProcessing.BackColor = Color.IndianRed
+            Me.ButtonStopContinueProcessing.Text = "Pause Processing"
+            Me.ButtonStopContinueProcessing.Tag = "Processing"
+
+            Me.mbProcessingPaused = False
+
+            If lbHasProcessedFEKLStatements Then
+                If MsgBox("Do you want to ignore previously processed FEKL Statements?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                    Call Me.LoadFEKLStatementsIntoModelJSON()
                 Else
-                    Me.DataGridView1.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.White
+                    Call Me.LoadFEKLStatementsIntoModelJSON(False)
                 End If
+
+            Else
+                Call Me.LoadFEKLStatementsIntoModelJSON()
             End If
 
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+        ElseIf Me.ButtonStopContinueProcessing.Tag = "Processing" Then
+            'Pause Processing, but show Green Continue Processing button
+            Me.ButtonStopContinueProcessing.BackColor = Color.DarkSeaGreen
+            Me.ButtonStopContinueProcessing.Text = "Continue Processing"
+            Me.ButtonStopContinueProcessing.Tag = "Paused"
 
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-        End Try
+            Me.mbProcessingPaused = True
+        End If
+
+        Me.ButtonStopContinueProcessing.Refresh()
+        Me.ButtonStopContinueProcessing.Invalidate()
+        Me.DataGridViewFEKLStatements.Refresh()
+        Me.DataGridViewFEKLStatements.Invalidate()
+
+        Me.Invalidate()
 
     End Sub
 
-    Private Sub DataGridView1_SelectionChanged(sender As Object, e As EventArgs) Handles DataGridView1.SelectionChanged
+    Private Sub frmFEKLUploader_Resize(sender As Object, e As EventArgs) Handles Me.Resize
 
         Try
-            If DataGridView1.SelectedRows.Count > 0 Then
-                ' At least one row is selected
-                Dim selectedRow As DataGridViewRow = DataGridView1.SelectedRows(0)
+            Me.ButtonStopContinueProcessing.Left = (Me.Panel1.Width - Me.ButtonStopContinueProcessing.Width) / 2
 
-                ' Access the data or perform actions based on the selected row
-                If selectedRow.DataBoundItem.InError Then
-                    Me.LabelFEKLJSONErrorType.Text = selectedRow.DataBoundItem.ErrorType.ToString
-                    Me.LabelFEKLJSONErrorString.Text = selectedRow.DataBoundItem.ErrorString
-                Else
-                    Me.LabelFEKLJSONErrorType.Text = "N/A"
-                    Me.LabelFEKLJSONErrorString.Text = "N/A"
-                End If
-            End If
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

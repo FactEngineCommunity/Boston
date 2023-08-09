@@ -9,6 +9,10 @@ Namespace DataLineage
 
         Public Name As String 'DataLineageItemName
 
+        Public DataLineageCategory As New DataLineage.DataLineageCategory
+
+        Public DataLineageItemProperty As New List(Of DataLineage.DataLineageItemProperty)
+
         'Parameterless Constructor
         Public Sub New()
         End Sub

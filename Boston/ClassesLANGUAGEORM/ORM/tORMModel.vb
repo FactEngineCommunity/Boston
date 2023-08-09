@@ -1025,9 +1025,14 @@ Namespace FBM
                                         lrColumn.IsMandatory = True
                                     End If
 
-                                    If lrColumn.ActiveRole.JoinsValueType.DataType = pcenumORMDataType.DataTypeNotSet Then
-                                        lrColumn.ActiveRole.JoinsValueType.DataType = pcenumORMDataType.TextVariableLength
-                                    End If
+                                    Try 'and set the DataType for the Column.
+                                        If lrColumn.ActiveRole.JoinsValueType.DataType = pcenumORMDataType.DataTypeNotSet Then
+                                            lrColumn.ActiveRole.JoinsValueType.DataType = pcenumORMDataType.TextVariableLength
+                                        End If
+                                    Catch ex As Exception
+                                        'We tried. In some circumstances the Column may not yet have a ValueType.
+                                    End Try
+
                                     lrTable.addColumn(lrColumn, Me.IsDatabaseSynchronised)
                                 End If
 
