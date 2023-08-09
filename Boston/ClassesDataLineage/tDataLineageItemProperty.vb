@@ -61,7 +61,11 @@ Namespace DataLineage
 
             Try
                 If Me.Control Is Nothing Then
-                    Exit Sub
+                    If Me.Property <> "" Then
+                        GoTo OkayToProceed
+                    Else
+                        Exit Sub
+                    End If
                 Else
                     Select Case Me.Control.GetType
                         Case Is = GetType(Windows.Forms.TextBox)
@@ -72,6 +76,7 @@ Namespace DataLineage
                 If Trim(Me.Property) = "" Then
                     Call tableDataLineageItemProperty.DeleteDataLineageItemProperty(Me)
                 Else
+OkayToProceed:
                     If tableDataLineageItemProperty.ExistsDataLineageItemProperty(Me) Then
                         Call tableDataLineageItemProperty.updateDataLineageItemProperty(Me)
                     Else

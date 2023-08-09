@@ -79,6 +79,7 @@ Public Module tableDataLineageItemProperty
             lsSQLQuery &= " AND DataLineageItemName = '" & Trim(arDataLineageItemProperty.Name) & "'"
             lsSQLQuery &= " AND DataLineageCategory = '" & Trim(arDataLineageItemProperty.Category) & "'"
             lsSQLQuery &= " AND DataLineagePropertyType = '" & Trim(arDataLineageItemProperty.PropertyType) & "'"
+            lsSQLQuery &= " AND LineageSetNumber = " & arDataLineageItemProperty.LineageSetNumber.ToString
 
             lREcordset.Open(lsSQLQuery)
 

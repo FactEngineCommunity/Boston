@@ -5,11 +5,15 @@ Public Class frmDataLineage
     Public mrModel As FBM.Model
     Public mrModelElement As FBM.ModelObject
 
+    Dim mrDataLineageItem As New DataLineage.DataLineageItem
+
     Private marLineageCategory As New List(Of DataLineage.DataLineageCategory)
 
     Private marDataLineageItemProperty As New List(Of DataLineage.DataLineageItemProperty)
 
     Private msDataLineageItemName As String
+
+    Private marLineageSet As New List(Of List(Of DataLineage.DataLineageItemProperty))
 
     Private Sub frmDataLineage_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -39,6 +43,9 @@ Public Class frmDataLineage
             End If
 
 #End Region
+
+            Me.mrDataLineageItem.Model = Me.mrModel
+            Me.mrDataLineageItem.Name = Me.msDataLineageItemName
 
 
             '==========================================================
@@ -104,21 +111,44 @@ Public Class frmDataLineage
                 loGroupBox.Width = Me.GroupBoxCategories.Width - 10
                 loGroupBox.Height = 100
                 loGroupBox.ForeColor = System.Drawing.ColorTranslator.FromHtml("#cdb69e")
+                loGroupBox.Name = lrDataLineageCategory.Name
 
                 Dim liFieldTop = 25
 
                 Dim liLineageSetNumber = tableDataLineageItemProperty.getHighestLineageSetNrForDataLineageItemCategory(Me.mrModel,
                                                                                                                        Me.msDataLineageItemName,
                                                                                                                        lrDataLineageCategory.Name)
-                If liLineageSetNumber = 0 Then liLineageSetNumber = 1
 
                 'For each set of Properties for the Data Lineage Category
                 For liInd = 1 To liLineageSetNumber
+
+                    Dim larLineagePropertySet As New List(Of DataLineage.DataLineageItemProperty)
+
+                    'Properties by Property Type
                     For Each lrDataLineageCategoryPropertyType In lrDataLineageCategory.DataLineagaeCategoryPropertyType.FindAll(Function(x) Not x.Hidden = abHideHidden)
 
-                        Dim loLabelPrompt As New Windows.Forms.Label
 #Region "Data Lineage Category Property Type"
+
+#Region "Get the Data Lineage Property"
+                        'Gets the actual data for the Data Lineage Property Type for the Data Lineage Category
+                        Dim lrDataLineageItemProperty As New DataLineage.DataLineageItemProperty
+                        lrDataLineageItemProperty.Model = Me.mrModel
+                        lrDataLineageItemProperty.Category = lrDataLineageCategory.Name
+                        lrDataLineageItemProperty.PropertyType = lrDataLineageCategoryPropertyType.PropertyType
+                        lrDataLineageItemProperty.LineageSetNumber = liInd
+                        lrDataLineageItemProperty.Name = Me.msDataLineageItemName
+
+
+                        Call tableDataLineageItemProperty.getDataLineageItemPropertyDetails(lrDataLineageItemProperty, True)
+#End Region
+
+                        Me.mrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageItemProperty)
+
+                        larLineagePropertySet.Add(lrDataLineageItemProperty)
+
+                        If liInd > 1 Then GoTo EndTextboxSetup
 #Region "Field Prompt"
+                        Dim loLabelPrompt As New Windows.Forms.Label
                         loLabelPrompt.Top = liFieldTop
                         loLabelPrompt.Left = 5
                         loLabelPrompt.Font = SystemFonts.DefaultFont
@@ -129,18 +159,6 @@ Public Class frmDataLineage
                         loGroupBox.Controls.Add(loLabelPrompt)
 #End Region
 
-#Region "Get the Data Lineage Property"
-                        'Gets the actual data for the Data Lineage Property Type for the Data Lineage Category
-                        Dim lrDataLineageItemProperty As New DataLineage.DataLineageItemProperty
-                        lrDataLineageItemProperty.Model = Me.mrModel
-                        lrDataLineageItemProperty.Category = lrDataLineageCategory.Name
-                        lrDataLineageItemProperty.PropertyType = lrDataLineageCategoryPropertyType.PropertyType
-                        lrDataLineageItemProperty.LineageSetNumber = liLineageSetNumber
-                        lrDataLineageItemProperty.Name = Me.msDataLineageItemName
-
-
-                        Call tableDataLineageItemProperty.getDataLineageItemPropertyDetails(lrDataLineageItemProperty, True)
-#End Region
 
 #Region "Text Field"
                         Dim loTextField As New Windows.Forms.TextBox
@@ -149,6 +167,7 @@ Public Class frmDataLineage
                         loTextField.Left = loLabelPrompt.Width + 8
                         loTextField.Width = loGroupBox.Width - loTextField.Left - 10
                         loTextField.BorderStyle = BorderStyle.None
+                        loTextField.Name = lrDataLineageCategory.Name & lrDataLineageItemProperty.PropertyType
 
                         loGroupBox.Controls.Add(loTextField)
 
@@ -156,7 +175,7 @@ Public Class frmDataLineage
                         lrDataLineageItemProperty.Control = loTextField
                         loTextField.Text = lrDataLineageItemProperty.Property
 #End Region
-
+EndTextboxSetup:
 
                         Me.marDataLineageItemProperty.Add(lrDataLineageItemProperty)
 
@@ -165,6 +184,8 @@ Public Class frmDataLineage
                         loGroupBox.Height = liFieldTop + 5
 #End Region
                     Next
+
+                    Me.marLineageSet.Add(larLineagePropertySet)
                 Next 'LineageSetNr
 
                 Me.GroupBoxCategories.Controls.Add(loGroupBox)
@@ -172,6 +193,12 @@ Public Class frmDataLineage
                 liCategoryGroupboxTop = loGroupBox.Top + loGroupBox.Height + 10
             Next
 #End Region
+
+            Me.BindingSourceLineageProperty.DataSource = Me.marLineageSet
+            If Me.BindingSourceLineageProperty.Count > 0 Then
+                Me.BindingSourceLineageProperty.Position = 0
+            End If
+            Call Me.SetProperties()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -181,6 +208,7 @@ Public Class frmDataLineage
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
+
 
     End Sub
 
@@ -240,4 +268,122 @@ Public Class frmDataLineage
 
     End Sub
 
+    Private Sub BindingNavigatorMoveNextItem_Click(sender As Object, e As EventArgs) Handles BindingNavigatorMoveNextItem.Click
+
+        Try
+            If Me.BindingSourceLineageProperty.Current IsNot Nothing Then
+                Dim currentIndex As Integer = Me.BindingSourceLineageProperty.Position
+                Dim nextIndex As Integer = currentIndex + 1
+
+                If nextIndex < Me.BindingSourceLineageProperty.Count Then
+                    Me.BindingSourceLineageProperty.Position = nextIndex
+                End If
+            End If
+
+            Call Me.SetProperties()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub SetProperties()
+
+        Try
+            Dim larLinesagePropertySet As List(Of DataLineage.DataLineageItemProperty) = Me.BindingSourceLineageProperty.Current
+
+#Region "Text Field"
+            Dim loTextField As Windows.Forms.TextBox
+
+            If larLinesagePropertySet.Count = 0 Then
+                Exit Sub
+
+            End If
+
+            Dim loGroupBox = Me.GroupBoxCategories.Controls.Find(larLinesagePropertySet(0).Category, False)(0)
+
+            For Each lrDataLineageItemProperty In larLinesagePropertySet
+                loTextField = loGroupBox.Controls.Find(lrDataLineageItemProperty.Category & lrDataLineageItemProperty.PropertyType, False)(0)
+                lrDataLineageItemProperty.Control = loTextField
+                loTextField.Text = lrDataLineageItemProperty.Property
+            Next
+#End Region
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub BindingNavigatorMovePreviousItem_Click(sender As Object, e As EventArgs) Handles BindingNavigatorMovePreviousItem.Click
+
+        Try
+            If Me.BindingSourceLineageProperty.Current IsNot Nothing Then
+                Dim currentIndex As Integer = Me.BindingSourceLineageProperty.Position
+                Dim previousIndex As Integer = currentIndex - 1
+
+                If previousIndex >= 0 Then
+                    Me.BindingSourceLineageProperty.Position = previousIndex
+                End If
+            End If
+
+            Call Me.SetProperties()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub BindingNavigatorMoveFirstItem_Click(sender As Object, e As EventArgs) Handles BindingNavigatorMoveFirstItem.Click
+
+        Try
+            If Me.BindingSourceLineageProperty.Count > 0 Then
+                Me.BindingSourceLineageProperty.Position = 0
+            End If
+
+            Call Me.SetProperties()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub BindingNavigatorMoveLastItem_Click(sender As Object, e As EventArgs) Handles BindingNavigatorMoveLastItem.Click
+
+        Try
+            If Me.BindingSourceLineageProperty.Count > 0 Then
+                Me.BindingSourceLineageProperty.Position = Me.BindingSourceLineageProperty.Count - 1
+            End If
+
+            Call Me.SetProperties()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class

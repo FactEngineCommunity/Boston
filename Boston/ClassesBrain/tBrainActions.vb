@@ -1462,6 +1462,71 @@ EndProcessing:
 
                 Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ISANENTITYTYPEStatement.MODELELEMENTNAME))
 
+#Region "Metadata Lineage"
+                'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+                '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+                If arFEKLLineageObject IsNot Nothing Then
+
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsEntityTypeName & " - Object Type")
+                    'Lineage Category
+                    Dim lrDataLineageCategory = New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1)
+                    lrDataLineageItem.DataLineageCategory = lrDataLineageCategory
+
+                    'Lineage Property/ies
+                    Dim liLineageSetNumber = tableDataLineageItemProperty.getHighestLineageSetNrForDataLineageItemCategory(Me.Model,
+                                                                                                                           lrDataLineageItem.Name,
+                                                                                                                           lrDataLineageCategory.Name)
+
+                    liLineageSetNumber += 1
+
+                    'Document Name
+                    Dim lrDataLineageProperty As New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Specification Document Name", arFEKLLineageObject.DocumentName, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'Document Location
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Document Location", arFEKLLineageObject.DocumentLocation, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'Document Location JSON
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Document Location JSON", arFEKLLineageObject.DocumentLocationJson, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'Page Number
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Page Number", arFEKLLineageObject.PageNumber, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'Line Number
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Line Number", arFEKLLineageObject.LineNumber, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'Section Id
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Section Id", arFEKLLineageObject.SectionId, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'Section Name
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Section Name", arFEKLLineageObject.SectionName, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'Requirement Id
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Requirement Id", arFEKLLineageObject.RequirementId, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'Start Offset
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Start Offset", arFEKLLineageObject.StartOffset, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+                    'End Offset
+                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "End Offset", arFEKLLineageObject.EndOffset, liLineageSetNumber)
+                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
+                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
+
+                    For Each lrDataLineageProperty In lrDataLineageItem.DataLineageItemProperty
+                        Call lrDataLineageProperty.Save(False)
+                    Next
+                End If
+SkipLineage:
+#End Region
+
                 If Me.Model.ExistsModelElement(lsEntityTypeName) Then
                     lsMessage = "There is already a Model Element with the name, '" & lsEntityTypeName & "'. Try another name"
                     If arDSCError IsNot Nothing Then
@@ -1490,18 +1555,6 @@ EndProcessing:
                     Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError, "", Nothing, lrEntityType, True)
                 End If
 
-#Region "Metadata Lineage"
-                If arFEKLLineageObject IsNot Nothing Then
-
-                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrEntityType.Id)
-
-                    'lrDataLineageItem.DataLineageCategory = 
-                    'lrDataLineageItem.DataLineageItemProperty.Add
-                    'Call lrDataLineageItem.DataLineageItemProperty(0).Save(False)
-
-
-                End If
-#End Region
 
                 Try
                     Select Case prApplication.WorkingPage.Language
