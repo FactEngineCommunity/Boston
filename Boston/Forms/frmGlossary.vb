@@ -555,6 +555,8 @@ Public Class frmGlossary
                         Call Me.VerbaliseGeneralConcept(Me.mrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
                 End Select
 
+                Me.ButtonViewLineage.Visible = True
+
             End With
 
             '-----------------------------------------------
@@ -669,7 +671,7 @@ Public Class frmGlossary
 
         Me.SplitContainer2.SplitterDistance = 0
 
-        liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height + 22 'StatusBar Height=22
+        liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height + 42 'StatusBar Height=22
 
         Me.SplitContainer2.SplitterDistance = liHeight
         'zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
@@ -821,8 +823,6 @@ Public Class frmGlossary
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.VerbaliseHeading("Fact Types:")
         lrVerbaliser.HTW.WriteBreak()
-        lrVerbaliser.HTW.WriteBreak()
-
 
         'LINQ
         Dim FactType = From ft In Me.mrModel.FactType,
@@ -860,6 +860,8 @@ Public Class frmGlossary
             End If
             lrVerbaliser.HTW.WriteBreak()
         Next
+
+        lrVerbaliser.HTW.WriteBreak()
 
         Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
@@ -1968,6 +1970,27 @@ Public Class frmGlossary
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
+    End Sub
+
+    Private Sub ButtonViewLineage_Click(sender As Object, e As EventArgs) Handles ButtonViewLineage.Click
+
+        Try
+            Try
+                If Me.mrCurrentModelElement IsNot Nothing Then
+                    Call frmMain.LoadDataLineageForm(mrCurrentModelElement)
+                End If
+            Catch
+                Exit Sub
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
 End Class

@@ -24,8 +24,13 @@ Imports edu.stanford.nlp.semgraph.SemanticGraphEdge
 Imports edu.stanford.nlp.ling.IndexedWord
 Imports java.util
 Imports Syn.WordNet
+Imports Newtonsoft.Json
 
-Public Class frmKeywordExtraction
+Public Class frmKnowledgeExtraction
+
+	'===========================================================================================================
+	'NB There used to be a [Save] button. See: 	Private Sub SaveButton_Click(sender As Object, e As EventArgs)
+	'===========================================================================================================
 
 	Private lvwColumnSorter As ListViewColumnSorter
 	Public WithEvents mrModel As FBM.Model
@@ -35,11 +40,14 @@ Public Class frmKeywordExtraction
 
 	Private wordNet As New WordNetEngine()
 
+	Private FEKLGPTKnowledgeExtractor As New FEKL.FEKLGPTKnowledgeExtractor
+
 	''' <summary>
 	''' Changed with the user clicks on a keyword.
 	''' </summary>
 	Private zrSelectedModelElement As FBM.ModelObject = Nothing
 
+#Region "Class - ListViewColumnSorter"
 	''' <summary>
 	''' This class is an implementation of the 'IComparer' interface.
 	''' </summary>
@@ -71,6 +79,8 @@ Public Class frmKeywordExtraction
 			' Initialize the CaseInsensitiveComparer object
 			ObjectCompare = New CaseInsensitiveComparer()
 		End Sub
+
+
 
 		''' <summary>
 		''' This method is inherited from the IComparer interface.  It compares the two objects passed using a case insensitive comparison.
@@ -139,7 +149,7 @@ Public Class frmKeywordExtraction
 
 	End Class
 
-
+#End Region
 	Private Sub KeywordExtractionForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
 		Call Me.SetupForm()
@@ -149,7 +159,7 @@ Public Class frmKeywordExtraction
 		Me.ResultListView.ListViewItemSorter = lvwColumnSorter
 
 		System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = False
-		SaveButton.Enabled = False
+
 		StandardizationButton.Enabled = False
 		RemoveStopButton.Enabled = False
 		KeywordExtractionMaxButton.Enabled = False
@@ -160,8 +170,25 @@ Public Class frmKeywordExtraction
 
 		'Wordnet
 		Call Me.wordNet.LoadFromDirectory(My.Settings.WordNetDictionaryEnglishPath)
-	End Sub
 
+
+#Region "FEKL Knowledge Extractor"
+
+		'Load JSON schema
+		Dim JsonContent As String = Boston.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "Boston.FEKL-GPT-KnowledgeExtractionPrompts.json") ' Path to your JSON schema
+		'Deserialize JSON into RootObject
+		Me.FEKLGPTKnowledgeExtractor = JsonConvert.DeserializeObject(Of FEKL.FEKLGPTKnowledgeExtractor)(JsonContent)
+
+		For Each lrFEKLGPTKnowledgeExtractorPrompt In Me.FEKLGPTKnowledgeExtractor.Prompt
+
+			Dim lrComboboxItem As New tComboboxItem(lrFEKLGPTKnowledgeExtractorPrompt.Description, lrFEKLGPTKnowledgeExtractorPrompt.Description, lrFEKLGPTKnowledgeExtractorPrompt)
+			Me.ComboBoxFEKLGPTPromptType.Items.Add(lrComboboxItem)
+		Next
+
+
+#End Region
+
+	End Sub
 
 	Private Sub SetupForm()
 
@@ -261,7 +288,7 @@ Public Class frmKeywordExtraction
 			ResultListView.Items.AddRange(lvi)
 
 			Dim dt2 As DateTime = DateTime.Now
-			SaveButton.Enabled = True
+
 			progressBar1.Value = 100
 
 			StatusLabel.Text = "Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & "."
@@ -270,7 +297,7 @@ Public Class frmKeywordExtraction
 		End SyncLock
 	End Sub
 
-	Private Sub SaveButton_Click(sender As Object, e As EventArgs) Handles SaveButton.Click
+	Private Sub SaveButton_Click(sender As Object, e As EventArgs)
 
 		Dim save As String()
 		Dim WordsNum As Integer = 0
@@ -296,7 +323,6 @@ Public Class frmKeywordExtraction
 
 	Private Sub OpenButton()
 		SelectFileButton.Enabled = True
-		SaveButton.Enabled = True
 		StandardizationButton.Enabled = True
 		RemoveStopButton.Enabled = True
 		KeywordExtractionMaxButton.Enabled = True
@@ -305,7 +331,6 @@ Public Class frmKeywordExtraction
 
 	Private Sub CloseButtons()
 		SelectFileButton.Enabled = False
-		SaveButton.Enabled = False
 		StandardizationButton.Enabled = False
 		RemoveStopButton.Enabled = False
 		KeywordExtractionMaxButton.Enabled = False
@@ -321,7 +346,7 @@ Public Class frmKeywordExtraction
 			Dim encode As Encoding = Encoding.GetEncoding("GB2312")
 			MyData.TheDoc = File.ReadAllText(path, encode)
 			RichTextBoxText.Text = MyData.TheDoc
-			SaveButton.Enabled = False
+
 			ResultListView.Items.Clear()
 			StandardizationButton.Enabled = True
 			RemoveStopButton.Enabled = True
@@ -447,7 +472,7 @@ Public Class frmKeywordExtraction
 				ResultListView.Items.AddRange(lvi)
 
 				Dim dt2 As DateTime = DateTime.Now
-				SaveButton.Enabled = True
+
 				progressBar1.Value = 100
 
 				StatusLabel.Text = "Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & "."
@@ -507,7 +532,7 @@ Public Class frmKeywordExtraction
 				Dim encode As Encoding = Encoding.GetEncoding("GB2312")
 				MyData.TheDoc = File.ReadAllText(ofd.FileName, encode)
 				RichTextBoxText.Text = MyData.TheDoc
-				SaveButton.Enabled = False
+
 				ResultListView.Items.Clear()
 				StandardizationButton.Enabled = True
 				RemoveStopButton.Enabled = True
@@ -2023,6 +2048,40 @@ NextSentence:
 
 		Try
 			Call Me.HighlightText()
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ComboBoxFEKLGPTPromptType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxFEKLGPTPromptType.SelectedIndexChanged
+
+		Try
+			Me.TextBoxAILLMPrompt.Text = Me.ComboBoxFEKLGPTPromptType.SelectedItem.Tag.Prompt
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ButtonClose_Click(sender As Object, e As EventArgs) Handles ButtonClose.Click
+
+		Try
+			Me.Hide()
+			Me.Close()
+			Me.Dispose()
+
 		Catch ex As Exception
 			Dim lsMessage As String
 			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

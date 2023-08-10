@@ -1469,11 +1469,11 @@ Namespace FBM
 
         End Sub
 
-        Public Function MakeNameFromFactTypeReadings() As String
+        Public Function MakeNameFromFactTypeReadings(Optional ByRef arFactTypeReading As FBM.FactTypeReading = Nothing) As String
 
             Try
                 Dim lsName As String = ""
-                Dim lrFactTypeReading As FBM.FactTypeReading
+                Dim lrFactTypeReading As FBM.FactTypeReading = arFactTypeReading
 
                 '--------------------------------------------------------------------
                 'CodeSafe: Make sure that all the Roles in the FactType reference a ModelElement
@@ -1487,18 +1487,24 @@ Namespace FBM
 
                 Select Case Me.FactTypeReading.Count
                     Case Is = 0
+                        If lrFactTypeReading IsNot Nothing Then GoTo OneFactTypeReading
                         For Each lrRole In Me.RoleGroup
                             lsName &= lrRole.JoinedORMObject.Id
                         Next
+                        lsName = Viev.Strings.RemoveWhiteSpace(lsName)
                     Case Is = 1
-                        lrFactTypeReading = Me.FactTypeReading(0)
+OneFactTypeReading:
+                        If lrFactTypeReading Is Nothing Then
+                            lrFactTypeReading = Me.FactTypeReading(0)
+                        End If
                         lsName = Viev.Strings.MakeCapCamelCase(lrFactTypeReading.GetReadingText)
                         lsName = Viev.Strings.RemoveWhiteSpace(lsName)
                         lsName = lsName.Replace("-", "")
 
                     Case Else
-
-                        lrFactTypeReading = Me.FactTypeReading.Find(Function(x) x.IsPreferred = True)
+                        If lrFactTypeReading Is Nothing Then
+                            lrFactTypeReading = Me.FactTypeReading.Find(Function(x) x.IsPreferred = True)
+                        End If
                         If lrFactTypeReading Is Nothing Then lrFactTypeReading = Me.FactTypeReading(0)
 
                         lsName = Viev.Strings.MakeCapCamelCase(lrFactTypeReading.GetReadingText)

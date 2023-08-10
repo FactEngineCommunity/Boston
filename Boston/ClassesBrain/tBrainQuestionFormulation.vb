@@ -1375,7 +1375,7 @@ Partial Public Class tBrain
                                     lrStep)
 
             If abStraightToActionProcessing Then
-                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError) Then
+                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject) Then
                     Return False
                 End If
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then

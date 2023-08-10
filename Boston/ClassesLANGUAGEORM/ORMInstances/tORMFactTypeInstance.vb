@@ -1851,7 +1851,9 @@ ReattachRoles:
         Public Sub Selected()
 
             Try
-                Me.Shape.Pen.Color = Color.Blue
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Pen.Color = Color.Blue
+                End If
 
                 If IsSomething(Me.FactTable.TableShape) Then
                     If Me.FactTable.TableShape IsNot Nothing Then
@@ -1860,7 +1862,7 @@ ReattachRoles:
                     End If
                 End If
 
-                    If Me.IsLinkFactType Then
+                If Me.IsLinkFactType Then
                     If Me.LinkFactTypeRole IsNot Nothing Then
                         Try
                             Me.Page.RoleInstance.Find(Function(x) x.Id = Me.LinkFactTypeRole.Id).Shape.Brush =
@@ -1875,8 +1877,10 @@ ReattachRoles:
                 End If
 
                 For Each lrRoleInstance In Me.RoleGroup
-                    lrRoleInstance.Shape.Text = ""
-                    lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                    If lrRoleInstance.Shape IsNot Nothing Then
+                        lrRoleInstance.Shape.Text = ""
+                        lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                    End If
                 Next
 
             Catch ex As Exception

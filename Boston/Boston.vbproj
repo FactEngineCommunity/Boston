@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\PdfiumViewer.Native.x86_64.v8-xfa.2018.4.8.256\build\PdfiumViewer.Native.x86_64.v8-xfa.props" Condition="Exists('..\packages\PdfiumViewer.Native.x86_64.v8-xfa.2018.4.8.256\build\PdfiumViewer.Native.x86_64.v8-xfa.props')" />
   <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.props')" />
   <Import Project="..\packages\SQLite.3.13.0\build\net45\SQLite.props" Condition="Exists('..\packages\SQLite.3.13.0\build\net45\SQLite.props')" />
   <PropertyGroup>
@@ -393,6 +394,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\PdfExport.dll</HintPath>
     </Reference>
+    <Reference Include="PdfiumViewer, Version=2.13.0.0, Culture=neutral, PublicKeyToken=91e4789cfb0609e0, processorArchitecture=MSIL">
+      <HintPath>..\packages\PdfiumViewer.2.13.0.0\lib\net20\PdfiumViewer.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="protobuf-java-3.19.2, Version=3.19.2.0, Culture=neutral, processorArchitecture=MSIL">
@@ -678,6 +682,7 @@
     <Compile Include="ClassesFactEngine\tFEQLProcessorWHICHStatementProcessing.vb" />
     <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
     <Compile Include="ClassesFEKL\tFEKL4JSON.vb" />
+    <Compile Include="ClassesFEKL\tFEKLGPTKnowledgeExtractor.vb" />
     <Compile Include="ClassesGeneral\BostonTreeView.vb">
       <SubType>Component</SubType>
     </Compile>
@@ -1567,10 +1572,10 @@
     <Compile Include="Forms\CRUD\frmCRUDRoleInstance.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\CRUD\KeywordExtraction\frmKeywordExtraction.Designer.vb">
-      <DependentUpon>frmKeywordExtraction.vb</DependentUpon>
+    <Compile Include="Forms\CRUD\KeywordExtraction\frmKnowledgeExtraction.Designer.vb">
+      <DependentUpon>frmKnowledgeExtraction.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\CRUD\KeywordExtraction\frmKeywordExtraction.vb">
+    <Compile Include="Forms\CRUD\KeywordExtraction\frmKnowledgeExtraction.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\CRUD\KeywordExtraction\MyData.vb" />
@@ -1723,6 +1728,12 @@
       <DependentUpon>frmDocumentGeneratorSettings.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmDocumentGeneratorSettings.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmDocumentViewer.Designer.vb">
+      <DependentUpon>frmDocumentViewer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmDocumentViewer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\frmFlashCard.Designer.vb">
@@ -2551,8 +2562,8 @@
       <DependentUpon>frmCRUDRoleInstance.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CRUD\KeywordExtraction\frmKeywordExtraction.resx">
-      <DependentUpon>frmKeywordExtraction.vb</DependentUpon>
+    <EmbeddedResource Include="Forms\CRUD\KeywordExtraction\frmKnowledgeExtraction.resx">
+      <DependentUpon>frmKnowledgeExtraction.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CRUD\LANGUAGEERD\frmCRUDAddAttributeNew.resx">
       <DependentUpon>frmCRUDAddAttributeNew.vb</DependentUpon>
@@ -2653,6 +2664,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmDocumentGeneratorSettings.resx">
       <DependentUpon>frmDocumentGeneratorSettings.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmDocumentViewer.resx">
+      <DependentUpon>frmDocumentViewer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmFlashCard.resx">
       <DependentUpon>frmFlashCard.vb</DependentUpon>
@@ -2887,6 +2901,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <EmbeddedResource Include="ClassesFEKL\FEKLDataLineageSchemaDefinition.json" />
+    <EmbeddedResource Include="ClassesFEKL\FEKL-GPT-KnowledgeExtractionPrompts.json" />
     <None Include="ClassesLANGUAGENORMA\ClassesNORMA\NORMAXSD\DiagramDisplay.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -3941,6 +3956,7 @@
     <Error Condition="!Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets'))" />
     <Error Condition="!Exists('..\packages\Grpc.Core.2.40.0\build\net45\Grpc.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Grpc.Core.2.40.0\build\net45\Grpc.Core.targets'))" />
     <Error Condition="!Exists('..\packages\NAudio.Lame.2.1.0\build\NAudio.Lame.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NAudio.Lame.2.1.0\build\NAudio.Lame.targets'))" />
+    <Error Condition="!Exists('..\packages\PdfiumViewer.Native.x86_64.v8-xfa.2018.4.8.256\build\PdfiumViewer.Native.x86_64.v8-xfa.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PdfiumViewer.Native.x86_64.v8-xfa.2018.4.8.256\build\PdfiumViewer.Native.x86_64.v8-xfa.props'))" />
   </Target>
   <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" />
   <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.5\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />

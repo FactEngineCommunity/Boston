@@ -1774,7 +1774,7 @@ SkipRegistrationChecking:
 
     Public Sub LoadKeywordExtractionTool(ByRef arModel As FBM.Model)
 
-        Dim child As New frmKeywordExtraction
+        Dim child As New frmKnowledgeExtraction
 
         child.MdiParent = Me
 

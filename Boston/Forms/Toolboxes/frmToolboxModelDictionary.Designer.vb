@@ -28,6 +28,7 @@ Partial Class frmToolboxModelDictionary
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmToolboxModelDictionary))
         Me.GroupBox_Main = New System.Windows.Forms.GroupBox()
+        Me.SearchTextbox = New CustomSearchTextbox()
         Me.LabelPromptViewAs = New System.Windows.Forms.Label()
         Me.ComboBoxView = New System.Windows.Forms.ComboBox()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
@@ -55,7 +56,7 @@ Partial Class frmToolboxModelDictionary
         Me.ContextMenuStripGeneralConcept = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ConvertToEntityTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConvertToValueTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SearchTextbox = New CustomSearchTextbox()
+        Me.LineageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStripMain.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -84,6 +85,15 @@ Partial Class frmToolboxModelDictionary
         Me.GroupBox_Main.TabIndex = 0
         Me.GroupBox_Main.TabStop = False
         Me.GroupBox_Main.Text = "Model Dictionary:"
+        '
+        'SearchTextbox
+        '
+        Me.SearchTextbox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.SearchTextbox.Location = New System.Drawing.Point(3, 71)
+        Me.SearchTextbox.Name = "SearchTextbox"
+        Me.SearchTextbox.Size = New System.Drawing.Size(357, 26)
+        Me.SearchTextbox.TabIndex = 9
         '
         'LabelPromptViewAs
         '
@@ -203,9 +213,9 @@ Partial Class frmToolboxModelDictionary
         '
         'ContextMenuStripMain
         '
-        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1, Me.ToolStripMenuItemMakeMDAModelElement})
+        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1, Me.ToolStripMenuItemMakeMDAModelElement, Me.LineageToolStripMenuItem})
         Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
-        Me.ContextMenuStripMain.Size = New System.Drawing.Size(281, 158)
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(281, 202)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -316,14 +326,11 @@ Partial Class frmToolboxModelDictionary
         Me.ConvertToValueTypeToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
         Me.ConvertToValueTypeToolStripMenuItem.Text = "convert to &Value Type"
         '
-        'CustomSearchTextbox1
+        'LineageToolStripMenuItem
         '
-        Me.SearchTextbox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SearchTextbox.Location = New System.Drawing.Point(3, 71)
-        Me.SearchTextbox.Name = "CustomSearchTextbox1"
-        Me.SearchTextbox.Size = New System.Drawing.Size(357, 26)
-        Me.SearchTextbox.TabIndex = 9
+        Me.LineageToolStripMenuItem.Name = "LineageToolStripMenuItem"
+        Me.LineageToolStripMenuItem.Size = New System.Drawing.Size(280, 22)
+        Me.LineageToolStripMenuItem.Text = "&Lineage"
         '
         'frmToolboxModelDictionary
         '
@@ -375,4 +382,5 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents ConvertToValueTypeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripStatusLabelPromptModelElementCount As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabelModelElementCount As ToolStripStatusLabel
+    Friend WithEvents LineageToolStripMenuItem As ToolStripMenuItem
 End Class

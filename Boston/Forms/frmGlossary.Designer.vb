@@ -25,6 +25,7 @@ Partial Class frmGlossary
         Me.components = New System.ComponentModel.Container()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TextboxSearch = New CustomSearchTextbox()
+        Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.ButtonGenerateHTMLGlossary = New System.Windows.Forms.Button()
         Me.CheckBoxShowGeneralConcepts = New System.Windows.Forms.CheckBox()
         Me.LabelModelName = New System.Windows.Forms.Label()
@@ -32,24 +33,24 @@ Partial Class frmGlossary
         Me.ListBoxGlossary = New System.Windows.Forms.ListBox()
         Me.ContextMenuStripMain = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowInModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DataLineageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ToolStripMenuItemRemoveFromModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
+        Me.CopyToClipboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripDropDownButton2 = New System.Windows.Forms.ToolStripDropDownButton()
         Me.CheckBoxHideFadedFactTypeNamesVerbalisationView = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.SearchTextbox = New CustomSearchTextbox()
         Me.LabelModelElement = New System.Windows.Forms.Label()
+        Me.ButtonViewLineage = New System.Windows.Forms.Button()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
-        Me.ButtonRefresh = New System.Windows.Forms.Button()
-        Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ShowInModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.DataLineageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemRemoveFromModel = New System.Windows.Forms.ToolStripMenuItem()
-        Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
-        Me.CopyToClipboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripDropDownButton2 = New System.Windows.Forms.ToolStripDropDownButton()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -82,7 +83,7 @@ Partial Class frmGlossary
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.SplitContainer2)
-        Me.SplitContainer1.Size = New System.Drawing.Size(966, 574)
+        Me.SplitContainer1.Size = New System.Drawing.Size(972, 589)
         Me.SplitContainer1.SplitterDistance = 289
         Me.SplitContainer1.TabIndex = 0
         '
@@ -95,10 +96,19 @@ Partial Class frmGlossary
         Me.TextboxSearch.Size = New System.Drawing.Size(195, 26)
         Me.TextboxSearch.TabIndex = 10
         '
+        'ButtonRefresh
+        '
+        Me.ButtonRefresh.Image = Global.Boston.My.Resources.MenuImages.Refresh_16x16
+        Me.ButtonRefresh.Location = New System.Drawing.Point(213, 43)
+        Me.ButtonRefresh.Name = "ButtonRefresh"
+        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
+        Me.ButtonRefresh.TabIndex = 6
+        Me.ButtonRefresh.UseVisualStyleBackColor = True
+        '
         'ButtonGenerateHTMLGlossary
         '
         Me.ButtonGenerateHTMLGlossary.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.ButtonGenerateHTMLGlossary.Location = New System.Drawing.Point(12, 539)
+        Me.ButtonGenerateHTMLGlossary.Location = New System.Drawing.Point(12, 554)
         Me.ButtonGenerateHTMLGlossary.Name = "ButtonGenerateHTMLGlossary"
         Me.ButtonGenerateHTMLGlossary.Size = New System.Drawing.Size(141, 23)
         Me.ButtonGenerateHTMLGlossary.TabIndex = 5
@@ -143,7 +153,7 @@ Partial Class frmGlossary
         Me.ListBoxGlossary.FormattingEnabled = True
         Me.ListBoxGlossary.Location = New System.Drawing.Point(12, 95)
         Me.ListBoxGlossary.Name = "ListBoxGlossary"
-        Me.ListBoxGlossary.Size = New System.Drawing.Size(262, 433)
+        Me.ListBoxGlossary.Size = New System.Drawing.Size(262, 446)
         Me.ListBoxGlossary.Sorted = True
         Me.ListBoxGlossary.TabIndex = 0
         '
@@ -151,114 +161,13 @@ Partial Class frmGlossary
         '
         Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ShowInModelDictionaryToolStripMenuItem, Me.DataLineageToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripSeparator2, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
-        Me.ContextMenuStripMain.Size = New System.Drawing.Size(211, 170)
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(211, 148)
         '
         'ToolStripMenuItemViewOnPage
         '
         Me.ToolStripMenuItemViewOnPage.Name = "ToolStripMenuItemViewOnPage"
         Me.ToolStripMenuItemViewOnPage.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemViewOnPage.Text = "&View on Page..."
-        '
-        'ToolStripSeparator1
-        '
-        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(207, 6)
-        '
-        'ToolStripSeparator2
-        '
-        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(207, 6)
-        '
-        'SplitContainer2
-        '
-        Me.SplitContainer2.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer2.Location = New System.Drawing.Point(0, 0)
-        Me.SplitContainer2.Name = "SplitContainer2"
-        Me.SplitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal
-        '
-        'SplitContainer2.Panel1
-        '
-        Me.SplitContainer2.Panel1.Controls.Add(Me.StatusStrip1)
-        Me.SplitContainer2.Panel1.Controls.Add(Me.CheckBoxHideFadedFactTypeNamesVerbalisationView)
-        Me.SplitContainer2.Panel1.Controls.Add(Me.TableLayoutPanel1)
-        Me.SplitContainer2.Panel1.Controls.Add(Me.WebBrowser)
-        Me.SplitContainer2.Size = New System.Drawing.Size(673, 574)
-        Me.SplitContainer2.SplitterDistance = 358
-        Me.SplitContainer2.TabIndex = 0
-        '
-        'StatusStrip1
-        '
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripDropDownButton1, Me.ToolStripDropDownButton2})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 336)
-        Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(673, 22)
-        Me.StatusStrip1.TabIndex = 8
-        Me.StatusStrip1.Text = "StatusStrip1"
-        '
-        'CheckBoxHideFadedFactTypeNamesVerbalisationView
-        '
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.AutoSize = True
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.BackColor = System.Drawing.Color.Transparent
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.ForeColor = System.Drawing.Color.DarkGray
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Location = New System.Drawing.Point(502, 316)
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Name = "CheckBoxHideFadedFactTypeNamesVerbalisationView"
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Size = New System.Drawing.Size(168, 17)
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.TabIndex = 7
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Text = "Hide Faded Fact Type Names"
-        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.UseVisualStyleBackColor = False
-        '
-        'TableLayoutPanel1
-        '
-        Me.TableLayoutPanel1.AutoSize = True
-        Me.TableLayoutPanel1.ColumnCount = 2
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Controls.Add(Me.SearchTextbox, 1, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.LabelModelElement, 0, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(3, 3)
-        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-        Me.TableLayoutPanel1.RowCount = 1
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(498, 36)
-        Me.TableLayoutPanel1.TabIndex = 10
-        '
-        'SearchTextbox
-        '
-        Me.SearchTextbox.Location = New System.Drawing.Point(109, 3)
-        Me.SearchTextbox.Name = "SearchTextbox"
-        Me.SearchTextbox.Size = New System.Drawing.Size(243, 26)
-        Me.SearchTextbox.TabIndex = 9
-        '
-        'LabelModelElement
-        '
-        Me.LabelModelElement.Anchor = System.Windows.Forms.AnchorStyles.Left
-        Me.LabelModelElement.AutoSize = True
-        Me.LabelModelElement.Location = New System.Drawing.Point(3, 11)
-        Me.LabelModelElement.Name = "LabelModelElement"
-        Me.LabelModelElement.Size = New System.Drawing.Size(100, 13)
-        Me.LabelModelElement.TabIndex = 10
-        Me.LabelModelElement.Text = "LabelModelElement"
-        '
-        'WebBrowser
-        '
-        Me.WebBrowser.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.WebBrowser.Location = New System.Drawing.Point(0, 38)
-        Me.WebBrowser.MinimumSize = New System.Drawing.Size(20, 20)
-        Me.WebBrowser.Name = "WebBrowser"
-        Me.WebBrowser.Size = New System.Drawing.Size(670, 320)
-        Me.WebBrowser.TabIndex = 2
-        '
-        'ButtonRefresh
-        '
-        Me.ButtonRefresh.Image = Global.Boston.My.Resources.MenuImages.Refresh_16x16
-        Me.ButtonRefresh.Location = New System.Drawing.Point(213, 43)
-        Me.ButtonRefresh.Name = "ButtonRefresh"
-        Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
-        Me.ButtonRefresh.TabIndex = 6
-        Me.ButtonRefresh.UseVisualStyleBackColor = True
         '
         'ToolStripMenuItemViewInDiagramSpy
         '
@@ -281,6 +190,11 @@ Partial Class frmGlossary
         Me.DataLineageToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
         Me.DataLineageToolStripMenuItem.Text = "&Lineage"
         '
+        'ToolStripSeparator1
+        '
+        Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(207, 6)
+        '
         'ToolStripMenuItemRemoveFromModel
         '
         Me.ToolStripMenuItemRemoveFromModel.Image = Global.Boston.My.Resources.MenuImages.Remove16x16
@@ -288,12 +202,43 @@ Partial Class frmGlossary
         Me.ToolStripMenuItemRemoveFromModel.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemRemoveFromModel.Text = "&Remove From Model"
         '
+        'ToolStripSeparator2
+        '
+        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(207, 6)
+        '
         'PropertiesToolStripMenuItem1
         '
         Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
         Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
         Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(210, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
+        '
+        'SplitContainer2
+        '
+        Me.SplitContainer2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.SplitContainer2.Location = New System.Drawing.Point(0, 0)
+        Me.SplitContainer2.Name = "SplitContainer2"
+        Me.SplitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'SplitContainer2.Panel1
+        '
+        Me.SplitContainer2.Panel1.Controls.Add(Me.StatusStrip1)
+        Me.SplitContainer2.Panel1.Controls.Add(Me.CheckBoxHideFadedFactTypeNamesVerbalisationView)
+        Me.SplitContainer2.Panel1.Controls.Add(Me.TableLayoutPanel1)
+        Me.SplitContainer2.Panel1.Controls.Add(Me.WebBrowser)
+        Me.SplitContainer2.Size = New System.Drawing.Size(679, 589)
+        Me.SplitContainer2.SplitterDistance = 367
+        Me.SplitContainer2.TabIndex = 0
+        '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripDropDownButton1, Me.ToolStripDropDownButton2})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 345)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(679, 22)
+        Me.StatusStrip1.TabIndex = 8
+        Me.StatusStrip1.Text = "StatusStrip1"
         '
         'ToolStripDropDownButton1
         '
@@ -320,11 +265,79 @@ Partial Class frmGlossary
         Me.ToolStripDropDownButton2.Size = New System.Drawing.Size(29, 20)
         Me.ToolStripDropDownButton2.Text = "ToolStripDropDownButton2"
         '
+        'CheckBoxHideFadedFactTypeNamesVerbalisationView
+        '
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.AutoSize = True
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.BackColor = System.Drawing.Color.Transparent
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.ForeColor = System.Drawing.Color.DarkGray
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Location = New System.Drawing.Point(508, 325)
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Name = "CheckBoxHideFadedFactTypeNamesVerbalisationView"
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Size = New System.Drawing.Size(168, 17)
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.TabIndex = 7
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.Text = "Hide Faded Fact Type Names"
+        Me.CheckBoxHideFadedFactTypeNamesVerbalisationView.UseVisualStyleBackColor = False
+        '
+        'TableLayoutPanel1
+        '
+        Me.TableLayoutPanel1.AutoSize = True
+        Me.TableLayoutPanel1.ColumnCount = 3
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 126.0!))
+        Me.TableLayoutPanel1.Controls.Add(Me.SearchTextbox, 1, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.LabelModelElement, 0, 0)
+        Me.TableLayoutPanel1.Controls.Add(Me.ButtonViewLineage, 2, 0)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(3, 3)
+        Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
+        Me.TableLayoutPanel1.RowCount = 1
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(542, 36)
+        Me.TableLayoutPanel1.TabIndex = 10
+        '
+        'SearchTextbox
+        '
+        Me.SearchTextbox.Location = New System.Drawing.Point(109, 3)
+        Me.SearchTextbox.Name = "SearchTextbox"
+        Me.SearchTextbox.Size = New System.Drawing.Size(243, 26)
+        Me.SearchTextbox.TabIndex = 9
+        '
+        'LabelModelElement
+        '
+        Me.LabelModelElement.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.LabelModelElement.AutoSize = True
+        Me.LabelModelElement.Location = New System.Drawing.Point(3, 11)
+        Me.LabelModelElement.Name = "LabelModelElement"
+        Me.LabelModelElement.Size = New System.Drawing.Size(100, 13)
+        Me.LabelModelElement.TabIndex = 10
+        Me.LabelModelElement.Text = "LabelModelElement"
+        '
+        'ButtonViewLineage
+        '
+        Me.ButtonViewLineage.Location = New System.Drawing.Point(419, 3)
+        Me.ButtonViewLineage.Name = "ButtonViewLineage"
+        Me.ButtonViewLineage.Size = New System.Drawing.Size(83, 23)
+        Me.ButtonViewLineage.TabIndex = 11
+        Me.ButtonViewLineage.Text = "View &Lineage"
+        Me.ButtonViewLineage.UseVisualStyleBackColor = True
+        Me.ButtonViewLineage.Visible = False
+        '
+        'WebBrowser
+        '
+        Me.WebBrowser.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.WebBrowser.Location = New System.Drawing.Point(0, 38)
+        Me.WebBrowser.MinimumSize = New System.Drawing.Size(20, 20)
+        Me.WebBrowser.Name = "WebBrowser"
+        Me.WebBrowser.Size = New System.Drawing.Size(676, 329)
+        Me.WebBrowser.TabIndex = 2
+        '
         'frmGlossary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(966, 574)
+        Me.ClientSize = New System.Drawing.Size(972, 589)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Name = "frmGlossary"
         Me.TabText = "Glossary"
@@ -373,4 +386,5 @@ Partial Class frmGlossary
     Friend WithEvents LabelModelElement As Label
     Friend WithEvents ToolStripDropDownButton2 As ToolStripDropDownButton
     Friend WithEvents DataLineageToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ButtonViewLineage As Button
 End Class

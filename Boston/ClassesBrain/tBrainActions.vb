@@ -685,6 +685,17 @@ Partial Public Class tBrain
             Dim lrConcept As New FBM.Concept(lsConceptName)
             Dim lrDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.GeneralConcept)
 
+#Region "Metadata Lineage"
+            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+            If arFEKLLineageObject IsNot Nothing Then
+
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsConceptName & " - Object Type")
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+
+            End If
+#End Region
+
             If Me.Model.ExistsModelElement(lrConcept.Symbol) Then
                 arDSCError.Success = False
                 arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
@@ -804,7 +815,8 @@ Partial Public Class tBrain
     Private Function executeStatementAddFactType(ByRef arQuestion As tQuestion,
                                                  Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                  Optional abStraightToActionProcessing As Boolean = False,
-                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                 Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lrResolvedWord As Language.WordResolved
@@ -907,6 +919,17 @@ ModelElementFound:
             '  which also broadcasts the event if in Client/Server mode. The below just creates the FactType ready for adding to the Model.
             lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , False,,, abBroadcastInterfaceEvent)
 
+#Region "Metadata Lineage"
+            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+            If arFEKLLineageObject IsNot Nothing Then
+
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsFactTypeName & " - Object Type")
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+
+            End If
+#End Region
+
             Dim larRole As New List(Of FBM.Role)
 
             For Each lrRole In lrFactType.RoleGroup
@@ -934,6 +957,7 @@ ModelElementFound:
 #End Region
 
             Call Me.Model.AddFactType(lrFactType, abBroadcastInterfaceEvent)
+
 
             '====================================================================
             'Check to see that the FactType doesn't clash with another FactType
@@ -1099,7 +1123,8 @@ EndProcessing:
     ''' <remarks></remarks>
     Private Function executeStatementAddFactTypePredetermined(ByRef arQuestion As tQuestion,
                                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                              Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+                                                              Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                              Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lsResolvedModelElementName As String
@@ -1166,6 +1191,19 @@ EndProcessing:
 
             Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, arQuestion.sentence)
 
+            Dim lsNewFactTypeName = lrFactType.MakeNameFromFactTypeReadings(lrFactTypeReading)
+
+#Region "Metadata Lineage"
+            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+            If arFEKLLineageObject IsNot Nothing Then
+
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsNewFactTypeName & " - Fact Type")
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+
+            End If
+#End Region
+
             Dim larFactTypeReading = From FactType In Me.Model.FactType
                                      From FactTypeReading In FactType.FactTypeReading
                                      Where FactTypeReading.EqualsByPredicatePartTextModelElements(lrFactTypeReading)
@@ -1181,7 +1219,7 @@ EndProcessing:
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, abBroadcastInterfaceEvent)
 
             If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
-                lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, abBroadcastInterfaceEvent)
+                lrFactType.setName(lsNewFactTypeName, abBroadcastInterfaceEvent)
             End If
 
             Call Me.Model.AddFactType(lrFactType)
@@ -1468,63 +1506,9 @@ EndProcessing:
                 If arFEKLLineageObject IsNot Nothing Then
 
                     Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsEntityTypeName & " - Object Type")
-                    'Lineage Category
-                    Dim lrDataLineageCategory = New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1)
-                    lrDataLineageItem.DataLineageCategory = lrDataLineageCategory
+                    Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
 
-                    'Lineage Property/ies
-                    Dim liLineageSetNumber = tableDataLineageItemProperty.getHighestLineageSetNrForDataLineageItemCategory(Me.Model,
-                                                                                                                           lrDataLineageItem.Name,
-                                                                                                                           lrDataLineageCategory.Name)
-
-                    liLineageSetNumber += 1
-
-                    'Document Name
-                    Dim lrDataLineageProperty As New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Specification Document Name", arFEKLLineageObject.DocumentName, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'Document Location
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Document Location", arFEKLLineageObject.DocumentLocation, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'Document Location JSON
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Document Location JSON", arFEKLLineageObject.DocumentLocationJson, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'Page Number
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Page Number", arFEKLLineageObject.PageNumber, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'Line Number
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Line Number", arFEKLLineageObject.LineNumber, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'Section Id
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Section Id", arFEKLLineageObject.SectionId, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'Section Name
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Section Name", arFEKLLineageObject.SectionName, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'Requirement Id
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Requirement Id", arFEKLLineageObject.RequirementId, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'Start Offset
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "Start Offset", arFEKLLineageObject.StartOffset, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-                    'End Offset
-                    lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, lrDataLineageItem.Name, "End Offset", arFEKLLineageObject.EndOffset, liLineageSetNumber)
-                    lrDataLineageProperty.Category = lrDataLineageItem.DataLineageCategory.Name
-                    lrDataLineageItem.DataLineageItemProperty.Add(lrDataLineageProperty)
-
-                    For Each lrDataLineageProperty In lrDataLineageItem.DataLineageItemProperty
-                        Call lrDataLineageProperty.Save(False)
-                    Next
                 End If
-SkipLineage:
 #End Region
 
                 If Me.Model.ExistsModelElement(lsEntityTypeName) Then
@@ -1954,6 +1938,17 @@ SkipLineage:
                 Me.Timeout.Stop()
 
                 Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ISAVALUETYPEStatement.MODELELEMENTNAME))
+
+#Region "Metadata Lineage"
+                'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+                '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+                If arFEKLLineageObject IsNot Nothing Then
+
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsValueTypeName & " - Object Type")
+                    Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+
+                End If
+#End Region
 
                 If Me.Model.ExistsModelElement(lsValueTypeName) Then
                     lsMessage = "There is already a Model Element with the name, '" & lsValueTypeName & "'. Try another name"

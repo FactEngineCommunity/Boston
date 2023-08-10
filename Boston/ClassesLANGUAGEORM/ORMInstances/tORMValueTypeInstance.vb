@@ -1266,10 +1266,12 @@ RemoveAnyway:
             If aiNewX < 0 Then aiNewX = 0
             If aiNewY < 0 Then aiNewY = 0
 
-            Me.Shape.Move(aiNewX, aiNewY)
-
             Me.X = aiNewX
             Me.Y = aiNewY
+
+            If Me.Shape IsNot Nothing Then
+                Me.Shape.Move(aiNewX, aiNewY)
+            End If
 
             '==============================================================================
             'Client/Server: Broadcast the moving of the Object

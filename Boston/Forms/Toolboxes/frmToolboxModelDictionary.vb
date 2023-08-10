@@ -154,10 +154,10 @@ Public Class frmToolboxModelDictionary
                 loNode = Me.TreeView1.Nodes("Entity").Nodes.Add("Entity" & lrEntity.Name, lrEntity.Name, 0, 0)
                 loNode.Tag = lrEntity
 
-                For Each lrAttribute In lrEntity.Column
-                    Dim liImageInd = Boston.returnIfTrue(lrAttribute.isPartOfPrimaryKey, 27, 14)
-                    loColumnNode = loNode.Nodes.Add("Attribute" & lrAttribute.Name, lrAttribute.Name, liImageInd, liImageInd)
-                    loColumnNode.Tag = lrAttribute
+                For Each lrColumn In lrEntity.Column
+                    Dim liImageInd = Boston.returnIfTrue(lrColumn.isPartOfPrimaryKey, 27, 14)
+                    loColumnNode = loNode.Nodes.Add("Attribute" & lrColumn.Name, lrColumn.Name, liImageInd, liImageInd)
+                    loColumnNode.Tag = lrColumn
                 Next
 
             Next
@@ -1795,4 +1795,34 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
+    Private Sub LineageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LineageToolStripMenuItem.Click
+
+        Try
+            Dim lrModelObject As FBM.ModelObject = Nothing
+
+            If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
+
+            Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                Case Is = GetType(RDS.Table)
+                    Dim lrTable As RDS.Table = Me.TreeView1.SelectedNode.Tag
+                    lrModelObject = lrTable.FBMModelElement
+                Case Is = GetType(RDS.Column)
+                    Dim lrColumn As RDS.Column = Me.TreeView1.SelectedNode.Tag
+                    lrModelObject = lrColumn.FactType
+                Case Else
+                    lrModelObject = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+            End Select
+
+            Call frmMain.LoadDataLineageForm(lrModelObject)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
 End Class

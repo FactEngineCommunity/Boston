@@ -36,9 +36,14 @@ Public Class frmDataLineage
             If Me.mrModelElement IsNot Nothing Then
                 Select Case Me.mrModelElement.GetType
                     Case Is = GetType(FBM.ValueType),
-                                      GetType(FBM.EntityType),
-                                      GetType(FBM.FactType)
+                                      GetType(FBM.EntityType)
                         Me.msDataLineageItemName = Me.mrModelElement.Id & " - Object Type"
+                    Case Is = GetType(FBM.FactType)
+                        If CType(Me.mrModelElement, FBM.FactType).IsObjectified Then
+                            Me.msDataLineageItemName = Me.mrModelElement.Id & " - Object Type"
+                        Else
+                            Me.msDataLineageItemName = Me.mrModelElement.Id & " - Fact Type"
+                        End If
                 End Select
             End If
 
@@ -51,6 +56,8 @@ Public Class frmDataLineage
             '==========================================================
             'Load the Properties
             Call Me.LoadProperties(True)
+
+            Me.ButtonClose.Focus()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -174,6 +181,7 @@ Public Class frmDataLineage
                         loTextField.Tag = lrDataLineageItemProperty
                         lrDataLineageItemProperty.Control = loTextField
                         loTextField.Text = lrDataLineageItemProperty.Property
+                        loTextField.SelectionLength = 0
 #End Region
 EndTextboxSetup:
 
@@ -311,9 +319,12 @@ EndTextboxSetup:
                 loTextField = loGroupBox.Controls.Find(lrDataLineageItemProperty.Category & lrDataLineageItemProperty.PropertyType, False)(0)
                 lrDataLineageItemProperty.Control = loTextField
                 loTextField.Text = lrDataLineageItemProperty.Property
+                loTextField.SelectionStart = 0
+                loTextField.SelectionLength = 0
             Next
 #End Region
-
+            Me.ButtonSave.TabStop = 0
+            Me.ButtonSave.Focus()
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -386,4 +397,39 @@ EndTextboxSetup:
         End Try
 
     End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+        Try
+            Dim lfrmDocumentViewer As New frmPDFDocumentViewer
+
+            Dim larLineageProperty As List(Of DataLineage.DataLineageItemProperty) = Me.BindingSourceLineageProperty.Current
+
+            lfrmDocumentViewer.msDocumentFilePath = larLineageProperty.Find(Function(x) x.PropertyType = "Document Location").Property
+
+            Dim liPageNumber As Integer = 0
+            If Integer.TryParse(larLineageProperty.Find(Function(x) x.PropertyType = "Page Number").Property, liPageNumber) Then
+                lfrmDocumentViewer.miPageNumber = liPageNumber
+            End If
+
+            lfrmDocumentViewer.msObjectTypeName = Me.mrModelElement.Id
+
+
+            Dim lfrmMain As frmMain = Me.MdiParent
+
+            With New WaitCursor
+                lfrmDocumentViewer.Show(lfrmMain.DockPanel)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

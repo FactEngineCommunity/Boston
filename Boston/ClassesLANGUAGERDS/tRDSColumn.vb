@@ -161,6 +161,9 @@ Namespace RDS
         '<XmlAttribute()> _
         'Public ContributesToPrimaryKey As Boolean = False
 
+        <XmlIgnore()>
+        <NonSerialized()>
+        Private _FactType As FBM.FactType = Nothing
         'CrossLayer Members
         ''' <summary>
         ''' The FactType (usually Binary) that is responsible for this Column within the Model from which this 
@@ -168,8 +171,25 @@ Namespace RDS
         ''' </summary>
         ''' <remarks></remarks>        
         <XmlIgnore()>
-        <NonSerialized()>
-        Public FactType As FBM.FactType
+        Public Property FactType As FBM.FactType
+            Get
+                If Me._FactType Is Nothing Then
+                    If Me.ActiveRole IsNot Nothing _
+                        AndAlso Me.ActiveRole.FactType.Arity = 2 _
+                        AndAlso Me.Role.FactType.Arity = 2 _
+                        AndAlso Me.ActiveRole.FactType.Id = Me.Role.FactType.Id Then
+                        Return Me.Role.FactType
+                    Else
+                        Return Nothing
+                    End If
+                Else
+                    Return Me._FactType
+                End If
+            End Get
+            Set(value As FBM.FactType)
+                Me._FactType = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' The Role that was responsible for the derivation of the Column.

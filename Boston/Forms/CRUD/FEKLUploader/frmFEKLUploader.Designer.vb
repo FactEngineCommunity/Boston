@@ -80,7 +80,7 @@ Partial Class frmFEKLUploader
         Me.GroupBox.Controls.Add(Me.LabelPromptModelName)
         Me.GroupBox.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox.Name = "GroupBox"
-        Me.GroupBox.Size = New System.Drawing.Size(509, 544)
+        Me.GroupBox.Size = New System.Drawing.Size(469, 544)
         Me.GroupBox.TabIndex = 0
         Me.GroupBox.TabStop = False
         '
@@ -95,7 +95,7 @@ Partial Class frmFEKLUploader
         Me.TabControl1.Location = New System.Drawing.Point(6, 49)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(494, 485)
+        Me.TabControl1.Size = New System.Drawing.Size(454, 485)
         Me.TabControl1.TabIndex = 10
         '
         'TabPageFEKLJSON
@@ -111,7 +111,7 @@ Partial Class frmFEKLUploader
         Me.TabPageFEKLJSON.Controls.Add(Me.ButtonOpenFEKLJSONFile)
         Me.TabPageFEKLJSON.Location = New System.Drawing.Point(4, 22)
         Me.TabPageFEKLJSON.Name = "TabPageFEKLJSON"
-        Me.TabPageFEKLJSON.Size = New System.Drawing.Size(486, 459)
+        Me.TabPageFEKLJSON.Size = New System.Drawing.Size(446, 459)
         Me.TabPageFEKLJSON.TabIndex = 2
         Me.TabPageFEKLJSON.Text = "FEKL JSON"
         Me.TabPageFEKLJSON.UseVisualStyleBackColor = True
@@ -123,7 +123,7 @@ Partial Class frmFEKLUploader
         Me.Panel1.Controls.Add(Me.ButtonStopContinueProcessing)
         Me.Panel1.Location = New System.Drawing.Point(201, 15)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(157, 25)
+        Me.Panel1.Size = New System.Drawing.Size(117, 25)
         Me.Panel1.TabIndex = 15
         '
         'ButtonStopContinueProcessing
@@ -211,7 +211,7 @@ Partial Class frmFEKLUploader
         Me.DataGridViewFEKLStatements.ContextMenuStrip = Me.ContextMenuStripGrid
         Me.DataGridViewFEKLStatements.Location = New System.Drawing.Point(17, 82)
         Me.DataGridViewFEKLStatements.Name = "DataGridViewFEKLStatements"
-        Me.DataGridViewFEKLStatements.Size = New System.Drawing.Size(451, 298)
+        Me.DataGridViewFEKLStatements.Size = New System.Drawing.Size(411, 298)
         Me.DataGridViewFEKLStatements.TabIndex = 4
         '
         'ContextMenuStripGrid
@@ -412,7 +412,7 @@ Partial Class frmFEKLUploader
         'ButtonClose
         '
         Me.ButtonClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonClose.Location = New System.Drawing.Point(531, 22)
+        Me.ButtonClose.Location = New System.Drawing.Point(491, 22)
         Me.ButtonClose.Name = "ButtonClose"
         Me.ButtonClose.Size = New System.Drawing.Size(73, 23)
         Me.ButtonClose.TabIndex = 1
@@ -423,7 +423,7 @@ Partial Class frmFEKLUploader
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(616, 558)
+        Me.ClientSize = New System.Drawing.Size(576, 558)
         Me.Controls.Add(Me.ButtonClose)
         Me.Controls.Add(Me.GroupBox)
         Me.Name = "frmFEKLUploader"

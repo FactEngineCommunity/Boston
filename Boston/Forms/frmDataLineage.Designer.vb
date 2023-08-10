@@ -30,18 +30,19 @@ Partial Class frmDataLineage
         Me.ButtonSave = New System.Windows.Forms.Button()
         Me.ButtonClose = New System.Windows.Forms.Button()
         Me.BindingNavigatorLineageProperty = New System.Windows.Forms.BindingNavigator(Me.components)
-        Me.BindingNavigatorCountItem = New System.Windows.Forms.ToolStripLabel()
-        Me.BindingNavigatorSeparator = New System.Windows.Forms.ToolStripSeparator()
-        Me.BindingNavigatorPositionItem = New System.Windows.Forms.ToolStripTextBox()
-        Me.BindingNavigatorSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-        Me.BindingNavigatorSeparator2 = New System.Windows.Forms.ToolStripSeparator()
         Me.BindingNavigatorAddNewItem = New System.Windows.Forms.ToolStripButton()
         Me.BindingSourceLineageProperty = New System.Windows.Forms.BindingSource(Me.components)
+        Me.BindingNavigatorCountItem = New System.Windows.Forms.ToolStripLabel()
         Me.BindingNavigatorDeleteItem = New System.Windows.Forms.ToolStripButton()
         Me.BindingNavigatorMoveFirstItem = New System.Windows.Forms.ToolStripButton()
         Me.BindingNavigatorMovePreviousItem = New System.Windows.Forms.ToolStripButton()
+        Me.BindingNavigatorSeparator = New System.Windows.Forms.ToolStripSeparator()
+        Me.BindingNavigatorPositionItem = New System.Windows.Forms.ToolStripTextBox()
+        Me.BindingNavigatorSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.BindingNavigatorMoveNextItem = New System.Windows.Forms.ToolStripButton()
         Me.BindingNavigatorMoveLastItem = New System.Windows.Forms.ToolStripButton()
+        Me.BindingNavigatorSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.Button1 = New System.Windows.Forms.Button()
         CType(Me.BindingNavigatorLineageProperty, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BindingNavigatorLineageProperty.SuspendLayout()
         CType(Me.BindingSourceLineageProperty, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -54,9 +55,9 @@ Partial Class frmDataLineage
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBoxCategories.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupBoxCategories.ForeColor = System.Drawing.Color.Gray
-        Me.GroupBoxCategories.Location = New System.Drawing.Point(12, 85)
+        Me.GroupBoxCategories.Location = New System.Drawing.Point(12, 109)
         Me.GroupBoxCategories.Name = "GroupBoxCategories"
-        Me.GroupBoxCategories.Size = New System.Drawing.Size(1036, 520)
+        Me.GroupBoxCategories.Size = New System.Drawing.Size(1036, 496)
         Me.GroupBoxCategories.TabIndex = 0
         Me.GroupBoxCategories.TabStop = False
         Me.GroupBoxCategories.Text = "Lineage Categories:"
@@ -84,7 +85,7 @@ Partial Class frmDataLineage
         '
         'ButtonSave
         '
-        Me.ButtonSave.Location = New System.Drawing.Point(15, 56)
+        Me.ButtonSave.Location = New System.Drawing.Point(15, 67)
         Me.ButtonSave.Name = "ButtonSave"
         Me.ButtonSave.Size = New System.Drawing.Size(75, 23)
         Me.ButtonSave.TabIndex = 3
@@ -93,7 +94,7 @@ Partial Class frmDataLineage
         '
         'ButtonClose
         '
-        Me.ButtonClose.Location = New System.Drawing.Point(96, 56)
+        Me.ButtonClose.Location = New System.Drawing.Point(96, 67)
         Me.ButtonClose.Name = "ButtonClose"
         Me.ButtonClose.Size = New System.Drawing.Size(75, 23)
         Me.ButtonClose.TabIndex = 4
@@ -108,48 +109,16 @@ Partial Class frmDataLineage
         Me.BindingNavigatorLineageProperty.DeleteItem = Me.BindingNavigatorDeleteItem
         Me.BindingNavigatorLineageProperty.Dock = System.Windows.Forms.DockStyle.None
         Me.BindingNavigatorLineageProperty.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BindingNavigatorMoveFirstItem, Me.BindingNavigatorMovePreviousItem, Me.BindingNavigatorSeparator, Me.BindingNavigatorPositionItem, Me.BindingNavigatorCountItem, Me.BindingNavigatorSeparator1, Me.BindingNavigatorMoveNextItem, Me.BindingNavigatorMoveLastItem, Me.BindingNavigatorSeparator2, Me.BindingNavigatorAddNewItem, Me.BindingNavigatorDeleteItem})
-        Me.BindingNavigatorLineageProperty.Location = New System.Drawing.Point(248, 56)
+        Me.BindingNavigatorLineageProperty.Location = New System.Drawing.Point(216, 67)
         Me.BindingNavigatorLineageProperty.MoveFirstItem = Me.BindingNavigatorMoveFirstItem
         Me.BindingNavigatorLineageProperty.MoveLastItem = Me.BindingNavigatorMoveLastItem
         Me.BindingNavigatorLineageProperty.MoveNextItem = Me.BindingNavigatorMoveNextItem
         Me.BindingNavigatorLineageProperty.MovePreviousItem = Me.BindingNavigatorMovePreviousItem
         Me.BindingNavigatorLineageProperty.Name = "BindingNavigatorLineageProperty"
         Me.BindingNavigatorLineageProperty.PositionItem = Me.BindingNavigatorPositionItem
-        Me.BindingNavigatorLineageProperty.Size = New System.Drawing.Size(286, 25)
+        Me.BindingNavigatorLineageProperty.Size = New System.Drawing.Size(255, 25)
         Me.BindingNavigatorLineageProperty.TabIndex = 5
         Me.BindingNavigatorLineageProperty.Text = "BindingNavigator1"
-        '
-        'BindingNavigatorCountItem
-        '
-        Me.BindingNavigatorCountItem.Name = "BindingNavigatorCountItem"
-        Me.BindingNavigatorCountItem.Size = New System.Drawing.Size(35, 22)
-        Me.BindingNavigatorCountItem.Text = "of {0}"
-        Me.BindingNavigatorCountItem.ToolTipText = "Total number of items"
-        '
-        'BindingNavigatorSeparator
-        '
-        Me.BindingNavigatorSeparator.Name = "BindingNavigatorSeparator"
-        Me.BindingNavigatorSeparator.Size = New System.Drawing.Size(6, 25)
-        '
-        'BindingNavigatorPositionItem
-        '
-        Me.BindingNavigatorPositionItem.AccessibleName = "Position"
-        Me.BindingNavigatorPositionItem.AutoSize = False
-        Me.BindingNavigatorPositionItem.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.BindingNavigatorPositionItem.Name = "BindingNavigatorPositionItem"
-        Me.BindingNavigatorPositionItem.Size = New System.Drawing.Size(50, 23)
-        Me.BindingNavigatorPositionItem.Text = "0"
-        Me.BindingNavigatorPositionItem.ToolTipText = "Current position"
-        '
-        'BindingNavigatorSeparator1
-        '
-        Me.BindingNavigatorSeparator1.Name = "BindingNavigatorSeparator1"
-        Me.BindingNavigatorSeparator1.Size = New System.Drawing.Size(6, 25)
-        '
-        'BindingNavigatorSeparator2
-        '
-        Me.BindingNavigatorSeparator2.Name = "BindingNavigatorSeparator2"
-        Me.BindingNavigatorSeparator2.Size = New System.Drawing.Size(6, 25)
         '
         'BindingNavigatorAddNewItem
         '
@@ -159,6 +128,13 @@ Partial Class frmDataLineage
         Me.BindingNavigatorAddNewItem.RightToLeftAutoMirrorImage = True
         Me.BindingNavigatorAddNewItem.Size = New System.Drawing.Size(23, 22)
         Me.BindingNavigatorAddNewItem.Text = "Add new"
+        '
+        'BindingNavigatorCountItem
+        '
+        Me.BindingNavigatorCountItem.Name = "BindingNavigatorCountItem"
+        Me.BindingNavigatorCountItem.Size = New System.Drawing.Size(35, 22)
+        Me.BindingNavigatorCountItem.Text = "of {0}"
+        Me.BindingNavigatorCountItem.ToolTipText = "Total number of items"
         '
         'BindingNavigatorDeleteItem
         '
@@ -187,6 +163,26 @@ Partial Class frmDataLineage
         Me.BindingNavigatorMovePreviousItem.Size = New System.Drawing.Size(23, 22)
         Me.BindingNavigatorMovePreviousItem.Text = "Move previous"
         '
+        'BindingNavigatorSeparator
+        '
+        Me.BindingNavigatorSeparator.Name = "BindingNavigatorSeparator"
+        Me.BindingNavigatorSeparator.Size = New System.Drawing.Size(6, 25)
+        '
+        'BindingNavigatorPositionItem
+        '
+        Me.BindingNavigatorPositionItem.AccessibleName = "Position"
+        Me.BindingNavigatorPositionItem.AutoSize = False
+        Me.BindingNavigatorPositionItem.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.BindingNavigatorPositionItem.Name = "BindingNavigatorPositionItem"
+        Me.BindingNavigatorPositionItem.Size = New System.Drawing.Size(50, 23)
+        Me.BindingNavigatorPositionItem.Text = "0"
+        Me.BindingNavigatorPositionItem.ToolTipText = "Current position"
+        '
+        'BindingNavigatorSeparator1
+        '
+        Me.BindingNavigatorSeparator1.Name = "BindingNavigatorSeparator1"
+        Me.BindingNavigatorSeparator1.Size = New System.Drawing.Size(6, 25)
+        '
         'BindingNavigatorMoveNextItem
         '
         Me.BindingNavigatorMoveNextItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
@@ -205,12 +201,27 @@ Partial Class frmDataLineage
         Me.BindingNavigatorMoveLastItem.Size = New System.Drawing.Size(23, 22)
         Me.BindingNavigatorMoveLastItem.Text = "Move last"
         '
+        'BindingNavigatorSeparator2
+        '
+        Me.BindingNavigatorSeparator2.Name = "BindingNavigatorSeparator2"
+        Me.BindingNavigatorSeparator2.Size = New System.Drawing.Size(6, 25)
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(474, 67)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(99, 23)
+        Me.Button1.TabIndex = 6
+        Me.Button1.Text = "&Open Document"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'frmDataLineage
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(1060, 617)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.BindingNavigatorLineageProperty)
         Me.Controls.Add(Me.ButtonClose)
         Me.Controls.Add(Me.ButtonSave)
@@ -218,7 +229,7 @@ Partial Class frmDataLineage
         Me.Controls.Add(Me.LabelPromtLineageItem)
         Me.Controls.Add(Me.GroupBoxCategories)
         Me.Name = "frmDataLineage"
-        Me.Text = "frmDataLineage"
+        Me.Text = "Metadata Lineage"
         CType(Me.BindingNavigatorLineageProperty, System.ComponentModel.ISupportInitialize).EndInit()
         Me.BindingNavigatorLineageProperty.ResumeLayout(False)
         Me.BindingNavigatorLineageProperty.PerformLayout()
@@ -246,4 +257,5 @@ Partial Class frmDataLineage
     Friend WithEvents BindingNavigatorMoveNextItem As ToolStripButton
     Friend WithEvents BindingNavigatorMoveLastItem As ToolStripButton
     Friend WithEvents BindingNavigatorSeparator2 As ToolStripSeparator
+    Friend WithEvents Button1 As Button
 End Class

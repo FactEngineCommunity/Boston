@@ -2344,13 +2344,20 @@ Namespace FBM
                                         'Create the new Column/s in the newly joined Table
                                         Dim lrNewColumn As New RDS.Column
                                         For Each lrActiveRole In larDownstreamActiveRoles
-                                            'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
-                                            lrNewColumn = New RDS.Column(lrNewTable,
+                                        'Dim lrOriginalColumn = larOriginalColumn.Find(Function(x) x.ActiveRole Is lrActiveRole)
+                                        lrNewColumn = New RDS.Column(lrNewTable,
                                                              lrActiveRole.JoinedORMObject.Id,
                                                              Me,
                                                              lrActiveRole,
                                                              Me.Mandatory)
-                                            If lrNewTable.Column.Find(Function(x) x.Role.Id = Me.Id) Is Nothing Then
+                                        'Assign the FactType
+                                        If lrActiveRole.FactType.Arity = 2 _
+                                                AndAlso Me.FactType.Arity = 2 _
+                                                AndAlso lrActiveRole.FactType.Id = Me.FactType.Id Then
+                                            lrNewColumn.FactType = Me.FactType
+                                        End If
+
+                                        If lrNewTable.Column.Find(Function(x) x.Role.Id = Me.Id) Is Nothing Then
                                                 lrNewTable.addColumn(lrNewColumn)
                                             Else
                                                 Call lrNewColumn.setTable(lrNewTable, True)
