@@ -58,6 +58,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItemTaxonomyTree = New System.Windows.Forms.ToolStripMenuItem()
         Me.FEKLUploaderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditAITrainingDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.VirtualBusinessAnalystToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
         Me.AddPageToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemPastePage = New System.Windows.Forms.ToolStripMenuItem()
@@ -91,6 +92,8 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ExportTestingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TocqlFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemExportToNORMAormFile = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToRDFTurtlettlFilebetaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToFEKLtxtFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemFixModelErrors = New System.Windows.Forms.ToolStripMenuItem()
         Me.DialogFolderBrowser = New System.Windows.Forms.FolderBrowserDialog()
         Me.DialogOpenFile = New System.Windows.Forms.OpenFileDialog()
@@ -101,13 +104,15 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ImportormNORMAFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UnhideHiddenModelsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UnhideASelectedModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FromRDFOWLTurtlettlFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpProvider = New System.Windows.Forms.HelpProvider()
         Me.BackgroundWorkerModelLoader = New System.ComponentModel.BackgroundWorker()
         Me.SaveFileDialog = New System.Windows.Forms.SaveFileDialog()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.TreeView = New BostonTreeView()
-        Me.VirtualBusinessAnalystToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TreeView = New Boston.BostonTreeView()
         Me.GroupBox_main.SuspendLayout()
         Me.ContextMenuStrip_Page.SuspendLayout()
         Me.ContextMenuStrip_ORMModel.SuspendLayout()
@@ -327,7 +332,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.VirtualBusinessAnalystToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 556)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 534)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -395,6 +400,13 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.EditAITrainingDataEditorToolStripMenuItem.Name = "EditAITrainingDataEditorToolStripMenuItem"
         Me.EditAITrainingDataEditorToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
         Me.EditAITrainingDataEditorToolStripMenuItem.Text = "Edit AI &Training Data"
+        '
+        'VirtualBusinessAnalystToolStripMenuItem
+        '
+        Me.VirtualBusinessAnalystToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.VirtualAnalyst16x16
+        Me.VirtualBusinessAnalystToolStripMenuItem.Name = "VirtualBusinessAnalystToolStripMenuItem"
+        Me.VirtualBusinessAnalystToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.VirtualBusinessAnalystToolStripMenuItem.Text = "&Virtual Business Analyst"
         '
         'ToolStripSeparator7
         '
@@ -581,7 +593,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ImportExportToolStripMenuItem
         '
-        Me.ImportExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem12, Me.ExportTestingToolStripMenuItem, Me.TocqlFileToolStripMenuItem, Me.ToolStripMenuItemExportToNORMAormFile})
+        Me.ImportExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem12, Me.ExportTestingToolStripMenuItem, Me.TocqlFileToolStripMenuItem, Me.ToolStripMenuItemExportToNORMAormFile, Me.ToRDFTurtlettlFilebetaToolStripMenuItem, Me.ToFEKLtxtFileToolStripMenuItem})
         Me.ImportExportToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.ImportExport16x16
         Me.ImportExportToolStripMenuItem.Name = "ImportExportToolStripMenuItem"
         Me.ImportExportToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
@@ -625,6 +637,18 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItemExportToNORMAormFile.Size = New System.Drawing.Size(216, 22)
         Me.ToolStripMenuItemExportToNORMAormFile.Text = "To NORMA .orm File (beta)"
         '
+        'ToRDFTurtlettlFilebetaToolStripMenuItem
+        '
+        Me.ToRDFTurtlettlFilebetaToolStripMenuItem.Name = "ToRDFTurtlettlFilebetaToolStripMenuItem"
+        Me.ToRDFTurtlettlFilebetaToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.ToRDFTurtlettlFilebetaToolStripMenuItem.Text = "To RDF Turtle .ttl File (beta)"
+        '
+        'ToFEKLtxtFileToolStripMenuItem
+        '
+        Me.ToFEKLtxtFileToolStripMenuItem.Name = "ToFEKLtxtFileToolStripMenuItem"
+        Me.ToFEKLtxtFileToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.ToFEKLtxtFileToolStripMenuItem.Text = "To FEKL .txt File (beta)"
+        '
         'ToolStripMenuItemFixModelErrors
         '
         Me.ToolStripMenuItemFixModelErrors.Name = "ToolStripMenuItemFixModelErrors"
@@ -634,9 +658,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModels
         '
-        Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1, Me.ImportormNORMAFileToolStripMenuItem, Me.UnhideHiddenModelsToolStripMenuItem, Me.UnhideASelectedModelToolStripMenuItem})
+        Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1, Me.ImportormNORMAFileToolStripMenuItem, Me.UnhideHiddenModelsToolStripMenuItem, Me.UnhideASelectedModelToolStripMenuItem, Me.ToolStripMenuItem3})
         Me.ContextMenuStrip_ORMModels.Name = "ContextMenuStrip_ORMModels"
-        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(207, 120)
+        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(207, 164)
         '
         'ToolStripMenuItemAddModel
         '
@@ -676,6 +700,27 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.UnhideASelectedModelToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
         Me.UnhideASelectedModelToolStripMenuItem.Text = "&Unhide a selected Model"
         '
+        'ToolStripMenuItem3
+        '
+        Me.ToolStripMenuItem3.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem4, Me.FromRDFOWLTurtlettlFileToolStripMenuItem})
+        Me.ToolStripMenuItem3.Image = Global.Boston.My.Resources.MenuImages.Import16x16
+        Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
+        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(206, 22)
+        Me.ToolStripMenuItem3.Text = "&Import"
+        '
+        'ToolStripMenuItem4
+        '
+        Me.ToolStripMenuItem4.Image = Global.Boston.My.Resources.Resources.XML16x16
+        Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
+        Me.ToolStripMenuItem4.Size = New System.Drawing.Size(226, 22)
+        Me.ToolStripMenuItem4.Text = "From .fbm file"
+        '
+        'FromRDFOWLTurtlettlFileToolStripMenuItem
+        '
+        Me.FromRDFOWLTurtlettlFileToolStripMenuItem.Name = "FromRDFOWLTurtlettlFileToolStripMenuItem"
+        Me.FromRDFOWLTurtlettlFileToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
+        Me.FromRDFOWLTurtlettlFileToolStripMenuItem.Text = "From RDF/OWL Turtle .ttl file"
+        '
         'HelpProvider
         '
         Me.HelpProvider.HelpNamespace = ".\richmondhelp\Boston.chm"
@@ -713,13 +758,6 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.TreeView.SelectedNode = Nothing
         Me.TreeView.Size = New System.Drawing.Size(380, 482)
         Me.TreeView.TabIndex = 0
-        '
-        'VirtualBusinessAnalystToolStripMenuItem
-        '
-        Me.VirtualBusinessAnalystToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.VirtualAnalyst16x16
-        Me.VirtualBusinessAnalystToolStripMenuItem.Name = "VirtualBusinessAnalystToolStripMenuItem"
-        Me.VirtualBusinessAnalystToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.VirtualBusinessAnalystToolStripMenuItem.Text = "&Virtual Business Analyst"
         '
         'frmToolboxEnterpriseExplorer
         '
@@ -795,7 +833,7 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ToolTip As ToolTip
     Friend WithEvents Panel1 As Panel
     Friend WithEvents ToolStripMenuItemCodeGenerator As ToolStripMenuItem
-    Friend WithEvents TreeView As BostonTreeView
+    Friend WithEvents TreeView As Boston.BostonTreeView
     Friend WithEvents FactEngineToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents HideToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents UnhideHiddenModelsToolStripMenuItem As ToolStripMenuItem
@@ -822,4 +860,9 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents SearchTextbox As CustomSearchTextbox
     Friend WithEvents ViewDatabaseSchemaToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents VirtualBusinessAnalystToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToRDFTurtlettlFilebetaToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToFEKLtxtFileToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem3 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem4 As ToolStripMenuItem
+    Friend WithEvents FromRDFOWLTurtlettlFileToolStripMenuItem As ToolStripMenuItem
 End Class

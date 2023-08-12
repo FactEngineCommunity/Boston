@@ -45,7 +45,7 @@ Partial Class frmToolboxTaxonomyTree
         Me.ToolStripSeparator19 = New System.Windows.Forms.ToolStripSeparator()
         Me.ShowInModelDictionaryToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem10 = New System.Windows.Forms.ToolStripMenuItem()
-        Me.TreeView = New BostonTreeView()
+        Me.TreeView = New Boston.BostonTreeView()
         Me.GroupBox.SuspendLayout()
         Me.GroupBoxTaxonomy.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -264,7 +264,7 @@ Partial Class frmToolboxTaxonomyTree
     Friend WithEvents GroupBoxTaxonomy As GroupBox
     Friend WithEvents TabControl1 As TabControl
     Friend WithEvents TabPageTreeLayout As TabPage
-    Friend WithEvents TreeView As BostonTreeView
+    Friend WithEvents TreeView As Boston.BostonTreeView
     Friend WithEvents ImageListTreeView As ImageList
     Friend WithEvents ContextMenuStrip_Diagram As ContextMenuStrip
     Friend WithEvents ViewToolStripMenuItem1 As ToolStripMenuItem

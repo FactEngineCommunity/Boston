@@ -28,7 +28,7 @@
         Me.Name = asText1
     End Sub
 
-    Public Shadows ReadOnly Property TreeView() As BostonTreeView
+    Public Shadows ReadOnly Property TreeView() As Boston.BostonTreeView
         Get
             Return MyBase.TreeView
         End Get

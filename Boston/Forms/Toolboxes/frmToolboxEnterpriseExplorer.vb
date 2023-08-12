@@ -10,7 +10,10 @@ Imports System.Xml.Schema
 Imports <xmlns:ns="http://www.w3.org/2001/XMLSchema">
 Imports <xmlns:orm="http://schemas.neumont.edu/ORM/2006-04/ORMCore">
 Imports <xmlns:ormDiagram="http://schemas.neumont.edu/ORM/2006-04/ORMDiagram">
-'Imports Microsoft.Office.Interop
+Imports VDS.RDF
+Imports VDS.RDF.Parsing
+Imports VDS.RDF.Query
+Imports VDS.RDF.Query.Patterns
 
 Public Class frmToolboxEnterpriseExplorer
 
@@ -5611,4 +5614,206 @@ Public Class frmToolboxEnterpriseExplorer
 
     End Sub
 
+    Private Sub ToFEKLtxtFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToFEKLtxtFileToolStripMenuItem.Click
+
+        Dim lsFolderLocation As String = ""
+        Dim lsFileName As String = ""
+        Dim lrModel As FBM.Model
+        Dim lrExportModel As New XMLModel.Model
+
+        Try
+            '-----------------------------------------
+            'Get the Model from the selected TreeNode
+            '-----------------------------------------
+            lrModel = Me.TreeView.SelectedNode.Tag.Tag
+            If Not lrModel.Loaded Then
+                Call Me.DoModelLoading(lrModel)
+                Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+            End If
+
+            lrExportModel.ORMModel.ModelId = lrModel.ModelId
+            lrExportModel.ORMModel.Name = lrModel.Name
+
+            If My.Settings.ExportFBMExcludeMDAModelElements Then
+                If MsgBox("Important: Your configuration settings will only allow the export of Object-Role Models. Are you happy to proceed?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then
+                    Exit Sub
+                End If
+            End If
+
+            Dim lsFileLocationName As String = ""
+
+            If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
+                lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
+                lsFileName = prApplication.User.Id & "-" & lrModel.Name & ".txt"
+                lsFileLocationName = lsFolderLocation & "\" & lsFileName
+            Else
+                Dim lrSaveFileDialog As New SaveFileDialog()
+
+                lsFileName = lrModel.Name & ".txt"
+                lsFileLocationName = lsFileName
+
+                lrSaveFileDialog.Filter = "FEKL Text File (*.txt)|*.txt"
+                lrSaveFileDialog.FilterIndex = 0
+                lrSaveFileDialog.RestoreDirectory = True
+                lrSaveFileDialog.FileName = lsFileLocationName
+
+                If lrSaveFileDialog.ShowDialog() = DialogResult.OK Then
+
+                    Dim lsFEKLFileText = lrModel.GenerateFEKL
+
+                    File.WriteAllText(lrSaveFileDialog.FileName, lsFEKLFileText)
+
+                    Dim lsMessage = "Your file is ready for viewing."
+
+                    Call Boston.ShowFlashCard(lsMessage, Color.DarkSeaGreen, 2500, 10)
+
+                End If
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        End Try
+    End Sub
+
+    Private Sub FromRDFOWLTurtlettlFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FromRDFOWLTurtlettlFileToolStripMenuItem.Click
+
+        Try
+            Dim openFileDialog As New OpenFileDialog()
+
+            ' Set the file filter to only show .ttl files
+            openFileDialog.Filter = "RDF Turtle Files (*.ttl)|*.ttl"
+
+            If openFileDialog.ShowDialog() = DialogResult.OK Then
+                Dim filePath As String = openFileDialog.FileName
+
+                ' Create a new RDF graph
+                Dim graph As New Graph()
+
+                ' Use the Turtle parser to load the file into the graph
+                Try
+                    Dim parser As New TurtleParser()
+                    parser.Load(graph, filePath)
+
+                    Dim outputLines As New List(Of String)
+                    Dim lsRelation As String = ""
+                    Dim larObjectTypeName As New List(Of String)
+
+                    ' Display or process the natural language triples with labels
+                    For Each triple In graph.Triples
+
+                        ' Get the subject, predicate, and object nodes
+                        Dim subject As INode = triple.Subject
+                        Dim predicate As INode = triple.Predicate
+                        Dim obj As INode = triple.Object
+
+                        ' Extract labels using the rdfs:label property
+                        Dim subjectLabel As String = GetRDFLabel(graph, subject)
+                        '================Predicate===============
+                        Dim predicateLabel As String = GetRDFLabel(graph, predicate)
+                        ' Get the local name of the predicate without the full URI
+                        predicateLabel = New Uri(predicateLabel).Segments.Last()
+                        '=========================
+                        Dim objectLabel As String = GetRDFLabel(graph, obj)
+
+                        Dim lsSubjectLabelPascalCase = MakeCapCamelCase(subjectLabel)
+                        objectLabel = MakeCapCamelCase(objectLabel)
+
+                        If subjectLabel.StartsWith("SAMPLE") Then GoTo SkipTriple
+
+                        Select Case predicateLabel
+                            Case Is = "rdf-schema", "isProxy"
+                                GoTo SkipTriple
+                            Case Is = "identifier", "22-rdf-syntax-ns"
+                                GoTo SkipTriple 'For now
+                            Case Is = "hasSource", "hasTarget"
+                                GoTo SkipTriple 'For now
+                            Case Is = "hasGenesysValue", "hasGenesysValueType"
+                                GoTo SkipTriple 'For now
+                            Case Is = "description"
+                                GoTo SkipTriple 'For now
+                        End Select
+
+                        Dim pattern As String = "(.*?)(\s>\s)(.*?)\s>\s(.*)"
+                        Dim match As Match = Regex.Match(subjectLabel, pattern)
+
+                        If match.Success Then
+                            Dim part1 As String = match.Groups(1).Value.Trim()
+                            Dim part2 As String = match.Groups(3).Value.Trim()
+                            Dim part3 As String = match.Groups(4).Value.Trim()
+
+                            lsRelation = $"{part1} {part2} {part3}"
+                            outputLines.Add(lsRelation)
+                        Else
+                            If Not larObjectTypeName.Contains(lsSubjectLabelPascalCase) Then
+                                lsRelation = $"{lsSubjectLabelPascalCase} IS A CONCEPT"
+                                outputLines.Add(lsRelation)
+                                larObjectTypeName.Add(lsSubjectLabelPascalCase)
+                            End If
+                            If Not larObjectTypeName.Contains(objectLabel) Then
+                                lsRelation = $"{objectLabel} IS A CONCEPT"
+                                outputLines.Add(lsRelation)
+                                larObjectTypeName.Add(objectLabel)
+                            End If
+
+                        End If
+
+SkipTriple:
+                    Next
+
+                    ' Save the output lines to a text file
+                    Dim saveFileDialog As New SaveFileDialog()
+                    saveFileDialog.Filter = "Text Files (*.txt)|*.txt"
+                    If saveFileDialog.ShowDialog() = DialogResult.OK Then
+                        Dim outputFilePath As String = saveFileDialog.FileName
+                        System.IO.File.WriteAllLines(outputFilePath, outputLines)
+                    End If
+
+                    Boston.ShowFlashCard("RDF file imported successfully.", Color.SeaGreen, 2500, 10)
+                Catch ex As Exception
+                    Throw New Exception(ex.Message)
+                End Try
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Function GetRDFLabel(graph As IGraph, node As INode) As String
+        'Dim labelPredicateUri As Uri = New Uri("http://www.w3.org/2000/01/rdf-schema#label")
+        'Dim labelPredicate As INode = graph.CreateUriNode(labelPredicateUri)
+        'Dim labelTriple As Triple = graph.GetTriplesWithSubjectPredicate(node, labelPredicate).FirstOrDefault()
+
+        'If labelTriple IsNot Nothing Then
+        '    Return labelTriple.Object.ToString()
+        'Else
+        '    Return node.ToString()
+        'End If
+        Dim rdfs As String = "http://www.w3.org/2000/01/rdf-schema#"
+        Dim labelPredicate As INode = graph.CreateUriNode(New Uri(rdfs & "label"))
+        Dim labelTriple As Triple = graph.GetTriplesWithSubjectPredicate(node, labelPredicate).FirstOrDefault()
+
+        If labelTriple IsNot Nothing Then
+            Return labelTriple.Object.ToString()
+        Else
+            Return node.ToString()
+        End If
+    End Function
+
+    Private Sub TextBoxSearch_InitiateSearch(asSearchString As String) Handles SearchTextbox.InitiateSearch
+
+    End Sub
 End Class
