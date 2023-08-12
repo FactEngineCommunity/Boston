@@ -1148,7 +1148,6 @@ Namespace FBM
 
 
             Me.isDirty = True
-            Me.Model.Save()
 
             Dim larColumn As Object
 

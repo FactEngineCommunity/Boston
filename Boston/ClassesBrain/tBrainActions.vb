@@ -782,7 +782,7 @@ Partial Public Class tBrain
         lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True, abBroadcastInterfaceEvent)
 
         If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
-            Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode)
+            Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode,,,,, True)
             Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
         Else
             Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")
@@ -1022,7 +1022,7 @@ ModelElementFound:
                 Call lrFactType.setName(lsFactTypeName, False)
             Else
                 If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
-                    Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False)
+                    Call lrFactType.setName(lrFactType.MakeNameFromFactTypeReadings, False, True)
                 End If
             End If
 
@@ -1219,7 +1219,7 @@ EndProcessing:
             Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, abBroadcastInterfaceEvent)
 
             If lrFactType.MakeNameFromFactTypeReadings <> lrFactType.Id Then
-                lrFactType.setName(lsNewFactTypeName, abBroadcastInterfaceEvent)
+                lrFactType.setName(lsNewFactTypeName, abBroadcastInterfaceEvent, True)
             End If
 
             Call Me.Model.AddFactType(lrFactType)
@@ -1532,7 +1532,7 @@ EndProcessing:
                 Dim lrEntityType = Me.Model.CreateEntityType(Trim(lsEntityTypeName), True, abBroadcastInterfaceEvent)
 
                 If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
-                    Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode,,, abBroadcastInterfaceEvent)
+                    Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode,,, abBroadcastInterfaceEvent, , True)
                     Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, abBroadcastInterfaceEvent)
                 Else
                     Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")

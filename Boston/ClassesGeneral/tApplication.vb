@@ -782,6 +782,9 @@ Public Class tApplication
         End If
         Me.MainForm.Invalidate()
 
+        Me.MainForm.StatusLabelGeneralStatus.Invalidate()
+        Me.MainForm.ToolStripProgressBar.Invalidate()
+
         Dim mainForm As frmMain = Application.OpenForms.OfType(Of frmMain)().FirstOrDefault()
         If mainForm IsNot Nothing Then
             ' Create an instance of the delegate

@@ -25,6 +25,18 @@ Module MyMethodExtensions
         Return pascalCase
     End Function
 
+
+    <Extension()>
+    Public Function ToPascalCaseWithSpaces(ByVal input As String) As String
+        Try
+            Dim pascalWithSpaces As String = Regex.Replace(input, "([a-z])([A-Z])", "$1 $2")
+            Return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pascalWithSpaces)
+        Catch ex As Exception
+            Return input
+        End Try
+
+    End Function
+
     ''' <summary>
     ''' Limit to use with ExpandoObjects please.
     ''' </summary>

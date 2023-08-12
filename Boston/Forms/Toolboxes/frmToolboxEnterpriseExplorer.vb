@@ -5704,30 +5704,43 @@ Public Class frmToolboxEnterpriseExplorer
                     Dim outputLines As New List(Of String)
                     Dim lsRelation As String = ""
                     Dim larObjectTypeName As New List(Of String)
+                    Dim larFactTypeName As New List(Of String)
 
                     ' Display or process the natural language triples with labels
                     For Each triple In graph.Triples
 
                         ' Get the subject, predicate, and object nodes
-                        Dim subject As INode = triple.Subject
-                        Dim predicate As INode = triple.Predicate
-                        Dim obj As INode = triple.Object
+                        Dim lrSubject As INode = triple.Subject
+                        Dim lrPredicate As INode = triple.Predicate
+                        Dim lrObject As INode = triple.Object
 
                         ' Extract labels using the rdfs:label property
-                        Dim subjectLabel As String = GetRDFLabel(graph, subject)
+                        '================Subject=================
+                        Dim lsSubjectLabel As String = GetRDFLabel(graph, lrSubject)
+                        If Uri.IsWellFormedUriString(lsSubjectLabel, UriKind.Absolute) Then
+                            lsSubjectLabel = New Uri(lsSubjectLabel).Segments.Last()
+                        End If
                         '================Predicate===============
-                        Dim predicateLabel As String = GetRDFLabel(graph, predicate)
+                        Dim lsPredicate As String = GetRDFLabel(graph, lrPredicate)
                         ' Get the local name of the predicate without the full URI
-                        predicateLabel = New Uri(predicateLabel).Segments.Last()
-                        '=========================
-                        Dim objectLabel As String = GetRDFLabel(graph, obj)
+                        lsPredicate = New Uri(lsPredicate).Segments.Last()
+                        '================Object==================
+                        Dim lsObjectLabel As String = GetRDFLabel(graph, lrObject)
+                        If Uri.IsWellFormedUriString(lsObjectLabel, UriKind.Absolute) Then
+                            lsObjectLabel = New Uri(lsObjectLabel).Segments.Last()
+                        End If
 
-                        Dim lsSubjectLabelPascalCase = MakeCapCamelCase(subjectLabel)
-                        objectLabel = MakeCapCamelCase(objectLabel)
+                        Dim lsSubjectLabelPascalCase = lsSubjectLabel.ToPascalCaseWithSpaces
+                        Dim lsObjectLabelPascalCase = lsObjectLabel.ToPascalCaseWithSpaces
 
-                        If subjectLabel.StartsWith("SAMPLE") Then GoTo SkipTriple
+                        '===========Clean=============================
+                        lsSubjectLabelPascalCase = CleanModelelementName(lsSubjectLabelPascalCase)
+                        lsObjectLabelPascalCase = CleanModelelementName(lsObjectLabelPascalCase)
+                        lsPredicate = CleanModelelementName(lsPredicate)
 
-                        Select Case predicateLabel
+                        If lsSubjectLabel.StartsWith("SAMPLE") Then GoTo SkipTriple
+
+                        Select Case lsPredicate
                             Case Is = "rdf-schema", "isProxy"
                                 GoTo SkipTriple
                             Case Is = "identifier", "22-rdf-syntax-ns"
@@ -5741,25 +5754,46 @@ Public Class frmToolboxEnterpriseExplorer
                         End Select
 
                         Dim pattern As String = "(.*?)(\s>\s)(.*?)\s>\s(.*)"
-                        Dim match As Match = Regex.Match(subjectLabel, pattern)
+                        Dim match As Match = Regex.Match(lsSubjectLabel, pattern)
 
+                        'hasPart, <other> section. I.e. Triples that have hasPart as the predicate, or some <other> predicate.
                         If match.Success Then
-                            Dim part1 As String = match.Groups(1).Value.Trim()
+                            'FactTypeReading
+                            Dim part1 As String = match.Groups(1).Value.Trim().ToPascalCaseWithSpaces
                             Dim part2 As String = match.Groups(3).Value.Trim()
-                            Dim part3 As String = match.Groups(4).Value.Trim()
+                            Dim part3 As String = match.Groups(4).Value.Trim().ToPascalCaseWithSpaces
 
-                            lsRelation = $"{part1} {part2} {part3}"
-                            outputLines.Add(lsRelation)
+                            Dim lsFactTypeName = $"{part1}{part2.ToPascalCase}{part3}".RemoveWhitespace
+                            Dim lsFactTypeReading = $"{part1} {part2} {part3}"
+                            lsFactTypeName.RemoveDoubleWhiteSpace.RemoveWhitespace
+
+                            If Not larFactTypeName.Contains(lsFactTypeName) Then
+                                outputLines.AddUnique(lsFactTypeReading)
+                            End If
                         Else
                             If Not larObjectTypeName.Contains(lsSubjectLabelPascalCase) Then
+                                lsRelation = $"{lsSubjectLabelPascalCase} IS AN ENTITY TYPE"
+                                outputLines.AddUnique(lsRelation)
+                                larObjectTypeName.AddUnique(lsSubjectLabelPascalCase)
+                            Else
                                 lsRelation = $"{lsSubjectLabelPascalCase} IS A CONCEPT"
-                                outputLines.Add(lsRelation)
-                                larObjectTypeName.Add(lsSubjectLabelPascalCase)
+                                If Not outputLines.Contains(lsRelation) Then
+                                    outputLines.AddUnique(lsRelation)
+                                End If
                             End If
-                            If Not larObjectTypeName.Contains(objectLabel) Then
-                                lsRelation = $"{objectLabel} IS A CONCEPT"
-                                outputLines.Add(lsRelation)
-                                larObjectTypeName.Add(objectLabel)
+
+                            If Not larObjectTypeName.Contains(lsObjectLabelPascalCase) Then
+                                lsRelation = $"{lsObjectLabelPascalCase} IS A CONCEPT"
+                                outputLines.AddUnique(lsRelation)
+                                larObjectTypeName.AddUnique(lsObjectLabelPascalCase)
+                            End If
+
+                            Dim lsFactTypeName As String = $"{lsSubjectLabelPascalCase}Has{lsObjectLabelPascalCase}".RemoveWhitespace
+
+                            If Not larFactTypeName.Contains(lsFactTypeName) Then
+                                'Create the Fact Type Reading
+                                Dim lsFactTypeReading = $"{lsSubjectLabelPascalCase} has ONE {lsObjectLabelPascalCase}"
+                                outputLines.AddUnique(lsFactTypeReading)
                             End If
 
                         End If
@@ -5775,7 +5809,11 @@ SkipTriple:
                         System.IO.File.WriteAllLines(outputFilePath, outputLines)
                     End If
 
-                    Boston.ShowFlashCard("RDF file imported successfully.", Color.SeaGreen, 2500, 10)
+                    Dim textWithNewlines As String = String.Join(Environment.NewLine, outputLines)
+                    Clipboard.SetText(textWithNewlines)
+
+                    Boston.ShowFlashCard("RDF file imported successfully.", Color.MediumSeaGreen, 2500, 10)
+
                 Catch ex As Exception
                     Throw New Exception(ex.Message)
                 End Try
@@ -5813,7 +5851,33 @@ SkipTriple:
         End If
     End Function
 
-    Private Sub TextBoxSearch_InitiateSearch(asSearchString As String) Handles SearchTextbox.InitiateSearch
+    Private Function CleanModelelementName(ByVal asModelElementName As String) As String
 
-    End Sub
+        Try
+            Dim lsReturnString As String = asModelElementName
+
+            lsReturnString = lsReturnString.Replace(".", "")
+            lsReturnString = lsReturnString.Replace(" - ", " ")
+            lsReturnString = lsReturnString.Replace("-", " ")
+            lsReturnString = lsReturnString.Replace("&", "And")
+            lsReturnString = lsReturnString.Replace("/", " ")
+            lsReturnString = lsReturnString.Replace(",", "")
+            lsReturnString = lsReturnString.Replace("_", " ")
+            lsReturnString = lsReturnString.Replace("(", "")
+            lsReturnString = lsReturnString.Replace(")", "")
+            lsReturnString = lsReturnString.Replace(":", "")
+
+            Return lsReturnString.Trim.RemoveDoubleWhiteSpace
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Function
+
 End Class

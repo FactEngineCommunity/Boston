@@ -14,6 +14,8 @@ Public Class frmFEKLUploader
 
     Private mbProcessingPaused As Boolean = False
 
+    Private miFEKLStraightProcessedUpToLine As Integer = 0
+
     Private Sub frmFEKLUploader_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         Try
@@ -116,7 +118,7 @@ Public Class frmFEKLUploader
 
     End Sub
 
-    Private Sub ButtonLoadIntoModel_Click(sender As Object, e As EventArgs) Handles ButtonLoadIntoModel.Click
+    Private Sub LoadStraightFEKLStatements(ByVal aiStartLineNumber As Integer)
 
         Try
             Dim lsFEKLStatement As String
@@ -134,8 +136,44 @@ Public Class frmFEKLUploader
 
             Dim lbErrorThrown As Boolean = False
 
-            For liInd = 0 To Me.RichTextBoxFEKLDocument.Lines.Length - 1
+
+
+            For liInd = aiStartLineNumber To Me.RichTextBoxFEKLDocument.Lines.Length - 1
+
+                'Get the FEKL Statement
                 lsFEKLStatement = Me.RichTextBoxFEKLDocument.Lines(liInd)
+
+                Application.DoEvents()
+
+#Region "Pause Processing?"
+                If Me.mbProcessingPaused Then
+                    'CodeSafe
+                    'Pause Processing
+                    Me.ButtonFEKLStartStop.BackColor = Color.DarkSeaGreen
+                    Me.ButtonFEKLStartStop.Text = "Continue Processing"
+                    Me.ButtonFEKLStartStop.Tag = "Paused"
+                    Exit Sub
+                End If
+#End Region
+
+                Me.miFEKLStraightProcessedUpToLine = liInd
+
+                If liInd Mod 500 = 0 Then
+                    ' Perform an action on every 500th iteration
+                    If Me.mrModel.StoreAsXML Then
+                        Call Me.mrModel.Save(,, False)
+                    Else
+                        Call Me.mrModel.SetStoreAsXML(True, True)
+                    End If
+                End If
+
+                Dim liPercent = 1
+                Try
+                    liPercent = Math.Min(liInd / Me.RichTextBoxFEKLDocument.Lines.Length, 1)
+                Catch ex As Exception
+
+                End Try
+                prApplication.WriteToStatusBar($"Processing: {liInd} of {Me.RichTextBoxFEKLDocument.Lines.Length}", False, liPercent)
 
                 Try
                     With New WaitCursor
@@ -145,27 +183,37 @@ Public Class frmFEKLUploader
 
                         lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lsFEKLStatement)
 
+                        Dim lbIgnoreDuplicates As Boolean = True
+
                         If lrDuplexServiceClientError.ErrorType <> [Interface].publicConstants.pcenumErrorType.None Then
+                            If (lrDuplexServiceClientError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists And lbIgnoreDuplicates) Then
+                                Me.RichTextBoxFEKLDocument.HighlightLine(liInd, Color.LightCoral)
+                            Else
+                                lbErrorThrown = True
 
-                            lbErrorThrown = True
+                                'Report the Error
+                                Me.LabelErrorType.Text = lrDuplexServiceClientError.ErrorType.ToString
+                                Me.LabelErrorMessage.Text = lrDuplexServiceClientError.ErrorString
 
-                            'Report the Error
-                            Me.LabelErrorType.Text = lrDuplexServiceClientError.ErrorType.ToString
-                            Me.LabelErrorMessage.Text = lrDuplexServiceClientError.ErrorString
+                                Me.RichTextBoxFEKLDocument.HighlightLine(liInd, Color.Orange)
 
-                            Me.RichTextBoxFEKLDocument.HighlightLine(liInd, Color.Orange)
+                                Try
+                                    Me.RichTextBoxFEKLDocument.GotoLine(liInd)
+                                Catch NewEx As Exception
+                                    'Not a biggie
+                                End Try
 
-                            Try
-                                Me.RichTextBoxFEKLDocument.GotoLine(liInd)
-                            Catch NewEx As Exception
-                                'Not a biggie
-                            End Try
-
-                            Exit For
-
+                                Exit For
+                            End If
                         End If
 
                         Me.RichTextBoxFEKLDocument.HighlightLine(liInd, Color.White)
+
+                        Try
+                            Me.RichTextBoxFEKLDocument.GotoLine(liInd)
+                        Catch ex As Exception
+
+                        End Try
 
                     End With
 
@@ -179,7 +227,7 @@ Public Class frmFEKLUploader
                     Me.RichTextBoxFEKLDocument.HighlightLine(liInd, Color.Orange)
 
                     Try
-                        Me.RichTextBoxFEKLDocument.gotoline(liInd)
+                        Me.RichTextBoxFEKLDocument.GotoLine(liInd)
                     Catch NewEx As Exception
                         'Not a biggie
                     End Try
@@ -195,6 +243,7 @@ Public Class frmFEKLUploader
                 lfrmFlashCard.Show(frmMain, "LightGray")
             End If
 
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -203,7 +252,6 @@ Public Class frmFEKLUploader
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
-
     End Sub
 
     Private Sub RichTextBoxFEKLDocument_KeyPress(sender As Object, e As KeyPressEventArgs) Handles RichTextBoxFEKLDocument.KeyPress
@@ -695,4 +743,53 @@ Public Class frmFEKLUploader
 
     End Sub
 
+    Private Sub ButtonFEKLStartStop_Click(sender As Object, e As EventArgs) Handles ButtonFEKLStartStop.Click
+
+        Try
+            Dim lbHasProcessedFEKLStatements = Me.miFEKLStraightProcessedUpToLine > 0
+
+            Dim larContinuePromptStatus = {"Paused", "NotYetStarted"}
+
+            If larContinuePromptStatus.Contains(Me.ButtonFEKLStartStop.Tag) Then
+                'Start Processing, but show Red Pause Button
+                Me.ButtonFEKLStartStop.BackColor = Color.IndianRed
+                Me.ButtonFEKLStartStop.Text = "Pause Processing"
+                Me.ButtonFEKLStartStop.Tag = "Processing"
+
+                Me.mbProcessingPaused = False
+
+                If lbHasProcessedFEKLStatements Then
+                    If MsgBox("Do you want to ignore previously processed FEKL Statements?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                        'Nothing to do
+                    Else
+                        Me.miFEKLStraightProcessedUpToLine = 0
+                    End If
+                    Call Me.LoadStraightFEKLStatements(Me.miFEKLStraightProcessedUpToLine)
+                Else
+                    Call Me.LoadStraightFEKLStatements(0)
+                End If
+
+            ElseIf Me.ButtonFEKLStartStop.Tag = "Processing" Then
+                'Pause Processing, but show Green Continue Processing button
+                Me.ButtonFEKLStartStop.BackColor = Color.DarkSeaGreen
+                Me.ButtonFEKLStartStop.Text = "Continue Processing"
+                Me.ButtonFEKLStartStop.Tag = "Paused"
+
+                Me.mbProcessingPaused = True
+            End If
+
+            Me.ButtonFEKLStartStop.Refresh()
+            Me.ButtonFEKLStartStop.Invalidate()
+
+            Me.Invalidate()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
 End Class
