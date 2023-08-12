@@ -5759,12 +5759,18 @@ Public Class frmToolboxEnterpriseExplorer
                         'hasPart, <other> section. I.e. Triples that have hasPart as the predicate, or some <other> predicate.
                         If match.Success Then
                             'FactTypeReading
-                            Dim part1 As String = match.Groups(1).Value.Trim().ToPascalCaseWithSpaces
-                            Dim part2 As String = match.Groups(3).Value.Trim()
-                            Dim part3 As String = match.Groups(4).Value.Trim().ToPascalCaseWithSpaces
+                            lsSubjectLabelPascalCase = match.Groups(1).Value.Trim().ToPascalCaseWithSpaces
+                            lsPredicate = match.Groups(3).Value.Trim()
+                            lsObjectLabelPascalCase = match.Groups(4).Value.Trim().ToPascalCaseWithSpaces
 
-                            Dim lsFactTypeName = $"{part1}{part2.ToPascalCase}{part3}".RemoveWhitespace
-                            Dim lsFactTypeReading = $"{part1} {part2} {part3}"
+                            If Not larObjectTypeName.Contains(lsSubjectLabelPascalCase) Then
+                                lsRelation = $"{lsSubjectLabelPascalCase} IS AN ENTITY TYPE"
+                                outputLines.AddUnique(lsRelation)
+                                larObjectTypeName.AddUnique(lsSubjectLabelPascalCase)
+                            End If
+
+                            Dim lsFactTypeName = $"{lsSubjectLabelPascalCase}{lsPredicate.ToPascalCase}{lsObjectLabelPascalCase}".RemoveWhitespace
+                            Dim lsFactTypeReading = $"{lsSubjectLabelPascalCase} {lsPredicate} {lsObjectLabelPascalCase}"
                             lsFactTypeName.RemoveDoubleWhiteSpace.RemoveWhitespace
 
                             If Not larFactTypeName.Contains(lsFactTypeName) Then
@@ -5792,7 +5798,7 @@ Public Class frmToolboxEnterpriseExplorer
 
                             If Not larFactTypeName.Contains(lsFactTypeName) Then
                                 'Create the Fact Type Reading
-                                Dim lsFactTypeReading = $"{lsSubjectLabelPascalCase} has ONE {lsObjectLabelPascalCase}"
+                                Dim lsFactTypeReading = $"{lsSubjectLabelPascalCase} has AT MOST ONE {lsObjectLabelPascalCase}"
                                 outputLines.AddUnique(lsFactTypeReading)
                             End If
 
