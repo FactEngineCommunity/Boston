@@ -1,4 +1,6 @@
 ﻿Imports System.Reflection
+Imports System.Threading.Tasks
+Imports System.Threading
 
 Namespace FBM
 
@@ -1887,6 +1889,8 @@ Namespace FBM
         Public Sub PopulateAllCoreStructuresFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
 
             Try
+                Dim loBackgroundWorker = aoBackgroundWorker
+
                 'CodeSafe
                 If Me.RDS.Table.Count > 0 Then Exit Sub
 
@@ -1903,16 +1907,14 @@ Namespace FBM
                 lsSQLQuery &= " WHERE ElementType = 'Entity'"
 
                 Dim lrORMRecordset,
-                    lrORMRecordset2,
                     lrORMRecordset3 As ORMQL.Recordset
 
                 lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                 Dim lrModelElement As FBM.ModelObject
                 Dim lsColumnName As String = ""
-                Dim lrResponsibleRole As FBM.Role
-                Dim lrActiveRole As FBM.Role
-                Dim liInd As Integer = 0 'For reporting progress on Tables loaded.
+
+
 
                 While Not lrORMRecordset.EOF
 #Region "Tables"
@@ -1956,175 +1958,19 @@ Namespace FBM
 
                 Dim larSortedTables = Me.RDS.Table.OrderBy(Function(x) x.getSupertypeTables.Count)
 
+                Dim maxConcurrentThreads As Integer = 2 ' Environment.ProcessorCount * 2 ' Adjust as needed
+
+                Dim liInd As Integer = 0 'For reporting progress on Tables loaded.
                 For Each lrTable In larSortedTables
 
                     Boston.WriteToStatusBar("Loading Model. CMML Load for Entity: " & lrTable.Name, True)
 
-                    '==========================================================================================================
-                    'Columns
-                    lsSQLQuery = " SELECT *"
-                    lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
-                    lsSQLQuery &= " WHERE ModelObject = '" & lrTable.Name & "'"
-
-                    lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    Dim lsColumnId As String = "" 'Used also for Debugging/ErrorThrowing.
-                    Dim lrSupertypeColumn As RDS.Column = Nothing
-
-                    While Not lrORMRecordset2.EOF
-
-                        Try
-                            lsColumnId = lrORMRecordset2("Attribute").Data
-
-                            'Responsible Role
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                            lsSQLQuery &= " WHERE Property = '" & lsColumnId & "'"
-
-                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                            lrResponsibleRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
-
-                            Dim lrResponsibleRoleTable As RDS.Table = lrResponsibleRole.getCorrespondingRDSTable
-                            If lrTable IsNot lrResponsibleRoleTable And lrResponsibleRoleTable.Column.Count > 0 Then
-
-                                lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Id = lsColumnId)
-                                If lrSupertypeColumn Is Nothing Then
-                                    'CodeSafe...fall back to ResponsibleRole
-                                    lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Role.Id = lrResponsibleRole.Id)
-                                End If
-
-                                Dim lrDummyTable As RDS.Table = lrTable
-                                Dim lrNewColumn = lrSupertypeColumn.Clone(lrDummyTable, Nothing, True)
-
-                                Dim lrExistingColumn = lrTable.Column.Find(Function(x) x.Role Is lrNewColumn.Role And x.ActiveRole Is lrNewColumn.ActiveRole)
-                                If lrExistingColumn Is Nothing Then
-                                    Call lrTable.Column.Add(lrNewColumn)
-                                End If
-                            Else
-                                'Column Name
-                                lsSQLQuery = "SELECT *"
-                                lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
-                                lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
-
-                                lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                                lsColumnName = lrORMRecordset3("PropertyName").Data
-
-                                'Active Role
-                                lsSQLQuery = "SELECT *"
-                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasActiveRole.ToString
-                                lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
-
-                                lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                                lrActiveRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
-
-                                'New Column
-                                lrColumn = New RDS.Column(lrTable, lsColumnName, lrResponsibleRole, lrActiveRole)
-                                lrColumn.Id = lsColumnId
-
-                                'IsMandatory
-                                lsSQLQuery = "SELECT *"
-                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsMandatory.ToString
-                                lsSQLQuery &= " WHERE IsMandatory = '" & lrColumn.Id & "'"
-
-                                lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                                lrColumn.IsMandatory = Not lrORMRecordset3.EOF
-
-                                'Fact Type
-                                lsSQLQuery = "SELECT *"
-                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                                lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
-
-                                lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                                lrColumn.FactType = Me.FactType.Find(Function(x) x.Id = lrORMRecordset3("FactType").Data)
-
-                                'Ordinal Position
-                                lsSQLQuery = "SELECT *"
-                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                                lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
-
-                                lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                                lrColumn.OrdinalPosition = lrORMRecordset3("Position").Data
-
-                                'Is Derived Fact Type Parameter
-                                lsSQLQuery = " SELECT COUNT(*)"
-                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsDerivedFactTypeParameter.ToString
-                                lsSQLQuery &= " WHERE IsDerivedFactTypeParameter = '" & lrColumn.Id & "'"
-
-                                lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                                If lrORMRecordset3(0).Data > 0 Then
-                                    lrColumn.IsDerivationParameter = True
-                                End If
-
-                                lrTable.Column.Add(lrColumn)
-                            End If
-
-                        Catch ex As Exception
-
-                            If My.Settings.AutomaticallyDeleteTroublesomeColumns Then
-                                'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
-                            Else
-
-                                Dim lsErrorMessage As String = "Trouble loading Column for Table, " & lrTable.Name & ". Column.Id = " & lsColumnId
-                                lsErrorMessage &= vbCrLf & vbCrLf & "Skipping loading of the Column from the ORM model (only) as a precaution."
-                                If Me.IsDatabaseSynchronised Then
-                                    lsErrorMessage &= " Contact support for instructions how to fix this problem."
-                                End If
-                                lsErrorMessage.AppendDoubleLineBreak("Optionally you can delete the Column from the database altogether. Click [Yes] to delete the Column, or [No] to keep the Column.")
-                                lsErrorMessage.AppendString(" You should only delete the Column if you know what you are doing or as advised by support. Backup your database before deleting core elements.")
-
-                                'Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
-                                'Me.IsDatabaseSynchronised = False
-                                'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
-                                'Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
-
-                                lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
-                                If prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Information,
-                                                                        ex.StackTrace,
-                                                                        False,
-                                                                        False,
-                                                                        True,
-                                                                        MessageBoxButtons.YesNo) = DialogResult.Yes Then
-                                    '20210813-VM-If this gets out of hand, remove this functionality.
-                                    Call Me.removeCMMLAttribute(lsColumnId)
-                                End If
-                            End If
-                        End Try
-
-                        lrORMRecordset2.MoveNext()
-                    End While
-                    '==========================================================================================================
-                    '===========================
-                    'Indexes                    
-                    Call Me.loadIndexesForTable(lrTable)
-
-                    Dim larNullActiveRoles = From Column In lrTable.Column
-                                             Where Column.ActiveRole Is Nothing
-                                             Select Column
-
-                    If larNullActiveRoles.Count > 0 Then
-                        'CodeSafe
-                        For Each lrColumn In larNullActiveRoles.ToArray
-                            Try
-                                If lrColumn.Role.FactType.Id = lrColumn.Table.Name And
-                                    lrColumn.Role.FactType.IsObjectified Then
-                                    If lrColumn.Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
-                                        lrColumn.ActiveRole = lrColumn.Role
-                                        Call Me.updateORSetCMMLPropertyActiveRole(lrColumn)
-                                    End If
-                                End If
-                            Catch ex As Exception
-                                'CodeSafe
-                                If lrColumn.ActiveRole Is Nothing And lrColumn.Role Is Nothing And lrColumn.FactType Is Nothing Then
-                                    Call lrTable.removeColumn(lrColumn)
-                                End If
-                            End Try
-                        Next
-                    End If
+                    Call Me.GetTableDetails(lrTable, liInd)
 
                     If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(Viev.Lesser(99, 80 + CInt(19 * (liInd / larSortedTables.Count))))
-                    liInd += 1 'For reporting progress on Tables loaded.
+
                 Next
+
 
                 '==========================================================================================================
                 'Relations                
@@ -2156,6 +2002,192 @@ Namespace FBM
                 Me.RDSLoading = False
             End Try
 
+        End Sub
+
+        Private Sub GetTableDetails(ByRef arTable As RDS.Table, ByRef aiInd As Integer)
+
+            Dim lrORMRecordset2 As ORMQL.Recordset
+            Dim lrORMRecordset3 As ORMQL.Recordset
+            Dim lrResponsibleRole As FBM.Role
+            Dim lrActiveRole As FBM.Role
+            Dim lrColumn As RDS.Column
+            Dim lrTable = arTable
+            Dim lsSQLQuery As String = ""
+            Dim lsColumnName As String = ""
+
+
+            Try
+
+#Region "Get Table Details"
+                '==========================================================================================================
+                'Columns
+
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
+                lsSQLQuery &= " WHERE ModelObject = '" & lrTable.Name & "'"
+
+                lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim lsColumnId As String = "" 'Used also for Debugging/ErrorThrowing.
+                Dim lrSupertypeColumn As RDS.Column = Nothing
+
+                While Not lrORMRecordset2.EOF
+
+                    Try
+                        lsColumnId = lrORMRecordset2("Attribute").Data
+
+                        'Responsible Role
+                        lsSQLQuery = "SELECT *"
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                        lsSQLQuery &= " WHERE Property = '" & lsColumnId & "'"
+
+                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        lrResponsibleRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
+
+                        Dim lrResponsibleRoleTable As RDS.Table = lrResponsibleRole.getCorrespondingRDSTable
+                        If lrTable IsNot lrResponsibleRoleTable And lrResponsibleRoleTable.Column.Count > 0 Then
+
+                            lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Id = lsColumnId)
+                            If lrSupertypeColumn Is Nothing Then
+                                'CodeSafe...fall back to ResponsibleRole
+                                lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Role.Id = lrResponsibleRole.Id)
+                            End If
+
+                            Dim lrDummyTable As RDS.Table = lrTable
+                            Dim lrNewColumn = lrSupertypeColumn.Clone(lrDummyTable, Nothing, True)
+
+                            Dim lrExistingColumn = lrTable.Column.Find(Function(x) x.Role Is lrNewColumn.Role And x.ActiveRole Is lrNewColumn.ActiveRole)
+                            If lrExistingColumn Is Nothing Then
+                                Call lrTable.Column.Add(lrNewColumn)
+                            End If
+                        Else
+                            'Column Name
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
+                            lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lsColumnName = lrORMRecordset3("PropertyName").Data
+
+                            'Active Role
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasActiveRole.ToString
+                            lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrActiveRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
+
+                            'New Column
+                            lrColumn = New RDS.Column(lrTable, lsColumnName, lrResponsibleRole, lrActiveRole)
+                            lrColumn.Id = lsColumnId
+
+                            'IsMandatory
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                            lsSQLQuery &= " WHERE IsMandatory = '" & lrColumn.Id & "'"
+
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrColumn.IsMandatory = Not lrORMRecordset3.EOF
+
+                            'Fact Type
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+                            lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
+
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrColumn.FactType = Me.FactType.Find(Function(x) x.Id = lrORMRecordset3("FactType").Data)
+
+                            'Ordinal Position
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                            lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
+
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrColumn.OrdinalPosition = lrORMRecordset3("Position").Data
+
+                            'Is Derived Fact Type Parameter
+                            lsSQLQuery = " SELECT COUNT(*)"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsDerivedFactTypeParameter.ToString
+                            lsSQLQuery &= " WHERE IsDerivedFactTypeParameter = '" & lrColumn.Id & "'"
+
+                            lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            If lrORMRecordset3(0).Data > 0 Then
+                                lrColumn.IsDerivationParameter = True
+                            End If
+
+                            lrTable.Column.Add(lrColumn)
+                        End If
+
+                    Catch ex As Exception
+
+                        If My.Settings.AutomaticallyDeleteTroublesomeColumns Then
+                            'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                        Else
+
+                            Dim lsErrorMessage As String = "Trouble loading Column for Table, " & lrTable.Name & ". Column.Id = " & lsColumnId
+                            lsErrorMessage &= vbCrLf & vbCrLf & "Skipping loading of the Column from the ORM model (only) as a precaution."
+                            If Me.IsDatabaseSynchronised Then
+                                lsErrorMessage &= " Contact support for instructions how to fix this problem."
+                            End If
+                            lsErrorMessage.AppendDoubleLineBreak("Optionally you can delete the Column from the database altogether. Click [Yes] to delete the Column, or [No] to keep the Column.")
+                            lsErrorMessage.AppendString(" You should only delete the Column if you know what you are doing or as advised by support. Backup your database before deleting core elements.")
+
+                            'Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
+                            'Me.IsDatabaseSynchronised = False
+                            'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                            'Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
+
+                            lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
+                            If prApplication.ThrowErrorMessage(lsErrorMessage, pcenumErrorType.Information,
+ex.StackTrace,
+False,
+False,
+True,
+MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                                '20210813-VM-If this gets out of hand, remove this functionality.
+                                Call Me.removeCMMLAttribute(lsColumnId)
+                            End If
+                        End If
+                    End Try
+
+                    lrORMRecordset2.MoveNext()
+                End While
+                '==========================================================================================================
+                '===========================
+                'Indexes                    
+                Call Me.loadIndexesForTable(lrTable)
+
+                Dim larNullActiveRoles = From Column In lrTable.Column
+                                         Where Column.ActiveRole Is Nothing
+                                         Select Column
+
+                If larNullActiveRoles.Count > 0 Then
+                    'CodeSafe
+                    For Each lrColumn In larNullActiveRoles.ToArray
+                        Try
+                            If lrColumn.Role.FactType.Id = lrColumn.Table.Name And
+lrColumn.Role.FactType.IsObjectified Then
+                                If lrColumn.Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                                    lrColumn.ActiveRole = lrColumn.Role
+                                    Call Me.updateORSetCMMLPropertyActiveRole(lrColumn)
+                                End If
+                            End If
+                        Catch ex As Exception
+                            'CodeSafe
+                            If lrColumn.ActiveRole Is Nothing And lrColumn.Role Is Nothing And lrColumn.FactType Is Nothing Then
+                                Call lrTable.removeColumn(lrColumn)
+                            End If
+                        End Try
+                    Next
+                End If
+
+                aiInd += 1 'For reporting progress on Tables loaded.
+#End Region 'Table Details
+
+            Catch ex As Exception
+
+            End Try
         End Sub
 
         ''' <summary>

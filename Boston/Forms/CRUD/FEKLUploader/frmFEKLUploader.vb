@@ -181,6 +181,8 @@ Public Class frmFEKLUploader
                         Me.RichTextBoxFEKLDocument.HighlightLine(liInd, Color.LightBlue)
                         Me.RichTextBoxFEKLDocument.Refresh()
 
+                        prApplication.Brain.Page = Nothing
+                        prApplication.WorkingPage = Nothing
                         lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lsFEKLStatement)
 
                         Dim lbIgnoreDuplicates As Boolean = True
@@ -202,6 +204,15 @@ Public Class frmFEKLUploader
                                 Catch NewEx As Exception
                                     'Not a biggie
                                 End Try
+
+#Region "Pause Processing?"
+                                Me.mbProcessingPaused = True
+                                'CodeSafe
+                                'Pause Processing
+                                Me.ButtonFEKLStartStop.BackColor = Color.DarkSeaGreen
+                                Me.ButtonFEKLStartStop.Text = "Continue Processing"
+                                Me.ButtonFEKLStartStop.Tag = "Paused"
+#End Region
 
                                 Exit For
                             End If
@@ -449,13 +460,19 @@ Public Class frmFEKLUploader
                 Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.LightBlue
             Else
                 If Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DataBoundItem.InError Then
-                    Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.Orange
+
+                    If Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DataBoundItem.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists _
+                        And Not Me.CheckBoxFlagDuplicates.Checked Then
+                        Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230) 'Light Gray
+                    Else
+                        Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.Orange
+                    End If
 
                 ElseIf Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DataBoundItem.Processed Then
-                    Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230)
+                        Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230) 'Light Gray
 
-                Else
-                    Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.White
+                    Else
+                        Me.DataGridViewFEKLStatements.Rows(e.RowIndex).DefaultCellStyle.BackColor = Color.White
                 End If
             End If
 
@@ -579,7 +596,6 @@ Public Class frmFEKLUploader
 
         Try
             Dim lrDuplexServiceClientError As DuplexServiceClient.DuplexServiceClientError = Nothing
-            Dim lbErrorThrown As Boolean = False
 
             'Stop|Continue Processing
             Me.ButtonStopContinueProcessing.Visible = True
@@ -617,34 +633,31 @@ Public Class frmFEKLUploader
 
                 lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lrFEKLObject.FEKLStatement, lrFEKLObject)
 
-                DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processing = True
+                lrFEKLObject.Processing = True
                 DataGridViewFEKLStatements.InvalidateRow(liInd)
                 Application.DoEvents()
 
                 If lrDuplexServiceClientError.ErrorType = [Interface].publicConstants.pcenumErrorType.None Then
                     'No Error
-                    DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorType = [Interface].publicConstants.pcenumErrorType.None
+                    lrFEKLObject.ErrorType = [Interface].publicConstants.pcenumErrorType.None
                 Else
-                    'Error in FEKL or Execution of FEKL
-
-                    lbErrorThrown = True
-
+                    'Error in FEKL or Execution of FEKL                    
                     'Report the Error
-                    DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorType = lrDuplexServiceClientError.ErrorType
-                    DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorString = lrDuplexServiceClientError.ErrorString
+                    lrFEKLObject.ErrorType = lrDuplexServiceClientError.ErrorType
+                    lrFEKLObject.ErrorString = lrDuplexServiceClientError.ErrorString
 
                 End If
 
-                Dim liId = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Id
+                Dim liId = lrFEKLObject.Id
 
-                DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processing = False
-                DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processed = True
+                lrFEKLObject.Processing = False
+                lrFEKLObject.Processed = True
 
                 Dim lrFEKLStatementCopy = Me.mrFEKL4JSONCopy.FEKLStatement.Find(Function(x) x.Id = liId)
-                lrFEKLStatementCopy.ErrorType = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorType
-                lrFEKLStatementCopy.ErrorString = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.ErrorString
-                lrFEKLStatementCopy.Processing = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processing
-                lrFEKLStatementCopy.Processed = DataGridViewFEKLStatements.Rows(liInd).DataBoundItem.Processed
+                lrFEKLStatementCopy.ErrorType = lrFEKLObject.ErrorType
+                lrFEKLStatementCopy.ErrorString = lrFEKLObject.ErrorString
+                lrFEKLStatementCopy.Processing = lrFEKLObject.Processing
+                lrFEKLStatementCopy.Processed = lrFEKLObject.Processed
 
                 DataGridViewFEKLStatements.InvalidateRow(liInd)
                 Application.DoEvents()
@@ -792,4 +805,21 @@ Public Class frmFEKLUploader
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
+
+    Private Sub CheckBoxFlagDuplicates_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxFlagDuplicates.CheckedChanged
+
+        Try
+            Me.DataGridViewFEKLStatements.Refresh()
+            Me.DataGridViewFEKLStatements.Invalidate()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

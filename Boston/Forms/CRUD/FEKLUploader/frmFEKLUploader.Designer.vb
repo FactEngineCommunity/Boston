@@ -59,6 +59,7 @@ Partial Class frmFEKLUploader
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelPromptModelName = New System.Windows.Forms.Label()
         Me.ButtonClose = New System.Windows.Forms.Button()
+        Me.CheckBoxFlagDuplicates = New System.Windows.Forms.CheckBox()
         Me.GroupBox.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPageFEKLJSON.SuspendLayout()
@@ -82,7 +83,7 @@ Partial Class frmFEKLUploader
         Me.GroupBox.Controls.Add(Me.LabelPromptModelName)
         Me.GroupBox.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox.Name = "GroupBox"
-        Me.GroupBox.Size = New System.Drawing.Size(653, 440)
+        Me.GroupBox.Size = New System.Drawing.Size(680, 440)
         Me.GroupBox.TabIndex = 0
         Me.GroupBox.TabStop = False
         '
@@ -97,11 +98,12 @@ Partial Class frmFEKLUploader
         Me.TabControl1.Location = New System.Drawing.Point(6, 49)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(638, 381)
+        Me.TabControl1.Size = New System.Drawing.Size(665, 381)
         Me.TabControl1.TabIndex = 10
         '
         'TabPageFEKLJSON
         '
+        Me.TabPageFEKLJSON.Controls.Add(Me.CheckBoxFlagDuplicates)
         Me.TabPageFEKLJSON.Controls.Add(Me.Panel1)
         Me.TabPageFEKLJSON.Controls.Add(Me.LabelFEKLJSONErrorString)
         Me.TabPageFEKLJSON.Controls.Add(Me.Label2)
@@ -113,7 +115,7 @@ Partial Class frmFEKLUploader
         Me.TabPageFEKLJSON.Controls.Add(Me.ButtonOpenFEKLJSONFile)
         Me.TabPageFEKLJSON.Location = New System.Drawing.Point(4, 22)
         Me.TabPageFEKLJSON.Name = "TabPageFEKLJSON"
-        Me.TabPageFEKLJSON.Size = New System.Drawing.Size(630, 355)
+        Me.TabPageFEKLJSON.Size = New System.Drawing.Size(657, 355)
         Me.TabPageFEKLJSON.TabIndex = 2
         Me.TabPageFEKLJSON.Text = "FEKL JSON"
         Me.TabPageFEKLJSON.UseVisualStyleBackColor = True
@@ -125,7 +127,7 @@ Partial Class frmFEKLUploader
         Me.Panel1.Controls.Add(Me.ButtonStopContinueProcessing)
         Me.Panel1.Location = New System.Drawing.Point(201, 15)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(301, 25)
+        Me.Panel1.Size = New System.Drawing.Size(328, 25)
         Me.Panel1.TabIndex = 15
         '
         'ButtonStopContinueProcessing
@@ -211,9 +213,9 @@ Partial Class frmFEKLUploader
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DataGridViewFEKLStatements.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGridViewFEKLStatements.ContextMenuStrip = Me.ContextMenuStripGrid
-        Me.DataGridViewFEKLStatements.Location = New System.Drawing.Point(17, 82)
+        Me.DataGridViewFEKLStatements.Location = New System.Drawing.Point(17, 94)
         Me.DataGridViewFEKLStatements.Name = "DataGridViewFEKLStatements"
-        Me.DataGridViewFEKLStatements.Size = New System.Drawing.Size(595, 194)
+        Me.DataGridViewFEKLStatements.Size = New System.Drawing.Size(622, 182)
         Me.DataGridViewFEKLStatements.TabIndex = 4
         '
         'ContextMenuStripGrid
@@ -430,18 +432,29 @@ Partial Class frmFEKLUploader
         'ButtonClose
         '
         Me.ButtonClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonClose.Location = New System.Drawing.Point(675, 22)
+        Me.ButtonClose.Location = New System.Drawing.Point(702, 22)
         Me.ButtonClose.Name = "ButtonClose"
         Me.ButtonClose.Size = New System.Drawing.Size(73, 23)
         Me.ButtonClose.TabIndex = 1
         Me.ButtonClose.Text = "&Close"
         Me.ButtonClose.UseVisualStyleBackColor = True
         '
+        'CheckBoxFlagDuplicates
+        '
+        Me.CheckBoxFlagDuplicates.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.CheckBoxFlagDuplicates.AutoSize = True
+        Me.CheckBoxFlagDuplicates.Location = New System.Drawing.Point(530, 71)
+        Me.CheckBoxFlagDuplicates.Name = "CheckBoxFlagDuplicates"
+        Me.CheckBoxFlagDuplicates.Size = New System.Drawing.Size(99, 17)
+        Me.CheckBoxFlagDuplicates.TabIndex = 16
+        Me.CheckBoxFlagDuplicates.Text = "Flag Duplicates"
+        Me.CheckBoxFlagDuplicates.UseVisualStyleBackColor = True
+        '
         'frmFEKLUploader
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(760, 454)
+        Me.ClientSize = New System.Drawing.Size(787, 454)
         Me.Controls.Add(Me.ButtonClose)
         Me.Controls.Add(Me.GroupBox)
         Me.Name = "frmFEKLUploader"
@@ -503,4 +516,5 @@ Partial Class frmFEKLUploader
     Friend WithEvents Panel1 As Panel
     Friend WithEvents Panel2 As Panel
     Friend WithEvents ButtonFEKLStartStop As Button
+    Friend WithEvents CheckBoxFlagDuplicates As CheckBox
 End Class

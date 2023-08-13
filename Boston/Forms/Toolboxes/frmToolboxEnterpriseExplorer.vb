@@ -5685,7 +5685,28 @@ Public Class frmToolboxEnterpriseExplorer
     Private Sub FromRDFOWLTurtlettlFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FromRDFOWLTurtlettlFileToolStripMenuItem.Click
 
         Try
+
+            With New WaitCursor
+                Call Me.ImportGenesysRDFOWLTurtleTTLFile
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ImportGenesysRDFOWLTurtleTTLFile()
+
+        Dim lsMessage As String
+        Try
             Dim openFileDialog As New OpenFileDialog()
+
 
             ' Set the file filter to only show .ttl files
             openFileDialog.Filter = "RDF Turtle Files (*.ttl)|*.ttl"
@@ -5741,7 +5762,7 @@ Public Class frmToolboxEnterpriseExplorer
                         If lsSubjectLabel.StartsWith("SAMPLE") Then GoTo SkipTriple
 
                         Select Case lsPredicate
-                            Case Is = "rdf-schema", "isProxy"
+                            Case Is = "rdf schema", "isProxy"
                                 GoTo SkipTriple
                             Case Is = "identifier", "22-rdf-syntax-ns"
                                 GoTo SkipTriple 'For now
@@ -5755,6 +5776,10 @@ Public Class frmToolboxEnterpriseExplorer
 
                         Dim pattern As String = "(.*?)(\s>\s)(.*?)\s>\s(.*)"
                         Dim match As Match = Regex.Match(lsSubjectLabel, pattern)
+
+                        If lsSubjectLabelPascalCase = lsObjectLabelPascalCase Then
+                            Debugger.Break()
+                        End If
 
                         'hasPart, <other> section. I.e. Triples that have hasPart as the predicate, or some <other> predicate.
                         If match.Success Then
@@ -5782,7 +5807,7 @@ Public Class frmToolboxEnterpriseExplorer
                                 outputLines.AddUnique(lsRelation)
                                 larObjectTypeName.AddUnique(lsSubjectLabelPascalCase)
                             Else
-                                lsRelation = $"{lsSubjectLabelPascalCase} IS A CONCEPT"
+                                lsRelation = $"{lsSubjectLabelPascalCase} IS AN ENTITY TYPE"
                                 If Not outputLines.Contains(lsRelation) Then
                                     outputLines.AddUnique(lsRelation)
                                 End If
@@ -5818,22 +5843,22 @@ SkipTriple:
                     Dim textWithNewlines As String = String.Join(Environment.NewLine, outputLines)
                     Clipboard.SetText(textWithNewlines)
 
-                    Boston.ShowFlashCard("RDF file imported successfully.", Color.MediumSeaGreen, 2500, 10)
+                    lsMessage = "RDF file imported successfully."
+                    lsMessage.AppendDoubleLineBreak("Copied to Clipboard.")
+
+                    Boston.ShowFlashCard(lsMessage, Color.DarkSeaGreen, 2500, 10)
 
                 Catch ex As Exception
                     Throw New Exception(ex.Message)
                 End Try
             End If
-
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
-
     End Sub
 
     Private Function GetRDFLabel(graph As IGraph, node As INode) As String

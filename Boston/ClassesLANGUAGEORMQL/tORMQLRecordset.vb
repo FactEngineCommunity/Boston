@@ -83,6 +83,7 @@
             Me.StatementType = aiStatementType
         End Sub
 
+
         Default Public Property Item(ByVal asItemValue As String) As FBM.FactData
             Get
                 Try
@@ -111,6 +112,7 @@
                                 Return Nothing
                         End Select
                     End If
+
                 Catch ex As Exception
                     Return Nothing
                 End Try

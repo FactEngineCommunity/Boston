@@ -464,6 +464,7 @@ Namespace FBM
             Dim lrFactData As New FBM.FactData
 
             Try
+
                 lrFactData = Me.Data.Find(Function(x) x.Role.Name = asRoleName)
 
                 If lrFactData Is Nothing Then

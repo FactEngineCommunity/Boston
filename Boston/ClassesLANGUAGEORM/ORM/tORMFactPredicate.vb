@@ -16,22 +16,18 @@ Namespace FBM
             Dim lr_data As FBM.FactData
             Dim lbFound As Boolean = False
 
+            lbFound = True
             For Each lr_data In Me.data
+
                 Select Case other.GetType.ToString
                     Case Is = GetType(FBM.Fact).ToString
                         If other.Data.Find(AddressOf lr_data.EqualsByRoleNameData) Is Nothing Then
-                            lbFound = False
                             Return False
-                        Else
-                            lbFound = True
                         End If
                     Case Is = GetType(FBM.FactInstance).ToString
                         Dim lrFactInstance As FBM.FactInstance = other
                         If lrFactInstance.Data.Find(AddressOf lr_data.EqualsByRoleNameData) Is Nothing Then
-                            lbFound = False
                             Return False
-                        Else
-                            lbFound = True                            
                         End If
                 End Select
             Next

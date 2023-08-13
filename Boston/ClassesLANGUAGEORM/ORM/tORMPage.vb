@@ -1173,7 +1173,7 @@ Namespace FBM
                 If Me.Diagram IsNot Nothing Then
 #Region "Diagram Display - Diagram IsNot Nothing"
 
-                    Call lrFactTypeInstance.DisplayAndAssociate(abDisplayFactTable, My.Settings.ShowFactTypeNamesOnORMModelLoad)
+                    lrFactTypeInstance.DisplayAndAssociate(abDisplayFactTable, My.Settings.ShowFactTypeNamesOnORMModelLoad)
 
                     '-------------------------------------------
                     'Display the InternalUniquenessConstraints
