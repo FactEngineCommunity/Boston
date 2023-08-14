@@ -82,6 +82,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.HideAllotherModelsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemMoveModel = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemShareModelWithProject = New System.Windows.Forms.ToolStripMenuItem()
         Me.DeleteModelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemModelConfiguration = New System.Windows.Forms.ToolStripMenuItem()
@@ -330,9 +331,9 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.VirtualBusinessAnalystToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.VirtualBusinessAnalystToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.ToolStripMenuItemShareModelWithProject, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 534)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 578)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
@@ -567,6 +568,12 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItemMoveModel.Size = New System.Drawing.Size(207, 22)
         Me.ToolStripMenuItemMoveModel.Text = "&Move Model"
         '
+        'ToolStripMenuItemShareModelWithProject
+        '
+        Me.ToolStripMenuItemShareModelWithProject.Name = "ToolStripMenuItemShareModelWithProject"
+        Me.ToolStripMenuItemShareModelWithProject.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemShareModelWithProject.Text = "Share with Project..."
+        '
         'DeleteModelToolStripMenuItem
         '
         Me.DeleteModelToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.deleteround16x16
@@ -660,7 +667,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModels.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddModel, Me.ToolStripSeparator2, Me.ToolStripMenuItem1, Me.ImportormNORMAFileToolStripMenuItem, Me.UnhideHiddenModelsToolStripMenuItem, Me.UnhideASelectedModelToolStripMenuItem, Me.ToolStripMenuItem3})
         Me.ContextMenuStrip_ORMModels.Name = "ContextMenuStrip_ORMModels"
-        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(207, 164)
+        Me.ContextMenuStrip_ORMModels.Size = New System.Drawing.Size(207, 142)
         '
         'ToolStripMenuItemAddModel
         '
@@ -865,4 +872,5 @@ Partial Class frmToolboxEnterpriseExplorer
     Friend WithEvents ToolStripMenuItem3 As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem4 As ToolStripMenuItem
     Friend WithEvents FromRDFOWLTurtlettlFileToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemShareModelWithProject As ToolStripMenuItem
 End Class

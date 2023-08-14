@@ -58,6 +58,9 @@ Public Class frmCRUDEditGroup
         Call Me.loadAvailableUsers(Me.zrGroup)
         Call Me.loadIncludedUsers(Me.zrGroup)
 
+        Call Me.loadAvailableOntologies(Me.zrGroup)
+        Call Me.loadIncludedOntologies(Me.zrGroup)
+
     End Sub
 
     Private Sub TextBoxGroupName_TextChanged(sender As Object, e As EventArgs) Handles TextBoxGroupName.TextChanged
@@ -147,10 +150,113 @@ Public Class frmCRUDEditGroup
     Private Sub TextBoxGroupName_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles TextBoxGroupName.Validating
 
         If Trim(Me.TextBoxGroupName.Text) = "" Then
-            Me.zbValidationError = True            
+            Me.zbValidationError = True
         End If
 
     End Sub
+
+    Private Sub loadAvailableOntologies(ByRef arGroup As ClientServer.Group)
+
+        Dim lsMessage As String
+        Dim lrOntology As Ontology.UnifiedOntology
+
+        Dim lsSQLQuery As String = ""
+        Dim lREcordset As New RecordsetProxy
+
+        lREcordset.ActiveConnection = pdbConnection
+        lREcordset.CursorType = pcOpenStatic
+
+        Try
+            '---------------------------------------------
+            'First get EntityTypes with no ParentEntityId
+            '---------------------------------------------
+            lsSQLQuery = " SELECT *"
+            lsSQLQuery &= "  FROM UnifiedOntology"
+            lsSQLQuery &= " WHERE Id NOT IN (SELECT OntologyId"
+            lsSQLQuery &= "                    FROM ClientServerGroupOntology"
+            lsSQLQuery &= "                   WHERE GroupId = '" & arGroup.Id & "'"
+            lsSQLQuery &= "                 )"
+            lsSQLQuery &= " ORDER BY UnifiedOntologyName"
+
+            lREcordset.Open(lsSQLQuery)
+
+            If Not lREcordset.EOF Then
+                While Not lREcordset.EOF
+                    lrOntology = New Ontology.UnifiedOntology
+                    lrOntology.Id = lREcordset("Id").Value
+                    lrOntology.Name = lREcordset("UnifiedOntologyName").Value
+                    lrOntology.ImageFileLocationName = lREcordset("ImageFileLocationName").Value
+
+                    Dim lrComboboxItem As New tComboboxItem(lrOntology.Id, lrOntology.Name, lrOntology)
+                    Me.ListBoxAvailableOntologies.Items.Add(lrComboboxItem)
+
+                    lREcordset.MoveNext()
+                End While
+            End If
+
+            lREcordset.Close()
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub loadIncludedOntologies(ByRef arGroup As ClientServer.Group)
+
+        Dim lsMessage As String
+        Dim lrOntology As Ontology.UnifiedOntology
+
+        Dim lsSQLQuery As String = ""
+        Dim lREcordset As New RecordsetProxy
+
+        lREcordset.ActiveConnection = pdbConnection
+        lREcordset.CursorType = pcOpenStatic
+
+        Try
+            '---------------------------------------------
+            'First get EntityTypes with no ParentEntityId
+            '---------------------------------------------
+            lsSQLQuery = " SELECT *"
+            lsSQLQuery &= "  FROM UnifiedOntology"
+            lsSQLQuery &= " WHERE Id IN (SELECT OntologyId"
+            lsSQLQuery &= "                FROM ClientServerGroupOntology"
+            lsSQLQuery &= "               WHERE GroupId = '" & arGroup.Id & "'"
+            lsSQLQuery &= "             )"
+            lsSQLQuery &= " ORDER BY UnifiedOntologyName"
+
+            lREcordset.Open(lsSQLQuery)
+
+            If Not lREcordset.EOF Then
+                While Not lREcordset.EOF
+                    lrOntology = New Ontology.UnifiedOntology
+                    lrOntology.Id = lREcordset("Id").Value
+                    lrOntology.Name = lREcordset("UnifiedName").Value
+                    lrOntology.ImageFileLocationName = lREcordset("ImageFileLocationName").Value
+
+                    Dim lrComboboxItem As New tComboboxItem(lrOntology.Id, lrOntology.Name, lrOntology)
+                    Me.ListBoxIncludedOntologies.Items.Add(lrComboboxItem)
+
+                    lREcordset.MoveNext()
+                End While
+            End If
+
+            lREcordset.Close()
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 
     Private Sub loadAvailableUsers(ByRef arGroup As ClientServer.Group)
 
@@ -452,6 +558,56 @@ Public Class frmCRUDEditGroup
         ElseIf Me.TextBoxUserName.Text = Me.TextBoxUserName.Tag Then    
             Me.TextBoxUserName.ForeColor = Color.LightGray
         End If
+
+    End Sub
+
+    Private Sub ButtonAddOntology_Click(sender As Object, e As EventArgs) Handles ButtonAddOntology.Click
+
+        Try
+            If Me.ListBoxAvailableOntologies.SelectedIndex = -1 Then
+                Exit Sub
+            Else
+                Dim lrOntology As Ontology.UnifiedOntology = Me.ListBoxAvailableOntologies.SelectedItem.Tag
+
+                Dim lrComboboxItem As New tComboboxItem(lrOntology.Id, lrOntology.Name, lrOntology)
+                Me.ListBoxIncludedOntologies.Items.Add(lrComboboxItem)
+                Me.ListBoxAvailableOntologies.Items.RemoveAt(Me.ListBoxAvailableOntologies.SelectedIndex)
+
+                Call tableClientServerGroupOntology.AddOntologyToGroup(lrOntology, Me.zrGroup)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonRemoveOntology_Click(sender As Object, e As EventArgs) Handles ButtonRemoveOntology.Click
+
+        Try
+            If Me.ListBoxIncludedOntologies.SelectedIndex = -1 Then
+                Exit Sub
+            Else
+                Dim lrOntology As Ontology.UnifiedOntology = Me.ListBoxIncludedOntologies.SelectedItem.Tag
+
+                Dim lrComboboxItem As New tComboboxItem(lrOntology.Id, lrOntology.Name, lrOntology)
+                Me.ListBoxAvailableOntologies.Items.Add(lrComboboxItem)
+                Me.ListBoxIncludedOntologies.Items.RemoveAt(Me.ListBoxIncludedOntologies.SelectedIndex)
+
+                Call tableClientServerGroupOntology.removeOntologyFromGroup(lrOntology, Me.zrGroup)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

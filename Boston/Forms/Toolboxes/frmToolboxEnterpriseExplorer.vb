@@ -167,7 +167,8 @@ Public Class frmToolboxEnterpriseExplorer
     End Sub
 
     Private Sub LoadModels(Optional ByVal asCreatedByUserId As String = Nothing,
-                           Optional ByVal asNamespaceId As String = Nothing)
+                           Optional ByVal asNamespaceId As String = Nothing,
+                           Optional ByRef arProject As ClientServer.Project = Nothing)
 
 
         Try
@@ -177,6 +178,13 @@ Public Class frmToolboxEnterpriseExplorer
 
             larModel = TableModel.GetModels(asCreatedByUserId, asNamespaceId)
             prApplication.Models = larModel
+
+            If arProject IsNot Nothing Then
+                Dim larProjectModel = tableClientServerProjectModelShare.getModelsForProjectForUser(arProject, prApplication.User)
+                For Each lrModel In larProjectModel
+                    larModel.AddUnique(lrModel)
+                Next
+            End If
 
             Dim lasExcludedModelIds As New List(Of String)
 
@@ -1090,6 +1098,9 @@ Public Class frmToolboxEnterpriseExplorer
             If My.Settings.UseClientServer Then
                 Me.ToolStripMenuItemKeywordExtractionTool.Enabled = False
             End If
+
+            Me.ToolStripMenuItemMoveModel.Visible = My.Settings.UseClientServer
+            Me.ToolStripMenuItemShareModelWithProject.Visible = My.Settings.UseClientServer
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -4141,9 +4152,8 @@ Public Class frmToolboxEnterpriseExplorer
                     Call Me.LoadModels(prApplication.User.Id, Nothing)
                 Else
                     Me.zsNamespaceId = Me.ComboBoxNamespace.SelectedItem.ItemData
-                    Call Me.LoadModels(Nothing, Me.zsNamespaceId)
+                    Call Me.LoadModels(Nothing, Me.zsNamespaceId, lrProject)
                 End If
-
 
                 If Me.TreeView.Nodes(0).Nodes.Count = 1 Then
                     Me.TreeView.Nodes(0).Expand()
@@ -5907,8 +5917,31 @@ SkipTriple:
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
         End Try
 
     End Function
+
+
+    Private Sub ShareWithProjectToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemShareModelWithProject.Click
+
+        Try
+            Dim lfrmModelProjectShare As New frmModelShareWithProject
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+            lfrmModelProjectShare.mrModel = lrModel
+
+            Call lfrmModelProjectShare.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 
 End Class

@@ -128,7 +128,7 @@ Namespace TableModel
 
         End Function
 
-        Public Sub GetModelDetails(ByRef arModel As FBM.Model)
+        Public Function GetModelDetails(ByRef arModel As FBM.Model) As Boolean
 
             Try
                 Dim lsSQLQuery As String = ""
@@ -184,6 +184,8 @@ Namespace TableModel
                     Throw New System.Exception(lsMessage)
                 End If
 
+                Return True
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -192,8 +194,10 @@ Namespace TableModel
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
+                Return False
             End Try
-        End Sub
+
+        End Function
 
         Public Function GetModels(ByRef asCreatedByUserId As String,
                                   Optional ByVal asNamespaceId As String = Nothing) As List(Of FBM.Model)

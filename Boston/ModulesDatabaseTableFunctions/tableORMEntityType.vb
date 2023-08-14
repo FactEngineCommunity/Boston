@@ -260,13 +260,7 @@ Namespace TableEntityType
                     End If
 
                     'Concept Classification
-                    If My.Settings.DatabaseType = pcenumDatabaseType.SQLite Then
-                        Dim lsEntityTypeId = arEntityType.Id
-                        Dim lrWhereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.Concept = lsEntityTypeId
-                        Dim lrDataStore As New DataStore.Store
-                        arEntityType.ClassificationValue = lrDataStore.Get(Of KnowledgeGraph.ConceptClassificationValue)(lrWhereClause)
-                    End If
-
+                    arEntityType.GetConceptClassifications()
 
                     arEntityType.isDirty = False
                 Else
@@ -357,12 +351,7 @@ Namespace TableEntityType
                         lrEntityType.DBName = lrDictionaryEntry.DBName
 
                         'Concept Classification
-                        If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
-                            Dim lsEntityTypeId = lrEntityType.Id
-                            Dim lrWhereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.Concept = lsEntityTypeId
-                            Dim lrDataStore As New DataStore.Store
-                            lrEntityType.ClassificationValue = lrDataStore.Get(Of KnowledgeGraph.ConceptClassificationValue)(lrWhereClause)
-                        End If
+                        lrEntityType.GetConceptClassifications()
 
                         getEntityTypesByModel.Add(lrEntityType)
                         lREcordset.MoveNext()

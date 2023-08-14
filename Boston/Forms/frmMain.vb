@@ -6202,4 +6202,30 @@ SaveModel:
         End Try
 
     End Sub
+
+    Private Sub ConceptClassificationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConceptClassificationToolStripMenuItem.Click
+
+        Try
+            Dim lfrmConceptClassification As New frmToolboxConceptClassification
+
+            lfrmConceptClassification.MdiParent = Me
+
+            If prApplication.ActivePages.Count > 0 Then
+                Dim loActivePane = prApplication.ActivePages(0).Pane
+                lfrmConceptClassification.Show(loActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
+
+                prApplication.ToolboxForms.Add(lfrmConceptClassification)
+                Call lfrmConceptClassification.SetupForm(Nothing)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class

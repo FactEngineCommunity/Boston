@@ -1,6 +1,8 @@
 ﻿Imports System.Reflection
 Imports System.IO
 Imports System.Web.UI
+Imports System.ComponentModel
+
 Public Class frmUnifiedOntologyBrowser
 
     Public WithEvents zrUnifiedOntology As Ontology.UnifiedOntology
@@ -47,6 +49,8 @@ Public Class frmUnifiedOntologyBrowser
             zrFrmORMDiagramViewer = formToShow
             '======================================================================================
 
+            prApplication.ActivePages.Add(Me)
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -79,6 +83,40 @@ Public Class frmUnifiedOntologyBrowser
 
     End Sub
 
+    Private Sub ListBox1_DrawItem(sender As Object, e As DrawItemEventArgs) Handles ListBox1.DrawItem
+
+        Try
+
+            If e.Index >= 0 AndAlso e.Index < ListBox1.Items.Count Then
+
+                Dim item As tComboboxItem = DirectCast(ListBox1.Items(e.Index), tComboboxItem)
+                Dim g As Graphics = e.Graphics
+                Dim itemBounds As Rectangle = e.Bounds
+
+                If (e.State And DrawItemState.Selected) = DrawItemState.Selected Then
+                    ' Item is selected, so draw with default selection colors
+                    g.FillRectangle(SystemBrushes.Highlight, itemBounds)
+                    g.DrawString(item.ToString(), e.Font, SystemBrushes.HighlightText, itemBounds)
+                Else
+                    Dim blackTextBounds As New Rectangle(itemBounds.Left, itemBounds.Top, 150, itemBounds.Height)
+                    Dim grayTextBounds As New Rectangle(itemBounds.Left + 150, itemBounds.Top, itemBounds.Width - 150, itemBounds.Height)
+
+                    ' Item is not selected, draw with custom colors
+                    g.FillRectangle(SystemBrushes.Window, itemBounds)
+
+                    g.DrawString(item.ItemData, e.Font, Brushes.Black, blackTextBounds)
+                    Dim lsModelName As String = item.Tag.Model.Name
+                    g.DrawString(lsModelName.CondenseString(15, 7, 5), e.Font, Brushes.Silver, grayTextBounds)
+                End If
+
+                e.DrawFocusRectangle()
+            End If
+
+        Catch ex As Exception
+            Debugger.Break()
+        End Try
+    End Sub
+
     Private Sub ShowGlossary(ByRef arUnifiedOntology As Ontology.UnifiedOntology)
 
         Me.ListBox1.Items.Clear()
@@ -94,7 +132,11 @@ Public Class frmUnifiedOntologyBrowser
 
         Dim lrComboBoxItem As tComboboxItem
         For Each lrModelDictionaryEntry In larModelDictionaryEntry
-            lrComboBoxItem = New tComboboxItem(lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry)
+
+            Dim lsConceptSymbol As String = lrModelDictionaryEntry.Model.Name.CondenseString(15, 7, 5)
+
+            lrComboBoxItem = New tComboboxItem(lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry.Symbol & " - " & lsConceptSymbol, lrModelDictionaryEntry)
+
             Me.ListBox1.Items.Add(lrComboBoxItem)
         Next
 
@@ -110,6 +152,7 @@ Public Class frmUnifiedOntologyBrowser
         'For Each lrFactType In arModel.FactType.FindAll(Function(x) (x.IsObjectified And x.IsMDAModelElement = False) Or x.isRDSTable)
         '    Me.ListBox1.Items.Add(lrFactType.Name)
         'Next
+        Me.ListBox1.Refresh()
 
     End Sub
 
@@ -414,6 +457,8 @@ Public Class frmUnifiedOntologyBrowser
         Try
             Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Nothing
 
+            Me.ListBox1.DrawMode = DrawMode.OwnerDrawVariable
+
             With New WaitCursor
                 If Me.ListBox1.SelectedIndex >= 0 Then
                     lrModelDictionaryEntry = ListBox1.SelectedItem.Tag
@@ -480,7 +525,18 @@ Public Class frmUnifiedOntologyBrowser
                     End Select
 
                     If lrModelElement IsNot Nothing Then
+
                         Call Me.DescribeModelElement(lrModelElement)
+
+                        Call lrModelElement.GetConceptClassifications()
+
+                        'Setup the Concept Classificaations toolbox
+                        Dim lfrmToolboxConceptClassication As frmToolboxConceptClassification
+                        lfrmToolboxConceptClassication = prApplication.GetToolboxForm(frmToolboxConceptClassification.Name)
+                        If lfrmToolboxConceptClassication IsNot Nothing Then
+                            Call lfrmToolboxConceptClassication.SetupForm(lrModelElement)
+                        End If
+
                     End If
                 End If
             End With
@@ -1490,4 +1546,19 @@ Public Class frmUnifiedOntologyBrowser
         End Try
     End Sub
 
+    Private Sub frmUnifiedOntologyBrowser_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+
+        Try
+            prApplication.ActivePages.Remove(Me)
+            prApplication.ToolboxForms.Remove(Me)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
 End Class

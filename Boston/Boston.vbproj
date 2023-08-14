@@ -1695,6 +1695,12 @@
     <Compile Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DialogBoxes\frmModelShareWithProject.Designer.vb">
+      <DependentUpon>frmModelShareWithProject.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\frmModelShareWithProject.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\DialogBoxes\frmModelMove.Designer.vb">
       <DependentUpon>frmModelMove.vb</DependentUpon>
     </Compile>
@@ -1895,9 +1901,11 @@
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerGroup.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerGroupOntology.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerGroupUser.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerInvitation.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableClientServerLog.vb" />
+    <Compile Include="ModulesDatabaseTableFunctions\tableClientServerProjectModelShare.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableDataLineageItemProperty.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableDataLineageItemModelElement.vb" />
     <Compile Include="ModulesDatabaseTableFunctions\tableDataLineageItem.vb" />
@@ -2648,6 +2656,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.resx">
       <DependentUpon>frmClientServerMessageBroadcast.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DialogBoxes\frmModelShareWithProject.resx">
+      <DependentUpon>frmModelShareWithProject.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmModelMove.resx">
       <DependentUpon>frmModelMove.vb</DependentUpon>

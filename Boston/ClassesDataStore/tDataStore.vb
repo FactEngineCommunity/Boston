@@ -226,7 +226,11 @@ Namespace DataStore
                     Dim lrRecordset As ORMQL.Recordset = pdbConnection.Execute(lsSQLQuery)
 
                     If lrRecordset.ErrorReturned Then
-                        Throw New Exception(lrRecordset.ErrorString)
+                        If lrRecordset.ErrorString.Contains("unique") Then
+                            'Ignore 
+                        Else
+                            Throw New Exception(lrRecordset.ErrorString)
+                        End If
                     End If
                 Else
                     ' If the record doesn't exist, insert it into the database

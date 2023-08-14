@@ -13,6 +13,8 @@ Public Class frmToolboxConceptClassification
 
     Private msOldValue, msNewValue As String 'For Cell editing.
 
+    Private mrSelectedRowDataItem As KnowledgeGraph.ConceptClassificationValue = Nothing
+
     Public Function EqualsByName(ByVal other As Form) As Boolean
         If Me.Name = other.Name Then
             Return True
@@ -39,10 +41,21 @@ Public Class frmToolboxConceptClassification
             Else
                 Me.mrBindingList = New BindingList(Of KnowledgeGraph.ConceptClassificationValue)(Me.mrModelElement.ClassificationValue)
                 Me.DataGridView.DataSource = Me.mrBindingList
+                Me.DataGridView.Columns(0).Visible = False
                 Me.LabelModelElementName.Text = Me.mrModelElement.Id
             End If
 
             Me.DataGridView.ReadOnly = False
+
+            'CodeSafe
+            Dim larClassificationType = Me.marContextClassification.GroupBy(Function(item) item.ClassificationType).Select(Function(group) group.Key).ToList()
+            If Me.DataGridView.Rows.Count >= larClassificationType.Count Then
+                'Can't add new Classifications
+                'CodeSafe
+                Me.DataGridView.AllowUserToAddRows = False
+            Else
+                Me.DataGridView.AllowUserToAddRows = True
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -84,6 +97,15 @@ Public Class frmToolboxConceptClassification
             'CodeSafe
             If Me.mrModelElement Is Nothing Then Exit Sub
 
+            'CodeSafe
+            Dim larClassificationType = Me.marContextClassification.GroupBy(Function(item) item.ClassificationType).Select(Function(group) group.Key).ToList()
+            If Me.DataGridView.Rows.Count >= larClassificationType.Count Then
+                'Can't add new Classifications
+                'CodeSafe
+                Me.DataGridView.AllowUserToAddRows = False
+                Exit Sub
+            End If
+
             ' Create a new object of type KnowledgeGraph.ClassificationValue
             Dim newClassificationValue As New KnowledgeGraph.ConceptClassificationValue(Me.mrModelElement.Model, Me.mrModelElement, "", "")
 
@@ -92,14 +114,18 @@ Public Class frmToolboxConceptClassification
 
             '=====================================================================
             'Data Store update
-            Dim lrConceptClassificationValue As New KnowledgeGraph.ConceptClassificationValue(Me.mrModelElement.Model, Me.mrModelElement, "", "")
-            Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.Concept = newClassificationValue.Concept And p.ClassificationType = newClassificationValue.ClassificationType
-            Dim lrDataStore As New DataStore.Store
-            Call lrDataStore.Upsert(lrConceptClassificationValue, whereClause)
+            '20230814-VM-Commented out. Don't want records with Null values.
+            'Dim lrConceptClassificationValue As New KnowledgeGraph.ConceptClassificationValue(Me.mrModelElement.Model, Me.mrModelElement, "", "")
+            'Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.Concept = newClassificationValue.Concept And p.ClassificationType = newClassificationValue.ClassificationType
+            'Dim lrDataStore As New DataStore.Store
+            'Call lrDataStore.Upsert(lrConceptClassificationValue, whereClause)
             '=====================================================================
 
-            Me.mrBindingList.ResetBindings()
-
+            Me.mrBindingList = New BindingList(Of KnowledgeGraph.ConceptClassificationValue)(Me.mrModelElement.ClassificationValue)
+            Me.DataGridView.DataSource = Me.mrBindingList
+            Me.DataGridView.Columns(0).Visible = False
+            ' Refresh the DataGridView to reflect the changes
+            Me.DataGridView.Refresh()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -129,13 +155,24 @@ Public Class frmToolboxConceptClassification
 
             '=====================================================================
             'Data Store update
-            Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.Concept = lrConceptClassificationValue.Concept And p.ClassificationType = lrConceptClassificationValue.ClassificationType
-            Dim lrDataStore As New DataStore.Store
-            Call lrDataStore.Upsert(lrConceptClassificationValue, whereClause)
+            '20230814-VM-Commented out. Don't want records with Null values.
+            'Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.Concept = lrConceptClassificationValue.Concept And p.ClassificationType = lrConceptClassificationValue.ClassificationType
+            'Dim lrDataStore As New DataStore.Store
+            'Call lrDataStore.Upsert(lrConceptClassificationValue, whereClause)
             '=====================================================================
 
-            Me.mrBindingList.ResetBindings()
+            Me.mrBindingList = New BindingList(Of KnowledgeGraph.ConceptClassificationValue)(Me.mrModelElement.ClassificationValue)
+            Me.DataGridView.DataSource = Me.mrBindingList
+            Me.DataGridView.Columns(0).Visible = False
+            Me.DataGridView.Refresh()
 
+            Dim larClassificationType = Me.marContextClassification.GroupBy(Function(item) item.ClassificationType).Select(Function(group) group.Key).ToList()
+            If Me.DataGridView.Rows.Count = larClassificationType.Count Then
+                'Can't add new Classifications
+                'CodeSafe
+                Me.DataGridView.AllowUserToAddRows = False
+                Exit Sub
+            End If
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -169,7 +206,7 @@ Public Class frmToolboxConceptClassification
     Private Sub DataGridView1_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles DataGridView.CellBeginEdit
         Try
             ' Check if the edited cell is in the ClassificationType column (second column)
-            If e.ColumnIndex = 1 Then ' Assuming ClassificationType column is at index 1 (0-based index)
+            If e.ColumnIndex = 2 Then ' Assuming ClassificationType column is at index 1 (0-based index)
 
                 Try
                     ' Get the associated ConceptClassificationValue object from the BindingList
@@ -191,10 +228,10 @@ LoadCombo:
 
             Dim larComboList As New List(Of Object)
             Select Case e.ColumnIndex
-                Case Is = 1
-                    larComboList = Me.marContextClassification.GroupBy(Function(item) item.ClassificationType).Select(Function(group) group.Key).ToList()
                 Case Is = 2
-                    Dim lsFilterValue = Me.DataGridView.Rows(e.RowIndex).Cells(1).Value
+                    larComboList = Me.marContextClassification.GroupBy(Function(item) item.ClassificationType).Select(Function(group) group.Key).ToList()
+                Case Is = 3
+                    Dim lsFilterValue = Me.DataGridView.Rows(e.RowIndex).Cells(2).Value
                     If lsFilterValue = "" Then
                         larComboList = Me.marContextClassification.GroupBy(Function(item) item.ClassificationValue).Select(Function(group) group.Key).ToList()
                     Else
@@ -227,34 +264,59 @@ LoadCombo:
 
         Try
             ' Check if the edited cell is in the ClassificationType column (second column)
-            If e.ColumnIndex = 1 Then ' Assuming ClassificationType column is at index 1 (0-based index)
-
-                ' Get the updated ClassificationType value from the cell
+            If e.ColumnIndex = 2 Then ' Assuming ClassificationType column is at index 1 (0-based index)
+#Region "ClassificationType"
+                Dim lsOldConceptClassificationType = Me.msOldValue
                 Dim lsUpdatedClassificationType As String = DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString()
 
-                ' Get the associated ConceptClassificationValue object from the BindingList
-                Dim lrConceptClassification As KnowledgeGraph.ConceptClassificationValue = CType(DataGridView.Rows(e.RowIndex).DataBoundItem, KnowledgeGraph.ConceptClassificationValue)
+                Dim larClassificationType As List(Of String) = Me.mrModelElement.ClassificationValue.Select(Function(x) x.ClassificationType).ToList
+                If larClassificationType.Count > 0 Then
+                    larClassificationType.RemoveAt(larClassificationType.Count - 1)
+                End If
 
-                Dim lsOldConceptClassificationType = Me.msOldValue
+                If larClassificationType.Contains(lsUpdatedClassificationType) Then
+                    DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = lsOldConceptClassificationType
+                    Exit Sub
+                Else
+                    If lsOldConceptClassificationType <> "" Then
+                        DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = lsOldConceptClassificationType
+                        Exit Sub
+                    End If
+                End If
 
-                ' Update the ClassificationType property of the ConceptClassificationValue object
-                lrConceptClassification.ClassificationType = lsUpdatedClassificationType
+                '20230814-VM-Don't want to ever update the type
+                '' Get the updated ClassificationType value from the cell
+                'Dim lsUpdatedClassificationType As String = DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString()
 
-                ' Perform the upsert operation with whereClause based on the old ClassificationType
-                Dim lrDataStore As New DataStore.Store
-                Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) =
-                Function(p) p.Concept = lrConceptClassification.Concept And p.ClassificationType = lsOldConceptClassificationType
+                '' Get the associated ConceptClassificationValue object from the BindingList
+                'Dim lrConceptClassification As KnowledgeGraph.ConceptClassificationValue = CType(DataGridView.Rows(e.RowIndex).DataBoundItem, KnowledgeGraph.ConceptClassificationValue)
 
-                lrDataStore.Upsert(lrConceptClassification, whereClause)
+                'Dim lsOldConceptClassificationType = Me.msOldValue
 
-                Me.msNewValue = lsUpdatedClassificationType
+                '' Update the ClassificationType property of the ConceptClassificationValue object
+                'lrConceptClassification.ClassificationType = lsUpdatedClassificationType
 
-                ' Refresh the DataGridView to reflect the changes
+                '' Perform the upsert operation with whereClause based on the old ClassificationType
+                'Dim lrDataStore As New DataStore.Store
+                'Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) =
+                'Function(p) p.ModelId = Me.mrModelElement.Model.ModelId And p.Concept = lrConceptClassification.Concept And p.ClassificationType = lsOldConceptClassificationType
+
+                'If lrConceptClassification.Concept <> "" _
+                '    And lrConceptClassification.ClassificationType <> "" _
+                '    And lrConceptClassification.ClassificationValue <> "" Then
+
+                '    lrDataStore.Upsert(lrConceptClassification, whereClause)
+                'End If
+
+                'Me.msNewValue = lsUpdatedClassificationType
+
+                '' Refresh the DataGridView to reflect the changes
                 DataGridView.Refresh()
-            ElseIf e.ColumnIndex > 1 Then ' Assuming ClassificationValue column starts at index 2 (0-based index)
+#End Region
+                ElseIf e.ColumnIndex > 2 Then ' Assuming ClassificationValue column starts at index 3 (0-based index)
 
-                ' Get the updated ClassificationValue value from the cell
-                Dim lsUpdatedClassificationValue As String = DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString()
+                    ' Get the updated ClassificationValue value from the cell
+                    Dim lsUpdatedClassificationValue As String = DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString()
 
                 ' Get the associated ConceptClassificationValue object from the BindingList
                 Dim lrConceptClassification As KnowledgeGraph.ConceptClassificationValue = CType(DataGridView.Rows(e.RowIndex).DataBoundItem, KnowledgeGraph.ConceptClassificationValue)
@@ -267,17 +329,22 @@ LoadCombo:
                 ' Perform the upsert operation with whereClause based on the old ClassificationType and ClassificationValue
                 Dim lrDataStore As New DataStore.Store
                 Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) =
-                    Function(p) p.Concept = lrConceptClassification.Concept And p.ClassificationType = lrConceptClassification.ClassificationType
+                    Function(p) p.ModelId = Me.mrModelElement.Model.ModelId And p.Concept = lrConceptClassification.Concept And p.ClassificationType = lrConceptClassification.ClassificationType
 
-                lrDataStore.Upsert(lrConceptClassification, whereClause)
+                If lrConceptClassification.Concept <> "" _
+                    And lrConceptClassification.ClassificationType <> "" _
+                    And lrConceptClassification.ClassificationValue <> "" Then
 
+                    lrDataStore.Upsert(lrConceptClassification, whereClause)
+                End If
                 Me.msNewValue = lsUpdatedClassificationValue
+
 
                 ' Refresh the DataGridView to reflect the changes
                 DataGridView.Refresh()
-            End If
+                End If
 
-            BeginInvoke(Sub()
+                BeginInvoke(Sub()
                             ' Create a new TextBox cell and set its value
                             Dim textBoxCell As New DataGridViewTextBoxCell()
                             textBoxCell.Value = Me.msNewValue
@@ -312,4 +379,47 @@ LoadCombo:
         End Try
 
     End Sub
+
+    Private Sub DataGridView_UserDeletedRow(sender As Object, e As DataGridViewRowEventArgs) Handles DataGridView.UserDeletedRow
+
+        Try
+            'CodeSafe
+            If Me.mrSelectedRowDataItem Is Nothing Then Exit Sub
+
+            Dim lrConceptClassification As KnowledgeGraph.ConceptClassificationValue = Me.mrSelectedRowDataItem
+
+            Dim lrDataStore As New DataStore.Store
+            Dim loWhereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) =
+                    Function(p) p.ModelId = lrConceptClassification.ModelId And p.Concept = lrConceptClassification.Concept And p.ClassificationType = lrConceptClassification.ClassificationType
+            Call lrDataStore.Delete(Of KnowledgeGraph.ConceptClassificationValue)(loWhereClause)
+
+            Me.mrSelectedRowDataItem = Nothing
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DataGridView_UserDeletingRow(sender As Object, e As DataGridViewRowCancelEventArgs) Handles DataGridView.UserDeletingRow
+
+        Try
+            Me.mrSelectedRowDataItem = Me.DataGridView.Rows(e.Row.Index).DataBoundItem
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+
 End Class

@@ -76,6 +76,7 @@ Partial Class frmMain
         Me.ToolStripMenuItemDiagramOverview = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemKLTheoremWriter = New System.Windows.Forms.ToolStripMenuItem()
         Me.TestToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ConceptClassificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusBarToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
@@ -390,7 +391,7 @@ Partial Class frmMain
         '
         'ToolboxesToolStripMenuItem
         '
-        Me.ToolboxesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemToolbox, Me.ToolStripMenuItemDiagramOverview, Me.ToolStripMenuItemKLTheoremWriter, Me.TestToolStripMenuItem})
+        Me.ToolboxesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemToolbox, Me.ToolStripMenuItemDiagramOverview, Me.ToolStripMenuItemKLTheoremWriter, Me.TestToolStripMenuItem, Me.ConceptClassificationToolStripMenuItem})
         Me.ToolboxesToolStripMenuItem.Name = "ToolboxesToolStripMenuItem"
         Me.ToolboxesToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
         Me.ToolboxesToolStripMenuItem.Text = "Tool&boxes"
@@ -399,19 +400,19 @@ Partial Class frmMain
         '
         Me.ToolStripMenuItemToolbox.Image = CType(resources.GetObject("ToolStripMenuItemToolbox.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemToolbox.Name = "ToolStripMenuItemToolbox"
-        Me.ToolStripMenuItemToolbox.Size = New System.Drawing.Size(172, 22)
+        Me.ToolStripMenuItemToolbox.Size = New System.Drawing.Size(192, 22)
         Me.ToolStripMenuItemToolbox.Text = "&Toolbox"
         '
         'ToolStripMenuItemDiagramOverview
         '
         Me.ToolStripMenuItemDiagramOverview.Name = "ToolStripMenuItemDiagramOverview"
-        Me.ToolStripMenuItemDiagramOverview.Size = New System.Drawing.Size(172, 22)
+        Me.ToolStripMenuItemDiagramOverview.Size = New System.Drawing.Size(192, 22)
         Me.ToolStripMenuItemDiagramOverview.Text = "Diagram &Overview"
         '
         'ToolStripMenuItemKLTheoremWriter
         '
         Me.ToolStripMenuItemKLTheoremWriter.Name = "ToolStripMenuItemKLTheoremWriter"
-        Me.ToolStripMenuItemKLTheoremWriter.Size = New System.Drawing.Size(172, 22)
+        Me.ToolStripMenuItemKLTheoremWriter.Size = New System.Drawing.Size(192, 22)
         Me.ToolStripMenuItemKLTheoremWriter.Text = "&KL Theorem Writer"
         '
         'TestToolStripMenuItem
@@ -419,8 +420,14 @@ Partial Class frmMain
         Me.TestToolStripMenuItem.Image = CType(resources.GetObject("TestToolStripMenuItem.Image"), System.Drawing.Image)
         Me.TestToolStripMenuItem.Name = "TestToolStripMenuItem"
         Me.TestToolStripMenuItem.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.P), System.Windows.Forms.Keys)
-        Me.TestToolStripMenuItem.Size = New System.Drawing.Size(172, 22)
+        Me.TestToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
         Me.TestToolStripMenuItem.Text = "&Properties"
+        '
+        'ConceptClassificationToolStripMenuItem
+        '
+        Me.ConceptClassificationToolStripMenuItem.Name = "ConceptClassificationToolStripMenuItem"
+        Me.ConceptClassificationToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.ConceptClassificationToolStripMenuItem.Text = "&Concept Classification"
         '
         'StatusBarToolStripMenuItem
         '
@@ -1149,4 +1156,5 @@ Partial Class frmMain
     Friend WithEvents ToolStripMenuItemLogInAs As ToolStripMenuItem
     Friend WithEvents JupyterNotebookToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents GenericTestFormToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ConceptClassificationToolStripMenuItem As ToolStripMenuItem
 End Class

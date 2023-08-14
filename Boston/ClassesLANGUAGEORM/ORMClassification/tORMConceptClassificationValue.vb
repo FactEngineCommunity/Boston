@@ -9,6 +9,21 @@ Namespace KnowledgeGraph
         Public Model As FBM.Model
 
         <JsonIgnore>
+        Private _ModelId As String = ""
+        Public Property ModelId As String
+            Get
+                If Me.Model IsNot Nothing Then
+                    Return Me.Model.ModelId
+                Else
+                    Return Me._ModelId
+                End If
+            End Get
+            Set(value As String)
+                Me._ModelId = value
+            End Set
+        End Property
+
+        <JsonIgnore>
         Private _Concept As String = ""
         Public Property Concept As String
             Get

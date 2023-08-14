@@ -4,6 +4,7 @@ Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
 Imports Newtonsoft.Json
+Imports System.Linq.Expressions
 
 Namespace FBM
     <Serializable()>
@@ -1528,6 +1529,25 @@ Namespace FBM
         Public Overridable Function getBaseModelObject() As FBM.ModelObject
             Return New FBM.ModelObject
         End Function
+
+        Public Sub GetConceptClassifications()
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+                    Dim lrWhereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.ModelId = Me.Model.ModelId And p.Concept = Me.Id
+                    Dim lrDataStore As New DataStore.Store
+                    Me.ClassificationValue = lrDataStore.Get(Of KnowledgeGraph.ConceptClassificationValue)(lrWhereClause)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
 
         Public Function getConnectedFactTypes() As List(Of FBM.FactType)
 

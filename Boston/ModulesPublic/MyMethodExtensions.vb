@@ -13,6 +13,19 @@ Imports System.Dynamic
 Module MyMethodExtensions
 
     <Extension()>
+    Public Function CondenseString(ByVal input As String, ByVal startLength As Integer, ByVal endLength As Integer, ByVal ellipsisCount As Integer) As String
+        If input.Length <= startLength + endLength + ellipsisCount Then
+            Return input
+        End If
+
+        Dim condensedString As String = input.Substring(0, startLength)
+        condensedString += New String("."c, ellipsisCount)
+        condensedString += input.Substring(input.Length - endLength, endLength)
+
+        Return condensedString
+    End Function
+
+    <Extension()>
     Function ToPascalCase(ByVal input As String) As String
         Dim words As String() = input.Split({" "c, "_"c}, StringSplitOptions.None)
 
