@@ -438,7 +438,14 @@ FinishAnyway:
             lsSQLQuery &= "   AND MD.Symbol = FT.FactTypeId"
             lsSQLQuery &= "   AND MD.ModelId = FT.ModelId"
             lsSQLQuery &= "   AND MD.IsFactType = " & True
-            lsSQLQuery &= " ORDER BY FT.IsObjectified ASC, FT.IsLinkFactType ASC"
+            lsSQLQuery &= " ORDER BY "
+
+            Select Case My.Settings.DatabaseType
+                Case Is = pcenumDatabaseType.SQLite.ToString
+                    lsSQLQuery &= "FT.IsObjectified DESC, FT.IsLinkFactType DESC"
+                Case Else
+                    lsSQLQuery &= "FT.IsObjectified ASC, FT.IsLinkFactType ASC"
+            End Select
 
 
             lREcordset.Open(lsSQLQuery)
@@ -763,8 +770,12 @@ SkipRoleConstraint:
                 lsSQLQuery &= "   AND ModelId = '" & Replace(arFactType.Model.ModelId, "'", "`") & "'"
 
                 pdbConnection.BeginTrans()
-                pdbConnection.Execute(lsSQLQuery)
+                Dim lrRecordset As ORMQL.Recordset = pdbConnection.Execute(lsSQLQuery)
                 pdbConnection.CommitTrans()
+
+                If lrRecordset.ErrorReturned Then
+                    Throw New Exception(lrRecordset.ErrorString)
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String

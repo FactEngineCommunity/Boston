@@ -21,7 +21,7 @@ FACTTYPENAME -> @"[aA-zZ]+";
 MULTDIV 	-> @"\*|/";
 MODELNAME     -> @"[aA-zZ]+";
 //20221110-[Color(76, 153, 0)]	MODELELEMENTNAME -> @"(([A-Z0-9]+[_a-z\-0-9]+[ |_]*)+[_|\s]?)+"; // @"(([A-Z0-9]+[_a-zA-Z0-9]*[ |_]*)+[_|\s]?)+"; // @"(([A-Z0-9][a-z0-9]+)+[_|\s]?)+"; //(([A-Z][a-z]+)+[_|\s]?)+
-[Color(76, 153, 0)]	MODELELEMENTNAME -> @"(((?!(IS|WRITTEN|TO))[A-Z0-9]+[_a-z\-0-9]*[ |_]*)+[_|\s]?)+"; //eclude word \b(?!\W+is\b))+";
+[Color(76, 153, 0)]	MODELELEMENTNAME -> @"(((?!(IS|WRITTEN|TO|INCLUDES))[A-Z0-9]+[_a-z\-0-9]*[ |_]*)+[_|\s]?)+"; //eclude word \b(?!\W+is\b))+";
 NUMBER 	-> @"[0-9]+";
 //PAGENAME      -> @"[aA-zZ0-9\s\-]+"; 
 PERIOD		-> @"\.";
@@ -173,8 +173,8 @@ MODELELEMENTLEADINGSTMT	-> FRONTREADINGTEXTCLAUSE? (MODELELEMENT | QUOTEDMODELEL
                                                  OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE |
                                                  ENTITYTYPEISIDENTIFIEDBYITSCLAUSE |
                                                  VALUETYPEISWRITTENASCLAUSE |
-							 VALUECONSTRAINTCLAUSE |
 						 	 FACTCLAUSE |
+							 VALUECONSTRAINTCLAUSE |
                                                  BINARYPREDICATECLAUSE |
                                                  UNARYPREDICATECLAUSE
 

@@ -97,7 +97,7 @@ Namespace VAQL
             Patterns.Add(TokenType.MODELNAME, regex)
             Tokens.Add(TokenType.MODELNAME)
 
-            regex = new Regex("(((?!(IS|WRITTEN|TO))[A-Z0-9]+[_a-z\-0-9]*[ |_]*)+[_|\s]?)+", RegexOptions.Compiled)
+            regex = new Regex("(((?!(IS|WRITTEN|TO|INCLUDES))[A-Z0-9]+[_a-z\-0-9]*[ |_]*)+[_|\s]?)+", RegexOptions.Compiled)
             Patterns.Add(TokenType.MODELELEMENTNAME, regex)
             Tokens.Add(TokenType.MODELELEMENTNAME)
 
@@ -341,9 +341,9 @@ Namespace VAQL
             Patterns.Add(TokenType.KEYWDDATATYPETEXTVARIABLELENGTH, regex)
             Tokens.Add(TokenType.KEYWDDATATYPETEXTVARIABLELENGTH)
 
-            regex = new Regex("IDENTIFIED BY ITS", RegexOptions.Compiled)
-            Patterns.Add(TokenType.KEYWDIDENTIFIEDBYITS, regex)
-            Tokens.Add(TokenType.KEYWDIDENTIFIEDBYITS)
+            regex = new Regex("IDENTIFIED BY", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDIDENTIFIEDBY, regex)
+            Tokens.Add(TokenType.KEYWDIDENTIFIEDBY)
 
             regex = new Regex("IS A CONCEPT", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISACONCEPT, regex)
@@ -361,13 +361,21 @@ Namespace VAQL
             Patterns.Add(TokenType.KEYWDISAVALUETYPE, regex)
             Tokens.Add(TokenType.KEYWDISAVALUETYPE)
 
-            regex = new Regex("IS IDENTIFIED BY ITS", RegexOptions.Compiled)
-            Patterns.Add(TokenType.KEYWDISIDENTIFIEDBYITS, regex)
-            Tokens.Add(TokenType.KEYWDISIDENTIFIEDBYITS)
+            regex = new Regex("IS IDENTIFIED BY", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDISIDENTIFIEDBY, regex)
+            Tokens.Add(TokenType.KEYWDISIDENTIFIEDBY)
+
+            regex = new Regex("IS OBJECTIFIED", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDISOBJECTIFIED, regex)
+            Tokens.Add(TokenType.KEYWDISOBJECTIFIED)
 
             regex = new Regex("IS WRITTEN AS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDISWRITTENAS, regex)
             Tokens.Add(TokenType.KEYWDISWRITTENAS)
+
+            regex = new Regex("ITS", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDITS, regex)
+            Tokens.Add(TokenType.KEYWDITS)
 
             regex = new Regex("NL:", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDNL, regex)
@@ -392,6 +400,10 @@ Namespace VAQL
             regex = new Regex("STAND ALONE", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDSTANDALONE, regex)
             Tokens.Add(TokenType.KEYWDSTANDALONE)
+
+            regex = new Regex("THEIR", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDTHEIR, regex)
+            Tokens.Add(TokenType.KEYWDTHEIR)
 
             regex = new Regex("WRITTEN AS", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDWRITTENAS, regex)
@@ -443,83 +455,73 @@ Namespace VAQL
         ''' </summary>
         ''' <returns></returns>
         Public Function LookAhead(ByVal ParamArray expectedtokens As TokenType()) As Token
-
             Dim i As Integer
             Dim start As Integer = StartPos
             Dim tok As Token = Nothing
             Dim scantokens As List(Of TokenType)
 
-            Try
+            ' this prevents double scanning and matching
+            ' increased performance
+            If LookAheadToken IsNot Nothing AndAlso LookAheadToken.Type <> TokenType._UNDETERMINED_ AndAlso LookAheadToken.Type <> TokenType._NONE_ Then
+                Return LookAheadToken
+            End If
 
-                ' this prevents double scanning and matching
-                ' increased performance
-                If LookAheadToken IsNot Nothing AndAlso LookAheadToken.Type <> TokenType._UNDETERMINED_ AndAlso LookAheadToken.Type <> TokenType._NONE_ Then
-                    Return LookAheadToken
+            If expectedtokens.Length = 0 Then
+                scantokens = Tokens
+            Else
+                scantokens = New List(Of TokenType)(expectedtokens)
+                scantokens.AddRange(SkipList)
+            End If
+
+            Do
+                Dim len As Integer = -1
+                Dim index As TokenType = Integer.MaxValue
+                Dim m_input As String
+
+                If start > Input.Length Then
+                    tok = New Token(start, start)
+                    tok.Type = TokenType._UNDETERMINED_
+                    Exit Do
                 End If
 
-                If expectedtokens.Length = 0 Then
-                    scantokens = Tokens
+                m_input = Input.Substring(start)
+
+                tok = New Token(start, EndPos)
+
+
+                For i = 0 To scantokens.Count - 1
+                    Dim r As Regex = Patterns(scantokens(i))
+                    Dim m As Match = r.Match(m_input)
+                    If m.Success AndAlso m.Index = 0 AndAlso ((m.Length > len) OrElse (scantokens(i) < index AndAlso m.Length = len)) Then
+                        len = m.Length
+                        index = scantokens(i)
+                        Exit For
+                    End If
+                Next i
+
+                If index >= 0 AndAlso len >= 0 Then
+                    tok.EndPos = start + len
+                    If tok.StartPos + len <= Input.Length Then
+                        tok.Text = Input.Substring(tok.StartPos, len)
+                    End If
+                    tok.Type = index
                 Else
-                    scantokens = New List(Of TokenType)(expectedtokens)
-                    scantokens.AddRange(SkipList)
+                    If tok.StartPos < tok.EndPos - 1 Then
+                        tok.Text = Input.Substring(tok.StartPos, 1)
+                    End If
                 End If
 
-                Do
-                    Dim len As Integer = -1
-                    Dim index As TokenType = Integer.MaxValue
-                    Dim m_input As String
+                If SkipList.Contains(tok.Type) Then
+                    start = tok.EndPos
+                    Skipped.Add(tok)
+                Else
+                    tok.Skipped = Skipped
+                    Skipped = New List(Of Token)
+                End If
+            Loop While SkipList.Contains(tok.Type)
 
-                    If start > Input.Length Then
-                        tok = New Token(start, start)
-                        tok.Type = TokenType._UNDETERMINED_
-                        Exit Do
-                    End If
-
-                    m_input = Input.Substring(start)
-
-                    tok = New Token(start, EndPos)
-
-
-                    For i = 0 To scantokens.Count - 1
-                        Dim r As Regex = Patterns(scantokens(i))
-                        Dim m As Match = r.Match(m_input)
-                        If m.Success AndAlso m.Index = 0 AndAlso ((m.Length > len) OrElse (scantokens(i) < index AndAlso m.Length = len)) Then
-                            len = m.Length
-                            index = scantokens(i)
-                            Exit For
-                        End If
-                    Next i
-
-                    If index >= 0 AndAlso len >= 0 Then
-                        tok.EndPos = start + len
-                        If tok.StartPos + len <= Input.Length Then
-                            tok.Text = Input.Substring(tok.StartPos, len)
-                        End If
-                        tok.Type = index
-                    Else
-                        If tok.StartPos < tok.EndPos - 1 Then
-                            tok.Text = Input.Substring(tok.StartPos, 1)
-                        End If
-                    End If
-
-                    If SkipList.Contains(tok.Type) Then
-                        start = tok.EndPos
-                        Skipped.Add(tok)
-                    Else
-                        tok.Skipped = Skipped
-                        Skipped = New List(Of Token)
-                    End If
-                Loop While SkipList.Contains(tok.Type)
-
-                LookAheadToken = tok
-                Return tok
-
-            Catch ex As Exception
-                Throw New Exception(ex.Message)
-
-                Return Nothing
-            End Try
-
+            LookAheadToken = tok
+            Return tok
         End Function
     End Class
 #End Region
@@ -555,122 +557,126 @@ Namespace VAQL
         ISACONCEPTCLAUSE= 21
         ISANENTITYTYPECLAUSE= 22
         ISAVALUETYPECLAUSE= 23
-        ISWHERECLAUSE= 24
-        MODELELEMENT= 25
-        MODELELEMENTTYPE= 26
-        OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE= 27
-        PREDICATECLAUSE= 28
-        QUOTEDMODELELEMENTNAME= 29
-        UNARYPREDICATECLAUSE= 30
-        VALUECONSTRAINTCLAUSE= 31
-        VALUECONSTRAINTVALUELIST= 32
-        VALUETYPEISWRITTENASCLAUSE= 33
-        VALUETYPEWRITTENASCLAUSE= 34
-        ADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT= 35
-        ADDOBJECTTYPETOPAGESTMT= 36
-        CREATEPAGESTMT= 37
-        CREATESTMT  = 38
-        FACTSTMT    = 39
-        FACTTYPEIDENTIFICATION= 40
-        FACTTYPESTMT= 41
-        FACTREADINGSTMT= 42
-        MODELELEMENTLEADINGSTMT= 43
-        BASEPRODUCTION= 44
-        Start       = 45
+        ISOBJECTIFIEDCLAUSE= 24
+        ISWHERECLAUSE= 25
+        MODELELEMENT= 26
+        MODELELEMENTTYPE= 27
+        OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE= 28
+        PREDICATECLAUSE= 29
+        QUOTEDMODELELEMENTNAME= 30
+        UNARYPREDICATECLAUSE= 31
+        VALUECONSTRAINTCLAUSE= 32
+        VALUECONSTRAINTVALUELIST= 33
+        VALUETYPEISWRITTENASCLAUSE= 34
+        VALUETYPEWRITTENASCLAUSE= 35
+        ADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT= 36
+        ADDOBJECTTYPETOPAGESTMT= 37
+        CREATEPAGESTMT= 38
+        CREATESTMT  = 39
+        FACTSTMT    = 40
+        FACTTYPEIDENTIFICATION= 41
+        FACTTYPESTMT= 42
+        FACTREADINGSTMT= 43
+        MODELELEMENTLEADINGSTMT= 44
+        BASEPRODUCTION= 45
+        Start       = 46
 
         'Terminal tokens:
-        BROPEN      = 46
-        BRCLOSE     = 47
-        COLON       = 48
-        COLUMNNAMESTR= 49
-        COMMA       = 50
-        CURLYBRACKETCLOSE= 51
-        CURLYBRACKETOPEN= 52
-        DOUBLEQUOTE = 53
-        EOF         = 54
-        EQUALS      = 55
-        FACTTYPENAME= 56
-        FOLLOWINGREADINGTEXT= 57
-        FRONTREADINGTEXT= 58
-        ID          = 59
-        MULTDIV     = 60
-        MODELNAME   = 61
-        MODELELEMENTNAME= 62
-        NUMBER      = 63
-        PERIOD      = 64
-        PLUSMINUS   = 65
-        PAGENAME    = 66
-        POSTBOUNDREADINGTEXT= 67
-        PREBOUNDREADINGTEXT= 68
-        PREDICATEPART= 69
-        PREDICATESPACE= 70
-        REFERENCEMODE= 71
-        ROLENAME    = 72
-        SINGLEQUOTE = 73
-        STAR        = 74
-        SPACE       = 75
-        UNARYPREDICATEPART= 76
-        USERTABLENAME= 77
-        VALUECONSTRAINTVALUE= 78
-        WHERECLAUSECOLUMNNAMESTR= 79
-        VALUE       = 80
-        KEYWDADDOBJECTTYPE= 81
-        KEYWDADDOBJECTTYPESRELATEDTO= 82
-        KEYWDANYNUMBEROF= 83
-        KEYWDANYFACTTYPE= 84
-        KEYWDATLEASTONE= 85
-        KEYWDATMOSTONE= 86
-        KEYWDCREATE = 87
-        KEYWDINCLUDES= 88
-        KEYWDISA    = 89
-        KEYWDISWHERE= 90
-        KEYWDDATATYPELOGICALTRUEFALSE= 91
-        KEYWDDATATYPELOGICALYESNO= 92
-        KEYWDDATATYPEAUTOCOUNTER= 93
-        KEYWDDATATYPEDECIMAL= 94
-        KEYWDDATATYPEFLOATCUSTOMPRECISION= 95
-        KEYWDDATATYPEFLOATDOUBLEPRECISION= 96
-        KEYWDDATATYPEFLOATSINGLEPRECISION= 97
-        KEYWDDATATYPEMONEY= 98
-        KEYWDDATATYPESIGNEDBIGINTEGER= 99
-        KEYWDDATATYPESIGNEDINTEGER= 100
-        KEYWDDATATYPESIGNEDSMALLINTEGER= 101
-        KEYWDDATATYPEUNSIGNEDBIGINTEGER= 102
-        KEYWDDATATYPEUNSIGNEDINTEGER= 103
-        KEYWDDATATYPEUNSIGNEDSMALLINTEGER= 104
-        KEYWDDATATYPEUNSIGNEDTINYINTEGER= 105
-        KEYWDDATATYPEOBJECTID= 106
-        KEYWDDATATYPEROWID= 107
-        KEYWDDATATYPERAWDATAFIXEDLENGTH= 108
-        KEYWDDATATYPERAWDATALARGELENGTH= 109
-        KEYWDDATATYPERAWDATAOLEOBJECT= 110
-        KEYWDDATATYPERAWDATA= 111
-        KEYWDDATATYPERAWDATAVARIABLELENGTH= 112
-        KEYWDDATATYPEAUTOTIMESTAMP= 113
-        KEYWDDATATYPEDATE= 114
-        KEYWDDATATYPEDATETIME= 115
-        KEYWDDATATYPETIME= 116
-        KEYWDDATATYPESTRINGFIXEDLENGTH= 117
-        KEYWDDATATYPESTRINGLARGELENGTH= 118
-        KEYWDDATATYPESTRINGVARIABLELENGTH= 119
-        KEYWDDATATYPETEXTFIXEDLENGTH= 120
-        KEYWDDATATYPETEXTLARGELENGTH= 121
-        KEYWDDATATYPETEXTVARIABLELENGTH= 122
-        KEYWDIDENTIFIEDBYITS= 123
-        KEYWDISACONCEPT= 124
-        KEYWDISAKINDOF= 125
-        KEYWDISANENTITYTYPE= 126
-        KEYWDISAVALUETYPE= 127
-        KEYWDISIDENTIFIEDBYITS= 128
-        KEYWDISWRITTENAS= 129
-        KEYWDNL     = 130
-        KEYWDONE    = 131
-        KEYWDPAGE   = 132
-        KEYWDREADING= 133
-        KEYWDTOPAGE = 134
-        KEYWDSTANDALONE= 135
-        KEYWDWRITTENAS= 136
-        WHITESPACE  = 137
+        BROPEN      = 47
+        BRCLOSE     = 48
+        COLON       = 49
+        COLUMNNAMESTR= 50
+        COMMA       = 51
+        CURLYBRACKETCLOSE= 52
+        CURLYBRACKETOPEN= 53
+        DOUBLEQUOTE = 54
+        EOF         = 55
+        EQUALS      = 56
+        FACTTYPENAME= 57
+        FOLLOWINGREADINGTEXT= 58
+        FRONTREADINGTEXT= 59
+        ID          = 60
+        MULTDIV     = 61
+        MODELNAME   = 62
+        MODELELEMENTNAME= 63
+        NUMBER      = 64
+        PERIOD      = 65
+        PLUSMINUS   = 66
+        PAGENAME    = 67
+        POSTBOUNDREADINGTEXT= 68
+        PREBOUNDREADINGTEXT= 69
+        PREDICATEPART= 70
+        PREDICATESPACE= 71
+        REFERENCEMODE= 72
+        ROLENAME    = 73
+        SINGLEQUOTE = 74
+        STAR        = 75
+        SPACE       = 76
+        UNARYPREDICATEPART= 77
+        USERTABLENAME= 78
+        VALUECONSTRAINTVALUE= 79
+        WHERECLAUSECOLUMNNAMESTR= 80
+        VALUE       = 81
+        KEYWDADDOBJECTTYPE= 82
+        KEYWDADDOBJECTTYPESRELATEDTO= 83
+        KEYWDANYNUMBEROF= 84
+        KEYWDANYFACTTYPE= 85
+        KEYWDATLEASTONE= 86
+        KEYWDATMOSTONE= 87
+        KEYWDCREATE = 88
+        KEYWDINCLUDES= 89
+        KEYWDISA    = 90
+        KEYWDISWHERE= 91
+        KEYWDDATATYPELOGICALTRUEFALSE= 92
+        KEYWDDATATYPELOGICALYESNO= 93
+        KEYWDDATATYPEAUTOCOUNTER= 94
+        KEYWDDATATYPEDECIMAL= 95
+        KEYWDDATATYPEFLOATCUSTOMPRECISION= 96
+        KEYWDDATATYPEFLOATDOUBLEPRECISION= 97
+        KEYWDDATATYPEFLOATSINGLEPRECISION= 98
+        KEYWDDATATYPEMONEY= 99
+        KEYWDDATATYPESIGNEDBIGINTEGER= 100
+        KEYWDDATATYPESIGNEDINTEGER= 101
+        KEYWDDATATYPESIGNEDSMALLINTEGER= 102
+        KEYWDDATATYPEUNSIGNEDBIGINTEGER= 103
+        KEYWDDATATYPEUNSIGNEDINTEGER= 104
+        KEYWDDATATYPEUNSIGNEDSMALLINTEGER= 105
+        KEYWDDATATYPEUNSIGNEDTINYINTEGER= 106
+        KEYWDDATATYPEOBJECTID= 107
+        KEYWDDATATYPEROWID= 108
+        KEYWDDATATYPERAWDATAFIXEDLENGTH= 109
+        KEYWDDATATYPERAWDATALARGELENGTH= 110
+        KEYWDDATATYPERAWDATAOLEOBJECT= 111
+        KEYWDDATATYPERAWDATA= 112
+        KEYWDDATATYPERAWDATAVARIABLELENGTH= 113
+        KEYWDDATATYPEAUTOTIMESTAMP= 114
+        KEYWDDATATYPEDATE= 115
+        KEYWDDATATYPEDATETIME= 116
+        KEYWDDATATYPETIME= 117
+        KEYWDDATATYPESTRINGFIXEDLENGTH= 118
+        KEYWDDATATYPESTRINGLARGELENGTH= 119
+        KEYWDDATATYPESTRINGVARIABLELENGTH= 120
+        KEYWDDATATYPETEXTFIXEDLENGTH= 121
+        KEYWDDATATYPETEXTLARGELENGTH= 122
+        KEYWDDATATYPETEXTVARIABLELENGTH= 123
+        KEYWDIDENTIFIEDBY= 124
+        KEYWDISACONCEPT= 125
+        KEYWDISAKINDOF= 126
+        KEYWDISANENTITYTYPE= 127
+        KEYWDISAVALUETYPE= 128
+        KEYWDISIDENTIFIEDBY= 129
+        KEYWDISOBJECTIFIED= 130
+        KEYWDISWRITTENAS= 131
+        KEYWDITS    = 132
+        KEYWDNL     = 133
+        KEYWDONE    = 134
+        KEYWDPAGE   = 135
+        KEYWDREADING= 136
+        KEYWDTOPAGE = 137
+        KEYWDSTANDALONE= 138
+        KEYWDTHEIR  = 139
+        KEYWDWRITTENAS= 140
+        WHITESPACE  = 141
     End Enum
 
     <Serializable()>

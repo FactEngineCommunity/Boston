@@ -5034,6 +5034,17 @@ CommitTransaction:
 
             Try
                 Me.IsLinkFactType = abIsLinkFactType
+
+                Try
+                    If abIsLinkFactType And Me.RoleGroup(0).JoinsFactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject.Id = Me.RoleGroup(1).JoinedORMObject.Id).Count = 1 Then
+                        Me.LinkFactTypeRole = Me.RoleGroup(0).JoinsFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = Me.RoleGroup(1).JoinedORMObject.Id)
+                    End If
+                Catch ex As Exception
+                    'We tried
+                End Try
+
+                Call Me.makeDirty()
+
                 RaiseEvent IsLinkFactTypeChanged()
 
             Catch ex As Exception

@@ -4666,6 +4666,9 @@ SkipORMReadingEditor:
                         Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataType", lrFactTypeInstance.IsObjectified)
                         Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypeLength", lrFactTypeInstance.IsObjectified)
                         Call lrFactTypeInstance.SetPropertyAttributes(Me, "DataTypePrecision", lrFactTypeInstance.IsObjectified)
+                        Dim lbShiftKeyDown = Control.ModifierKeys = Keys.Shift
+                        Call lrFactTypeInstance.SetPropertyAttributes(Me, "IsLinkFactType", lbShiftKeyDown)
+
                         If lrFactTypeInstance.IsObjectified Then
 
                             'CodeSafe 
@@ -6055,19 +6058,44 @@ SkipPopup:
 
     Private Sub PropertieToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PropertieToolStripMenuItem.Click
 
-        Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+        Try
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
 
-        Dim lrPropertyGridForm As frmToolboxProperties
-        lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-        Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
-        lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-        If IsSomething(lrPropertyGridForm) Then
-            If Me.Diagram.Selection.Items.Count > 0 Then
-                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
-            Else
-                lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0) ' Diagram.Selection.Items(0).Tag
+            Try
+                lrFactTypeInstance = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                Exit Sub
+            End Try
+
+
+            Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
+
+            Dim lrPropertyGridForm As frmToolboxProperties
+            lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+            Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
+            lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
+
+
+            Dim lbShiftKeyDown = Control.ModifierKeys = Keys.Shift
+            Call lrFactTypeInstance.SetPropertyAttributes(Me, "IsLinkFactType", lbShiftKeyDown)
+
+
+            If IsSomething(lrPropertyGridForm) Then
+                If Me.Diagram.Selection.Items.Count > 0 Then
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
+                Else
+                    lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0) ' Diagram.Selection.Items(0).Tag
+                End If
             End If
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

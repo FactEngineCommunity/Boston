@@ -368,38 +368,33 @@ Namespace VAQL
     ''' this method should be used only by HighlightText or RestoreState methods
     ''' </summary>
     Private Sub HighlighTextCore()
-            'Tree = Parser.Parse(Textbox.Text);
-            Try
-                Dim sb As New StringBuilder()
-                If Tree Is Nothing Then
-                    Return
-                End If
+        'Tree = Parser.Parse(Textbox.Text);
+        Dim sb As New StringBuilder()
+        If Tree Is Nothing Then
+            Return
+        End If
 
-                If Tree.Errors.Count > 0 Then
-                    Exit Sub
-                End If
+            If Tree.Errors.Count > 0 Then
+                Exit Sub
+            End If
 
-                Dim start As ParseNode = Tree.Nodes(0)
-                HightlightNode(start, sb)
+        Dim start As ParseNode = Tree.Nodes(0)
+        HightlightNode(start, sb)
 
-                ' append any trailing skipped tokens that were scanned
-                For Each skiptoken As Token In Scanner.Skipped
-                    HighlightToken(skiptoken, sb)
-                    sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
-                Next
+        ' append any trailing skipped tokens that were scanned
+        For Each skiptoken As Token In Scanner.Skipped
+            HighlightToken(skiptoken, sb)
+            sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
+        Next
 
-                sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
+        sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
 
-                AddRtfHeader(sb)
-                AddRtfEnd(sb)
+        AddRtfHeader(sb)
+        AddRtfEnd(sb)
 
-                Textbox.Rtf = sb.ToString()
+        Textbox.Rtf = sb.ToString()
 
-            Catch ex As Exception
-
-            End Try
-
-        End Sub
+    End Sub
 
 
     ''' <summary>
@@ -430,42 +425,38 @@ Namespace VAQL
 
     Private Sub AutoHighlightStart()
         Dim _tree As ParseTree
-            Dim _currenttext As String = ""
-            Try
-                While Not isDisposing
-                    Dim _textchanged As Boolean
-                    SyncLock treelock
-                        _textchanged = textChanged
-                        If textChanged Then
-                            textChanged = False
-                            _currenttext = currentText
-                        End If
-                    End SyncLock
-                    If Not _textchanged Then
-                        Thread.Sleep(200)
+        Dim _currenttext As String = ""
+        While Not isDisposing
+            Dim _textchanged As Boolean
+            SyncLock treelock
+                _textchanged = textChanged
+                If textChanged Then
+                    textChanged = False
+                    _currenttext = currentText
+                End If
+            End SyncLock
+            If Not _textchanged Then
+                Thread.Sleep(200)
+                Continue While
+            End If
+
+                _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+
+                SyncLock treelock
+                    If textChanged Then
                         Continue While
+                    Else
+                        ' assign new tree
+                        Tree = _tree
                     End If
-
-                    _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
-
-                    SyncLock treelock
-                        If textChanged Then
-                            Continue While
-                        Else
-                            ' assign new tree
-                            Tree = _tree
-                        End If
-                    End SyncLock
+                End SyncLock
 
 
-                    If _tree.Errors.Count = 0 Then
-                        Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-                    End If
-                End While
-            Catch ex As Exception
-
-            End Try
-        End Sub
+                If _tree.Errors.Count = 0 Then
+                    Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
+                End If
+            End While
+    End Sub
 
 
     ''' <summary>
@@ -670,7 +661,7 @@ Namespace VAQL
                     Case TokenType.KEYWDDATATYPETEXTVARIABLELENGTH:
                         sb.Append("{{\cf57 ")
                         Exit Select
-                    Case TokenType.KEYWDIDENTIFIEDBYITS:
+                    Case TokenType.KEYWDIDENTIFIEDBY:
                         sb.Append("{{\cf58 ")
                         Exit Select
                     Case TokenType.KEYWDISACONCEPT:
@@ -685,32 +676,41 @@ Namespace VAQL
                     Case TokenType.KEYWDISAVALUETYPE:
                         sb.Append("{{\cf62 ")
                         Exit Select
-                    Case TokenType.KEYWDISIDENTIFIEDBYITS:
+                    Case TokenType.KEYWDISIDENTIFIEDBY:
                         sb.Append("{{\cf63 ")
                         Exit Select
-                    Case TokenType.KEYWDISWRITTENAS:
+                    Case TokenType.KEYWDISOBJECTIFIED:
                         sb.Append("{{\cf64 ")
                         Exit Select
-                    Case TokenType.KEYWDNL:
+                    Case TokenType.KEYWDISWRITTENAS:
                         sb.Append("{{\cf65 ")
                         Exit Select
-                    Case TokenType.KEYWDONE:
+                    Case TokenType.KEYWDITS:
                         sb.Append("{{\cf66 ")
                         Exit Select
-                    Case TokenType.KEYWDPAGE:
+                    Case TokenType.KEYWDNL:
                         sb.Append("{{\cf67 ")
                         Exit Select
-                    Case TokenType.KEYWDREADING:
+                    Case TokenType.KEYWDONE:
                         sb.Append("{{\cf68 ")
                         Exit Select
-                    Case TokenType.KEYWDTOPAGE:
+                    Case TokenType.KEYWDPAGE:
                         sb.Append("{{\cf69 ")
                         Exit Select
-                    Case TokenType.KEYWDSTANDALONE:
+                    Case TokenType.KEYWDREADING:
                         sb.Append("{{\cf70 ")
                         Exit Select
-                    Case TokenType.KEYWDWRITTENAS:
+                    Case TokenType.KEYWDTOPAGE:
                         sb.Append("{{\cf71 ")
+                        Exit Select
+                    Case TokenType.KEYWDSTANDALONE:
+                        sb.Append("{{\cf72 ")
+                        Exit Select
+                    Case TokenType.KEYWDTHEIR:
+                        sb.Append("{{\cf73 ")
+                        Exit Select
+                    Case TokenType.KEYWDWRITTENAS:
+                        sb.Append("{{\cf74 ")
                         Exit Select
 
             Case Else
@@ -721,7 +721,7 @@ Namespace VAQL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red227\green143\blue247;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red216\green127\blue178;\red153\green0\blue0;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red227\green143\blue247;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red216\green127\blue178;\red153\green0\blue0;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)

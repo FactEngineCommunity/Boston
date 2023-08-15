@@ -192,11 +192,6 @@ Public Class frmToolboxModelDictionary
             loNode = Me.TreeView1.Nodes.Add("Constraints", "Constraints", 0, 0)
             loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
 
-            If prApplication.WorkingModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept).Count > 0 Then
-                loNode = Me.TreeView1.Nodes.Add("General Concepts", "General Concepts", 28, 28)
-                loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
-            End If
-
             If Me.CheckBoxShowModelDictionary.Checked Then
                 loNode = Me.TreeView1.Nodes.Add("ModelDictionary", "Model Dictionary", 0, 0)
                 loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
@@ -204,6 +199,14 @@ Public Class frmToolboxModelDictionary
 
             If prApplication.WorkingModel Is Nothing Then
                 Exit Sub
+            Else
+                'CodeSafe
+                Me.zrORMModel = prApplication.WorkingModel
+            End If
+
+            If Me.zrORMModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept).Count > 0 Then
+                loNode = Me.TreeView1.Nodes.Add("General Concepts", "General Concepts", 28, 28)
+                loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
             End If
 
             Dim lrEntityType As New FBM.EntityType

@@ -1408,7 +1408,7 @@ Namespace VAQL
                       Return False
                    End If
                 tok = m_scanner.LookAhead(TokenType.PREDICATEPART) ' OneOrMore Rule
-            Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.PREDICATEPART ' OneOrMore Rule
+            Loop While tok.Type = TokenType.PREDICATEPART ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                         Return False
             End If
@@ -3707,19 +3707,19 @@ Namespace VAQL
 
              ' Concat Rule
                                 lbProblemSolved = True
-                                        tok = m_scanner.Scan(TokenType.KEYWDISIDENTIFIEDBYITS) ' Terminal Rule: KEYWDISIDENTIFIEDBYITS
+                                        tok = m_scanner.Scan(TokenType.KEYWDISIDENTIFIEDBY) ' Terminal Rule: KEYWDISIDENTIFIEDBY
                     n = node.CreateNode(tok, tok.ToString() )
                     node.Token.UpdateRange(tok)
                     node.Nodes.Add(n)
                     If m_scanner.StartPos >= Me.MaxDistance Then
-                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
                     End If
-                    If tok.Type <> TokenType.KEYWDISIDENTIFIEDBYITS Then
-                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                    If tok.Type <> TokenType.KEYWDISIDENTIFIEDBY Then
+                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
                       lbProblemSolved = False
                       If liMaxRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
-                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
                         max_tree = m_tree.clone
                       End If
                       Return False
@@ -3730,6 +3730,129 @@ Namespace VAQL
                     End If
                     End If
 
+
+               If Not lbProblemSolved Then
+                  If m_scanner.StartPos > Me.MaxDistance Then
+                    Me.MaxDistance = m_scanner.StartPos
+                    max_tree = m_tree.clone
+                  End If
+                  m_scanner.StartPos = liMaxRange
+                  Return False
+               Else
+                  liMaxRange = m_scanner.EndPos
+                  If liMaxRange > Me.MaxDistance Then
+                    Me.MaxDistance = m_scanner.StartPos
+                    max_tree = m_tree.clone
+                  End If
+               End If
+
+             ' Concat Rule
+                                tok = m_scanner.LookAhead({TokenType.KEYWDITS, TokenType.KEYWDTHEIR}) ' Choice Rule
+                    
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                    Select Case tok.Type
+                     ' Choice Rule
+                        Case TokenType.KEYWDITS
+                                                lbProblemSolved = True
+                                                        tok = m_scanner.Scan(TokenType.KEYWDITS) ' Terminal Rule: KEYWDITS
+                            n = node.CreateNode(tok, tok.ToString() )
+                            node.Token.UpdateRange(tok)
+                            node.Nodes.Add(n)
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                              m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                            End If
+                            If tok.Type <> TokenType.KEYWDITS Then
+                              m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                              lbProblemSolved = False
+                              If liMaxRange >= Me.MaxDistance Then
+                                Me.MaxDistance = m_scanner.StartPos
+                                max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                                max_tree = m_tree.clone
+                              End If
+                              Return False
+
+                            Else
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                                m_tree.Optionals.Clear
+                            End If
+                            End If
+
+
+                        Case TokenType.KEYWDTHEIR
+                                                lbProblemSolved = True
+                                                        tok = m_scanner.Scan(TokenType.KEYWDTHEIR) ' Terminal Rule: KEYWDTHEIR
+                            n = node.CreateNode(tok, tok.ToString() )
+                            node.Token.UpdateRange(tok)
+                            node.Nodes.Add(n)
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                              m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                            End If
+                            If tok.Type <> TokenType.KEYWDTHEIR Then
+                              m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                              lbProblemSolved = False
+                              If liMaxRange >= Me.MaxDistance Then
+                                Me.MaxDistance = m_scanner.StartPos
+                                max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                                max_tree = m_tree.clone
+                              End If
+                              Return False
+
+                            Else
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                                m_tree.Optionals.Clear
+                            End If
+                            End If
+
+
+                        Case Else
+                        If m_tree.Errors.Count = 0 Then
+                        lbProblemSolved = False
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                        End If
+                            m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                            Exit Select
+                    End Select ' Choice Rule
+                        If Not lbProblemSolved Then
+                           m_tree.Errors.Clear
+                        If Not lbProblemSolved Then
+                          m_tree.Errors.Clear
+                          If liMaxRange > Me.MaxDistance Then
+                            Me.MaxDistance = m_scanner.StartPos
+                            max_tree = m_tree.clone
+                          End If
+                                        lbProblemSolved = True
+                                        tok = m_scanner.Scan(TokenType.KEYWDTHEIR) ' Terminal Rule: KEYWDTHEIR
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If m_scanner.StartPos >= Me.MaxDistance Then
+                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                    End If
+                    If tok.Type <> TokenType.KEYWDTHEIR Then
+                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                      lbProblemSolved = False
+                      If liMaxRange >= Me.MaxDistance Then
+                        Me.MaxDistance = m_scanner.StartPos
+                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                        max_tree = m_tree.clone
+                      End If
+                      Return False
+
+                    Else
+                    If m_scanner.StartPos >= Me.MaxDistance Then
+                        m_tree.Optionals.Clear
+                    End If
+                    End If
+
+
+                        End If
+                        End If
+                     If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
+                         parent.Nodes.Remove(node)
+                         Return False
+                     End If
 
                If Not lbProblemSolved Then
                   If m_scanner.StartPos > Me.MaxDistance Then
@@ -3861,19 +3984,19 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
 
              ' Concat Rule
                                 lbProblemSolved = True
-                                        tok = m_scanner.Scan(TokenType.KEYWDIDENTIFIEDBYITS) ' Terminal Rule: KEYWDIDENTIFIEDBYITS
+                                        tok = m_scanner.Scan(TokenType.KEYWDIDENTIFIEDBY) ' Terminal Rule: KEYWDIDENTIFIEDBY
                     n = node.CreateNode(tok, tok.ToString() )
                     node.Token.UpdateRange(tok)
                     node.Nodes.Add(n)
                     If m_scanner.StartPos >= Me.MaxDistance Then
-                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBYITS"))
+                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBY"))
                     End If
-                    If tok.Type <> TokenType.KEYWDIDENTIFIEDBYITS Then
-                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBYITS"))
+                    If tok.Type <> TokenType.KEYWDIDENTIFIEDBY Then
+                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBY"))
                       lbProblemSolved = False
                       If liMaxRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
-                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBYITS"))
+                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBY"))
                         max_tree = m_tree.clone
                       End If
                       Return False
@@ -3884,6 +4007,129 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                     End If
                     End If
 
+
+               If Not lbProblemSolved Then
+                  If m_scanner.StartPos > Me.MaxDistance Then
+                    Me.MaxDistance = m_scanner.StartPos
+                    max_tree = m_tree.clone
+                  End If
+                  m_scanner.StartPos = liMaxRange
+                  Return False
+               Else
+                  liMaxRange = m_scanner.EndPos
+                  If liMaxRange > Me.MaxDistance Then
+                    Me.MaxDistance = m_scanner.StartPos
+                    max_tree = m_tree.clone
+                  End If
+               End If
+
+             ' Concat Rule
+                                tok = m_scanner.LookAhead({TokenType.KEYWDITS, TokenType.KEYWDTHEIR}) ' Choice Rule
+                    
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                    Select Case tok.Type
+                     ' Choice Rule
+                        Case TokenType.KEYWDITS
+                                                lbProblemSolved = True
+                                                        tok = m_scanner.Scan(TokenType.KEYWDITS) ' Terminal Rule: KEYWDITS
+                            n = node.CreateNode(tok, tok.ToString() )
+                            node.Token.UpdateRange(tok)
+                            node.Nodes.Add(n)
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                              m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                            End If
+                            If tok.Type <> TokenType.KEYWDITS Then
+                              m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                              lbProblemSolved = False
+                              If liMaxRange >= Me.MaxDistance Then
+                                Me.MaxDistance = m_scanner.StartPos
+                                max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                                max_tree = m_tree.clone
+                              End If
+                              Return False
+
+                            Else
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                                m_tree.Optionals.Clear
+                            End If
+                            End If
+
+
+                        Case TokenType.KEYWDTHEIR
+                                                lbProblemSolved = True
+                                                        tok = m_scanner.Scan(TokenType.KEYWDTHEIR) ' Terminal Rule: KEYWDTHEIR
+                            n = node.CreateNode(tok, tok.ToString() )
+                            node.Token.UpdateRange(tok)
+                            node.Nodes.Add(n)
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                              m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                            End If
+                            If tok.Type <> TokenType.KEYWDTHEIR Then
+                              m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                              lbProblemSolved = False
+                              If liMaxRange >= Me.MaxDistance Then
+                                Me.MaxDistance = m_scanner.StartPos
+                                max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                                max_tree = m_tree.clone
+                              End If
+                              Return False
+
+                            Else
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                                m_tree.Optionals.Clear
+                            End If
+                            End If
+
+
+                        Case Else
+                        If m_tree.Errors.Count = 0 Then
+                        lbProblemSolved = False
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                        End If
+                            m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                            Exit Select
+                    End Select ' Choice Rule
+                        If Not lbProblemSolved Then
+                           m_tree.Errors.Clear
+                        If Not lbProblemSolved Then
+                          m_tree.Errors.Clear
+                          If liMaxRange > Me.MaxDistance Then
+                            Me.MaxDistance = m_scanner.StartPos
+                            max_tree = m_tree.clone
+                          End If
+                                        lbProblemSolved = True
+                                        tok = m_scanner.Scan(TokenType.KEYWDTHEIR) ' Terminal Rule: KEYWDTHEIR
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If m_scanner.StartPos >= Me.MaxDistance Then
+                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                    End If
+                    If tok.Type <> TokenType.KEYWDTHEIR Then
+                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                      lbProblemSolved = False
+                      If liMaxRange >= Me.MaxDistance Then
+                        Me.MaxDistance = m_scanner.StartPos
+                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                        max_tree = m_tree.clone
+                      End If
+                      Return False
+
+                    Else
+                    If m_scanner.StartPos >= Me.MaxDistance Then
+                        m_tree.Optionals.Clear
+                    End If
+                    End If
+
+
+                        End If
+                        End If
+                     If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
+                         parent.Nodes.Remove(node)
+                         Return False
+                     End If
 
                If Not lbProblemSolved Then
                   If m_scanner.StartPos > Me.MaxDistance Then
@@ -4422,7 +4668,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                       Return False
                    End If
                 tok = m_scanner.LookAhead(TokenType.COMMA) ' OneOrMore Rule
-            Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.COMMA ' OneOrMore Rule
+            Loop While tok.Type = TokenType.COMMA ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                         Return False
             End If
@@ -5697,6 +5943,62 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
             Return lbProblemSolved
         End Function ' NonTerminalSymbol: ISAVALUETYPECLAUSE
 
+        Private Function ParseISOBJECTIFIEDCLAUSE(ByVal parent As ParseNode) As Boolean ' NonTerminalSymbol: ISOBJECTIFIEDCLAUSE
+            Dim tok As Token
+            Dim n As ParseNode
+            Dim node As ParseNode = parent.CreateNode(m_scanner.GetToken(TokenType.ISOBJECTIFIEDCLAUSE), "ISOBJECTIFIEDCLAUSE")
+            Dim lbProblemSolved As Boolean = True
+
+            Dim liOriginalRange as Integer = m_scanner.StartPos
+            Dim liMaxRange as Integer = liOriginalRange
+            parent.Nodes.Add(node)
+
+            Try
+            lbProblemSolved = True
+                        tok = m_scanner.Scan(TokenType.KEYWDISOBJECTIFIED) ' Terminal Rule: KEYWDISOBJECTIFIED
+            n = node.CreateNode(tok, tok.ToString() )
+            node.Token.UpdateRange(tok)
+            node.Nodes.Add(n)
+            If m_scanner.StartPos >= Me.MaxDistance Then
+              m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISOBJECTIFIED.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISOBJECTIFIED"))
+            End If
+            If tok.Type <> TokenType.KEYWDISOBJECTIFIED Then
+              m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISOBJECTIFIED.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISOBJECTIFIED"))
+              lbProblemSolved = False
+              If liMaxRange >= Me.MaxDistance Then
+                Me.MaxDistance = m_scanner.StartPos
+                max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISOBJECTIFIED.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISOBJECTIFIED"))
+                max_tree = m_tree.clone
+              End If
+              Return False
+
+            Else
+            If m_scanner.StartPos >= Me.MaxDistance Then
+                m_tree.Optionals.Clear
+            End If
+            End If
+
+
+            If m_scanner.Input.Length > (parent.Token.EndPos + 1) Then
+            End If
+            Finally
+                If lbProblemSolved Then
+                    parent.Token.UpdateRange(node.Token)
+                    Me.MaxDistance = node.Token.EndPos
+                    If m_scanner.EndPos >= Me.MaxDistance Then
+                       If m_tree.MaxDistance > max_tree.MaxDistance Then
+                          Me.MaxDistance = m_scanner.StartPos
+                          max_tree = m_tree.clone
+                       End If
+                    End If
+                Else
+                   m_scanner.StartPos = liOriginalRange
+                   parent.Nodes.Remove(node)
+                End If
+            End Try
+            Return lbProblemSolved
+        End Function ' NonTerminalSymbol: ISOBJECTIFIEDCLAUSE
+
         Private Function ParseISWHERECLAUSE(ByVal parent As ParseNode) As Boolean ' NonTerminalSymbol: ISWHERECLAUSE
             Dim tok As Token
             Dim n As ParseNode
@@ -6267,16 +6569,16 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                End If
 
              ' Concat Rule
-                                tok = m_scanner.LookAhead({TokenType.KEYWDWRITTENAS, TokenType.KEYWDIDENTIFIEDBYITS}) ' Option Rule
+                                tok = m_scanner.LookAhead({TokenType.KEYWDWRITTENAS, TokenType.KEYWDIDENTIFIEDBY}) ' Option Rule
                     If m_scanner.EndPos >= Me.MaxDistance Then
                                             max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWRITTENAS"))
-                                            max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBYITS"))
+                                            max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBY"))
                     End If
-                    If tok.Type = TokenType.KEYWDWRITTENAS Or tok.Type = TokenType.KEYWDIDENTIFIEDBYITS Then
-                        tok = m_scanner.LookAhead({TokenType.KEYWDWRITTENAS, TokenType.KEYWDIDENTIFIEDBYITS}) ' Choice Rule
+                    If tok.Type = TokenType.KEYWDWRITTENAS Or tok.Type = TokenType.KEYWDIDENTIFIEDBY Then
+                        tok = m_scanner.LookAhead({TokenType.KEYWDWRITTENAS, TokenType.KEYWDIDENTIFIEDBY}) ' Choice Rule
                         
                             m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWRITTENAS"))
-                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBYITS"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBY"))
                         Select Case tok.Type
                          ' Choice Rule
                             Case TokenType.KEYWDWRITTENAS
@@ -6289,7 +6591,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                                   lbProblemSolved = False
                                 End If
 
-                            Case TokenType.KEYWDIDENTIFIEDBYITS
+                            Case TokenType.KEYWDIDENTIFIEDBY
                         lbProblemSolved =                                 ParseENTITYTYPEIDENTIFIEDBYITSCLAUSE(node) ' NonTerminal Rule: ENTITYTYPEIDENTIFIEDBYITSCLAUSE
                                 If m_tree.Errors.Count > 0 Then
                                   If m_scanner.EndPos > Me.MaxDistance Then
@@ -6303,7 +6605,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                             If m_tree.Errors.Count = 0 Then
                             lbProblemSolved = False
                             m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDWRITTENAS"))
-                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBYITS"))
+                            m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDWRITTENAS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDIDENTIFIEDBY"))
                             End If
                                 m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
                                 Exit Select
@@ -6394,19 +6696,19 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
 
              ' Concat Rule
                                 lbProblemSolved = True
-                                        tok = m_scanner.Scan(TokenType.KEYWDISIDENTIFIEDBYITS) ' Terminal Rule: KEYWDISIDENTIFIEDBYITS
+                                        tok = m_scanner.Scan(TokenType.KEYWDISIDENTIFIEDBY) ' Terminal Rule: KEYWDISIDENTIFIEDBY
                     n = node.CreateNode(tok, tok.ToString() )
                     node.Token.UpdateRange(tok)
                     node.Nodes.Add(n)
                     If m_scanner.StartPos >= Me.MaxDistance Then
-                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
                     End If
-                    If tok.Type <> TokenType.KEYWDISIDENTIFIEDBYITS Then
-                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                    If tok.Type <> TokenType.KEYWDISIDENTIFIEDBY Then
+                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
                       lbProblemSolved = False
                       If liMaxRange >= Me.MaxDistance Then
                         Me.MaxDistance = m_scanner.StartPos
-                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBYITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISIDENTIFIEDBY.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
                         max_tree = m_tree.clone
                       End If
                       Return False
@@ -6417,6 +6719,129 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                     End If
                     End If
 
+
+               If Not lbProblemSolved Then
+                  If m_scanner.StartPos > Me.MaxDistance Then
+                    Me.MaxDistance = m_scanner.StartPos
+                    max_tree = m_tree.clone
+                  End If
+                  m_scanner.StartPos = liMaxRange
+                  Return False
+               Else
+                  liMaxRange = m_scanner.EndPos
+                  If liMaxRange > Me.MaxDistance Then
+                    Me.MaxDistance = m_scanner.StartPos
+                    max_tree = m_tree.clone
+                  End If
+               End If
+
+             ' Concat Rule
+                                tok = m_scanner.LookAhead({TokenType.KEYWDITS, TokenType.KEYWDTHEIR}) ' Choice Rule
+                    
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                    Select Case tok.Type
+                     ' Choice Rule
+                        Case TokenType.KEYWDITS
+                                                lbProblemSolved = True
+                                                        tok = m_scanner.Scan(TokenType.KEYWDITS) ' Terminal Rule: KEYWDITS
+                            n = node.CreateNode(tok, tok.ToString() )
+                            node.Token.UpdateRange(tok)
+                            node.Nodes.Add(n)
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                              m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                            End If
+                            If tok.Type <> TokenType.KEYWDITS Then
+                              m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                              lbProblemSolved = False
+                              If liMaxRange >= Me.MaxDistance Then
+                                Me.MaxDistance = m_scanner.StartPos
+                                max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                                max_tree = m_tree.clone
+                              End If
+                              Return False
+
+                            Else
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                                m_tree.Optionals.Clear
+                            End If
+                            End If
+
+
+                        Case TokenType.KEYWDTHEIR
+                                                lbProblemSolved = True
+                                                        tok = m_scanner.Scan(TokenType.KEYWDTHEIR) ' Terminal Rule: KEYWDTHEIR
+                            n = node.CreateNode(tok, tok.ToString() )
+                            node.Token.UpdateRange(tok)
+                            node.Nodes.Add(n)
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                              m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                            End If
+                            If tok.Type <> TokenType.KEYWDTHEIR Then
+                              m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                              lbProblemSolved = False
+                              If liMaxRange >= Me.MaxDistance Then
+                                Me.MaxDistance = m_scanner.StartPos
+                                max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                                max_tree = m_tree.clone
+                              End If
+                              Return False
+
+                            Else
+                            If m_scanner.StartPos >= Me.MaxDistance Then
+                                m_tree.Optionals.Clear
+                            End If
+                            End If
+
+
+                        Case Else
+                        If m_tree.Errors.Count = 0 Then
+                        lbProblemSolved = False
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDITS"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDITS.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                        End If
+                            m_tree.Errors.Add(new ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found.", &H0002, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos))
+                            Exit Select
+                    End Select ' Choice Rule
+                        If Not lbProblemSolved Then
+                           m_tree.Errors.Clear
+                        If Not lbProblemSolved Then
+                          m_tree.Errors.Clear
+                          If liMaxRange > Me.MaxDistance Then
+                            Me.MaxDistance = m_scanner.StartPos
+                            max_tree = m_tree.clone
+                          End If
+                                        lbProblemSolved = True
+                                        tok = m_scanner.Scan(TokenType.KEYWDTHEIR) ' Terminal Rule: KEYWDTHEIR
+                    n = node.CreateNode(tok, tok.ToString() )
+                    node.Token.UpdateRange(tok)
+                    node.Nodes.Add(n)
+                    If m_scanner.StartPos >= Me.MaxDistance Then
+                      m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                    End If
+                    If tok.Type <> TokenType.KEYWDTHEIR Then
+                      m_tree.Errors.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                      lbProblemSolved = False
+                      If liMaxRange >= Me.MaxDistance Then
+                        Me.MaxDistance = m_scanner.StartPos
+                        max_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDTHEIR.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDTHEIR"))
+                        max_tree = m_tree.clone
+                      End If
+                      Return False
+
+                    Else
+                    If m_scanner.StartPos >= Me.MaxDistance Then
+                        m_tree.Optionals.Clear
+                    End If
+                    End If
+
+
+                        End If
+                        End If
+                     If (m_tree.Errors.Count > 0) Or Not lbProblemSolved Then
+                         parent.Nodes.Remove(node)
+                         Return False
+                     End If
 
                If Not lbProblemSolved Then
                   If m_scanner.StartPos > Me.MaxDistance Then
@@ -6530,7 +6955,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                               Return False
                            End If
                         tok = m_scanner.LookAhead(TokenType.COMMA) ' OneOrMore Rule
-                    Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.COMMA ' OneOrMore Rule
+                    Loop While tok.Type = TokenType.COMMA ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                                 Return False
             End If
@@ -6610,7 +7035,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                 End If
 
                 tok = m_scanner.LookAhead(TokenType.PREDICATEPART) ' OneOrMore Rule
-            Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.PREDICATEPART ' OneOrMore Rule
+            Loop While tok.Type = TokenType.PREDICATEPART ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                         Return False
             End If
@@ -6854,7 +7279,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                 End If
 
                 tok = m_scanner.LookAhead(TokenType.UNARYPREDICATEPART) ' OneOrMore Rule
-            Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.UNARYPREDICATEPART ' OneOrMore Rule
+            Loop While tok.Type = TokenType.UNARYPREDICATEPART ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                         Return False
             End If
@@ -9413,7 +9838,7 @@ lbProblemSolved =                         ParseVALUETYPEWRITTENASCLAUSE(node) ' 
                               Return False
                            End If
                         tok = m_scanner.LookAhead(TokenType.COMMA) ' OneOrMore Rule
-                    Loop While m_tree.Errors.Count = 0 And tok.Type = TokenType.COMMA ' OneOrMore Rule
+                    Loop While tok.Type = TokenType.COMMA ' OneOrMore Rule
             If m_tree.Errors.Count > 0 Then
                                 Return False
             End If
@@ -10208,18 +10633,19 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                End If
 
              ' Concat Rule
-                                tok = m_scanner.LookAhead({TokenType.KEYWDISAKINDOF, TokenType.KEYWDISACONCEPT, TokenType.KEYWDISANENTITYTYPE, TokenType.KEYWDISAVALUETYPE, TokenType.KEYWDISWHERE, TokenType.KEYWDISIDENTIFIEDBYITS, TokenType.KEYWDISWRITTENAS, TokenType.KEYWDINCLUDES, TokenType.COMMA, TokenType.PREDICATEPART, TokenType.UNARYPREDICATEPART}) ' Choice Rule
+                                tok = m_scanner.LookAhead({TokenType.KEYWDISAKINDOF, TokenType.KEYWDISACONCEPT, TokenType.KEYWDISANENTITYTYPE, TokenType.KEYWDISAVALUETYPE, TokenType.KEYWDISOBJECTIFIED, TokenType.KEYWDISWHERE, TokenType.KEYWDISIDENTIFIEDBY, TokenType.KEYWDISWRITTENAS, TokenType.COMMA, TokenType.KEYWDINCLUDES, TokenType.PREDICATEPART, TokenType.UNARYPREDICATEPART}) ' Choice Rule
                     
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISAKINDOF"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISACONCEPT"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISANENTITYTYPE"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISAVALUETYPE"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISOBJECTIFIED"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWHERE"))
-                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
-                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWRITTENAS"))
-                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDINCLUDES"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COMMA"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDINCLUDES"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATEPART"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "UNARYPREDICATEPART"))
                     Select Case tok.Type
@@ -10325,6 +10751,16 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                               lbProblemSolved = False
                             End If
 
+                        Case TokenType.KEYWDISOBJECTIFIED
+                    lbProblemSolved =                             ParseISOBJECTIFIEDCLAUSE(node) ' NonTerminal Rule: ISOBJECTIFIEDCLAUSE
+                            If m_tree.Errors.Count > 0 Then
+                              If m_scanner.EndPos > Me.MaxDistance Then
+                                Me.MaxDistance = m_scanner.StartPos
+                                max_tree = m_tree.clone
+                              End If
+                              lbProblemSolved = False
+                            End If
+
                         Case TokenType.KEYWDISWHERE
                     lbProblemSolved =                             ParseISWHERECLAUSE(node) ' NonTerminal Rule: ISWHERECLAUSE
                             If m_tree.Errors.Count > 0 Then
@@ -10335,7 +10771,7 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                               lbProblemSolved = False
                             End If
 
-                        Case TokenType.KEYWDISIDENTIFIEDBYITS
+                        Case TokenType.KEYWDISIDENTIFIEDBY
                     lbProblemSolved =                             ParseOBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE(node) ' NonTerminal Rule: OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE
                             If m_tree.Errors.Count > 0 Then
                               If m_scanner.EndPos > Me.MaxDistance Then
@@ -10345,7 +10781,7 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                               lbProblemSolved = False
                             End If
 
-                        Case TokenType.KEYWDISIDENTIFIEDBYITS
+                        Case TokenType.KEYWDISIDENTIFIEDBY
                     lbProblemSolved =                             ParseENTITYTYPEISIDENTIFIEDBYITSCLAUSE(node) ' NonTerminal Rule: ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                             If m_tree.Errors.Count > 0 Then
                               If m_scanner.EndPos > Me.MaxDistance Then
@@ -10365,8 +10801,8 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                               lbProblemSolved = False
                             End If
 
-                        Case TokenType.KEYWDINCLUDES
-                    lbProblemSolved =                             ParseVALUECONSTRAINTCLAUSE(node) ' NonTerminal Rule: VALUECONSTRAINTCLAUSE
+                        Case TokenType.COMMA
+                    lbProblemSolved =                             ParseFACTCLAUSE(node) ' NonTerminal Rule: FACTCLAUSE
                             If m_tree.Errors.Count > 0 Then
                               If m_scanner.EndPos > Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
@@ -10375,8 +10811,8 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                               lbProblemSolved = False
                             End If
 
-                        Case TokenType.COMMA
-                    lbProblemSolved =                             ParseFACTCLAUSE(node) ' NonTerminal Rule: FACTCLAUSE
+                        Case TokenType.KEYWDINCLUDES
+                    lbProblemSolved =                             ParseVALUECONSTRAINTCLAUSE(node) ' NonTerminal Rule: VALUECONSTRAINTCLAUSE
                             If m_tree.Errors.Count > 0 Then
                               If m_scanner.EndPos > Me.MaxDistance Then
                                 Me.MaxDistance = m_scanner.StartPos
@@ -10412,12 +10848,13 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISACONCEPT"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISANENTITYTYPE"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISAVALUETYPE"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISOBJECTIFIED"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWHERE"))
-                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
-                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBYITS"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISIDENTIFIEDBY"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDISWRITTENAS"))
-                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDINCLUDES"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "COMMA"))
+                        m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "KEYWDINCLUDES"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "PREDICATEPART"))
                         m_tree.Optionals.Add(New ParseError("Unexpected token '" + tok.Text.Replace("\n", "") + "' found. Expected " + TokenType.KEYWDISAKINDOF.ToString(), &H1001, 0, tok.StartPos, tok.StartPos, tok.EndPos - tok.StartPos, "UNARYPREDICATEPART"))
                         End If
@@ -10471,6 +10908,25 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                             max_tree = m_tree.clone
                           End If
                     lbProblemSolved =                         ParseISAVALUETYPECLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ISAVALUETYPECLAUSE
+                        If m_tree.Errors.Count > 0 Then
+                          If m_scanner.EndPos > Me.MaxDistance Then
+                            Me.MaxDistance = m_scanner.StartPos
+                            max_tree = m_tree.clone
+                          End If
+                          lbProblemSolved = False
+                        Else If m_scanner.EndPos = Me.MaxDistance Then
+                            Me.MaxDistance = m_scanner.EndPos
+                            max_tree = m_tree.clone
+                        End If
+
+                        End If
+                        If Not lbProblemSolved Then
+                          m_tree.Errors.Clear
+                          If liMaxRange > Me.MaxDistance Then
+                            Me.MaxDistance = m_scanner.StartPos
+                            max_tree = m_tree.clone
+                          End If
+                    lbProblemSolved =                         ParseISOBJECTIFIEDCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: ISOBJECTIFIEDCLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
@@ -10565,7 +11021,7 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
-                    lbProblemSolved =                         ParseVALUECONSTRAINTCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: VALUECONSTRAINTCLAUSE
+                    lbProblemSolved =                         ParseFACTCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FACTCLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos
@@ -10584,7 +11040,7 @@ lbProblemSolved =                         ParseFRONTREADINGTEXTCLAUSE(node) ' No
                             Me.MaxDistance = m_scanner.StartPos
                             max_tree = m_tree.clone
                           End If
-                    lbProblemSolved =                         ParseFACTCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: FACTCLAUSE
+                    lbProblemSolved =                         ParseVALUECONSTRAINTCLAUSE(parent.Nodes(parent.Nodes.Count -1)) ' NonTerminal Rule: VALUECONSTRAINTCLAUSE
                         If m_tree.Errors.Count > 0 Then
                           If m_scanner.EndPos > Me.MaxDistance Then
                             Me.MaxDistance = m_scanner.StartPos

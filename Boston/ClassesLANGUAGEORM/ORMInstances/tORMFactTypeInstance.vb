@@ -81,6 +81,18 @@ Namespace FBM
         End Property
 
         <XmlIgnore()>
+        <CategoryAttribute("Fact Type"),
+        Browsable(False)>
+        Public Shadows Property IsLinkFactType As Boolean
+            Get
+                Return Me._IsLinkFactType
+            End Get
+            Set(value As Boolean)
+                Me._IsLinkFactType = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
         Public Shadows Property IsSubtypeStateControllin() As Boolean
             Get
                 Return Me._IsSubtypeStateControlling
@@ -2759,6 +2771,8 @@ ReattachRoles:
                                 End If
 
                             End If
+                        Case Is = "IsLinkFactType"
+                            Call Me.FactType.SetIsLinkFactType(Me.IsLinkFactType)
                         Case Is = "DataType"
                             Select Case Me._DataType
                                 Case Is = pcenumORMDataType.NumericFloatCustomPrecision,

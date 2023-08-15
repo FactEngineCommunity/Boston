@@ -408,6 +408,9 @@ Namespace VAQL
                 Case TokenType.ISAVALUETYPECLAUSE
                     Value = EvalISAVALUETYPECLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.ISOBJECTIFIEDCLAUSE
+                    Value = EvalISOBJECTIFIEDCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.ISWHERECLAUSE
                     Value = EvalISWHERECLAUSE(tree, paramlist)
                     Exit Select
@@ -587,6 +590,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalISAVALUETYPECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalISOBJECTIFIEDCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
