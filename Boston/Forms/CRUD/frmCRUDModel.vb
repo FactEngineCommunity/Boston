@@ -888,7 +888,6 @@ ConnectionFailed:
                     Next
 
                     With New WaitCursor
-                        Call Me.zrModel.RapidEmpty(True)
                         Call Me.zrModel.SaveToXMLDocument()
                         Me.zrModel.SetStoreAsXML(True, True)
                     End With

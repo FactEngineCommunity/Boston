@@ -24,6 +24,7 @@ Partial Class frmUnifiedOntologyBrowser
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.Label1 = New System.Windows.Forms.Label()
         Me.ButtonSearch = New System.Windows.Forms.Button()
         Me.ButtonDescribeUnifiedOntology = New System.Windows.Forms.Button()
         Me.LabelOntologyName = New System.Windows.Forms.Label()
@@ -36,7 +37,6 @@ Partial Class frmUnifiedOntologyBrowser
         Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabelModel = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.Label1 = New System.Windows.Forms.Label()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -71,6 +71,15 @@ Partial Class frmUnifiedOntologyBrowser
         Me.SplitContainer1.Size = New System.Drawing.Size(884, 574)
         Me.SplitContainer1.SplitterDistance = 289
         Me.SplitContainer1.TabIndex = 0
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(12, 78)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(39, 13)
+        Me.Label1.TabIndex = 4
+        Me.Label1.Text = "Label1"
         '
         'ButtonSearch
         '
@@ -122,6 +131,7 @@ Partial Class frmUnifiedOntologyBrowser
         Me.ListBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ListBox1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable
         Me.ListBox1.FormattingEnabled = True
         Me.ListBox1.Location = New System.Drawing.Point(12, 121)
         Me.ListBox1.Name = "ListBox1"
@@ -179,15 +189,6 @@ Partial Class frmUnifiedOntologyBrowser
         Me.ToolStripStatusLabelModel.Size = New System.Drawing.Size(147, 17)
         Me.ToolStripStatusLabelModel.Text = "ToolStripStatusLabelModel"
         Me.ToolStripStatusLabelModel.Visible = False
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 78)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(39, 13)
-        Me.Label1.TabIndex = 4
-        Me.Label1.Text = "Label1"
         '
         'frmUnifiedOntologyBrowser
         '

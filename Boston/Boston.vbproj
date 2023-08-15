@@ -1659,16 +1659,16 @@
     <Compile Include="Forms\Diagrams\frmDiagramBPMNCollaboration.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\Diagrams\frmDiagramORMforOntologyBrowser.designer.vb">
-      <DependentUpon>frmDiagramORMforOntologyBrowser.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\Diagrams\frmDiagramORMforOntologyBrowser.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Forms\Diagrams\frmDiagramORMForGlossary.designer.vb">
       <DependentUpon>frmDiagramORMForGlossary.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\Diagrams\frmDiagramORMForGlossary.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramORMforOntologyBrowser.designer.vb">
+      <DependentUpon>frmDiagramORMforOntologyBrowser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Diagrams\frmDiagramORMforOntologyBrowser.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Diagrams\frmDiagramPGS.Designer.vb">
@@ -2628,13 +2628,12 @@
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramBPMNCollaboration.resx">
       <DependentUpon>frmDiagramBPMNCollaboration.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Diagrams\frmDiagramORMforOntologyBrowser.resx">
-      <DependentUpon>frmDiagramORMforOntologyBrowser.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramORMForGlossary.resx">
       <DependentUpon>frmDiagramORMForGlossary.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Diagrams\frmDiagramORMforOntologyBrowser.resx">
+      <DependentUpon>frmDiagramORMforOntologyBrowser.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramPGS.resx">
       <DependentUpon>frmDiagramPGS.vb</DependentUpon>

@@ -6,7 +6,7 @@ Imports System.ComponentModel
 Public Class frmUnifiedOntologyBrowser
 
     Public WithEvents zrUnifiedOntology As Ontology.UnifiedOntology
-    Private zrFrmORMDiagramViewer As frmDiagramORMForGlossary
+    Private zrFrmORMDiagramViewer As frmDiagramORMForOntologyBrowser
 
     ''' <summary>
     ''' The Model for the information shown in the WebBrowser.
@@ -28,7 +28,7 @@ Public Class frmUnifiedOntologyBrowser
 
             '======================================================================================
             'Load the Sub ORM Diagram Form/Viewer
-            Dim formToShow As New frmDiagramORMForGlossary
+            Dim formToShow As New frmDiagramORMForOntologyBrowser
             formToShow.TopLevel = False
             formToShow.WindowState = FormWindowState.Maximized
             formToShow.FormBorderStyle = Windows.Forms.FormBorderStyle.None
@@ -50,6 +50,12 @@ Public Class frmUnifiedOntologyBrowser
             '======================================================================================
 
             prApplication.ActivePages.Add(Me)
+
+            If Me.ListBox1.Items.Count > 0 Then
+                Me.ListBox1.SelectedItem = 0
+            End If
+            Me.ListBox1.Refresh()
+            Me.ListBox1.Invalidate()
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -129,6 +135,8 @@ Public Class frmUnifiedOntologyBrowser
                                             ModelDictionaryEntry.isEntityType
                                       Select ModelDictionaryEntry
                                       Order By ModelDictionaryEntry.Symbol Ascending
+
+        If larModelDictionaryEntry.ToList.Find(Function(x) x.Symbol = "Claim") IsNot Nothing Then Debugger.Break()
 
         Dim lrComboBoxItem As tComboboxItem
         For Each lrModelDictionaryEntry In larModelDictionaryEntry
@@ -457,13 +465,14 @@ Public Class frmUnifiedOntologyBrowser
         Try
             Dim lrModelDictionaryEntry As FBM.DictionaryEntry = Nothing
 
-            Me.ListBox1.DrawMode = DrawMode.OwnerDrawVariable
+            Me.ListBox1.SuspendLayout()
 
             With New WaitCursor
                 If Me.ListBox1.SelectedIndex >= 0 Then
                     lrModelDictionaryEntry = ListBox1.SelectedItem.Tag
                 End If
 
+                'Load the Model Elements for the Model because are required in Verbalisation.
                 If lrModelDictionaryEntry IsNot Nothing Then
 
                     Me.mrWebBrowserModel = lrModelDictionaryEntry.Model
@@ -540,6 +549,8 @@ Public Class frmUnifiedOntologyBrowser
                     End If
                 End If
             End With
+
+            Me.ListBox1.ResumeLayout()
 
         Catch ex As Exception
             Dim lsMessage As String

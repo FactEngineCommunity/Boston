@@ -117,6 +117,8 @@ Partial Class frmMain
         Me.AddNamespaceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditNamespaceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemUnifiedOntology = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator17 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemAddUnifiedOntology = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemEditUnifiedOntology = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -672,23 +674,35 @@ Partial Class frmMain
         '
         'ToolStripMenuItemUnifiedOntology
         '
-        Me.ToolStripMenuItemUnifiedOntology.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddUnifiedOntology, Me.ToolStripMenuItemEditUnifiedOntology})
+        Me.ToolStripMenuItemUnifiedOntology.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem3, Me.ToolStripSeparator17, Me.ToolStripMenuItemAddUnifiedOntology, Me.ToolStripMenuItemEditUnifiedOntology})
         Me.ToolStripMenuItemUnifiedOntology.Name = "ToolStripMenuItemUnifiedOntology"
         Me.ToolStripMenuItemUnifiedOntology.Size = New System.Drawing.Size(110, 22)
         Me.ToolStripMenuItemUnifiedOntology.Text = "&Unified Ontology"
+        '
+        'ToolStripMenuItem3
+        '
+        Me.ToolStripMenuItem3.Image = CType(resources.GetObject("ToolStripMenuItem3.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
+        Me.ToolStripMenuItem3.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItem3.Text = "&Unified Ontology Browser"
+        '
+        'ToolStripSeparator17
+        '
+        Me.ToolStripSeparator17.Name = "ToolStripSeparator17"
+        Me.ToolStripSeparator17.Size = New System.Drawing.Size(207, 6)
         '
         'ToolStripMenuItemAddUnifiedOntology
         '
         Me.ToolStripMenuItemAddUnifiedOntology.Image = CType(resources.GetObject("ToolStripMenuItemAddUnifiedOntology.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemAddUnifiedOntology.Name = "ToolStripMenuItemAddUnifiedOntology"
-        Me.ToolStripMenuItemAddUnifiedOntology.Size = New System.Drawing.Size(190, 22)
+        Me.ToolStripMenuItemAddUnifiedOntology.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemAddUnifiedOntology.Text = "&Add Unified Ontology"
         '
         'ToolStripMenuItemEditUnifiedOntology
         '
         Me.ToolStripMenuItemEditUnifiedOntology.Image = CType(resources.GetObject("ToolStripMenuItemEditUnifiedOntology.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemEditUnifiedOntology.Name = "ToolStripMenuItemEditUnifiedOntology"
-        Me.ToolStripMenuItemEditUnifiedOntology.Size = New System.Drawing.Size(190, 22)
+        Me.ToolStripMenuItemEditUnifiedOntology.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemEditUnifiedOntology.Text = "&Edit Unified Ontology"
         '
         'HelpToolStripMenuItem
@@ -1157,4 +1171,6 @@ Partial Class frmMain
     Friend WithEvents JupyterNotebookToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents GenericTestFormToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ConceptClassificationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem3 As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator17 As ToolStripSeparator
 End Class

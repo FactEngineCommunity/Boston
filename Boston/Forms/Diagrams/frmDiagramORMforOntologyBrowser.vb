@@ -37,6 +37,8 @@ Public Class frmDiagramORMForOntologyBrowser
     Public _ComboBoxEntityTypeInstance As New ComboBox
     Public _ComboBoxValueTypeInstance As New ComboBox
 
+    Public IsBeingUsedAsOntologyBrowser As Boolean = True
+
     Public Shadows Sub BringToFront(Optional asSelectModelElementId As String = Nothing)
 
         Call MyBase.BringToFront()
@@ -1388,6 +1390,40 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
+    Public Function DropFrequencyConstraintAtPoint(ByRef arRoleConstraint As FBM.RoleConstraint, ByVal aoPoint As PointF) As FBM.RoleConstraintInstance
+
+        Dim lrRoleConstraintInstance As FBM.FrequencyConstraint
+
+        '-----------------------------------
+        'Create the RoleConstraintInstance
+        '-----------------------------------
+        lrRoleConstraintInstance = arRoleConstraint.CloneFrequencyConstraintInstance(Me.zrPage)
+        lrRoleConstraintInstance.X = aoPoint.X
+        lrRoleConstraintInstance.Y = aoPoint.Y
+
+        lrRoleConstraintInstance.MaximumFrequencyCount = arRoleConstraint.MaximumFrequencyCount
+        lrRoleConstraintInstance.MinimumFrequencyCount = arRoleConstraint.MinimumFrequencyCount
+
+        Call lrRoleConstraintInstance.DisplayAndAssociate()
+
+        '----------------------------------------------------------------------------
+        'Add the RoleConstraint to the Model if it is not already within the Model.
+        '----------------------------------------------------------------------------
+        If Not Me.zrPage.Model.RoleConstraint.Exists(AddressOf arRoleConstraint.Equals) Then
+            Me.zrPage.Model.RoleConstraint.Add(arRoleConstraint)
+        End If
+
+        '---------------------------------------------
+        'Add the RoleConstraintInstance to the Page.
+        '---------------------------------------------
+        Me.zrPage.RoleConstraintInstance.Add(lrRoleConstraintInstance)
+
+        Call Me.zrPage.MakeDirty()
+
+        Return lrRoleConstraintInstance
+
+    End Function
+
     Private Function DropModelNoteAtPoint(ByRef arModelNote As FBM.ModelNote, ByVal aoPoint As PointF) As FBM.ModelNoteInstance
 
 
@@ -1998,6 +2034,11 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrTableNode As New TableNode
         Dim lr_cell As MindFusion.Diagramming.TableNode.Cell
 
+        '20230819-Vm-Make changes from Pages loaded from the Model Explorer
+        Call Boston.ShowFlashCard("Remember to make changes to the Model from Pages opened in the Model Explorer", Color.LightGray, 2500, 10)
+        Exit Sub
+
+
         If e.NewText = e.OldText Then
             '--------------------------------------------
             ' No change to the RoleData so exit the sub
@@ -2127,6 +2168,10 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrLinkToRemove As New DiagramLink(Me.Diagram)
 
         Try
+            '20230819-Vm-Make changes from Pages loaded from the Model Explorer
+            Call Boston.ShowFlashCard("Remember to make changes to the Model from Pages opened in the Model Explorer", Color.LightGray, 2500, 10)
+            Exit Sub
+
             lrModelObject = e.Link.Tag
             lrTargetModelObject = e.Link.Destination.Tag
             lrOriginModelObject = e.Link.Origin.Tag
@@ -2440,6 +2485,10 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrModelObject As FBM.ModelObject
 
         Try
+            '20230819-Vm-Make changes from Pages loaded from the Model Explorer
+            Call Boston.ShowFlashCard("Remember to make changes to the Model from Pages opened in the Model Explorer", Color.LightGray, 2500, 10)
+            Exit Sub
+
             lrModelObject = e.Origin.Tag
 
             If lrModelObject Is Nothing Then
@@ -2502,6 +2551,11 @@ Public Class frmDiagramORMForOntologyBrowser
 
         lrPageObject = e.Link.Tag
 
+        '20230819-Vm-Make changes from Pages loaded from the Model Explorer
+        Call Boston.ShowFlashCard("Remember to make changes to the Model from Pages opened in the Model Explorer", Color.LightGray, 2500, 10)
+        Exit Sub
+
+
         'MsgBox(lrPageObject.ConceptType.ToString)
 
         If lrPageObject Is Nothing Then
@@ -2552,14 +2606,6 @@ Public Class frmDiagramORMForOntologyBrowser
                 End If
         End Select
 
-
-    End Sub
-
-    Private Sub Diagram_LinkDoubleClicked(sender As Object, e As LinkEventArgs) Handles Diagram.LinkDoubleClicked
-
-    End Sub
-
-    Private Sub Diagram_LinkModifying(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkValidationEventArgs) Handles Diagram.LinkModifying
 
     End Sub
 
@@ -2749,6 +2795,11 @@ Public Class frmDiagramORMForOntologyBrowser
 
         loObject = Me.Diagram.Selection.Items(0).Tag
 
+        '20230819-Vm-Make changes from Pages loaded from the Model Explorer
+        Call Boston.ShowFlashCard("Remember to make changes to the Model from Pages opened in the Model Explorer", Color.LightGray, 2500, 10)
+        Exit Sub
+
+
         If Me.zrPage.SelectedObject.Count = 1 Then
             If TypeOf loObject Is FBM.ModelObject Then
                 Select Case loObject.ConceptType
@@ -2889,9 +2940,6 @@ Public Class frmDiagramORMForOntologyBrowser
             End Select
         End If
 
-
-
-
     End Sub
 
     Private Sub Diagram_NodeDoubleClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeDoubleClicked
@@ -2900,6 +2948,9 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim loNode As Object 'Because may be ShapeNode or TableNode
         Dim lrModelObject As New FBM.ModelObject
 
+        '20230819-Vm-Make changes from Pages loaded from the Model Explorer
+        Call Boston.ShowFlashCard("Remember to make changes to the Model from Pages opened in the Model Explorer", Color.LightGray, 2500, 10)
+        Exit Sub
 
         If IsSomething(Diagram.GetNodeAt(lo_point)) Then
             loNode = Diagram.GetNodeAt(lo_point, True, False)
@@ -10040,9 +10091,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub Diagram_DrawLink(sender As Object, e As DrawLinkEventArgs) Handles Diagram.DrawLink
-
-    End Sub
 
     Private Sub ToolStripMenuItemModelNoteRemoveFromPageAndModel_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemModelNoteRemoveFromPageAndModel.Click
 
@@ -10056,9 +10104,6 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Private Sub DiagramView_CreateEditControl(sender As Object, e As InPlaceEditEventArgs) Handles DiagramView.CreateEditControl
-
-    End Sub
 
     Private Sub ContextMenuStrip_Diagram_Opening(sender As Object, e As CancelEventArgs) Handles ContextMenuStrip_Diagram.Opening
 

@@ -5,6 +5,7 @@ Imports System.ComponentModel
 Public Class frmCRUDEditUnifiedOntology
 
     Public moUnifiedOntology As Ontology.UnifiedOntology
+    Private msImageFilePath As String = ""
 
     Private Sub frmCRUDAddUnifiedOntology_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -31,8 +32,9 @@ Public Class frmCRUDEditUnifiedOntology
                 Exit Sub
             End If
 
+            Me.msImageFilePath = Me.moUnifiedOntology.ImageFileLocationName
             Me.TextBoxUnifiedOntologyName.Text = Me.moUnifiedOntology.Name
-            Me.TextBoxImageFileLocation.Text = Me.moUnifiedOntology.ImageFileLocationName
+            Me.TextBoxImageFileLocation.Text = Me.msImageFilePath.CondenseString(40, 20, 5)
 
             Call Me.LoadAvailableModelsForUnifiedOntology(Me.moUnifiedOntology)
             Call Me.LoadIncludedModelsForUnifiedOntology(Me.moUnifiedOntology)
@@ -149,36 +151,6 @@ Public Class frmCRUDEditUnifiedOntology
     End Sub
 
 
-
-    Private Sub ButtonFileSelect_Click(sender As Object, e As EventArgs) Handles ButtonFileSelect.Click
-
-        Try
-            RemoveHandler Me.TextBoxImageFileLocation.Validating, AddressOf Me.TextBoxImageFileLocation_Validating
-            Using lrOpenFileDialog As New OpenFileDialog
-
-                If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
-
-                    If File.Exists(lrOpenFileDialog.FileName) Then
-                        Me.TextBoxImageFileLocation.Text = lrOpenFileDialog.FileName
-                    Else
-                        MsgBox("No file exists at the given location/name.")
-                    End If
-                End If
-
-            End Using
-            AddHandler Me.TextBoxImageFileLocation.Validating, AddressOf Me.TextBoxImageFileLocation_Validating
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-        End Try
-
-    End Sub
-
     Private Function CheckFields() As Boolean
 
         Try
@@ -187,8 +159,8 @@ Public Class frmCRUDEditUnifiedOntology
                 Return False
             End If
 
-            If Trim(Me.TextBoxImageFileLocation.Text) <> "" Then
-                If Not File.Exists(Trim(Me.TextBoxImageFileLocation.Text)) Then
+            If Trim(Me.msImageFilePath) <> "" Then
+                If Not File.Exists(Trim(Me.msImageFilePath)) Then
                     Me.ErrorProvider.SetError(Me.TextBoxImageFileLocation, "Enter a valid file location/name.")
                     Return False
                 End If
@@ -207,13 +179,44 @@ Public Class frmCRUDEditUnifiedOntology
 
     End Function
 
+    Private Sub ButtonFileSelect_Click(sender As Object, e As EventArgs) Handles ButtonFileSelect.Click
+
+        Try
+            RemoveHandler Me.TextBoxImageFileLocation.Validating, AddressOf Me.TextBoxImageFileLocation_Validating
+            Using lrOpenFileDialog As New OpenFileDialog
+
+                If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
+
+                    If File.Exists(lrOpenFileDialog.FileName) Then
+                        Me.msImageFilePath = lrOpenFileDialog.FileName
+                        Me.TextBoxImageFileLocation.Text = Me.msImageFilePath.CondenseString(40, 20, 5)
+                    Else
+                        Me.msImageFilePath = ""
+                        MsgBox("No file exists at the given location/name.")
+                    End If
+                End If
+
+            End Using
+            AddHandler Me.TextBoxImageFileLocation.Validating, AddressOf Me.TextBoxImageFileLocation_Validating
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
     Private Sub ButtonOkay_Click(sender As Object, e As EventArgs) Handles ButtonOkay.Click
 
         Try
             If Me.CheckFields Then
 
                 Me.moUnifiedOntology.Name = Database.MakeStringSafe(Trim(Me.TextBoxUnifiedOntologyName.Text))
-                Me.moUnifiedOntology.ImageFileLocationName = Trim(Me.TextBoxImageFileLocation.Text)
+                Me.moUnifiedOntology.ImageFileLocationName = Trim(Me.msImageFilePath)
 
                 If TableUnifiedOntology.UpdateUnifiedOntology(Me.moUnifiedOntology) Then
                     Me.Close()
@@ -287,8 +290,10 @@ Public Class frmCRUDEditUnifiedOntology
 
         Try
 
-            If Trim(Me.TextBoxImageFileLocation.Text) <> "" Then
-                If Not File.Exists(Trim(Me.TextBoxImageFileLocation.Text)) Then
+            If Me.msImageFilePath.Trim = "" Then
+                Exit Sub
+            ElseIf Trim(Me.msImageFilePath) <> "" Then
+                If Not File.Exists(Trim(Me.msImageFilePath)) Then
                     Me.ErrorProvider.SetError(Me.TextBoxImageFileLocation, "Enter a valid image location/file name.")
                     e.Cancel = True
                 Else
@@ -298,7 +303,7 @@ Public Class frmCRUDEditUnifiedOntology
 
             Dim ImageExtensions As New List(Of String) From {".JPG", ".JPEG", ".JPE", ".BMP", ".GIF", ".PNG"}
 
-            If Not ImageExtensions.Contains(Path.GetExtension(Trim(Me.TextBoxImageFileLocation.Text)).ToUpperInvariant()) Then
+            If Not ImageExtensions.Contains(Path.GetExtension(Trim(Me.msImageFilePath)).ToUpperInvariant()) Then
                 Me.ErrorProvider.SetError(Me.TextBoxImageFileLocation, "Enter a valid image file location/name.")
                 e.Cancel = True
             Else
@@ -333,7 +338,6 @@ Public Class frmCRUDEditUnifiedOntology
         Try
             If Me.ActiveControl.Name.Equals("ButtonFileSelect") Then
                 RemoveHandler Me.TextBoxImageFileLocation.Validating, AddressOf Me.TextBoxImageFileLocation_Validating
-                Call Me.ButtonFileSelect_Click(sender, e)
             End If
 
         Catch ex As Exception
@@ -402,6 +406,23 @@ Public Class frmCRUDEditUnifiedOntology
                 Me.ListBoxIncludedModels.Items.RemoveAt(Me.ListBoxIncludedModels.SelectedIndex)
 
                 Call tableUnifiedOntologyModel.removeModelFromUnifiedOntology(lrModel, Me.moUnifiedOntology)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextBoxImageFileLocation_TextChanged(sender As Object, e As EventArgs) Handles TextBoxImageFileLocation.TextChanged
+
+        Try
+            If Me.TextBoxImageFileLocation.Text.Trim = "" Then
+                Me.msImageFilePath = ""
             End If
         Catch ex As Exception
             Dim lsMessage As String

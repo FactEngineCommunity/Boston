@@ -213,11 +213,16 @@ Namespace TableUnifiedOntology
 
             Try
                 lsSQLQuery = " UPDATE UnifiedOntology"
-                lsSQLQuery &= "   SET UnifiedOntologyName = '" & Trim(Replace(arUnifiedOntology.Name, "'", "`")) & "'"
+                lsSQLQuery &= "   SET UnifiedOntologyName = '" & Trim(Replace(arUnifiedOntology.Name, "'", "`")) & "',"
+                lsSQLQuery &= "       ImageFileLocationName = '" & arUnifiedOntology.ImageFileLocationName.Trim & "'"
                 lsSQLQuery &= " WHERE Id = '" & Trim(Replace(arUnifiedOntology.Id, "'", "`")) & "'"
 
                 pdbConnection.BeginTrans()
-                pdbConnection.Execute(lsSQLQuery)
+                Dim lrRecordset As ORMQL.Recordset = pdbConnection.Execute(lsSQLQuery)
+
+                If lrRecordset.ErrorReturned Then
+                    Throw New Exception(lrRecordset.ErrorString)
+                End If
                 pdbConnection.CommitTrans()
 
                 Return True

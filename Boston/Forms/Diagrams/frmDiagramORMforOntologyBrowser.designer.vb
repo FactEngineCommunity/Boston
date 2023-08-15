@@ -436,14 +436,12 @@ Partial Class frmDiagramORMForOntologyBrowser
         Me.Diagram.AlignToGrid = False
         Me.Diagram.AllowSelfLoops = False
         Me.Diagram.AllowUnconnectedLinks = True
-        Me.Diagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFF5EE")
+        Me.Diagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFAF0E6")
         Me.Diagram.DynamicLinks = True
         Me.Diagram.ExpandButtonPosition = MindFusion.Diagramming.ExpandButtonPosition.OuterLeft
         Me.Diagram.LinkBaseShapeSize = 2.0!
-        Me.Diagram.LinkBrush = New MindFusion.Drawing.SolidBrush("#FF790079")
         Me.Diagram.LinkHeadShape = MindFusion.Diagramming.ArrowHead.None
         Me.Diagram.LinkHeadShapeSize = 2.0!
-        Me.Diagram.LinkPen = New MindFusion.Drawing.Pen("0/#FF000000/0.5/0/0//0/0/10/")
         Me.Diagram.LinksSnapToBorders = True
         Me.Diagram.SelectAfterCreate = False
         Me.Diagram.ShadowColor = System.Drawing.Color.Black
@@ -452,7 +450,6 @@ Partial Class frmDiagramORMForOntologyBrowser
         Me.Diagram.ShapeBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         Me.Diagram.ShapeCustomDraw = MindFusion.Diagramming.CustomDraw.Additional
         Me.Diagram.ShapeHandlesStyle = MindFusion.Diagramming.HandlesStyle.InvisibleMove
-        Me.Diagram.ShapePen = New MindFusion.Drawing.Pen("0/#FF000000/0.01/0/0//0/0/10/")
         Me.Diagram.ShowAnchors = MindFusion.Diagramming.ShowAnchors.Never
         Me.Diagram.ShowHandlesOnDrag = False
         '
@@ -630,10 +627,6 @@ Partial Class frmDiagramORMForOntologyBrowser
         Me.mnuOption_CopyImageToClipboard.Name = "mnuOption_CopyImageToClipboard"
         Me.mnuOption_CopyImageToClipboard.Size = New System.Drawing.Size(207, 22)
         Me.mnuOption_CopyImageToClipboard.Text = "&Copy Image to Clipboard"
-        '
-        'HiddenDiagram
-        '
-        Me.HiddenDiagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
         '
         'ContextMenuStrip_shape_list
         '
@@ -1567,7 +1560,6 @@ Partial Class frmDiagramORMForOntologyBrowser
         'DiagramView
         '
         Me.DiagramView.AllowDrop = True
-        Me.DiagramView.AllowInplaceEdit = True
         Me.DiagramView.BackColor = System.Drawing.SystemColors.Control
         Me.DiagramView.Behavior = MindFusion.Diagramming.Behavior.DrawLinks
         Me.DiagramView.ContextMenuStrip = Me.ContextMenuStrip_Diagram

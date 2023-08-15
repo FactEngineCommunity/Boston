@@ -6027,7 +6027,7 @@ SaveModel:
                 lrUnifiedOntology.Id = lrGenericSelection.SelectIndex
                 Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
                 lfrmEditUnfiedOntology.moUnifiedOntology = lrUnifiedOntology
-                Call lfrmEditUnfiedOntology.ShowDialog()
+                Call lfrmEditUnfiedOntology.Show() 'Dialog()
 
             End If
 
@@ -6211,7 +6211,14 @@ SaveModel:
             lfrmConceptClassification.MdiParent = Me
 
             If prApplication.ActivePages.Count > 0 Then
-                Dim loActivePane = prApplication.ActivePages(0).Pane
+                Dim loActivePane As Object = Nothing
+                Dim liInd = 0
+                For Each loPage In prApplication.ActivePages
+                    loActivePane = prApplication.ActivePages(liInd).Pane
+                    If loActivePane IsNot Nothing Then Exit For
+                    liInd += 1
+                Next
+
                 lfrmConceptClassification.Show(loActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
 
                 prApplication.ToolboxForms.Add(lfrmConceptClassification)
@@ -6228,4 +6235,48 @@ SaveModel:
         End Try
 
     End Sub
+
+    Private Sub ToolStripMenuItem3_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem3.Click
+
+        Try
+            Dim lrGenericSelection As New tGenericSelection()
+            Dim lrUnifiedOntology As New Ontology.UnifiedOntology
+            Dim lsWhereClause As String = ""
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                               "Unified Ontology",
+                                               "UnifiedOntology",
+                                               "UnifiedOntologyName",
+                                               "Id",
+                                               lsWhereClause,
+                                               Nothing,
+                                               pcenumComboBoxStyle.DropdownList,
+                                               "1",
+                                               1,
+                                               "120",
+                                               "Unified Ontology Name") = Windows.Forms.DialogResult.OK Then
+
+
+                With New WaitCursor
+
+
+                    lrUnifiedOntology.Id = lrGenericSelection.SelectValue
+                    Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
+
+                    Call Me.LoadUnifiedOntologyBrowser(lrUnifiedOntology, Nothing)
+                End With
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

@@ -219,7 +219,7 @@ Namespace TableConceptInstance
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = pcOpenStatic
 
-                lsSQLQuery = " SELECT DISTINCT ci.*, P.*"
+                lsSQLQuery = " SELECT DISTINCT ci.PageId AS CIPageId, P.*"
                 lsSQLQuery &= "  FROM ModelConceptInstance ci,"
                 lsSQLQuery &= "       ModelPage P"
                 lsSQLQuery &= " WHERE ci.Symbol = '" & Trim(arModelDictionaryEntry.Symbol) & "'"
@@ -231,7 +231,7 @@ Namespace TableConceptInstance
                 lREcordset.Open(lsSQLQuery)
 
                 While Not lREcordset.EOF
-                    lrPage = New FBM.Page(arModelDictionaryEntry.Model, lREcordset("ci.PageId").Value, lREcordset("PageName").Value, pcenumLanguage.ORMModel)
+                    lrPage = New FBM.Page(arModelDictionaryEntry.Model, lREcordset("CIPageId").Value, lREcordset("PageName").Value, pcenumLanguage.ORMModel)
 
                     If arModelDictionaryEntry.Model.Page.Find(AddressOf lrPage.Equals) Is Nothing Then
                         larPage.Add(lrPage)
