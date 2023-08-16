@@ -225,17 +225,27 @@ Namespace FBM
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
-        Public Shadows _HideReferenceMode As Boolean
+        Public Shadows _HideReferenceMode As Boolean = False
 
         <XmlAttribute()>
         <CategoryAttribute("Entity Type"),
          DescriptionAttribute("True if the Reference Mode for the Entity Type is hidden on Pages.")>
         Public Shadows Property HideReferenceMode As Boolean
             Get
-                Return Me.Flag.Find(Function(x) x.Flag = pcenumConceptInstanceFlag.EntityTypeHideReferenceMode) IsNot Nothing
+                If Me.Flag.Find(Function(x) x.Flag = pcenumConceptInstanceFlag.EntityTypeHideReferenceMode) IsNot Nothing Then
+                    Return True
+                Else
+                    Return False
+                End If
+
             End Get
             Set(value As Boolean)
-                Me.Flag.AddUnique(New FBM.ConceptInstanceFlag(Me.Model, Me.Page, Me.Id, pcenumConceptType.EntityType, Me.InstanceNumber, pcenumConceptInstanceFlag.EntityTypeHideReferenceMode))
+                Me._HideReferenceMode = value
+                If Me._HideReferenceMode Then
+                    Me.Flag.AddUnique(New ConceptInstanceFlag(Me.Model, Me.Page, Me.Id, pcenumConceptType.EntityType, Me.InstanceNumber, pcenumConceptInstanceFlag.EntityTypeHideReferenceMode))
+                Else
+                    Me.Flag.Remove(New ConceptInstanceFlag(Me.Model, Me.Page, Me.Id, pcenumConceptType.EntityType, Me.InstanceNumber, pcenumConceptInstanceFlag.EntityTypeHideReferenceMode))
+                End If
             End Set
         End Property
 
@@ -3327,6 +3337,13 @@ MoveOn:
 
             Try
                 Me._HideReferenceMode = abHideReferenceMode
+
+                If Me._HideReferenceMode Then
+                    Me.Flag.AddUnique(New ConceptInstanceFlag(Me.Model, Me.Page, Me.Id, pcenumConceptType.EntityType, Me.InstanceNumber, pcenumConceptInstanceFlag.EntityTypeHideReferenceMode))
+                Else
+                    Me.Flag.Remove(New ConceptInstanceFlag(Me.Model, Me.Page, Me.Id, pcenumConceptType.EntityType, Me.InstanceNumber, pcenumConceptInstanceFlag.EntityTypeHideReferenceMode))
+                End If
+
                 Call Me.RefreshShape()
 
             Catch ex As Exception

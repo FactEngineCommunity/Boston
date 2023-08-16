@@ -1272,6 +1272,7 @@ Namespace FBM
                               GetType(FBM.EntityTypeInstance),
                               GetType(FBM.FactTypeInstance),
                               GetType(FBM.RoleInstance),
+                              GetType(FBM.RoleConstraintInstance),
                               GetType(FBM.RoleConstraintRoleInstance),
                               GetType(FBM.ModelNoteInstance),
                               GetType(FBM.FactTable),

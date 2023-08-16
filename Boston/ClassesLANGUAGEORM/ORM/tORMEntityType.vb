@@ -2859,6 +2859,8 @@ FailsafeContinue:
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateEntityType, Me, Nothing)
                 End If
 
+                Me.SetHideReferenceMode(My.Settings.HideAllReferenceModesOnReferenceModeSet)
+
                 'So much happens/changes, so save.
                 If Not abSuppressModelSave Then
                     Call Me.Model.Save()

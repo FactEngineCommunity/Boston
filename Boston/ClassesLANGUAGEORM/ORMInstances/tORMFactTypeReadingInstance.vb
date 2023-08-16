@@ -152,20 +152,23 @@ Namespace FBM
                 If Me.Page.Form Is Nothing Then Exit Sub
 
                 G = Me.Page.Form.CreateGraphics
-                lsDottedReadingText = Me.GetDottedReadingText
+                lsDottedReadingText = Me.GetDottedReadingText.Trim
 
-                StringSize = Me.Page.Diagram.MeasureString(Trim(lsDottedReadingText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                Dim lrFont = Me.Page.Diagram.Font
+                StringSize = Me.Page.Diagram.MeasureString(lsDottedReadingText, lrFont, 1000, System.Drawing.StringFormat.GenericDefault)
 
                 Dim liX, liY As Integer
                 liX = Me.FactType.FactTypeReadingPoint.X 'Shape.Bounds.X
                 liY = Me.FactType.FactTypeReadingPoint.Y 'Shape.Bounds.Y
 
                 'For Y = liY + (StringSize.Height + 8)
-                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(liX, liY, StringSize.Width, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
+                loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(liX, liY, StringSize.Width * 0.98, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
                 loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
                 loDroppedNode.Text = Trim(lsDottedReadingText)
                 loDroppedNode.TextColor = Color.Black ' 20230603-VM-Was Color.Blue
                 loDroppedNode.Transparent = True
+                loDroppedNode.Font = Me.Page.Diagram.Font
+                loDroppedNode.ResizeToFitText(FitSize.KeepHeight)
                 loDroppedNode.ZTop()
                 loDroppedNode.Tag = Me
 
@@ -192,8 +195,14 @@ Namespace FBM
                 Me.Shape = loDroppedNode
 
                 'CodeSafe
-                If Not Me.FactType.ShapeIsWithinRadius(Me.ShapeMidPoint, 40) And Me.FactType.Visible Then
-                    Call Me.Move(Me.FactType.X, Me.FactType.Y + StringSize.Height + 8, False)
+                'NB This code also in FactTypeIntance.AdjustBorderHeight
+                If Not Me.FactType.ShapeIsWithinRadius(Me.FactType.FactTypeReadingShape.ShapeMidPoint, 80) And Me.FactType.Arity = 1 Then
+                    Me.FactType.FactTypeReadingShape.Move(Me.Shape.Bounds.X + Me.Shape.Bounds.Width + 1, Me.Y, True) 'FactTypeReadingShape.Shape.Bounds.Y)
+                ElseIf Not Me.FactType.ShapeIsWithinRadius(Me.FactType.FactTypeReadingShape.ShapeMidPoint, 50) And Me.FactType.Arity > 1 Then
+                    Me.FactType.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.X) - (Me.FactType.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Y + Me.Shape.Bounds.Height) - 6, True)
+                End If
+                If Me.FactType.ShapeIsWithinRadius(Me.FactType.FactTypeReadingShape.ShapeMidPoint, 4) Then
+                    Me.FactType.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactType.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Y + Me.Shape.Bounds.Height) + 2, True)
                 End If
 
             Catch ex As Exception
@@ -373,6 +382,8 @@ Namespace FBM
                                 ByVal abBroadcastInterfaceEvent As Boolean,
                                 Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
 
+            Me.Shape.Detach()
+
             Me.X = aiNewX
             Me.Y = aiNewY
             Me.FactType.FactTypeReadingPoint = New Point(aiNewX, aiNewY)
@@ -380,6 +391,8 @@ Namespace FBM
             If Me.Shape IsNot Nothing Then
                 Me.Shape.Move(aiNewX, aiNewY)
             End If
+
+            Me.Shape.AttachTo(Me.FactType.Shape, AttachToNode.TopLeft)
 
             If abMakeDirty Then
                 Me.makeDirty()

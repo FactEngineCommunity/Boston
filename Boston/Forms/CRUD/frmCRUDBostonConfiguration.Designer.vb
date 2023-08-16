@@ -113,6 +113,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet = New System.Windows.Forms.CheckBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -976,6 +977,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxModelling
         '
+        Me.GroupBoxModelling.Controls.Add(Me.CheckBoxHideReferenceModeOnReferenceModeSet)
         Me.GroupBoxModelling.Controls.Add(Me.CheckBoxModelllingUseThreadingLoadingXMLPage)
         Me.GroupBoxModelling.Controls.Add(Me.ComboBoxDefaultGeneralConceptConversion)
         Me.GroupBoxModelling.Controls.Add(Me.LabelPromptNLAPIConvertsGeneralConceptsTo)
@@ -1076,6 +1078,16 @@ Partial Class frmCRUDBostonConfiguration
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
+        '
+        'CheckBoxHideReferenceModeOnReferenceModeSet
+        '
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.AutoSize = True
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Location = New System.Drawing.Point(18, 155)
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Name = "CheckBoxHideReferenceModeOnReferenceModeSet"
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Size = New System.Drawing.Size(180, 17)
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.TabIndex = 6
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Text = "Hide Reference Mode on setting"
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.UseVisualStyleBackColor = True
         '
         'frmCRUDBostonConfiguration
         '
@@ -1223,4 +1235,5 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents ButtonFileSelect As Button
     Friend WithEvents CheckBoxUseThreadingDatabaseLoad As CheckBox
     Friend WithEvents CheckBoxStoreAndUseBinarySerialisations As CheckBox
+    Friend WithEvents CheckBoxHideReferenceModeOnReferenceModeSet As CheckBox
 End Class

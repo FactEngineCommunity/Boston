@@ -1063,11 +1063,15 @@ Namespace FBM
                     lrRoleInstance.Shape.Detach()
                 Next
 
-                Me.Y = Me.RoleGroup(0).Y - 3 - (Me.GetHighestConstraintLevel * 2)
                 '20220715-VM-Was below for Height 12 + 4 + ((Me.GetHighestConstraintLevel - 1) * 2))
                 Me.Shape.Resize(Me.Shape.Bounds.Width, 12 + ((Me.GetHighestConstraintLevel - 1) * 2))
 
-                Me.Shape.Move(Me.X, Me.Y)
+                For Each lrRole In Me.RoleGroup
+                    Me.RoleGroup(0).Y = Me.Y + 3 + (Me.GetHighestConstraintLevel * 2)
+                    lrRole.Shape.Move(lrRole.X, lrRole.Y)
+                Next
+
+
                 Call Me.Shape.ZBottom()
 
                 'FactTypeName
@@ -1082,6 +1086,13 @@ Namespace FBM
                     Me.FactTypeName.Shape.Resize(StringSize.Width + 4, StringSize.Height)
                 End If
 
+ReattachRoles:
+                Call Me.SortRoleGroup()
+                For Each lrRoleInstance In Me.RoleGroup
+                    lrRoleInstance.Shape.Detach()
+                    lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
+                Next
+
                 If Me.FactTypeReadingShape IsNot Nothing Then
 
                     Me.FactTypeReadingShape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y, False, False)
@@ -1095,24 +1106,20 @@ Namespace FBM
                         End If
 
                     Else
-                        If Not Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 40) Then
-                            Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                        'NB Same code in DisplayAndAssociate
+                        If Not Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 80) And Me.Arity = 1 Then
+                            Me.FactTypeReadingShape.Move(Me.Shape.Bounds.X + Me.Shape.Bounds.Width + 1, Me.Y, True) 'FactTypeReadingShape.Shape.Bounds.Y)
+                        ElseIf Not Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 50) And Me.Arity > 1 Then
+                            Me.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Y + Me.Shape.Bounds.Height) - 6, True)
                         End If
                         If Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 4) Then
-                            Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) + 2) 'FactTypeReadingShape.Shape.Bounds.Y)
+                            Me.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Y + Me.Shape.Bounds.Height) + 2, True)
                         End If
                     End If
                 End If
 
-ReattachRoles:
-                Call Me.SortRoleGroup()
-                For Each lrRoleInstance In Me.RoleGroup
-                    lrRoleInstance.Shape.Detach()
-                    lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
-                Next
-
                 If Me.FactTypeReadingShape IsNot Nothing Then
-                    Me.FactTypeReadingShape.Shape.AttachTo(Me.Shape, AttachToNode.MiddleLeft)
+                    Me.FactTypeReadingShape.Shape.AttachTo(Me.Shape, AttachToNode.TopLeft)
                 End If
 
                 If Me.FactTypeName IsNot Nothing Then
