@@ -10,7 +10,10 @@ Namespace FBM
         Sub NodeDeselected()
         Sub NodeModified()
         Sub NodeSelected()
-        Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean)
+        Sub Move(ByVal aiNewX As Integer,
+                 ByVal aiNewY As Integer,
+                 ByVal abBroadcastInterfaceEvent As Boolean,
+                 Optional ByVal abMakeDirty As Boolean = True)
         Sub Moved()
         Sub RepellNeighbouringPageObjects(ByVal aiDepth As Integer)
         Sub SetAppropriateColour()

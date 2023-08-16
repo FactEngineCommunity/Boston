@@ -1333,6 +1333,12 @@ Public Class frmToolboxModelDictionary
 
     Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
 
+        Call Me.RefreshDictionary
+
+    End Sub
+
+    Public Sub RefreshDictionary()
+
         Dim liCurrentLanguage As pcenumLanguage = pcenumLanguage.ORMModel
 
         Try

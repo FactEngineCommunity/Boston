@@ -1259,7 +1259,8 @@ Namespace FBM
             Throw New NotImplementedException()
         End Sub
 
-        Public Overridable Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Overridable Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean,
+                                      Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
             Throw New NotImplementedException()
         End Sub
 

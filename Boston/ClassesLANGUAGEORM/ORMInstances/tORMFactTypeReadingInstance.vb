@@ -368,7 +368,10 @@ Namespace FBM
             Me.Model.IsDirty = True
         End Sub
 
-        Public Shadows Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Shadows Sub Move(ByVal aiNewX As Integer,
+                                ByVal aiNewY As Integer,
+                                ByVal abBroadcastInterfaceEvent As Boolean,
+                                Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
 
             Me.X = aiNewX
             Me.Y = aiNewY
@@ -378,8 +381,10 @@ Namespace FBM
                 Me.Shape.Move(aiNewX, aiNewY)
             End If
 
-            Me.makeDirty()
-            Me.Page.MakeDirty()
+            If abMakeDirty Then
+                Me.makeDirty()
+                Me.Page.MakeDirty()
+            End If
 
         End Sub
 

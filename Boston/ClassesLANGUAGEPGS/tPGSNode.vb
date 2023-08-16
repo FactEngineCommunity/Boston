@@ -377,7 +377,8 @@ Namespace PGS
 
         End Sub
 
-        Public Overloads Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
+        Public Overloads Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean,
+                                    Optional ByVal abMakeDirty As Boolean = True) Implements FBM.iPageObject.Move
 
             Me.X = aiNewX
             Me.Y = aiNewY

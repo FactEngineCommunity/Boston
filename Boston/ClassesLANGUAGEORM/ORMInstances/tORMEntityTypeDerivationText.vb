@@ -169,7 +169,8 @@ Namespace FBM
 
         End Sub
 
-        Public Overloads Sub Move(aiNewX As Integer, aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Overloads Sub Move(aiNewX As Integer, aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean,
+                                   Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
 
         End Sub
 

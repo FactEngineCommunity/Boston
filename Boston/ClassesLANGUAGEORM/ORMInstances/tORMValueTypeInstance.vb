@@ -1261,7 +1261,8 @@ RemoveAnyway:
             Next
         End Sub
 
-        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean,
+                   Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
 
             If aiNewX < 0 Then aiNewX = 0
             If aiNewY < 0 Then aiNewY = 0

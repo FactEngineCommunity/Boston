@@ -365,7 +365,8 @@ Namespace FBM
             Throw New NotImplementedException()
         End Sub
 
-        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Sub Move(aiNewX As Integer, aiNewY As Integer, abBroadcastInterfaceEvent As Boolean,
+                           Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
             Throw New NotImplementedException()
         End Sub
 

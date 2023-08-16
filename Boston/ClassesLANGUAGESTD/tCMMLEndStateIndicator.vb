@@ -52,7 +52,8 @@ Namespace STD
             Return Me.EndStateId = other.EndStateId
         End Function
 
-        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements FBM.iPageObject.Move
+        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean,
+                         Optional ByVal abMakeDirty As Boolean = True) Implements FBM.iPageObject.Move
 
             Me.X = aiNewX
             Me.Y = aiNewY

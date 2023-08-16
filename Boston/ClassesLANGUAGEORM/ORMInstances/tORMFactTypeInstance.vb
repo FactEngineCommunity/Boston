@@ -1083,9 +1083,24 @@ Namespace FBM
                 End If
 
                 If Me.FactTypeReadingShape IsNot Nothing Then
+
+                    Me.FactTypeReadingShape.Move(Me.FactTypeReadingPoint.X, Me.FactTypeReadingPoint.Y, False, False)
+
                     If Me.FactTypeReadingShape.Shape IsNot Nothing And abMoveFactTypeReadingShape Then
                         '20220715-VM-Commented out.
-                        'Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                        If Not Me.IsObjectified Then
+                            Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 2) 'FactTypeReadingShape.Shape.Bounds.Y)
+                        Else
+                            Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height)) 'FactTypeReadingShape.Shape.Bounds.Y)
+                        End If
+
+                    Else
+                        If Not Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 40) Then
+                            Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6) 'FactTypeReadingShape.Shape.Bounds.Y)
+                        End If
+                        If Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 4) Then
+                            Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) + 2) 'FactTypeReadingShape.Shape.Bounds.Y)
+                        End If
                     End If
                 End If
 
@@ -1675,7 +1690,7 @@ ReattachRoles:
 
                 Dim liHypotenuse = Math.Sqrt(Math.Abs(lat1 - lat2) ^ 2 + Math.Abs(lon1 - lon2) ^ 2)
 
-                Return (aiRadius - liHypotenuse) > 0
+                Return liHypotenuse < aiRadius
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -3975,7 +3990,8 @@ ReattachRoles:
 
         End Sub
 
-        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean,
+                        Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
 
             Try
 

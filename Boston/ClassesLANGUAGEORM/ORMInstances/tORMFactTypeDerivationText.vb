@@ -209,7 +209,8 @@ Namespace FBM
 
         End Sub
 
-        Public Shadows Sub Move(aiNewX As Integer, aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Shadows Sub Move(aiNewX As Integer, aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean,
+                                 Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
 
             Try
                 If aiNewX < 0 Then aiNewX = 0

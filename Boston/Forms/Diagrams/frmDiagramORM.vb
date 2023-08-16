@@ -926,10 +926,25 @@ Public Class frmDiagramORM
                 'DraggedObject is a ModelObject (from the ModelDictionary form etc),
                 ' rather than a Shape Object dragged from the Toolbox.
                 '---------------------------------------------------------------------
-                If Not TypeOf (lrDraggedNode.Tag) Is FBM.ModelObject Then
-                    Exit Sub
-                End If
-                lrModelObject = lrDraggedNode.Tag
+                Select Case lrDraggedNode.Tag.GetType
+                    Case Is = GetType(FBM.ModelObject)
+                        lrModelObject = lrDraggedNode.Tag
+                    Case Is = GetType(RDS.Table), GetType(PGS.Node)
+                        lrModelObject = lrDraggedNode.Tag.FBMModelElement
+                    Case Is = GetType(RDS.Column)
+                        Try
+                            lrModelObject = CType(lrDroppedObject, RDS.Column).ActiveRole.JoinsValueType
+                        Catch ex As Exception
+                            Exit Sub
+                        End Try
+
+                    Case Else
+                        Try
+                            lrModelObject = lrDraggedNode.Tag
+                        Catch ex As Exception
+                            Exit Sub
+                        End Try
+                End Select
 
                 If (GetType(FBM.DiagramSpyPage) Is Me.zrPage.GetType) Then
                     '---------------------------------------------------------------------------------------------------
@@ -1040,7 +1055,7 @@ ProcessEntityType:
                         loEntityTypeNameStringSize = Me.zrPage.Diagram.MeasureString(Trim(Me.Name), Me.zrPage.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
 
                         loDropPtF = New Point(loPt.X - CInt(loEntityTypeNameStringSize.Width / 3), loPt.Y - 5)
-                        lrValueTypeInstance = Me.zrPage.DropValueTypeAtPoint(lrValueType, loDropPtF, True)
+                        lrValueTypeInstance = Me.zrPage.DropValueTypeAtPoint(lrValueType, loDropPtF, True, True)
                         Me.zrPage.Save()
                         '---------------------------------------
                         'Create the UserAction for the UndoLog
@@ -4151,12 +4166,19 @@ SkipORMReadingEditor:
                     'Special handling for FactTypes.
                     '  FactTypeInstances are not added to zrPage.SelectedObject in Diagram.NodeSelected
                     '------------------------------------------------------------------------------------
-                    If loSelectedNode.Tag.ConceptType = pcenumConceptType.FactType Then
-                        Me.zrPage.SelectedObject.Clear()
-                        Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
-                        Call Me.SelectNode(loSelectedNode)
-                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
-                    End If
+                    Select Case loSelectedNode.Tag.GetType
+                        Case Is = GetType(FBM.FactTypeInstance)
+                            Me.zrPage.SelectedObject.Clear()
+                            Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
+                            Call Me.SelectNode(loSelectedNode)
+                            Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactType
+                        Case Is = GetType(FBM.EntityTypeInstance), GetType(FBM.ValueTypeInstance)
+                            Me.zrPage.SelectedObject.Clear()
+                            Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag)
+                        Case Is = GetType(FBM.EntityTypeName)
+                            Me.zrPage.SelectedObject.Clear()
+                            Me.zrPage.SelectedObject.AddUnique(loSelectedNode.Tag.EntityTypeInstance)
+                    End Select
                     Select Case loSelectedNode.GetType
                         Case Is = GetType(ShapeNode)
                             Call Me.SelectNode(loSelectedNode)
@@ -7688,6 +7710,10 @@ SkipPopup:
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 If lrFactTypeInstance.IsDerived Then
                     Call lrFactTypeInstance.FactTypeDerivationText.Move(lrFactTypeInstance.X, Viev.Greater(lrFactTypeInstance.Y - 10 - lrFactTypeInstance.FactTypeDerivationText.Shape.Bounds.Height, 0), False)
+                End If
+                Call lrFactTypeInstance.AdjustBorderHeight(True)
+                If lrFactTypeInstance.isReferenceModeFactType Then
+                    lrFactTypeInstance.Hide()
                 End If
             Next
 
@@ -12906,6 +12932,7 @@ SkipRemovalFromModel:
         Try
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrFactTypeInstance As FBM.FactTypeInstance
+            Dim larFactTypeInstance As New List(Of FBM.FactTypeInstance)
 
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
@@ -12914,6 +12941,8 @@ SkipRemovalFromModel:
                 If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
 
                     lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
+
+                    larFactTypeInstance.Add(lrFactTypeInstance)
 
                     If lrFactTypeInstance IsNot Nothing Then
                         If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
@@ -12933,7 +12962,7 @@ SkipRemovalFromModel:
                         prApplication.ThrowErrorMessage("There was an error dropping the Fact Type, " & lrFactTypeReading.FactType.Id & ", on the Page.", pcenumErrorType.Warning,, False, False, True,, True)
                     End If
                 ElseIf lrFactTypeReading.FactType.IsSubtypeRelationshipFactType And Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count > 0 Then
-                        Try
+                    Try
                         lrFactTypeInstance = Me.zrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactTypeReading.FactType.Id)
 
                         Dim lrSubtypeRelationshipInstance = (From SubtypeRelationshipInstance In lrEntityTypeInstance.SubtypeRelationship
@@ -12969,6 +12998,10 @@ SkipRemovalFromModel:
                         'Not a biggie. But shouldn't fail.
                     End Try
                 End If
+            Next
+
+            For Each lrFactTypeInstance In larFactTypeInstance
+                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(10, False)
             Next
 
             If My.Settings.AutoLayoutAfterAddingAssociatedFactTypes Then

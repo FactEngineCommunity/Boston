@@ -1275,7 +1275,9 @@ Namespace FBM
                               GetType(FBM.RoleConstraintRoleInstance),
                               GetType(FBM.ModelNoteInstance),
                               GetType(FBM.FactTable),
-                              GetType(FBM.EntityTypeName)
+                              GetType(FBM.EntityTypeName),
+                              GetType(FBM.FactTypeName),
+                              GetType(FBM.FactTypeReadingInstance)
 
                         Return True
 
@@ -1368,6 +1370,36 @@ Namespace FBM
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 Return False
             End Try
+        End Function
+
+        Public Function isReferenceModeFactType() As Boolean
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.FactType), GetType(FBM.FactTypeInstance)
+
+                        Dim larEntitType = From EntityType In Me.Model.EntityType
+                                           Where EntityType.ReferenceModeFactType IsNot Nothing
+                                           Where EntityType.ReferenceModeFactType.Id = Me.Id
+                                           Select EntityType
+
+                        Return larEntitType.Count > 0
+
+                    Case Else
+                        Return False
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
         End Function
 
         Public Function isReferenceModeValueType() As Boolean

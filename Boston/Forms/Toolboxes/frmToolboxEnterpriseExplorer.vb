@@ -1840,15 +1840,37 @@ Public Class frmToolboxEnterpriseExplorer
 
     Private Sub ViewModelDictionaryToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ViewModelDictionaryToolStripMenuItem.Click
 
-        Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
-        If Not lrModel.Loaded Then
-            Call Me.DoModelLoading(lrModel)
-            Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
-        End If
+        Dim lsMessage As String
 
-        Dim lfrmToolboxModelDictionary As frmToolboxModelDictionary = frmMain.LoadToolboxModelDictionary()
-        lfrmToolboxModelDictionary.zrORMModel = lrModel
-        lfrmToolboxModelDictionary.zrLoadedModel = lrModel
+        Try
+            Dim lrModel As FBM.Model = Me.TreeView.SelectedNode.Tag.Tag
+
+            If Not lrModel.Loaded Then
+
+                lsMessage = "This model is not loaded, would you like to load it?"
+                lsMessage.AppendDoubleLineBreak("The model needs to be loaded to display its model elements in the Model Dictionary.")
+
+                If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                    Call Me.DoModelLoading(lrModel)
+                    Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
+                Else
+                    Exit Sub
+                End If
+            End If
+
+            Dim lfrmToolboxModelDictionary As frmToolboxModelDictionary = frmMain.LoadToolboxModelDictionary()
+            lfrmToolboxModelDictionary.zrORMModel = lrModel
+            lfrmToolboxModelDictionary.zrLoadedModel = lrModel
+
+            Call lfrmToolboxModelDictionary.RefreshDictionary()
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 

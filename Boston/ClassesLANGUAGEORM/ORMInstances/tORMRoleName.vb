@@ -286,7 +286,8 @@ Namespace FBM
             Me.RoleInstance.makeDirty()
         End Sub
 
-        Public Overloads Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean) Implements iPageObject.Move
+        Public Overloads Sub Move(ByVal aiNewX As Integer, ByVal aiNewY As Integer, ByVal abBroadcastInterfaceEvent As Boolean,
+                                       Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
 
             Try
                 Me.X = aiNewX

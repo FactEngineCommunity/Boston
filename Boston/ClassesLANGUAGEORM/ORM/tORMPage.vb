@@ -1609,9 +1609,18 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' Drops the Value Type onto a Page.
+        ''' </summary>
+        ''' <param name="arValueType"></param>
+        ''' <param name="ao_pt"></param>
+        ''' <param name="abBroadcastInterfaceEvent"></param>
+        ''' <param name="abForceDisplay">True if want to force the display of the Value Type. E.g. If is a Reference Mode Value Type, but we drop it onto a Page anyway.</param>
+        ''' <returns></returns>
         Public Function DropValueTypeAtPoint(ByRef arValueType As FBM.ValueType,
                                              ByVal ao_pt As PointF,
-                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = False) As FBM.ValueTypeInstance
+                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = False,
+                                             Optional ByVal abForceDisplay As Boolean = False) As FBM.ValueTypeInstance
 
             Dim lrValuetype As New FBM.ValueType
             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
@@ -1660,7 +1669,7 @@ Namespace FBM
                 If Me.DiagramView IsNot Nothing Then
                     Me.DiagramView.Cursor = Cursors.WaitCursor
 
-                    Call lrValueTypeInstance.DisplayAndAssociate()
+                    Call lrValueTypeInstance.DisplayAndAssociate(abForceDisplay)
                     Me.Diagram.Invalidate()
 
                     Me.DiagramView.Cursor = Cursors.Default
