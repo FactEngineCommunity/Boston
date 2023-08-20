@@ -67,6 +67,8 @@ Partial Class frmDiagramORM
         Me.ToolStripMenuItem8 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ORMVerbalisationViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RichmondBrainBoxToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ConceptClassificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemInterlinkEditor = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowHideToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FactTypesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HideFactTypeNamesRoleNamesFactTypeReadingsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -313,7 +315,6 @@ Partial Class frmDiagramORM
         Me.ToolStripMenuItemModelNoteRemoveFromPageAndModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.DiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
         Me.HiddenDiagramView = New MindFusion.Diagramming.WinForms.DiagramView()
-        Me.ConceptClassificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip_Diagram.SuspendLayout()
         Me.ContextMenuStrip_shape_list.SuspendLayout()
         Me.ContextMenuStrip_Role.SuspendLayout()
@@ -557,7 +558,7 @@ Partial Class frmDiagramORM
         '
         'ViewToolStripMenuItem1
         '
-        Me.ViewToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_Toolbox, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator18, Me.ErrorListToolStripMenuItem, Me.ToolStripMenuItem8, Me.ORMVerbalisationViewToolStripMenuItem, Me.RichmondBrainBoxToolStripMenuItem, Me.ConceptClassificationToolStripMenuItem})
+        Me.ViewToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_Toolbox, Me.ModelDictionaryToolStripMenuItem, Me.PropertiesToolStripMenuItem, Me.ToolStripSeparator18, Me.ErrorListToolStripMenuItem, Me.ToolStripMenuItem8, Me.ORMVerbalisationViewToolStripMenuItem, Me.RichmondBrainBoxToolStripMenuItem, Me.ConceptClassificationToolStripMenuItem, Me.ToolStripMenuItemInterlinkEditor})
         Me.ViewToolStripMenuItem1.Name = "ViewToolStripMenuItem1"
         Me.ViewToolStripMenuItem1.Size = New System.Drawing.Size(207, 22)
         Me.ViewToolStripMenuItem1.Text = "&View"
@@ -615,6 +616,18 @@ Partial Class frmDiagramORM
         Me.RichmondBrainBoxToolStripMenuItem.Name = "RichmondBrainBoxToolStripMenuItem"
         Me.RichmondBrainBoxToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
         Me.RichmondBrainBoxToolStripMenuItem.Text = "&Virtual Analyst"
+        '
+        'ConceptClassificationToolStripMenuItem
+        '
+        Me.ConceptClassificationToolStripMenuItem.Name = "ConceptClassificationToolStripMenuItem"
+        Me.ConceptClassificationToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.ConceptClassificationToolStripMenuItem.Text = "&Concept Classification"
+        '
+        'ToolStripMenuItemInterlinkEditor
+        '
+        Me.ToolStripMenuItemInterlinkEditor.Name = "ToolStripMenuItemInterlinkEditor"
+        Me.ToolStripMenuItemInterlinkEditor.Size = New System.Drawing.Size(203, 22)
+        Me.ToolStripMenuItemInterlinkEditor.Text = "&Interlink Editor"
         '
         'ShowHideToolStripMenuItem
         '
@@ -2247,12 +2260,6 @@ Partial Class frmDiagramORM
         Me.HiddenDiagramView.TabIndex = 9
         Me.HiddenDiagramView.Text = "DiagramView1"
         '
-        'ConceptClassificationToolStripMenuItem
-        '
-        Me.ConceptClassificationToolStripMenuItem.Name = "ConceptClassificationToolStripMenuItem"
-        Me.ConceptClassificationToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
-        Me.ConceptClassificationToolStripMenuItem.Text = "&Concept Classification"
-        '
         'frmDiagramORM
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2583,4 +2590,5 @@ Partial Class frmDiagramORM
     Friend WithEvents ToolStripMenuItem18 As ToolStripMenuItem
     Friend WithEvents RemoveFromPageToolStripMenuItem2 As ToolStripMenuItem
     Friend WithEvents ConceptClassificationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemInterlinkEditor As ToolStripMenuItem
 End Class

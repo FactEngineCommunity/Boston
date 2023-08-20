@@ -241,60 +241,70 @@ Public Class frmKnowledgeExtraction
 	End Sub
 
 	Private Sub DoWork()
-		SyncLock Me
-			CloseButtons()
 
-			Dim dt1 As DateTime = DateTime.Now
+		Try
+			SyncLock Me
+				CloseButtons()
 
-			StatusLabel.Text = "Keyword extraction process is ongoing:0%"
+				Dim dt1 As DateTime = DateTime.Now
 
-			ResultListView.Items.Clear()
+				StatusLabel.Text = "Keyword extraction process is ongoing:0%"
 
-			MyData.WordsFre = MyFun.StatisticsWords(MyData.TheDoc)
+				ResultListView.Items.Clear()
 
-			For i As Integer = 0 To MyData.WordsFre.Length - 1
-				MyData.WordsFre(i).EntropyDifference_Max()
-				progressBar1.Value = i * 100 \ MyData.WordsFre.Length
-				StatusLabel.Text = "Keyword extraction process is ongoing: " & progressBar1.Value & "%"
-			Next
+				MyData.WordsFre = MyFun.StatisticsWords(MyData.TheDoc)
 
-			MyFun.QuickSort(MyData.WordsFre, 0, MyData.WordsFre.Length - 1)
+				For i As Integer = 0 To MyData.WordsFre.Length - 1
+					MyData.WordsFre(i).EntropyDifference_Max()
+					progressBar1.Value = i * 100 \ MyData.WordsFre.Length
+					StatusLabel.Text = "Keyword extraction process is ongoing: " & progressBar1.Value & "%"
+				Next
 
-			Dim WordsNum As Integer = 0
-			For i As Integer = 0 To MyData.WordsFre.Length - 1
-				If MyData.WordsFre(i).ED > 0 Then
-					WordsNum += 1
-				Else
-					Exit For
-				End If
-			Next
-			Dim lvi As ListViewItem() = New ListViewItem(WordsNum - 1) {}
-			For i As Integer = 0 To WordsNum - 1
-				lvi(i) = New ListViewItem()
-				lvi(i).SubItems(0).Text = (i + 1).ToString()
-				lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
+				MyFun.QuickSort(MyData.WordsFre, 0, MyData.WordsFre.Length - 1)
 
-				If Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
-					MyData.WordsFre(i).IsInModel = True
-					Dim loFont = New Font("Arial", 10, FontStyle.Bold)
-					lvi(i).SubItems(1).Font = loFont
-					lvi(i).ForeColor = Color.RoyalBlue
-					'lvi(i).BackColor = Color.Beige
-				End If
+				Dim WordsNum As Integer = 0
+				For i As Integer = 0 To MyData.WordsFre.Length - 1
+					If MyData.WordsFre(i).ED > 0 Then
+						WordsNum += 1
+					Else
+						Exit For
+					End If
+				Next
+				Dim lvi As ListViewItem() = New ListViewItem(WordsNum - 1) {}
+				For i As Integer = 0 To WordsNum - 1
+					lvi(i) = New ListViewItem()
+					lvi(i).SubItems(0).Text = (i + 1).ToString()
+					lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
 
-				lvi(i).SubItems.Add(MyData.WordsFre(i).ED.ToString())
-				lvi(i).SubItems.Add(MyData.WordsFre(i).Frequency.ToString())
-			Next
-			ResultListView.Items.AddRange(lvi)
+					If Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
+						MyData.WordsFre(i).IsInModel = True
+						Dim loFont = New Font("Arial", 10, FontStyle.Bold)
+						lvi(i).SubItems(1).Font = loFont
+						lvi(i).ForeColor = Color.RoyalBlue
+						'lvi(i).BackColor = Color.Beige
+					End If
 
-			Dim dt2 As DateTime = DateTime.Now
+					lvi(i).SubItems.Add(MyData.WordsFre(i).ED.ToString())
+					lvi(i).SubItems.Add(MyData.WordsFre(i).Frequency.ToString())
+				Next
+				ResultListView.Items.AddRange(lvi)
 
-			progressBar1.Value = 100
+				Dim dt2 As DateTime = DateTime.Now
 
-			StatusLabel.Text = "Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & "."
+				progressBar1.Value = 100
 
-			OpenButton()
-		End SyncLock
+				StatusLabel.Text = "Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & "."
+
+				OpenButton()
+			End SyncLock
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 	End Sub
 
 	Private Sub SaveButton_Click(sender As Object, e As EventArgs)
@@ -367,60 +377,72 @@ Public Class frmKnowledgeExtraction
 	End Sub
 
 	Private Sub ResultListView_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ResultListView.SelectedIndexChanged
-		If ResultListView.SelectedIndices IsNot Nothing AndAlso ResultListView.SelectedIndices.Count > 0 Then
-			Dim g As Graphics = Me.CreateGraphics()
-			g.Clear(Me.BackColor)
-			Dim word As String = ""
-			Dim c As ListView.SelectedIndexCollection = ResultListView.SelectedIndices
-			word = ResultListView.Items(c(0)).SubItems(1).Text
 
-			Dim WordIndex As Integer = 0
-			For WordIndex = 0 To MyData.WordsFre.Length - 1
-				If word = MyData.WordsFre(WordIndex).Word Then
-					Exit For
+		Try
+			If ResultListView.SelectedIndices IsNot Nothing AndAlso ResultListView.SelectedIndices.Count > 0 Then
+				Dim g As Graphics = Me.CreateGraphics()
+				g.Clear(Me.BackColor)
+				Dim word As String = ""
+				Dim c As ListView.SelectedIndexCollection = ResultListView.SelectedIndices
+				word = ResultListView.Items(c(0)).SubItems(1).Text
+
+				Dim WordIndex As Integer = 0
+				For WordIndex = 0 To MyData.WordsFre.Length - 1
+					If word = MyData.WordsFre(WordIndex).Word Then
+						Exit For
+					End If
+				Next
+
+				Dim lrModelElement = Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(word), True)
+				If lrModelElement IsNot Nothing Then
+					'-------------------------------------------------------
+					'ORM Verbalisation
+					'-------------------------------------------------------
+					Dim lrToolboxForm As frmToolboxORMVerbalisation
+					lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+					If IsSomething(lrToolboxForm) Then
+						lrToolboxForm.zrModel = Me.mrModel
+						Call lrToolboxForm.verbaliseModelElement(lrModelElement)
+					End If
+
 				End If
-			Next
+				Me.zrSelectedModelElement = lrModelElement
 
-			Dim lrModelElement = Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(word), True)
-			If lrModelElement IsNot Nothing Then
-				'-------------------------------------------------------
-				'ORM Verbalisation
-				'-------------------------------------------------------
-				Dim lrToolboxForm As frmToolboxORMVerbalisation
-				lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-				If IsSomething(lrToolboxForm) Then
-					lrToolboxForm.zrModel = Me.mrModel
-					Call lrToolboxForm.verbaliseModelElement(lrModelElement)
-				End If
+				Dim max As Integer = 0
+				For Each length As Integer In MyData.WordsFre(WordIndex).Distance
+					max += length
+				Next
 
+				Dim p As New Pen(Color.Black, 2)
+				g.DrawRectangle(p, 38, Me.Size.Height - 80, 809, 60)
+				Dim b1 As New SolidBrush(Color.Black)
+
+				g.DrawString("0", New Font("Arial", 10), b1, New PointF(33, Me.Size.Height - 20))
+				g.DrawString((max \ 10).ToString(), New Font("Arial", 10), b1, New PointF(113, Me.Size.Height - 20))
+				g.DrawString((max * 2 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(193, Me.Size.Height - 20))
+				g.DrawString((max * 3 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(273, Me.Size.Height - 20))
+				g.DrawString((max * 4 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(353, Me.Size.Height - 20))
+				g.DrawString((max * 5 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(433, Me.Size.Height - 20))
+				g.DrawString((max * 6 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(513, Me.Size.Height - 20))
+				g.DrawString((max * 7 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(593, Me.Size.Height - 20))
+				g.DrawString((max * 8 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(673, Me.Size.Height - 20))
+				g.DrawString((max * 9 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(753, Me.Size.Height - 20))
+				g.DrawString(max.ToString(), New Font("Arial", 10), b1, New PointF(833, Me.Size.Height - 20))
+				For Each po As Integer In MyData.WordsFre(WordIndex).Position
+					Dim x As Single = CSng(38 + 1.0 * po * 809 / max)
+					g.DrawLine(p, x, Me.Size.Height - 80, x, Me.Size.Height - 20)
+				Next
 			End If
-			Me.zrSelectedModelElement = lrModelElement
 
-			Dim max As Integer = 0
-			For Each length As Integer In MyData.WordsFre(WordIndex).Distance
-				max += length
-			Next
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-			Dim p As New Pen(Color.Black, 2)
-			g.DrawRectangle(p, 38, Me.Size.Height - 80, 809, 60)
-			Dim b1 As New SolidBrush(Color.Black)
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,,, ex)
+		End Try
 
-			g.DrawString("0", New Font("Arial", 10), b1, New PointF(33, Me.Size.Height - 20))
-			g.DrawString((max \ 10).ToString(), New Font("Arial", 10), b1, New PointF(113, Me.Size.Height - 20))
-			g.DrawString((max * 2 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(193, Me.Size.Height - 20))
-			g.DrawString((max * 3 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(273, Me.Size.Height - 20))
-			g.DrawString((max * 4 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(353, Me.Size.Height - 20))
-			g.DrawString((max * 5 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(433, Me.Size.Height - 20))
-			g.DrawString((max * 6 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(513, Me.Size.Height - 20))
-			g.DrawString((max * 7 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(593, Me.Size.Height - 20))
-			g.DrawString((max * 8 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(673, Me.Size.Height - 20))
-			g.DrawString((max * 9 \ 10).ToString(), New Font("Arial", 10), b1, New PointF(753, Me.Size.Height - 20))
-			g.DrawString(max.ToString(), New Font("Arial", 10), b1, New PointF(833, Me.Size.Height - 20))
-			For Each po As Integer In MyData.WordsFre(WordIndex).Position
-				Dim x As Single = CSng(38 + 1.0 * po * 809 / max)
-				g.DrawLine(p, x, Me.Size.Height - 80, x, Me.Size.Height - 20)
-			Next
-		End If
 	End Sub
 
 
@@ -559,24 +581,46 @@ Public Class frmKnowledgeExtraction
 
 		If word = String.Empty Then Return
 		Dim index As Integer = 0
-		Dim s_start As Integer = myRtb.SelectionStart
 		Dim startIndex As Integer = 0
-		Dim lsAllText As String = LCase(myRtb.Text)
 
-		While index < myRtb.TextLength
-			index = lsAllText.IndexOf(LCase(word), startIndex)
-			If index > 0 And index < myRtb.TextLength - word.Length Then
-				myRtb.[Select](index, word.Length)
-				myRtb.SelectionColor = color
-				startIndex = index + word.Length
-			Else
-				Exit While
-			End If
-		End While
+		Try
+			Dim lsAllText As String = LCase(myRtb.Text)
+			While index < myRtb.TextLength
 
-		myRtb.SelectionStart = s_start
-		myRtb.SelectionLength = 0
-		myRtb.SelectionColor = Color.Black
+				index = lsAllText.IndexOf(LCase(word), startIndex)
+				If index >= 0 And index < myRtb.TextLength - word.Length Then
+					myRtb.[Select](index, word.Length)
+					myRtb.SelectionColor = color
+					startIndex = index + word.Length
+				Else
+					Exit While
+				End If
+
+			End While
+
+			startIndex = 0
+			lsAllText = myRtb.Text
+			While index < myRtb.TextLength
+				index = lsAllText.IndexOf(word, startIndex)
+				If index >= 0 And index < myRtb.TextLength - word.Length Then
+					myRtb.[Select](index, word.Length)
+					myRtb.SelectionColor = color
+					startIndex = index + word.Length
+				Else
+					Exit While
+				End If
+
+			End While
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
 	End Sub
 
 
@@ -997,6 +1041,11 @@ Public Class frmKnowledgeExtraction
 	Public Function ExtractFactTypeReadings(text As String) As List(Of String)
 
 		Try
+			Dim lasKeywords As New List(Of String)
+
+
+			MyData.WordsFre = {}
+
 			' Create a new StanfordCoreNLP pipeline with the required annotators
 			Dim pipelineProps As New java.util.Properties()
 			pipelineProps.setProperty("annotators", "tokenize, ssplit, pos, lemma, depparse")
@@ -1019,75 +1068,148 @@ Public Class frmKnowledgeExtraction
 
 			'================Noun Phrases revised=====================================
 			For Each sentence As CoreMap In sentences
-				Dim tokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
-				Dim numTokens As Integer = tokens.size()
 
-				Dim nounPhrase As StringBuilder = Nothing ' Variable to store the current noun phrase
-				Dim subject As String = Nothing ' Variable to store the subject
-				Dim verb As String = Nothing ' Variable to store the verb
-				Dim [object] As String = Nothing ' Variable to store the object
+				With New WaitCursor
+					Dim tokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
+					Dim numTokens As Integer = tokens.size()
 
-				For i As Integer = 0 To numTokens - 1
-					Dim token As CoreLabel = CType(tokens.get(i), CoreLabel)
-					Dim pos As String = token.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+					Dim nounPhrase As StringBuilder = Nothing ' Variable to store the current noun phrase
+					Dim subject As String = Nothing ' Variable to store the subject
+					Dim verb As String = Nothing ' Variable to store the verb
+					Dim [object] As String = Nothing ' Variable to store the object
 
-					If pos.StartsWith("NN") Then
-						If nounPhrase Is Nothing Then
-							nounPhrase = New StringBuilder()
-						End If
+					For i As Integer = 0 To numTokens - 1
+						Dim token As CoreLabel = CType(tokens.get(i), CoreLabel)
+						Dim pos As String = token.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
 
-						nounPhrase.Append(token.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
-
-						' Check if the next token is a verb
-						If i + 1 < numTokens Then
-							Dim nextToken As CoreLabel = CType(tokens.get(i + 1), CoreLabel)
-							Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
-
-							If nextPos.StartsWith("VB") Then
-								verb = nextToken.get(GetType(CoreAnnotations.TextAnnotation)).ToString()
+						If pos.StartsWith("NN") Then
+							If nounPhrase Is Nothing Then
+								nounPhrase = New StringBuilder()
 							End If
-						End If
-					ElseIf nounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(nounPhrase.ToString()) Then
-						' A noun phrase has been captured, save it as the subject
-						subject = nounPhrase.ToString().Trim()
-						nounPhrase = Nothing ' Reset nounPhrase for the next noun phrase
 
-						' Find the object related to the subject
-						Dim objectNounPhrase As StringBuilder = Nothing ' Variable to store the current object noun phrase
+							nounPhrase.Append(token.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
 
-						For j As Integer = i To numTokens - 1
-							Dim nextToken As CoreLabel = CType(tokens.get(j), CoreLabel)
-							Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+							' Check if the next token is a verb
+							If i + 1 < numTokens Then
+								Dim nextToken As CoreLabel = CType(tokens.get(i + 1), CoreLabel)
+								Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
 
-							If nextPos.StartsWith("NN") Then
-								If objectNounPhrase Is Nothing Then
-									objectNounPhrase = New StringBuilder()
+								If nextPos.StartsWith("VB") Then
+									verb = nextToken.get(GetType(CoreAnnotations.TextAnnotation)).ToString()
 								End If
-
-								objectNounPhrase.Append(nextToken.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
-							ElseIf objectNounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(objectNounPhrase.ToString()) Then
-								' A noun phrase has been captured, save it as the object
-								[object] = objectNounPhrase.ToString().Trim()
-								Exit For
 							End If
-						Next
+						ElseIf nounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(nounPhrase.ToString()) Then
+							' A noun phrase has been captured, save it as the subject
+							subject = nounPhrase.ToString().Trim()
+							nounPhrase = Nothing ' Reset nounPhrase for the next noun phrase
 
-						subject = Singularize(subject)
-						[object] = Singularize([object])
-						verb = ConjugateVerbWN(verb, subject)
+							' Find the object related to the subject
+							Dim objectNounPhrase As StringBuilder = Nothing ' Variable to store the current object noun phrase
 
-						'CodeSafe
-						If verb Is Nothing Then verb = "has"
+							For j As Integer = i To numTokens - 1
+								Dim nextToken As CoreLabel = CType(tokens.get(j), CoreLabel)
+								Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
 
-						If Not String.IsNullOrEmpty([object]) Then
-							' Add the SVO triple with noun phrase object
-							lasFactTypeReading.Add(subject.ToPascalCase & " " & verb & " " & [object].ToPascalCase)
-						Else
-							' No noun phrase found for the object, fallback to the singular word noun
-							lasFactTypeReading.Add(subject.ToPascalCase & " " & verb & " " & tokens.get(i).get(GetType(CoreAnnotations.TextAnnotation)).ToString().ToPascalCase)
+								If nextPos.StartsWith("NN") Then
+									If objectNounPhrase Is Nothing Then
+										objectNounPhrase = New StringBuilder()
+									End If
+
+									objectNounPhrase.Append(nextToken.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
+								ElseIf objectNounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(objectNounPhrase.ToString()) Then
+									' A noun phrase has been captured, save it as the object
+									[object] = objectNounPhrase.ToString().Trim()
+									Exit For
+								End If
+							Next
+
+							subject = Singularize(subject)
+							[object] = Singularize([object])
+							verb = ConjugateVerbWN(verb, subject)
+
+							'CodeSafe
+							If verb Is Nothing Then verb = "has"
+
+							Dim lsSubjectKeyword As String = ""
+							Dim lsObjectKeyword As String = ""
+
+							lsSubjectKeyword = subject.ToPascalCase
+
+							If Not String.IsNullOrEmpty([object]) Then
+								' Add the SVO triple with noun phrase object
+								lsObjectKeyword = [object].ToPascalCase
+								lasFactTypeReading.Add(subject.ToPascalCase & " " & verb & " " & lsObjectKeyword)
+
+							Else
+								' No noun phrase found for the object, fallback to the singular word noun
+								lsObjectKeyword = tokens.get(i).get(GetType(CoreAnnotations.TextAnnotation)).ToString().ToPascalCase
+								lasFactTypeReading.Add(subject.ToPascalCase & " " & verb & " " & lsObjectKeyword)
+							End If
+
+
+#Region "Add Keyword to list"
+							If Not lasKeywords.Contains(lsSubjectKeyword) Then
+
+								Dim lvi As New ListViewItem()
+								lvi.SubItems(0).Text = lsSubjectKeyword
+								lvi.SubItems.Add(lsSubjectKeyword)
+
+								Dim loWordFrequency As New WORDSFRE
+								loWordFrequency.Position = {1}
+								loWordFrequency.Distance = {1}
+								loWordFrequency.Word = lsSubjectKeyword
+								loWordFrequency.Frequency = 1
+								loWordFrequency.Position(0) = 1
+								MyData.WordsFre.Add(loWordFrequency)
+
+								MyData.WordsFre.Add(New WORDSFRE())
+								If Me.mrModel.GetModelObjectByName(lsSubjectKeyword, True) IsNot Nothing Then
+									loWordFrequency.IsInModel = True
+									Dim loFont = New Font("Arial", 10, FontStyle.Bold)
+									lvi.SubItems(1).Font = loFont
+									lvi.ForeColor = Color.RoyalBlue
+									'lvi(i).BackColor = Color.Beige
+								End If
+								lvi.SubItems.Add(0.ToString)
+								lvi.SubItems.Add((lasKeywords.FindAll(Function(x) x = subject.ToPascalCase).Count + 1).ToString)
+								ResultListView.Items.Add(lvi)
+
+							End If
+
+							lasKeywords.Add(lsSubjectKeyword)
+
+							If Not lasKeywords.Contains(lsObjectKeyword) Then
+
+								Dim lvi As New ListViewItem()
+								lvi.SubItems(0).Text = lsObjectKeyword
+								lvi.SubItems.Add(lsObjectKeyword)
+
+								Dim loWordFrequency As New WORDSFRE
+								loWordFrequency.Position = {1}
+								loWordFrequency.Distance = {1}
+								loWordFrequency.Word = lsSubjectKeyword
+								loWordFrequency.Frequency = 1
+								loWordFrequency.Position(0) = 1
+								MyData.WordsFre.Add(loWordFrequency)
+
+								If Me.mrModel.GetModelObjectByName(lsObjectKeyword, True) IsNot Nothing Then
+									loWordFrequency.IsInModel = True
+									Dim loFont = New Font("Arial", 10, FontStyle.Bold)
+									lvi.SubItems(1).Font = loFont
+									lvi.ForeColor = Color.RoyalBlue
+									'lvi(i).BackColor = Color.Beige
+								End If
+								lvi.SubItems.Add(0.ToString)
+								lvi.SubItems.Add((lasKeywords.FindAll(Function(x) x = lsObjectKeyword).Count - 1).ToString)
+								ResultListView.Items.Add(lvi)
+							End If
+
+							lasKeywords.Add(lsObjectKeyword)
+#End Region
 						End If
-					End If
-				Next
+
+					Next
+				End With
 			Next            '=========================================
 
 
@@ -1445,10 +1567,18 @@ NextSentence:
 
 		With New WaitCursor
 
-			Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.RichTextBoxText.Text)
-
-			Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
 			Me.TabPageResults.Show()
+			Me.TabControl1.SelectedTab = Me.TabPageResults
+			Me.TabControl1.SelectedTab.Refresh()
+			Me.TabControl1.Refresh()
+
+			With New WaitCursor
+
+				Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.RichTextBoxText.Text)
+
+				Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
+				Me.TabPageResults.Show()
+			End With
 
 		End With
 
@@ -1797,7 +1927,7 @@ NextSentence:
 					lrToolboxForm = frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
 
 					If IsSomething(lrToolboxForm) Then
-						lrToolboxForm.TextBoxInput.Text = lsSelectedText
+						lrToolboxForm.TextBoxInput.Text = "NL: " & lsSelectedText
 					End If
 				End If
 			End With
@@ -2081,6 +2211,45 @@ NextSentence:
 			Me.Hide()
 			Me.Close()
 			Me.Dispose()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub RichTextBoxText_TextChanged(sender As Object, e As EventArgs) Handles RichTextBoxText.TextChanged
+
+		Try
+			If Clipboard.ContainsText() Then
+				Dim clipboardText As String = Clipboard.GetText()
+				Dim richTextBoxText As String = Me.RichTextBoxText.Text
+
+				' Trim both clipboard and RichTextBox text before comparison
+				clipboardText = clipboardText.Trim()
+				richTextBoxText = richTextBoxText.Trim()
+
+				Dim cleanedClipboardText As String = System.Text.RegularExpressions.Regex.Replace(clipboardText, "\s+", "")
+				Dim cleanedRichTextBoxText As String = System.Text.RegularExpressions.Regex.Replace(richTextBoxText, "\s+", "")
+
+				' Your handling code
+
+				If cleanedClipboardText = cleanedRichTextBoxText Then
+					' Handle the paste event
+					' Your code to process the pasted text
+					StandardizationButton.Enabled = True
+					RemoveStopButton.Enabled = True
+					KeywordExtractionMaxButton.Enabled = True
+					KeywordExtractionNormalButton.Enabled = True
+				End If
+			End If
+
+			MyData.TheDoc = Me.RichTextBoxText.Text.Trim
 
 		Catch ex As Exception
 			Dim lsMessage As String

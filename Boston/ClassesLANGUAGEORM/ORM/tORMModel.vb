@@ -4781,7 +4781,12 @@ SkipRDSProcessing:
 
                         lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
                     Else
-                        lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                        Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                        lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+                        Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
+                        lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
+                        'NB My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
+                        '  is no good, becase is User and Assembly Version Number specific. Need to store in C:\Program Data
                     End If
                     System.IO.Directory.CreateDirectory(lsFolderLocation)
                     lsFileName = Trim(Me.ModelId & "-" & Me.Name)
@@ -6824,6 +6829,7 @@ XMLDeserialisation:
 
                 If Not File.Exists(lsFileLocationName) Then
                     lsMessage = "The XML file for the Model, " & Me.Name & ", does not exist. Consider removing the Model from the Model Explorer."
+                    lsMessage.AppendDoubleLineBreak(lsFileLocationName)
                     prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
                     Exit Sub
                 End If

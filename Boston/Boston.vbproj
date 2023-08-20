@@ -822,6 +822,7 @@
     <Compile Include="ClassesGraphStandard\tRelationshipPropertyType.vb" />
     <Compile Include="ClassesGraphStandard\tRelationshipType.vb" />
     <Compile Include="ClassesGraphStandard\tRelationshipTypeRef.vb" />
+    <Compile Include="ClassesInterlink\tORMInterlink.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\Interfaces\iBPMNPageObject.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNActor.vb" />
     <Compile Include="ClassesLANGUAGEBPMN\tBPMNActorProcessRelation.vb" />
@@ -1695,6 +1696,12 @@
     <Compile Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DialogBoxes\frmModelElementSelector.Designer.vb">
+      <DependentUpon>frmModelElementSelector.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\frmModelElementSelector.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\DialogBoxes\frmModelShareWithProject.Designer.vb">
       <DependentUpon>frmModelShareWithProject.vb</DependentUpon>
     </Compile>
@@ -1837,6 +1844,12 @@
       <DependentUpon>frmAutoComplete.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\Toolboxes\frmAutoComplete.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxInterlinkEditor.Designer.vb">
+      <DependentUpon>frmToolboxInterlinkEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Toolboxes\frmToolboxInterlinkEditor.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\Toolboxes\frmToolboxDatabaseSchemaViewer.Designer.vb">
@@ -2656,6 +2669,9 @@
     <EmbeddedResource Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.resx">
       <DependentUpon>frmClientServerMessageBroadcast.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DialogBoxes\frmModelElementSelector.resx">
+      <DependentUpon>frmModelElementSelector.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmModelShareWithProject.resx">
       <DependentUpon>frmModelShareWithProject.vb</DependentUpon>
     </EmbeddedResource>
@@ -2755,6 +2771,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxAIPretrainingDataEditor.resx">
       <DependentUpon>frmToolboxAIPretrainingDataEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Toolboxes\frmToolboxInterlinkEditor.resx">
+      <DependentUpon>frmToolboxInterlinkEditor.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxDatabaseSchemaViewer.resx">
       <DependentUpon>frmToolboxDatabaseSchemaViewer.vb</DependentUpon>
@@ -3254,6 +3273,7 @@
     <None Include="Images\MenuImages\backup16x16.jpg" />
     <Content Include="Boston.ico" />
     <Content Include="ClassesFBMInterfaceHost\ReadMe.txt" />
+    <EmbeddedResource Include="ClassesFEKL\VirtualAnalyst-FEKL-Prompt.txt" />
     <Content Include="ClassesLANGUAGESTM\ReadMe.txt" />
     <Content Include="ClassesLANGUAGESTD\ReadMe.txt" />
     <Content Include="ClassesLANGUAGEUML\tUMLModel-ReadMe.txt" />

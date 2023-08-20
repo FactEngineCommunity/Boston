@@ -337,6 +337,8 @@ Namespace TableFactType
                         End If
                     End If
 
+                    Call arFactType.GetInterlinks()
+
                 Else
                     lsMessage = "Error: No FactType exists in the database for FactType.Id: " & arFactType.Id
                     Throw New System.Exception(lsMessage)

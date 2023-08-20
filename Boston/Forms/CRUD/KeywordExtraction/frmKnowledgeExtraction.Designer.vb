@@ -79,6 +79,8 @@ Partial Class frmKnowledgeExtraction
         Me.ToolStripStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelChunkCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ButtonClose = New System.Windows.Forms.Button()
+        Me.GroupBoxStatistical = New System.Windows.Forms.GroupBox()
+        Me.GroupboxCoreNLP = New System.Windows.Forms.GroupBox()
         Me.ContextMenuStripKeyword.SuspendLayout()
         Me.ContextMenuStripTextbox.SuspendLayout()
         Me.ContextMenuStripTextboxSelection.SuspendLayout()
@@ -89,6 +91,8 @@ Partial Class frmKnowledgeExtraction
         Me.TabPageAIExtraction.SuspendLayout()
         Me.GroupBoxAILLMPrompt.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
+        Me.GroupBoxStatistical.SuspendLayout()
+        Me.GroupboxCoreNLP.SuspendLayout()
         Me.SuspendLayout()
         '
         'HelpButton
@@ -103,7 +107,7 @@ Partial Class frmKnowledgeExtraction
         'KeywordExtractionNormalButton
         '
         Me.KeywordExtractionNormalButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.KeywordExtractionNormalButton.Location = New System.Drawing.Point(889, 199)
+        Me.KeywordExtractionNormalButton.Location = New System.Drawing.Point(13, 137)
         Me.KeywordExtractionNormalButton.Name = "KeywordExtractionNormalButton"
         Me.KeywordExtractionNormalButton.Size = New System.Drawing.Size(115, 53)
         Me.KeywordExtractionNormalButton.TabIndex = 49
@@ -113,7 +117,7 @@ Partial Class frmKnowledgeExtraction
         'progressBar1
         '
         Me.progressBar1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.progressBar1.Location = New System.Drawing.Point(12, 385)
+        Me.progressBar1.Location = New System.Drawing.Point(12, 362)
         Me.progressBar1.Name = "progressBar1"
         Me.progressBar1.Size = New System.Drawing.Size(809, 25)
         Me.progressBar1.TabIndex = 47
@@ -121,7 +125,7 @@ Partial Class frmKnowledgeExtraction
         'KeywordExtractionMaxButton
         '
         Me.KeywordExtractionMaxButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.KeywordExtractionMaxButton.Location = New System.Drawing.Point(889, 258)
+        Me.KeywordExtractionMaxButton.Location = New System.Drawing.Point(13, 196)
         Me.KeywordExtractionMaxButton.Name = "KeywordExtractionMaxButton"
         Me.KeywordExtractionMaxButton.Size = New System.Drawing.Size(115, 53)
         Me.KeywordExtractionMaxButton.TabIndex = 45
@@ -131,7 +135,7 @@ Partial Class frmKnowledgeExtraction
         'RemoveStopButton
         '
         Me.RemoveStopButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.RemoveStopButton.Location = New System.Drawing.Point(889, 140)
+        Me.RemoveStopButton.Location = New System.Drawing.Point(13, 78)
         Me.RemoveStopButton.Name = "RemoveStopButton"
         Me.RemoveStopButton.Size = New System.Drawing.Size(115, 53)
         Me.RemoveStopButton.TabIndex = 44
@@ -141,7 +145,7 @@ Partial Class frmKnowledgeExtraction
         'StandardizationButton
         '
         Me.StandardizationButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.StandardizationButton.Location = New System.Drawing.Point(889, 81)
+        Me.StandardizationButton.Location = New System.Drawing.Point(13, 19)
         Me.StandardizationButton.Name = "StandardizationButton"
         Me.StandardizationButton.Size = New System.Drawing.Size(115, 53)
         Me.StandardizationButton.TabIndex = 43
@@ -156,9 +160,9 @@ Partial Class frmKnowledgeExtraction
         Me.ResultListView.FullRowSelect = True
         Me.ResultListView.GridLines = True
         Me.ResultListView.HideSelection = False
-        Me.ResultListView.Location = New System.Drawing.Point(566, 81)
+        Me.ResultListView.Location = New System.Drawing.Point(536, 81)
         Me.ResultListView.Name = "ResultListView"
-        Me.ResultListView.Size = New System.Drawing.Size(303, 229)
+        Me.ResultListView.Size = New System.Drawing.Size(303, 258)
         Me.ResultListView.TabIndex = 48
         Me.ResultListView.UseCompatibleStateImageBehavior = False
         Me.ResultListView.View = System.Windows.Forms.View.Details
@@ -199,9 +203,10 @@ Partial Class frmKnowledgeExtraction
         Me.RichTextBoxText.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.RichTextBoxText.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.RichTextBoxText.Location = New System.Drawing.Point(6, 6)
         Me.RichTextBoxText.Name = "RichTextBoxText"
-        Me.RichTextBoxText.Size = New System.Drawing.Size(509, 304)
+        Me.RichTextBoxText.Size = New System.Drawing.Size(479, 281)
         Me.RichTextBoxText.TabIndex = 46
         Me.RichTextBoxText.Text = ""
         '
@@ -225,7 +230,7 @@ Partial Class frmKnowledgeExtraction
         '
         Me.StatusLabel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.StatusLabel.AutoSize = True
-        Me.StatusLabel.Location = New System.Drawing.Point(12, 369)
+        Me.StatusLabel.Location = New System.Drawing.Point(12, 346)
         Me.StatusLabel.Name = "StatusLabel"
         Me.StatusLabel.Size = New System.Drawing.Size(35, 13)
         Me.StatusLabel.TabIndex = 51
@@ -339,7 +344,7 @@ Partial Class frmKnowledgeExtraction
         'ButtonExtractFactTypeReadings
         '
         Me.ButtonExtractFactTypeReadings.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonExtractFactTypeReadings.Location = New System.Drawing.Point(889, 327)
+        Me.ButtonExtractFactTypeReadings.Location = New System.Drawing.Point(13, 19)
         Me.ButtonExtractFactTypeReadings.Name = "ButtonExtractFactTypeReadings"
         Me.ButtonExtractFactTypeReadings.Size = New System.Drawing.Size(115, 40)
         Me.ButtonExtractFactTypeReadings.TabIndex = 55
@@ -357,7 +362,7 @@ Partial Class frmKnowledgeExtraction
         Me.TabControl1.Location = New System.Drawing.Point(12, 67)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(548, 299)
+        Me.TabControl1.Size = New System.Drawing.Size(518, 276)
         Me.TabControl1.TabIndex = 56
         '
         'TabDocumentText
@@ -366,7 +371,7 @@ Partial Class frmKnowledgeExtraction
         Me.TabDocumentText.Location = New System.Drawing.Point(4, 22)
         Me.TabDocumentText.Name = "TabDocumentText"
         Me.TabDocumentText.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabDocumentText.Size = New System.Drawing.Size(503, 273)
+        Me.TabDocumentText.Size = New System.Drawing.Size(510, 250)
         Me.TabDocumentText.TabIndex = 0
         Me.TabDocumentText.Text = "Document Text"
         Me.TabDocumentText.UseVisualStyleBackColor = True
@@ -380,7 +385,7 @@ Partial Class frmKnowledgeExtraction
         Me.TabPageResults.Location = New System.Drawing.Point(4, 22)
         Me.TabPageResults.Name = "TabPageResults"
         Me.TabPageResults.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageResults.Size = New System.Drawing.Size(503, 273)
+        Me.TabPageResults.Size = New System.Drawing.Size(510, 250)
         Me.TabPageResults.TabIndex = 1
         Me.TabPageResults.Text = "Results"
         Me.TabPageResults.UseVisualStyleBackColor = True
@@ -389,7 +394,7 @@ Partial Class frmKnowledgeExtraction
         '
         Me.ButtonRefereshResults.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ButtonRefereshResults.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
-        Me.ButtonRefereshResults.Location = New System.Drawing.Point(490, 8)
+        Me.ButtonRefereshResults.Location = New System.Drawing.Point(459, 8)
         Me.ButtonRefereshResults.Name = "ButtonRefereshResults"
         Me.ButtonRefereshResults.Size = New System.Drawing.Size(25, 23)
         Me.ButtonRefereshResults.TabIndex = 11
@@ -419,9 +424,10 @@ Partial Class frmKnowledgeExtraction
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.RichTextBoxResults.ContextMenuStrip = Me.ContextMenuStripResultsSelection
+        Me.RichTextBoxResults.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.RichTextBoxResults.Location = New System.Drawing.Point(6, 37)
         Me.RichTextBoxResults.Name = "RichTextBoxResults"
-        Me.RichTextBoxResults.Size = New System.Drawing.Size(509, 273)
+        Me.RichTextBoxResults.Size = New System.Drawing.Size(498, 207)
         Me.RichTextBoxResults.TabIndex = 0
         Me.RichTextBoxResults.Text = ""
         '
@@ -467,7 +473,7 @@ Partial Class frmKnowledgeExtraction
         Me.TabPageAIExtraction.Controls.Add(Me.GroupBoxAILLMPrompt)
         Me.TabPageAIExtraction.Location = New System.Drawing.Point(4, 22)
         Me.TabPageAIExtraction.Name = "TabPageAIExtraction"
-        Me.TabPageAIExtraction.Size = New System.Drawing.Size(540, 273)
+        Me.TabPageAIExtraction.Size = New System.Drawing.Size(510, 250)
         Me.TabPageAIExtraction.TabIndex = 2
         Me.TabPageAIExtraction.Text = "AI Extraction"
         Me.TabPageAIExtraction.UseVisualStyleBackColor = True
@@ -483,7 +489,7 @@ Partial Class frmKnowledgeExtraction
         Me.GroupBoxAILLMPrompt.Controls.Add(Me.ButtonExecuteLLMGenerativeAI)
         Me.GroupBoxAILLMPrompt.Location = New System.Drawing.Point(12, 13)
         Me.GroupBoxAILLMPrompt.Name = "GroupBoxAILLMPrompt"
-        Me.GroupBoxAILLMPrompt.Size = New System.Drawing.Size(521, 242)
+        Me.GroupBoxAILLMPrompt.Size = New System.Drawing.Size(491, 219)
         Me.GroupBoxAILLMPrompt.TabIndex = 0
         Me.GroupBoxAILLMPrompt.TabStop = False
         Me.GroupBoxAILLMPrompt.Text = "LLM Prompt:"
@@ -511,16 +517,17 @@ Partial Class frmKnowledgeExtraction
         Me.TextBoxAILLMPrompt.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBoxAILLMPrompt.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxAILLMPrompt.Location = New System.Drawing.Point(6, 55)
         Me.TextBoxAILLMPrompt.Multiline = True
         Me.TextBoxAILLMPrompt.Name = "TextBoxAILLMPrompt"
-        Me.TextBoxAILLMPrompt.Size = New System.Drawing.Size(506, 181)
+        Me.TextBoxAILLMPrompt.Size = New System.Drawing.Size(476, 158)
         Me.TextBoxAILLMPrompt.TabIndex = 0
         '
         'ButtonExecuteLLMGenerativeAI
         '
         Me.ButtonExecuteLLMGenerativeAI.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonExecuteLLMGenerativeAI.Location = New System.Drawing.Point(406, 28)
+        Me.ButtonExecuteLLMGenerativeAI.Location = New System.Drawing.Point(376, 28)
         Me.ButtonExecuteLLMGenerativeAI.Name = "ButtonExecuteLLMGenerativeAI"
         Me.ButtonExecuteLLMGenerativeAI.Size = New System.Drawing.Size(71, 21)
         Me.ButtonExecuteLLMGenerativeAI.TabIndex = 57
@@ -530,9 +537,9 @@ Partial Class frmKnowledgeExtraction
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel, Me.ToolStripStatusLabelChunkCount})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 450)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 427)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(1026, 22)
+        Me.StatusStrip1.Size = New System.Drawing.Size(996, 22)
         Me.StatusStrip1.TabIndex = 58
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -557,23 +564,45 @@ Partial Class frmKnowledgeExtraction
         Me.ButtonClose.Text = "&Close"
         Me.ButtonClose.UseVisualStyleBackColor = True
         '
+        'GroupBoxStatistical
+        '
+        Me.GroupBoxStatistical.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxStatistical.Controls.Add(Me.StandardizationButton)
+        Me.GroupBoxStatistical.Controls.Add(Me.RemoveStopButton)
+        Me.GroupBoxStatistical.Controls.Add(Me.KeywordExtractionMaxButton)
+        Me.GroupBoxStatistical.Controls.Add(Me.KeywordExtractionNormalButton)
+        Me.GroupBoxStatistical.Location = New System.Drawing.Point(841, 81)
+        Me.GroupBoxStatistical.Name = "GroupBoxStatistical"
+        Me.GroupBoxStatistical.Size = New System.Drawing.Size(144, 260)
+        Me.GroupBoxStatistical.TabIndex = 60
+        Me.GroupBoxStatistical.TabStop = False
+        Me.GroupBoxStatistical.Text = "Statistical:"
+        '
+        'GroupboxCoreNLP
+        '
+        Me.GroupboxCoreNLP.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupboxCoreNLP.Controls.Add(Me.ButtonExtractFactTypeReadings)
+        Me.GroupboxCoreNLP.Location = New System.Drawing.Point(841, 347)
+        Me.GroupboxCoreNLP.Name = "GroupboxCoreNLP"
+        Me.GroupboxCoreNLP.Size = New System.Drawing.Size(143, 73)
+        Me.GroupboxCoreNLP.TabIndex = 61
+        Me.GroupboxCoreNLP.TabStop = False
+        Me.GroupboxCoreNLP.Text = "CoreNLP:"
+        '
         'frmKnowledgeExtraction
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1026, 472)
+        Me.ClientSize = New System.Drawing.Size(996, 449)
+        Me.Controls.Add(Me.GroupboxCoreNLP)
+        Me.Controls.Add(Me.GroupBoxStatistical)
         Me.Controls.Add(Me.ButtonClose)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.TabControl1)
-        Me.Controls.Add(Me.ButtonExtractFactTypeReadings)
         Me.Controls.Add(Me.LabelModelName)
         Me.Controls.Add(Me.LabelPromptModel)
         Me.Controls.Add(Me.HelpButton)
-        Me.Controls.Add(Me.KeywordExtractionNormalButton)
         Me.Controls.Add(Me.progressBar1)
-        Me.Controls.Add(Me.KeywordExtractionMaxButton)
-        Me.Controls.Add(Me.RemoveStopButton)
-        Me.Controls.Add(Me.StandardizationButton)
         Me.Controls.Add(Me.ResultListView)
         Me.Controls.Add(Me.SelectFileButton)
         Me.Controls.Add(Me.PathTextBox)
@@ -593,6 +622,8 @@ Partial Class frmKnowledgeExtraction
         Me.GroupBoxAILLMPrompt.PerformLayout()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
+        Me.GroupBoxStatistical.ResumeLayout(False)
+        Me.GroupboxCoreNLP.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -654,4 +685,6 @@ Partial Class frmKnowledgeExtraction
     Friend WithEvents LabelPromptPrompt As Label
     Friend WithEvents ComboBoxFEKLGPTPromptType As ComboBox
     Friend WithEvents ButtonClose As Button
+    Friend WithEvents GroupBoxStatistical As GroupBox
+    Friend WithEvents GroupboxCoreNLP As GroupBox
 End Class

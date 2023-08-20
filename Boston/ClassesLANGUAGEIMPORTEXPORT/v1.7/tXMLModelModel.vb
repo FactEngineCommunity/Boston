@@ -91,6 +91,7 @@ Namespace XMLModel
                     lrXMLValueType.IsIndependent = lrValueType.IsIndependent
                     lrXMLValueType.GUID = lrValueType.GUID
                     lrXMLValueType.IsMDAModelElement = lrValueType.IsMDAModelElement
+                    lrXMLValueType.DBName = lrValueType.DBName
 
                     If lrXMLValueType.IsMDAModelElement And abExcludedMDAModelElements Then GoTo SkipModelLevelValueType
 
@@ -719,6 +720,7 @@ SkipModelLevelRoleConstraint:
                     lrValueType.DataTypeLength = lrXMLValueType.DataTypeLength
                     lrValueType.IsIndependent = lrXMLValueType.IsIndependent
                     lrValueType.IsMDAModelElement = lrXMLValueType.IsMDAModelElement
+                    lrValueType.DBName = lrXMLValueType.DBName
 
                     For Each lsValueTypeConstraintValue In lrXMLValueType.ValueConstraint
                         lrValueType.ValueConstraint.Add(lsValueTypeConstraintValue)
@@ -728,7 +730,7 @@ SkipModelLevelRoleConstraint:
                     '------------------------------------------------
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrValueType.Id, pcenumConceptType.ValueType, lrValueType.ShortDescription, lrValueType.LongDescription, True, True)
+                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrValueType.Id, pcenumConceptType.ValueType, lrValueType.ShortDescription, lrValueType.LongDescription, True, True, lrValueType.DBName)
                     lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, ,,, True,, True)
 
 
@@ -1291,6 +1293,7 @@ SkipModelNote:
                         lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
 
                         lrValueTypeInstance.Name = lrConceptInstance.Symbol
+                        lrValueTypeInstance.DBName = lrValueType.DBName
                         lrValueTypeInstance.X = lrConceptInstance.X
                         lrValueTypeInstance.Y = lrConceptInstance.Y
 

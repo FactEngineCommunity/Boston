@@ -4524,7 +4524,7 @@ CommitTransaction:
             End Try
         End Sub
 
-        Public Overrides Sub SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint)
+        Public Overrides Function SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint) As Boolean
 
             Try
                 If Me.IsObjectified Then
@@ -4535,7 +4535,10 @@ CommitTransaction:
                     Me.Model.MakeDirty(False, False)
                 Else
                     prApplication.ThrowErrorMessage("Can't call this method for Fact Types that are not objectified.", pcenumErrorType.Warning, False, False, False, True)
+                    Return False
                 End If
+
+                Return True
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -4544,9 +4547,11 @@ CommitTransaction:
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
         Public Sub SetDerivationText(ByVal asDerivationText As String, ByVal abBroadcastInterfaceEvent As Boolean)
 

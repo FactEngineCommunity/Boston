@@ -6641,16 +6641,29 @@ SkipPopup:
             End If
 
             'Setup the Concept Classificaations toolbox
-            Dim lfrmToolboxConceptClassication As frmToolboxConceptClassification
-            lfrmToolboxConceptClassication = prApplication.GetToolboxForm(frmToolboxConceptClassification.Name)
-            If lfrmToolboxConceptClassication IsNot Nothing Then
+            Dim lfrmToolboxConceptClassification As New frmToolboxConceptClassification
+            lfrmToolboxConceptClassification = prApplication.GetToolboxForm(frmToolboxConceptClassification.Name)
+            If lfrmToolboxConceptClassification IsNot Nothing Then
                 Select Case Me.zrPage.SelectedObject.Count
                     Case Is = 0
-                        Call lfrmToolboxConceptClassication.SetupForm()
+                        Call lfrmToolboxConceptClassification.SetupForm()
                     Case Else
-                        Call lfrmToolboxConceptClassication.SetupForm(Me.zrPage.SelectedObject(0).ModelLevelElement)
+                        Call lfrmToolboxConceptClassification.SetupForm(Me.zrPage.SelectedObject(0).ModelLevelElement)
                 End Select
             End If
+
+            'Setup the Inerlink toolbox
+            Dim lfrmToolboxInterlinkEditor As frmToolboxInterlinkEditor
+            lfrmToolboxInterlinkEditor = prApplication.GetToolboxForm(frmToolboxInterlinkEditor.Name)
+            If lfrmToolboxInterlinkEditor IsNot Nothing Then
+                Select Case Me.zrPage.SelectedObject.Count
+                    Case Is = 0
+                        Call lfrmToolboxInterlinkEditor.SetupForm()
+                    Case Else
+                        Call lfrmToolboxInterlinkEditor.SetupForm(Me.zrPage.SelectedObject(0).ModelLevelElement)
+                End Select
+            End If
+
 
             Select Case Me.zrPage.SelectedObject.Count
                 Case Is = 0
@@ -12653,9 +12666,6 @@ SkipRemovalFromModel:
 
     End Sub
 
-    Private Sub DiagramView_CreateEditControl(sender As Object, e As InPlaceEditEventArgs) Handles DiagramView.CreateEditControl
-
-    End Sub
 
     Private Sub ContextMenuStrip_Diagram_Opening(sender As Object, e As CancelEventArgs) Handles ContextMenuStrip_Diagram.Opening
 
@@ -12669,6 +12679,8 @@ SkipRemovalFromModel:
             Me.ToolStripMenuItemCopyMultiple.Enabled = True
         End If
 
+        'Interlink
+        Me.ToolStripMenuItemInterlinkEditor.Enabled = (My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString)
 
         Me.ContextMenuStrip_Diagram.ImageScalingSize = New Drawing.Size(16, 16)
 
@@ -13526,4 +13538,22 @@ SkipRemovalFromModel:
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
+
+    Private Sub InterlinkEditorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemInterlinkEditor.Click
+
+        Try
+            prApplication.WorkingPage = Me.zrPage
+            Call frmMain.loadToolboxInterlinkEditor(Me.DockPanel.ActivePane)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

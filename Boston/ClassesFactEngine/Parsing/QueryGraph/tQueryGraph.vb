@@ -383,7 +383,12 @@ MoveForward:
                             lrRole = lrQueryEdge.FBMFactType.GetOtherRoleOfBinaryFactType(lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).Id)
 
                         ElseIf lrQueryEdge.IsPartialFactTypeMatch Then
-                            lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
+                            Try
+                                lrRole = lrQueryEdge.FBMFactTypeReading.PredicatePart(lrQueryEdge.FBMFactTypeReading.PredicatePart.IndexOf(lrQueryEdge.FBMPredicatePart) + 1).Role
+                            Catch ex As Exception
+                                Throw New Exception("QueryGraph: Looking for predicate, '" & lrQueryEdge.FBMPredicatePart.PredicatePartText & "', in FactTypeReading:" & lrQueryEdge.FBMFactTypeReading.Id)
+                            End Try
+
                             liRoleInd = lrQueryEdge.FBMFactType.RoleGroup.IndexOf(lrRole)
                         Else
                             liRoleInd = 1

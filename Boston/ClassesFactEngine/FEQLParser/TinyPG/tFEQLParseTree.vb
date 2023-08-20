@@ -693,6 +693,9 @@ Namespace FEQL
                 Case TokenType.FACTTYPEIDENTIFICATION
                     Value = EvalFACTTYPEIDENTIFICATION(tree, paramlist)
                     Exit Select
+                Case TokenType.FACTTYPEISOBJECTIFIEDCLAUSE
+                    Value = EvalFACTTYPEISOBJECTIFIEDCLAUSE(tree, paramlist)
+                    Exit Select
                 Case TokenType.FACTTYPEPARTCLAUSE
                     Value = EvalFACTTYPEPARTCLAUSE(tree, paramlist)
                     Exit Select
@@ -740,6 +743,9 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.MATCHSELECTSTMT
                     Value = EvalMATCHSELECTSTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE
+                    Value = EvalOBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.ONPAGESTMT
                     Value = EvalONPAGESTMT(tree, paramlist)
@@ -1306,6 +1312,10 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalFACTTYPEISOBJECTIFIEDCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalFACTTYPEPARTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -1367,6 +1377,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalMATCHSELECTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalOBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

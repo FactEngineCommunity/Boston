@@ -117,7 +117,7 @@ Namespace TinyPG
             Patterns.Add(TokenType.WHERECLAUSECOLUMNNAMESTR, regex)
             Tokens.Add(TokenType.WHERECLAUSECOLUMNNAMESTR)
 
-            regex = new Regex("[a-zA-Z0-9,\-\s_\.\""+\[\]#*?$@!%]*", RegexOptions.Compiled)
+            regex = new Regex("[a-zA-Z0-9,<>\-\s_\.\""+\[\]#*?$@!%]*", RegexOptions.Compiled)
             Patterns.Add(TokenType.VALUE, regex)
             Tokens.Add(TokenType.VALUE)
 

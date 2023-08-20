@@ -36,6 +36,7 @@ Partial Class frmToolboxBrainBox
         Me.StatusLabelMain = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ContextMenuStripBrainBox = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemUseLLMNLToFEKL = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -104,20 +105,20 @@ Partial Class frmToolboxBrainBox
         'ContextMenuVirtualAnalyst
         '
         Me.ContextMenuVirtualAnalyst.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuVirtualAnalyst.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemDictationMode, Me.ToolStripMenuItemQuietMode})
+        Me.ContextMenuVirtualAnalyst.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemDictationMode, Me.ToolStripMenuItemQuietMode, Me.ToolStripMenuItemUseLLMNLToFEKL})
         Me.ContextMenuVirtualAnalyst.Name = "ContextMenuVirtualAnalyst"
-        Me.ContextMenuVirtualAnalyst.Size = New System.Drawing.Size(157, 48)
+        Me.ContextMenuVirtualAnalyst.Size = New System.Drawing.Size(188, 92)
         '
         'ToolStripMenuItemDictationMode
         '
         Me.ToolStripMenuItemDictationMode.Name = "ToolStripMenuItemDictationMode"
-        Me.ToolStripMenuItemDictationMode.Size = New System.Drawing.Size(156, 22)
+        Me.ToolStripMenuItemDictationMode.Size = New System.Drawing.Size(187, 22)
         Me.ToolStripMenuItemDictationMode.Text = "&Dictation Mode"
         '
         'ToolStripMenuItemQuietMode
         '
         Me.ToolStripMenuItemQuietMode.Name = "ToolStripMenuItemQuietMode"
-        Me.ToolStripMenuItemQuietMode.Size = New System.Drawing.Size(156, 22)
+        Me.ToolStripMenuItemQuietMode.Size = New System.Drawing.Size(187, 22)
         Me.ToolStripMenuItemQuietMode.Text = "&Quiet Mode"
         '
         'TimerInput
@@ -154,6 +155,12 @@ Partial Class frmToolboxBrainBox
         Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(102, 22)
         Me.CopyToolStripMenuItem.Text = "&Copy"
         '
+        'ToolStripMenuItemUseLLMNLToFEKL
+        '
+        Me.ToolStripMenuItemUseLLMNLToFEKL.Name = "ToolStripMenuItemUseLLMNLToFEKL"
+        Me.ToolStripMenuItemUseLLMNLToFEKL.Size = New System.Drawing.Size(187, 22)
+        Me.ToolStripMenuItemUseLLMNLToFEKL.Text = "Use LLM - NL to FEKL"
+        '
         'frmToolboxBrainBox
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -189,4 +196,5 @@ Partial Class frmToolboxBrainBox
     Friend WithEvents TextBoxInput As System.Windows.Forms.RichTextBox
     Friend WithEvents ContextMenuStripBrainBox As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents CopyToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemUseLLMNLToFEKL As ToolStripMenuItem
 End Class

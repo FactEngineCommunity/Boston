@@ -1144,6 +1144,54 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Sub loadToolboxInterlinkEditor(ByRef aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
+
+        Dim child As New frmToolboxInterlinkEditor
+
+        Try
+            If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+                '-------------------------------------------------------------
+                'Form is already loaded. Bring it to the front of the ZOrder
+                '-------------------------------------------------------------            
+                child = prApplication.ToolboxForms.Find(AddressOf child.EqualsByName)
+                child.BringToFront()
+            Else
+                '----------------------------------------------------------
+                'Create a new instance of the FactTypeReadingEditor form.
+                '----------------------------------------------------------
+                If prApplication.ToolboxForms.Count > 0 Then
+                    '----------------------------------------------------------------------------------------------------
+                    'Add the FactTypeReadingEditor form to the Panel of a form already loaded at the bottom of the Page
+                    '----------------------------------------------------------------------------------------------------    
+                    Dim lrPane As WeifenLuo.WinFormsUI.Docking.DockPane
+
+                    prApplication.ToolboxForms(0).Focus()
+                    lrPane = prApplication.ToolboxForms(0).Pane
+                    child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
+                    child.DockTo(lrPane, DockStyle.Fill, 0)
+                    prApplication.ToolboxForms.Add(child)
+                Else
+                    '--------------------------------------------------
+                    'Add the ORMReadingEditor form to the bottom of the Page
+                    '--------------------------------------------------
+                    child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
+
+                End If
+                prApplication.ToolboxForms.Add(child)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+
     Sub loadToolboxConceptClassification(ByRef aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
 
         Dim child As New frmToolboxConceptClassification
@@ -2339,9 +2387,24 @@ SkipRegistrationChecking:
 
             If prApplication.ActivePages.Count > 0 Then
                 child.Show(Me.DockPanel)
-                child.DockTo(prApplication.ActivePages(0).Pane, DockStyle.Fill, 0)
+
+                Dim lrActivePage As WeifenLuo.WinFormsUI.Docking.DockContent = Nothing
+                For Each lrActivePageFind In prApplication.ActivePages
+
+                    lrActivePage = lrActivePageFind
+                    If lrActivePage.Pane IsNot Nothing Then
+                        Exit For
+                    End If
+                Next
+
+                If lrActivePage IsNot Nothing Then
+                    child.DockTo(lrActivePage.Pane, DockStyle.Fill, 0)
+                Else
+CouldntFindActivePage:
+                    Boston.ShowFlashCard("I'm having trouble finding an active page. Try opening a Page in a Model and try again", Color.LightGray, 2500)
+                End If
             Else
-                child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+                    child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
             End If
 
 

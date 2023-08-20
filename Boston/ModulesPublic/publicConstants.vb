@@ -330,6 +330,7 @@ Public Module publicConstants
         <Description(".date")> DotLowercaseDate
         <Description(".Time")> DotUppercaseTime
         <Description(".time")> DotLowercaseTime
+        <Description(".Letter")> UppercaseLetter
     End Enum
 
     Public Enum pcenumValueTypeCandidates

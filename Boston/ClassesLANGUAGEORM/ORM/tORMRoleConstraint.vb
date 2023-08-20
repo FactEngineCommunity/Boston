@@ -2759,7 +2759,9 @@ RemoveAnyway:
                     If lrRole.JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then
                         Dim lrEntityType As FBM.EntityType = lrRole.JoinedORMObject
 
-                        Call lrEntityType.SetCompoundReferenceSchemeRoleConstraint(Me)
+                        If Not lrEntityType.SetCompoundReferenceSchemeRoleConstraint(Me) Then
+                            Exit Sub
+                        End If
                     End If
                 End If
 

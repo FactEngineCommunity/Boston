@@ -851,21 +851,30 @@ Namespace RDS
                                                      Optional ByRef arQueryEdge As FactEngine.QueryEdge = Nothing) As RDS.Relation
 
             Try
-                Dim larRelation = From Relation In Me.getOutgoingRelations
-                                  Where aarFBMModelObject.Contains(Relation.DestinationTable.FBMModelElement)
-                                  Where aarFBMModelObject.Contains(Relation.OriginTable.FBMModelElement)
-                                  Where Relation.ResponsibleFactType.Id = arFactType.Id
-                                  Select Relation
+                Dim larRelation = (From Relation In Me.getOutgoingRelations
+                                   Where aarFBMModelObject.Contains(Relation.DestinationTable.FBMModelElement)
+                                   Where aarFBMModelObject.Contains(Relation.OriginTable.FBMModelElement)
+                                   Where Relation.ResponsibleFactType.Id = arFactType.Id
+                                   Select Relation).ToList
 
                 If larRelation.Count = 0 Then
 
-                    For Each lrRelation In Me.getOutgoingRelations
+                    'Incoming
+                    larRelation = (From Relation In Me.getIncomingRelations
+                                   Where aarFBMModelObject.Contains(Relation.DestinationTable.FBMModelElement)
+                                   Where aarFBMModelObject.Contains(Relation.OriginTable.FBMModelElement)
+                                   Where Relation.ResponsibleFactType.Id = arFactType.Id
+                                   Select Relation).ToList
 
-                        If lrRelation.DestinationTable.FBMModelElement.hasModelElementAsDownstreamSubtype(aarFBMModelObject(1)) And
+                    If larRelation.Count = 0 Then
+                        For Each lrRelation In Me.getOutgoingRelations
+
+                            If lrRelation.DestinationTable.FBMModelElement.hasModelElementAsDownstreamSubtype(aarFBMModelObject(1)) And
                             aarFBMModelObject.Contains(lrRelation.OriginTable.FBMModelElement) Then
-                            Return lrRelation
-                        End If
-                    Next
+                                Return lrRelation
+                            End If
+                        Next
+                    End If
 
                 End If
 

@@ -46,6 +46,16 @@ Namespace FBM
             End Set
         End Property
 
+        <Browsable(True)>
+        Public Shadows Property DBName() As String
+            Get
+                Return _DBName
+            End Get
+            Set(ByVal value As String)
+                Me._DBName = value
+            End Set
+        End Property
+
         <XmlIgnore()> _
         Public Shadows _ValueConstraint As New FBM.ValueConstraintInstance(Me)
         <XmlIgnore()>
@@ -656,11 +666,14 @@ RemoveAnyway:
 
                     Call Me.Page.MakeDirty()
                 Else
-                    lsMessage = "You cannot remove the Value Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Value Type have been removed from the Page."
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
-                    Return False
+                    If Me.Shape IsNot Nothing AndAlso (Me.Shape.OutgoingLinks.Count = 0 And Me.Shape.IncomingLinks.Count = 0) Then
+                        Me.Page.RemoveValueTypeInstance(Me, abBroadcastInterfaceEvent)
+                    Else
+                        lsMessage = "You cannot remove the Value Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Value Type have been removed from the Page."
+                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                        Return False
+                    End If
                 End If
-
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1406,6 +1419,8 @@ RemoveAnyway:
 
             Try
                 Me.DBName = asDBName
+
+                Call Me.makeDirty()
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

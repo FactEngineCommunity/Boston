@@ -23,6 +23,9 @@ Public Class tBrain
     XmlIgnore()>
     Public Page As FBM.Page
 
+    Public NL2FEKLPrompt As String = Nothing
+    Dim mrOpenAIAPI As OpenAI_API.OpenAIAPI
+
     Private Thread As Thread
     Public SAPI = CreateObject("SAPI.spvoice")
     'Dim synth = New SpeechSynthesizer
@@ -138,6 +141,8 @@ Public Class tBrain
         Try
             AddHandler Timeout.Elapsed, AddressOf OutOfTimeOut
 
+            Me.mrOpenAIAPI = New OpenAI_API.OpenAIAPI(New OpenAI_API.APIAuthentication(My.Settings.FactEngineOpenAIAPIKey))
+
             Me.QuietMode = My.Settings.StartVirtualAnalystInQuietMode
 
             Me.CommandList.Add("start")
@@ -191,6 +196,9 @@ Public Class tBrain
             Me.SentenceAnalyser.isAcceptingUserInput = True
             Boston.WriteToStatusBar("Default AIML File Loaded", True)
             '========================================================================================
+
+            'Load JSON schema
+            Me.NL2FEKLPrompt = Boston.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "VirtualAnalyst-FEKL-Prompt.txt") ' Path to the GPT Prompt for NL to FEKL
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1864,7 +1872,12 @@ SkipOutputChannel:
             arQuestion.Resolution = aiResolution
 
             If Me.Question.Count > 0 Then
-                Me.Question.Remove(arQuestion)
+                Try
+                    Me.Question.Remove(arQuestion)
+                Catch ex As Exception
+                    'Sometimes clashes
+                End Try
+
             End If
 
             If abTimeoutStart Then
@@ -2291,6 +2304,19 @@ SkipOutputChannel:
         lsEnumeratedFactTypeReading = arSentence.FrontText
 
         Try
+            If arSentence.PredicatePart.Count = 0 Then
+                'CodeSafe
+                liInd = 0
+                For Each lsModelObjectName In aasModelObject
+                    Dim lsPredicate = "has"
+                    If liInd = aasModelObject.Count - 1 Then lsPredicate = ""
+                    arSentence.PredicatePart.Add(New Language.PredicatePart(lsPredicate))
+                    liInd += 1
+                Next
+
+            End If
+
+            liInd = 0
             For Each lsModelObjectName In aasModelObject
                 lsEnumeratedFactTypeReading &= " " & arSentence.PredicatePart(liInd).PreboundText
                 lsEnumeratedFactTypeReading &= lsModelObjectName
@@ -4026,13 +4052,6 @@ SkipOutputChannel:
                     Call Language.ResolveSentence(Me.CurrentSentence)
                 End If
 
-                If Me.CurrentSentence.POStaggingResolved Then
-                    '--------------------------------------------------------------------------------
-                    'Populates Me.CurrentSentence.ModelElement and Me.CurrentSentence.PredicatePart 
-                    '  if the sentence is a Fact Type declaration (i.e. a valid Fact Type Reading).
-                    '--------------------------------------------------------------------------------
-                    Call Me.ValidateIfCurrentSentenceIsAFactType()
-                End If
                 '====================================================================================================================
 
                 '------------------------------------------------------
@@ -4058,6 +4077,56 @@ SkipOutputChannel:
                     Exit Sub
                 End If
 
+                '=====================================================================================
+                'Farm out to OpenAI via the OpenAI API
+                If Me.NL2FEKLPrompt IsNot Nothing AndAlso Me.mrOpenAIAPI.Auth.ApiKey.Trim <> "" Then
+                    Dim lsPromptExtension = "Try this user input first:"
+                    lsPromptExtension.AppendDoubleLineBreak(Me.InputBuffer)
+                    Dim lsModifiedPrompt As String = Me.NL2FEKLPrompt.AppendDoubleLineBreak(lsPromptExtension)
+                    Dim lrCompletionResult As OpenAI_API.Chat.ChatResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsModifiedPrompt)
+                    Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
+
+                    Dim lines As String() = lsGPT3ReturnString.Split({vbLf}, StringSplitOptions.None)
+
+                    ' Add each line to the result list
+                    For Each line As String In lines
+
+                        If Me.IsVAQLStatement("NL: " & lsGPT3ReturnString) Then
+                            Dim loTokenType As VAQL.TokenType
+
+                            Me.send_data(lsGPT3ReturnString)
+                            Me.send_data("Okay")
+
+                            Me.CurrentSentence = Nothing
+                            'Determine if is a valid VAQL Statement.
+                            Call Me.VAQLProcessor.ProcessVAQLStatement(lsGPT3ReturnString, loTokenType, Me.VAQLParsetree)
+
+                            'Process the VAQL Statement based on the primary TokenType returned (above)
+                            Dim lrDSCError As New DuplexServiceClient.DuplexServiceClientError
+                            If Me.ProcessVAQLStatement(lsGPT3ReturnString, loTokenType,, True, lrDSCError) Then
+                                '----------------------------------------------------------------------------------------------
+                                'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
+                                '----------------------------------------------------------------------------------------------
+                                Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
+                                Exit Sub
+                            Else
+                                Me.send_data("Error processing: " & lsGPT3ReturnString)
+                                Exit Sub
+                            End If
+                        End If
+                    Next
+
+                End If
+                '=====================================================================================
+
+                If Me.CurrentSentence.POStaggingResolved Then
+                    '--------------------------------------------------------------------------------
+                    'Populates Me.CurrentSentence.ModelElement and Me.CurrentSentence.PredicatePart 
+                    '  if the sentence is a Fact Type declaration (i.e. a valid Fact Type Reading).
+                    '--------------------------------------------------------------------------------
+                    Call Me.ValidateIfCurrentSentenceIsAFactType()
+                End If
+
                 If Not Me.CurrentSentence.SentenceType.Contains(pcenumSentenceType.Response) And
                     Me.CurrentSentence.POStaggingResolved And
                     (Me.CurrentSentence.ModelElement.Count = 0 Or Me.CurrentSentence.PredicatePart.Count = 0) Then
@@ -4080,7 +4149,7 @@ SkipOutputChannel:
                 '----------------------------------------------------------------------------------------------
                 Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
 
-            End If
+                End If
 
         Catch ex As Exception
             Dim lsMessage As String

@@ -915,7 +915,7 @@ NextWord:
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
                             Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
 
-                        Case Is = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS
+                        Case Is = FEQL.TokenType.KEYWDISIDENTIFIEDBY
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
                             Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
 

@@ -1064,7 +1064,7 @@ Public Class frmToolboxBrainBox
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace)
         End Try
 
     End Sub
@@ -1372,7 +1372,7 @@ ProcessToken:
                 If IsSomething(lsCurrentTokenType) And (Me.TextBoxInput.Text.Length > 0) Then
                     lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
                     Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
-                        Case Is = VAQL.TokenType.PREDICATEPART, _
+                        Case Is = VAQL.TokenType.PREDICATEPART,
                                   VAQL.TokenType.PREDICATESPACE
                             Me.AutoComplete.Enabled = True
                             'Call Me.AddFactTypeReadingsToEnterpriseAware()

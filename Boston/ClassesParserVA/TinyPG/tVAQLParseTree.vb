@@ -468,6 +468,9 @@ Namespace VAQL
                 Case TokenType.FACTREADINGSTMT
                     Value = EvalFACTREADINGSTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.LONGDESCRIPTIONSTMT
+                    Value = EvalLONGDESCRIPTIONSTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.MODELELEMENTLEADINGSTMT
                     Value = EvalMODELELEMENTLEADINGSTMT(tree, paramlist)
                     Exit Select
@@ -670,6 +673,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalFACTREADINGSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalLONGDESCRIPTIONSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

@@ -2333,7 +2333,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True, arException:=ex)
 
                 Return False
             End Try
@@ -3369,7 +3369,7 @@ SkipSettingReferenceModeObjects:
         ''' </summary>
         ''' <param name="arRoleConstraint">The RoleConstraint that defines the CompoundReferenceScheme for the EntityType</param>
         ''' <remarks></remarks>
-        Public Overrides Sub SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint)
+        Public Overrides Function SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint) As Boolean
 
             Dim lsMessage As String
 
@@ -3397,15 +3397,18 @@ SkipSettingReferenceModeObjects:
                     RaiseEvent ReferenceModeRoleConstraintChanged(arRoleConstraint)
                 End If
 
+                Return True
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,,,,,,, ex)
+
+                Return False
             End Try
 
-        End Sub
+        End Function
 
 
         Public Sub setIsDatabaseReservedWord(ByVal abIsDatabaseReservedWord As Boolean)

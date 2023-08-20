@@ -101,13 +101,13 @@ Namespace FEQL
     Public Class EntityTypeIsIdentifiedByItsStatement
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
-        Private _KEYWDISIDENTIFIEDBYITS As String = Nothing
-        Public Property KEYWDISIDENTIFIEDBYITS As String
+        Private _KEYWDISIDENTIFIEDBY As String = Nothing
+        Public Property KEYWDISIDENTIFIEDBY As String
             Get
-                Return Me._KEYWDISIDENTIFIEDBYITS
+                Return Me._KEYWDISIDENTIFIEDBY
             End Get
             Set(value As String)
-                Me._KEYWDISIDENTIFIEDBYITS = value
+                Me._KEYWDISIDENTIFIEDBY = value
             End Set
         End Property
 
@@ -1583,8 +1583,8 @@ Namespace FEQL
                         aoParseTree = Me.Parsetree
                         Return Me.processCREATEDATABASEStatement(asFEQLStatement)
 
-                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDISIDENTIFIEDBYITS) Then
-                        aoTokenType = FEQL.TokenType.KEYWDISIDENTIFIEDBYITS
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDISIDENTIFIEDBY) Then
+                        aoTokenType = FEQL.TokenType.KEYWDISIDENTIFIEDBY
                         aoParseTree = Me.Parsetree
                         Return Nothing
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, FEQL.TokenType.KEYWDISWHERE) Then

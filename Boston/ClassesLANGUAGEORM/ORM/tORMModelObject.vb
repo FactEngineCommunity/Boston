@@ -46,6 +46,8 @@ Namespace FBM
 
         Public ClassificationValue As New List(Of KnowledgeGraph.ConceptClassificationValue)
 
+        Public Interlink As New List(Of Interlink.Interlink)
+
         Public ReadOnly Property ModelLevelElement As FBM.ModelObject
             Get
                 Select Case Me.GetType
@@ -1582,6 +1584,27 @@ Namespace FBM
 
         End Sub
 
+        Public Sub GetInterlinks()
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+
+                    Dim lrWhereClause As Expression(Of Func(Of Interlink.Interlink, Boolean)) = Function(p) p.ModelId = Me.Model.ModelId And
+                                                                                                            p.ModelElementId = Me.Id
+                    Dim lrDataStore As New DataStore.Store
+                    Me.Interlink = lrDataStore.Get(Of Interlink.Interlink)(lrWhereClause)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Function getConnectedFactTypes() As List(Of FBM.FactType)
 
             Dim larFactType = From FactType In Me.Model.FactType
@@ -1777,14 +1800,14 @@ Namespace FBM
         ''' </summary>
         ''' <param name="arRoleConstraint">The RoleConstraint that defines the CompoundReferenceScheme for the EntityType</param>
         ''' <remarks></remarks>
-        Public Overridable Sub SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint)
-
-        End Sub
+        Public Overridable Function SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint) As Boolean
+            Return False
+        End Function
 
 
         Public Sub SetDBName(ByVal asDBName As String)
 
-            Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+            Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id And x.ConceptType = Me.ConceptType)
 
             If lrDictionaryEntry IsNot Nothing Then
                 lrDictionaryEntry.DBName = asDBName
