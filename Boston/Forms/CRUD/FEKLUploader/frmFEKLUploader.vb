@@ -359,9 +359,6 @@ Public Class frmFEKLUploader
 
             Dim larTable As List(Of RDS.Table) = lrDatabaseConnection.ParseDDL(Me.TextBoxDDL.Text.Trim)
 
-            Debugger.Break()
-
-
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

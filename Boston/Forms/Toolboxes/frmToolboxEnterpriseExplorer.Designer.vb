@@ -54,8 +54,8 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.GenerateDocumentationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemCodeGenerator = New System.Windows.Forms.ToolStripMenuItem()
         Me.FactEngineToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemKeywordExtractionTool = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemTaxonomyTree = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemKeywordExtractionTool = New System.Windows.Forms.ToolStripMenuItem()
         Me.FEKLUploaderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EditAITrainingDataEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.VirtualBusinessAnalystToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -331,101 +331,103 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         'ContextMenuStrip_ORMModel
         '
-        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemKeywordExtractionTool, Me.ToolStripMenuItemTaxonomyTree, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.VirtualBusinessAnalystToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.ToolStripMenuItemShareModelWithProject, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
+        Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripMenuItemKeywordExtractionTool, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.VirtualBusinessAnalystToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.ToolStripMenuItemShareModelWithProject, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(208, 578)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(220, 556)
         '
         'ViewModelDictionaryToolStripMenuItem
         '
         Me.ViewModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.dictionary16x16
         Me.ViewModelDictionaryToolStripMenuItem.Name = "ViewModelDictionaryToolStripMenuItem"
-        Me.ViewModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.ViewModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.ViewModelDictionaryToolStripMenuItem.Text = "View Model Di&ctionary"
         '
         'ViewGlossaryToolStripMenuItem
         '
         Me.ViewGlossaryToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Glossary16x16
         Me.ViewGlossaryToolStripMenuItem.Name = "ViewGlossaryToolStripMenuItem"
-        Me.ViewGlossaryToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.ViewGlossaryToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.ViewGlossaryToolStripMenuItem.Text = "View &Glossary"
         '
         'ViewDatabaseSchemaToolStripMenuItem
         '
         Me.ViewDatabaseSchemaToolStripMenuItem.Name = "ViewDatabaseSchemaToolStripMenuItem"
-        Me.ViewDatabaseSchemaToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.ViewDatabaseSchemaToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.ViewDatabaseSchemaToolStripMenuItem.Text = "View Database Schema"
         '
         'GenerateDocumentationToolStripMenuItem
         '
         Me.GenerateDocumentationToolStripMenuItem.Image = CType(resources.GetObject("GenerateDocumentationToolStripMenuItem.Image"), System.Drawing.Image)
         Me.GenerateDocumentationToolStripMenuItem.Name = "GenerateDocumentationToolStripMenuItem"
-        Me.GenerateDocumentationToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.GenerateDocumentationToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.GenerateDocumentationToolStripMenuItem.Text = "Generate D&ocumentation"
         '
         'ToolStripMenuItemCodeGenerator
         '
         Me.ToolStripMenuItemCodeGenerator.Image = Global.Boston.My.Resources.MenuImagesMain.Project16x16
         Me.ToolStripMenuItemCodeGenerator.Name = "ToolStripMenuItemCodeGenerator"
-        Me.ToolStripMenuItemCodeGenerator.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemCodeGenerator.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemCodeGenerator.Text = "Code &Generator"
         '
         'FactEngineToolStripMenuItem
         '
         Me.FactEngineToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImagesMain.FactEngine16x16
         Me.FactEngineToolStripMenuItem.Name = "FactEngineToolStripMenuItem"
-        Me.FactEngineToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.FactEngineToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.FactEngineToolStripMenuItem.Text = "&Fact Engine"
-        '
-        'ToolStripMenuItemKeywordExtractionTool
-        '
-        Me.ToolStripMenuItemKeywordExtractionTool.Image = Global.Boston.My.Resources.Resources.KeywordSearch16x16
-        Me.ToolStripMenuItemKeywordExtractionTool.Name = "ToolStripMenuItemKeywordExtractionTool"
-        Me.ToolStripMenuItemKeywordExtractionTool.Size = New System.Drawing.Size(207, 22)
-        Me.ToolStripMenuItemKeywordExtractionTool.Text = "&Keyword Extraction Tool"
         '
         'ToolStripMenuItemTaxonomyTree
         '
         Me.ToolStripMenuItemTaxonomyTree.Image = Global.Boston.My.Resources.Resources.TaxonomyModel16x16
         Me.ToolStripMenuItemTaxonomyTree.Name = "ToolStripMenuItemTaxonomyTree"
-        Me.ToolStripMenuItemTaxonomyTree.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemTaxonomyTree.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemTaxonomyTree.Text = "Taxonomy Tree"
+        '
+        'ToolStripMenuItemKeywordExtractionTool
+        '
+        Me.ToolStripMenuItemKeywordExtractionTool.Image = CType(resources.GetObject("ToolStripMenuItemKeywordExtractionTool.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItemKeywordExtractionTool.Name = "ToolStripMenuItemKeywordExtractionTool"
+        Me.ToolStripMenuItemKeywordExtractionTool.Size = New System.Drawing.Size(219, 22)
+        Me.ToolStripMenuItemKeywordExtractionTool.Text = "&Knowledge Extraction Tools"
         '
         'FEKLUploaderToolStripMenuItem
         '
+        Me.FEKLUploaderToolStripMenuItem.Image = CType(resources.GetObject("FEKLUploaderToolStripMenuItem.Image"), System.Drawing.Image)
         Me.FEKLUploaderToolStripMenuItem.Name = "FEKLUploaderToolStripMenuItem"
-        Me.FEKLUploaderToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.FEKLUploaderToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.FEKLUploaderToolStripMenuItem.Text = "FEKL Uploader"
         '
         'EditAITrainingDataEditorToolStripMenuItem
         '
+        Me.EditAITrainingDataEditorToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.AI16x16
         Me.EditAITrainingDataEditorToolStripMenuItem.Name = "EditAITrainingDataEditorToolStripMenuItem"
-        Me.EditAITrainingDataEditorToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.EditAITrainingDataEditorToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.EditAITrainingDataEditorToolStripMenuItem.Text = "Edit AI &Training Data"
         '
         'VirtualBusinessAnalystToolStripMenuItem
         '
         Me.VirtualBusinessAnalystToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.VirtualAnalyst16x16
         Me.VirtualBusinessAnalystToolStripMenuItem.Name = "VirtualBusinessAnalystToolStripMenuItem"
-        Me.VirtualBusinessAnalystToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.VirtualBusinessAnalystToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.VirtualBusinessAnalystToolStripMenuItem.Text = "&Virtual Business Analyst"
         '
         'ToolStripSeparator7
         '
         Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-        Me.ToolStripSeparator7.Size = New System.Drawing.Size(204, 6)
+        Me.ToolStripSeparator7.Size = New System.Drawing.Size(216, 6)
         '
         'AddPageToolStripMenuItem1
         '
         Me.AddPageToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.PageAdd16x16
         Me.AddPageToolStripMenuItem1.Name = "AddPageToolStripMenuItem1"
-        Me.AddPageToolStripMenuItem1.Size = New System.Drawing.Size(207, 22)
+        Me.AddPageToolStripMenuItem1.Size = New System.Drawing.Size(219, 22)
         Me.AddPageToolStripMenuItem1.Text = "&Add ORM Page"
         '
         'ToolStripMenuItemPastePage
         '
         Me.ToolStripMenuItemPastePage.Image = Global.Boston.My.Resources.MenuImages.Paste16x16
         Me.ToolStripMenuItemPastePage.Name = "ToolStripMenuItemPastePage"
-        Me.ToolStripMenuItemPastePage.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemPastePage.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemPastePage.Text = "&Paste Page"
         '
         'ToolStripMenuItemLanguage
@@ -433,7 +435,7 @@ Partial Class frmToolboxEnterpriseExplorer
         Me.ToolStripMenuItemLanguage.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PropertyGraphSchemaToolStripMenuItem, Me.EntityRelationshipDiagramToolStripMenuItem, Me.StateTransitionDiagramToolStripMenuItem, Me.BusinessProcessModellingNotationToolStripMenuItem, Me.UMLToolStripMenuItem})
         Me.ToolStripMenuItemLanguage.Image = CType(resources.GetObject("ToolStripMenuItemLanguage.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemLanguage.Name = "ToolStripMenuItemLanguage"
-        Me.ToolStripMenuItemLanguage.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemLanguage.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemLanguage.Text = "&Language"
         '
         'PropertyGraphSchemaToolStripMenuItem
@@ -534,76 +536,76 @@ Partial Class frmToolboxEnterpriseExplorer
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(204, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(216, 6)
         '
         'ToolStripMenuItemEmptyModel
         '
         Me.ToolStripMenuItemEmptyModel.Image = Global.Boston.My.Resources.MenuImages.empty16x16
         Me.ToolStripMenuItemEmptyModel.Name = "ToolStripMenuItemEmptyModel"
-        Me.ToolStripMenuItemEmptyModel.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemEmptyModel.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemEmptyModel.Text = "E&mpty Model"
         Me.ToolStripMenuItemEmptyModel.Visible = False
         '
         'HideToolStripMenuItem
         '
         Me.HideToolStripMenuItem.Name = "HideToolStripMenuItem"
-        Me.HideToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.HideToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.HideToolStripMenuItem.Text = "&Hide"
         '
         'HideAllotherModelsToolStripMenuItem
         '
         Me.HideAllotherModelsToolStripMenuItem.Name = "HideAllotherModelsToolStripMenuItem"
-        Me.HideAllotherModelsToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.HideAllotherModelsToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.HideAllotherModelsToolStripMenuItem.Text = "Hide all &other models"
         '
         'RenameToolStripMenuItem
         '
         Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
-        Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.RenameToolStripMenuItem.Text = "&Rename"
         '
         'ToolStripMenuItemMoveModel
         '
         Me.ToolStripMenuItemMoveModel.Name = "ToolStripMenuItemMoveModel"
-        Me.ToolStripMenuItemMoveModel.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemMoveModel.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemMoveModel.Text = "&Move Model"
         '
         'ToolStripMenuItemShareModelWithProject
         '
         Me.ToolStripMenuItemShareModelWithProject.Name = "ToolStripMenuItemShareModelWithProject"
-        Me.ToolStripMenuItemShareModelWithProject.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemShareModelWithProject.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemShareModelWithProject.Text = "Share with Project..."
         '
         'DeleteModelToolStripMenuItem
         '
         Me.DeleteModelToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.deleteround16x16
         Me.DeleteModelToolStripMenuItem.Name = "DeleteModelToolStripMenuItem"
-        Me.DeleteModelToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.DeleteModelToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.DeleteModelToolStripMenuItem.Text = "&Delete Model"
         '
         'ToolStripSeparator3
         '
         Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-        Me.ToolStripSeparator3.Size = New System.Drawing.Size(204, 6)
+        Me.ToolStripSeparator3.Size = New System.Drawing.Size(216, 6)
         '
         'ToolStripMenuItemModelConfiguration
         '
         Me.ToolStripMenuItemModelConfiguration.Image = Global.Boston.My.Resources.Resources.Properties216x16
         Me.ToolStripMenuItemModelConfiguration.Name = "ToolStripMenuItemModelConfiguration"
-        Me.ToolStripMenuItemModelConfiguration.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemModelConfiguration.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemModelConfiguration.Text = "Model Con&figuration"
         '
         'ToolStripSeparator5
         '
         Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-        Me.ToolStripSeparator5.Size = New System.Drawing.Size(204, 6)
+        Me.ToolStripSeparator5.Size = New System.Drawing.Size(216, 6)
         '
         'ImportExportToolStripMenuItem
         '
         Me.ImportExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem12, Me.ExportTestingToolStripMenuItem, Me.TocqlFileToolStripMenuItem, Me.ToolStripMenuItemExportToNORMAormFile, Me.ToRDFTurtlettlFilebetaToolStripMenuItem, Me.ToFEKLtxtFileToolStripMenuItem})
         Me.ImportExportToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.ImportExport16x16
         Me.ImportExportToolStripMenuItem.Name = "ImportExportToolStripMenuItem"
-        Me.ImportExportToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.ImportExportToolStripMenuItem.Size = New System.Drawing.Size(219, 22)
         Me.ImportExportToolStripMenuItem.Text = "&Export"
         '
         'ToolStripMenuItem12
@@ -659,7 +661,7 @@ Partial Class frmToolboxEnterpriseExplorer
         'ToolStripMenuItemFixModelErrors
         '
         Me.ToolStripMenuItemFixModelErrors.Name = "ToolStripMenuItemFixModelErrors"
-        Me.ToolStripMenuItemFixModelErrors.Size = New System.Drawing.Size(207, 22)
+        Me.ToolStripMenuItemFixModelErrors.Size = New System.Drawing.Size(219, 22)
         Me.ToolStripMenuItemFixModelErrors.Text = "Fi&x Model Errors"
         Me.ToolStripMenuItemFixModelErrors.Visible = False
         '

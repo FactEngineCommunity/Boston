@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("1.38")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1.39")>  _
         Public Property DatabaseVersionNumber() As String
             Get
                 Return CType(Me("DatabaseVersionNumber"),String)
@@ -1167,6 +1167,18 @@ Namespace My
             End Get
             Set
                 Me("HideAllReferenceModesOnReferenceModeSet") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property EnableKnowledgeExtraction() As Boolean
+            Get
+                Return CType(Me("EnableKnowledgeExtraction"),Boolean)
+            End Get
+            Set
+                Me("EnableKnowledgeExtraction") = value
             End Set
         End Property
     End Class

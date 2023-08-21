@@ -814,7 +814,6 @@ Public Class frmToolboxTableData
                 'Special handling of a PGS Relation, especially if is a Neo4j database
 
                 If Me.AllDataGridCulumnsPopulatedByRow(e.RowIndex) Then
-                    Debugger.Break()
 #Region "Create Boilerplate"
                     Dim larRelation = mrTable.getRelations
 
@@ -1348,10 +1347,6 @@ Public Class frmToolboxTableData
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
-    End Sub
-
-    Private Sub AdvancedDataGridView_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles AdvancedDataGridView.DataError
-        'Debugger.Break()
     End Sub
 
     Private Sub ToolStripButtonCSVImport_Click(sender As Object, e As EventArgs) Handles ToolStripButtonCSVImport.Click

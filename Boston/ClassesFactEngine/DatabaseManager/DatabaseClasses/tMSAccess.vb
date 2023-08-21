@@ -106,17 +106,27 @@ Namespace FactEngine
 
         Public Overloads Function Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False) As ORMQL.Recordset
 
+            Dim lrRecordset As New ORMQL.Recordset
+
             Try
                 Me.Connection.Execute(asQuery)
+
+                Return lrRecordset
             Catch ex As Exception
-                If abIgnoreErrors Then Return New ORMQL.Recordset
+
+                lrRecordset.ErrorString = ex.Message
+
+                If abIgnoreErrors Then Return lrRecordset
+
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
                 Return New ORMQL.Recordset
+
             End Try
         End Function
 

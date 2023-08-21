@@ -2825,15 +2825,12 @@ NextWord:
 
             If {"Cypher", "openCypher"}.Contains(Me.ToolStripComboBoxQueryLanguage.Text) And lbIsSQLDatabase Then
 
-                'Debugger.Break()
-
                 Dim graphDef = New RDS.GraphProvider(prApplication.WorkingModel.RDS)
                 Dim lrParser = New openCypherTranspiler.openCypherParser.OpenCypherParser(Nothing)
                 Dim plan = openCypherTranspiler.LogicalPlanner.LogicalPlan.ProcessQueryTree(lrParser.Parse(lsQuery), graphDef, Nothing)
                 Dim sqlRender = New openCypherTranspiler.SQLRenderer.SQLRenderer(graphDef, Nothing)
                 lsQuery = sqlRender.RenderPlan(plan)
 
-                'Debugger.Break()
             End If
 
             With New WaitCursor

@@ -119,7 +119,7 @@ Public Class frmUnifiedOntologyBrowser
             End If
 
         Catch ex As Exception
-            Debugger.Break()
+            'We tried.
         End Try
     End Sub
 
@@ -135,8 +135,6 @@ Public Class frmUnifiedOntologyBrowser
                                             ModelDictionaryEntry.isEntityType
                                       Select ModelDictionaryEntry
                                       Order By ModelDictionaryEntry.Symbol Ascending
-
-        If larModelDictionaryEntry.ToList.Find(Function(x) x.Symbol = "Claim") IsNot Nothing Then Debugger.Break()
 
         Dim lrComboBoxItem As tComboboxItem
         For Each lrModelDictionaryEntry In larModelDictionaryEntry

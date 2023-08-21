@@ -451,7 +451,6 @@ Namespace FBM
 
 
                 For Each lrColumnDef In larDuplicateColumn.ToList
-                    'Debugger.Break()
                     'Dim lrColumn = lrColumnDef.Table.Column.Find(Function(x) x.Role.Id = lrColumnDef.RoleId
                     '                                             And x.ActiveRole.Id = lrColumnDef.ActiveRoleId 
                     '                                             And x.FactType.Id = lrColumnDef.FactTypeId)

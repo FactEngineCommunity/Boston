@@ -80,7 +80,7 @@ OkayToProceed:
                     If tableDataLineageItemProperty.ExistsDataLineageItemProperty(Me) Then
                         Call tableDataLineageItemProperty.updateDataLineageItemProperty(Me)
                     Else
-                        Call tableDataLineageItemProperty.addDataLineageItemProperty(Me)
+                        Call tableDataLineageItemProperty.addDataLineageItemProperty(Me, abIgnoreErrors)
                     End If
                 End If
 

@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DatabaseVersionNumber" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.38</Value>
+      <Value Profile="(Default)">1.39</Value>
     </Setting>
     <Setting Name="DisplayStatusBar" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -279,6 +279,9 @@
       <Value Profile="(Default)">500</Value>
     </Setting>
     <Setting Name="HideAllReferenceModesOnReferenceModeSet" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="EnableKnowledgeExtraction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>

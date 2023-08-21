@@ -1096,7 +1096,7 @@ Public Class frmToolboxEnterpriseExplorer
 
         Try
             If My.Settings.UseClientServer Then
-                Me.ToolStripMenuItemKeywordExtractionTool.Enabled = False
+                Me.ToolStripMenuItemKeywordExtractionTool.Enabled = My.Settings.EnableKnowledgeExtraction
             End If
 
             Me.ToolStripMenuItemMoveModel.Visible = My.Settings.UseClientServer
@@ -5165,7 +5165,9 @@ Public Class frmToolboxEnterpriseExplorer
                 End With
             End If
 
-            Call frmMain.LoadKeywordExtractionTool(lrModel)
+            With New WaitCursor
+                Call frmMain.LoadKeywordExtractionTool(lrModel)
+            End With
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -5809,10 +5811,6 @@ Public Class frmToolboxEnterpriseExplorer
                         Dim pattern As String = "(.*?)(\s>\s)(.*?)\s>\s(.*)"
                         Dim match As Match = Regex.Match(lsSubjectLabel, pattern)
 
-                        If lsSubjectLabelPascalCase = lsObjectLabelPascalCase Then
-                            Debugger.Break()
-                        End If
-
                         'hasPart, <other> section. I.e. Triples that have hasPart as the predicate, or some <other> predicate.
                         If match.Success Then
                             'FactTypeReading
@@ -5966,4 +5964,7 @@ SkipTriple:
 
     End Sub
 
+    Private Sub TextBoxSearch_InitiateSearch(asSearchString As String) Handles SearchTextbox.InitiateSearch
+
+    End Sub
 End Class

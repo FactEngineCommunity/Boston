@@ -691,7 +691,7 @@ Partial Public Class tBrain
             If arFEKLLineageObject IsNot Nothing Then
 
                 Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsConceptName & " - Object Type")
-                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
 #End Region
@@ -925,7 +925,7 @@ ModelElementFound:
             If arFEKLLineageObject IsNot Nothing Then
 
                 Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsFactTypeName & " - Object Type")
-                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
 #End Region
@@ -1199,7 +1199,7 @@ EndProcessing:
             If arFEKLLineageObject IsNot Nothing Then
 
                 Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsNewFactTypeName & " - Fact Type")
-                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
 #End Region
@@ -1506,7 +1506,7 @@ EndProcessing:
                 If arFEKLLineageObject IsNot Nothing Then
 
                     Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsEntityTypeName & " - Object Type")
-                    Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+                    Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
                 End If
 #End Region
@@ -1945,7 +1945,7 @@ EndProcessing:
                 If arFEKLLineageObject IsNot Nothing Then
 
                     Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsValueTypeName & " - Object Type")
-                    Call lrDataLineageItem.SaveProperties(arFEKLLineageObject)
+                    Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
                 End If
 #End Region

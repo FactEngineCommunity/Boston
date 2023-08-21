@@ -381,16 +381,20 @@ Namespace Database
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "The following step in the upgrade failed:"
+                lsMessage.AppendDoubleLineBreak(ex.Message)
+                lsMessage.AppendDoubleLineBreak("The following step in the upgrade failed:")
                 'lsMessage &= vbCrLf & vbCrLf
                 'lsMessage &= "Upgrade Type: " & lrDatabaseUpgradeSQL.UpgradeType
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "Sequence#: " & lrRecordset("SequenceNr").Value
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "Stall Message/s: " & lsStallMessage
-                lsMessage &= vbCrLf & vbCrLf
-                lsMessage &= "SQL: " & lrRecordset("SQLString").Value
-                lsMessage &= vbCrLf & vbCrLf
+                lsMessage.AppendLine("Stall Message/s: " & lsStallMessage)
+                Try
+                    lsMessage &= vbCrLf
+                    lsMessage &= "Sequence#: " & lrRecordset("SequenceNr").Value
+
+                    lsMessage &= vbCrLf
+                    lsMessage &= "SQL: " & lrRecordset("SQLString").Value
+                Catch ex1 As Exception
+                    'Tried to get as much information as possible.
+                End Try
 
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
 

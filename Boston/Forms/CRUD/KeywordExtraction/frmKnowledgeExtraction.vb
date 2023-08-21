@@ -89,38 +89,52 @@ Public Class frmKnowledgeExtraction
 		''' <param name="y">Second object to be compared</param>
 		''' <returns>The result of the comparison. "0" if equal, negative if 'x' is less than 'y' and positive if 'x' is greater than 'y'</returns>
 		Public Function Compare(x As Object, y As Object) As Integer Implements IComparer.Compare
+
 			Dim compareResult As Integer
-			Dim listviewX As ListViewItem, listviewY As ListViewItem
 
-			' Cast the objects to be compared to ListViewItem objects
-			listviewX = DirectCast(x, ListViewItem)
-			listviewY = DirectCast(y, ListViewItem)
-
-			Dim num As Decimal = 0
 			Try
-				' Suspect code  
-				If Decimal.TryParse(listviewX.SubItems(ColumnToSort).Text, num) Then
-					compareResult = Decimal.Compare(num, Convert.ToDecimal(listviewY.SubItems(ColumnToSort).Text))
-				Else
-					' Compare the two items
+
+				Dim listviewX As ListViewItem, listviewY As ListViewItem
+
+				' Cast the objects to be compared to ListViewItem objects
+				listviewX = DirectCast(x, ListViewItem)
+				listviewY = DirectCast(y, ListViewItem)
+
+				Dim num As Decimal = 0
+				Try
+					' Suspect code  
+					If Decimal.TryParse(listviewX.SubItems(ColumnToSort).Text, num) Then
+						compareResult = Decimal.Compare(num, Convert.ToDecimal(listviewY.SubItems(ColumnToSort).Text))
+					Else
+						' Compare the two items
+						compareResult = ObjectCompare.Compare(listviewX.SubItems(ColumnToSort).Text, listviewY.SubItems(ColumnToSort).Text)
+					End If
+				Catch e As Exception
+					' Action after the exception is caught  
 					compareResult = ObjectCompare.Compare(listviewX.SubItems(ColumnToSort).Text, listviewY.SubItems(ColumnToSort).Text)
+				End Try
+
+				' Calculate correct return value based on object comparison
+				If OrderOfSort = SortOrder.Ascending Then
+					' Ascending sort is selected, return normal result of compare operation
+					Return compareResult
+				ElseIf OrderOfSort = SortOrder.Descending Then
+					' Descending sort is selected, return negative result of compare operation
+					Return (-compareResult)
+				Else
+					' Return '0' to indicate they are equal
+					Return 0
 				End If
-			Catch e As Exception
-				' Action after the exception is caught  
-				compareResult = ObjectCompare.Compare(listviewX.SubItems(ColumnToSort).Text, listviewY.SubItems(ColumnToSort).Text)
+
+			Catch ex As Exception
+				Dim lsMessage As String
+				Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+				lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+				lsMessage &= vbCrLf & vbCrLf & ex.Message
+				prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 			End Try
 
-			' Calculate correct return value based on object comparison
-			If OrderOfSort = SortOrder.Ascending Then
-				' Ascending sort is selected, return normal result of compare operation
-				Return compareResult
-			ElseIf OrderOfSort = SortOrder.Descending Then
-				' Descending sort is selected, return negative result of compare operation
-				Return (-compareResult)
-			Else
-				' Return '0' to indicate they are equal
-				Return 0
-			End If
 		End Function
 
 		''' <summary>
@@ -150,43 +164,53 @@ Public Class frmKnowledgeExtraction
 	End Class
 
 #End Region
-	Private Sub KeywordExtractionForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+	Private Sub KeywordExtractionForm_Load(sender As Object, e As EventArgs) Handles Me.Load
 
-		Call Me.SetupForm()
+		Try
+			Call Me.SetupForm()
 
-		' Create an instance of a ListView column sorter and assign it to the ListView control.
-		lvwColumnSorter = New ListViewColumnSorter()
-		Me.ResultListView.ListViewItemSorter = lvwColumnSorter
+			' Create an instance of a ListView column sorter and assign it to the ListView control.
+			lvwColumnSorter = New ListViewColumnSorter()
+			Me.ResultListView.ListViewItemSorter = lvwColumnSorter
 
-		System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = False
+			System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = False
 
-		StandardizationButton.Enabled = False
-		RemoveStopButton.Enabled = False
-		KeywordExtractionMaxButton.Enabled = False
-		KeywordExtractionNormalButton.Enabled = False
-		StatusLabel.Text = "Welcome to keyword extraction software, which is based on the entropy difference."
-		'Help Text
-		'MessageBox.Show("The process of document keyword extraction:" & vbLf & vbLf & "Step 1: Open the document: Click ""Open"" button, select the target document. (File should be ""*. Txt "" file)" & vbLf & vbLf & "Step 2: Document standardization: Click ""Document Standardization"" button to remove the document punctuation, line breaks, and other useless symbols, and text replaces lowercase letters. (If the above operations have been completed, you can skip this step.)" & vbLf & vbLf & "Step 3: Stop word removal: Click ""Remove Stop"" button and follow the list of stop words, removing stop words in the document. (This step is optional, remove stop words, it may improve the accuracy of keyword extraction.)" & vbLf & vbLf & "Step 4: Here are two method to extract the keyword, you can choose one of them to finish the Keyword extraction work." & vbLf & "    4.1: Keyword extraction (normal entropy): Click ""Keyword Extraction (Entropy)"" button to extract keywords." & vbLf & "    4.2: Keyword extraction (maximum entropy): Click ""Keyword Extraction (Maximum Entropy)"" button and follow the maximum entropy method to extract keywords.", "Help")
+			StandardizationButton.Enabled = False
+			RemoveStopButton.Enabled = False
+			KeywordExtractionMaxButton.Enabled = False
+			KeywordExtractionNormalButton.Enabled = False
+			StatusLabel.Text = "Welcome to keyword extraction software, which is based on the entropy difference."
+			'Help Text
+			'MessageBox.Show("The process of document keyword extraction:" & vbLf & vbLf & "Step 1: Open the document: Click ""Open"" button, select the target document. (File should be ""*. Txt "" file)" & vbLf & vbLf & "Step 2: Document standardization: Click ""Document Standardization"" button to remove the document punctuation, line breaks, and other useless symbols, and text replaces lowercase letters. (If the above operations have been completed, you can skip this step.)" & vbLf & vbLf & "Step 3: Stop word removal: Click ""Remove Stop"" button and follow the list of stop words, removing stop words in the document. (This step is optional, remove stop words, it may improve the accuracy of keyword extraction.)" & vbLf & vbLf & "Step 4: Here are two method to extract the keyword, you can choose one of them to finish the Keyword extraction work." & vbLf & "    4.1: Keyword extraction (normal entropy): Click ""Keyword Extraction (Entropy)"" button to extract keywords." & vbLf & "    4.2: Keyword extraction (maximum entropy): Click ""Keyword Extraction (Maximum Entropy)"" button and follow the maximum entropy method to extract keywords.", "Help")
 
-		'Wordnet
-		Call Me.wordNet.LoadFromDirectory(My.Settings.WordNetDictionaryEnglishPath)
+			'Wordnet
+			Call Me.wordNet.LoadFromDirectory(My.Settings.WordNetDictionaryEnglishPath)
 
 
 #Region "FEKL Knowledge Extractor"
 
-		'Load JSON schema
-		Dim JsonContent As String = Boston.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "Boston.FEKL-GPT-KnowledgeExtractionPrompts.json") ' Path to your JSON schema
-		'Deserialize JSON into RootObject
-		Me.FEKLGPTKnowledgeExtractor = JsonConvert.DeserializeObject(Of FEKL.FEKLGPTKnowledgeExtractor)(JsonContent)
+			'Load JSON schema
+			Dim JsonContent As String = Boston.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "Boston.FEKL-GPT-KnowledgeExtractionPrompts.json") ' Path to your JSON schema
+			'Deserialize JSON into RootObject
+			Me.FEKLGPTKnowledgeExtractor = JsonConvert.DeserializeObject(Of FEKL.FEKLGPTKnowledgeExtractor)(JsonContent)
 
-		For Each lrFEKLGPTKnowledgeExtractorPrompt In Me.FEKLGPTKnowledgeExtractor.Prompt
+			For Each lrFEKLGPTKnowledgeExtractorPrompt In Me.FEKLGPTKnowledgeExtractor.Prompt
 
-			Dim lrComboboxItem As New tComboboxItem(lrFEKLGPTKnowledgeExtractorPrompt.Description, lrFEKLGPTKnowledgeExtractorPrompt.Description, lrFEKLGPTKnowledgeExtractorPrompt)
-			Me.ComboBoxFEKLGPTPromptType.Items.Add(lrComboboxItem)
-		Next
-
+				Dim lrComboboxItem As New tComboboxItem(lrFEKLGPTKnowledgeExtractorPrompt.Description, lrFEKLGPTKnowledgeExtractorPrompt.Description, lrFEKLGPTKnowledgeExtractorPrompt)
+				Me.ComboBoxFEKLGPTPromptType.Items.Add(lrComboboxItem)
+			Next
+			If Me.ComboBoxFEKLGPTPromptType.Items.Count > 0 Then Me.ComboBoxFEKLGPTPromptType.SelectedIndex = 0
 
 #End Region
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 
 	End Sub
 
@@ -211,13 +235,27 @@ Public Class frmKnowledgeExtraction
 	End Sub
 
 	Private Sub StandardizationButton_Click(sender As Object, e As EventArgs) Handles StandardizationButton.Click
-		CloseButtons()
-		MyData.TheDoc = MyFun.DocStandardization(MyData.TheDoc)
-		StatusLabel.Text = "Document standardization process has been completed."
-		OpenButton()
+
+		Try
+
+			CloseButtons()
+			MyData.TheDoc = MyFun.DocStandardization(MyData.TheDoc)
+			StatusLabel.Text = "Document standardization process has been completed."
+			OpenButton()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
 	End Sub
 
 	Private Sub RemoveStopButton_Click(sender As Object, e As EventArgs) Handles RemoveStopButton.Click
+
 		CloseButtons()
 		'MessageBox.Show("Tip: If the document is longer, it may take you few minutes, please be patient ...", "Prompt", 0, MessageBoxIcon.Asterisk)
 
@@ -235,9 +273,20 @@ Public Class frmKnowledgeExtraction
 	End Sub
 
 	Private Sub KeywordExtractionButton_Click(sender As Object, e As EventArgs) Handles KeywordExtractionMaxButton.Click
-		Dim thread As New Thread(New ThreadStart(AddressOf DoWork))
-		thread.IsBackground = True
-		thread.Start()
+
+		Try
+			Dim thread As New Thread(New ThreadStart(AddressOf DoWork))
+			thread.IsBackground = True
+			thread.Start()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 	End Sub
 
 	Private Sub DoWork()
@@ -307,28 +356,43 @@ Public Class frmKnowledgeExtraction
 		End Try
 	End Sub
 
+	''' <summary>
+	''' not currently used. 20230823
+	''' </summary>
+	''' <param name="sender"></param>
+	''' <param name="e"></param>
 	Private Sub SaveButton_Click(sender As Object, e As EventArgs)
 
-		Dim save As String()
-		Dim WordsNum As Integer = 0
-		For i As Integer = 0 To MyData.WordsFre.Length - 1
-			If MyData.WordsFre(i).ED > 0 Then
-				WordsNum += 1
-			Else
-				Exit For
-			End If
-		Next
-		save = New String(WordsNum - 1) {}
-		For i As Integer = 0 To WordsNum - 1
-			save(i) = (i + 1).ToString() & vbTab & MyData.WordsFre(i).Word.ToString() & vbTab & MyData.WordsFre(i).ED.ToString()
-		Next
-		Dim sfd As New SaveFileDialog()
-		sfd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
-		If sfd.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-			Dim encode As Encoding = Encoding.GetEncoding("GB2312")
-			File.WriteAllLines(sfd.FileName, save)
-		End If
+		Try
 
+			Dim save As String()
+			Dim WordsNum As Integer = 0
+			For i As Integer = 0 To MyData.WordsFre.Length - 1
+				If MyData.WordsFre(i).ED > 0 Then
+					WordsNum += 1
+				Else
+					Exit For
+				End If
+			Next
+			save = New String(WordsNum - 1) {}
+			For i As Integer = 0 To WordsNum - 1
+				save(i) = (i + 1).ToString() & vbTab & MyData.WordsFre(i).Word.ToString() & vbTab & MyData.WordsFre(i).ED.ToString()
+			Next
+			Dim sfd As New SaveFileDialog()
+			sfd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
+			If sfd.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+				Dim encode As Encoding = Encoding.GetEncoding("GB2312")
+				File.WriteAllLines(sfd.FileName, save)
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 	End Sub
 
 	Private Sub OpenButton()
@@ -347,33 +411,57 @@ Public Class frmKnowledgeExtraction
 		KeywordExtractionNormalButton.Enabled = False
 	End Sub
 
-	Private Sub KeywordExtractionForm_DragDrop(sender As Object, e As DragEventArgs) Handles MyBase.DragDrop
-		Dim path As String = DirectCast(e.Data.GetData(DataFormats.FileDrop), System.Array).GetValue(0).ToString()
-		Dim regex As New Regex("^*.txt$")
-		Dim ma As Match = regex.Match(path)
-		If ma.Success Then
-			PathTextBox.Text = path
-			Dim encode As Encoding = Encoding.GetEncoding("GB2312")
-			MyData.TheDoc = File.ReadAllText(path, encode)
-			RichTextBoxText.Text = MyData.TheDoc
+	Private Sub KeywordExtractionForm_DragDrop(sender As Object, e As DragEventArgs) Handles Me.DragDrop
 
-			ResultListView.Items.Clear()
-			StandardizationButton.Enabled = True
-			RemoveStopButton.Enabled = True
-			KeywordExtractionMaxButton.Enabled = True
-			KeywordExtractionNormalButton.Enabled = True
-			StatusLabel.Text = path & " file open finish."
-		Else
-			MessageBox.Show("Sorry, your documents do not meet format, please select ""txt"" file.")
-		End If
+		Try
+
+			Dim path As String = DirectCast(e.Data.GetData(DataFormats.FileDrop), System.Array).GetValue(0).ToString()
+			Dim regex As New Regex("^*.txt$")
+			Dim ma As Match = regex.Match(path)
+			If ma.Success Then
+				PathTextBox.Text = path
+				Dim encode As Encoding = Encoding.GetEncoding("GB2312")
+				MyData.TheDoc = File.ReadAllText(path, encode)
+				RichTextBoxText.Text = MyData.TheDoc
+
+				ResultListView.Items.Clear()
+				StandardizationButton.Enabled = True
+				RemoveStopButton.Enabled = True
+				KeywordExtractionMaxButton.Enabled = True
+				KeywordExtractionNormalButton.Enabled = True
+				StatusLabel.Text = path & " file open finish."
+			Else
+				MessageBox.Show("Sorry, your documents do not meet format, please select ""txt"" file.")
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 	End Sub
 
-	Private Sub KeywordExtractionForm_DragEnter(sender As Object, e As DragEventArgs) Handles MyBase.DragEnter
-		If e.Data.GetDataPresent(DataFormats.FileDrop) Then
-			e.Effect = DragDropEffects.Link
-		Else
-			e.Effect = DragDropEffects.None
-		End If
+	Private Sub KeywordExtractionForm_DragEnter(sender As Object, e As DragEventArgs) Handles Me.DragEnter
+
+		Try
+
+			If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+				e.Effect = DragDropEffects.Link
+			Else
+				e.Effect = DragDropEffects.None
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 	End Sub
 
 	Private Sub ResultListView_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ResultListView.SelectedIndexChanged
@@ -512,34 +600,57 @@ Public Class frmKnowledgeExtraction
 		MessageBox.Show("The process of document keyword extraction:" & vbLf & vbLf & "Step 1: Open the document: Click ""Open"" button, select the target document. (File should be ""*. Txt "" file)" & vbLf & vbLf & "Step 2: Document standardization: Click ""Document Standardization"" button to remove the document punctuation, line breaks, and other useless symbols, and text replaces lowercase letters. (If the above operations have been completed, you can skip this step.)" & vbLf & vbLf & "Step 3: Stop word removal: Click ""Remove Stop"" button and follow the list of stop words, removing stop words in the document. (This step is optional, remove stop words, it may improve the accuracy of keyword extraction.)" & vbLf & vbLf & "Step 4: Here are two method to extract the keyword, you can choose one of them to finish the Keyword extraction work." & vbLf & "    4.1: Keyword extraction (normal entropy): Click ""Keyword Extraction (Entropy)"" button to extract keywords." & vbLf & "    4.2: Keyword extraction (maximum entropy): Click ""Keyword Extraction (Maximum Entropy)"" button and follow the maximum entropy method to extract keywords.", "Help")
 	End Sub
 
-	Private Sub TextRichTextBox_KeyPress(sender As Object, e As KeyPressEventArgs) Handles RichTextBoxText.KeyPress
+	Private Sub TextRichTextBox_KeyPress(sender As Object, e As KeyPressEventArgs)
 		'e.Handled = True
 	End Sub
 
 	Private Sub ResultListView_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles ResultListView.ColumnClick
-		' Determine if clicked column is already the column that is being sorted.
-		If e.Column = lvwColumnSorter.SortColumn Then
-			' Reverse the current sort direction for this column.
-			If lvwColumnSorter.Order = SortOrder.Ascending Then
-				lvwColumnSorter.Order = SortOrder.Descending
+
+		Try
+
+			' Determine if clicked column is already the column that is being sorted.
+			If e.Column = lvwColumnSorter.SortColumn Then
+				' Reverse the current sort direction for this column.
+				If lvwColumnSorter.Order = SortOrder.Ascending Then
+					lvwColumnSorter.Order = SortOrder.Descending
+				Else
+					lvwColumnSorter.Order = SortOrder.Ascending
+				End If
 			Else
+				' Set the column number that is to be sorted; default to ascending.
+				lvwColumnSorter.SortColumn = e.Column
 				lvwColumnSorter.Order = SortOrder.Ascending
 			End If
-		Else
-			' Set the column number that is to be sorted; default to ascending.
-			lvwColumnSorter.SortColumn = e.Column
-			lvwColumnSorter.Order = SortOrder.Ascending
-		End If
 
-		' Perform the sort with these new sort options.
-		Me.ResultListView.Sort()
+			' Perform the sort with these new sort options.
+			Me.ResultListView.Sort()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 	End Sub
 
 	Private Sub KeywordExtractionNormalButton_Click(sender As Object, e As EventArgs) Handles KeywordExtractionNormalButton.Click
 
-		Dim thread As New Thread(New ThreadStart(AddressOf DoWork_Normal))
-		thread.IsBackground = True
-		thread.Start()
+		Try
+
+			Dim thread As New Thread(New ThreadStart(AddressOf DoWork_Normal))
+			thread.IsBackground = True
+			thread.Start()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 
 	End Sub
 
@@ -589,6 +700,18 @@ Public Class frmKnowledgeExtraction
 
 				index = lsAllText.IndexOf(LCase(word), startIndex)
 				If index >= 0 And index < myRtb.TextLength - word.Length Then
+
+					If index >= 1 Then
+						If Not Char.IsWhiteSpace(lsAllText(index - 1)) Then
+							startIndex = index + word.Length
+							Continue While
+						End If
+						If Not (Char.IsWhiteSpace(lsAllText(index + word.Length)) Or lsAllText(index + word.Length) = vbCrLf Or lsAllText(index + word.Length) = vbLf) Then
+							startIndex = index + word.Length
+							Continue While
+						End If
+					End If
+
 					myRtb.[Select](index, word.Length)
 					myRtb.SelectionColor = color
 					startIndex = index + word.Length
@@ -603,6 +726,18 @@ Public Class frmKnowledgeExtraction
 			While index < myRtb.TextLength
 				index = lsAllText.IndexOf(word, startIndex)
 				If index >= 0 And index < myRtb.TextLength - word.Length Then
+
+					If index >= 1 Then
+						If Not Char.IsWhiteSpace(lsAllText(index - 1)) Then
+							startIndex = index + word.Length
+							Continue While
+						End If
+						If Not (Char.IsWhiteSpace(lsAllText(index + word.Length)) Or lsAllText(index + word.Length) = vbCrLf Or lsAllText(index + word.Length) = vbLf) Then
+							startIndex = index + word.Length
+							Continue While
+						End If
+					End If
+
 					myRtb.[Select](index, word.Length)
 					myRtb.SelectionColor = color
 					startIndex = index + word.Length
@@ -713,7 +848,6 @@ Public Class frmKnowledgeExtraction
 				End If
 			End With
 
-
 		Catch ex As Exception
 			Dim lsMessage As String
 			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -728,10 +862,12 @@ Public Class frmKnowledgeExtraction
 	Private Sub TextRichTextBox_MouseDown(sender As Object, e As MouseEventArgs) Handles RichTextBoxText.MouseDown
 
 		Try
-			If Me.RichTextBoxText.SelectionLength > 0 Then
-				Me.RichTextBoxText.ContextMenuStrip = Me.ContextMenuStripTextboxSelection
-			Else
-				Me.RichTextBoxText.ContextMenuStrip = Me.ContextMenuStripTextbox
+			If e.Button = MouseButtons.Right Then
+				If Me.RichTextBoxText.SelectionLength > 0 Then
+					Me.RichTextBoxText.ContextMenuStrip = Me.ContextMenuStripTextboxSelection
+				Else
+					Me.RichTextBoxText.ContextMenuStrip = Me.ContextMenuStripTextbox
+				End If
 			End If
 
 
@@ -1147,18 +1283,31 @@ Public Class frmKnowledgeExtraction
 							End If
 
 
-#Region "Add Keyword to list"
+#Region "Add Keywords to list"
+							Dim words As String() = text.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
+							Dim wordCount As Integer = words.Length
+
 							If Not lasKeywords.Contains(lsSubjectKeyword) Then
 
 								Dim lvi As New ListViewItem()
-								lvi.SubItems(0).Text = lsSubjectKeyword
+
+								Dim occurrencesCount As Integer = text.Split(lsSubjectKeyword).Length - 1
+
+								Dim liRanking = 50
+								Try
+									liRanking = ((occurrencesCount / wordCount) * 100) + 1
+								Catch ex As Exception
+									'We tried
+								End Try
+
+								lvi.SubItems(0).Text = liRanking.ToString
 								lvi.SubItems.Add(lsSubjectKeyword)
 
 								Dim loWordFrequency As New WORDSFRE
 								loWordFrequency.Position = {1}
 								loWordFrequency.Distance = {1}
 								loWordFrequency.Word = lsSubjectKeyword
-								loWordFrequency.Frequency = 1
+								loWordFrequency.Frequency = occurrencesCount
 								loWordFrequency.Position(0) = 1
 								MyData.WordsFre.Add(loWordFrequency)
 
@@ -1171,7 +1320,7 @@ Public Class frmKnowledgeExtraction
 									'lvi(i).BackColor = Color.Beige
 								End If
 								lvi.SubItems.Add(0.ToString)
-								lvi.SubItems.Add((lasKeywords.FindAll(Function(x) x = subject.ToPascalCase).Count + 1).ToString)
+								lvi.SubItems.Add(occurrencesCount.ToString)
 								ResultListView.Items.Add(lvi)
 
 							End If
@@ -1180,15 +1329,24 @@ Public Class frmKnowledgeExtraction
 
 							If Not lasKeywords.Contains(lsObjectKeyword) Then
 
+								Dim occurrencesCount As Integer = text.Split(lsObjectKeyword).Length - 1
+
+								Dim liRanking = 50
+								Try
+									liRanking = ((occurrencesCount / wordCount) * 100) + 1
+								Catch ex As Exception
+									'We tried
+								End Try
+
 								Dim lvi As New ListViewItem()
-								lvi.SubItems(0).Text = lsObjectKeyword
+								lvi.SubItems(0).Text = liRanking.ToString
 								lvi.SubItems.Add(lsObjectKeyword)
 
 								Dim loWordFrequency As New WORDSFRE
 								loWordFrequency.Position = {1}
 								loWordFrequency.Distance = {1}
 								loWordFrequency.Word = lsSubjectKeyword
-								loWordFrequency.Frequency = 1
+								loWordFrequency.Frequency = occurrencesCount
 								loWordFrequency.Position(0) = 1
 								MyData.WordsFre.Add(loWordFrequency)
 
@@ -1200,7 +1358,7 @@ Public Class frmKnowledgeExtraction
 									'lvi(i).BackColor = Color.Beige
 								End If
 								lvi.SubItems.Add(0.ToString)
-								lvi.SubItems.Add((lasKeywords.FindAll(Function(x) x = lsObjectKeyword).Count - 1).ToString)
+								lvi.SubItems.Add(occurrencesCount.ToString)
 								ResultListView.Items.Add(lvi)
 							End If
 
@@ -1553,40 +1711,68 @@ NextSentence:
 	'	End Function
 #End Region
 	Private Function FindNoun(governorIndex As Integer, dependencies As java.util.ArrayList) As String
-		For Each dependency As TypedDependency In dependencies
-			If dependency.reln().getShortName() = "nsubj" OrElse dependency.reln().getShortName() = "nsubjpass" Then
-				If dependency.gov().index() = governorIndex Then
-					Return dependency.dep().originalText()
+
+		Try
+			For Each dependency As TypedDependency In dependencies
+				If dependency.reln().getShortName() = "nsubj" OrElse dependency.reln().getShortName() = "nsubjpass" Then
+					If dependency.gov().index() = governorIndex Then
+						Return dependency.dep().originalText()
+					End If
 				End If
-			End If
-		Next
-		Return Nothing
+			Next
+			Return Nothing
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+			Return Nothing
+		End Try
+
 	End Function
 
 	Private Sub Button1_Click(sender As Object, e As EventArgs) Handles ButtonExtractFactTypeReadings.Click
 
-		With New WaitCursor
-
-			Me.TabPageResults.Show()
-			Me.TabControl1.SelectedTab = Me.TabPageResults
-			Me.TabControl1.SelectedTab.Refresh()
-			Me.TabControl1.Refresh()
+		Try
 
 			With New WaitCursor
 
-				Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.RichTextBoxText.Text)
-
-				Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
 				Me.TabPageResults.Show()
+				Me.TabControl1.SelectedTab = Me.TabPageResults
+				Me.TabControl1.SelectedTab.Refresh()
+				Me.TabControl1.Refresh()
+
+				With New WaitCursor
+
+					Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.RichTextBoxText.Text)
+
+					Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
+					Me.TabPageResults.Show()
+				End With
+
 			End With
 
-		End With
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 
 	End Sub
 
 	Function Singularize(ByVal asWord As String) As String
 
 		Try
+			'CodeSafe
+			If asWord Is Nothing Then Return ""
+
 			Dim pipelineProps As New java.util.Properties()
 			pipelineProps.setProperty("annotators", "tokenize, ssplit, pos, lemma, depparse")
 			pipelineProps.setProperty("pos.model", "CoreNLP\models\english-caseless-left3words-distsim.tagger") ' Specify the path to the tagger properties file
@@ -1718,33 +1904,46 @@ NextSentence:
 	Private Sub ButtonExecuteLLMGenerativeAI_Click(sender As Object, e As EventArgs) Handles ButtonExecuteLLMGenerativeAI.Click
 
 		'CodeSafe
-		'If msSingleFilePath Is Nothing Then
-		'	MsgBox("Please select a file to search.")
-		'	Exit Sub
-		'End If
-		If Trim(Me.TextBoxAILLMPrompt.Text) = "" Then
-			MsgBox("Please enter a LLM Prompt to operate over the document.")
+		If Me.RichTextBoxText.Text.Trim = "" Then
+			MsgBox("Please add some text in the [Document Text] tab area.")
 			Exit Sub
 		End If
-		If Trim(My.Settings.FactEngineOpenAIAPIKey) = "" Then
-			prApplication.ThrowErrorMessage("Set the OpenAI API Key in configuration", pcenumErrorType.Warning,, False,, True,, True)
-			Exit Sub
-		End If
-
-		'Clear the Results textbox.
-		Me.RichTextBoxResults.Clear()
-
-		'Reset the Progress Bar
-		Me.ProgressBar.Value = 0
-		Me.ProgressBar.Visible = True
-
-		'Show the Abort button
-		Me.ButtonAbort.Visible = True
-		Me.mbAbort = False
-
-		Me.ButtonExecuteLLMGenerativeAI.Enabled = False
 
 		Dim liChunkCounter As Integer = 1
+
+		Try
+
+			If Trim(Me.TextBoxAILLMPrompt.Text) = "" Then
+				MsgBox("Please enter a LLM Prompt to operate over the document.")
+				Exit Sub
+			End If
+			If Trim(My.Settings.FactEngineOpenAIAPIKey) = "" Then
+				prApplication.ThrowErrorMessage("Set the OpenAI API Key in configuration", pcenumErrorType.Warning,, False,, True,, True)
+				Exit Sub
+			End If
+
+			'Clear the Results textbox.
+			Me.RichTextBoxResults.Clear()
+
+			'Reset the Progress Bar
+			Me.ProgressBar.Value = 0
+			Me.ProgressBar.Visible = True
+
+			'Show the Abort button
+			Me.ButtonAbort.Visible = True
+			Me.mbAbort = False
+
+			Me.ButtonExecuteLLMGenerativeAI.Enabled = False
+
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 
 		Try
 			Dim lsDocumentText As String = ""
@@ -1764,87 +1963,91 @@ NextSentence:
 
 			ToolStripStatusLabel.Text = "Processing search"
 
-			'Loop through each chunk of the current page         
-			While startIndex < words.Count
-				Dim endIndex As Integer = Math.Min(startIndex + chunkSize - 1, words.Length - 1)
-				Dim chunkText As String = String.Join(" ", words, startIndex, endIndex - startIndex + 1)
+			With New WaitCursor
 
-				'Display the Chunk Number in the status bar.
-				Me.ToolStripStatusLabelChunkCount.Text = "Chunk#: " & liChunkCounter
+				'Loop through each chunk of the current page         
+				While startIndex < words.Count
+					Dim endIndex As Integer = Math.Min(startIndex + chunkSize - 1, words.Length - 1)
+					Dim chunkText As String = String.Join(" ", words, startIndex, endIndex - startIndex + 1)
 
-				'Do something with the current 500-word chunk, such as write it to a file or process it in some way             
-				Me.mrOpenAIAPI = New OpenAI_API.OpenAIAPI(New OpenAI_API.APIAuthentication(My.Settings.FactEngineOpenAIAPIKey))
+					'Display the Chunk Number in the status bar.
+					Me.ToolStripStatusLabelChunkCount.Text = "Chunk#: " & liChunkCounter
 
-				If mbAbort Then Exit While
+					'Do something with the current 500-word chunk, such as write it to a file or process it in some way             
+					Me.mrOpenAIAPI = New OpenAI_API.OpenAIAPI(New OpenAI_API.APIAuthentication(My.Settings.FactEngineOpenAIAPIKey))
 
-				Try
+					If mbAbort Then Exit While
 
-					Dim lsPrompt As String = ""
-
-					'lsPrompt = My.Settings.PromptPreText
-					lsPrompt &= Trim(Me.TextBoxAILLMPrompt.Text)
-					'lsPrompt &= My.Settings.PromptPostText
-
-					'---------------------------------------------------
-					'ChatGPT - Tested, but not very good for this task.
-					'---------------------------------------------------
-					'Dim lrCompletionResult = Me.GetGPT3ChatResult(chunkText & vbCrLf & vbCrLf & lsPrompt)
-					'Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
-					'---------------------------------------------------
-
-					'=====================================================================================
-					'Farm out to OpenAI via the OpenAI API
-					Dim lsModifiedPrompt As String = chunkText & vbCrLf & vbCrLf & lsPrompt
-					Dim lrCompletionResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsModifiedPrompt)
-					Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
-					'=====================================================================================
-
-					Dim liIndex As Integer
 					Try
-						liIndex = Math.Max(lsGPT3ReturnString.IndexOf(vbCrLf), lsGPT3ReturnString.Length)
+
+						Dim lsPrompt As String = ""
+
+						'lsPrompt = My.Settings.PromptPreText
+						lsPrompt &= Trim(Me.TextBoxAILLMPrompt.Text)
+						'lsPrompt &= My.Settings.PromptPostText
+
+						'---------------------------------------------------
+						'ChatGPT - Tested, but not very good for this task.
+						'---------------------------------------------------
+						'Dim lrCompletionResult = Me.GetGPT3ChatResult(chunkText & vbCrLf & vbCrLf & lsPrompt)
+						'Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
+						'---------------------------------------------------
+
+						'=====================================================================================
+						'Farm out to OpenAI via the OpenAI API
+						Dim lsModifiedPrompt As String = lsPrompt.AppendDoubleLineBreak(chunkText)
+						Dim lrCompletionResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsModifiedPrompt)
+						Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
+						'=====================================================================================
+
+						Dim liIndex As Integer
+						Try
+							liIndex = Math.Max(lsGPT3ReturnString.IndexOf(vbCrLf), lsGPT3ReturnString.Length)
+						Catch ex As Exception
+							liIndex = lsGPT3ReturnString.Length
+						End Try
+
+						Dim loColor As Color = Color.Black
+
+						Dim start As Integer = Me.RichTextBoxResults.TextLength
+
+						If Not (lsGPT3ReturnString.Replace(vbLf, "").Replace(vbCrLf, "").Replace(Chr(24), "") = "I don't know.") And Not lsGPT3ReturnString.Contains("I don't know") Then
+							Me.RichTextBoxResults.AppendText(lsGPT3ReturnString.Substring(0, liIndex) & vbCrLf & "==========================" & vbCrLf)
+						End If
+
+						Dim li_end As Integer = Me.RichTextBoxResults.TextLength
+
+						' Textbox may transform chars, so (end-start) != text.Length
+						Me.RichTextBoxResults.Select(start, li_end - start)
+						Me.RichTextBoxResults.SelectionColor = loColor
+						Me.RichTextBoxResults.SelectionLength = 0 ' // clear                    
+
 					Catch ex As Exception
-						liIndex = lsGPT3ReturnString.Length
+						Throw New Exception(ex.Message)
 					End Try
 
-					Dim loColor As Color = Color.Black
+					'Move the start index forward by 400 words to create a 100-word overlap with the next chunk             
+					startIndex += chunkSize - overlapSize
 
-					Dim start As Integer = Me.RichTextBoxResults.TextLength
-
-					If Not (lsGPT3ReturnString.Replace(vbLf, "").Replace(vbCrLf, "").Replace(Chr(24), "") = "I don't know.") And Not lsGPT3ReturnString.Contains("I don't know") Then
-						Me.RichTextBoxResults.AppendText(lsGPT3ReturnString.Substring(0, liIndex) & vbCrLf & "==========================" & vbCrLf)
+					If startIndex < words.Count Then
+						Me.ProgressBar.Value = (startIndex / words.Count) * 100
+					Else
+						Me.ProgressBar.Value = 100
 					End If
 
-					Dim li_end As Integer = Me.RichTextBoxResults.TextLength
+					Application.DoEvents()
 
-					' Textbox may transform chars, so (end-start) != text.Length
-					Me.RichTextBoxResults.Select(start, li_end - start)
-					Me.RichTextBoxResults.SelectionColor = loColor
-					Me.RichTextBoxResults.SelectionLength = 0 ' // clear                    
+					If Me.mbAbort Then
+						Me.ProgressBar.Value = 0
+						Me.ProgressBar.Visible = False
+						Me.ButtonAbort.Visible = False
+						Exit Sub
+					End If
 
-				Catch ex As Exception
-					Throw New Exception(ex.Message)
-				End Try
+					liChunkCounter += 1
+				End While
 
-				'Move the start index forward by 400 words to create a 100-word overlap with the next chunk             
-				startIndex += chunkSize - overlapSize
-
-				If startIndex < words.Count Then
-					Me.ProgressBar.Value = (startIndex / words.Count) * 100
-				Else
-					Me.ProgressBar.Value = 100
-				End If
-
-				Application.DoEvents()
-
-				If Me.mbAbort Then
-					Me.ProgressBar.Value = 0
-					Me.ProgressBar.Visible = False
-					Me.ButtonAbort.Visible = False
-					Exit Sub
-				End If
-
-				liChunkCounter += 1
-			End While
+			End With
 
 			'Hide the ProgressBar
 			Me.ProgressBar.Visible = False
@@ -1855,6 +2058,7 @@ NextSentence:
 
 			ToolStripStatusLabel.Text = "Completed search successfully"
 
+			Me.TabControl1.SelectedTab = Me.TabPageResults
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -2107,10 +2311,10 @@ NextSentence:
 	Private Sub RichTextBoxResults_MouseDown(sender As Object, e As MouseEventArgs) Handles RichTextBoxResults.MouseDown
 
 		Try
-			If Me.RichTextBoxResults.SelectionLength > 0 Then
-				Me.RichTextBoxResults.ContextMenuStrip = Me.ContextMenuStripResultsSelection
-			Else
-				Me.RichTextBoxResults.ContextMenuStrip = Me.ContextMenuStripTextbox
+			If e.Button = MouseButtons.Right Then
+				If Me.RichTextBoxResults.SelectionLength > 0 Then
+					Me.RichTextBoxResults.ContextMenuStrip = Me.ContextMenuStripResultsSelection
+				End If
 			End If
 
 
@@ -2139,12 +2343,12 @@ NextSentence:
 				Next
 			Next
 
-			For Each lrModelElement In Me.mrModel.getModelObjects
+			For Each lrModelElement In Me.mrModel.getModelObjects.OrderBy(Function(x) x.Id)
 				Call Me.HighlightText(Me.RichTextBoxText, lrModelElement.Id, Color.RoyalBlue)
 				Call Me.HighlightText(Me.RichTextBoxResults, lrModelElement.Id, Color.RoyalBlue)
 			Next
 
-			For Each lrModelElement In Me.mrModel.ValueType
+			For Each lrModelElement In Me.mrModel.ValueType.OrderBy(Function(x) x.Id)
 				Call Me.HighlightText(Me.RichTextBoxText, lrModelElement.Id, Color.DarkGreen)
 				Call Me.HighlightText(Me.RichTextBoxResults, lrModelElement.Id, Color.DarkGreen)
 			Next
@@ -2158,7 +2362,7 @@ NextSentence:
 				Call Me.HighlightText(Me.RichTextBoxResults, lsValueConstraint, Color.Maroon)
 			Next
 
-			For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept)
+			For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept).OrderBy(Function(x) x.Symbol)
 				Call Me.HighlightText(Me.RichTextBoxText, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
 				Call Me.HighlightText(Me.RichTextBoxResults, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
 			Next
@@ -2246,10 +2450,70 @@ NextSentence:
 					RemoveStopButton.Enabled = True
 					KeywordExtractionMaxButton.Enabled = True
 					KeywordExtractionNormalButton.Enabled = True
+				ElseIf Me.RichTextBoxText.Text.Trim <> "" Then
+					StandardizationButton.Enabled = True
+					RemoveStopButton.Enabled = True
+					KeywordExtractionMaxButton.Enabled = True
+					KeywordExtractionNormalButton.Enabled = True
 				End If
 			End If
 
 			MyData.TheDoc = Me.RichTextBoxText.Text.Trim
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ContextMenuStripTextbox_Opening(sender As Object, e As CancelEventArgs) Handles ContextMenuStripTextbox.Opening
+
+		Try
+			ToolStripMenuItemCorpusTextPaste.Enabled = Clipboard.GetDataObject.GetDataPresent(DataFormats.Text) Or Clipboard.ContainsText
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub DoPaste(sender As Object, e As EventArgs) Handles ToolStripMenuItemCorpusTextPaste.Click
+
+		Try
+			Dim clipboardData As IDataObject = Clipboard.GetDataObject()
+
+			ToolStripMenuItemCorpusTextPaste.Enabled = Clipboard.GetDataObject.GetDataPresent(DataFormats.Text) Or Clipboard.ContainsText
+
+			If Clipboard.ContainsText Then
+				Me.RichTextBoxText.Text = Clipboard.GetText
+			ElseIf clipboardData.GetDataPresent(DataFormats.Text) Then
+				Dim clipboardText As String = clipboardData.GetData(DataFormats.Text).ToString()
+				Me.RichTextBoxText.Text = clipboardText.Trim
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+	End Sub
+
+	Private Sub Button1_Click_1(sender As Object, e As EventArgs) Handles Button1.Click
+
+		Try
+			Call Me.HighlightText()
 
 		Catch ex As Exception
 			Dim lsMessage As String

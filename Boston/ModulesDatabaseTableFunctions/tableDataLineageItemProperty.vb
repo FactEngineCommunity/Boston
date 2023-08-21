@@ -1,7 +1,8 @@
 ﻿Imports System.Reflection
 
 Public Module tableDataLineageItemProperty
-    Public Sub addDataLineageItemProperty(ByRef arDataLineageItemProperty As DataLineage.DataLineageItemProperty)
+    Public Sub addDataLineageItemProperty(ByRef arDataLineageItemProperty As DataLineage.DataLineageItemProperty,
+                                          Optional ByVal abIgnoreErrors As Boolean = False)
 
         Dim lsSQLQuery As String = ""
 
@@ -17,10 +18,13 @@ Public Module tableDataLineageItemProperty
             lsSQLQuery &= ")"
 
             pdbConnection.BeginTrans()
-            Call pdbConnection.Execute(lsSQLQuery)
+            Call pdbConnection.Execute(lsSQLQuery, abIgnoreErrors)
             pdbConnection.CommitTrans()
 
         Catch ex As Exception
+
+            If abIgnoreErrors Then Exit Sub
+
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 

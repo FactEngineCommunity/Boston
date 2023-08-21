@@ -373,10 +373,6 @@ Public Class frmCRUDEditReferenceTable
             Dim lsFilterString As String
             Dim larColumn As List(Of RDS.Column) = Nothing
 
-            If Me.mrReferenceTable.Column.Count > 0 Then
-                Debugger.Break()
-            End If
-
             'lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
 
             For liInd = 0 To Me.mrReferenceTable.Column.Count - 1

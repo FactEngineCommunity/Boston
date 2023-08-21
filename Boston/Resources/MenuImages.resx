@@ -268,4 +268,13 @@
   <data name="MovePrevious16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\MenuImages\MovePrevious16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="KeywordSearch16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\KeywordSearch16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="AI16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\AI16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FEKL16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\MenuImages\FEKL16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

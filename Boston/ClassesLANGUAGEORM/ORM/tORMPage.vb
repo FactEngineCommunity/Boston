@@ -1056,8 +1056,6 @@ Namespace FBM
                     Return Nothing
                 End If
 
-                If Me.Name = "All others" And arFactType.Id = "ControlFlowConnection" Then Debugger.Break()
-
                 'Return failsafe
                 DropFactTypeAtPoint = Nothing
 

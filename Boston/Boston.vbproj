@@ -81,7 +81,7 @@
   <ItemGroup>
     <Reference Include="adodb, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
       <HintPath>..\Dependencies\adodb.dll</HintPath>
     </Reference>
     <Reference Include="AdvancedDataGridView, Version=0.1.0.10, Culture=neutral, processorArchitecture=MSIL">
@@ -3738,6 +3738,7 @@
     <None Include="Images\BPMN\Gateway-EventBased.png" />
     <None Include="Images\BPMN\Event-Intermediate-Timer-BoundaryNonInterupting.png" />
     <None Include="Images\DatabaseLogos\RelationalAI16x16.png" />
+    <None Include="Images\MenuImages\AI16x16.png" />
     <Content Include="Images\MenuImages\Camera16x16.jpg" />
     <None Include="Images\MenuImages\delete16x16.png" />
     <None Include="Images\MenuImages\deleteround16x16.png" />
@@ -3773,6 +3774,7 @@
     <None Include="Images\MenuImages\Glossary16x16.png" />
     <None Include="Images\MenuImages\GO16x16.png" />
     <None Include="Images\MenuImages\folder16x16.png" />
+    <None Include="Images\MenuImages\FEKL16x16.png" />
     <Content Include="Images\MenuImages\Grid.jpg" />
     <None Include="Images\MenuImages\Help16x16.png" />
     <None Include="Images\MenuImages\Group16x16.png" />

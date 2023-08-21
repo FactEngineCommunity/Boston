@@ -35,7 +35,8 @@ Namespace DataLineage
             Return Me.Name = other.Name
         End Function
 
-        Public Sub SaveProperties(ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject)
+        Public Sub SaveProperties(ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject,
+                                  Optional ByRef abIgnoreErrors As Boolean = False)
 
             Try
 #Region "Metadata Lineage"
@@ -96,7 +97,7 @@ Namespace DataLineage
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
 
                 For Each lrDataLineageProperty In Me.DataLineageItemProperty
-                    Call lrDataLineageProperty.Save(False)
+                    Call lrDataLineageProperty.Save(abIgnoreErrors)
                 Next
 
 

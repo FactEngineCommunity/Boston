@@ -145,17 +145,28 @@ Public Class frmPDFDocumentViewer
     Private Sub ToolStripButtonGetPageText_Click(sender As Object, e As EventArgs) Handles ToolStripButtonGetPageText.Click
 
         Try
-            Dim liPageNumber As Integer
-            If Not Integer.TryParse(Me.ToolStripTextBoxPage.Text, liPageNumber) Then
-                Exit Sub
-            End If
+            With New WaitCursor
+                Dim liPageNumber As Integer
+                If Not Integer.TryParse(Me.ToolStripTextBoxPage.Text, liPageNumber) Then
+                    Exit Sub
+                End If
 
-            'CodeSafe
-            If liPageNumber - 1 < 0 Then Exit Sub
+                'CodeSafe
+                If liPageNumber - 1 < 0 Then Exit Sub
 
-            Dim lsPageText = Me.PdfViewer.Document.GetPdfText(liPageNumber - 1)
+                Dim lsPageText = Me.PdfViewer.Document.GetPdfText(liPageNumber - 1)
 
-            Clipboard.SetText(lsPageText)
+                My.Computer.Clipboard.SetText(lsPageText)
+
+                If My.Computer.Keyboard.AltKeyDown Then
+                    Dim dataObject As New DataObject()
+                    dataObject.SetText(lsPageText)
+                    Clipboard.SetDataObject(dataObject)
+                End If
+
+                Boston.ShowFlashCard("Copied the current page to the Clipboard.", Color.MediumSeaGreen, 2500, 10)
+
+            End With
 
         Catch ex As Exception
             Dim lsMessage As String
