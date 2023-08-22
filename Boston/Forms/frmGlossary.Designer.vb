@@ -51,6 +51,7 @@ Partial Class frmGlossary
         Me.LabelModelElement = New System.Windows.Forms.Label()
         Me.ButtonViewLineage = New System.Windows.Forms.Button()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
+        Me.ShowInDescriptionEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -159,59 +160,59 @@ Partial Class frmGlossary
         '
         'ContextMenuStripMain
         '
-        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ShowInModelDictionaryToolStripMenuItem, Me.DataLineageToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripSeparator2, Me.PropertiesToolStripMenuItem1})
+        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ShowInModelDictionaryToolStripMenuItem, Me.ShowInDescriptionEditorToolStripMenuItem, Me.DataLineageToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripSeparator2, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
-        Me.ContextMenuStripMain.Size = New System.Drawing.Size(211, 148)
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(214, 192)
         '
         'ToolStripMenuItemViewOnPage
         '
         Me.ToolStripMenuItemViewOnPage.Name = "ToolStripMenuItemViewOnPage"
-        Me.ToolStripMenuItemViewOnPage.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemViewOnPage.Size = New System.Drawing.Size(213, 22)
         Me.ToolStripMenuItemViewOnPage.Text = "&View on Page..."
         '
         'ToolStripMenuItemViewInDiagramSpy
         '
         Me.ToolStripMenuItemViewInDiagramSpy.Image = Global.Boston.My.Resources.MenuImages.Spyglass16x16
         Me.ToolStripMenuItemViewInDiagramSpy.Name = "ToolStripMenuItemViewInDiagramSpy"
-        Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(213, 22)
         Me.ToolStripMenuItemViewInDiagramSpy.Text = "View in Diagram Spy"
         '
         'ShowInModelDictionaryToolStripMenuItem
         '
         Me.ShowInModelDictionaryToolStripMenuItem.Image = Global.Boston.My.Resources.MenuImages.dictionary16x16
         Me.ShowInModelDictionaryToolStripMenuItem.Name = "ShowInModelDictionaryToolStripMenuItem"
-        Me.ShowInModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
+        Me.ShowInModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(213, 22)
         Me.ShowInModelDictionaryToolStripMenuItem.Text = "Show in Model &Dictionary"
         '
         'DataLineageToolStripMenuItem
         '
         Me.DataLineageToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Lineage16x16
         Me.DataLineageToolStripMenuItem.Name = "DataLineageToolStripMenuItem"
-        Me.DataLineageToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
+        Me.DataLineageToolStripMenuItem.Size = New System.Drawing.Size(213, 22)
         Me.DataLineageToolStripMenuItem.Text = "&Lineage"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(207, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(210, 6)
         '
         'ToolStripMenuItemRemoveFromModel
         '
         Me.ToolStripMenuItemRemoveFromModel.Image = Global.Boston.My.Resources.MenuImages.Remove16x16
         Me.ToolStripMenuItemRemoveFromModel.Name = "ToolStripMenuItemRemoveFromModel"
-        Me.ToolStripMenuItemRemoveFromModel.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemRemoveFromModel.Size = New System.Drawing.Size(213, 22)
         Me.ToolStripMenuItemRemoveFromModel.Text = "&Remove From Model"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(207, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(210, 6)
         '
         'PropertiesToolStripMenuItem1
         '
         Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
         Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
-        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(210, 22)
+        Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(213, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
         '
         'SplitContainer2
@@ -333,6 +334,12 @@ Partial Class frmGlossary
         Me.WebBrowser.Size = New System.Drawing.Size(676, 329)
         Me.WebBrowser.TabIndex = 2
         '
+        'ShowInDescriptionEditorToolStripMenuItem
+        '
+        Me.ShowInDescriptionEditorToolStripMenuItem.Name = "ShowInDescriptionEditorToolStripMenuItem"
+        Me.ShowInDescriptionEditorToolStripMenuItem.Size = New System.Drawing.Size(213, 22)
+        Me.ShowInDescriptionEditorToolStripMenuItem.Text = "Show in &Description Editor"
+        '
         'frmGlossary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -387,4 +394,5 @@ Partial Class frmGlossary
     Friend WithEvents ToolStripDropDownButton2 As ToolStripDropDownButton
     Friend WithEvents DataLineageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ButtonViewLineage As Button
+    Friend WithEvents ShowInDescriptionEditorToolStripMenuItem As ToolStripMenuItem
 End Class

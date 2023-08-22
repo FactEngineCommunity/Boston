@@ -1171,18 +1171,19 @@ OpenConnection:
 
         Public Function GetGPTChatResponse(ByVal arOpenAIAPI As OpenAI_API.OpenAIAPI, ByVal asPrompt As String, Optional ByVal asActualNLQuery As String = "") As OpenAI_API.Chat.ChatResult
             Try
-                Dim _timeout As Integer = 30000 ' 5 seconds
+                Dim _timeout As Integer = 10000 ' 5 seconds
 
                 ' Task to execute the main operation
                 Dim chatTask = Task.Run(Function() arOpenAIAPI.Chat.CreateChatCompletionAsync(
-            New OpenAI_API.Chat.ChatRequest() With {
-                .Model = Model.GPT4,
-                .Temperature = 0,
-                .MaxTokens = 1500,
-                .TopP = 1,
-                .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asPrompt)}
-            }
-        ))
+                                              New OpenAI_API.Chat.ChatRequest() With {
+                                                                                     .Model = Model.ChatGPTTurbo,
+                                                                                     .Temperature = 0,
+                                                                                     .MaxTokens = 1000,
+                                                                                     .TopP = 1,
+                                                                                     .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asPrompt)}
+                                                                                     }
+                                                )
+                                        )
 
                 ' Wait for either the main task to complete or the timeout task to complete
                 Dim completedTask = Task.WhenAny(chatTask, Task.Delay(_timeout)).Result
@@ -1200,9 +1201,9 @@ OpenConnection:
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage.AppendDoubleLineBreak(ex.InnerException.Message)
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                lsMessage.AppendDoubleLineBreak(ex.Message)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical,,,,,,, ex)
 
                 Return Nothing
             End Try

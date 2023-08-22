@@ -1993,4 +1993,24 @@ Public Class frmGlossary
         End Try
     End Sub
 
+    Private Sub ShowInDescriptionEditorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowInDescriptionEditorToolStripMenuItem.Click
+
+        Try
+            Dim lrModelObject As FBM.ModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Id)
+
+
+            Dim lrActivePane = Me.DockPanel.Panes(0)
+
+            Call frmMain.loadToolboxDescriptions(lrActivePane, lrModelObject)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class

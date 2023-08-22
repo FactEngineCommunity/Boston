@@ -60,6 +60,7 @@ Partial Class frmKnowledgeExtraction
         Me.ButtonExtractFactTypeReadings = New System.Windows.Forms.Button()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabDocumentText = New System.Windows.Forms.TabPage()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.TabPageAIExtraction = New System.Windows.Forms.TabPage()
         Me.GroupBoxAILLMPrompt = New System.Windows.Forms.GroupBox()
         Me.LabelPromptGPTPrompt = New System.Windows.Forms.Label()
@@ -85,7 +86,15 @@ Partial Class frmKnowledgeExtraction
         Me.GroupBoxStatistical = New System.Windows.Forms.GroupBox()
         Me.GroupboxCoreNLP = New System.Windows.Forms.GroupBox()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.TabControl2 = New System.Windows.Forms.TabControl()
+        Me.TabPagePromptSelection = New System.Windows.Forms.TabPage()
+        Me.TabPageSettings = New System.Windows.Forms.TabPage()
+        Me.LabelPromptOpenAIModel = New System.Windows.Forms.Label()
+        Me.ComboBoxOpenAIModel = New System.Windows.Forms.ComboBox()
+        Me.LabelPromptChunkSize = New System.Windows.Forms.Label()
+        Me.TextBoxChunkSize = New System.Windows.Forms.TextBox()
+        Me.LabelPromptMaxTokens = New System.Windows.Forms.Label()
+        Me.TextBoxMaxTokens = New System.Windows.Forms.TextBox()
         Me.ContextMenuStripKeyword.SuspendLayout()
         Me.ContextMenuStripTextbox.SuspendLayout()
         Me.ContextMenuStripTextboxSelection.SuspendLayout()
@@ -102,6 +111,9 @@ Partial Class frmKnowledgeExtraction
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.TabControl2.SuspendLayout()
+        Me.TabPagePromptSelection.SuspendLayout()
+        Me.TabPageSettings.SuspendLayout()
         Me.SuspendLayout()
         '
         'HelpButton
@@ -126,7 +138,7 @@ Partial Class frmKnowledgeExtraction
         'progressBar1
         '
         Me.progressBar1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.progressBar1.Location = New System.Drawing.Point(12, 473)
+        Me.progressBar1.Location = New System.Drawing.Point(12, 470)
         Me.progressBar1.Name = "progressBar1"
         Me.progressBar1.Size = New System.Drawing.Size(809, 25)
         Me.progressBar1.TabIndex = 47
@@ -172,7 +184,7 @@ Partial Class frmKnowledgeExtraction
         Me.ResultListView.HideSelection = False
         Me.ResultListView.Location = New System.Drawing.Point(8, 8)
         Me.ResultListView.Name = "ResultListView"
-        Me.ResultListView.Size = New System.Drawing.Size(330, 367)
+        Me.ResultListView.Size = New System.Drawing.Size(318, 364)
         Me.ResultListView.TabIndex = 48
         Me.ResultListView.UseCompatibleStateImageBehavior = False
         Me.ResultListView.View = System.Windows.Forms.View.Details
@@ -240,7 +252,7 @@ Partial Class frmKnowledgeExtraction
         '
         Me.StatusLabel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.StatusLabel.AutoSize = True
-        Me.StatusLabel.Location = New System.Drawing.Point(12, 457)
+        Me.StatusLabel.Location = New System.Drawing.Point(12, 454)
         Me.StatusLabel.Name = "StatusLabel"
         Me.StatusLabel.Size = New System.Drawing.Size(35, 13)
         Me.StatusLabel.TabIndex = 51
@@ -384,7 +396,7 @@ Partial Class frmKnowledgeExtraction
         Me.TabControl1.Location = New System.Drawing.Point(7, 8)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(511, 371)
+        Me.TabControl1.Size = New System.Drawing.Size(492, 368)
         Me.TabControl1.TabIndex = 56
         '
         'TabDocumentText
@@ -399,12 +411,22 @@ Partial Class frmKnowledgeExtraction
         Me.TabDocumentText.Text = "Document Text"
         Me.TabDocumentText.UseVisualStyleBackColor = True
         '
+        'Button1
+        '
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.Button1.Location = New System.Drawing.Point(453, 6)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(25, 23)
+        Me.Button1.TabIndex = 47
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'TabPageAIExtraction
         '
-        Me.TabPageAIExtraction.Controls.Add(Me.GroupBoxAILLMPrompt)
+        Me.TabPageAIExtraction.Controls.Add(Me.TabControl2)
         Me.TabPageAIExtraction.Location = New System.Drawing.Point(4, 22)
         Me.TabPageAIExtraction.Name = "TabPageAIExtraction"
-        Me.TabPageAIExtraction.Size = New System.Drawing.Size(503, 345)
+        Me.TabPageAIExtraction.Size = New System.Drawing.Size(484, 342)
         Me.TabPageAIExtraction.TabIndex = 2
         Me.TabPageAIExtraction.Text = "AI Extraction"
         Me.TabPageAIExtraction.UseVisualStyleBackColor = True
@@ -419,9 +441,9 @@ Partial Class frmKnowledgeExtraction
         Me.GroupBoxAILLMPrompt.Controls.Add(Me.ComboBoxFEKLGPTPromptType)
         Me.GroupBoxAILLMPrompt.Controls.Add(Me.TextBoxAILLMPrompt)
         Me.GroupBoxAILLMPrompt.Controls.Add(Me.ButtonExecuteLLMGenerativeAI)
-        Me.GroupBoxAILLMPrompt.Location = New System.Drawing.Point(12, 13)
+        Me.GroupBoxAILLMPrompt.Location = New System.Drawing.Point(6, 7)
         Me.GroupBoxAILLMPrompt.Name = "GroupBoxAILLMPrompt"
-        Me.GroupBoxAILLMPrompt.Size = New System.Drawing.Size(484, 314)
+        Me.GroupBoxAILLMPrompt.Size = New System.Drawing.Size(762, 537)
         Me.GroupBoxAILLMPrompt.TabIndex = 0
         Me.GroupBoxAILLMPrompt.TabStop = False
         Me.GroupBoxAILLMPrompt.Text = "LLM Prompt:"
@@ -463,7 +485,7 @@ Partial Class frmKnowledgeExtraction
         Me.TextBoxAILLMPrompt.Location = New System.Drawing.Point(6, 78)
         Me.TextBoxAILLMPrompt.Multiline = True
         Me.TextBoxAILLMPrompt.Name = "TextBoxAILLMPrompt"
-        Me.TextBoxAILLMPrompt.Size = New System.Drawing.Size(469, 230)
+        Me.TextBoxAILLMPrompt.Size = New System.Drawing.Size(444, 208)
         Me.TextBoxAILLMPrompt.TabIndex = 0
         '
         'ButtonExecuteLLMGenerativeAI
@@ -570,9 +592,9 @@ Partial Class frmKnowledgeExtraction
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel, Me.ToolStripStatusLabelChunkCount})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 538)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 535)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(1063, 22)
+        Me.StatusStrip1.Size = New System.Drawing.Size(1032, 22)
         Me.StatusStrip1.TabIndex = 58
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -604,7 +626,7 @@ Partial Class frmKnowledgeExtraction
         Me.GroupBoxStatistical.Controls.Add(Me.RemoveStopButton)
         Me.GroupBoxStatistical.Controls.Add(Me.KeywordExtractionMaxButton)
         Me.GroupBoxStatistical.Controls.Add(Me.KeywordExtractionNormalButton)
-        Me.GroupBoxStatistical.Location = New System.Drawing.Point(908, 81)
+        Me.GroupBoxStatistical.Location = New System.Drawing.Point(877, 81)
         Me.GroupBoxStatistical.Name = "GroupBoxStatistical"
         Me.GroupBoxStatistical.Size = New System.Drawing.Size(144, 260)
         Me.GroupBoxStatistical.TabIndex = 60
@@ -615,7 +637,7 @@ Partial Class frmKnowledgeExtraction
         '
         Me.GroupboxCoreNLP.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupboxCoreNLP.Controls.Add(Me.ButtonExtractFactTypeReadings)
-        Me.GroupboxCoreNLP.Location = New System.Drawing.Point(908, 347)
+        Me.GroupboxCoreNLP.Location = New System.Drawing.Point(877, 347)
         Me.GroupboxCoreNLP.Name = "GroupboxCoreNLP"
         Me.GroupboxCoreNLP.Size = New System.Drawing.Size(143, 73)
         Me.GroupboxCoreNLP.TabIndex = 61
@@ -638,25 +660,106 @@ Partial Class frmKnowledgeExtraction
         '
         Me.SplitContainer1.Panel2.AutoScroll = True
         Me.SplitContainer1.Panel2.Controls.Add(Me.ResultListView)
-        Me.SplitContainer1.Size = New System.Drawing.Size(875, 382)
-        Me.SplitContainer1.SplitterDistance = 521
+        Me.SplitContainer1.Size = New System.Drawing.Size(844, 379)
+        Me.SplitContainer1.SplitterDistance = 502
         Me.SplitContainer1.TabIndex = 12
         '
-        'Button1
+        'TabControl2
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
-        Me.Button1.Location = New System.Drawing.Point(453, 6)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(25, 23)
-        Me.Button1.TabIndex = 47
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.TabControl2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TabControl2.Controls.Add(Me.TabPagePromptSelection)
+        Me.TabControl2.Controls.Add(Me.TabPageSettings)
+        Me.TabControl2.Location = New System.Drawing.Point(3, 16)
+        Me.TabControl2.Name = "TabControl2"
+        Me.TabControl2.SelectedIndex = 0
+        Me.TabControl2.Size = New System.Drawing.Size(478, 323)
+        Me.TabControl2.TabIndex = 59
+        '
+        'TabPagePromptSelection
+        '
+        Me.TabPagePromptSelection.Controls.Add(Me.GroupBoxAILLMPrompt)
+        Me.TabPagePromptSelection.Location = New System.Drawing.Point(4, 22)
+        Me.TabPagePromptSelection.Name = "TabPagePromptSelection"
+        Me.TabPagePromptSelection.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPagePromptSelection.Size = New System.Drawing.Size(470, 297)
+        Me.TabPagePromptSelection.TabIndex = 0
+        Me.TabPagePromptSelection.Text = "Prompt Selection"
+        Me.TabPagePromptSelection.UseVisualStyleBackColor = True
+        '
+        'TabPageSettings
+        '
+        Me.TabPageSettings.Controls.Add(Me.TextBoxMaxTokens)
+        Me.TabPageSettings.Controls.Add(Me.LabelPromptMaxTokens)
+        Me.TabPageSettings.Controls.Add(Me.TextBoxChunkSize)
+        Me.TabPageSettings.Controls.Add(Me.LabelPromptChunkSize)
+        Me.TabPageSettings.Controls.Add(Me.ComboBoxOpenAIModel)
+        Me.TabPageSettings.Controls.Add(Me.LabelPromptOpenAIModel)
+        Me.TabPageSettings.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageSettings.Name = "TabPageSettings"
+        Me.TabPageSettings.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPageSettings.Size = New System.Drawing.Size(470, 297)
+        Me.TabPageSettings.TabIndex = 1
+        Me.TabPageSettings.Text = "Settings"
+        Me.TabPageSettings.UseVisualStyleBackColor = True
+        '
+        'LabelPromptOpenAIModel
+        '
+        Me.LabelPromptOpenAIModel.AutoSize = True
+        Me.LabelPromptOpenAIModel.Location = New System.Drawing.Point(17, 24)
+        Me.LabelPromptOpenAIModel.Name = "LabelPromptOpenAIModel"
+        Me.LabelPromptOpenAIModel.Size = New System.Drawing.Size(39, 13)
+        Me.LabelPromptOpenAIModel.TabIndex = 0
+        Me.LabelPromptOpenAIModel.Text = "Model:"
+        '
+        'ComboBoxOpenAIModel
+        '
+        Me.ComboBoxOpenAIModel.FormattingEnabled = True
+        Me.ComboBoxOpenAIModel.Location = New System.Drawing.Point(62, 21)
+        Me.ComboBoxOpenAIModel.Name = "ComboBoxOpenAIModel"
+        Me.ComboBoxOpenAIModel.Size = New System.Drawing.Size(185, 21)
+        Me.ComboBoxOpenAIModel.TabIndex = 1
+        '
+        'LabelPromptChunkSize
+        '
+        Me.LabelPromptChunkSize.AutoSize = True
+        Me.LabelPromptChunkSize.Location = New System.Drawing.Point(17, 52)
+        Me.LabelPromptChunkSize.Name = "LabelPromptChunkSize"
+        Me.LabelPromptChunkSize.Size = New System.Drawing.Size(64, 13)
+        Me.LabelPromptChunkSize.TabIndex = 2
+        Me.LabelPromptChunkSize.Text = "Chunk Size:"
+        '
+        'TextBoxChunkSize
+        '
+        Me.TextBoxChunkSize.Location = New System.Drawing.Point(87, 48)
+        Me.TextBoxChunkSize.Name = "TextBoxChunkSize"
+        Me.TextBoxChunkSize.Size = New System.Drawing.Size(53, 20)
+        Me.TextBoxChunkSize.TabIndex = 3
+        Me.TextBoxChunkSize.Text = "500"
+        '
+        'LabelPromptMaxTokens
+        '
+        Me.LabelPromptMaxTokens.AutoSize = True
+        Me.LabelPromptMaxTokens.Location = New System.Drawing.Point(17, 77)
+        Me.LabelPromptMaxTokens.Name = "LabelPromptMaxTokens"
+        Me.LabelPromptMaxTokens.Size = New System.Drawing.Size(69, 13)
+        Me.LabelPromptMaxTokens.TabIndex = 4
+        Me.LabelPromptMaxTokens.Text = "Max Tokens:"
+        '
+        'TextBoxMaxTokens
+        '
+        Me.TextBoxMaxTokens.Location = New System.Drawing.Point(87, 74)
+        Me.TextBoxMaxTokens.Name = "TextBoxMaxTokens"
+        Me.TextBoxMaxTokens.Size = New System.Drawing.Size(53, 20)
+        Me.TextBoxMaxTokens.TabIndex = 5
+        Me.TextBoxMaxTokens.Text = "1500"
         '
         'frmKnowledgeExtraction
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1063, 560)
+        Me.ClientSize = New System.Drawing.Size(1032, 557)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Controls.Add(Me.GroupboxCoreNLP)
         Me.Controls.Add(Me.GroupBoxStatistical)
@@ -690,6 +793,10 @@ Partial Class frmKnowledgeExtraction
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        Me.TabControl2.ResumeLayout(False)
+        Me.TabPagePromptSelection.ResumeLayout(False)
+        Me.TabPageSettings.ResumeLayout(False)
+        Me.TabPageSettings.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -758,4 +865,13 @@ Partial Class frmKnowledgeExtraction
     Friend WithEvents SplitContainer1 As SplitContainer
     Friend WithEvents LabelPromptGPTPrompt As Label
     Friend WithEvents Button1 As Button
+    Friend WithEvents TabControl2 As TabControl
+    Friend WithEvents TabPagePromptSelection As TabPage
+    Friend WithEvents TabPageSettings As TabPage
+    Friend WithEvents ComboBoxOpenAIModel As ComboBox
+    Friend WithEvents LabelPromptOpenAIModel As Label
+    Friend WithEvents TextBoxChunkSize As TextBox
+    Friend WithEvents LabelPromptChunkSize As Label
+    Friend WithEvents TextBoxMaxTokens As TextBox
+    Friend WithEvents LabelPromptMaxTokens As Label
 End Class

@@ -1250,7 +1250,8 @@ SkipRegistrationChecking:
     End Sub
 
 
-    Sub loadToolboxDescriptions(ByRef aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
+    Sub loadToolboxDescriptions(ByRef aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane,
+                                Optional ByRef arModelElement As FBM.ModelObject = Nothing)
 
         Dim child As New frmToolboxDescriptions
 
@@ -1276,6 +1277,8 @@ SkipRegistrationChecking:
                     child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
                     child.DockTo(lrPane, DockStyle.Fill, 0)
                     prApplication.ToolboxForms.Add(child)
+
+                    Call child.setDescriptions(arModelElement)
                 Else
                     '--------------------------------------------------
                     'Add the ORMReadingEditor form to the bottom of the Page

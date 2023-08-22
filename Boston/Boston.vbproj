@@ -1965,6 +1965,7 @@
     <Compile Include="ModulesPublic\publicConstantsFactEngine.vb" />
     <Compile Include="ModulesPublic\publicConstantsFBM.vb" />
     <Compile Include="ModulesPublic\PublicConstantsODBC.vb" />
+    <Compile Include="ModulesPublic\publicConstantsOpenAI.vb" />
     <Compile Include="ModulesPublic\publicDatabase.vb" />
     <Compile Include="ModulesPublic\publicFBMConstants.vb" />
     <Compile Include="ModulesPublic\PublicImageProcessing.vb" />

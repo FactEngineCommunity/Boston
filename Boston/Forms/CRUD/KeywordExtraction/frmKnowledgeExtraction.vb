@@ -25,6 +25,7 @@ Imports edu.stanford.nlp.ling.IndexedWord
 Imports java.util
 Imports Syn.WordNet
 Imports Newtonsoft.Json
+Imports OpenAI_API.Models
 
 Public Class frmKnowledgeExtraction
 
@@ -222,6 +223,9 @@ Public Class frmKnowledgeExtraction
 			'Status Tool Strip
 			Me.ToolStripStatusLabel.Text = ""
 			Me.ToolStripStatusLabelChunkCount.Text = ""
+
+			Me.ComboBoxOpenAIModel.DataSource = [Enum].GetValues(GetType(pcenumOpenAIModel))
+			Me.ComboBoxOpenAIModel.SelectedIndex = 3
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -1957,7 +1961,8 @@ NextSentence:
 
 			Dim words As String() = lsDocumentText.ToString.Split(" "c)
 
-			Dim chunkSize As Integer = My.Settings.LLMChunkSize
+			Dim chunkSize As Integer = Math.Min(My.Settings.LLMChunkSize, CInt(Me.TextBoxChunkSize.Text))
+
 			Dim overlapSize As Integer = 100
 			Dim startIndex As Integer = 0
 
@@ -1996,37 +2001,56 @@ NextSentence:
 						'=====================================================================================
 						'Farm out to OpenAI via the OpenAI API
 						Dim lsModifiedPrompt As String = lsPrompt.AppendDoubleLineBreak(chunkText)
-						Dim lrCompletionResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsModifiedPrompt) 'GetGPT3Result
-						'Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
-						Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
+
+						Dim lsGPT3ReturnString As String = ""
+
+						With New WaitCursor
+
+							Select Case Me.ComboBoxOpenAIModel.SelectedItem
+								Case Is = pcenumOpenAIModel.ChatGPTTurbo, pcenumOpenAIModel.ChatGPTTurbo301
+									Dim lrCompletionResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsModifiedPrompt)
+									Try
+										lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
+									Catch
+										GoTo SkipSection
+									End Try
+
+								Case Else
+									Dim lrCompletionResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsModifiedPrompt)
+									Try
+										lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
+									Catch
+										GoTo SkipSection
+									End Try
+							End Select
+						End With
 						'=====================================================================================
-
 						Dim liIndex As Integer
-						Try
-							liIndex = Math.Max(lsGPT3ReturnString.IndexOf(vbCrLf), lsGPT3ReturnString.Length)
+							Try
+								liIndex = Math.Max(lsGPT3ReturnString.IndexOf(vbCrLf), lsGPT3ReturnString.Length)
+							Catch ex As Exception
+								liIndex = lsGPT3ReturnString.Length
+							End Try
+
+							Dim loColor As Color = Color.Black
+
+							Dim start As Integer = Me.RichTextBoxResults.TextLength
+
+							If Not (lsGPT3ReturnString.Replace(vbLf, "").Replace(vbCrLf, "").Replace(Chr(24), "") = "I don't know.") And Not lsGPT3ReturnString.Contains("I don't know") Then
+								Me.RichTextBoxResults.AppendText(lsGPT3ReturnString.Substring(0, liIndex) & vbCrLf & "==========================" & vbCrLf)
+							End If
+
+							Dim li_end As Integer = Me.RichTextBoxResults.TextLength
+
+							' Textbox may transform chars, so (end-start) != text.Length
+							Me.RichTextBoxResults.Select(start, li_end - start)
+							Me.RichTextBoxResults.SelectionColor = loColor
+							Me.RichTextBoxResults.SelectionLength = 0 ' // clear                    
+
 						Catch ex As Exception
-							liIndex = lsGPT3ReturnString.Length
-						End Try
-
-						Dim loColor As Color = Color.Black
-
-						Dim start As Integer = Me.RichTextBoxResults.TextLength
-
-						If Not (lsGPT3ReturnString.Replace(vbLf, "").Replace(vbCrLf, "").Replace(Chr(24), "") = "I don't know.") And Not lsGPT3ReturnString.Contains("I don't know") Then
-							Me.RichTextBoxResults.AppendText(lsGPT3ReturnString.Substring(0, liIndex) & vbCrLf & "==========================" & vbCrLf)
-						End If
-
-						Dim li_end As Integer = Me.RichTextBoxResults.TextLength
-
-						' Textbox may transform chars, so (end-start) != text.Length
-						Me.RichTextBoxResults.Select(start, li_end - start)
-						Me.RichTextBoxResults.SelectionColor = loColor
-						Me.RichTextBoxResults.SelectionLength = 0 ' // clear                    
-
-					Catch ex As Exception
-						Throw New Exception(ex.Message)
+							Throw New Exception(ex.Message)
 					End Try
-
+SkipSection:
 					'Move the start index forward by 400 words to create a 100-word overlap with the next chunk             
 					startIndex += chunkSize - overlapSize
 
