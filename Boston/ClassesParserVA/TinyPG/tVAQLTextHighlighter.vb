@@ -368,33 +368,42 @@ Namespace VAQL
     ''' this method should be used only by HighlightText or RestoreState methods
     ''' </summary>
     Private Sub HighlighTextCore()
-        'Tree = Parser.Parse(Textbox.Text);
-        Dim sb As New StringBuilder()
-            If Tree Is Nothing Or Tree.Nodes.Count = 0 Then
-                Return
-            End If
+            'Tree = Parser.Parse(Textbox.Text);
+            Try
+                Dim sb As New StringBuilder()
+                If Tree Is Nothing Then
+                    Return
+                End If
 
-            If Tree.Errors.Count > 0 Then
-                Exit Sub
-            End If
+                If Tree.Nodes.Count = 0 Then
+                    Return
+                End If
 
-        Dim start As ParseNode = Tree.Nodes(0)
-        HightlightNode(start, sb)
+                If Tree.Errors.Count > 0 Then
+                    Exit Sub
+                End If
 
-        ' append any trailing skipped tokens that were scanned
-        For Each skiptoken As Token In Scanner.Skipped
-            HighlightToken(skiptoken, sb)
-            sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
-        Next
+                Dim start As ParseNode = Tree.Nodes(0)
+                HightlightNode(start, sb)
 
-        sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
+                ' append any trailing skipped tokens that were scanned
+                For Each skiptoken As Token In Scanner.Skipped
+                    HighlightToken(skiptoken, sb)
+                    sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
+                Next
 
-        AddRtfHeader(sb)
-        AddRtfEnd(sb)
+                sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
 
-        Textbox.Rtf = sb.ToString()
+                AddRtfHeader(sb)
+                AddRtfEnd(sb)
 
-    End Sub
+                Textbox.Rtf = sb.ToString()
+
+            Catch ex As Exception
+
+            End Try
+
+        End Sub
 
 
     ''' <summary>
@@ -425,38 +434,42 @@ Namespace VAQL
 
     Private Sub AutoHighlightStart()
         Dim _tree As ParseTree
-        Dim _currenttext As String = ""
-        While Not isDisposing
-            Dim _textchanged As Boolean
-            SyncLock treelock
-                _textchanged = textChanged
-                If textChanged Then
-                    textChanged = False
-                    _currenttext = currentText
-                End If
-            End SyncLock
-            If Not _textchanged Then
-                Thread.Sleep(200)
-                Continue While
-            End If
-
-                _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
-
-                SyncLock treelock
-                    If textChanged Then
+            Dim _currenttext As String = ""
+            Try
+                While Not isDisposing
+                    Dim _textchanged As Boolean
+                    SyncLock treelock
+                        _textchanged = textChanged
+                        If textChanged Then
+                            textChanged = False
+                            _currenttext = currentText
+                        End If
+                    End SyncLock
+                    If Not _textchanged Then
+                        Thread.Sleep(200)
                         Continue While
-                    Else
-                        ' assign new tree
-                        Tree = _tree
                     End If
-                End SyncLock
+
+                    _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+
+                    SyncLock treelock
+                        If textChanged Then
+                            Continue While
+                        Else
+                            ' assign new tree
+                            Tree = _tree
+                        End If
+                    End SyncLock
 
 
-                If _tree.Errors.Count = 0 Then
-                    Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-                End If
-            End While
-    End Sub
+                    If _tree.Errors.Count = 0 Then
+                        Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
+                    End If
+                End While
+            Catch ex As Exception
+
+            End Try
+        End Sub
 
 
     ''' <summary>

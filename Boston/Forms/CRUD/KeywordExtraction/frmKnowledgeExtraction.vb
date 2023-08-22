@@ -1996,8 +1996,9 @@ NextSentence:
 						'=====================================================================================
 						'Farm out to OpenAI via the OpenAI API
 						Dim lsModifiedPrompt As String = lsPrompt.AppendDoubleLineBreak(chunkText)
-						Dim lrCompletionResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsModifiedPrompt)
-						Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
+						Dim lrCompletionResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsModifiedPrompt) 'GetGPT3Result
+						'Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
+						Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
 						'=====================================================================================
 
 						Dim liIndex As Integer

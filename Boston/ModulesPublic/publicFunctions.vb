@@ -1160,8 +1160,9 @@ OpenConnection:
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                lsMessage.AppendDoubleLineBreak(ex.InnerException.Message)
+                lsMessage.AppendDoubleLineBreak(ex.Message)
+                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, False,,,,, ex)
 
                 Return Nothing
             End Try

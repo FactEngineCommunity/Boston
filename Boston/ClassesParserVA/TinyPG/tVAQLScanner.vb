@@ -4,7 +4,9 @@ Imports System
 Imports System.Collections.Generic
 Imports System.Text.RegularExpressions
 Imports System.Xml.Serialization
-Imports System.Threading.task
+Imports System.Threading.Tasks
+
+
 
 Namespace VAQL
 #Region "Scanner"
@@ -499,9 +501,7 @@ Namespace VAQL
 
                 For i = 0 To scantokens.Count - 1
                     Dim r As Regex = Patterns(scantokens(i))
-
-
-                    Dim timeoutDuration As Integer = 5 ' Adjust as needed
+                    Dim timeoutDuration As Integer = 10 ' Adjust as needed
 
                     Dim cts As New System.Threading.CancellationTokenSource()
                     Dim matchingTask = System.Threading.Tasks.Task.Run(
