@@ -183,7 +183,24 @@ Public Class frmFEKLUploader
 
                         prApplication.Brain.Page = Nothing
                         prApplication.WorkingPage = Nothing
-                        lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lsFEKLStatement)
+
+                        Dim lrFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing
+                        If Me.TextBoxDefaultDocumentName.Text.Trim <> "" Or
+                            Me.TextBoxDefaultDocumentLocation.Text.Trim <> "" Or
+                            Me.TextBoxDefaultSectionId.Text.Trim <> "" Or
+                            Me.TextBoxDefaultSectionName.Text.Trim <> "" _
+                            Or Me.TextBoxDefaultPageNumber.Text.Trim <> "" Then
+
+                            lrFEKLLineageObject = New FEKL.FEKL4JSONObject
+
+                            lrFEKLLineageObject.DocumentName = Me.TextBoxDefaultDocumentName.Text.Trim
+                            lrFEKLLineageObject.DocumentLocation = Me.TextBoxDefaultDocumentLocation.Text.Trim
+                            lrFEKLLineageObject.SectionId = Me.TextBoxDefaultSectionId.Text.Trim
+                            lrFEKLLineageObject.SectionName = Me.TextBoxDefaultSectionName.Text.Trim
+                            lrFEKLLineageObject.PageNumber = If(Me.TextBoxDefaultPageNumber.Text.Trim = "", 0, Me.TextBoxDefaultPageNumber.Text.Trim)
+                        End If
+
+                        lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lsFEKLStatement, lrFEKLLineageObject)
 
                         Dim lbIgnoreDuplicates As Boolean = True
 
@@ -613,6 +630,12 @@ Public Class frmFEKLUploader
             For Each lrFEKLObject As FEKL.FEKL4JSONObject In larFEKLStatementsToProcess
 
                 liInd = Me.mrFEKL4JSON.FEKLStatement.IndexOf(lrFEKLObject)
+
+                If Me.TextBoxDefaultDocumentName.Text.Trim <> "" Then lrFEKLObject.DocumentName = Me.TextBoxDefaultDocumentName.Text.Trim
+                If Me.TextBoxDefaultDocumentLocation.Text.Trim <> "" Then lrFEKLObject.DocumentName = Me.TextBoxDefaultDocumentLocation.Text.Trim
+                If Me.TextBoxDefaultSectionId.Text.Trim <> "" Then lrFEKLObject.DocumentName = Me.TextBoxDefaultSectionId.Text.Trim
+                If Me.TextBoxDefaultSectionName.Text.Trim <> "" Then lrFEKLObject.DocumentName = Me.TextBoxDefaultSectionName.Text.Trim
+                If Me.TextBoxDefaultPageNumber.Text.Trim <> "" Then lrFEKLObject.DocumentName = Me.TextBoxDefaultPageNumber.Text.Trim
 
                 '===============================
                 'Make Row Visisble

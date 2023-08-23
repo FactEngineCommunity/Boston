@@ -27,6 +27,7 @@ Partial Class frmFEKLUploader
         Me.GroupBox = New System.Windows.Forms.GroupBox()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPageFEKLJSON = New System.Windows.Forms.TabPage()
+        Me.CheckBoxFlagDuplicates = New System.Windows.Forms.CheckBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.ButtonStopContinueProcessing = New System.Windows.Forms.Button()
         Me.LabelFEKLJSONErrorString = New System.Windows.Forms.Label()
@@ -59,7 +60,18 @@ Partial Class frmFEKLUploader
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelPromptModelName = New System.Windows.Forms.Label()
         Me.ButtonClose = New System.Windows.Forms.Button()
-        Me.CheckBoxFlagDuplicates = New System.Windows.Forms.CheckBox()
+        Me.TabPageDefaults = New System.Windows.Forms.TabPage()
+        Me.GroupBoxDefaults = New System.Windows.Forms.GroupBox()
+        Me.LabelPromptDefaultDocumentName = New System.Windows.Forms.Label()
+        Me.LabelPromptDefaultSection = New System.Windows.Forms.Label()
+        Me.LabelPromptDefaultPageNumber = New System.Windows.Forms.Label()
+        Me.LabelPromptDefaultDocumentLocation = New System.Windows.Forms.Label()
+        Me.LabelPromptDefaultSectionName = New System.Windows.Forms.Label()
+        Me.TextBoxDefaultDocumentName = New System.Windows.Forms.TextBox()
+        Me.TextBoxDefaultDocumentLocation = New System.Windows.Forms.TextBox()
+        Me.TextBoxDefaultSectionId = New System.Windows.Forms.TextBox()
+        Me.TextBoxDefaultSectionName = New System.Windows.Forms.TextBox()
+        Me.TextBoxDefaultPageNumber = New System.Windows.Forms.TextBox()
         Me.GroupBox.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPageFEKLJSON.SuspendLayout()
@@ -71,6 +83,8 @@ Partial Class frmFEKLUploader
         Me.TabPageDDL2FEKL.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
+        Me.TabPageDefaults.SuspendLayout()
+        Me.GroupBoxDefaults.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox
@@ -95,6 +109,7 @@ Partial Class frmFEKLUploader
         Me.TabControl1.Controls.Add(Me.TabPageFEKLJSON)
         Me.TabControl1.Controls.Add(Me.TabPageFEKL)
         Me.TabControl1.Controls.Add(Me.TabPageDDL2FEKL)
+        Me.TabControl1.Controls.Add(Me.TabPageDefaults)
         Me.TabControl1.Location = New System.Drawing.Point(6, 49)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -119,6 +134,17 @@ Partial Class frmFEKLUploader
         Me.TabPageFEKLJSON.TabIndex = 2
         Me.TabPageFEKLJSON.Text = "FEKL JSON"
         Me.TabPageFEKLJSON.UseVisualStyleBackColor = True
+        '
+        'CheckBoxFlagDuplicates
+        '
+        Me.CheckBoxFlagDuplicates.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.CheckBoxFlagDuplicates.AutoSize = True
+        Me.CheckBoxFlagDuplicates.Location = New System.Drawing.Point(530, 71)
+        Me.CheckBoxFlagDuplicates.Name = "CheckBoxFlagDuplicates"
+        Me.CheckBoxFlagDuplicates.Size = New System.Drawing.Size(99, 17)
+        Me.CheckBoxFlagDuplicates.TabIndex = 16
+        Me.CheckBoxFlagDuplicates.Text = "Flag Duplicates"
+        Me.CheckBoxFlagDuplicates.UseVisualStyleBackColor = True
         '
         'Panel1
         '
@@ -257,7 +283,7 @@ Partial Class frmFEKLUploader
         Me.TabPageFEKL.Location = New System.Drawing.Point(4, 22)
         Me.TabPageFEKL.Name = "TabPageFEKL"
         Me.TabPageFEKL.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageFEKL.Size = New System.Drawing.Size(630, 355)
+        Me.TabPageFEKL.Size = New System.Drawing.Size(657, 355)
         Me.TabPageFEKL.TabIndex = 0
         Me.TabPageFEKL.Text = "FEKL"
         Me.TabPageFEKL.UseVisualStyleBackColor = True
@@ -352,7 +378,7 @@ Partial Class frmFEKLUploader
         Me.TabPageDDL2FEKL.Location = New System.Drawing.Point(4, 22)
         Me.TabPageDDL2FEKL.Name = "TabPageDDL2FEKL"
         Me.TabPageDDL2FEKL.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageDDL2FEKL.Size = New System.Drawing.Size(630, 355)
+        Me.TabPageDDL2FEKL.Size = New System.Drawing.Size(657, 355)
         Me.TabPageDDL2FEKL.TabIndex = 1
         Me.TabPageDDL2FEKL.Text = "DDL-2-FEKL"
         Me.TabPageDDL2FEKL.UseVisualStyleBackColor = True
@@ -370,7 +396,7 @@ Partial Class frmFEKLUploader
         Me.TableLayoutPanel1.RowCount = 2
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 90.90909!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(624, 349)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(651, 349)
         Me.TableLayoutPanel1.TabIndex = 1
         '
         'ToolStrip1
@@ -378,7 +404,7 @@ Partial Class frmFEKLUploader
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonDDLExtractFEKL, Me.ToolStripLabelPromptDatabaseType, Me.ToolStripComboBoxDatabaseType})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(624, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(651, 25)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -408,7 +434,7 @@ Partial Class frmFEKLUploader
         Me.TextBoxDDL.Location = New System.Drawing.Point(3, 34)
         Me.TextBoxDDL.Multiline = True
         Me.TextBoxDDL.Name = "TextBoxDDL"
-        Me.TextBoxDDL.Size = New System.Drawing.Size(618, 312)
+        Me.TextBoxDDL.Size = New System.Drawing.Size(645, 312)
         Me.TextBoxDDL.TabIndex = 0
         '
         'LabelModelName
@@ -439,16 +465,117 @@ Partial Class frmFEKLUploader
         Me.ButtonClose.Text = "&Close"
         Me.ButtonClose.UseVisualStyleBackColor = True
         '
-        'CheckBoxFlagDuplicates
+        'TabPageDefaults
         '
-        Me.CheckBoxFlagDuplicates.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.CheckBoxFlagDuplicates.AutoSize = True
-        Me.CheckBoxFlagDuplicates.Location = New System.Drawing.Point(530, 71)
-        Me.CheckBoxFlagDuplicates.Name = "CheckBoxFlagDuplicates"
-        Me.CheckBoxFlagDuplicates.Size = New System.Drawing.Size(99, 17)
-        Me.CheckBoxFlagDuplicates.TabIndex = 16
-        Me.CheckBoxFlagDuplicates.Text = "Flag Duplicates"
-        Me.CheckBoxFlagDuplicates.UseVisualStyleBackColor = True
+        Me.TabPageDefaults.Controls.Add(Me.GroupBoxDefaults)
+        Me.TabPageDefaults.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageDefaults.Name = "TabPageDefaults"
+        Me.TabPageDefaults.Size = New System.Drawing.Size(657, 355)
+        Me.TabPageDefaults.TabIndex = 3
+        Me.TabPageDefaults.Text = "Defaults"
+        Me.TabPageDefaults.UseVisualStyleBackColor = True
+        '
+        'GroupBoxDefaults
+        '
+        Me.GroupBoxDefaults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxDefaults.Controls.Add(Me.TextBoxDefaultPageNumber)
+        Me.GroupBoxDefaults.Controls.Add(Me.TextBoxDefaultSectionName)
+        Me.GroupBoxDefaults.Controls.Add(Me.TextBoxDefaultSectionId)
+        Me.GroupBoxDefaults.Controls.Add(Me.TextBoxDefaultDocumentLocation)
+        Me.GroupBoxDefaults.Controls.Add(Me.TextBoxDefaultDocumentName)
+        Me.GroupBoxDefaults.Controls.Add(Me.LabelPromptDefaultSectionName)
+        Me.GroupBoxDefaults.Controls.Add(Me.LabelPromptDefaultDocumentLocation)
+        Me.GroupBoxDefaults.Controls.Add(Me.LabelPromptDefaultPageNumber)
+        Me.GroupBoxDefaults.Controls.Add(Me.LabelPromptDefaultSection)
+        Me.GroupBoxDefaults.Controls.Add(Me.LabelPromptDefaultDocumentName)
+        Me.GroupBoxDefaults.Location = New System.Drawing.Point(13, 13)
+        Me.GroupBoxDefaults.Name = "GroupBoxDefaults"
+        Me.GroupBoxDefaults.Size = New System.Drawing.Size(628, 326)
+        Me.GroupBoxDefaults.TabIndex = 0
+        Me.GroupBoxDefaults.TabStop = False
+        Me.GroupBoxDefaults.Text = "Default Metadata Lineage Properties:"
+        '
+        'LabelPromptDefaultDocumentName
+        '
+        Me.LabelPromptDefaultDocumentName.AutoSize = True
+        Me.LabelPromptDefaultDocumentName.Location = New System.Drawing.Point(20, 36)
+        Me.LabelPromptDefaultDocumentName.Name = "LabelPromptDefaultDocumentName"
+        Me.LabelPromptDefaultDocumentName.Size = New System.Drawing.Size(90, 13)
+        Me.LabelPromptDefaultDocumentName.TabIndex = 0
+        Me.LabelPromptDefaultDocumentName.Text = "Document Name:"
+        '
+        'LabelPromptDefaultSection
+        '
+        Me.LabelPromptDefaultSection.AutoSize = True
+        Me.LabelPromptDefaultSection.Location = New System.Drawing.Point(52, 93)
+        Me.LabelPromptDefaultSection.Name = "LabelPromptDefaultSection"
+        Me.LabelPromptDefaultSection.Size = New System.Drawing.Size(58, 13)
+        Me.LabelPromptDefaultSection.TabIndex = 1
+        Me.LabelPromptDefaultSection.Text = "Section Id:"
+        '
+        'LabelPromptDefaultPageNumber
+        '
+        Me.LabelPromptDefaultPageNumber.AutoSize = True
+        Me.LabelPromptDefaultPageNumber.Location = New System.Drawing.Point(35, 147)
+        Me.LabelPromptDefaultPageNumber.Name = "LabelPromptDefaultPageNumber"
+        Me.LabelPromptDefaultPageNumber.Size = New System.Drawing.Size(75, 13)
+        Me.LabelPromptDefaultPageNumber.TabIndex = 2
+        Me.LabelPromptDefaultPageNumber.Text = "Page Number:"
+        '
+        'LabelPromptDefaultDocumentLocation
+        '
+        Me.LabelPromptDefaultDocumentLocation.AutoSize = True
+        Me.LabelPromptDefaultDocumentLocation.Location = New System.Drawing.Point(7, 64)
+        Me.LabelPromptDefaultDocumentLocation.Name = "LabelPromptDefaultDocumentLocation"
+        Me.LabelPromptDefaultDocumentLocation.Size = New System.Drawing.Size(103, 13)
+        Me.LabelPromptDefaultDocumentLocation.TabIndex = 3
+        Me.LabelPromptDefaultDocumentLocation.Text = "Document Location:"
+        '
+        'LabelPromptDefaultSectionName
+        '
+        Me.LabelPromptDefaultSectionName.AutoSize = True
+        Me.LabelPromptDefaultSectionName.Location = New System.Drawing.Point(33, 120)
+        Me.LabelPromptDefaultSectionName.Name = "LabelPromptDefaultSectionName"
+        Me.LabelPromptDefaultSectionName.Size = New System.Drawing.Size(77, 13)
+        Me.LabelPromptDefaultSectionName.TabIndex = 4
+        Me.LabelPromptDefaultSectionName.Text = "Section Name:"
+        '
+        'TextBoxDefaultDocumentName
+        '
+        Me.TextBoxDefaultDocumentName.Location = New System.Drawing.Point(116, 33)
+        Me.TextBoxDefaultDocumentName.Name = "TextBoxDefaultDocumentName"
+        Me.TextBoxDefaultDocumentName.Size = New System.Drawing.Size(370, 20)
+        Me.TextBoxDefaultDocumentName.TabIndex = 5
+        '
+        'TextBoxDefaultDocumentLocation
+        '
+        Me.TextBoxDefaultDocumentLocation.Location = New System.Drawing.Point(116, 61)
+        Me.TextBoxDefaultDocumentLocation.Name = "TextBoxDefaultDocumentLocation"
+        Me.TextBoxDefaultDocumentLocation.Size = New System.Drawing.Size(370, 20)
+        Me.TextBoxDefaultDocumentLocation.TabIndex = 6
+        '
+        'TextBoxDefaultSectionId
+        '
+        Me.TextBoxDefaultSectionId.Location = New System.Drawing.Point(116, 90)
+        Me.TextBoxDefaultSectionId.Name = "TextBoxDefaultSectionId"
+        Me.TextBoxDefaultSectionId.Size = New System.Drawing.Size(100, 20)
+        Me.TextBoxDefaultSectionId.TabIndex = 7
+        '
+        'TextBoxDefaultSectionName
+        '
+        Me.TextBoxDefaultSectionName.Location = New System.Drawing.Point(116, 117)
+        Me.TextBoxDefaultSectionName.Name = "TextBoxDefaultSectionName"
+        Me.TextBoxDefaultSectionName.Size = New System.Drawing.Size(370, 20)
+        Me.TextBoxDefaultSectionName.TabIndex = 8
+        '
+        'TextBoxDefaultPageNumber
+        '
+        Me.TextBoxDefaultPageNumber.Location = New System.Drawing.Point(116, 144)
+        Me.TextBoxDefaultPageNumber.Name = "TextBoxDefaultPageNumber"
+        Me.TextBoxDefaultPageNumber.Size = New System.Drawing.Size(100, 20)
+        Me.TextBoxDefaultPageNumber.TabIndex = 9
         '
         'frmFEKLUploader
         '
@@ -477,6 +604,9 @@ Partial Class frmFEKLUploader
         Me.TableLayoutPanel1.PerformLayout()
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
+        Me.TabPageDefaults.ResumeLayout(False)
+        Me.GroupBoxDefaults.ResumeLayout(False)
+        Me.GroupBoxDefaults.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -517,4 +647,16 @@ Partial Class frmFEKLUploader
     Friend WithEvents Panel2 As Panel
     Friend WithEvents ButtonFEKLStartStop As Button
     Friend WithEvents CheckBoxFlagDuplicates As CheckBox
+    Friend WithEvents TabPageDefaults As TabPage
+    Friend WithEvents GroupBoxDefaults As GroupBox
+    Friend WithEvents TextBoxDefaultPageNumber As TextBox
+    Friend WithEvents TextBoxDefaultSectionName As TextBox
+    Friend WithEvents TextBoxDefaultSectionId As TextBox
+    Friend WithEvents TextBoxDefaultDocumentLocation As TextBox
+    Friend WithEvents TextBoxDefaultDocumentName As TextBox
+    Friend WithEvents LabelPromptDefaultSectionName As Label
+    Friend WithEvents LabelPromptDefaultDocumentLocation As Label
+    Friend WithEvents LabelPromptDefaultPageNumber As Label
+    Friend WithEvents LabelPromptDefaultSection As Label
+    Friend WithEvents LabelPromptDefaultDocumentName As Label
 End Class
