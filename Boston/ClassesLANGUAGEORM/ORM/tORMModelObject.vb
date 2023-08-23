@@ -1769,7 +1769,7 @@ Namespace FBM
             Try
                 Me.LongDescription = asLongDescription
 
-                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id And x.ConceptType = Me.ConceptType)
 
                 If lrDictionaryEntry IsNot Nothing Then
                     lrDictionaryEntry.LongDescription = asLongDescription
@@ -1845,7 +1845,7 @@ Namespace FBM
             Try
                 Me.ShortDescription = asShortDescription
 
-                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id)
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id And x.ConceptType = Me.ConceptType)
 
                 If lrDictionaryEntry IsNot Nothing Then
                     lrDictionaryEntry.ShortDescription = asShortDescription
