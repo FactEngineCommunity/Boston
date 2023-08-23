@@ -460,44 +460,65 @@ Public Class frmGlossary
 
         Dim lsSelectedString As String = ""
 
-        With New WaitCursor
-            If Me.ListBoxGlossary.SelectedIndex >= 0 Then
-                lsSelectedString = ListBoxGlossary.GetItemText(ListBoxGlossary.SelectedItem)
-            End If
+        Try
+            With New WaitCursor
+                If Me.ListBoxGlossary.SelectedIndex >= 0 Then
+                    lsSelectedString = ListBoxGlossary.GetItemText(ListBoxGlossary.SelectedItem)
+                End If
 
-            Dim lrModelObject As FBM.ModelObject
+                Dim lrModelObject As FBM.ModelObject
 
-            If lsSelectedString <> "" Then
-                lrModelObject = Me.mrModel.GetModelObjectByName(lsSelectedString)
+                If lsSelectedString <> "" Then
+                    lrModelObject = Me.mrModel.GetModelObjectByName(lsSelectedString)
 
-                Call Me.DescribeModelElement(lrModelObject)
+                    Call Me.DescribeModelElement(lrModelObject)
 
-                'House Keeping
-                Select Case lrModelObject.GetType
-                    Case Is = GetType(FBM.FactType)
-                        Dim lrORMReadingEditor As frmToolboxORMReadingEditor
-                        lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+                    '===================================================================================
+                    'House Keeping
+                    Select Case lrModelObject.GetType
+                        Case Is = GetType(FBM.FactType)
+#Region "ORM Reading Editor - FactTypes"
+                            Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                            lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                        If IsSomething(lrORMReadingEditor) Then
+                            If IsSomething(lrORMReadingEditor) Then
 
-                            '-------------------------------------------------------------------------
-                            'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
-                            '-------------------------------------------------------------------------
-                            Dim lrPage As FBM.Page = New FBM.Page(Me.mrModel,, "Glossary Page", pcenumLanguage.ORMModel)
-                            Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage)
-                            lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
-                            lrORMReadingEditor.zrFactType = lrModelObject
-                            lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
-                            lrORMReadingEditor.DataGrid_Readings.Refresh()
-                            lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
-                            lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
-                            Call lrORMReadingEditor.SetupForm(lrPage, lrFactTypeInstance)
-                        End If
-                End Select
+                                '-------------------------------------------------------------------------
+                                'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                                '-------------------------------------------------------------------------
+                                Dim lrPage As FBM.Page = New FBM.Page(Me.mrModel,, "Glossary Page", pcenumLanguage.ORMModel)
+                                Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage)
+                                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                                lrORMReadingEditor.zrFactType = lrModelObject
+                                lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                                lrORMReadingEditor.DataGrid_Readings.Refresh()
+                                lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                                lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                                Call lrORMReadingEditor.SetupForm(lrPage, lrFactTypeInstance)
+                            End If
+#End Region
+                    End Select
+#Region "Descriptions Editor"
+                    'Setup the Descriptions toolbox
+                    Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
+                    lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
+                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                        Call lrModelElementDescriptionsEditor.setDescriptions(lrModelObject)
+                    End If
+#End Region
 
-            End If
+                End If
 
-        End With
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
