@@ -1262,6 +1262,7 @@ SkipRegistrationChecking:
                 '-------------------------------------------------------------            
                 child = prApplication.ToolboxForms.Find(AddressOf child.EqualsByName)
                 child.BringToFront()
+                Call child.setDescriptions(arModelElement)
             Else
                 '----------------------------------------------------------
                 'Create a new instance of the FactTypeReadingEditor form.
