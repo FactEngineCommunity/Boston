@@ -1690,6 +1690,12 @@
     <Compile Include="Forms\Diagrams\frmDiagramUMLUseCase.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\DialogBoxes\DlgFind.Designer.vb">
+      <DependentUpon>DlgFind.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DialogBoxes\DlgFind.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.Designer.vb">
       <DependentUpon>frmClientServerMessageBroadcast.vb</DependentUpon>
     </Compile>
@@ -2666,6 +2672,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Diagrams\frmDiagramUMLUseCase.resx">
       <DependentUpon>frmDiagramUMLUseCase.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DialogBoxes\DlgFind.resx">
+      <DependentUpon>DlgFind.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DialogBoxes\frmClientServerMessageBroadcast.resx">
       <DependentUpon>frmClientServerMessageBroadcast.vb</DependentUpon>
