@@ -43,6 +43,8 @@ Public Class frmKnowledgeExtraction
 
 	Private FEKLGPTKnowledgeExtractor As New FEKL.FEKLGPTKnowledgeExtractor
 
+	Private childDialog As Form = Nothing
+
 	''' <summary>
 	''' Changed with the user clicks on a keyword.
 	''' </summary>
@@ -170,6 +172,8 @@ Public Class frmKnowledgeExtraction
 		Try
 			Call Me.SetupForm()
 
+			Me.mrOpenAIAPI = New OpenAI_API.OpenAIAPI(New OpenAI_API.APIAuthentication(My.Settings.FactEngineOpenAIAPIKey))
+
 			' Create an instance of a ListView column sorter and assign it to the ListView control.
 			lvwColumnSorter = New ListViewColumnSorter()
 			Me.ResultListView.ListViewItemSorter = lvwColumnSorter
@@ -225,7 +229,7 @@ Public Class frmKnowledgeExtraction
 			Me.ToolStripStatusLabelChunkCount.Text = ""
 
 			Me.ComboBoxOpenAIModel.DataSource = [Enum].GetValues(GetType(pcenumOpenAIModel))
-			Me.ComboBoxOpenAIModel.SelectedIndex = 3
+			Me.ComboBoxOpenAIModel.SelectedIndex = 0
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -1979,8 +1983,6 @@ NextSentence:
 					Me.ToolStripStatusLabelChunkCount.Text = "Chunk#: " & liChunkCounter
 
 					'Do something with the current 500-word chunk, such as write it to a file or process it in some way             
-					Me.mrOpenAIAPI = New OpenAI_API.OpenAIAPI(New OpenAI_API.APIAuthentication(My.Settings.FactEngineOpenAIAPIKey))
-
 					If mbAbort Then Exit While
 
 					Try
@@ -2012,6 +2014,7 @@ NextSentence:
 									Try
 										lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
 									Catch
+										Me.RichTextBoxResults.AppendText(vbCrLf & "Error in AI API")
 										GoTo SkipSection
 									End Try
 
@@ -2020,6 +2023,7 @@ NextSentence:
 									Try
 										lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
 									Catch
+										Me.RichTextBoxResults.AppendText(vbCrLf & "Error in AI API")
 										GoTo SkipSection
 									End Try
 							End Select
@@ -2539,6 +2543,111 @@ SkipSection:
 
 		Try
 			Call Me.HighlightText()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub RichTextBoxResults_KeyDown(sender As Object, e As KeyEventArgs) Handles RichTextBoxResults.KeyDown
+
+		Try
+			If e.Control AndAlso e.KeyCode = Keys.F AndAlso Me.childDialog Is Nothing Then
+				' Create and show your dialog here
+				Dim lfrmFindDialog As New DlgFind
+				lfrmFindDialog.mRichTextBox = Me.RichTextBoxResults
+				lfrmFindDialog.Owner = Me
+				lfrmFindDialog.TopMost = True
+				Me.childDialog = lfrmFindDialog
+				AddHandler Me.childDialog.FormClosed, AddressOf ChildDialog_FormClosed ' Handle FormClosed event
+
+				'See if any text has been selected.
+				Dim selectedText As String = Me.RichTextBoxResults.SelectedText
+				If Not String.IsNullOrEmpty(selectedText) AndAlso Me.childDialog IsNot Nothing Then
+					' Call the child dialog's method with the selected text
+					lfrmFindDialog.SetFindText(selectedText)
+				End If
+
+				lfrmFindDialog.Show()
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ChildDialog_FormClosed(ByVal sender As Object, ByVal e As FormClosedEventArgs)
+		' Reset the childDialog reference to Nothing when the child dialog is closed
+		Me.childDialog = Nothing
+	End Sub
+
+	Private Sub RichTextBoxResults_Click(sender As Object, e As EventArgs) Handles RichTextBoxResults.Click
+
+		Try
+
+			If Me.childDialog IsNot Nothing AndAlso Me.childDialog.Name = DlgFind.Name Then
+
+
+				' Get the index of the cursor position in the TextBox
+				Dim index As Integer = Me.RichTextBoxResults.SelectionStart
+				' Update the value in the child dialog
+				CType(Me.childDialog, DlgFind).findIndex = index
+				CType(Me.childDialog, DlgFind).foundWord = ""
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+	End Sub
+
+	Private Sub RichTextBoxText_KeyDown(sender As Object, e As KeyEventArgs) Handles RichTextBoxText.KeyDown
+
+		Try
+			Try
+				If e.Control AndAlso e.KeyCode = Keys.F AndAlso Me.childDialog Is Nothing Then
+					' Create and show your dialog here
+					Dim lfrmFindDialog As New DlgFind
+					lfrmFindDialog.mRichTextBox = Me.RichTextBoxText
+					lfrmFindDialog.Owner = Me
+					lfrmFindDialog.TopMost = True
+					Me.childDialog = lfrmFindDialog
+					AddHandler Me.childDialog.FormClosed, AddressOf ChildDialog_FormClosed ' Handle FormClosed event
+
+					'See if any text has been selected.
+					Dim selectedText As String = Me.RichTextBoxText.SelectedText
+					If Not String.IsNullOrEmpty(selectedText) AndAlso Me.childDialog IsNot Nothing Then
+						' Call the child dialog's method with the selected text
+						lfrmFindDialog.SetFindText(selectedText)
+					End If
+
+					lfrmFindDialog.Show()
+				End If
+
+			Catch ex As Exception
+				Dim lsMessage As String
+				Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+				lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+				lsMessage &= vbCrLf & vbCrLf & ex.Message
+				prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			End Try
 
 		Catch ex As Exception
 			Dim lsMessage As String
