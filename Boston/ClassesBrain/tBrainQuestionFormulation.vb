@@ -1309,9 +1309,9 @@ Partial Public Class tBrain
                     If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Or (liInd <> 1 And Me.VAQLProcessor.ATMOSTONEStatement.KEYWDWRITTENAS IsNot Nothing) Then
                         Select Case lrQuestion.QuestionType
                             Case Is = pcenumQuestionType.CreateValueType
-                                Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent)
+                                Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                             Case Is = pcenumQuestionType.CreateEntityType
-                                Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent)
+                                Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         End Select
                     ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                         Me.AddQuestion(lrQuestion)
