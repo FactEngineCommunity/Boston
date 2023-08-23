@@ -35,35 +35,41 @@ Public Class frmPDFDocumentViewer
             Me.TableLayoutPanel1.Controls.Add(PdfViewer, 0, 1)
             PdfViewer.Dock = DockStyle.Fill
 
-            Dim loBytes() = System.IO.File.ReadAllBytes(Me.msDocumentFilePath)
+            Dim loBytes() As Byte = {}
+            Try
+                loBytes = System.IO.File.ReadAllBytes(Me.msDocumentFilePath)
+            Catch
+                Boston.ShowFlashCard("Check to see that the Document Name and Location/Path are correct.", Color.LightGray, 2500, 10)
+                Exit Sub
+            End Try
             Dim loStream = New MemoryStream(loBytes)
 
-            Dim lrPDFDocument As PdfDocument = PdfDocument.Load(loStream)
+                Dim lrPDFDocument As PdfDocument = PdfDocument.Load(loStream)
 
-            PdfViewer.Document = lrPDFDocument
+                PdfViewer.Document = lrPDFDocument
 
-            AddHandler PdfViewer.Renderer.DisplayRectangleChanged, AddressOf Me.Renderer_DisplayRectangleChanged
+                AddHandler PdfViewer.Renderer.DisplayRectangleChanged, AddressOf Me.Renderer_DisplayRectangleChanged
 
-            'Page
-            Me.TimerGotoPage.Enabled = True
-            Me.TimerGotoPage.Start()
+                'Page
+                Me.TimerGotoPage.Enabled = True
+                Me.TimerGotoPage.Start()
 
 #Region "Search"
-            _searchManager = New PdfSearchManager(PdfViewer.Renderer)
+                _searchManager = New PdfSearchManager(PdfViewer.Renderer)
 
-            '_matchCase.Checked = _searchManager.MatchCase
-            '_matchWholeWord.Checked = _searchManager.MatchWholeWord
-            '_highlightAll.Checked = _searchManager.HighlightAllMatches
-            _searchManager.HighlightAllMatches = True
+                '_matchCase.Checked = _searchManager.MatchCase
+                '_matchWholeWord.Checked = _searchManager.MatchWholeWord
+                '_highlightAll.Checked = _searchManager.HighlightAllMatches
+                _searchManager.HighlightAllMatches = True
 
-            If Me.msObjectTypeName IsNot Nothing Then
-                Call Me.FindText(Me.msObjectTypeName, True)
-            End If
+                If Me.msObjectTypeName IsNot Nothing Then
+                    Call Me.FindText(Me.msObjectTypeName, True)
+                End If
 #End Region
 
 
-        Catch ex As Exception
-            Dim lsMessage As String
+            Catch ex As Exception
+                Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -182,6 +188,23 @@ Public Class frmPDFDocumentViewer
     Private Sub Renderer_DisplayRectangleChanged(sender As Object, e As EventArgs)
         Try
             Me.ToolStripTextBoxPage.Text = (PdfViewer.Renderer.Page + 1).ToString()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CloseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CloseToolStripMenuItem.Click
+
+        Try
+            Me.Hide()
+            Me.Close()
+            Me.Dispose()
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

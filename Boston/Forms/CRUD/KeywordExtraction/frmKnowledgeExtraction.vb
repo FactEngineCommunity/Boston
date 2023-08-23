@@ -2559,7 +2559,7 @@ SkipSection:
 
 		Try
 			If e.Control AndAlso e.KeyCode = Keys.F AndAlso Me.childDialog Is Nothing Then
-				' Create and show your dialog here
+
 				Dim lfrmFindDialog As New DlgFind
 				lfrmFindDialog.mRichTextBox = Me.RichTextBoxResults
 				lfrmFindDialog.Owner = Me
@@ -2649,6 +2649,65 @@ SkipSection:
 				prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 			End Try
 
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub FindReplaceToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FindReplaceToolStripMenuItem.Click
+
+		Try
+			Dim lfrmFindDialog As New DlgFind
+			lfrmFindDialog.mRichTextBox = Me.RichTextBoxText
+			lfrmFindDialog.Owner = Me
+			lfrmFindDialog.TopMost = True
+			Me.childDialog = lfrmFindDialog
+			AddHandler Me.childDialog.FormClosed, AddressOf ChildDialog_FormClosed ' Handle FormClosed event
+
+			'See if any text has been selected.
+			Dim selectedText As String = Me.RichTextBoxText.SelectedText
+			If Not String.IsNullOrEmpty(selectedText) AndAlso Me.childDialog IsNot Nothing Then
+				' Call the child dialog's method with the selected text
+				lfrmFindDialog.SetFindText(selectedText)
+			End If
+
+			lfrmFindDialog.Show()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub ToolStripMenuItem8_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem8.Click
+
+		Try
+			Dim lfrmFindDialog As New DlgFind
+			lfrmFindDialog.mRichTextBox = Me.RichTextBoxResults
+			lfrmFindDialog.Owner = Me
+			lfrmFindDialog.TopMost = True
+			Me.childDialog = lfrmFindDialog
+			AddHandler Me.childDialog.FormClosed, AddressOf ChildDialog_FormClosed ' Handle FormClosed event
+
+			'See if any text has been selected.
+			Dim selectedText As String = Me.RichTextBoxResults.SelectedText
+			If Not String.IsNullOrEmpty(selectedText) AndAlso Me.childDialog IsNot Nothing Then
+				' Call the child dialog's method with the selected text
+				lfrmFindDialog.SetFindText(selectedText)
+			End If
+
+			lfrmFindDialog.Show()
 		Catch ex As Exception
 			Dim lsMessage As String
 			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()

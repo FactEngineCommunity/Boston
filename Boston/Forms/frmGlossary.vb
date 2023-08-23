@@ -692,7 +692,7 @@ Public Class frmGlossary
 
         Me.SplitContainer2.SplitterDistance = 0
 
-        liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height + 42 'StatusBar Height=22
+        liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height + 62 'StatusBar Height=22
 
         Me.SplitContainer2.SplitterDistance = liHeight
         'zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
@@ -2034,4 +2034,29 @@ Public Class frmGlossary
         End Try
 
     End Sub
+
+    Private Sub SplitContainer2_Paint(sender As Object, e As PaintEventArgs) Handles SplitContainer2.Paint
+
+        Try
+            Dim s As SplitContainer = TryCast(sender, SplitContainer)
+
+            If s IsNot Nothing Then
+                Dim top As Integer = 5
+                Dim bottom As Integer = s.Height - 5
+                Dim left As Integer = s.SplitterDistance
+                Dim right As Integer = left + s.SplitterWidth - 1
+                e.Graphics.FillRectangle(Brushes.LightGray, s.SplitterRectangle)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

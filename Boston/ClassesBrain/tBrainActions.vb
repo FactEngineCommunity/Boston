@@ -27,6 +27,17 @@ Partial Public Class tBrain
             Dim lsEntityTypeName As String = Trim(Me.VAQLProcessor.ENTITYTYPEISIDENTIFIEDBYITSStatement.MODELELEMENTNAME)
             Dim lsActualModelElementName As String = ""
 
+#Region "Metadata Lineage"
+            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+            If arFEKLLineageObject IsNot Nothing Then
+
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsEntityTypeName & " - Object Type")
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+            End If
+#End Region
+
             If Me.Model.GetConceptTypeByNameFuzzy(lsEntityTypeName, lsActualModelElementName) = pcenumConceptType.EntityType Then
                 '---------------------------------------------------------
                 'Great! The name identified by the user is an EntityType
@@ -82,7 +93,18 @@ Partial Public Class tBrain
                 End If
             Next
 
-            Call lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, abBroadcastInterfaceEvent)
+            Dim lrValueType = lrEntityType.SetReferenceMode(lsReferenceMode, False, Nothing, abBroadcastInterfaceEvent)
+
+#Region "Metadata Lineage"
+            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+            If arFEKLLineageObject IsNot Nothing Then
+
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrValueType.Id & " - Object Type")
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+            End If
+#End Region
 
             'Check if the DataType of the ReferenceModeValueType has been specified
             Dim lsDataTypeName As String = ""
@@ -751,8 +773,8 @@ Partial Public Class tBrain
     End Function
 
     Private Function ProcessStatementAddEntityType(ByRef arQuestion As tQuestion,
-                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
+                                                   Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                   Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Try
             Me.Model = prApplication.WorkingModel
@@ -828,13 +850,13 @@ Partial Public Class tBrain
 
         Catch ex As Exception
             Dim lsMessage As String
-        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
-        Return False
+            Return False
         End Try
     End Function
 
@@ -873,9 +895,29 @@ Partial Public Class tBrain
                             If Me.Model.ModelElementIsGeneralConceptOnly(Trim(lrResolvedWord.Word)) Then
                                 Select Case My.Settings.DefaultGeneralConceptToObjectTypeConversion
                                     Case Is = "Value Type"
-                                        Call Me.Model.CreateValueType(lrResolvedWord.Word, True, ,,, abBroadcastInterfaceEvent)
+                                        lrValueType = Me.Model.CreateValueType(lrResolvedWord.Word, True, ,,, abBroadcastInterfaceEvent)
+#Region "Metadata Lineage"
+                                        'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+                                        '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+                                        If arFEKLLineageObject IsNot Nothing Then
+
+                                            Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrValueType.Id & " - Object Type")
+                                            Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+                                        End If
+#End Region
                                     Case Is = "Entity Type"
-                                        Call Me.Model.CreateEntityType(lrResolvedWord.Word, True, abBroadcastInterfaceEvent, False, True)
+                                        lrEntityType = Me.Model.CreateEntityType(lrResolvedWord.Word, True, abBroadcastInterfaceEvent, False, True)
+#Region "Metadata Lineage"
+                                        'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+                                        '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+                                        If arFEKLLineageObject IsNot Nothing Then
+
+                                            Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrEntityType.Id & " - Object Type")
+                                            Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+                                        End If
+#End Region
                                 End Select
                                 GoTo ModelElementFound
                             Else
@@ -2361,6 +2403,17 @@ EndProcessing:
 
                 Dim lrValueType As FBM.ValueType
                 lrValueType = Me.Model.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
+
+#Region "Metadata Lineage"
+                'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+                '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+                If arFEKLLineageObject IsNot Nothing Then
+
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrValueType.Id & " - Object Type")
+                    Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+                End If
+#End Region
 
                 If Me.Page IsNot Nothing Then
 

@@ -1262,7 +1262,6 @@ SkipRegistrationChecking:
                 '-------------------------------------------------------------            
                 child = prApplication.ToolboxForms.Find(AddressOf child.EqualsByName)
                 child.BringToFront()
-                Call child.setDescriptions(arModelElement)
             Else
                 '----------------------------------------------------------
                 'Create a new instance of the FactTypeReadingEditor form.
@@ -1278,8 +1277,6 @@ SkipRegistrationChecking:
                     child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
                     child.DockTo(lrPane, DockStyle.Fill, 0)
                     prApplication.ToolboxForms.Add(child)
-
-                    Call child.setDescriptions(arModelElement)
                 Else
                     '--------------------------------------------------
                     'Add the ORMReadingEditor form to the bottom of the Page
@@ -1290,6 +1287,11 @@ SkipRegistrationChecking:
                 prApplication.ToolboxForms.Add(child)
             End If
 
+            Try
+                Call child.setDescriptions(arModelElement)
+            Catch ex As Exception
+                'We tried
+            End Try
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1329,6 +1331,7 @@ SkipRegistrationChecking:
                     Dim lrPane As WeifenLuo.WinFormsUI.Docking.DockPane
 
                     prApplication.ToolboxForms(0).Focus()
+
                     lrPane = prApplication.ToolboxForms(0).Pane
                     child.MdiParent = Me
                     child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)

@@ -333,7 +333,7 @@ Partial Class frmToolboxEnterpriseExplorer
         '
         Me.ContextMenuStrip_ORMModel.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewModelDictionaryToolStripMenuItem, Me.ViewGlossaryToolStripMenuItem, Me.ViewDatabaseSchemaToolStripMenuItem, Me.GenerateDocumentationToolStripMenuItem, Me.ToolStripMenuItemCodeGenerator, Me.FactEngineToolStripMenuItem, Me.ToolStripMenuItemTaxonomyTree, Me.ToolStripMenuItemKeywordExtractionTool, Me.FEKLUploaderToolStripMenuItem, Me.EditAITrainingDataEditorToolStripMenuItem, Me.VirtualBusinessAnalystToolStripMenuItem, Me.ToolStripSeparator7, Me.AddPageToolStripMenuItem1, Me.ToolStripMenuItemPastePage, Me.ToolStripMenuItemLanguage, Me.ToolStripSeparator1, Me.ToolStripMenuItemEmptyModel, Me.HideToolStripMenuItem, Me.HideAllotherModelsToolStripMenuItem, Me.RenameToolStripMenuItem, Me.ToolStripMenuItemMoveModel, Me.ToolStripMenuItemShareModelWithProject, Me.DeleteModelToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemModelConfiguration, Me.ToolStripSeparator5, Me.ImportExportToolStripMenuItem, Me.ToolStripMenuItemFixModelErrors})
         Me.ContextMenuStrip_ORMModel.Name = "ContextMenuStrip_ORMModel"
-        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(220, 556)
+        Me.ContextMenuStrip_ORMModel.Size = New System.Drawing.Size(220, 578)
         '
         'ViewModelDictionaryToolStripMenuItem
         '

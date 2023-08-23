@@ -197,7 +197,11 @@ Public Class frmFEKLUploader
                             lrFEKLLineageObject.DocumentLocation = Me.TextBoxDefaultDocumentLocation.Text.Trim
                             lrFEKLLineageObject.SectionId = Me.TextBoxDefaultSectionId.Text.Trim
                             lrFEKLLineageObject.SectionName = Me.TextBoxDefaultSectionName.Text.Trim
-                            lrFEKLLineageObject.PageNumber = If(Me.TextBoxDefaultPageNumber.Text.Trim = "", 0, Me.TextBoxDefaultPageNumber.Text.Trim)
+                            Try
+                                lrFEKLLineageObject.PageNumber = If(Me.TextBoxDefaultPageNumber.Text.Trim = "", 0, Me.TextBoxDefaultPageNumber.Text.Trim)
+                            Catch
+                                lrFEKLLineageObject.PageNumber = 0
+                            End Try
                         End If
 
                         lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lsFEKLStatement, lrFEKLLineageObject)
@@ -263,6 +267,11 @@ Public Class frmFEKLUploader
                     Exit For
                 End Try
             Next
+
+            miFEKLStraightProcessedUpToLine = 0
+            Me.ButtonFEKLStartStop.BackColor = Color.DarkSeaGreen
+            Me.ButtonFEKLStartStop.Text = "Start Processing"
+            Me.ButtonFEKLStartStop.Tag = "Paused"
 
             If Not lbErrorThrown Then
                 Dim lfrmFlashCard As New frmFlashCard
@@ -696,8 +705,10 @@ Public Class frmFEKLUploader
                 'liInd += 1
             Next
 
-            'Buttons
-            Me.ButtonStopContinueProcessing.Visible = False
+            Me.ButtonStopContinueProcessing.BackColor = Color.DarkSeaGreen
+            Me.ButtonStopContinueProcessing.Text = "Start Processing"
+            Me.ButtonStopContinueProcessing.Tag = "Paused"
+
 
             Dim lsFlashText = "Success. FEKL loaded."
             Dim liErrorCount = Me.mrFEKL4JSON.FEKLStatement.Where(Function(x) x.InError).Count
@@ -719,45 +730,77 @@ Public Class frmFEKLUploader
 
     Private Sub ButtonStopContinueProcessing_Click(sender As Object, e As EventArgs) Handles ButtonStopContinueProcessing.Click
 
-        Dim lbHasProcessedFEKLStatements = Me.mrFEKL4JSON.FEKLStatement.FindAll(Function(x) x.Processed).Count > 0
+        Dim lsMessage As String
 
-        Dim larContinuePromptStatus = {"Paused", "NotYetStarted"}
+        Try
 
-        If larContinuePromptStatus.Contains(Me.ButtonStopContinueProcessing.Tag) Then
-            'Start Processing, but show Red Pause Button
-            Me.ButtonStopContinueProcessing.BackColor = Color.IndianRed
-            Me.ButtonStopContinueProcessing.Text = "Pause Processing"
-            Me.ButtonStopContinueProcessing.Tag = "Processing"
+            Dim lbHasProcessedFEKLStatements = Me.mrFEKL4JSON.FEKLStatement.FindAll(Function(x) x.Processed).Count > 0
 
-            Me.mbProcessingPaused = False
+            Dim larContinuePromptStatus = {"Paused", "NotYetStarted"}
 
-            If lbHasProcessedFEKLStatements Then
-                If MsgBox("Do you want to ignore previously processed FEKL Statements?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                    Call Me.LoadFEKLStatementsIntoModelJSON()
+            If larContinuePromptStatus.Contains(Me.ButtonStopContinueProcessing.Tag) Then
+                'Start Processing, but show Red Pause Button
+                Me.ButtonStopContinueProcessing.BackColor = Color.IndianRed
+                Me.ButtonStopContinueProcessing.Text = "Pause Processing"
+                Me.ButtonStopContinueProcessing.Tag = "Processing"
+
+                Me.mbProcessingPaused = False
+
+#Region "Check for Defaults"
+                If Me.TextBoxDefaultDocumentName.Text.Trim <> "" Or
+                        Me.TextBoxDefaultDocumentLocation.Text.Trim <> "" Or
+                        Me.TextBoxDefaultSectionId.Text.Trim <> "" Or
+                        Me.TextBoxDefaultSectionName.Text.Trim <> "" _
+                        Or Me.TextBoxDefaultPageNumber.Text.Trim <> "" Then
+
+                    lsMessage = "There are default Metadata Lineage items set in the [Default] tab."
+                    lsMessage.AppendDoubleLineBreak("Do you want to continue?")
+                    lsMessage.AppendDoubleLineBreak("Recommendation: Continue if you are happy for the defaults to have priority over Medata Lineage items in your JSON file.")
+                    If Not MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                        Me.ButtonStopContinueProcessing.BackColor = Color.DarkSeaGreen
+                        Me.ButtonStopContinueProcessing.Text = "Continue Processing"
+                        Me.ButtonStopContinueProcessing.Tag = "Paused"
+                        Exit Sub
+                    End If
+                End If
+#End Region
+
+                If lbHasProcessedFEKLStatements Then
+                    If MsgBox("Do you want to ignore previously processed FEKL Statements?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                        Call Me.LoadFEKLStatementsIntoModelJSON()
+                    Else
+                        Call Me.LoadFEKLStatementsIntoModelJSON(False)
+                    End If
+
                 Else
-                    Call Me.LoadFEKLStatementsIntoModelJSON(False)
+                    Call Me.LoadFEKLStatementsIntoModelJSON()
+                    End If
+
+                ElseIf Me.ButtonStopContinueProcessing.Tag = "Processing" Then
+                    'Pause Processing, but show Green Continue Processing button
+                    Me.ButtonStopContinueProcessing.BackColor = Color.DarkSeaGreen
+                    Me.ButtonStopContinueProcessing.Text = "Continue Processing"
+                    Me.ButtonStopContinueProcessing.Tag = "Paused"
+
+                    Me.mbProcessingPaused = True
                 End If
 
-            Else
-                Call Me.LoadFEKLStatementsIntoModelJSON()
-            End If
+                Me.ButtonStopContinueProcessing.Refresh()
+                Me.ButtonStopContinueProcessing.Invalidate()
+                Me.DataGridViewFEKLStatements.Refresh()
+                Me.DataGridViewFEKLStatements.Invalidate()
 
-        ElseIf Me.ButtonStopContinueProcessing.Tag = "Processing" Then
-            'Pause Processing, but show Green Continue Processing button
-            Me.ButtonStopContinueProcessing.BackColor = Color.DarkSeaGreen
-            Me.ButtonStopContinueProcessing.Text = "Continue Processing"
-            Me.ButtonStopContinueProcessing.Tag = "Paused"
+                Me.Invalidate()
 
-            Me.mbProcessingPaused = True
-        End If
+        Catch ex As Exception
 
-        Me.ButtonStopContinueProcessing.Refresh()
-        Me.ButtonStopContinueProcessing.Invalidate()
-        Me.DataGridViewFEKLStatements.Refresh()
-        Me.DataGridViewFEKLStatements.Invalidate()
 
-        Me.Invalidate()
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
     Private Sub frmFEKLUploader_Resize(sender As Object, e As EventArgs) Handles Me.Resize
@@ -778,6 +821,8 @@ Public Class frmFEKLUploader
 
     Private Sub ButtonFEKLStartStop_Click(sender As Object, e As EventArgs) Handles ButtonFEKLStartStop.Click
 
+        Dim lsMessage As String
+
         Try
             Dim lbHasProcessedFEKLStatements = Me.miFEKLStraightProcessedUpToLine > 0
 
@@ -791,7 +836,27 @@ Public Class frmFEKLUploader
 
                 Me.mbProcessingPaused = False
 
+#Region "Check for Defaults"
+                If Me.TextBoxDefaultDocumentName.Text.Trim <> "" Or
+                        Me.TextBoxDefaultDocumentLocation.Text.Trim <> "" Or
+                        Me.TextBoxDefaultSectionId.Text.Trim <> "" Or
+                        Me.TextBoxDefaultSectionName.Text.Trim <> "" _
+                        Or Me.TextBoxDefaultPageNumber.Text.Trim <> "" Then
+
+                    lsMessage = "There are default Metadata Lineage items set in the [Default] tab."
+                    lsMessage.AppendDoubleLineBreak("Do you want to continue?")
+                    lsMessage.AppendDoubleLineBreak("Recommendation: Continue if you are happy with the default Medata Lineage items in the [Defaults] tab.")
+                    If Not MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                        Me.ButtonFEKLStartStop.BackColor = Color.DarkSeaGreen
+                        Me.ButtonFEKLStartStop.Text = "Start Processing"
+                        Me.ButtonFEKLStartStop.Tag = "Paused"
+                        Exit Sub
+                    End If
+                End If
+#End Region
+
                 If lbHasProcessedFEKLStatements Then
+
                     If MsgBox("Do you want to ignore previously processed FEKL Statements?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
                         'Nothing to do
                     Else
@@ -817,7 +882,6 @@ Public Class frmFEKLUploader
             Me.Invalidate()
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name

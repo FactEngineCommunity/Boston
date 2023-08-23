@@ -23,6 +23,7 @@ Partial Class frmGlossary
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGlossary))
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TextboxSearch = New CustomSearchTextbox()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
@@ -35,6 +36,7 @@ Partial Class frmGlossary
         Me.ToolStripMenuItemViewOnPage = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemViewInDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowInModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowInDescriptionEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DataLineageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemRemoveFromModel = New System.Windows.Forms.ToolStripMenuItem()
@@ -51,7 +53,6 @@ Partial Class frmGlossary
         Me.LabelModelElement = New System.Windows.Forms.Label()
         Me.ButtonViewLineage = New System.Windows.Forms.Button()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
-        Me.ShowInDescriptionEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -162,7 +163,7 @@ Partial Class frmGlossary
         '
         Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ShowInModelDictionaryToolStripMenuItem, Me.ShowInDescriptionEditorToolStripMenuItem, Me.DataLineageToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripSeparator2, Me.PropertiesToolStripMenuItem1})
         Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
-        Me.ContextMenuStripMain.Size = New System.Drawing.Size(214, 192)
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(214, 170)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -183,6 +184,13 @@ Partial Class frmGlossary
         Me.ShowInModelDictionaryToolStripMenuItem.Name = "ShowInModelDictionaryToolStripMenuItem"
         Me.ShowInModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(213, 22)
         Me.ShowInModelDictionaryToolStripMenuItem.Text = "Show in Model &Dictionary"
+        '
+        'ShowInDescriptionEditorToolStripMenuItem
+        '
+        Me.ShowInDescriptionEditorToolStripMenuItem.Image = CType(resources.GetObject("ShowInDescriptionEditorToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.ShowInDescriptionEditorToolStripMenuItem.Name = "ShowInDescriptionEditorToolStripMenuItem"
+        Me.ShowInDescriptionEditorToolStripMenuItem.Size = New System.Drawing.Size(213, 22)
+        Me.ShowInDescriptionEditorToolStripMenuItem.Text = "Show in &Description Editor"
         '
         'DataLineageToolStripMenuItem
         '
@@ -217,6 +225,7 @@ Partial Class frmGlossary
         '
         'SplitContainer2
         '
+        Me.SplitContainer2.BackColor = System.Drawing.SystemColors.Control
         Me.SplitContainer2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.SplitContainer2.Location = New System.Drawing.Point(0, 0)
         Me.SplitContainer2.Name = "SplitContainer2"
@@ -333,12 +342,6 @@ Partial Class frmGlossary
         Me.WebBrowser.Name = "WebBrowser"
         Me.WebBrowser.Size = New System.Drawing.Size(676, 329)
         Me.WebBrowser.TabIndex = 2
-        '
-        'ShowInDescriptionEditorToolStripMenuItem
-        '
-        Me.ShowInDescriptionEditorToolStripMenuItem.Name = "ShowInDescriptionEditorToolStripMenuItem"
-        Me.ShowInDescriptionEditorToolStripMenuItem.Size = New System.Drawing.Size(213, 22)
-        Me.ShowInDescriptionEditorToolStripMenuItem.Text = "Show in &Description Editor"
         '
         'frmGlossary
         '

@@ -97,7 +97,7 @@ Partial Public Class tBrain
                         lrQuestion.ValueType(0).DataTypePrecision = 0
 
                         If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                            Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent)
+                            Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                             Me.AddQuestion(lrQuestion)
                         End If
@@ -120,7 +120,7 @@ Partial Public Class tBrain
                         lrQuestion.ModelObject.Add(lrEntityType)
 
                         If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                            Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent)
+                            Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                             Me.AddQuestion(lrQuestion)
                         End If
@@ -190,7 +190,7 @@ Partial Public Class tBrain
                     End If
 
                     If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                        Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent)
+                        Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                     ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                         Me.AddQuestion(lrQuestion)
                     End If
@@ -366,7 +366,7 @@ Partial Public Class tBrain
                         lrQuestion.ValueType(0).DataTypePrecision = 0
 
                         If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                            Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent)
+                            Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                             Me.AddQuestion(lrQuestion)
                         End If
@@ -389,7 +389,7 @@ Partial Public Class tBrain
                         lrQuestion.ModelObject.Add(lrEntityType)
 
                         If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                            Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent)
+                            Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                             Me.AddQuestion(lrQuestion)
                         End If
@@ -459,7 +459,7 @@ Partial Public Class tBrain
                     End If
 
                     If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                        Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent)
+                        Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                     ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                         Me.AddQuestion(lrQuestion)
                     End If
@@ -632,7 +632,7 @@ Partial Public Class tBrain
                         lrQuestion.ValueType(0).DataTypePrecision = 0
 
                         If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                            Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent)
+                            Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                             Me.AddQuestion(lrQuestion)
                         End If
@@ -655,7 +655,7 @@ Partial Public Class tBrain
                         lrQuestion.ModelObject.Add(lrEntityType)
 
                         If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                            Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent)
+                            Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                             Me.AddQuestion(lrQuestion)
                         End If
@@ -742,7 +742,7 @@ Partial Public Class tBrain
                         End If
 
                         If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                            Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent)
+                            Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                             Me.AddQuestion(lrQuestion)
                         End If
@@ -765,7 +765,7 @@ Partial Public Class tBrain
                         lrQuestion.ModelObject.Add(lrEntityType)
 
                         If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                            Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent)
+                            Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                             Me.AddQuestion(lrQuestion)
                         End If
@@ -1021,9 +1021,9 @@ Partial Public Class tBrain
                     If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
                         Select Case lrQuestion.QuestionType
                             Case Is = pcenumQuestionType.CreateValueType
-                                Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent)
+                                Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                             Case Is = pcenumQuestionType.CreateEntityType
-                                Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent)
+                                Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
                         End Select
 
                     ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then

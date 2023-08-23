@@ -2772,13 +2772,13 @@ FailsafeContinue:
         ''' <param name="abSimpleAssignment">True if just setting the ReferenceMode without creating references or changing anything, else False</param>
         ''' <param name="asValueTypeName">Provided if the name for the ValueType is known and need not be generated.</param>
         ''' <remarks></remarks>
-        Public Overrides Sub SetReferenceMode(ByVal asReferenceMode As String,
-                                              Optional ByVal abSimpleAssignment As Boolean = False,
-                                              Optional ByVal asValueTypeName As String = Nothing,
-                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                              Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
-                                              Optional ByVal abSuppressModelSave As Boolean = False,
-                                              Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False)
+        Public Overrides Function SetReferenceMode(ByVal asReferenceMode As String,
+                                                   Optional ByVal abSimpleAssignment As Boolean = False,
+                                                   Optional ByVal asValueTypeName As String = Nothing,
+                                                   Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                   Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
+                                                   Optional ByVal abSuppressModelSave As Boolean = False,
+                                                   Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False) As FBM.ValueType
 
             Try
                 If IsSomething(Me.ReferenceModeValueType) Or IsSomething(Me.ReferenceModeFactType) Then
@@ -2866,6 +2866,10 @@ FailsafeContinue:
                     Call Me.Model.Save()
                 End If
 
+                If Me.ReferenceModeValueType IsNot Nothing Then
+                    Return Me.ReferenceModeValueType
+                End If
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -2873,9 +2877,11 @@ FailsafeContinue:
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return Nothing
             End Try
 
-        End Sub
+        End Function
 
         Public Function MakeReferenceModeName() As String
 

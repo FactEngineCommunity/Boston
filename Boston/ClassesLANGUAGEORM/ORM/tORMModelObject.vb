@@ -1830,15 +1830,16 @@ Namespace FBM
             'See inherited Classes.
         End Function
 
-        Public Overridable Sub SetReferenceMode(ByVal asReferenceMode As String,
-                                                Optional ByVal abSimpleAssignment As Boolean = False,
-                                                Optional ByVal asValueTypeName As String = Nothing,
-                                                Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
-                                                Optional ByVal abSuppressModelSave As Boolean = False,
-                                                Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False)
+        Public Overridable Function SetReferenceMode(ByVal asReferenceMode As String,
+                                                     Optional ByVal abSimpleAssignment As Boolean = False,
+                                                     Optional ByVal asValueTypeName As String = Nothing,
+                                                     Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                     Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
+                                                     Optional ByVal abSuppressModelSave As Boolean = False,
+                                                     Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False) As FBM.ValueType
+            Return Nothing
 
-        End Sub
+        End Function
 
         Public Sub SetShortDescription(ByVal asShortDescription As String)
 

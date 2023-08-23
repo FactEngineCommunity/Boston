@@ -95,6 +95,12 @@ Partial Class frmKnowledgeExtraction
         Me.GroupBoxStatistical = New System.Windows.Forms.GroupBox()
         Me.GroupboxCoreNLP = New System.Windows.Forms.GroupBox()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FindReplaceToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MenuStrip2 = New System.Windows.Forms.MenuStrip()
+        Me.ToolStripMenuItem7 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem8 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStripKeyword.SuspendLayout()
         Me.ContextMenuStripTextbox.SuspendLayout()
         Me.ContextMenuStripTextboxSelection.SuspendLayout()
@@ -114,6 +120,8 @@ Partial Class frmKnowledgeExtraction
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.MenuStrip1.SuspendLayout()
+        Me.MenuStrip2.SuspendLayout()
         Me.SuspendLayout()
         '
         'HelpButton
@@ -403,6 +411,7 @@ Partial Class frmKnowledgeExtraction
         '
         Me.TabDocumentText.Controls.Add(Me.Button1)
         Me.TabDocumentText.Controls.Add(Me.RichTextBoxText)
+        Me.TabDocumentText.Controls.Add(Me.MenuStrip1)
         Me.TabDocumentText.Location = New System.Drawing.Point(4, 22)
         Me.TabDocumentText.Name = "TabDocumentText"
         Me.TabDocumentText.Padding = New System.Windows.Forms.Padding(3)
@@ -595,6 +604,7 @@ Partial Class frmKnowledgeExtraction
         Me.TabPageResults.Controls.Add(Me.ButtonAbort)
         Me.TabPageResults.Controls.Add(Me.ProgressBar)
         Me.TabPageResults.Controls.Add(Me.RichTextBoxResults)
+        Me.TabPageResults.Controls.Add(Me.MenuStrip2)
         Me.TabPageResults.Location = New System.Drawing.Point(4, 22)
         Me.TabPageResults.Name = "TabPageResults"
         Me.TabPageResults.Padding = New System.Windows.Forms.Padding(3)
@@ -615,7 +625,7 @@ Partial Class frmKnowledgeExtraction
         '
         'ButtonAbort
         '
-        Me.ButtonAbort.Location = New System.Drawing.Point(6, 8)
+        Me.ButtonAbort.Location = New System.Drawing.Point(6, 36)
         Me.ButtonAbort.Name = "ButtonAbort"
         Me.ButtonAbort.Size = New System.Drawing.Size(43, 23)
         Me.ButtonAbort.TabIndex = 10
@@ -625,7 +635,7 @@ Partial Class frmKnowledgeExtraction
         '
         'ProgressBar
         '
-        Me.ProgressBar.Location = New System.Drawing.Point(55, 17)
+        Me.ProgressBar.Location = New System.Drawing.Point(55, 45)
         Me.ProgressBar.Name = "ProgressBar"
         Me.ProgressBar.Size = New System.Drawing.Size(100, 14)
         Me.ProgressBar.TabIndex = 9
@@ -638,9 +648,9 @@ Partial Class frmKnowledgeExtraction
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.RichTextBoxResults.ContextMenuStrip = Me.ContextMenuStripResultsSelection
         Me.RichTextBoxResults.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.RichTextBoxResults.Location = New System.Drawing.Point(6, 37)
+        Me.RichTextBoxResults.Location = New System.Drawing.Point(6, 65)
         Me.RichTextBoxResults.Name = "RichTextBoxResults"
-        Me.RichTextBoxResults.Size = New System.Drawing.Size(472, 299)
+        Me.RichTextBoxResults.Size = New System.Drawing.Size(472, 271)
         Me.RichTextBoxResults.TabIndex = 0
         Me.RichTextBoxResults.Text = ""
         '
@@ -756,6 +766,50 @@ Partial Class frmKnowledgeExtraction
         Me.SplitContainer1.SplitterDistance = 502
         Me.SplitContainer1.TabIndex = 12
         '
+        'MenuStrip1
+        '
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EditToolStripMenuItem})
+        Me.MenuStrip1.Location = New System.Drawing.Point(3, 3)
+        Me.MenuStrip1.Name = "MenuStrip1"
+        Me.MenuStrip1.Size = New System.Drawing.Size(478, 24)
+        Me.MenuStrip1.TabIndex = 48
+        Me.MenuStrip1.Text = "MenuStrip1"
+        '
+        'EditToolStripMenuItem
+        '
+        Me.EditToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FindReplaceToolStripMenuItem})
+        Me.EditToolStripMenuItem.Name = "EditToolStripMenuItem"
+        Me.EditToolStripMenuItem.Size = New System.Drawing.Size(39, 20)
+        Me.EditToolStripMenuItem.Text = "&Edit"
+        '
+        'FindReplaceToolStripMenuItem
+        '
+        Me.FindReplaceToolStripMenuItem.Name = "FindReplaceToolStripMenuItem"
+        Me.FindReplaceToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
+        Me.FindReplaceToolStripMenuItem.Text = "&Find / Replace"
+        '
+        'MenuStrip2
+        '
+        Me.MenuStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem7})
+        Me.MenuStrip2.Location = New System.Drawing.Point(3, 3)
+        Me.MenuStrip2.Name = "MenuStrip2"
+        Me.MenuStrip2.Size = New System.Drawing.Size(478, 24)
+        Me.MenuStrip2.TabIndex = 12
+        Me.MenuStrip2.Text = "MenuStrip2"
+        '
+        'ToolStripMenuItem7
+        '
+        Me.ToolStripMenuItem7.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem8})
+        Me.ToolStripMenuItem7.Name = "ToolStripMenuItem7"
+        Me.ToolStripMenuItem7.Size = New System.Drawing.Size(39, 20)
+        Me.ToolStripMenuItem7.Text = "&Edit"
+        '
+        'ToolStripMenuItem8
+        '
+        Me.ToolStripMenuItem8.Name = "ToolStripMenuItem8"
+        Me.ToolStripMenuItem8.Size = New System.Drawing.Size(180, 22)
+        Me.ToolStripMenuItem8.Text = "&Find / Replace"
+        '
         'frmKnowledgeExtraction
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -774,6 +828,7 @@ Partial Class frmKnowledgeExtraction
         Me.Controls.Add(Me.PathTextBox)
         Me.Controls.Add(Me.PathLabel)
         Me.Controls.Add(Me.StatusLabel)
+        Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmKnowledgeExtraction"
         Me.Text = "Knowledge Extraction (beta)"
         Me.ContextMenuStripKeyword.ResumeLayout(False)
@@ -781,6 +836,7 @@ Partial Class frmKnowledgeExtraction
         Me.ContextMenuStripTextboxSelection.ResumeLayout(False)
         Me.TabControl1.ResumeLayout(False)
         Me.TabDocumentText.ResumeLayout(False)
+        Me.TabDocumentText.PerformLayout()
         Me.TabPageAIExtraction.ResumeLayout(False)
         Me.TabControl2.ResumeLayout(False)
         Me.TabPagePromptSelection.ResumeLayout(False)
@@ -789,6 +845,7 @@ Partial Class frmKnowledgeExtraction
         Me.TabPageSettings.ResumeLayout(False)
         Me.TabPageSettings.PerformLayout()
         Me.TabPageResults.ResumeLayout(False)
+        Me.TabPageResults.PerformLayout()
         Me.ContextMenuStripResultsSelection.ResumeLayout(False)
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
@@ -798,6 +855,10 @@ Partial Class frmKnowledgeExtraction
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        Me.MenuStrip1.ResumeLayout(False)
+        Me.MenuStrip1.PerformLayout()
+        Me.MenuStrip2.ResumeLayout(False)
+        Me.MenuStrip2.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -875,4 +936,10 @@ Partial Class frmKnowledgeExtraction
     Friend WithEvents LabelPromptChunkSize As Label
     Friend WithEvents TextBoxMaxTokens As TextBox
     Friend WithEvents LabelPromptMaxTokens As Label
+    Friend WithEvents MenuStrip1 As MenuStrip
+    Friend WithEvents EditToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents FindReplaceToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents MenuStrip2 As MenuStrip
+    Friend WithEvents ToolStripMenuItem7 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem8 As ToolStripMenuItem
 End Class
