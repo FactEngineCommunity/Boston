@@ -305,6 +305,9 @@ EndTextboxSetup:
         Try
             Dim larLinesagePropertySet As List(Of DataLineage.DataLineageItemProperty) = Me.BindingSourceLineageProperty.Current
 
+            'CodeSafe
+            If larLinesagePropertySet Is Nothing Then Exit Sub
+
 #Region "Text Field"
             Dim loTextField As Windows.Forms.TextBox
 
