@@ -8552,11 +8552,15 @@ Public Class frmDiagramORMForGlossary
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrPage.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)
 
-            lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-            Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrEntityTypeInstance.EntityType, Control.ModifierKeys = Keys.Control)
+            Try
+                lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+                Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrEntityTypeInstance.EntityType, Control.ModifierKeys = Keys.Control)
+            Catch
+                Boston.ShowFlashCard("Oops. Try reselecting the Model Element.", Color.LightGray, 11)
+            End Try
 
         Catch ex As Exception
-            Dim lsMessage1 As String
+                Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
