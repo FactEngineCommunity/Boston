@@ -12,6 +12,106 @@ Imports System.Dynamic
 
 Module MyMethodExtensions
 
+    ''' <summary>
+    ''' RichTextBox: Move cursor and scroll to index.
+    ''' </summary>
+    ''' <param name="richTextBox"></param>
+    ''' <param name="index"></param>
+    <Extension()>
+    Public Sub MoveCursorAndScrollToIndex(ByVal richTextBox As RichTextBox, ByVal index As Integer)
+        If index >= 0 AndAlso index <= richTextBox.TextLength Then
+            richTextBox.SelectionStart = index
+            richTextBox.SelectionLength = 0
+            richTextBox.ScrollToCaret()
+        Else
+            ' Handle the case where the index is out of bounds.
+        End If
+    End Sub
+
+
+    ''' <summary>
+    ''' RichTextBox: FindAndReplaceAll
+    ''' </summary>
+    ''' <param name="richTextBox"></param>
+    ''' <param name="findText"></param>
+    ''' <param name="replaceText"></param>
+    <Extension()>
+    Public Sub FindAndReplaceAll(ByVal richTextBox As RichTextBox, ByVal findText As String, ByVal replaceText As String)
+        Dim index As Integer = richTextBox.Text.IndexOf(findText)
+        While index <> -1
+            richTextBox.SelectionStart = index
+            richTextBox.SelectionLength = findText.Length
+            richTextBox.SelectedText = replaceText
+            index = richTextBox.Text.IndexOf(findText, index + replaceText.Length)
+        End While
+    End Sub
+
+
+    ''' <summary>
+    ''' Richtextbox: FindReplaceNext
+    ''' </summary>
+    ''' <param name="richTextBox"></param>
+    ''' <param name="findText"></param>
+    ''' <param name="replaceText"></param>
+    ''' <param name="startIndex"></param>
+    <Extension()>
+    Public Sub FindReplaceNext(ByVal richTextBox As RichTextBox,
+                               ByVal findText As String,
+                               ByVal replaceText As String,
+                               ByVal startIndex As Integer,
+                               ByRef aiFoundIndex As Integer)
+
+        If startIndex < 0 OrElse startIndex > richTextBox.TextLength Then
+            ' Handle the case where the startIndex is out of bounds
+            Return
+        End If
+
+        Dim index As Integer = richTextBox.Text.IndexOf(findText, startIndex)
+        If index <> -1 Then
+            richTextBox.SelectionStart = index
+            richTextBox.SelectionLength = findText.Length
+            richTextBox.SelectedText = replaceText
+            richTextBox.SelectionStart = index ' Optional: set the cursor after the replaced text
+            richTextBox.ScrollToCaret() ' Optional: scroll to the replaced text
+            aiFoundIndex = index
+        Else
+            ' Handle the case where the text is not found
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' RichTextBox: Highlight Text
+    ''' </summary>
+    ''' <param name="richTextBox"></param>
+    ''' <param name="startIndex"></param>
+    ''' <param name="wordLength"></param>
+    <Extension()>
+    Public Sub HighlightText(ByVal richTextBox As RichTextBox, ByVal startIndex As Integer, ByVal wordLength As Integer)
+        If startIndex < 0 OrElse startIndex + wordLength > richTextBox.TextLength Then
+            ' Handle the case where the startIndex or wordLength is out of bounds
+            Return
+        End If
+
+        richTextBox.SelectionStart = startIndex
+        richTextBox.SelectionLength = wordLength
+
+        ' Set the selection background color to blue and the text color to white
+        richTextBox.SelectionBackColor = Color.Blue
+        richTextBox.SelectionColor = Color.White
+    End Sub
+
+    ''' <summary>
+    ''' RichTextBox: Reset highlighting
+    ''' </summary>
+    ''' <param name="richTextBox"></param>
+    <Extension()>
+    Public Sub ResetHighlighting(ByVal richTextBox As RichTextBox)
+        richTextBox.SelectAll()
+        richTextBox.SelectionBackColor = Color.White ' Reset background color
+        richTextBox.SelectionColor = Color.Black ' Reset text color
+        richTextBox.SelectionLength = 0 ' Deselect everything
+    End Sub
+
     <Extension()>
     Public Function CondenseString(ByVal input As String, ByVal startLength As Integer, ByVal endLength As Integer, ByVal ellipsisCount As Integer) As String
         If input.Length <= startLength + endLength + ellipsisCount Then
