@@ -750,67 +750,93 @@ Partial Public Class tBrain
 
     End Function
 
-    Private Sub ProcessStatementAddEntityType(ByRef arQuestion As tQuestion,
-                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+    Private Function ProcessStatementAddEntityType(ByRef arQuestion As tQuestion,
+                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
-        Me.Model = prApplication.WorkingModel
+        Try
+            Me.Model = prApplication.WorkingModel
 
-        Dim lrEnityTypeInstance As FBM.EntityTypeInstance
+            Dim lrEnityTypeInstance As FBM.EntityTypeInstance
 
-        Dim lsOldEntityTypeName As String = ""
-        Dim lsEntityTypeName As String = ""
+            Dim lsOldEntityTypeName As String = ""
+            Dim lsEntityTypeName As String = ""
 
-        Me.Timeout.Stop()
+            Me.Timeout.Stop()
 
-        lsOldEntityTypeName = arQuestion.ModelObject(0).Id
-        lsEntityTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ModelObject(0).Id)
+            lsOldEntityTypeName = arQuestion.ModelObject(0).Id
+            lsEntityTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ModelObject(0).Id)
 
-        If IsSomething(arQuestion.sentence) Then
-            arQuestion.sentence.Sentence = arQuestion.sentence.Sentence.Replace(lsOldEntityTypeName, lsEntityTypeName)
-            arQuestion.sentence.ResetSentence()
+            If IsSomething(arQuestion.sentence) Then
+                arQuestion.sentence.Sentence = arQuestion.sentence.Sentence.Replace(lsOldEntityTypeName, lsEntityTypeName)
+                arQuestion.sentence.ResetSentence()
 
-            Call Language.AnalyseSentence(arQuestion.sentence, Me.Model)
-            Call Language.ProcessSentence(arQuestion.sentence)
-            If arQuestion.sentence.AreAllWordsResolved Then
-                Call Language.ResolveSentence(arQuestion.sentence)
+                Call Language.AnalyseSentence(arQuestion.sentence, Me.Model)
+                Call Language.ProcessSentence(arQuestion.sentence)
+                If arQuestion.sentence.AreAllWordsResolved Then
+                    Call Language.ResolveSentence(arQuestion.sentence)
+                End If
+
             End If
 
-        End If
+            Dim lrEntityType As FBM.EntityType
 
-        Dim lrEntityType As FBM.EntityType
+            lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True, abBroadcastInterfaceEvent)
 
-        lrEntityType = Me.Model.CreateEntityType(lsEntityTypeName, True, abBroadcastInterfaceEvent)
-
-        If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
-            Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode,,,,, True)
-            Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
-        Else
-            Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")
-        End If
-
-        If Me.Page IsNot Nothing Then
-
-            Select Case Me.Page.Language
-                Case Is = pcenumLanguage.ORMModel
-                    lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
-
-                    Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
-                    Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
-                Case Is = pcenumLanguage.PropertyGraphSchema
-
-                    Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrEntityType.getCorrespondingRDSTable, New PointF(50, 50), True)
-
-            End Select
-
-
-            If Me.AutoLayoutOn Then
-                Me.Page.Form.AutoLayout()
+            If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+                Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode,,,,, True)
+                Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+            Else
+                Me.send_data("Don't forget to give the new Entity Type a Primary Reference Scheme as soon as possible.")
             End If
-        End If
 
-        Me.Timeout.Start()
+#Region "Metadata Lineage"
+            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+            If arFEKLLineageObject IsNot Nothing Then
 
-    End Sub
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrEntityType.Id & " - Object Type")
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+            End If
+#End Region
+
+            If Me.Page IsNot Nothing Then
+#Region "Draw on Page"
+                Select Case Me.Page.Language
+                    Case Is = pcenumLanguage.ORMModel
+                        lrEnityTypeInstance = Me.Page.DropEntityTypeAtPoint(lrEntityType, New PointF(100, 10)) 'VM-20180329-Me.Page.Form.CreateEntityType(lsEntityTypeName, True)
+
+                        Call lrEnityTypeInstance.RepellFromNeighbouringPageObjects(1, False)
+                        Call lrEnityTypeInstance.Move(lrEnityTypeInstance.X, lrEnityTypeInstance.Y, True)
+                    Case Is = pcenumLanguage.PropertyGraphSchema
+
+                        Call Me.Page.LoadPGSNodeTypeFromRDSTable(lrEntityType.getCorrespondingRDSTable, New PointF(50, 50), True)
+
+                End Select
+
+
+                If Me.AutoLayoutOn Then
+                    Me.Page.Form.AutoLayout()
+                End If
+#End Region
+            End If
+
+            Me.Timeout.Start()
+
+            Return True
+
+        Catch ex As Exception
+            Dim lsMessage As String
+        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+        lsMessage &= vbCrLf & vbCrLf & ex.Message
+        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        Return False
+        End Try
+    End Function
 
     Private Function executeStatementAddFactType(ByRef arQuestion As tQuestion,
                                                  Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
@@ -1400,8 +1426,9 @@ EndProcessing:
 
     End Function
 
-    Private Sub ProcessStatementAddValueType(ByRef arQuestion As tQuestion,
-                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+    Private Function ProcessStatementAddValueType(ByRef arQuestion As tQuestion,
+                                                  Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                  Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
         Dim lrValueTypeInstance As FBM.ValueTypeInstance
 
@@ -1449,8 +1476,19 @@ EndProcessing:
 
             Me.Model.AddValueType(lrValueType, True, abBroadcastInterfaceEvent, Nothing, True)
 
-            If Me.Page IsNot Nothing Then
+#Region "Metadata Lineage"
+            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+            If arFEKLLineageObject IsNot Nothing Then
 
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrValueType.Id & " - Object Type")
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+            End If
+#End Region
+
+            If Me.Page IsNot Nothing Then
+#Region "Draw on Page"
                 Select Case Me.Page.Language
                     Case Is = pcenumLanguage.ORMModel
                         lrValueTypeInstance = Me.Page.DropValueTypeAtPoint(lrValueType, New PointF(100, 100)) 'VM-20181329-Remove this commented-out code, if all okay. Me.Page.Form.CreateValueType(lsValueTypeName, True)
@@ -1464,9 +1502,12 @@ EndProcessing:
                             End If
                         End If
                 End Select
+#End Region
             End If
 
             Me.Timeout.Start()
+
+            Return True
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1477,9 +1518,11 @@ EndProcessing:
             prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.Timeout.Start()
+
+            Return False
         End Try
 
-    End Sub
+    End Function
 
     Private Function ProcessISANENTITYTYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                  Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
