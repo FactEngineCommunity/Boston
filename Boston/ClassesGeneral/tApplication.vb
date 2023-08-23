@@ -448,6 +448,19 @@ Public Class tApplication
 
     End Function
 
+    ''' <summary>
+    ''' Finds and refreshes the PropertiesGrid if it is loaded
+    ''' </summary>
+    Public Sub ResetPropertiesGrid()
+
+        Dim lfrmPropertiesGrid As New frmToolboxProperties
+        lfrmPropertiesGrid = Me.GetToolboxForm(lfrmPropertiesGrid.Name)
+        If lfrmPropertiesGrid IsNot Nothing Then
+            Call lfrmPropertiesGrid.SetSelectedObject(Nothing, True)
+        End If
+
+    End Sub
+
     Public Sub ResetWorkingEnvironment()
 
         With Me
