@@ -67,11 +67,18 @@ Public Class frmToolboxProperties
 
     End Sub
 
-    Public Sub SetSelectedObject(ByRef arObject As Object)
+    Public Sub SetSelectedObject(ByRef arObject As Object, Optional ByVal abSetCurrentSelection As Boolean = False)
 
         Try
             RemoveHandler PropertyGrid.SelectedGridItemChanged, AddressOf Me.PropertyGrid_SelectedGridItemChanged
-            Me.PropertyGrid.SelectedObject = arObject
+
+            If arObject IsNot Nothing Then
+                Me.PropertyGrid.SelectedObject = arObject
+            ElseIf Me.zrSelectedObject IsNot Nothing Then
+                'Dim lrTempObject As Object = Me.zrSelectedObject
+                Me.PropertyGrid.SelectedObject = Me.PropertyGrid.SelectedObject
+                'Me.PropertyGrid.SelectedObject = lrTempObject
+            End If
             AddHandler PropertyGrid.SelectedGridItemChanged, AddressOf Me.PropertyGrid_SelectedGridItemChanged
 
         Catch ex As Exception
