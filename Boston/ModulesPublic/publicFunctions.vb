@@ -1178,7 +1178,7 @@ OpenConnection:
                                               New OpenAI_API.Chat.ChatRequest() With {
                                                                                      .Model = Model.ChatGPTTurbo,
                                                                                      .Temperature = 0,
-                                                                                     .MaxTokens = 1000,
+                                                                                     .MaxTokens = 2000,
                                                                                      .TopP = 1,
                                                                                      .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asPrompt)}
                                                                                      }

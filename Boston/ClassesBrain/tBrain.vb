@@ -2726,6 +2726,9 @@ SkipOutputChannel:
                 Case Is = VAQL.TokenType.FACTSTMT
                     'Is StraightToAction
                     Return Me.ProcessFactStatement(abBroadcastInterfaceEvent, arDSCError)
+                Case Is = VAQL.TokenType.KEYWDHASLONGDESCRIPTION
+                    'Is StraightToAction
+                    Return Me.ProcessHasLongDescription(abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject)
                 Case Is = VAQL.TokenType.KEYWDISANENTITYTYPE
                     'Is StraightToAction
                     Return Me.ProcessISANENTITYTYPECLAUSE(abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject)

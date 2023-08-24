@@ -2002,6 +2002,99 @@ EndProcessing:
 
     End Function
 
+    Private Function ProcessHasLongDescription(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                               Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                               Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
+
+        Dim lsMessage As String
+
+        Try
+            With New WaitCursor
+                Me.Model = prApplication.WorkingModel
+
+                Me.VAQLProcessor.LONGDESCRIPTIONSTMT.MODELELEMENTNAME = ""
+                Me.VAQLProcessor.LONGDESCRIPTIONSTMT.DESCRIPTIONCONTENT = ""
+
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.LONGDESCRIPTIONSTMT, Me.VAQLParsetree.Nodes(0))
+
+                Me.Timeout.Stop()
+
+                Dim lsModelElementName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.LONGDESCRIPTIONSTMT.MODELELEMENTNAME))
+
+                If Not Me.Model.ExistsModelElement(lsModelElementName) Then
+                    lsMessage = "There is no Model Element with the name, '" & lsModelElementName & "'."
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                        arDSCError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
+                End If
+
+                Dim lrModelElement = Me.Model.GetModelObjectByName(lsModelElementName)
+
+#Region "Metadata Lineage"
+                'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+                '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+                If arFEKLLineageObject IsNot Nothing Then
+
+                    Dim lsObjectTypeIdentifier As String = " - Object Type"
+
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.ValueType),
+                                  GetType(FBM.EntityType),
+                                  GetType(FBM.RoleConstraint)
+
+                            lsObjectTypeIdentifier = " - Object Type"
+                        Case Is = GetType(FBM.FactType)
+
+                            Dim lrFactType As FBM.FactType = lrModelElement
+                            If lrFactType.IsObjectified Then
+                                lsObjectTypeIdentifier = " - Object Type"
+                            Else
+                                lsObjectTypeIdentifier = " - Fact Type"
+                            End If
+
+                        Case Else
+                            lsMessage = "Cannot store a description for the Model Element, '" & lsModelElementName & "' because of its type: " & lrModelElement.ConceptType.ToString
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                                arDSCError.ErrorString = lsMessage
+                            End If
+                            Me.send_data(lsMessage)
+                            Return False
+                    End Select
+
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsModelElementName & lsObjectTypeIdentifier)
+                    Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+                End If
+#End Region
+
+                Call lrModelElement.SetLongDescription(Me.VAQLProcessor.LONGDESCRIPTIONSTMT.DESCRIPTIONCONTENT)
+
+                'Have already checked to see wither it is okay to create the ValueType above.
+                Me.send_data("Ok")
+
+                Me.Timeout.Start()
+            End With
+
+            Return True
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
+
+
 
     Private Function ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,

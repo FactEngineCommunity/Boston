@@ -622,6 +622,12 @@ Public Class frmGlossary
                 lrValueType = arModelObject
                 Call zrFrmORMDiagramViewer.zrPage.DropValueTypeAtPoint(lrValueType, loPt)
                 Call zrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrValueType)
+
+                For Each lrFactTypeInstance In zrFrmORMDiagramViewer.zrPage.FactTypeInstance
+                    Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
+                    Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(10, False)
+                Next
+
             Case Is = pcenumConceptType.EntityType
                 Dim lrEntityType As FBM.EntityType
                 lrEntityType = arModelObject

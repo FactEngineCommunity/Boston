@@ -754,13 +754,14 @@ Namespace FBM
                                 Dim lrObject As Object
                                 lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject
 
-                                liX = Viev.Lesser(Me.Shape.Bounds.X, lrObject.Shape.Bounds.X) + Math.Abs(Me.Shape.Bounds.X - lrObject.Shape.Bounds.X) / 2
-                                liY = Viev.Lesser(Me.Shape.Bounds.Y, lrObject.Shape.Bounds.y) + Math.Abs(Me.Shape.Bounds.Y - lrObject.Shape.Bounds.Y) / 2
+                                If Me.Shape IsNot Nothing AndAlso lrObject IsNot Nothing AndAlso lrObject.Shape IsNot Nothing Then
+                                    liX = Viev.Lesser(Me.Shape.Bounds.X, lrObject.Shape.Bounds.X) + Math.Abs(Me.Shape.Bounds.X - lrObject.Shape.Bounds.X) / 2
+                                    liY = Viev.Lesser(Me.Shape.Bounds.Y, lrObject.Shape.Bounds.y) + Math.Abs(Me.Shape.Bounds.Y - lrObject.Shape.Bounds.Y) / 2
 
-                                lrFactTypeInstance.Shape.Move(liX, liY)
-
+                                    lrFactTypeInstance.Shape.Move(liX, liY)
+                                End If
                             End If
-                        Else
+                            Else
                             If lrFactTypeInstance.IsBinaryFactType Then
                                 Dim lrObject As Object
                                 lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject

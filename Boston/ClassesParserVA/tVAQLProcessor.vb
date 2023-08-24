@@ -182,6 +182,30 @@ Namespace VAQL
         End Property
     End Class
 
+    Public Class LongDescriptionStatement
+
+        Private _MODELELEMENTNAME As String
+        Public Property MODELELEMENTNAME As String
+            Get
+                Return Me._MODELELEMENTNAME
+            End Get
+            Set(value As String)
+                Me._MODELELEMENTNAME = value
+            End Set
+        End Property
+
+        Private _DESCRIPTIONCONTENT As String
+        Public Property DESCRIPTIONCONTENT As String
+            Get
+                Return Me._DESCRIPTIONCONTENT
+            End Get
+            Set(value As String)
+                Me._DESCRIPTIONCONTENT = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class IsAValueTypeStatement
 
         Private _MODELELEMENTNAME As String
@@ -901,6 +925,7 @@ Namespace VAQL
         Public ENTITYTYPEISIDENTIFIEDBYITSStatement As New VAQL.EntityTypeIsIdentifiedByItsStatement
         Public OBJECTIFIEDFACTTYPEISIDENTIFIEDBYITSStatement As New VAQL.ObjectifiedFactTypeIsIdentifiedByItsStatement
         Public FACTTYPEREADINGStatement As New VAQL.FactTypeReadingStatement
+        Public LONGDESCRIPTIONSTMT As New VAQL.LongDescriptionStatement
         Public MODELELEMENTClause As New VAQL.ModelElementClause
         Public MODELELEMENTTYPEClause As New VAQL.ModelElementTypeClause
         Public VALUETYPEISWRITTENASStatement As New VAQL.ValueTypeIsWrittenAsStatement
@@ -1323,6 +1348,10 @@ Namespace VAQL
                     ElseIf Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDCREATE) And
                            Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDPAGE) Then
                         aoTokenType = TokenType.CREATEPAGESTMT
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDHASLONGDESCRIPTION) Then
+                        aoTokenType = TokenType.KEYWDHASLONGDESCRIPTION
                         aoParseTree = Me.Parsetree
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUETYPEISWRITTENASCLAUSE) Then

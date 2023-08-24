@@ -721,6 +721,8 @@ SkipModelLevelRoleConstraint:
                     lrValueType.IsIndependent = lrXMLValueType.IsIndependent
                     lrValueType.IsMDAModelElement = lrXMLValueType.IsMDAModelElement
                     lrValueType.DBName = lrXMLValueType.DBName
+                    lrValueType.ShortDescription = lrXMLValueType.ShortDescription
+                    lrValueType.LongDescription = lrXMLValueType.LongDescription
 
                     For Each lsValueTypeConstraintValue In lrXMLValueType.ValueConstraint
                         lrValueType.ValueConstraint.Add(lsValueTypeConstraintValue)
@@ -776,6 +778,8 @@ SkipValueType:
                     lrEntityType.IsMDAModelElement = lrXMLEntityType.IsMDAModelElement
                     lrEntityType.IsAbsorbed = lrXMLEntityType.IsAbsorbed
                     lrEntityType.DBName = lrXMLEntityType.DBName
+                    lrEntityType.ShortDescription = lrXMLEntityType.ShortDescription
+                    lrEntityType.LongDescription = lrXMLEntityType.LongDescription
 
                     If lrXMLEntityType.ReferenceModeValueTypeId = "" Then
                         lrEntityType.ReferenceModeValueType = Nothing
@@ -794,7 +798,7 @@ SkipValueType:
                     '------------------------------------------------
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, , , True, True, lrEntityType.DBName)
+                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, lrEntityType.ShortDescription, lrEntityType.LongDescription, True, True, lrEntityType.DBName)
                     lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , True,, True,, True)
 
                     lrEntityType.Concept = lrDictionaryEntry.Concept
@@ -976,6 +980,8 @@ SkipSubtypeRelationship:
                             lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Between
                     End Select
                     lrRoleConstraint.IsMDAModelElement = lrXMLRoleConstraint.IsMDAModelElement
+                    lrRoleConstraint.ShortDescription = lrXMLRoleConstraint.ShortDescription
+                    lrRoleConstraint.LongDescription = lrXMLRoleConstraint.LongDescription
 
                     '------------------------------------------------
                     'Link to the Concept within the ModelDictionary
@@ -4853,6 +4859,8 @@ SkipRoleConstraintInstance:
                 arFactType.IsMDAModelElement = lrXMLFactType.IsMDAModelElement
                 arFactType.IsSubtypeStateControlling = lrXMLFactType.IsSubtypeStateControlling
                 arFactType.StoreFactCoordinates = lrXMLFactType.StoreFactCoordinates
+                arFactType.ShortDescription = lrXMLFactType.ShortDescription
+                arFactType.LongDescription = lrXMLFactType.LongDescription
                 arFactType.DBName = lrXMLFactType.DBName
 
                 If lrXMLFactType.ObjectifyingEntityTypeId = "" Then
