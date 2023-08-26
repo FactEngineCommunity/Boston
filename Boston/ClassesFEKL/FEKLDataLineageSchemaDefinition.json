@@ -25,11 +25,11 @@
           },
           "ObjectType": {
             "type": "string",
-            "description": "The Fact Engine Knowledge Language"
+            "description": "The name of the Object Type. This field is filled when the item introduces a new object type"
           },
           "FEKLStatement": {
             "type": "string",
-            "description": "The Fact Engine Knowledge Language"
+            "description": "The Fact Engine Knowledge Language statement"
           },
           "PageNumber": {
             "type": "integer",
@@ -60,7 +60,7 @@
             "description": "the character offset which ends the segment containing the FEKL within the lowest-level section or requirement"
           }
         },
-        "required": ["Id", "DocumentName", "DocumentLocation", "DocumentLocationJson", "SectionId", "StartOffset", "EndOffset"]
+        "required": ["Id", "DocumentName"]
       }
     }
   },

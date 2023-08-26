@@ -1,8 +1,23 @@
 ﻿Imports System.Reflection
+Imports System.Runtime.InteropServices
+
 
 Public Class frmStartup
 
     Private WithEvents zrWebBrowser As New WebBrowser
+
+    <ComVisible(True)>
+    Public Class ScriptingHelper
+
+        Public Sub NavigateTo(url As String)
+
+            If MsgBox("Are you okay to leave Boston and open the site in your default browser", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Process.Start(url)
+            End If
+
+        End Sub
+
+    End Class
 
     Private Sub frmStartup_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
@@ -17,6 +32,9 @@ Public Class frmStartup
 
 
             Me.zrWebBrowser = Me.WebBrowser
+
+            Dim loHelper As New ScriptingHelper
+            Me.zrWebBrowser.ObjectForScripting = loHelper
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -71,6 +89,10 @@ Public Class frmStartup
             e.Cancel = True
 
             Select Case lasURLArgument(1)
+                Case Is = "NavigateTo"
+                    Dim liIndex = e.Url.ToString.IndexOf("NavigateTo:")
+                    Dim urlPart As String = e.Url.ToString.Substring(liIndex + "NavigateTo:".Length)
+                    Call Me.zrWebBrowser.ObjectForScripting.navigateTo(urlPart)
                 Case Is = "AddNewModel"
                     If frmMain.zfrmModelExplorer IsNot Nothing Then
                         Me.Cursor = Cursors.WaitCursor

@@ -68,9 +68,48 @@ Public Class frmMain
     'http://localhost
     Private ServiceEndpointUri As String = My.Settings.BostonServerIPAddress & ":" & My.Settings.BostonServerPortNumber & "/WCFServices/DuplexService"
 
+#Region "Security - Disable Menu Items on Startup for Client Server"
+
+    Private Sub DisableAllMenuItems()
+        For Each menuItem As ToolStripMenuItem In Me.MenuStrip_main.Items
+            DisableMenuItem(menuItem)
+        Next
+    End Sub
+
+    Private Sub DisableMenuItem(ByVal menuItem As ToolStripMenuItem)
+        menuItem.Enabled = False
+        For Each subItem As ToolStripItem In menuItem.DropDownItems
+            If TypeOf subItem Is ToolStripMenuItem Then
+                DisableMenuItem(CType(subItem, ToolStripMenuItem))
+            End If
+        Next
+    End Sub
+
+    Private Sub EnableAllMenuItems()
+        For Each menuItem As ToolStripMenuItem In Me.MenuStrip_main.Items
+            EnableMenuItem(menuItem)
+        Next
+    End Sub
+
+    Private Sub EnableMenuItem(ByVal menuItem As ToolStripMenuItem)
+        menuItem.Enabled = True
+        For Each subItem As ToolStripItem In menuItem.DropDownItems
+            If TypeOf subItem Is ToolStripMenuItem Then
+                EnableMenuItem(CType(subItem, ToolStripMenuItem))
+            End If
+        Next
+    End Sub
+
+#End Region
+
     Private Sub frm_main_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         Try
+            If My.Settings.UseClientServer And My.Settings.RequireLoginAtStartup Then
+                Call Me.DisableAllMenuItems()
+            End If
+
+
             'NB The current SVN Repository for Richmond is at
             '  github
             '-----------------------------------------------------
@@ -181,7 +220,6 @@ ConfigurationOK:
             prApplication.ActivePages = New List(Of WeifenLuo.WinFormsUI.Docking.DockContent)
 
             Me.StatusLabelGeneralStatus.Text = "Loaded docking forms"
-
 
             prApplication.MainForm = Me
 
@@ -384,41 +422,19 @@ ConfigurationOK:
                 'CodeSafe - Settings
                 My.Settings.UsecaseShapeLibrary = ".\shapelibrary\usecase.shl"
 
-                '======================================================
-                'Load the Core Model
-                '---------------------
-                If My.Settings.ModelingUseThreadedXMLPageLoading Then
-                    ltThread = New Thread(AddressOf Me.LoadCoreModel)
-                    ltThread.IsBackground = True
-                    ltThread.Start()
-                Else
-                    Call Me.LoadCoreModel()
-                End If
-                '======================================================
-
                 With New WaitCursor
-                    '=======================================
-                    Call TableModel.GetModelDetails(prApplication.Language.Model)
-                    Call prApplication.Language.Model.Load(abDontUseBLOBLoading:=True)
-
-                    prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
-
-                    If pbLogStartup Then
-                        prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
-                    End If
-                    '=======================================
-
                     '==========================================
                     'Client/Server                
 #Region "Client/Server"
                     If My.Settings.UseClientServer _
-    And My.Settings.RequireLoginAtStartup _
-    And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
+                          And My.Settings.RequireLoginAtStartup _
+                           And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                         If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
 
                             '------------------------------------------------------------------
                             'LogIn from populates prApplication.User
                             Call Me.logInUser(prApplication.User)
+                            Call Me.EnableAllMenuItems()
                         Else
                             Me.Close()
                             Me.Dispose()
@@ -445,6 +461,35 @@ And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                             Call Me.logInUser(prUser)
                         End If
                     End If
+#End Region
+
+#Region "Core and Language Models"
+                    With New WaitCursor
+                        '======================================================
+                        'Load the Core Model
+                        '---------------------
+                        If My.Settings.ModelingUseThreadedXMLPageLoading Then
+                            ltThread = New Thread(AddressOf Me.LoadCoreModel)
+                            ltThread.IsBackground = True
+                            ltThread.Start()
+                        Else
+                            Call Me.LoadCoreModel()
+                        End If
+                        '======================================================
+
+
+                        '=======================================
+                        'Load the Language Model
+                        Call TableModel.GetModelDetails(prApplication.Language.Model)
+                        Call prApplication.Language.Model.Load(abDontUseBLOBLoading:=True)
+
+                        prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
+
+                        If pbLogStartup Then
+                            prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
+                        End If
+                        '=======================================
+                    End With
 #End Region
 
                     Call Me.SetupForm()
