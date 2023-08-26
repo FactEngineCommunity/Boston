@@ -722,6 +722,18 @@ Public Class frmKnowledgeExtraction
 
 					myRtb.[Select](index, word.Length)
 					myRtb.SelectionColor = color
+#Region "Bold"
+					Dim currentFont As Font = myRtb.SelectionFont
+					Dim newFontStyle As FontStyle
+
+					If currentFont.Bold Then
+						newFontStyle = currentFont.Style And Not FontStyle.Bold
+					Else
+						newFontStyle = currentFont.Style Or FontStyle.Bold
+					End If
+
+					myRtb.SelectionFont = New Font(currentFont.FontFamily, currentFont.Size, newFontStyle)
+#End Region
 					startIndex = index + word.Length
 				Else
 					Exit While
@@ -729,6 +741,7 @@ Public Class frmKnowledgeExtraction
 
 			End While
 
+			index = 0
 			startIndex = 0
 			lsAllText = myRtb.Text
 			While index < myRtb.TextLength
@@ -748,6 +761,19 @@ Public Class frmKnowledgeExtraction
 
 					myRtb.[Select](index, word.Length)
 					myRtb.SelectionColor = color
+#Region "Bold"
+					Dim currentFont As Font = myRtb.SelectionFont
+					Dim newFontStyle As FontStyle
+
+					If currentFont.Bold Then
+						newFontStyle = currentFont.Style And Not FontStyle.Bold
+					Else
+						newFontStyle = currentFont.Style Or FontStyle.Bold
+					End If
+
+					myRtb.SelectionFont = New Font(currentFont.FontFamily, currentFont.Size, newFontStyle)
+#End Region
+
 					startIndex = index + word.Length
 				Else
 					Exit While
