@@ -28,6 +28,7 @@ Public Class frmMain
     Private Shared Function MoveWindow(ByVal hwnd As IntPtr, ByVal x As Integer, ByVal y As Integer, ByVal cx As Integer, ByVal cy As Integer, ByVal repaint As Boolean) As Boolean
     End Function
 
+    Dim msLoadDebugMode As String = ""
 
     Private ltThread As Thread
     Private ltSplashThread As Thread
@@ -109,16 +110,27 @@ Public Class frmMain
                 Call Me.DisableAllMenuItems()
             End If
 
+            '=============================================================
+            'Check if User wants to Debug Load/log the startup process
+            '-----------------------------------------------------------
+            Me.msLoadDebugMode = My.Settings.DebugMode.ToString
+            If My.Computer.Keyboard.CtrlKeyDown Then
+                My.Settings.DebugMode = pcenumDebugMode.Debug.ToString
+                pbLogStartup = True
+            ElseIf My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
 
-            'NB The current SVN Repository for Richmond is at
+                If MsgBox("Boston is in Debug Mode. Do you want to keep Debugging?", MsgBoxStyle.YesNo) = MsgBoxResult.No Then
+                    My.Settings.DebugMode = pcenumDebugMode.DebugCriticalErrorsOnly.ToString
+                    My.Settings.Save()
+                End If
+            End If
+
+            '===============================================================================================================================================
+            'NB The current SVN Repository for Boston is at:
             '  github
             '-----------------------------------------------------
             'Configuration file ends up in something like: C:\Users\Viev\AppData\Local\Viev_Pty_Ltd\Boston.exe_Url_wd25rcgtvmds0ynngskc2ps2lwmmryie\2.5.0.0
             '------------------------------------------------------------------------------------------------------------------------
-
-            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
-                prApplication.ThrowErrorMessage("Starting Boston", pcenumErrorType.Information)
-            End If
 
             Dim lsMessage As String = ""
 
@@ -135,13 +147,6 @@ Public Class frmMain
             Me.MenuStrip_main.ImageScalingSize = New Drawing.Size(16, 16)
 
             Cursor.Current = Cursors.WaitCursor
-
-            '---------------------------------------------------------------------------
-            'Check if the user wants to log the startup process
-            '----------------------------------------------------
-            If My.Computer.Keyboard.CtrlKeyDown Then
-                pbLogStartup = True
-            End If
 
             '-------------------------------------------------------------------------------------------------------------
             'Change the SoftwareCategory before building the project for release.
@@ -212,6 +217,10 @@ ConfigurationOK:
             prApplication.MainForm = Me
             Me.StatusLabelGeneralStatus.Text = "Application Initialised"
 
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
+                prApplication.ThrowErrorMessage("Starting Boston", pcenumErrorType.Information)
+            End If
+
             prApplication.SoftwareCategory = prSoftwareCategory
 
             prApplication.ToolboxForms = New List(Of WeifenLuo.WinFormsUI.Docking.DockContent)
@@ -220,6 +229,7 @@ ConfigurationOK:
             prApplication.ActivePages = New List(Of WeifenLuo.WinFormsUI.Docking.DockContent)
 
             Me.StatusLabelGeneralStatus.Text = "Loaded docking forms"
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowErrorMessage("Loaded docking forms", pcenumErrorType.Information)
 
             prApplication.MainForm = Me
 
@@ -246,6 +256,7 @@ ConfigurationOK:
                 End If
             End If
             '===============================================================================
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowErrorMessage("Checked for Plugins", pcenumErrorType.Information)
             '-------------------------------------------------------------------------------------------------------------
             '20170101-VM-Might pay to (first-use) copy the database to the following directory and set the user permissions to 
             '  stop MS Access "An updatable query Is required" errors, when the JetEngine can't access the database file.
@@ -343,8 +354,10 @@ ConfigurationOK:
 
             End If
 
-            'DockPanel
-            'Dim configFile As String = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Application.ExecutablePath), "DockPanel.config")            
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowErrorMessage("Checked database availability", pcenumErrorType.Information)
+
+
+            'DockPanel            
             Dim configFile As String = System.IO.Path.Combine(Boston.MyPath, "DockPanel.config")
 
             Me.IsMdiContainer = True
@@ -417,6 +430,7 @@ ConfigurationOK:
 #End Region
 
                 Me.StatusLabelGeneralStatus.Text = "Database Opened Successfully"
+                If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowErrorMessage("Database Opened Successfully", pcenumErrorType.Information)
 
                 '=========================================================================
                 'CodeSafe - Settings
@@ -485,9 +499,7 @@ And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
 
                         prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
 
-                        If pbLogStartup Then
-                            prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
-                        End If
+                        If pbLogStartup Then prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
                         '=======================================
                     End With
 #End Region
@@ -502,14 +514,10 @@ And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                     lrChildForm.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
                     Me.zfrmStartup = lrChildForm
 
-                    If pbLogStartup Then
-                        prApplication.ThrowErrorMessage("Successfully loaded the Startup page", pcenumErrorType.Information)
-                    End If
+                    If pbLogStartup Then prApplication.ThrowErrorMessage("Successfully loaded the Startup page", pcenumErrorType.Information)
                     '=======================================================================================================================
 
-                    If pbLogStartup Then
-                        prApplication.ThrowErrorMessage("Finished loading the Main form.", pcenumErrorType.Information)
-                    End If
+                    If pbLogStartup Then prApplication.ThrowErrorMessage("Finished loading the Main form.", pcenumErrorType.Information)
 
                     Cursor.Current = Cursors.Default
 
@@ -599,6 +607,8 @@ And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                     End Try
 #End Region
 
+                    If pbLogStartup Then prApplication.ThrowErrorMessage("Finished Registration Checking", pcenumErrorType.Information)
+
 SkipRegistrationChecking:
                     '-----------------------------------------------------------
                     'Automatic Update Checker
@@ -618,6 +628,9 @@ SkipRegistrationChecking:
                 Me.Close()
                 Me.Dispose()
             End If
+
+            My.Settings.DebugMode = Me.msLoadDebugMode
+            If pbLogStartup Then prApplication.ThrowErrorMessage("Finished frmMain.Load method.", pcenumErrorType.Information)
 
         Catch ex As Exception
             Dim lsMessage1 As String
