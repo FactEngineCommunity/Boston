@@ -28,6 +28,28 @@ Module MyMethodExtensions
         End If
     End Sub
 
+    ''' <summary>
+    ''' Append to an array.
+    ''' </summary>
+    ''' <typeparam name="T"></typeparam>
+    ''' <param name="original"></param>
+    ''' <param name="rangeToAppend"></param>
+    ''' <returns></returns>
+    <Extension()>
+    Public Function AppendRange(ByVal original As Array, ByVal rangeToAppend As Array) As Array
+
+        If original.GetType() IsNot rangeToAppend.GetType() Then
+            Throw New ArgumentException("The arrays must be of the same type.")
+        End If
+
+        Dim resultArray = Array.CreateInstance(original.GetType().GetElementType(), original.Length + rangeToAppend.Length)
+
+        Array.Copy(original, resultArray, original.Length)
+        Array.Copy(rangeToAppend, 0, resultArray, original.Length, rangeToAppend.Length)
+
+        Return resultArray
+    End Function
+
 
     ''' <summary>
     ''' RichTextBox: FindAndReplaceAll

@@ -1193,7 +1193,7 @@ Partial Public Class tBrain
                     Dim lbIsLikelyValueType As Boolean = False
                     Dim items As Array
                     items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
-
+                    Dim LikelyVTItems As Array = System.Enum.GetValues(GetType(pcenumLikelyValueTypeEndings))
                     If Me.Model.ModelElementIsGeneralConceptOnly(lsModelObjectName) Then
                         If My.Settings.DefaultGeneralConceptToObjectTypeConversion = "Value Type" Then
                             lbIsLikelyValueType = True
@@ -1203,15 +1203,25 @@ Partial Public Class tBrain
                     If liInd <> 1 And Me.VAQLProcessor.ATMOSTONEStatement.KEYWDWRITTENAS IsNot Nothing Then
                         lbIsLikelyValueType = True
                     Else
-                        For Each item In items
+                        For Each item As pcenumReferenceModeEndings In items
                             If lsModelObjectName.EndsWith(GetEnumDescription(item)) Then
                                 lbIsLikelyValueType = True
-                                Exit For
+                                GoTo FinishedCheckingLikelies
                             ElseIf lsModelObjectName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
                                 lbIsLikelyValueType = True
-                                Exit For
+                                GoTo FinishedCheckingLikelies
                             End If
                         Next
+                        For Each item As pcenumLikelyValueTypeEndings In LikelyVTItems
+                            If lsModelObjectName.EndsWith(GetEnumDescription(item)) Then
+                                lbIsLikelyValueType = True
+                                GoTo FinishedCheckingLikelies
+                            ElseIf lsModelObjectName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                                lbIsLikelyValueType = True
+                                GoTo FinishedCheckingLikelies
+                            End If
+                        Next
+FinishedCheckingLikelies:
                     End If
 
                     items = System.Enum.GetValues(GetType(pcenumValueTypeCandidates))

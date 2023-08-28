@@ -133,16 +133,16 @@ Partial Class frmFactEngine
         Me.TextBoxInput.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxInput.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TextBoxInput.ForeColor = System.Drawing.Color.Wheat
-        Me.TextBoxInput.Location = New System.Drawing.Point(0, 31)
+        Me.TextBoxInput.Location = New System.Drawing.Point(0, 66)
         Me.TextBoxInput.Margin = New System.Windows.Forms.Padding(2)
         Me.TextBoxInput.Name = "TextBoxInput"
-        Me.TextBoxInput.Size = New System.Drawing.Size(1082, 114)
+        Me.TextBoxInput.Size = New System.Drawing.Size(1082, 79)
         Me.TextBoxInput.TabIndex = 1
         Me.TextBoxInput.Text = ""
         '
         'ContextMenuStripFactEngine
         '
-        Me.ContextMenuStripFactEngine.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ToolStripSeparator1, Me.BackgroundColourToolStripMenuItem, Me.ToolStripMenuItemHelpTips, Me.DefaultAfterQueryToToolStripMenuItem, Me.ToolStripMenuItemAutoCapitalise, Me.ToolStripMenuItemNaturalLanguage, Me.ToolStripMenuItemNaturalLanguageAnswers})
+        Me.ContextMenuStripFactEngine.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem, Me.ToolStripSeparator1, Me.BackgroundColourToolStripMenuItem, Me.ToolStripMenuItemHelpTips, Me.DefaultAfterQueryToToolStripMenuItem, Me.ToolStripMenuItemAutoCapitalise, Me.ToolStripMenuItemNaturalLanguageAnswers, Me.ToolStripMenuItemNaturalLanguage})
         Me.ContextMenuStripFactEngine.Name = "ContextMenuStripFactEngine"
         Me.ContextMenuStripFactEngine.Size = New System.Drawing.Size(221, 172)
         '
@@ -269,6 +269,8 @@ Partial Class frmFactEngine
         '
         'ToolStripMenuItemNaturalLanguage
         '
+        Me.ToolStripMenuItemNaturalLanguage.Checked = True
+        Me.ToolStripMenuItemNaturalLanguage.CheckState = System.Windows.Forms.CheckState.Checked
         Me.ToolStripMenuItemNaturalLanguage.Name = "ToolStripMenuItemNaturalLanguage"
         Me.ToolStripMenuItemNaturalLanguage.Size = New System.Drawing.Size(220, 22)
         Me.ToolStripMenuItemNaturalLanguage.Text = "Natural Language Tool Strip"
@@ -292,7 +294,6 @@ Partial Class frmFactEngine
         Me.ToolStripNaturalLanguage.TabIndex = 0
         Me.ToolStripNaturalLanguage.TabStop = True
         Me.ToolStripNaturalLanguage.Text = "ToolStrip4"
-        Me.ToolStripNaturalLanguage.Visible = False
         '
         'ToolStripLabelPromptNaturalLanguage
         '

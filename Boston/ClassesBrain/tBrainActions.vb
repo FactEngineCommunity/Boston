@@ -2328,16 +2328,31 @@ EndProcessing:
                 Dim lbIsLikelyValueType As Boolean = False
                 Dim items As Array
                 items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
-                Dim item As pcenumReferenceModeEndings
-                For Each item In items
+                Dim laLikelyVTItems As Array = System.Enum.GetValues(GetType(pcenumLikelyValueTypeEndings))
+                For Each item As pcenumReferenceModeEndings In items
                     If asModelObjectName.EndsWith(GetEnumDescription(item)) Then
                         lbIsLikelyValueType = True
-                        Exit For
+                        GoTo FinishedCheckingLikelies
                     ElseIf asModelObjectName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
                         lbIsLikelyValueType = True
-                        Exit For
+                        GoTo FinishedCheckingLikelies
                     End If
                 Next
+                For Each item As pcenumLikelyValueTypeEndings In laLikelyVTItems
+                    Try
+                        If asModelObjectName.EndsWith(GetEnumDescription(item)) Then
+                            lbIsLikelyValueType = True
+                            GoTo FinishedCheckingLikelies
+                        ElseIf asModelObjectName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                            lbIsLikelyValueType = True
+                            GoTo FinishedCheckingLikelies
+                        End If
+                    Catch ex As Exception
+                        Debugger.Break()
+                    End Try
+                Next
+FinishedCheckingLikelies:
+
 
                 If lbIsLikelyValueType And Not abEntityTypeOnly Then
                     lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None, Nothing)

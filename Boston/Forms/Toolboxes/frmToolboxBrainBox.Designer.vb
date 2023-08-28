@@ -31,12 +31,12 @@ Partial Class frmToolboxBrainBox
         Me.ContextMenuVirtualAnalyst = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemDictationMode = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemQuietMode = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemUseLLMNLToFEKL = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerInput = New System.Windows.Forms.Timer(Me.components)
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.StatusLabelMain = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ContextMenuStripBrainBox = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemUseLLMNLToFEKL = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -121,6 +121,13 @@ Partial Class frmToolboxBrainBox
         Me.ToolStripMenuItemQuietMode.Size = New System.Drawing.Size(187, 22)
         Me.ToolStripMenuItemQuietMode.Text = "&Quiet Mode"
         '
+        'ToolStripMenuItemUseLLMNLToFEKL
+        '
+        Me.ToolStripMenuItemUseLLMNLToFEKL.CheckOnClick = True
+        Me.ToolStripMenuItemUseLLMNLToFEKL.Name = "ToolStripMenuItemUseLLMNLToFEKL"
+        Me.ToolStripMenuItemUseLLMNLToFEKL.Size = New System.Drawing.Size(187, 22)
+        Me.ToolStripMenuItemUseLLMNLToFEKL.Text = "Use LLM - NL to FEKL"
+        '
         'TimerInput
         '
         Me.TimerInput.Interval = 1000
@@ -154,12 +161,6 @@ Partial Class frmToolboxBrainBox
         Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
         Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(102, 22)
         Me.CopyToolStripMenuItem.Text = "&Copy"
-        '
-        'ToolStripMenuItemUseLLMNLToFEKL
-        '
-        Me.ToolStripMenuItemUseLLMNLToFEKL.Name = "ToolStripMenuItemUseLLMNLToFEKL"
-        Me.ToolStripMenuItemUseLLMNLToFEKL.Size = New System.Drawing.Size(187, 22)
-        Me.ToolStripMenuItemUseLLMNLToFEKL.Text = "Use LLM - NL to FEKL"
         '
         'frmToolboxBrainBox
         '
