@@ -57,21 +57,23 @@ Partial Class frmFEKLUploader
         Me.ToolStripLabelPromptDatabaseType = New System.Windows.Forms.ToolStripLabel()
         Me.ToolStripComboBoxDatabaseType = New System.Windows.Forms.ToolStripComboBox()
         Me.TextBoxDDL = New System.Windows.Forms.TextBox()
+        Me.TabPageDefaults = New System.Windows.Forms.TabPage()
+        Me.GroupBoxDefaults = New System.Windows.Forms.GroupBox()
+        Me.TextBoxDefaultPageNumber = New System.Windows.Forms.TextBox()
+        Me.TextBoxDefaultSectionName = New System.Windows.Forms.TextBox()
+        Me.TextBoxDefaultSectionId = New System.Windows.Forms.TextBox()
+        Me.TextBoxDefaultDocumentLocation = New System.Windows.Forms.TextBox()
+        Me.TextBoxDefaultDocumentName = New System.Windows.Forms.TextBox()
+        Me.LabelPromptDefaultSectionName = New System.Windows.Forms.Label()
+        Me.LabelPromptDefaultDocumentLocation = New System.Windows.Forms.Label()
+        Me.LabelPromptDefaultPageNumber = New System.Windows.Forms.Label()
+        Me.LabelPromptDefaultSection = New System.Windows.Forms.Label()
+        Me.LabelPromptDefaultDocumentName = New System.Windows.Forms.Label()
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelPromptModelName = New System.Windows.Forms.Label()
         Me.ButtonClose = New System.Windows.Forms.Button()
-        Me.TabPageDefaults = New System.Windows.Forms.TabPage()
-        Me.GroupBoxDefaults = New System.Windows.Forms.GroupBox()
-        Me.LabelPromptDefaultDocumentName = New System.Windows.Forms.Label()
-        Me.LabelPromptDefaultSection = New System.Windows.Forms.Label()
-        Me.LabelPromptDefaultPageNumber = New System.Windows.Forms.Label()
-        Me.LabelPromptDefaultDocumentLocation = New System.Windows.Forms.Label()
-        Me.LabelPromptDefaultSectionName = New System.Windows.Forms.Label()
-        Me.TextBoxDefaultDocumentName = New System.Windows.Forms.TextBox()
-        Me.TextBoxDefaultDocumentLocation = New System.Windows.Forms.TextBox()
-        Me.TextBoxDefaultSectionId = New System.Windows.Forms.TextBox()
-        Me.TextBoxDefaultSectionName = New System.Windows.Forms.TextBox()
-        Me.TextBoxDefaultPageNumber = New System.Windows.Forms.TextBox()
+        Me.TimerHighlighting = New System.Windows.Forms.Timer(Me.components)
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.GroupBox.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPageFEKLJSON.SuspendLayout()
@@ -273,6 +275,7 @@ Partial Class frmFEKLUploader
         '
         'TabPageFEKL
         '
+        Me.TabPageFEKL.Controls.Add(Me.Button1)
         Me.TabPageFEKL.Controls.Add(Me.Panel2)
         Me.TabPageFEKL.Controls.Add(Me.RichTextBoxFEKLDocument)
         Me.TabPageFEKL.Controls.Add(Me.LabelErrorMessage)
@@ -437,34 +440,6 @@ Partial Class frmFEKLUploader
         Me.TextBoxDDL.Size = New System.Drawing.Size(645, 312)
         Me.TextBoxDDL.TabIndex = 0
         '
-        'LabelModelName
-        '
-        Me.LabelModelName.AutoSize = True
-        Me.LabelModelName.Location = New System.Drawing.Point(55, 20)
-        Me.LabelModelName.Name = "LabelModelName"
-        Me.LabelModelName.Size = New System.Drawing.Size(67, 13)
-        Me.LabelModelName.TabIndex = 4
-        Me.LabelModelName.Text = "Model Name"
-        '
-        'LabelPromptModelName
-        '
-        Me.LabelPromptModelName.AutoSize = True
-        Me.LabelPromptModelName.Location = New System.Drawing.Point(9, 20)
-        Me.LabelPromptModelName.Name = "LabelPromptModelName"
-        Me.LabelPromptModelName.Size = New System.Drawing.Size(39, 13)
-        Me.LabelPromptModelName.TabIndex = 3
-        Me.LabelPromptModelName.Text = "Model:"
-        '
-        'ButtonClose
-        '
-        Me.ButtonClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonClose.Location = New System.Drawing.Point(702, 22)
-        Me.ButtonClose.Name = "ButtonClose"
-        Me.ButtonClose.Size = New System.Drawing.Size(73, 23)
-        Me.ButtonClose.TabIndex = 1
-        Me.ButtonClose.Text = "&Close"
-        Me.ButtonClose.UseVisualStyleBackColor = True
-        '
         'TabPageDefaults
         '
         Me.TabPageDefaults.Controls.Add(Me.GroupBoxDefaults)
@@ -497,41 +472,40 @@ Partial Class frmFEKLUploader
         Me.GroupBoxDefaults.TabStop = False
         Me.GroupBoxDefaults.Text = "Default Metadata Lineage Properties:"
         '
-        'LabelPromptDefaultDocumentName
+        'TextBoxDefaultPageNumber
         '
-        Me.LabelPromptDefaultDocumentName.AutoSize = True
-        Me.LabelPromptDefaultDocumentName.Location = New System.Drawing.Point(20, 36)
-        Me.LabelPromptDefaultDocumentName.Name = "LabelPromptDefaultDocumentName"
-        Me.LabelPromptDefaultDocumentName.Size = New System.Drawing.Size(90, 13)
-        Me.LabelPromptDefaultDocumentName.TabIndex = 0
-        Me.LabelPromptDefaultDocumentName.Text = "Document Name:"
+        Me.TextBoxDefaultPageNumber.Location = New System.Drawing.Point(116, 144)
+        Me.TextBoxDefaultPageNumber.Name = "TextBoxDefaultPageNumber"
+        Me.TextBoxDefaultPageNumber.Size = New System.Drawing.Size(100, 20)
+        Me.TextBoxDefaultPageNumber.TabIndex = 9
         '
-        'LabelPromptDefaultSection
+        'TextBoxDefaultSectionName
         '
-        Me.LabelPromptDefaultSection.AutoSize = True
-        Me.LabelPromptDefaultSection.Location = New System.Drawing.Point(52, 93)
-        Me.LabelPromptDefaultSection.Name = "LabelPromptDefaultSection"
-        Me.LabelPromptDefaultSection.Size = New System.Drawing.Size(58, 13)
-        Me.LabelPromptDefaultSection.TabIndex = 1
-        Me.LabelPromptDefaultSection.Text = "Section Id:"
+        Me.TextBoxDefaultSectionName.Location = New System.Drawing.Point(116, 117)
+        Me.TextBoxDefaultSectionName.Name = "TextBoxDefaultSectionName"
+        Me.TextBoxDefaultSectionName.Size = New System.Drawing.Size(370, 20)
+        Me.TextBoxDefaultSectionName.TabIndex = 8
         '
-        'LabelPromptDefaultPageNumber
+        'TextBoxDefaultSectionId
         '
-        Me.LabelPromptDefaultPageNumber.AutoSize = True
-        Me.LabelPromptDefaultPageNumber.Location = New System.Drawing.Point(35, 147)
-        Me.LabelPromptDefaultPageNumber.Name = "LabelPromptDefaultPageNumber"
-        Me.LabelPromptDefaultPageNumber.Size = New System.Drawing.Size(75, 13)
-        Me.LabelPromptDefaultPageNumber.TabIndex = 2
-        Me.LabelPromptDefaultPageNumber.Text = "Page Number:"
+        Me.TextBoxDefaultSectionId.Location = New System.Drawing.Point(116, 90)
+        Me.TextBoxDefaultSectionId.Name = "TextBoxDefaultSectionId"
+        Me.TextBoxDefaultSectionId.Size = New System.Drawing.Size(100, 20)
+        Me.TextBoxDefaultSectionId.TabIndex = 7
         '
-        'LabelPromptDefaultDocumentLocation
+        'TextBoxDefaultDocumentLocation
         '
-        Me.LabelPromptDefaultDocumentLocation.AutoSize = True
-        Me.LabelPromptDefaultDocumentLocation.Location = New System.Drawing.Point(7, 64)
-        Me.LabelPromptDefaultDocumentLocation.Name = "LabelPromptDefaultDocumentLocation"
-        Me.LabelPromptDefaultDocumentLocation.Size = New System.Drawing.Size(103, 13)
-        Me.LabelPromptDefaultDocumentLocation.TabIndex = 3
-        Me.LabelPromptDefaultDocumentLocation.Text = "Document Location:"
+        Me.TextBoxDefaultDocumentLocation.Location = New System.Drawing.Point(116, 61)
+        Me.TextBoxDefaultDocumentLocation.Name = "TextBoxDefaultDocumentLocation"
+        Me.TextBoxDefaultDocumentLocation.Size = New System.Drawing.Size(370, 20)
+        Me.TextBoxDefaultDocumentLocation.TabIndex = 6
+        '
+        'TextBoxDefaultDocumentName
+        '
+        Me.TextBoxDefaultDocumentName.Location = New System.Drawing.Point(116, 33)
+        Me.TextBoxDefaultDocumentName.Name = "TextBoxDefaultDocumentName"
+        Me.TextBoxDefaultDocumentName.Size = New System.Drawing.Size(370, 20)
+        Me.TextBoxDefaultDocumentName.TabIndex = 5
         '
         'LabelPromptDefaultSectionName
         '
@@ -542,40 +516,84 @@ Partial Class frmFEKLUploader
         Me.LabelPromptDefaultSectionName.TabIndex = 4
         Me.LabelPromptDefaultSectionName.Text = "Section Name:"
         '
-        'TextBoxDefaultDocumentName
+        'LabelPromptDefaultDocumentLocation
         '
-        Me.TextBoxDefaultDocumentName.Location = New System.Drawing.Point(116, 33)
-        Me.TextBoxDefaultDocumentName.Name = "TextBoxDefaultDocumentName"
-        Me.TextBoxDefaultDocumentName.Size = New System.Drawing.Size(370, 20)
-        Me.TextBoxDefaultDocumentName.TabIndex = 5
+        Me.LabelPromptDefaultDocumentLocation.AutoSize = True
+        Me.LabelPromptDefaultDocumentLocation.Location = New System.Drawing.Point(7, 64)
+        Me.LabelPromptDefaultDocumentLocation.Name = "LabelPromptDefaultDocumentLocation"
+        Me.LabelPromptDefaultDocumentLocation.Size = New System.Drawing.Size(103, 13)
+        Me.LabelPromptDefaultDocumentLocation.TabIndex = 3
+        Me.LabelPromptDefaultDocumentLocation.Text = "Document Location:"
         '
-        'TextBoxDefaultDocumentLocation
+        'LabelPromptDefaultPageNumber
         '
-        Me.TextBoxDefaultDocumentLocation.Location = New System.Drawing.Point(116, 61)
-        Me.TextBoxDefaultDocumentLocation.Name = "TextBoxDefaultDocumentLocation"
-        Me.TextBoxDefaultDocumentLocation.Size = New System.Drawing.Size(370, 20)
-        Me.TextBoxDefaultDocumentLocation.TabIndex = 6
+        Me.LabelPromptDefaultPageNumber.AutoSize = True
+        Me.LabelPromptDefaultPageNumber.Location = New System.Drawing.Point(35, 147)
+        Me.LabelPromptDefaultPageNumber.Name = "LabelPromptDefaultPageNumber"
+        Me.LabelPromptDefaultPageNumber.Size = New System.Drawing.Size(75, 13)
+        Me.LabelPromptDefaultPageNumber.TabIndex = 2
+        Me.LabelPromptDefaultPageNumber.Text = "Page Number:"
         '
-        'TextBoxDefaultSectionId
+        'LabelPromptDefaultSection
         '
-        Me.TextBoxDefaultSectionId.Location = New System.Drawing.Point(116, 90)
-        Me.TextBoxDefaultSectionId.Name = "TextBoxDefaultSectionId"
-        Me.TextBoxDefaultSectionId.Size = New System.Drawing.Size(100, 20)
-        Me.TextBoxDefaultSectionId.TabIndex = 7
+        Me.LabelPromptDefaultSection.AutoSize = True
+        Me.LabelPromptDefaultSection.Location = New System.Drawing.Point(52, 93)
+        Me.LabelPromptDefaultSection.Name = "LabelPromptDefaultSection"
+        Me.LabelPromptDefaultSection.Size = New System.Drawing.Size(58, 13)
+        Me.LabelPromptDefaultSection.TabIndex = 1
+        Me.LabelPromptDefaultSection.Text = "Section Id:"
         '
-        'TextBoxDefaultSectionName
+        'LabelPromptDefaultDocumentName
         '
-        Me.TextBoxDefaultSectionName.Location = New System.Drawing.Point(116, 117)
-        Me.TextBoxDefaultSectionName.Name = "TextBoxDefaultSectionName"
-        Me.TextBoxDefaultSectionName.Size = New System.Drawing.Size(370, 20)
-        Me.TextBoxDefaultSectionName.TabIndex = 8
+        Me.LabelPromptDefaultDocumentName.AutoSize = True
+        Me.LabelPromptDefaultDocumentName.Location = New System.Drawing.Point(20, 36)
+        Me.LabelPromptDefaultDocumentName.Name = "LabelPromptDefaultDocumentName"
+        Me.LabelPromptDefaultDocumentName.Size = New System.Drawing.Size(90, 13)
+        Me.LabelPromptDefaultDocumentName.TabIndex = 0
+        Me.LabelPromptDefaultDocumentName.Text = "Document Name:"
         '
-        'TextBoxDefaultPageNumber
+        'LabelModelName
         '
-        Me.TextBoxDefaultPageNumber.Location = New System.Drawing.Point(116, 144)
-        Me.TextBoxDefaultPageNumber.Name = "TextBoxDefaultPageNumber"
-        Me.TextBoxDefaultPageNumber.Size = New System.Drawing.Size(100, 20)
-        Me.TextBoxDefaultPageNumber.TabIndex = 9
+        Me.LabelModelName.AutoSize = True
+        Me.LabelModelName.Location = New System.Drawing.Point(55, 20)
+        Me.LabelModelName.Name = "LabelModelName"
+        Me.LabelModelName.Size = New System.Drawing.Size(67, 13)
+        Me.LabelModelName.TabIndex = 4
+        Me.LabelModelName.Text = "Model Name"
+        '
+        'LabelPromptModelName
+        '
+        Me.LabelPromptModelName.AutoSize = True
+        Me.LabelPromptModelName.Location = New System.Drawing.Point(9, 20)
+        Me.LabelPromptModelName.Name = "LabelPromptModelName"
+        Me.LabelPromptModelName.Size = New System.Drawing.Size(39, 13)
+        Me.LabelPromptModelName.TabIndex = 3
+        Me.LabelPromptModelName.Text = "Model:"
+        '
+        'ButtonClose
+        '
+        Me.ButtonClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ButtonClose.Location = New System.Drawing.Point(702, 22)
+        Me.ButtonClose.Name = "ButtonClose"
+        Me.ButtonClose.Size = New System.Drawing.Size(73, 23)
+        Me.ButtonClose.TabIndex = 1
+        Me.ButtonClose.Text = "&Close"
+        Me.ButtonClose.UseVisualStyleBackColor = True
+        '
+        'TimerHighlighting
+        '
+        Me.TimerHighlighting.Enabled = True
+        Me.TimerHighlighting.Interval = 2000
+        '
+        'Button1
+        '
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.Button1.Location = New System.Drawing.Point(599, 31)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(25, 23)
+        Me.Button1.TabIndex = 48
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'frmFEKLUploader
         '
@@ -659,4 +677,6 @@ Partial Class frmFEKLUploader
     Friend WithEvents LabelPromptDefaultPageNumber As Label
     Friend WithEvents LabelPromptDefaultSection As Label
     Friend WithEvents LabelPromptDefaultDocumentName As Label
+    Friend WithEvents TimerHighlighting As Timer
+    Friend WithEvents Button1 As Button
 End Class

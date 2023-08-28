@@ -702,6 +702,11 @@
     <Compile Include="ClassesFBMInterfaceHost\tFBMInterfaceHost.vb" />
     <Compile Include="ClassesFEKL\tFEKL4JSON.vb" />
     <Compile Include="ClassesFEKL\tFEKLGPTKnowledgeExtractor.vb" />
+    <Compile Include="ClassesFEKL\TinyPG\tFEKLParser.vb" />
+    <Compile Include="ClassesFEKL\TinyPG\tFEKLParseTree.vb" />
+    <Compile Include="ClassesFEKL\TinyPG\tFEKLScanner.vb" />
+    <Compile Include="ClassesFEKL\TinyPG\tFEKLTextHighlighter.vb" />
+    <Compile Include="ClassesFEKL\TinyPG\tTextMarker.vb" />
     <Compile Include="ClassesGeneral\BostonTreeView.vb">
       <SubType>Component</SubType>
     </Compile>

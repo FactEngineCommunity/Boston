@@ -16,6 +16,11 @@ Public Class frmFEKLUploader
 
     Private miFEKLStraightProcessedUpToLine As Integer = 0
 
+    Public zrScanner As FEKL.Scanner
+    Public zrParser As FEKL.Parser
+    Public WithEvents zrTextHighlighter As FEKL.TextHighlighter
+    Private TextMarker As FEKL.Controls.TextMarker
+
     Private Sub frmFEKLUploader_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         Try
@@ -37,6 +42,19 @@ Public Class frmFEKLUploader
             Me.LabelModelName.Text = Me.mrModel.Name
 
             Call Me.LoadDatabaseTypes()
+
+            '-------------------------------------------------------
+            'Setup the Parser etc
+            '---------------------
+            zrScanner = New FEKL.Scanner
+            zrParser = New FEKL.Parser(zrScanner)
+            'Set in refresh button
+            'Me.zrTextHighlighter = New FEKL.TextHighlighter(
+            '                       Me.RichTextBoxFEKLDocument,
+            '                       Me.zrScanner,
+            '                       Me.zrParser)
+
+            Me.TextMarker = New FEKL.Controls.TextMarker(Me.RichTextBoxFEKLDocument)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -306,35 +324,19 @@ Public Class frmFEKLUploader
 
     End Sub
 
-    Private Sub RichTextBoxFEKLDocument_KeyDown(sender As Object, e As KeyEventArgs) Handles RichTextBoxFEKLDocument.KeyDown
-
-        Try
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-        End Try
-
-    End Sub
-
     Private Sub RichTextBoxFEKLDocument_Click(sender As Object, e As EventArgs) Handles RichTextBoxFEKLDocument.Click
 
         Try
             Dim CaretPosition As Integer = Me.RichTextBoxFEKLDocument.SelectionStart
-            Me.RichTextBoxFEKLDocument.SelectAll()
-            Me.RichTextBoxFEKLDocument.SelectionBackColor = Me.RichTextBoxFEKLDocument.BackColor
-            Me.RichTextBoxFEKLDocument.DeselectAll()
-            Try
-                Me.RichTextBoxFEKLDocument.SelectionStart = CaretPosition
-                Me.RichTextBoxFEKLDocument.SelectionLength = 0
-                Me.RichTextBoxFEKLDocument.ScrollToCaret()
-            Catch ex As Exception
-                'Not a biggie.
-            End Try
+            'Me.RichTextBoxFEKLDocument.SelectAll()
+            'Me.RichTextBoxFEKLDocument.SelectionBackColor = Me.RichTextBoxFEKLDocument.BackColor
+            'Me.RichTextBoxFEKLDocument.DeselectAll()
+            'Try
+            Me.RichTextBoxFEKLDocument.SelectionStart = CaretPosition
+            '    Me.RichTextBoxFEKLDocument.SelectionLength = 0
+            'Catch ex As Exception
+            '    'Not a biggie.
+            'End Try
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -895,6 +897,78 @@ Public Class frmFEKLUploader
         Try
             Me.DataGridViewFEKLStatements.Refresh()
             Me.DataGridViewFEKLStatements.Invalidate()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+        Try
+            Me.RichTextBoxFEKLDocument.ResetHighlighting
+            Me.zrTextHighlighter = New FEKL.TextHighlighter(
+                                   Me.RichTextBoxFEKLDocument,
+                                   Me.zrScanner,
+                                   Me.zrParser)
+
+            Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.RichTextBoxFEKLDocument.Text)
+
+            Call Me.zrTextHighlighter.HighlightText()
+
+            Me.TextMarker.Clear()
+            Me.LabelErrorType.Text = [Interface].pcenumErrorType.None.ToString
+            Me.LabelErrorMessage.Text = ""
+            Me.LabelErrorType.ForeColor = Color.Black
+            Me.LabelErrorMessage.ForeColor = Color.Black
+            If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
+                Me.TextMarker.AddWord(Me.zrTextHighlighter.Tree.Errors(0).Position, Me.zrTextHighlighter.Tree.Errors(0).Length, Color.Red)
+                Me.RichTextBoxFEKLDocument.SelectionStart = Me.zrTextHighlighter.Tree.Errors(0).Position
+                Me.RichTextBoxFEKLDocument.Invalidate()
+                Me.RichTextBoxFEKLDocument.Refresh()
+                Me.RichTextBoxFEKLDocument.Invalidate()
+                Me.RichTextBoxFEKLDocument.Update()
+                Me.RichTextBoxFEKLDocument.ScrollToCaret()
+
+                Me.LabelErrorType.Text = [Interface].pcenumErrorType.SyntaxError.ToString
+                Me.LabelErrorMessage.Text = Me.zrTextHighlighter.Tree.Errors(0).Message
+                Me.LabelErrorType.ForeColor = Color.Red
+                Me.LabelErrorMessage.ForeColor = Color.Red
+                Me.TextMarker.MarkWords()
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub RichTextBoxFEKLDocument_KeyDown(sender As Object, e As KeyEventArgs) Handles RichTextBoxFEKLDocument.KeyDown
+
+        Try
+            'CodeSafe
+            If Me.zrTextHighlighter Is Nothing Then Exit Sub
+
+            Me.zrTextHighlighter.threadAutoHighlight.Join(10)
+            If Me.zrTextHighlighter.threadAutoHighlight.IsAlive Then
+                Me.zrTextHighlighter.threadAutoHighlight.Abort()
+                Dim liSelectionStart = Me.RichTextBoxFEKLDocument.SelectionStart
+                Me.RichTextBoxFEKLDocument.ResetHighlighting
+                Me.RichTextBoxFEKLDocument.SelectionStart = liSelectionStart
+
+            End If
+            Me.zrTextHighlighter.Dispose()
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
