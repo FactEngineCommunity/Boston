@@ -3814,15 +3814,21 @@ PostRDSProcessing:
                         Dim lsFolderLocation As String
                         Dim lsFileName As String
 
-                        If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+                        Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                        lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-                            Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                            lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+                        Select Case My.Settings.DatabaseType
+                            Case Is = pcenumDatabaseType.MSJet.ToString,
+                                      pcenumDatabaseType.SQLite.ToString
+                                'Data Source' in ConnectionString
+                                lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+                                Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
+                                lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
+                            Case Else
+                                'No 'Data Source' in ConnectionString
+                                lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                        End Select
 
-                            lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
-                        Else
-                            lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
-                        End If
                         System.IO.Directory.CreateDirectory(lsFolderLocation)
                         lsFileName = Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
                         lsFileLocationName = lsFolderLocation & "\" & lsFileName
@@ -3861,15 +3867,20 @@ PostRDSProcessing:
                 Dim lsFileName As String
                 Dim lsFileLocationName As String
 
-                If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
 
-                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+                Select Case My.Settings.DatabaseType
+                    Case Is = pcenumDatabaseType.MSJet.ToString,
+                              pcenumDatabaseType.SQLite.ToString
+                        'Data Source' in ConnectionString
+                        lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+                        Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
+                        lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
+                    Case Else
+                        'No 'Data Source' in ConnectionString
+                        lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                End Select
 
-                    lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
-                Else
-                    lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
-                End If
 
                 lsFileName = Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
                 lsFileLocationName = lsFolderLocation & "\" & lsFileName
@@ -4773,21 +4784,20 @@ SkipRDSProcessing:
                 If Boston.IsSerializable(lrExportModel) Then
 
                     Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
 
-                    If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+                    Select Case My.Settings.DatabaseType
+                        Case Is = pcenumDatabaseType.MSJet.ToString,
+                                      pcenumDatabaseType.SQLite.ToString
+                            'Data Source' in ConnectionString
+                            lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+                            Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
+                            lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
+                        Case Else
+                            'No 'Data Source' in ConnectionString
+                            lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                    End Select
 
-                        Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                        lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
-
-                        lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
-                    Else
-                        Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                        lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
-                        Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
-                        lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
-                        'NB My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
-                        '  is no good, becase is User and Assembly Version Number specific. Need to store in C:\Program Data
-                    End If
                     System.IO.Directory.CreateDirectory(lsFolderLocation)
                     lsFileName = Trim(Me.ModelId & "-" & Me.Name)
                     lsXMLFileLocationName = lsFolderLocation & "\" & lsFileName & ".fbm"
@@ -4855,16 +4865,22 @@ SkipRDSProcessing:
 
 
                 Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
 
-                If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+                Select Case My.Settings.DatabaseType
+                    Case Is = pcenumDatabaseType.MSJet.ToString,
+                                      pcenumDatabaseType.SQLite.ToString
+                        'Data Source' in ConnectionString
+                        lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+                        Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
+                        lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
+                    Case Else
+                        'No 'Data Source' in ConnectionString
+                        lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                End Select
 
-                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-                    lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
-                Else
-                    lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
-                End If
+
                 System.IO.Directory.CreateDirectory(lsFolderLocation)
                 lsFileName = Trim(Me.ModelId & "-OBJECTXML-" & Me.Name) & ".json"
                 lsFileLocationName = lsFolderLocation & "\" & lsFileName
@@ -4943,16 +4959,22 @@ SkipRDSProcessing:
                 If Me.StoreAsXML Then
                     Dim lsFileName, lsNewFileName As String
                     Dim lsFolderLocation As String
+
                     Dim lsConnectionString As String = Trim(My.Settings.DatabaseConnectionString)
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
 
-                    If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
-                        Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                        lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+                    Select Case My.Settings.DatabaseType
+                        Case Is = pcenumDatabaseType.MSJet.ToString,
+                                      pcenumDatabaseType.SQLite.ToString
+                            'Data Source' in ConnectionString
+                            lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+                            Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
+                            lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
+                        Case Else
+                            'No 'Data Source' in ConnectionString
+                            lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                    End Select
 
-                        lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
-                    Else
-                        lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
-                    End If
                     System.IO.Directory.CreateDirectory(lsFolderLocation)
 
                     lsFileName = lsFolderLocation & "\" & Trim(Me.ModelId & "-" & Me.Name) & ".fbm"
@@ -6586,14 +6608,16 @@ SkipModelElement: 'Because is not in the ModelDictionary
             Dim lsBLOBFileLocationName As String
 
             Try
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+
                 If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
 
-                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
                     lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
-
                     lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
                 Else
-                    lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                    lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+                    Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
+                    lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
                 End If
 
                 lsFileName = Me.ModelId & "-" & Me.Name
@@ -6814,13 +6838,15 @@ XMLDeserialisation:
             Dim lsMessage As String
 
             Try
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
                 If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
-                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
                     lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
 
                     lsFolderLocation = Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source")) & "\XML"
                 Else
-                    lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\XML"
+                    lrSQLConnectionStringBuilder.ConnectionString = My.Settings.DatabaseConnectionString
+                    Dim lsPath = System.IO.Path.GetDirectoryName(lrSQLConnectionStringBuilder("Data Source"))
+                    lsFolderLocation = Path.GetDirectoryName(lsPath) & "\database\XML"
                 End If
 
 

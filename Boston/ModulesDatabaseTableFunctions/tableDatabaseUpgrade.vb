@@ -195,8 +195,8 @@ Public Module tableDatabaseUpgrade
 
         lsSQLQuery = "SELECT *"
         lsSQLQuery &= " FROM DatabaseUpgrade"
-        lsSQLQuery &= " WHERE (ToVersion = ("
-        lsSQLQuery &= "                     SELECT MAX(upg2.ToVersion)"
+        lsSQLQuery &= " WHERE (csng(ToVersion) = ("
+        lsSQLQuery &= "                     SELECT MAX(csng(upg2.ToVersion))"
         lsSQLQuery &= "                       FROM DatabaseUpgrade upg2"
         lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yet
         lsSQLQuery &= "                        AND csng(ToVersion) <= " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
@@ -204,13 +204,13 @@ Public Module tableDatabaseUpgrade
         lsSQLQuery &= "   AND SuccessfulImplementation = FALSE)" 'i.e. Upgrade has not been performed yet
         lsSQLQuery &= "   OR"
         lsSQLQuery &= " (ToVersion = ("
-        lsSQLQuery &= "                     SELECT MIN(upg3.ToVersion)"
+        lsSQLQuery &= "                     SELECT MIN(csng((upg3.ToVersion))"
         lsSQLQuery &= "                       FROM DatabaseUpgrade upg3"
         lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yet
         lsSQLQuery &= "                        AND csng(upg3.ToVersion) >= " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
         lsSQLQuery &= "                     )"
         lsSQLQuery &= "   AND SuccessfulImplementation = FALSE)" 'i.e. Upgrade has not been performed yet\
-        lsSQLQuery &= " ORDER BY ToVersion DESC"
+        lsSQLQuery &= " ORDER BY csng(ToVersion) DESC"
 
 
         lrRecordset.Open(lsSQLQuery, , , pc_cmd_table)
@@ -274,6 +274,5 @@ Public Module tableDatabaseUpgrade
         End Try
 
     End Sub
-
 
 End Module
