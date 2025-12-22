@@ -25,7 +25,7 @@ Bi-directinal modeling is managed via events within a MVC (Model View Controller
 
 The effect is that the user can model in their required language (ORM, ERD, LPG, etc) and the common metamodel (ultimately at the ORM meta/metamodel layer) updated by the software via the events of the MVC architecture.
 
-## Folders/Directories
+Folders/Directories
 ===================
 
 \ClassesLANGUAGEORM\: Stores the Object-Role Modeling (Fact-Based Modelling) meta/metamodel classes;
