@@ -17,6 +17,7 @@ Architecture
 Boston uses a 4-Layer Architecture where the metamodel of various languages (ERDs, LPGs, STDs, UCDs) are stored within the metamodel of Object-Role Modeling using Sample Populations/Fact Tables as the data storage of the model elements of the metamodel, making the ORM metamodel as meta-metamodel for that purpose.  
 
 Pages/Views store the language of interpretation for each language (ORM, ERD, LPG, STD, UCD) and Boston interprets the ORM model for that Page/View as the respective language.  
+
 Effectively a stylised Ehrenfeucht-Fraisse Game is established where the Duplicator 'wins' by finding the required structure of a given language within the given ORM model within the ORM meta/metamodel. Flagging each Page/View with the language of interpretation acts as a signalling mechanism under the same game theoretic approach to model interpretation.  
 
 See the paper in the root directory: Applied Use Of Ehrenfeucht-FraisseGames In Conceptual Model Management  And Model Transformation. AppliedUseOfEhrenfeuchtFraisseGamesInConceptualModelManagementAndModelTransformation.pdf
