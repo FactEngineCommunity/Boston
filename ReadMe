@@ -1,1 +1,9 @@
+Conceptual Modelling software with bi-directional modelling between Object-Role Modeling, Entity Relationship Diagrams, Labelled Property Graphs, Use Case Diagrams and State Transition Diagrams.
 
+Requires Mindfusion.eu FlowCharter.Net Professional Edition, 248f04/msi which may be available from Mindfusion (‎Digitally Signed: Wednesday, ‎24 ‎October ‎2007 11:01:57 PM)
+
+## Database
+
+boston.db (SQLite) is in the \database directory
+
+Set [FirstRun] setting to 'True' for distributable, which copies the Boston database to C:\Users\**UserName**\AppData\Local\FactEngine\Boston\Database on first run of Boston.
