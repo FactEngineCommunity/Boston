@@ -19,6 +19,8 @@ Boston uses a 4-Layer Architecture where the metamodel of various languages (ERD
 Pages/Views store the language of interpretation for each language (ORM, ERD, LPG, STD, UCD) and Boston interprets the ORM model for that Page/View as the respective language.
 Effectively a stylised Ehrenfeucht-Fraisse Game is established where the Duplicator 'wins' by finding the required structure of a given language within the given ORM model within the ORM meta/metamodel. Flagging each Page/View with the language of interpretation acts as a signalling mechanism under the same game theoretic approach to model interpretation.
 
+See the paper in the root directory: Applied Use Of Ehrenfeucht-FraisseGames In Conceptual Model Management  And Model Transformation. AppliedUseOfEhrenfeuchtFraisseGamesInConceptualModelManagementAndModelTransformation.pdf
+
 Bi-directinal modeling is managed via events within a MVC (Model View Controller) architecture with Property Graph Schema (Labelled Property Graphs) and Entity Relationship Diagrams sharing a common metamodel, differentiated at interpretation (View Projection) time.
 
 The effect is that the user can model in their required language (ORM, ERD, LPG, etc) and the common metamodel (ultimately at the ORM meta/metamodel layer) updated by the software via the events of the MVC architecture.
