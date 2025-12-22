@@ -2,6 +2,8 @@ Conceptual Modelling software with bi-directional modelling between Object-Role 
 
 Requires Mindfusion.eu FlowCharter.Net Professional Edition, 248f04/msi which may be available from Mindfusion (‎Digitally Signed: Wednesday, ‎24 ‎October ‎2007 11:01:57 PM)
 
+![Morphing between 5 languages](./Morphing-5-Five-Languages.gif)
+
 Database
 =========
 
