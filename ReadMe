@@ -8,3 +8,7 @@ Database
 boston.db (SQLite) is in the \database directory
 
 Set [FirstRun] setting to 'True' for distributable, which copies the Boston database to C:\Users\<UserName>\AppData\Local\FactEngine\Boston\Database on first run of Boston.
+
+Details of the Fact-Based Modelling metamodel used by Boston can be found at: https://github.com/FactEngineCommunity/Fact-Based-Modelling-MetaModel
+
+
