@@ -1,4 +1,4 @@
-Conceptual Modelling software with bi-directional modelling between Object-Role Modeling, Entity Relationship Diagrams, Labelled Property Graphs, Use Case Diagrams and State Transition Diagrams.
+Conceptual Modelling software with bi-directional modelling between Object-Role Modeling (ORM), Entity Relationship Diagrams, Labelled Property Graphs, Use Case Diagrams and State Transition Diagrams.
 
 Requires Mindfusion.eu FlowCharter.Net Professional Edition, 248f04/msi which may be available from Mindfusion (‎Digitally Signed: Wednesday, ‎24 ‎October ‎2007 11:01:57 PM)
 
@@ -11,4 +11,30 @@ Set [FirstRun] setting to 'True' for distributable, which copies the Boston data
 
 Details of the Fact-Based Modelling metamodel used by Boston can be found at: https://github.com/FactEngineCommunity/Fact-Based-Modelling-MetaModel
 
+Architecture
+============
+
+Boston uses a 4-Layer Architecture where the metamodel of various languages (ERDs, LPGs, STDs, UCDs) are stored within the metamodel of Object-Role Modeling using Sample Populations/Fact Tables as the data storage of the model elements of the metamodel, making the ORM metamodel as meta-metamodel for that purpose.
+
+Pages/Views store the language of interpretation for each language (ORM, ERD, LPG, STD, UCD) and Boston interprets the ORM model for that Page/View as the respective language.
+Effectively a stylised Ehrenfeucht-Fraisse Game is established where the Duplicator 'wins' by finding the required structure of a given language within the given ORM model within the ORM meta/metamodel. Flagging each Page/View with the language of interpretation acts as a signalling mechanism under the same game theoretic approach to model interpretation.
+
+Bi-directinal modeling is managed via events within a MVC (Model View Controller) architecture with Property Graph Schema (Labelled Property Graphs) and Entity Relationship Diagrams sharing a common metamodel, differentiated at interpretation (View Projection) time.
+
+The effect is that the user can model in their required language (ORM, ERD, LPG, etc) and the common metamodel (ultimately at the ORM meta/metamodel layer) updated by the software via the events of the MVC architecture.
+
+## Folders/Directories
+===================
+
+\ClassesLANGUAGEORM\: Stores the Object-Role Modeling (Fact-Based Modelling) meta/metamodel classes;
+\ClassesLANGUAGEORM\ORMInstances\: Stores the View classes of the MVC architecture, for ORM Diagrams, and as used within Pages/Views for other languages;
+\ClassesLANGUAGERDS\: Stores the 'Relational Data Structure', which is the common metamodel between Entity Relationship Diagrams and Labelled Property Graphs;
+\ClassesLANGUAGEPGS\: Stores Property Graph Schema (Labelled Property Graph) specific classes (used at the View level);
+\ClassesLANGUAGEERD\: Stores Entity Relationship Diagram specific classes (used at the View level);
+\ClassesLANGUAGEUCD\: Stores Use Case Diagram specific classes (used at the View level);
+\ClassesLANGUAGESTD\: Stores State Transition Diagram specific classes (used at the View level);
+
+\Forms\Diagrams: Stores the forms for the various views (ORM, ERD, LPG, STD, UCD);
+
+\ClassesLANGUAGEORM\ORMCMML\: Stores the (partial) classes of the ORM metamodel with methods to manage view data (Sample Populations/Fact Tables) for languages other than ORM;
 
