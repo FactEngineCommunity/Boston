@@ -39,7 +39,7 @@ Folders/Directories
 **\ClassesLANGUAGEUCD\:** Stores Use Case Diagram specific classes (used at the View level);  
 **\ClassesLANGUAGESTD\:** Stores State Transition Diagram specific classes (used at the View level);  
 
-\Forms\Diagrams: Stores the forms for the various views (ORM, ERD, LPG, STD, UCD);  
+**\Forms\Diagrams\:** Stores the forms for the various views (ORM, ERD, LPG, STD, UCD);  
 
-\ClassesLANGUAGEORM\ORMCMML\: Stores the (partial) classes of the ORM metamodel with methods to manage view data (Sample Populations/Fact Tables) for languages other than ORM;
+**\ClassesLANGUAGEORM\ORMCMML\:** Stores the (partial) classes of the ORM metamodel with methods to manage view data (Sample Populations/Fact Tables) for languages other than ORM;
 
