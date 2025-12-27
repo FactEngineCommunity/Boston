@@ -31,13 +31,13 @@ The effect is that the user can model in their required language (ORM, ERD, LPG,
 Folders/Directories
 ===================
 
-\ClassesLANGUAGEORM\: Stores the Object-Role Modeling (Fact-Based Modelling) meta/metamodel classes;  
-\ClassesLANGUAGEORM\ORMInstances\: Stores the View classes of the MVC architecture, for ORM Diagrams, and as used within Pages/Views for other languages;  
-\ClassesLANGUAGERDS\: Stores the 'Relational Data Structure', which is the common metamodel between Entity Relationship Diagrams and Labelled Property Graphs;  
-\ClassesLANGUAGEPGS\: Stores Property Graph Schema (Labelled Property Graph) specific classes (used at the View level);  
-\ClassesLANGUAGEERD\: Stores Entity Relationship Diagram specific classes (used at the View level);  
-\ClassesLANGUAGEUCD\: Stores Use Case Diagram specific classes (used at the View level);  
-\ClassesLANGUAGESTD\: Stores State Transition Diagram specific classes (used at the View level);  
+**\ClassesLANGUAGEORM\:** Stores the Object-Role Modeling (Fact-Based Modelling) meta/metamodel classes;  
+**\ClassesLANGUAGEORM\ORMInstances\:** Stores the View classes of the MVC architecture, for ORM Diagrams, and as used within Pages/Views for other languages;  
+**\ClassesLANGUAGERDS\:** Stores the 'Relational Data Structure', which is the common metamodel between Entity Relationship Diagrams and Labelled Property Graphs;  
+**\ClassesLANGUAGEPGS\:** Stores Property Graph Schema (Labelled Property Graph) specific classes (used at the View level);  
+**\ClassesLANGUAGEERD\:** Stores Entity Relationship Diagram specific classes (used at the View level);  
+**\ClassesLANGUAGEUCD\:** Stores Use Case Diagram specific classes (used at the View level);  
+**\ClassesLANGUAGESTD\:** Stores State Transition Diagram specific classes (used at the View level);  
 
 \Forms\Diagrams: Stores the forms for the various views (ORM, ERD, LPG, STD, UCD);  
 
