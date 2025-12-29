@@ -47,7 +47,7 @@ Folders/Directories
 
 ## Metamodel
 
-The Metamodel used by Boston is documented at: https://github.com/FactEngineCommunity/Fact-Based-Modelling-MetaModel.
+The Metamodel used by Boston is documented at: https://github.com/FactEngineCommunity/Fact-Based-Modelling-MetaModel with ORMModel and ORMDiagram rather than FBMModel and FBMDiagram (otherwise the same).
 
 The .fbm (Fact-Based Modelling) file extension is used for persisting models as XML using the Fact-Based Modelling MetaModel.  
 
