@@ -13,6 +13,8 @@ Set [FirstRun] setting to 'True' for distributable, which copies the Boston data
 
 Details of the Fact-Based Modelling metamodel used by Boston can be found at: https://github.com/FactEngineCommunity/Fact-Based-Modelling-MetaModel.  
 
+**NB** Models may be stored completely within the databased (slowest performance), or the database table, MetaModelModel, used to reference the Model persisted as XML within a .fbm file (fastest performance).
+
 Architecture
 ============
 
@@ -40,6 +42,13 @@ Folders/Directories
 **\ClassesLANGUAGESTD\:** Stores State Transition Diagram specific classes (used at the View level);  
 
 **\Forms\Diagrams\:** Stores the forms for the various views (ORM, ERD, LPG, STD, UCD);  
+
+
+## Metamodel
+
+The Metamodel used by Boston is documented at: https://github.com/FactEngineCommunity/Fact-Based-Modelling-MetaModel.
+
+The .fbm (Fact-Based Modelling) file extension is used for persisting models as XML using the Fact-Based Modelling MetaModel.
 
 **\ClassesLANGUAGEORM\ORMCMML\:** Stores the (partial) classes of the ORM metamodel with methods to manage view data (Sample Populations/Fact Tables) for languages other than ORM;
 
