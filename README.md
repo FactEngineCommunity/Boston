@@ -43,12 +43,11 @@ Folders/Directories
 
 **\Forms\Diagrams\:** Stores the forms for the various views (ORM, ERD, LPG, STD, UCD);  
 
+**\ClassesLANGUAGEORM\ORMCMML\:** Stores the (partial) classes of the ORM metamodel with methods to manage view data (Sample Populations/Fact Tables) for languages other than ORM;
 
 ## Metamodel
 
 The Metamodel used by Boston is documented at: https://github.com/FactEngineCommunity/Fact-Based-Modelling-MetaModel.
 
-The .fbm (Fact-Based Modelling) file extension is used for persisting models as XML using the Fact-Based Modelling MetaModel.
-
-**\ClassesLANGUAGEORM\ORMCMML\:** Stores the (partial) classes of the ORM metamodel with methods to manage view data (Sample Populations/Fact Tables) for languages other than ORM;
+The .fbm (Fact-Based Modelling) file extension is used for persisting models as XML using the Fact-Based Modelling MetaModel.  
 
