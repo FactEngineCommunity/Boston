@@ -6,7 +6,9 @@ Requires Mindfusion.eu FlowCharter.Net Professional Edition, 248f04/msi which ma
 
 Enterprise Ready
 ================
-Supports Projects, Users, Groups, Functions, Roles, Permissions in a client-server configuration. May be virtualised with peer-2-peer model management between users.
+Supports Projects, Users, Groups, Functions, Roles, Permissions in a client-server configuration. May be virtualised with peer-2-peer model management between users. Contact www.factengine.ai for Boston Enterprise support with Boston Server managing peer-2-peer relationships.
+
+Or run as stand-alone Windows application.
 
 Database
 =========
