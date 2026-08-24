@@ -14,6 +14,8 @@
         ''' <remarks></remarks>
         Public IPAddress As String = ""
 
+        Public BrowserId As String = ""
+
     End Class
 
 End Namespace

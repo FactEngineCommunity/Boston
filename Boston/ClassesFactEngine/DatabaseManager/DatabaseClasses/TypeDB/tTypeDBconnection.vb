@@ -120,7 +120,7 @@ Namespace FactEngine.TypeDB
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Column)
             End Try
@@ -257,7 +257,7 @@ Namespace FactEngine.TypeDB
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Index)
             End Try
@@ -291,7 +291,7 @@ Namespace FactEngine.TypeDB
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return pcenumORMDataType.TextVariableLength
             End Try
@@ -299,7 +299,7 @@ Namespace FactEngine.TypeDB
         End Function
 
 
-        Public Overrides Sub getDatabaseTypes()
+        Public Overrides Sub getDatabaseDataTypes()
 
             Try
                 Dim lsPath = Boston.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
@@ -314,7 +314,7 @@ Namespace FactEngine.TypeDB
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -384,7 +384,7 @@ Namespace FactEngine.TypeDB
 
                 lsMessage = "Error: " & arTable.Name & ":" & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message & ex.StackTrace
-                'prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                'prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 'Return New List(Of RDS.Relation)
                 Throw New Exception(lsMessage)
@@ -479,7 +479,7 @@ Namespace FactEngine.TypeDB
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Table)
             End Try
@@ -523,8 +523,8 @@ Namespace FactEngine.TypeDB
 
                                     Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
                                     lrFactType.RoleGroup.AddUnique(lrRole)
-                                    lrRecordset.Columns.Add(lsColumnName)
-                                Next
+                                lrRecordset.ColumnNames.Add(lsColumnName)
+                            Next
                             End If
 
                             Dim loFieldValue As Object = Nothing
@@ -698,14 +698,14 @@ Namespace FactEngine.TypeDB
                 '                        Dim loEncoding As String = loValue.Type.Encoding.ToString
                 '                            Dim loValueType As String = loValue.Type.ValueType.ToString
                 '                            If Not (loEncoding.StartsWith("Attribute") Or loEncoding.StartsWith("Relation")) Then
-                '                                'Debugger.Break()
+                '                                Throw New Exception("There is a problem with the Encoding")
                 '                            End If
 
                 '                        Catch ex As Exception
                 '                            'Not a biggie at this stage.
                 '                        End Try
                 '                    Case Else
-                '                        'Debugger.Break()
+                '                        Throw New Exception("Unexpected Type")
                 '                End Select
 
                 '                Try
@@ -743,6 +743,9 @@ Namespace FactEngine.TypeDB
             Throw New NotImplementedException()
         End Function
 
+        Private Function iDatabaseConnection_GOAbstractionLayer(asQuery As String) As Recordset Implements iDatabaseConnection.GOAbstractionLayer
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 End Namespace

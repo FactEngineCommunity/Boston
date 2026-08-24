@@ -1,6 +1,5 @@
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
-Imports System.Reflection
 Imports MindFusion.Diagramming
 Imports MindFusion.Drawing
 Imports MindFusion.Diagramming.Layout
@@ -13,6 +12,12 @@ Imports TextureBrush = MindFusion.Drawing.TextureBrush
 Imports System.IO
 Imports System.Threading
 Imports System.ComponentModel
+Imports System.Text.RegularExpressions
+Imports System.Reflection
+Imports System.Runtime.InteropServices
+Imports Boston.FBM
+Imports com.sun.swing.internal.plaf.metal.resources
+'Imports Boston.BPMN
 
 Public Class frmDiagramORM
 
@@ -29,6 +34,16 @@ Public Class frmDiagramORM
     Dim pdfExp As New MindFusion.Diagramming.Export.PdfExporter
     Private MorphVector As New List(Of tMorphVector)
 
+    'Derivation Text Highlighter
+    '20231108-VM-Tried, but did not work. Could not replace the InplaceEdit (for a Shape) with a RichTextBox.
+    '  Revisit, because could not persue because of an internet outage.
+    Public zrScanner As New FEQL.Scanner
+    Public zrParser As New FEQL.Parser(Me.zrScanner)
+    Public zrNORMADerivationScanner As New ORMDerivation.Scanner
+    Public zrNORMADerivationParser As New ORMDerivation.Parser(Me.zrNORMADerivationScanner)
+    Public WithEvents zrTextHighlighter As FEQL.TextHighlighter
+    Public WithEvents zrNORMADerivationTextHighlighter As ORMDerivation.TextHighlighter
+
     '--------------------------------------------
     'Declare variables for use with ComboBoxFact
     '--------------------------------------------
@@ -40,6 +55,68 @@ Public Class frmDiagramORM
     Public _ComboBoxValueTypeInstance As New ComboBox 'NB See Page.TableCellClicked event and FBM.FactTypeInstance handling of that event for loading of the combobox.
 
     Private PropertyTableNode As TableNode
+
+    Private mrDerivationsRichtextEditor As RichTextBox = Nothing
+
+    Private Sub ORMModel_frm_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+
+        Try
+            Call SetupForm() 'NB DisplayORMModelPage is the method that loads the objects onto the Page. This is called by frmMain.LoadORMModelPage
+
+            Me._ComboBoxFactInstance = Me.ComboBoxFact
+            Me._ComboBoxEntityTypeInstance = Me.ComboBoxEntityType
+            Me._ComboBoxValueTypeInstance = Me.ComboBoxValueType
+
+            prApplication.ActivePages.AddUnique(Me)
+
+            Call frmMain.ShowHideMenuOptions()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Sub SetupForm()
+
+        'NB LoadORMModelPage is the method that loads the objects onto the Page. This is called by frmMain.LoadORMModelPage
+
+        Try
+            Me.Briana = Me.Animator1
+            Me.CircularProgressBar.SendToBack()
+
+            Me.MenuItemHelpTips.Checked = True
+
+            Me.DiagramView.InplaceEditAcceptOnEnter = True
+            Me.DiagramView.InplaceEditCancelOnEsc = True
+
+            Diagram.Selection.Pen.Width = 0.5
+
+            Diagram.UndoManager.UndoEnabled = True
+            Diagram.Selection.AllowMultipleSelection = True
+
+            Me.ViewFactTablesToolStripMenuItem.Checked = My.Settings.ShowFactTablesOnORMModelLoad
+
+            Call Me.ShowHideToolStripMenuItems()
+
+            Call Me.ResizeHelpTipsBox()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 
     Public Shadows Sub BringToFront(Optional asSelectModelElementId As String = Nothing)
 
@@ -99,7 +176,7 @@ Public Class frmDiagramORM
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -243,7 +320,7 @@ Public Class frmDiagramORM
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -269,7 +346,7 @@ Public Class frmDiagramORM
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -345,7 +422,7 @@ Public Class frmDiagramORM
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -374,12 +451,12 @@ Public Class frmDiagramORM
 
 #Region "Debugging"
             lsDebugMessage = "Changing FactDataInstance at Row:" & _row & ", Col:" & _col & " in FactTable"
-            If IsSomething(lrFactInstance.FactType) Then
+            If lrFactInstance.FactType IsNot Nothing Then
                 lsDebugMessage &= vbCrLf & "FactType.Id: " & lrFactInstance.FactType.Id
             Else
                 lsDebugMessage &= vbCrLf & "FactType.Id: Nothing"
             End If
-            If IsSomething(lrFactInstance.Fact) Then
+            If lrFactInstance.Fact IsNot Nothing Then
                 lsDebugMessage &= vbCrLf & "Fact.Symbol: " & lrFactInstance.Id
                 lsDebugMessage &= vbCrLf & lrFactInstance.Fact.EnumerateAsBracketedFact
             Else
@@ -388,12 +465,12 @@ Public Class frmDiagramORM
             '20220617-VM-Not use for FactDataInstances...but for FactInstances (as above)
             'lsDebugMessage &= vbCrLf & "Role.Id :" & lrFactDataInstance.Role.Id
             'lsDebugMessage &= vbCrLf & vbCrLf
-            'If IsSomething(lrFactDataInstance.FactData.FactType) Then
+            'If lrFactDataInstance.FactData.FactType IsNot Nothing Then
             '    lsDebugMessage &= vbCrLf & "FactData.FactType.Id: " & lrFactDataInstance.FactData.FactType.Id
             'Else
             '    lsDebugMessage &= vbCrLf & "FactData.FactType.Id: Nothing"
             'End If
-            'If IsSomething(lrFactDataInstance.FactData.Fact) Then
+            'If lrFactDataInstance.FactData.Fact IsNot Nothing Then
             '    lsDebugMessage &= vbCrLf & "FactData.Fact.Symbol: " & lrFactDataInstance.FactData.Fact.Symbol
             '    lsDebugMessage &= vbCrLf & lrFactDataInstance.FactData.Fact.EnumerateAsBracketedFact
             'Else
@@ -402,8 +479,8 @@ Public Class frmDiagramORM
             'lsDebugMessage &= vbCrLf & "FactData.Role.Id :" & lrFactDataInstance.FactData.Role.Id
 
             '20220617-VM-Removed, not really using.
-            'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
-            'Call prApplication.ThrowErrorMessage("...." & lrFactInstance.Fact.Symbol, pcenumErrorType.Information)
+            'Call prApplication.ThrowMessage(lsDebugMessage, pcenumErrorType.Information)
+            'Call prApplication.ThrowMessage("...." & lrFactInstance.Fact.Symbol, pcenumErrorType.Information)
 #End Region 'Debugging
 
             '---------------------------------------------
@@ -414,7 +491,7 @@ Public Class frmDiagramORM
             lrFactDataInstance.FactData.Data = Me.ComboBoxFact.Items(Me.ComboBoxFact.SelectedIndex).ItemData
             lrFactDataInstance.Data = lrFactDataInstance.FactData.Data
             '20220617-VM-Not really using.
-            'Call prApplication.ThrowErrorMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
+            'Call prApplication.ThrowMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
 
             lrFactDataInstance.Cell.Text = Me.ComboBoxFact.SelectedItem.Tag.EnumerateAsBracketedFact()
 
@@ -463,7 +540,7 @@ Public Class frmDiagramORM
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -485,44 +562,6 @@ Public Class frmDiagramORM
 
     End Sub
 
-    Private Sub ORMModel_frm_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-
-        Call SetupForm() 'NB DisplayORMModelPage is the method that loads the objects onto the Page. This is called by frmMain.LoadORMModelPage
-
-        Me._ComboBoxFactInstance = Me.ComboBoxFact
-        Me._ComboBoxEntityTypeInstance = Me.ComboBoxEntityType
-        Me._ComboBoxValueTypeInstance = Me.ComboBoxValueType
-
-        prApplication.ActivePages.Add(Me)
-
-        Call frmMain.ShowHideMenuOptions()
-
-    End Sub
-
-    Sub SetupForm()
-
-        'NB DisplayORMModelPage is the method that loads the objects onto the Page. This is called by frmMain.LoadORMModelPage
-
-        Me.Briana = Me.Animator1
-
-        Me.MenuItemHelpTips.Checked = True
-
-        Me.DiagramView.InplaceEditAcceptOnEnter = True
-        Me.DiagramView.InplaceEditCancelOnEsc = True
-
-        Diagram.Selection.Pen.Width = 0.5
-
-        Diagram.UndoManager.UndoEnabled = True
-        Diagram.Selection.AllowMultipleSelection = True
-
-        Me.ViewFactTablesToolStripMenuItem.Checked = My.Settings.ShowFactTablesOnORMModelLoad
-
-        Call Me.ShowHideToolStripMenuItems()
-
-        Call Me.ResizeHelpTipsBox()
-
-    End Sub
-
     Private Sub ResizeHelpTipsBox()
 
         Try
@@ -539,7 +578,7 @@ Public Class frmDiagramORM
                 liVerticalScrollBarWidth = System.Windows.Forms.SystemInformation.VerticalScrollBarWidth
             End If
 
-            Me.LabelHelp.Top = Viev.Greater(Me.Height - Me.LabelHelp.Height - liHorizontalScrollBarHeight, 0)
+            Me.LabelHelp.Top = Viev.Greater(Me.Height - Me.LabelHelp.Height - liHorizontalScrollBarHeight - Me.StatusStrip.Height, 0)
             Me.LabelHelp.Width = Me.Width - liVerticalScrollBarWidth
 
         Catch ex As Exception
@@ -548,7 +587,7 @@ Public Class frmDiagramORM
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -578,7 +617,7 @@ Public Class frmDiagramORM
 
         Dim lrFactTypeInstance As FBM.FactTypeInstance
         Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
-        Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+        Dim lrSubtypeRelationship As FBM.SubtypeRelationship
 
         For Each lrFactType In larFactType
 
@@ -642,8 +681,8 @@ Public Class frmDiagramORM
 
     Private Sub frm_ORMModel_page_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.GotFocus
 
-        If IsSomething(Me.zoTreeNode) Then
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+        If Me.zoTreeNode IsNot Nothing Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
             End If
         End If
@@ -667,7 +706,7 @@ Public Class frmDiagramORM
             '20180620-Remove if all okay. Commented out because Boston.PageDataExistsInClipboad caused some sort of unsolveable threading issue
             '  when the form is loading and when this form is the second/third/etc frmDiagramORM form loaded for a Model.
             'If Boston.PageDataExistsInClipboard(lrPage) Then
-            '    If IsSomething(Me.zrPage) Then
+            '    If Me.zrPage IsNot Nothing Then
             '        If lrPage.CopiedPageId <> Me.zrPage.PageId Then
             '            prApplication.MainForm.PasteToolStripMenuItem.Enabled = True
             '        Else
@@ -678,8 +717,8 @@ Public Class frmDiagramORM
             '    prApplication.MainForm.PasteToolStripMenuItem.Enabled = False
             'End If
 
-            If IsSomething(Me.zoTreeNode) Then
-                If IsSomething(frmMain.zfrmModelExplorer) Then
+            If Me.zoTreeNode IsNot Nothing Then
+                If frmMain.zfrmModelExplorer IsNot Nothing Then
                     frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
                 End If
             End If
@@ -690,7 +729,7 @@ Public Class frmDiagramORM
             prApplication.MainForm.ToolStripComboBox_zoom.SelectedIndex =
                    prApplication.MainForm.ToolStripComboBox_zoom.FindStringExact(CInt(Me.DiagramView.ZoomFactor).ToString & "%")
 
-            If IsSomething(Me.zrPage) Then
+            If Me.zrPage IsNot Nothing Then
                 If prApplication.WorkingModel Is Nothing Then
                     prApplication.WorkingModel = Me.zrPage.Model
                 End If
@@ -698,12 +737,12 @@ Public Class frmDiagramORM
                 Dim lrModelDictionaryForm As frmToolboxModelDictionary
                 lrModelDictionaryForm = prApplication.GetToolboxForm(frmToolboxModelDictionary.Name)
 
-                If IsSomething(lrModelDictionaryForm) Then
+                If lrModelDictionaryForm IsNot Nothing Then
                     Call lrModelDictionaryForm.LoadToolboxModelDictionary(Me.zrPage.Language)
                 End If
             End If
 
-            If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
+            If frmMain.zfrm_KL_theorem_writer IsNot Nothing Then
                 frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
             End If
 
@@ -724,7 +763,7 @@ Public Class frmDiagramORM
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -735,7 +774,7 @@ Public Class frmDiagramORM
         '-------------------------------------------
         'Process the page associated with the form.
         '-------------------------------------------
-        If IsSomething(Me.zrPage) Then
+        If Me.zrPage IsNot Nothing Then
             If Me.zrPage.IsDirty And Not Me.zrPage.UserRejectedSave And (Not GetType(FBM.DiagramSpyPage) Is Me.zrPage.GetType) Then
 
                 Dim lsMessage As String = ""
@@ -833,18 +872,20 @@ Public Class frmDiagramORM
         If Me.zrSpecialDragMode.SpecialDragMode = pcenumSpecialDragMode.ORMSubtypeConnector Then
             If Me.zrPage.SelectedObject.Count > 1 Then
 
-                If Me.zrPage.SelectedObject(0).ConceptType = pcenumConceptType.EntityType And
-                       Me.zrPage.SelectedObject.Last.ConceptType = pcenumConceptType.EntityType And
+                Dim laiAcceptableSupertypeConceptType = {pcenumConceptType.EntityType, pcenumConceptType.ValueType, pcenumConceptType.FactType}
+
+                If laiAcceptableSupertypeConceptType.Contains(Me.zrPage.SelectedObject(0).ConceptType) And
+                       laiAcceptableSupertypeConceptType.Contains(Me.zrPage.SelectedObject.Last.ConceptType) And
                        System.Windows.Forms.Form.MouseButtons = Windows.Forms.MouseButtons.None Then
 
-                    Dim lrEntityType_1 As New FBM.EntityTypeInstance
-                    Dim lrEntityType_2 As New FBM.EntityTypeInstance
+                    Dim lrModelElement_1 As New FBM.ModelObject
+                    Dim lrModelElement_2 As New FBM.ModelObject
 
-                    lrEntityType_1 = Me.zrPage.SelectedObject(0)
-                    lrEntityType_2 = Me.zrPage.SelectedObject.Last
+                    lrModelElement_1 = Me.zrPage.SelectedObject(0)
+                    lrModelElement_2 = Me.zrPage.SelectedObject.Last
 
                     Call Me.zrSpecialDragMode.ResetSpecialDragMode()
-                    Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
+                    Call CType(lrModelElement_1, FBM.EntityTypeInstance).AddSubtypeRelationship(lrModelElement_2)
 
                 End If
             End If
@@ -921,7 +962,7 @@ Public Class frmDiagramORM
 
             'ModelObjects first.
             If Not (TypeOf (lrDroppedObject) Is MindFusion.Diagramming.Shape) Then
-#Region "Model Objects. I.e. Not shapes"
+#Region "Model Objects. I.e. Not shape from Toolbox."
                 '---------------------------------------------------------------------
                 'DraggedObject is a ModelObject (from the ModelDictionary form etc),
                 ' rather than a Shape Object dragged from the Toolbox.
@@ -950,7 +991,9 @@ Public Class frmDiagramORM
                     '---------------------------------------------------------------------------------------------------
                     'Dropping a ModelObject onto the DiagramSpy Page. Need to show that ModelObject in the DiagramSpy.
                     '---------------------------------------------------------------------------------------------------
-                    Call Me.ShowSpyInformationForModelObject(lrModelObject, Control.ModifierKeys = Keys.Control)
+                    Call Me.ShowSpyInformationForModelObject(lrModelObject,
+                                                             Control.ModifierKeys = Keys.Control,
+                                                             Control.ModifierKeys = Keys.Alt)
                     Exit Sub
                 End If
 
@@ -980,7 +1023,7 @@ ProcessEntityType:
                         Dim lrEntityTypeInstance As New FBM.EntityTypeInstance(lrModel, pcenumLanguage.ORMModel, lrEntityType.Name, True)
 
                         '20220713-VM-Multiple instances can now be on a Page. Below If..then..else commented out.
-                        'If IsSomething(Me.zrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)) Then
+                        'If Me.zrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals) IsNot Nothing Then
                         '    MsgBox("This Page already contains the Entity Type, '" & lrEntityType.Name & "'.")
                         'Else
                         '------------------------------------------------------------------------------------
@@ -1034,7 +1077,7 @@ ProcessEntityType:
                         Dim lrValueTypeInstance As New FBM.ValueTypeInstance(Me.zrPage.Model, Me.zrPage, pcenumLanguage.ORMModel, lrValueType.Name, True)
 
                         '20220713-VM-Multiple instances can now be on a Page. Below If..then..else commented out.
-                        'If IsSomething(Me.zrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)) Then
+                        'If Me.zrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals) IsNot Nothing Then
                         '    MsgBox("This Page already contains the Value Type, '" & lrValueType.Name & "'.")
                         'Else                        
 
@@ -1093,80 +1136,48 @@ ProcessFactType:
                             lrFactType = lrFactType.Clone(lrModel, True)
                         End If
 
-                        '--------------------------------------------------------------------------------
-                        'Create a FactTypeInstance to see if the FactType is already loaded on the Page
-                        '--------------------------------------------------------------------------------
-                        Dim lrFactTypeInstance As New FBM.FactTypeInstance(lrModel, Me.zrPage, pcenumLanguage.ORMModel, lrFactType.Name, True)
-
-#Region "Pre-InstanceNumber" '20220715-VM-Can remove if no longer needed.
-                        '======================================================================================================
-                        'If IsSomething(Me.zrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)) Then
-                        '    If lrFactTypeInstance.Shape Is Nothing Then
-                        '        lrFactType = Me.zrPage.Model.GetModelObjectByName(lrFactTypeInstance.Id)
-                        '        '===================================================================================
-                        '        'CodeSafe
-                        '        '  May be something wrong. E.g. IsPreferredReferenceMode, but is not actually.
-                        '        If lrFactType.IsPreferredReferenceMode Then
-                        '            Dim lasRoleConstraintId = From RoleConstraint In lrFactType.InternalUniquenessConstraint
-                        '                                      Select RoleConstraint.Id
-
-                        '            Dim larEntityType = From EntityType In Me.zrPage.Model.EntityType
-                        '                                Where lasRoleConstraintId.Contains(EntityType.PreferredIdentifierRCId)
-                        '                                Select EntityType
-
-                        '            If larEntityType.Count = 0 Then
-                        '                lrFactType.IsPreferredReferenceMode = False
-                        '                Call lrFactTypeInstance.RemoveFromPage(True)
-                        '                lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, New PointF(100, 100), False, False, True)
-                        '                lrFactType.makeDirty()
-                        '                Dim larObjectType = From RoleInstance In lrFactTypeInstance.RoleGroup
-                        '                                    Select RoleInstance.JoinedORMObject
-
-                        '                For Each lrObjectType As Object In larObjectType
-                        '                    If lrObjectType.Shape IsNot Nothing Then
-                        '                        lrObjectType.Shape.Visible = True
-                        '                    End If
-                        '                Next
-                        '            Else
-                        '                Dim lrEntityTypeInstance = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = larEntityType.First.Id)
-                        '                Call lrEntityTypeInstance.ExpandTheReferenceScheme()
-                        '            End If
-                        '        End If
-                        '        '===================================================================================
-                        '    ElseIf lrFactTypeInstance.Shape.Visible = False Then
-                        '        Call lrFactTypeInstance.Show()
-                        '    Else
-                        '        MsgBox("This Page already contains the Fact Type, '" & lrFactType.Name & "'.")
-                        '    End If
-                        'Else
-                        '======================================================================================================
-
+                        If lrFactType.isReferenceModeFactType Then
+#Region "Reference Mode Fact Type"
+                            For Each lrExistingFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactType.Id)
+                                lrExistingFactTypeInstance.MakeVisible()
+                            Next
 #End Region
-                        '--------------------------------------------------------------------------------------
-                        'Check to see if the ModelObjects joined by the Roles of the FactType are already
-                        '  in the ModelDictionary for the lrModel, otherwise add them to the ModelDictionary
-                        '--------------------------------------------------------------------------------------
-                        Dim lrRole As FBM.Role
-                        For Each lrRole In lrFactType.RoleGroup
-                            'Because may be dropping from a different Model.
-                            lrModelObject = lrRole.JoinedORMObject
-                            Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrModelObject.Name, lrModelObject.ConceptType)
-                            If lrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
-                                '--------------------------------------------------------------------------------------------------------
-                                'Do not add the lrDictionaryEntry to the ModelDictionary because already exists in the ModelDictionary,
-                                '--------------------------------------------------------------------------------------------------------
-                            Else
-                                lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
-                            End If
-                        Next
+                        Else
+#Region "Standard Fact Type"
+                            '--------------------------------------------------------------------------------
+                            'Create a FactTypeInstance to see if the FactType is already loaded on the Page
+                            '--------------------------------------------------------------------------------
+                            Dim lrFactTypeInstance As New FBM.FactTypeInstance(lrModel, Me.zrPage, pcenumLanguage.ORMModel, lrFactType.Name, True)
 
-                        lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType,
-                                                                           loPt,
-                                                                           Me.ViewFactTablesToolStripMenuItem.Checked,
-                                                                           True,
-                                                                           True)
+                            '--------------------------------------------------------------------------------------
+                            'Check to see if the ModelObjects joined by the Roles of the FactType are already
+                            '  in the ModelDictionary for the lrModel, otherwise add them to the ModelDictionary
+                            '--------------------------------------------------------------------------------------
+                            Dim lrRole As FBM.Role
+                            For Each lrRole In lrFactType.RoleGroup
+                                'Because may be dropping from a different Model.
+                                lrModelObject = lrRole.JoinedORMObject
+                                Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrModelObject.Name, lrModelObject.ConceptType)
+                                If lrModel.ModelDictionary.Exists(AddressOf lrDictionaryEntry.Equals) Then
+                                    '--------------------------------------------------------------------------------------------------------
+                                    'Do not add the lrDictionaryEntry to the ModelDictionary because already exists in the ModelDictionary,
+                                    '--------------------------------------------------------------------------------------------------------
+                                Else
+                                    lrModel.AddModelDictionaryEntry(lrDictionaryEntry)
+                                End If
+                            Next
 
-                        Me.zrPage.Save()
+                            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType,
+                                                                                   loPt,
+                                                                                   Me.ViewFactTablesToolStripMenuItem.Checked,
+                                                                                   True,
+                                                                                   True)
+
+
+                            Me.zrPage.Save()
+#End Region
+
+                        End If
 
                         '---------------------------------------
                         'Create the UserAction for the UndoLog
@@ -1255,6 +1266,7 @@ ProcessFactType:
 
                     Select Case lrDraggedNode.Tag.Id
                         Case Is = "Binary Fact Type"
+#Region "Binary Fact Type"
                             Dim lsFactTypeName As String = ""
                             lsFactTypeName = Me.zrPage.Model.CreateUniqueFactTypeName("NewFactType", 0)
 
@@ -1276,10 +1288,36 @@ ProcessFactType:
                                                                                False,
                                                                                False)
                             'Me.zrPage.Save() - 20190929-VM-Caused errors because called removeRolesThatReferenceNothing, removing the FactType just dropped.
+#End Region
+                        Case Is = "Ternary Fact Type"
+#Region "Ternary Fact Type"
+                            Dim lsFactTypeName As String = ""
+                            lsFactTypeName = Me.zrPage.Model.CreateUniqueFactTypeName("NewFactType", 0)
+
+                            lrFactType = Me.zrPage.Model.CreateFactType(lsFactTypeName,
+                                                                        Nothing,
+                                                                        False,
+                                                                        True,
+                                                                        False,
+                                                                        Nothing,
+                                                                        False)
+
+                            'lrFactType = New FBM.FactType(Me.zrPage.Model, lsFactTypeName, True)
+                            lrFactType.CreateRole(Nothing)
+                            lrFactType.CreateRole(Nothing)
+                            lrFactType.CreateRole(Nothing)
+                            Dim lrFactTypeInstance As FBM.FactTypeInstance
+                            loDropPtF = New Point(loPt.X - 15, loPt.Y - 5)
+                            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType,
+                                                                               loDropPtF,
+                                                                               False,
+                                                                               False)
+                            'Me.zrPage.Save() - 20190929-VM-Caused errors because called removeRolesThatReferenceNothing, removing the FactType just dropped.
+#End Region
                         Case Is = "Subtype Connector"
                             Me.Cursor = New Cursor(My.Resources.Icons.SubtypeConnectorCursor.Handle)
                         Case Is = "Entity Type"
-
+#Region "Entity Type"
                             Dim lr_combobox_item As New tComboboxItem("0", "[Create New Entity Type]")
                             Dim lrGenericSelection As New tGenericSelection
                             Dim lrEntityType As New FBM.EntityType(Me.zrPage.Model, pcenumLanguage.ORMModel)
@@ -1335,8 +1373,9 @@ ProcessFactType:
                             frmMain.ToolStripMenuItemUndo.Enabled = True
 
                             '------------------------------------------------------------------
+#End Region
                         Case Is = "Value Type"
-
+#Region "Value Type"
                             Dim lrValueType As New FBM.ValueType(Me.zrPage.Model, pcenumLanguage.ORMModel, "", False)
                             Dim lr_combobox_item As New tComboboxItem("0", "[Create New Value Type]")
                             Dim lrGenericSelection As New tGenericSelection
@@ -1363,11 +1402,13 @@ ProcessFactType:
                                 Me.zrPage.Save()
                             End With
                             '------------------------------------------------------------------
+#End Region
                         Case Is = "Subtype Connector"
 
                             Call Me.zrSpecialDragMode.SetSpecialDragMode(pcenumSpecialDragMode.ORMSubtypeConnector)
                             '------------------------------------------------------------------
                         Case Is = "Role"
+#Region "Role"
                             '---------------------------------------------------------------
                             'Check if there are any EntityTypes within the canvas.
                             '  If there are none, then cannot drop a role onto the canvas.
@@ -1408,6 +1449,7 @@ ProcessFactType:
                             End If
 
                             '-------------------------------------------------------------------------------
+#End Region
                         Case Is = "Ring Constraint"
                             Dim lrRoleConstraint As FBM.RoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.RingConstraint, , , , , False)
                             lrRoleConstraint.RingConstraintType = pcenumRingConstraintType.Acyclic
@@ -1456,12 +1498,14 @@ ProcessFactType:
                                     larRoleInstance.Add(loDropTargetNode.Tag)
                                     Call Me.AddFrequencyConstraint(larRoleInstance, loPt)
                                 Else
-                                    ls_message = "You must drop a Frequency Constraint on the Role to which you would like it to relate."
-                                    MsgBox(ls_message)
+                                    Dim lrRoleConstraint As FBM.RoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExternalFrequencyConstraint, , , , , False)
+                                    Call Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                                    Me.zrPage.Save()
                                 End If
                             Else
-                                ls_message = "You must drop a Frequency Constraint on the Role to which you would like it to relate."
-                                MsgBox(ls_message)
+                                Dim lrRoleConstraint As FBM.RoleConstraint = Me.zrPage.Model.CreateRoleConstraint(pcenumRoleConstraintType.ExternalFrequencyConstraint, , , , , False)
+                                Call Me.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                                Me.zrPage.Save()
                             End If
                         Case Is = "Model Note"
                             Dim lrModelNote = Me.zrPage.Model.CreateModelNote
@@ -1523,7 +1567,7 @@ ProcessFactType:
             'Create the corresponding FactType and add it to the model.
             '  Name is set within the RoleInstance form by the ObjectTypes that the User selects to join the RoleInstance to.
             '------------------------------------------------------------------------------------------------------------------
-            If IsSomething(aoDropTargetNode) Then
+            If aoDropTargetNode IsNot Nothing Then
                 lrFactType = aoDropTargetNode.Tag.FactType
                 lrFactType = Me.zrPage.Model.FactType.Find(Function(x) x.Id = lrFactType.Id)
 
@@ -1571,7 +1615,7 @@ ProcessFactType:
 
             lrRoleInstanceForm.zrBaseFactType = lrFactType
             lrRoleInstanceForm.zrRole = lrRole
-            If IsSomething(aoDropTargetNode) Then
+            If aoDropTargetNode IsNot Nothing Then
                 lrRoleInstanceForm.zbExtendingExistingFactType = True
             End If
             If lrRoleInstanceForm.showdialog(lrRole, Me.zrPage) = Windows.Forms.DialogResult.OK Then
@@ -1587,7 +1631,7 @@ ProcessFactType:
                         'The FactType.Name already exists within the database
                         '  so create a new FactType.Name
                         '-----------------------------------------------------------
-                        lrFactType.setName(Me.zrPage.Model.CreateUniqueFactTypeName(Viev.Strings.RemoveWhiteSpace(lrFactType.Name), 0))
+                        lrFactType.setName(Me.zrPage.Model.CreateUniqueFactTypeName(FEStrings.ProperSpace(lrFactType.Name), 0))
                     End If
 
                     '----------------------------------------------
@@ -1678,7 +1722,7 @@ ProcessFactType:
             Dim lsMessage As String
             lsMessage = "Error: frmDiagramORM.DropRoleAtPoint"
             lsMessage &= vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -1705,7 +1749,7 @@ ProcessFactType:
                 '--------------------------------------------------
                 prApplication.WorkingPage = Me.zrPage
 
-                If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+                If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                     '----------------------------
                     'Mouse is over an ShapeNode
                     '----------------------------
@@ -1723,6 +1767,14 @@ ProcessFactType:
                     End Select
                 End If
             End If
+
+            'CodeSafe
+            Try
+                If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
+                End If
+            Catch ex As Exception
+                prApplication.ThrowMessage(e.Data.ToString, pcenumErrorType.Warning, ex.StackTrace, False, False, False,,, ex, False)
+            End Try
 
             If e.Data.GetDataPresent(tShapeNodeDragItem.DraggedItemObjectType) Then
 
@@ -1772,7 +1824,7 @@ ProcessFactType:
                                 Me.LabelHelp.Text = "Drop the Frequency Constraint on a Role."
                                 e.Effect = DragDropEffects.Copy
                             Case Is = "Role"
-                                If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+                                If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                                     '-------------------------------------------
                                     'Change the color of any object that the
                                     '  item is dragged over. Visual aid.
@@ -1815,6 +1867,7 @@ ProcessFactType:
                 'HelpTipsLabel
                 If (GetType(FBM.DiagramSpyPage) Is Me.zrPage.GetType) Then
                     Me.LabelHelp.Text = "Hold down the [Ctrl] key on your keyboard to only show this Model Element in the Diagram Spy and not related Fact Types."
+                    Me.LabelHelp.Text.AppendLine("Hold down the [Alt] key to add this Entity Type to the Diagram Spy page. I.e. Not replace the existing focus of the Diagram Spy page.")
                 End If
 
             ElseIf e.Data.GetDataPresent(GetType(FBM.ValueType).ToString, False) Then
@@ -1823,12 +1876,18 @@ ProcessFactType:
             ElseIf e.Data.GetDataPresent(GetType(FBM.FactType).ToString, False) Then
                 Call Me.zrSpecialDragMode.SetSpecialDragMode(pcenumSpecialDragMode.None)
                 e.Effect = DragDropEffects.Copy
+
+                'HelpTipsLabel
+                If (GetType(FBM.DiagramSpyPage) Is Me.zrPage.GetType) Then
+                    Me.LabelHelp.Text = "Hold down the [Ctrl] key on your keyboard to only show this Model Element in the Diagram Spy and not related Fact Types."
+                    Me.LabelHelp.Text.AppendLine("Hold down the [Alt] key to add this Fact Type to the Diagram Spy page. I.e. Not replace the existing focus of the Diagram Spy page.")
+                End If
             Else
                 'e.Effect = DragDropEffects.None
             End If
 
 
-            'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            'If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             '    '-------------------------------------------
             '    'Change the color of any object that the
             '    '  item is dragged over. Visual aid.
@@ -1856,7 +1915,7 @@ ProcessFactType:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1992,74 +2051,74 @@ ProcessFactType:
                 Case Is = GetType(FBM.FactTable)
 
                     lrFactTable = e.Table.Tag
-            lrFactTable.ResetBlackCellText()
-            lrFactTable.SelectedRow = e.Row + 1
+                    lrFactTable.ResetBlackCellText()
+                    lrFactTable.SelectedRow = e.Row + 1
 
-            lrFactDataInstance = e.Cell.Tag
+                    lrFactDataInstance = e.Cell.Tag
 
-            'CodeSafe
-            If lrFactDataInstance Is Nothing Then
-                e.Cell.Text = "Error-No Fact Data"
-                Call lrFactTable.ResortFactTable(True)
-                Exit Sub
-            End If
+                    'CodeSafe
+                    If lrFactDataInstance Is Nothing Then
+                        e.Cell.Text = "Error-No Fact Data"
+                        Call lrFactTable.ResortFactTable(True)
+                        Exit Sub
+                    End If
 
-            For Each lrFactDataInstance In lrFactDataInstance.Fact.Data
-                lrFactDataInstance.Cell.TextColor = Color.Blue
-                lrFactDataInstance.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
-            Next
-
-            If e.MouseButton = MouseButton.Left Then
-                '-------------------------------------------------
-                'Taken care of in Me.ORMDiagramView.NodeSelected
-                '-------------------------------------------------
-                Me.zrPage.SelectedObject.Add(lrFactDataInstance.Fact)
-
-            ElseIf e.MouseButton = MouseButton.Right Then
-                Me.DiagramView.ContextMenuStrip = Nothing
-                Me.Refresh()
-                Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactTable
-                Me.Refresh()
-
-                Me.zrPage.SelectedObject.Add(lrFactTable)
-                DeleteRowToolStripMenuItem.Enabled = True
-                Me.DeleteRowFactFromPageAndModelToolStripMenuItem.Enabled = True
-            End If
-
-            '==============================================================================================
-#Region "Model Errors - Showing in Menu"
-            Dim lrModel As FBM.Model
-            Dim lrFact As New FBM.Fact
-            Dim lrFactInstance As New FBM.FactInstance
-            Dim lo_menu_option As ToolStripItem
-            If lrFactTable.SelectedRow > 0 Then
-                lrFactInstance = lrFactTable.FactTypeInstance.Fact(lrFactTable.SelectedRow - 1)
-                lrFact = lrFactInstance.Fact
-                lrModel = lrFact.Model
-                'ToolStripMenuItemFactModelErrors
-                Me.ToolStripMenuItemFactModelErrors.DropDownItems.Clear()
-                Dim lrModelError As FBM.ModelError
-                If lrFact.ModelError.Count > 0 Then
-                    Me.ToolStripMenuItemFactModelErrors.Image = My.Resources.MenuImages.RainCloudRed16x16
-                    For Each lrModelError In lrFact.ModelError
-                        lo_menu_option = Me.ToolStripMenuItemFactModelErrors.DropDownItems.Add(lrModelError.Description)
-                        lo_menu_option.Image = My.Resources.MenuImages.RainCloudRed16x16
+                    For Each lrFactDataInstance In lrFactDataInstance.Fact.Data
+                        lrFactDataInstance.Cell.TextColor = Color.Blue
+                        lrFactDataInstance.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
                     Next
-                Else
-                    Me.ToolStripMenuItemFactModelErrors.Image = My.Resources.MenuImages.Cloud216x16
-                    lo_menu_option = Me.ToolStripMenuItemFactModelErrors.DropDownItems.Add("There are no Model Errors for this Fact.")
-                    lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
-                End If
-            End If
-#End Region
-            '==============================================================================================
 
-            '----------------
-            'Verbalise Fact
-            '----------------
-            Dim lrToolboxForm As frmToolboxORMVerbalisation
-            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                    If IsSomething(lrToolboxForm) Then
+                    If e.MouseButton = MouseButton.Left Then
+                        '-------------------------------------------------
+                        'Taken care of in Me.ORMDiagramView.NodeSelected
+                        '-------------------------------------------------
+                        Me.zrPage.SelectedObject.AddUnique(lrFactDataInstance.Fact)
+
+                    ElseIf e.MouseButton = MouseButton.Right Then
+                        Me.DiagramView.ContextMenuStrip = Nothing
+                        Me.Refresh()
+                        Me.DiagramView.ContextMenuStrip = ContextMenuStrip_FactTable
+                        Me.Refresh()
+
+                        Me.zrPage.SelectedObject.AddUnique(lrFactTable)
+                        DeleteRowToolStripMenuItem.Enabled = True
+                        Me.DeleteRowFactFromPageAndModelToolStripMenuItem.Enabled = True
+                    End If
+
+                    '==============================================================================================
+#Region "Model Errors - Showing in Menu"
+                    Dim lrModel As FBM.Model
+                    Dim lrFact As New FBM.Fact
+                    Dim lrFactInstance As New FBM.FactInstance
+                    Dim lo_menu_option As ToolStripItem
+                    If lrFactTable.SelectedRow > 0 Then
+                        lrFactInstance = lrFactTable.FactTypeInstance.Fact(lrFactTable.SelectedRow - 1)
+                        lrFact = lrFactInstance.Fact
+                        lrModel = lrFact.Model
+                        'ToolStripMenuItemFactModelErrors
+                        Me.ToolStripMenuItemFactModelErrors.DropDownItems.Clear()
+                        Dim lrModelError As FBM.ModelError
+                        If lrFact.ModelError.Count > 0 Then
+                            Me.ToolStripMenuItemFactModelErrors.Image = My.Resources.MenuImages.RainCloudRed16x16
+                            For Each lrModelError In lrFact.ModelError
+                                lo_menu_option = Me.ToolStripMenuItemFactModelErrors.DropDownItems.Add(lrModelError.Description)
+                                lo_menu_option.Image = My.Resources.MenuImages.RainCloudRed16x16
+                            Next
+                        Else
+                            Me.ToolStripMenuItemFactModelErrors.Image = My.Resources.MenuImages.Cloud216x16
+                            lo_menu_option = Me.ToolStripMenuItemFactModelErrors.DropDownItems.Add("There are no Model Errors for this Fact.")
+                            lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
+                        End If
+                    End If
+#End Region
+                    '==============================================================================================
+
+                    '----------------
+                    'Verbalise Fact
+                    '----------------
+                    Dim lrToolboxForm As frmToolboxORMVerbalisation
+                    lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                    If lrToolboxForm IsNot Nothing Then
                         lrToolboxForm.zrModel = Me.zrPage.Model
                         If lrFactTable.FactTypeInstance.Fact.Count > 0 Then
                             lrFactDataInstance = lrFactTable.TableShape.Item(0, lrFactTable.SelectedRow - 1).Tag
@@ -2091,7 +2150,7 @@ ProcessFactType:
                     Dim lrAttribute As New ERD.Attribute(lrColumn, Me.zrPage)
 
                     Me.zrPage.SelectedObject.Clear()
-                    Me.zrPage.SelectedObject.Add(lrAttribute)
+                    Me.zrPage.SelectedObject.AddUnique(lrAttribute)
 
                     e.Cell.TextColor = Color.White
                     e.Cell.Brush = New MindFusion.Drawing.SolidBrush(Color.LightGray)
@@ -2112,7 +2171,7 @@ ProcessFactType:
                     Dim lrPropertyGridForm As frmToolboxProperties
 
                     lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                    If IsSomething(lrPropertyGridForm) Then
+                    If lrPropertyGridForm IsNot Nothing Then
                         Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                         lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
                         lrPropertyGridForm.PropertyGrid.SelectedObject = lrAttribute 'e.Cell.Tag
@@ -2123,7 +2182,7 @@ ProcessFactType:
                     '-------------------------------------------------------
                     Dim lrToolboxForm As frmToolboxORMVerbalisation
                     lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                    If IsSomething(lrToolboxForm) Then
+                    If lrToolboxForm IsNot Nothing Then
                         lrToolboxForm.zrModel = Me.zrPage.Model
                         Select Case TypeOf (e.Cell.Tag) Is RDS.Column
                             Case Is = pcenumConceptType.Actor
@@ -2137,7 +2196,7 @@ ProcessFactType:
                     Dim lrORMReadingEditor As frmToolboxORMReadingEditor
                     lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                    If IsSomething(lrORMReadingEditor) Then
+                    If lrORMReadingEditor IsNot Nothing Then
 
                         lrORMReadingEditor.zrPage = Me.zrPage
 
@@ -2202,7 +2261,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2238,7 +2297,7 @@ SkipORMReadingEditor:
         '--------------------
         Dim lrFactDataInstance As New FBM.FactDataInstance
         lrFactDataInstance = e.Cell.Tag
-        If IsSomething(lrFactDataInstance) Then
+        If lrFactDataInstance IsNot Nothing Then
             lrFactDataInstance.ChangeData(e.NewText)
         Else
             '----------------------------------------------------------
@@ -2295,7 +2354,7 @@ SkipORMReadingEditor:
             lrModelObject = Me.zrPage.SelectedObject(0)
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Select Case lrModelObject.ConceptType
                     Case Is = pcenumConceptType.EntityType
@@ -2314,6 +2373,8 @@ SkipORMReadingEditor:
                                 Call lrToolboxForm.VerbaliseRoleConstraintEqualityConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.ExclusionConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintExclusionConstraint(lrRoleConstraintInstance.RoleConstraint)
+                            Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                Call lrToolboxForm.VerbaliseRoleConstraintExternalFrequencyConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InclusiveORConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintInclusiveORConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
@@ -2363,7 +2424,7 @@ SkipORMReadingEditor:
 
             Select Case lrOriginModelObject.ConceptType
                 Case Is = pcenumConceptType.Role
-
+#Region "Role"
                     With New WaitCursor
                         Dim lrRoleInstance As New FBM.RoleInstance
                         lrRoleInstance = lrModelObject
@@ -2385,6 +2446,8 @@ SkipORMReadingEditor:
                             MsgBox("You cannot directly reassign the Role of a Link Fact Type.")
                             Exit Sub
                         End If
+
+                        Dim lbRoleWasNotPreviouslyJoined = lrRoleInstance.Role.JoinedORMObject Is Nothing
 
                         If lrTargetModelObject Is Nothing Then
                             lrRoleInstance = lrModelObject
@@ -2414,11 +2477,50 @@ SkipORMReadingEditor:
                             Call lrRoleInstance.FactType.SortRoleGroup()
                         End If
 
+                        If lbRoleWasNotPreviouslyJoined And lrRoleInstance.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count = 0 Then
+
+                            Dim larRole As New List(Of FBM.Role)
+
+                            For Each lrRoleInstanceTemp In lrRoleInstance.FactType.RoleGroup
+                                larRole.Add(lrRoleInstanceTemp.Role)
+                            Next
+
+                            Dim lrFactTypeInstance = lrRoleInstance.FactType
+
+                            Select Case lrFactTypeInstance.Arity
+
+                                Case Is = 2
+                                    Dim lrSentence As New Language.Sentence($"{larRole(1).JoinedORMObject.Id} is of {larRole(0).JoinedORMObject.Id}")
+                                    lrSentence.PredicatePart.Add(New Language.PredicatePart("is of"))
+                                    lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+
+                                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactTypeInstance.FactType, larRole.GetReversed, lrSentence)
+                                    lrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                                    lrSentence = New Language.Sentence($"{larRole(0).JoinedORMObject.Id} has {larRole(1).JoinedORMObject.Id}")
+                                    lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                    lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+
+                                    lrFactTypeReading = New FBM.FactTypeReading(lrFactTypeInstance.FactType, larRole, lrSentence)
+                                    lrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                                    Dim lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.zrPage)
+
+                                    Dim lrShapeNode = lrFactTypeInstance.FactTypeReadingShape.Shape
+
+                                    lrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
+                                    lrFactTypeInstance.FactTypeReadingShape.Shape = lrShapeNode
+                                    lrFactTypeInstance.FactTypeReadingShape.RefreshShape()
+                            End Select
+
+                        End If
+
                         Me.Diagram.AllowUnanchoredLinks = False
                         Me.Diagram.AllowUnconnectedLinks = False
                     End With
+#End Region
                 Case Is = pcenumConceptType.ModelNote
-
+#Region "Model Note"
                     'CodeSafe
                     If lrTargetModelObject Is Nothing Then
                         Me.Diagram.Links.Remove(e.Link)
@@ -2444,13 +2546,14 @@ SkipORMReadingEditor:
                             Exit For
                         End If
                     Next
-                    If IsSomething(lrLinkToRemove) Then
+                    If lrLinkToRemove IsNot Nothing Then
                         Me.Diagram.Links.Remove(lrLinkToRemove)
                     End If
                     lrModelNoteInstance.JoinedObjectType = New FBM.ModelObject
                     lrModelNoteInstance.JoinedObjectType = lrTargetModelObject
                     lrModelNoteInstance.ModelNote.JoinedObjectType = New FBM.ModelObject
                     lrModelNoteInstance.ModelNote.JoinedObjectType.Id = lrTargetModelObject.Id
+#End Region
             End Select
 
             If (lrTargetModelObject Is Nothing) And
@@ -2474,7 +2577,7 @@ SkipORMReadingEditor:
                     Dim lrRoleInstance As New FBM.RoleInstance
                     lrSubtypeConstraintInstance = trg.Tag
                     lbJoinedSubtypingRelationship = True
-                    lrRoleInstance = lrSubtypeConstraintInstance.FactType.FindFirstRoleByModelObject(lrSubtypeConstraintInstance.parentModelElement)
+                    lrRoleInstance = lrSubtypeConstraintInstance.FactType.FindFirstRoleByModelObject(lrSubtypeConstraintInstance.ParentModelElement)
 
                     lrTargetModelObject = lrRoleInstance
 
@@ -2483,7 +2586,7 @@ SkipORMReadingEditor:
                 Me.Diagram.Links.Remove(a)
             End If
 
-            If IsSomething(lrTargetModelObject) Then
+            If lrTargetModelObject IsNot Nothing Then
                 Select Case lrModelObject.ConceptType
                     Case Is = pcenumConceptType.ModelNote
                         e.Link.Pen.DashPattern = New Single() {2, 1, 2, 1}
@@ -2508,12 +2611,32 @@ SkipORMReadingEditor:
                             'Start a RoleConstraintArgument for the RoleConstraint if one hasn't already been started.
                             '-------------------------------------------------------------------------------------------                            
                             If Not lrRoleConstraintInstance.CreatingArgument Then
-                                lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint, lrRoleConstraintInstance.RoleConstraint.GetNextArgumentSequenceNr)
-                                lrRoleConstraintInstance.CreatingArgument = True
+
+                                Select Case lrRoleConstraint.RoleConstraintType
+                                    Case Is = pcenumRoleConstraintType.SubsetConstraint
+                                        If lrRoleConstraint.Argument.Count >= 1 Then
+                                            Dim lrArgument = lrRoleConstraint.Argument(lrRoleConstraint.Argument.Count - 1)
+                                            If lrArgument.RoleConstraintRole.Count = 1 Then
+                                                'Unfinished Argument
+                                                lrRoleConstraintInstance.CurrentArgument = lrArgument
+                                                lrRoleConstraintInstance.CreatingArgument = True
+                                            Else
+                                                GoTo JustCreateTheArgument
+                                            End If
+                                        Else
+                                            GoTo JustCreateTheArgument
+                                        End If
+
+                                    Case Else
+JustCreateTheArgument:
+                                        lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint, lrRoleConstraintInstance.RoleConstraint.GetNextArgumentSequenceNr)
+                                        lrRoleConstraintInstance.CreatingArgument = True
+                                End Select
                             End If
 
                             Select Case lrRoleConstraintInstance.RoleConstraintType
                                 Case Is = pcenumRoleConstraintType.RingConstraint
+#Region "Ring Constraint"
                                     If lrTargetModelObject.ConceptType = pcenumConceptType.Role Then
                                         Dim lrRoleInstance As FBM.RoleInstance
                                         lrRoleInstance = lrTargetModelObject
@@ -2549,8 +2672,10 @@ SkipORMReadingEditor:
                                         MsgBox("You can only create links from a Ring Constraint to the Roles of a Fact Type.")
                                         Me.Diagram.Links.Remove(e.Link)
                                     End If
+#End Region
                                 Case Is = pcenumRoleConstraintType.EqualityConstraint,
                                           pcenumRoleConstraintType.ExclusionConstraint,
+                                          pcenumRoleConstraintType.ExternalFrequencyConstraint,
                                           pcenumRoleConstraintType.InclusiveORConstraint,
                                           pcenumRoleConstraintType.ExclusiveORConstraint,
                                           pcenumRoleConstraintType.ValueComparisonConstraint
@@ -2583,7 +2708,7 @@ SkipORMReadingEditor:
                                     '    lrRoleConstraintRoleInstance.SubtypeConstraintInstance = lrSubtypeConstraintInstance
                                     'End If
                                 Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
-
+#Region "External Uniqueness Constraint"
                                     Dim lrRoleInstance As FBM.RoleInstance = lrTargetModelObject
                                     Dim lrRole As FBM.Role = lrRoleInstance.Role
 
@@ -2607,8 +2732,9 @@ SkipORMReadingEditor:
 
                                     Call Me.zrPage.MakeDirty()
                                     Call Me.EnableSaveButton()
-
+#End Region
                                 Case Is = pcenumRoleConstraintType.SubsetConstraint
+#Region "Subset Constraint"
                                     Dim lrRoleInstance As FBM.RoleInstance = lrTargetModelObject
                                     Dim lrRole As FBM.Role = lrRoleInstance.Role
 
@@ -2653,7 +2779,7 @@ SkipORMReadingEditor:
 
                                     Call Me.zrPage.MakeDirty()
                                     Call Me.EnableSaveButton()
-
+#End Region
                             End Select
                         Else
                             MsgBox("You can only create links from a Role Constraint to the Roles of a Fact Type.")
@@ -2671,7 +2797,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.Diagram.Links.Remove(e.Link)
         End Try
@@ -2702,6 +2828,7 @@ SkipORMReadingEditor:
                     Select Case lrRoleConstraintInstance.RoleConstraintType
                         Case Is = pcenumRoleConstraintType.RingConstraint,
                                   pcenumRoleConstraintType.EqualityConstraint,
+                                  pcenumRoleConstraintType.ExternalFrequencyConstraint,
                                   pcenumRoleConstraintType.ExternalUniquenessConstraint,
                                   pcenumRoleConstraintType.ExclusionConstraint,
                                   pcenumRoleConstraintType.ExclusiveORConstraint,
@@ -2714,7 +2841,7 @@ SkipORMReadingEditor:
                     End Select
                     Dim loNode As DiagramNode
                     loNode = Me.Diagram.GetNodeAt(e.MousePosition)
-                    If IsSomething(loNode) Then
+                    If loNode IsNot Nothing Then
                         If loNode.Tag.ConceptType = pcenumConceptType.Role Then
                             Me.DiagramView.DrawLinkCursor = Cursors.Hand
                             loNode.AllowIncomingLinks = True
@@ -2734,7 +2861,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.Diagram.Links.Remove(e.Link)
             e.Cancel = True
@@ -2801,21 +2928,13 @@ SkipORMReadingEditor:
 
     End Sub
 
-    Private Sub Diagram_LinkDoubleClicked(sender As Object, e As LinkEventArgs) Handles Diagram.LinkDoubleClicked
-
-    End Sub
-
-    Private Sub Diagram_LinkModifying(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkValidationEventArgs) Handles Diagram.LinkModifying
-
-    End Sub
-
     Private Sub Diagram_LinkSelected(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkEventArgs) Handles Diagram.LinkSelected
 
         Try
             Select Case e.Link.Tag.ConceptType
                 Case Is = pcenumConceptType.SubtypeRelationship
                     Me.zrPage.SelectedObject.Clear()
-                    Me.zrPage.SelectedObject.Add(e.Link.Tag)
+                    Me.zrPage.SelectedObject.AddUnique(e.Link.Tag)
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_SubtypeRelationship
             End Select
         Catch ex As Exception
@@ -2824,7 +2943,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2842,7 +2961,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2855,143 +2974,159 @@ SkipORMReadingEditor:
         Dim loNode As Object 'Because may be ShapeNode or TableNode
         Dim lrModelObject As FBM.ModelObject
 
-        If IsSomething(Diagram.GetNodeAt(e.MousePosition)) Then
-            loNode = Diagram.GetNodeAt(e.MousePosition, True, False)
-            lrModelObject = loNode.tag
-            Select Case lrModelObject.ConceptType
-                Case Is = pcenumConceptType.Role
-                    '----------------------------------------------------------------------------------------------
-                    'See if the user is adding a Role to a RoleConstraint.Argument
-                    If Me.zrPage.RoleConstraintInstance.FindAll(Function(x) x.CreatingArgument = True).Count > 0 Then
-
-                        Dim lrRoleInstance As FBM.RoleInstance
-                        lrRoleInstance = lrModelObject
-
-                        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                        Dim lrRoleConstraintRole As FBM.RoleConstraintRole
-
-                        '-------------------------------------------------------------------------------------
-                        'Get the RoleConstraint/Instance
-                        lrRoleConstraintInstance = Me.GetRoleConstraintCurrentlyCreatingArgument
-
-                        If Control.ModifierKeys = Keys.Control Then
-                            '--------------------------------------------------------------------------------------------------
-                            'Manually creating the JoinPath for the RoleConstraint/Argument
-                            If lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count = 0 Then
-                                If lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole.Count > 0 Then
-                                    lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.AddUnique(lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole(0).Role)
-                                End If
-                            End If
-                            lrRoleConstraintInstance.CurrentArgument.ManuallyCreatedJoinPath = True
-                            lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.AddUnique(lrRoleInstance.Role)
-                            Call lrRoleConstraintInstance.RefreshRoleConstraintRoleTexts()
-                            Exit Sub
-                        End If
-
-                        If lrRoleConstraintInstance.RoleConstraint.Argument.Count >= 1 Then
-                            '--------------------------------------------------------------------------------------------------
-                            'User has already created the first Argument in the set. Must check to see that any Roles
-                            '  added to subsequent Arguments are compatible with their respective Role in the first Argument.
-                            '--------------------------------------------------------------------------------------------------
-                            Dim liInd As Integer
-                            liInd = lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole.Count
-                            'MsgBox(Me.zrPage.Model.AreRolesCompatible(lrRoleInstance.Role, _
-                            '                                           lrRoleConstraintInstance.RoleConstraint.Argument(0).RoleConstraintRole(liInd).Role))
-                        End If
-
-                        Dim larRole As New List(Of FBM.Role)
-                        Dim lrRoleConstraintRoleInd As FBM.RoleConstraintRole
-                        If lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count > 1 Then
-                            larRole.Add(lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath(lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count - 1))
-                        Else
-                            For Each lrRoleConstraintRoleInd In lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole
-                                larRole.Add(lrRoleConstraintRoleInd.Role)
-                            Next
-                        End If
-
-                        larRole.Add(lrRoleInstance.Role)
-
-                        Dim liJoinPathError As pcenumJoinPathError = pcenumJoinPathError.None
-
-                        '----------------------------------------------------------------------------------------------------------
-                        'Check to see if creating 2nd, 3rd, 4th etc Argument for a RoleConstraint that doesn't require a JoinPath
-                        '  NB See also: frmDiagramORM.LinkCreated (for saving the RoleConstraintRole  to the CurrentArgument). Happens before this.
-                        If Not lrRoleConstraintInstance.RequiresJoinPath Then
-
-                            Call Me.SaveAnyRoleConstraintArgumentsBeingCreated()
-
-                            lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint, lrRoleConstraintInstance.RoleConstraint.GetNextArgumentSequenceNr)
-                            lrRoleConstraintInstance.CreatingArgument = True
+        Try
+            'CodeSafe
+            If e.Node.Tag Is Nothing OrElse e.Node.Tag.GetType = GetType(ORMPopupToolSelector) Then Exit Sub
 
 
-                            lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
-                            lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
-                            lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
-                                                        "." &
-                                                        lrRoleConstraintRole.ArgumentSequenceNr.ToString
+            If Diagram.GetNodeAt(e.MousePosition) IsNot Nothing Then
+                loNode = Diagram.GetNodeAt(e.MousePosition, True, False)
+                lrModelObject = loNode.tag
+                Select Case lrModelObject.ConceptType
+                    Case Is = pcenumConceptType.Role
+#Region "Role"
+                        '----------------------------------------------------------------------------------------------
+                        'See if the user is adding a Role to a RoleConstraint.Argument
+                        If Me.zrPage.RoleConstraintInstance.FindAll(Function(x) x.CreatingArgument = True).Count > 0 Then
 
-                        ElseIf Me.zrPage.Model.ExistsJoinPathForRoles(larRole, liJoinPathError, lrRoleConstraintInstance.RoleConstraint) Then
+                            Dim lrRoleInstance As FBM.RoleInstance
+                            lrRoleInstance = lrModelObject
 
-                            If lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.SubsetConstraint Then
+                            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                            Dim lrRoleConstraintRole As FBM.RoleConstraintRole
 
-                                lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role, lrRoleConstraintInstance.CurrentArgument)
-                                '20220426-VM-Removed because was adding twice.
-                                'lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
-                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
-                                                            "." &
-                                                            lrRoleConstraintRole.ArgumentSequenceNr.ToString
+                            '-------------------------------------------------------------------------------------
+                            'Get the RoleConstraint/Instance
+                            lrRoleConstraintInstance = Me.GetRoleConstraintCurrentlyCreatingArgument
 
-                                If lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole.Count = 2 Then
-                                    Call Me.SaveAnyRoleConstraintArgumentsBeingCreated()
-
-                                    If lrRoleConstraintInstance.RoleConstraint.Argument.Count = 2 Then
-                                        lrRoleConstraintInstance.CreatingArgument = False
-                                    Else
-                                        lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint, lrRoleConstraintInstance.RoleConstraint.GetNextArgumentSequenceNr)
-                                        lrRoleConstraintInstance.CreatingArgument = True
+                            If Control.ModifierKeys = Keys.Control Then
+                                '--------------------------------------------------------------------------------------------------
+                                'Manually creating the JoinPath for the RoleConstraint/Argument
+                                If lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count = 0 Then
+                                    If lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole.Count > 0 Then
+                                        lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.AddUnique(lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole(0).Role)
                                     End If
                                 End If
+                                lrRoleConstraintInstance.CurrentArgument.ManuallyCreatedJoinPath = True
+                                lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.AddUnique(lrRoleInstance.Role)
+                                Call lrRoleConstraintInstance.RefreshRoleConstraintRoleTexts()
+                                Exit Sub
+                            End If
 
-                            ElseIf lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.RingConstraint Then
+                            If lrRoleConstraintInstance.RoleConstraint.Argument.Count >= 1 Then
+                                '--------------------------------------------------------------------------------------------------
+                                'User has already created the first Argument in the set. Must check to see that any Roles
+                                '  added to subsequent Arguments are compatible with their respective Role in the first Argument.
+                                '--------------------------------------------------------------------------------------------------
+                                Dim liInd As Integer
+                                liInd = lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole.Count
+                                'MsgBox(Me.zrPage.Model.AreRolesCompatible(lrRoleInstance.Role, _
+                                '                                           lrRoleConstraintInstance.RoleConstraint.Argument(0).RoleConstraintRole(liInd).Role))
+                            End If
+
+                            Dim larRole As New List(Of FBM.Role)
+                            Dim lrRoleConstraintRoleInd As FBM.RoleConstraintRole
+                            If lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count > 1 Then
+                                larRole.Add(lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath(lrRoleConstraintInstance.CurrentArgument.JoinPath.RolePath.Count - 1))
+                            Else
+                                For Each lrRoleConstraintRoleInd In lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole
+                                    larRole.Add(lrRoleConstraintRoleInd.Role)
+                                Next
+                            End If
+
+                            larRole.Add(lrRoleInstance.Role)
+
+                            Dim liJoinPathError As pcenumJoinPathError = pcenumJoinPathError.None
+
+                            '----------------------------------------------------------------------------------------------------------
+                            'Check to see if creating 2nd, 3rd, 4th etc Argument for a RoleConstraint that doesn't require a JoinPath
+                            '  NB See also: frmDiagramORM.LinkCreated (for saving the RoleConstraintRole  to the CurrentArgument). Happens before this.
+                            If Not lrRoleConstraintInstance.RequiresJoinPath Then
 
                                 Call Me.SaveAnyRoleConstraintArgumentsBeingCreated()
 
                                 lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint, lrRoleConstraintInstance.RoleConstraint.GetNextArgumentSequenceNr)
                                 lrRoleConstraintInstance.CreatingArgument = True
 
+
                                 lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
                                 lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
                                 lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
                                                             "." &
                                                             lrRoleConstraintRole.ArgumentSequenceNr.ToString
 
+                            ElseIf Me.zrPage.Model.ExistsJoinPathForRoles(larRole, liJoinPathError, lrRoleConstraintInstance.RoleConstraint) Then
+
+                                If lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.SubsetConstraint Then
+
+                                    lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role, lrRoleConstraintInstance.CurrentArgument)
+                                    '20220426-VM-Removed because was adding twice.
+                                    'lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
+                                    lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                                "." &
+                                                                lrRoleConstraintRole.ArgumentSequenceNr.ToString
+
+                                    If lrRoleConstraintInstance.CurrentArgument.RoleConstraintRole.Count = 2 Then
+                                        Call Me.SaveAnyRoleConstraintArgumentsBeingCreated()
+
+                                        If lrRoleConstraintInstance.RoleConstraint.Argument.Count = 2 Then
+                                            lrRoleConstraintInstance.CreatingArgument = False
+                                        Else
+                                            lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint, lrRoleConstraintInstance.RoleConstraint.GetNextArgumentSequenceNr)
+                                            lrRoleConstraintInstance.CreatingArgument = True
+                                        End If
+                                    End If
+
+                                ElseIf lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.RingConstraint Then
+
+                                    Call Me.SaveAnyRoleConstraintArgumentsBeingCreated()
+
+                                    lrRoleConstraintInstance.CurrentArgument = New FBM.RoleConstraintArgument(lrRoleConstraintInstance.RoleConstraint, lrRoleConstraintInstance.RoleConstraint.GetNextArgumentSequenceNr)
+                                    lrRoleConstraintInstance.CreatingArgument = True
+
+                                    lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
+                                    lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
+                                    lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                                "." &
+                                                                lrRoleConstraintRole.ArgumentSequenceNr.ToString
+
+                                Else
+                                    lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
+                                    lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
+                                    lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                                "." &
+                                                                lrRoleConstraintRole.ArgumentSequenceNr.ToString
+                                End If
                             Else
-                                lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
-                                lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole)
-                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
-                                                            "." &
-                                                            lrRoleConstraintRole.ArgumentSequenceNr.ToString
-                            End If
-                        Else
-                            Dim lsMessage As String = ""
-                            lsMessage = "Tried to add a RoleConstraintRole to the Argument of a RoleConstraint, where there is no JoinPath between the existing Roles of the Argument, and the Role being added."
-                            lsMessage &= vbCrLf & vbCrLf
-                            lsMessage &= "Error: " & liJoinPathError.ToString
-                            lsMessage &= vbCrLf & vbCrLf
-                            lsMessage &= "Do you want to add the Role to the Role Constaint anyway?"
-                            If MsgBox(lsMessage, MsgBoxStyle.Exclamation + MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                                Dim lsMessage As String = ""
+                                lsMessage = "Tried to add a RoleConstraintRole to the Argument of a RoleConstraint, where there is no JoinPath between the existing Roles of the Argument, and the Role being added."
+                                lsMessage &= vbCrLf & vbCrLf
+                                lsMessage &= "Error: " & liJoinPathError.ToString
+                                lsMessage &= vbCrLf & vbCrLf
+                                lsMessage &= "Do you want to add the Role to the Role Constaint anyway?"
+                                If MsgBox(lsMessage, MsgBoxStyle.Exclamation + MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
 
-                                lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
-                                lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole, True)
-                                lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
-                                                            "." &
-                                                            lrRoleConstraintRole.ArgumentSequenceNr.ToString
+                                    lrRoleConstraintRole = lrRoleConstraintInstance.RoleConstraint.CreateRoleConstraintRole(lrRoleInstance.Role)
+                                    lrRoleConstraintInstance.CurrentArgument.AddRoleConstraintRole(lrRoleConstraintRole, True)
+                                    lrRoleInstance.Shape.Text = lrRoleConstraintInstance.CurrentArgument.SequenceNr.ToString &
+                                                                "." &
+                                                                lrRoleConstraintRole.ArgumentSequenceNr.ToString
+                                End If
                             End If
+
                         End If
+#End Region
+                End Select
+            End If
 
-                    End If
-            End Select
-        End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -3120,7 +3255,7 @@ SkipORMReadingEditor:
         'Try this...if one node is deselected, then deselect all nodes
         'Me.zrPage.SelectedObject.Clear() 'Didn't seem to work
 
-        If IsSomething(e.Node) Then
+        If e.Node IsNot Nothing Then
             Select Case e.Node.Tag.GetType
                 Case Is = GetType(FBM.EntityTypeInstance)
                     If Not (Control.ModifierKeys = Keys.Control) Then
@@ -3156,14 +3291,22 @@ SkipORMReadingEditor:
 
     End Sub
 
+    Private mbNodeJustDoubleClicked As Boolean = False
+
     Private Sub Diagram_NodeDoubleClicked(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeDoubleClicked
 
         Dim lo_point As PointF = e.MousePosition
         Dim loNode As Object 'Because may be ShapeNode or TableNode
         Dim lrModelObject As New FBM.ModelObject
 
+        'CodeSafe
+        loNode = Diagram.GetNodeAt(lo_point, True, False)
+        If loNode Is Nothing OrElse TypeOf loNode.Tag Is ORMPopupToolSelector Then Exit Sub
 
-        If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        mbNodeJustDoubleClicked = True 'So that Popup Control Selector does not show. See DiagramView.DoubleClicked
+        'RemoveHandler Me.DiagramView.DoubleClick, AddressOf DiagramView_DoubleClick
+
+        If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             loNode = Diagram.GetNodeAt(lo_point, True, False)
             lrModelObject = loNode.tag
             Select Case lrModelObject.ConceptType
@@ -3265,30 +3408,51 @@ SkipORMReadingEditor:
     Private Sub DiagramView_EnterInplaceEditMode(sender As Object, e As InPlaceEditEventArgs) Handles DiagramView.EnterInplaceEditMode
 
         Try
+            Dim lsEditText = e.EditControl.Text
 
-            Dim graphics As Graphics = Me.DiagramView.CreateGraphics()
-            Dim liStringWidth, liStringHeight As Integer
+            Select Case e.Node.Tag.GetType
+                Case Is = GetType(FBM.FactTypeDerivationText)
+                    'Do Nothing
+                    Dim lrFactTypeDerivationText As FBM.FactTypeDerivationText = e.Node.Tag
+                    lsEditText = lrFactTypeDerivationText.FactTypeInstance.FactType.DerivationText
+                    Call lrFactTypeDerivationText.SetSize()
+                Case Else
+                    Dim graphics As Graphics = Me.DiagramView.CreateGraphics()
+                    Dim liStringWidth, liStringHeight As Integer
 
+                    If lsEditText = Trim("") Then
+                        liStringWidth = graphics.MeasureString(e.EditControl.Text + "MMMMMMMMMMMMMMM", e.EditControl.Font).Width
+                        liStringHeight = graphics.MeasureString("M", e.EditControl.Font).Height + 5
+                    Else
+                        liStringWidth = graphics.MeasureString(e.EditControl.Text + "MMMM", e.EditControl.Font).Width
+                        liStringHeight = graphics.MeasureString(e.EditControl.Text, e.EditControl.Font).Height + 5
+                    End If
 
-            If e.EditControl.Text = Trim("") Then
-                liStringWidth = graphics.MeasureString(e.EditControl.Text + "MMMMMMMMMMMMMMM", e.EditControl.Font).Width
-                liStringHeight = graphics.MeasureString("M", e.EditControl.Font).Height + 5
-            Else
-                liStringWidth = graphics.MeasureString(e.EditControl.Text + "MMMM", e.EditControl.Font).Width
-                liStringHeight = graphics.MeasureString(e.EditControl.Text, e.EditControl.Font).Height + 5
-            End If
+                    Select Case e.Node.Tag.GetType
+                        Case Is = GetType(FBM.FactTypeDerivationText)
+                            Dim lrFactTypeDerivationText As FBM.FactTypeDerivationText = e.Node.Tag
+                            lsEditText = lrFactTypeDerivationText.FactTypeInstance.FactType.DerivationText
 
-            Dim loDiagramView As DiagramView = e.EditControl.Parent
-            Dim loRectangle As New Rectangle(e.Node.Bounds.X, e.Node.Bounds.Y, e.Node.Bounds.Width, e.Node.Bounds.Height)
+                            '20231108-VM-Tried....did not work. Could not replace the e.EditControl. Possibly because e is ByVal, rather than ByRef
+                            'See DiagramView.CreateEditControl
 
-            'CodeSafe
-            If loDiagramView Is Nothing Then
-                e.EditControl.Width = 20
-                e.EditControl.Height = 8
-            Else
-                e.EditControl.Width = Viev.Greater(liStringWidth * ((loDiagramView.ZoomFactor + 20) / 100), liStringWidth)
-                e.EditControl.Height = Viev.Greater(liStringHeight * ((loDiagramView.ZoomFactor + 20) / 100), liStringHeight)
-            End If
+                    End Select
+
+                    Dim loDiagramView As DiagramView = e.EditControl.Parent
+                    Dim loRectangle As New Rectangle(e.Node.Bounds.X, e.Node.Bounds.Y, e.Node.Bounds.Width, e.Node.Bounds.Height)
+
+                    'CodeSafe
+                    If loDiagramView Is Nothing Then
+                        e.EditControl.Width = 20
+                        e.EditControl.Height = 8
+                    Else
+                        e.EditControl.Width = Viev.Greater(liStringWidth * ((loDiagramView.ZoomFactor + 20) / 100), liStringWidth)
+                        e.EditControl.Height = Viev.Greater(liStringHeight * ((loDiagramView.ZoomFactor + 20) / 100), liStringHeight)
+                    End If
+
+            End Select
+
+            e.EditControl.Text = lsEditText
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -3296,7 +3460,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3335,7 +3499,7 @@ SkipORMReadingEditor:
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
-            If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                 '20200820-VM-Moved to DiagramView.Click, so that the user needs to click on the ModelElement they want to use in the subtype.
                 'If Me.zrPage.SelectedObject.Count = 2 Then
 
@@ -3460,7 +3624,7 @@ SkipORMReadingEditor:
                     lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                     Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                     lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-                    If IsSomething(lrPropertyGridForm) Then
+                    If lrPropertyGridForm IsNot Nothing Then
                         If Me.Diagram.Selection.Items.Count = 1 Then
                             lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
                             Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag.Shape.Selected = True
@@ -3535,7 +3699,7 @@ SkipORMReadingEditor:
                                 End Select
                             Next
 
-                            lsFactTypeName = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+                            lsFactTypeName = FEStrings.ProperSpace(lsFactTypeName)
 
                             '-------------------------------------------------------------------------
                             'Create a list of the selected objects so that a FactType can be created
@@ -3599,15 +3763,16 @@ SkipORMReadingEditor:
 
                                 Dim lbContainsValueType As Boolean = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.ConceptType = pcenumConceptType.ValueType) IsNot Nothing
 
-                                If lbContainsEntityTypeOrObjectifiedFactType And lbContainsValueType Then
+                                If lbContainsEntityTypeOrObjectifiedFactType Then '20240824-VM-Also has: And lbContainsValueType Then
 
                                     Dim lrSentence As New Language.Sentence("FirstObject has SecondObject", "FirstObject has SecondObject")
                                     lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
                                     lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
                                     Dim larRole As New List(Of FBM.Role)
 
-                                    larRole.Add(lrFactType.RoleGroup.Find(Function(x) lasConceptTypeSet.Contains(x.JoinedORMObject.ConceptType)))
-                                    larRole.Add(lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.ConceptType = pcenumConceptType.ValueType))
+                                    Dim laiValidObjectTypes = New List(Of pcenumConceptType) From {pcenumConceptType.EntityType, pcenumConceptType.FactType, pcenumConceptType.ValueType}
+                                    larRole.Add(lrFactType.RoleGroup.Find(Function(x) laiValidObjectTypes.Contains(x.JoinedORMObject.ConceptType)))
+                                    larRole.Add(lrFactType.GetOtherRoleOfBinaryFactType(larRole(0).Id))
 
                                     Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
 
@@ -3616,6 +3781,10 @@ SkipORMReadingEditor:
                                     'lrFactTypeReading.IsPreferredForPredicate = (lrFactType.FactTypeReading.FindAll(AddressOf lrFactTypeReading.EqualsByRoleSequence).Count = 0)
 
                                     lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                                    lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole.GetReversed, New List(Of String) From {"is of", ""})
+                                    lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
                                 End If
 #End Region
                             ElseIf lrFactType.Arity = 1 Then
@@ -3631,12 +3800,14 @@ SkipORMReadingEditor:
 
                                 'RDS
                                 Try
-                                    Dim lrTable = larModelObject(0).getCorrespondingRDSTable
-                                    Dim lrColumn As New RDS.Column(lrTable, "change predicate", lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), False)
-                                    Call lrTable.addColumn(lrColumn)
+                                    If larModelObject(0).GetType <> GetType(FBM.ValueType) Then
+                                        Dim lrTable = larModelObject(0).getCorrespondingRDSTable
+                                        Dim lrColumn As New RDS.Column(lrTable, "change predicate", lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), False)
+                                        Call lrTable.addColumn(lrColumn)
+                                    End If
                                 Catch ex As Exception
                                     'Warning only. Because could be modifying the Core model, in which case there is no Table for larModelObject(0).
-                                    prApplication.ThrowErrorMessage("Error trying to create a Column for a unary Fact Type, for Model Element:" & larModelObject(0).Id, pcenumErrorType.Warning, Nothing, False, False, True)
+                                    prApplication.ThrowMessage("Error trying to create a Column for a unary Fact Type, for Model Element:" & larModelObject(0).Id, pcenumErrorType.Warning, Nothing, False, False, True)
                                 End Try
 
                             End If
@@ -3783,7 +3954,7 @@ SkipORMReadingEditor:
                         Dim lrDiagramOverviewForm As frmToolboxOverview
                         lrDiagramOverviewForm = prApplication.GetToolboxForm(frmToolboxOverview.Name)
 
-                        If IsSomething(lrDiagramOverviewForm) Then
+                        If lrDiagramOverviewForm IsNot Nothing Then
                             lrDiagramOverviewForm.SetDocument(Me.DiagramView)
                         End If
                     End If
@@ -3825,38 +3996,56 @@ SkipORMReadingEditor:
                     End If
                 Case Is = Keys.S And Not Keys.Alt 'Subtype
                     If ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.are_all_SelectedObjects_entity_types) Or
-                       ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.areSelectedObjectsEntityTypeAndFactType) Then
+                       ((Me.zrPage.SelectedObject.Count = 2) And Me.zrPage.areSelectedObjectsEntityTypeAndFactType) Or
+                       (1 = 1) Then
 
-                        Dim lrEntityType_1 As New FBM.EntityTypeInstance
-                        Dim lrEntityType_2 As New FBM.EntityTypeInstance
+                        Dim lrModelElement_1 As New FBM.ModelObject
+                        Dim lrModelElement_2 As New FBM.ModelObject
                         Dim lrParentModelObject As FBM.ModelObject
 
                         lrParentModelObject = Me.zrPage.SelectedObject(1)
 
                         Select Case lrParentModelObject.ConceptType
                             Case Is = pcenumConceptType.EntityType
-                                lrEntityType_1 = Me.zrPage.SelectedObject(0)
-                                lrEntityType_2 = Me.zrPage.SelectedObject(1)
+                                lrModelElement_1 = Me.zrPage.SelectedObject(0)
+                                lrModelElement_2 = Me.zrPage.SelectedObject(1)
 
-                                Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
+                                Call CType(lrModelElement_1, FBM.EntityTypeInstance).AddSubtypeRelationship(lrModelElement_2)
                             Case Is = pcenumConceptType.FactType
 
                                 lrFactTypeInstance = New FBM.FactTypeInstance
                                 lrFactTypeInstance = Me.zrPage.SelectedObject(1)
 
                                 If lrFactTypeInstance.IsObjectified Then
-                                    lrEntityType_1 = Me.zrPage.SelectedObject(0)
-                                    lrEntityType_2 = lrFactTypeInstance.ObjectifyingEntityType
+                                    lrModelElement_1 = Me.zrPage.SelectedObject(0)
+                                    lrModelElement_2 = lrFactTypeInstance.ObjectifyingEntityType
 
-                                    Call lrEntityType_1.AddSubtypeRelationship(lrEntityType_2)
-                                Else
-                                    '--------------------------------------------------------------------------------------------------------
-                                    'Ignore, can't create a Subtype Constraint to a Parent that is not an EntityType or ObjectifiedFactType
-                                    '--------------------------------------------------------------------------------------------------------
+                                    Call CType(lrModelElement_1, FBM.EntityTypeInstance).AddSubtypeRelationship(lrModelElement_2)
                                 End If
+                            Case Else
+                                Select Case Me.zrPage.SelectedObject(0).GetType
+                                    Case Is = GetType(FBM.ValueTypeInstance)
+                                        lrModelElement_1 = Me.zrPage.SelectedObject(0)
+                                        lrModelElement_2 = Me.zrPage.SelectedObject(1)
+
+                                        Call CType(lrModelElement_1, FBM.ValueTypeInstance).AddSubtypeRelationship(lrModelElement_2)
+                                    Case Is = GetType(FBM.EntityTypeInstance)
+                                        lrModelElement_1 = Me.zrPage.SelectedObject(0)
+                                        lrModelElement_2 = Me.zrPage.SelectedObject(1)
+
+                                        Call CType(lrModelElement_1, FBM.EntityTypeInstance).AddSubtypeRelationship(lrModelElement_2)
+
+                                        Dim lrErrorValidator = New Validation.EntityTypeRequiresReferenceSchemeError(Me.zrPage.Model)
+                                        Call lrErrorValidator.CheckForErrors(lrModelElement_1.ModelLevelElement)
+
+                                    Case Is = GetType(FBM.FactTypeInstance)
+                                        lrModelElement_2 = lrFactTypeInstance.ObjectifyingEntityType
+
+                                        Call CType(lrModelElement_1, FBM.EntityTypeInstance).AddSubtypeRelationship(lrModelElement_2)
+                                End Select
+
 
                         End Select
-
 
                     End If
                 Case Is = Keys.T
@@ -3888,7 +4077,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3933,8 +4122,8 @@ SkipORMReadingEditor:
     Public Function CreateValueType(Optional ByVal as_value_type_name As String = Nothing,
                                     Optional ByVal ab_use_value_type_name_as_id As Boolean = False,
                                     Optional ByVal aiDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet,
-                                    Optional ByVal aiLength As Integer = Nothing,
-                                    Optional ByVal aiPrecision As Integer = Nothing) As FBM.ValueTypeInstance
+                                    Optional ByVal aiLength As Integer = 0,
+                                    Optional ByVal aiPrecision As Integer = 0) As FBM.ValueTypeInstance
 
         Dim lo_ValueTypeInstance As FBM.ValueTypeInstance
         Dim ls_value_type_name As String = ""
@@ -3947,12 +4136,9 @@ SkipORMReadingEditor:
         Dim lrValueType As FBM.ValueType
         lrValueType = Me.zrPage.Model.CreateValueType(as_value_type_name)
         lrValueType.DataType = aiDataType
-        If IsSomething(aiLength) Then
-            lrValueType.DataTypeLength = aiLength
-        End If
-        If IsSomething(aiPrecision) Then
-            lrValueType.DataTypePrecision = aiPrecision
-        End If
+        lrValueType.DataTypeLength = aiLength
+        lrValueType.DataTypePrecision = aiPrecision
+
         lo_ValueTypeInstance = Me.zrPage.DropValueTypeAtPoint(lrValueType, lo_point)
         '=================================================================
 
@@ -4050,6 +4236,12 @@ SkipORMReadingEditor:
                 Case Is = pcenumConceptType.FactTypeName
                     loNode.Selected = True
                 Case Is = pcenumConceptType.FactTypeReading
+                    Dim lrFactTypeInstance As FBM.FactTypeInstance
+                    lrFactTypeInstance = CType(loNode.Tag, FBM.FactTypeReadingInstance).FactType
+                    If lrFactTypeInstance Is Nothing Then
+                        lrFactTypeInstance = New FBM.FactTypeInstance(Me.zrPage.Model, Me.zrPage, pcenumLanguage.ORMModel, )
+                    End If
+                    'Call lrFactTypeInstance.MouseDown() Was making is so that could not move the FactTypeReading independently of the FactTypeInstance.
                     loNode.Selected = True
                     Dim lrFactTypeReading As FBM.FactTypeReadingInstance = loNode.Tag
                     lrFactTypeReading.Shape.Detach()
@@ -4083,12 +4275,12 @@ SkipORMReadingEditor:
                     Dim lrRoleInstance As FBM.RoleInstance
                     lrRoleInstance = loNode.Tag
 
-                    If IsSomething(lrRoleInstance.Link) Then
+                    If lrRoleInstance.Link IsNot Nothing Then
                         lrRoleInstance.Link.Pen.Color = Color.LightGray
                     End If
                     Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                     For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-                        If IsSomething(lrEntityTypeInstance.Shape) Then
+                        If lrEntityTypeInstance.Shape IsNot Nothing Then
                             lrEntityTypeInstance.Shape.AllowIncomingLinks = True
                         End If
                     Next
@@ -4115,7 +4307,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4148,11 +4340,11 @@ SkipORMReadingEditor:
             End If
 #End Region
 
-
             '---------------------------------------------------------------------------------------------------------------------
             'RichtClick handling is mostly taken care of in Diagram.NodeSelected
             '---------------------------------------------------------------------
             If e.Button = Windows.Forms.MouseButtons.Right Then
+#Region "Right Mouse Button"
                 loSelectedNode = Diagram.GetNodeAt(lo_point)
                 Dim loSelectedLink As DiagramLink = Diagram.GetLinkAt(lo_point, 2)
                 If Me.Diagram.Selection.Items.Count > 2 And Not Me.zrPage.AreAllSelectedObjectsRoles Then
@@ -4161,7 +4353,7 @@ SkipORMReadingEditor:
                     Me.zrPage.SelectedObject.Clear()
                     Me.Diagram.Selection.Clear()
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
-                ElseIf IsSomething(loSelectedNode) Then
+                ElseIf loSelectedNode IsNot Nothing Then
                     '------------------------------------------------------------------------------------
                     'Special handling for FactTypes.
                     '  FactTypeInstances are not added to zrPage.SelectedObject in Diagram.NodeSelected
@@ -4190,6 +4382,7 @@ SkipORMReadingEditor:
                 End If
 
                 Exit Sub
+#End Region
             End If
 
             '--------------------------------------------------
@@ -4197,11 +4390,11 @@ SkipORMReadingEditor:
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
-            If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
+#Region "Mouse over ShapeNode"
                 '----------------------------
                 'Mouse is over an ShapeNode
-                '----------------------------
-
+                '----------------------------        
                 '----------------------------------------------------
                 'Get the Node/Shape under the mouse cursor.
                 '----------------------------------------------------
@@ -4212,6 +4405,7 @@ SkipORMReadingEditor:
                     lrTableNode.Selected = True
                     Exit Sub
                 End If
+
                 loNode = Diagram.GetNodeAt(lo_point)
 
                 Try
@@ -4222,6 +4416,7 @@ SkipORMReadingEditor:
 
                 If (Control.ModifierKeys And Keys.Control) Or
                     Me.zrSpecialDragMode.SpecialDragMode = pcenumSpecialDragMode.ORMSubtypeConnector Then
+#Region "Controll Key Down or SpecialDragMode"
                     '------------------------------------
                     'Use is holding down the CtrlKey so
                     '  enforce the selection of the object
@@ -4245,6 +4440,7 @@ SkipORMReadingEditor:
                             '---------------------------------------------------------------------------------------
                             Dim lrFactTypeInstance As FBM.FactTypeInstance
                             lrFactTypeInstance = loNode.Tag
+                            loNode.Selected = True
                             If Me.zrPage.SelectedObject.Contains(lrFactTypeInstance) Then
                                 '-----------------------------------
                                 'Already selected
@@ -4279,9 +4475,11 @@ SkipORMReadingEditor:
                     '-------------------------------------------------------
                     Me.Diagram.AllowUnconnectedLinks = False
 
-                        Exit Sub
-                    Else
-                        If Me.zrPage.MultiSelectionPerformed Then
+                    Exit Sub
+#End Region
+                Else
+                    If Me.zrPage.MultiSelectionPerformed Then
+#Region "Multi Selection Performed"
                         If Diagram.Selection.Nodes.Contains(loNode) Then
                             '-----------------------------------------------------------------------
                             'Don't clear the SelectedObjects if the ShapeNode selected/clicked on 
@@ -4305,6 +4503,19 @@ SkipORMReadingEditor:
                                     Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
                                     loNode.Selected = True
                                     loNode.Pen.Color = Color.Blue
+
+                                    '-------------------------------------------------------------------
+                                    'Reset the MultiSelectionPerformed flag on the ORMModel
+                                    '-------------------------------------------------------------------
+                                    Me.zrPage.MultiSelectionPerformed = False
+                                Case Is = pcenumConceptType.FactTypeReading
+                                    Me.zrPage.SelectedObject.Clear()
+                                    Diagram.Selection.Clear()
+                                    '-----------------------------------------------
+                                    'Select the ShapeNode/ORMObject just clicked on
+                                    '-----------------------------------------------                    
+                                    Me.zrPage.SelectedObject.AddUnique(CType(loNode.Tag, FBM.FactTypeReading).FactType)
+                                    loNode.Selected = True
 
                                     '-------------------------------------------------------------------
                                     'Reset the MultiSelectionPerformed flag on the ORMModel
@@ -4357,7 +4568,9 @@ SkipORMReadingEditor:
                             Me.zrPage.MultiSelectionPerformed = False
 
                         End If
-                    Else 'MultiSelectionPerformed (below is Not MultiSelectionPerformed )
+#End Region
+                    Else 'EndIf MultiSelectionPerformed (below is Not MultiSelectionPerformed )
+#Region "Not Multi Selection Performed"
                         '---------------------------------------------------------------------------
                         'Clear the SelectedObjects because the user neither did a MultiSelection
                         '  nor held down the [Ctrl] key before clicking on the ShapeNode.
@@ -4368,13 +4581,15 @@ SkipORMReadingEditor:
                         Diagram.Selection.Clear()
                         '-----------------------------------------------
                         'Select the ShapeNode/ORMObject just clicked on
-                        '-----------------------------------------------                                                      
+                        '-----------------------------------------------                                                                                                      
                         Call Me.SelectNode(loNode)
+
 
                         '-------------------------------------------------------
                         'Reset the MultiSelectionPerformed flag on the ORMModel
                         '-------------------------------------------------------
                         Me.zrPage.MultiSelectionPerformed = False
+#End Region
                     End If
                 End If
 
@@ -4382,7 +4597,7 @@ SkipORMReadingEditor:
                 'PropertiesForm load, set the 'SelectedObject' property of the PropertyGrid to the ORMModel object selected
                 '-----------------------------------------------------------------------------------------------------------------------
 #Region "Propery Grid"
-                If IsSomething(loNode) Then
+                If loNode IsNot Nothing Then
                     Dim lrModelObject As FBM.ModelObject
                     lrModelObject = loNode.Tag
 
@@ -4394,8 +4609,9 @@ SkipORMReadingEditor:
                 Cursor.Show()
 
                 Me.Diagram.Invalidate()
-
-            ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 1, True)) Then
+#End Region
+            ElseIf Diagram.GetLinkAt(lo_point, 1, True) IsNot Nothing Then
+#Region "Mouse over Link"
                 '----------------------------
                 'Mouse is over a Link
                 '----------------------------
@@ -4404,7 +4620,7 @@ SkipORMReadingEditor:
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-                If IsSomething(lrPropertyGridForm) And IsSomething(loLink) Then
+                If lrPropertyGridForm IsNot Nothing And loLink IsNot Nothing Then
 
                     Dim lrModelObject As FBM.ModelObject
                     lrModelObject = loLink.Tag
@@ -4427,6 +4643,7 @@ SkipORMReadingEditor:
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrSubtypeRelationshipRoleInstance
                     End Select
                 End If
+#End Region
             Else
                 '---------------------------------------------------
                 'MouseDown is on canvas (not on object).
@@ -4444,6 +4661,8 @@ SkipORMReadingEditor:
                 'Mouse is over the Canvas
                 '----------------------------
                 Me.Diagram.AllowUnconnectedLinks = False
+
+                'AddHandler Me.DiagramView.DoubleClick, AddressOf DiagramView_DoubleClick
 
                 '-----------------------------------------------------------------------------------------------------------------------
                 'Properties Node. I.e. Properties table, as in PropertyGrphSchema Properties shown for EntityType/ObjectifiedFactType.
@@ -4466,7 +4685,7 @@ SkipORMReadingEditor:
                 Dim lrPropertyGridForm As frmToolboxProperties
 
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
 
                     Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
                     Dim myHiddenAttribute As Attribute = New System.ComponentModel.DisplayNameAttribute("Language")
@@ -4492,7 +4711,28 @@ SkipORMReadingEditor:
                 If prApplication.WorkingPage Is Nothing Then
                     prApplication.WorkingPage = Me.zrPage
                 End If
+
+                'CodeSafe
+                Me.zrPage.Diagram.Selection.Clear()
+                Dim larSelectedNode = Me.zrPage.SelectedObject.ToArray
                 Me.zrPage.SelectedObject.Clear()
+
+                For Each lrModelElementInstance In larSelectedNode
+                    Select Case lrModelElementInstance.GetType
+                        Case = GetType(FBM.FactTypeInstance)
+                            Dim lrFactTypeInstance = CType(lrModelElementInstance, FBM.FactTypeInstance)
+                            For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
+                                lrRoleInstance.Shape.Selected = False
+                            Next
+                            lrFactTypeInstance.Shape.Selected = False
+                    End Select
+                    Dim lrShapeNode As ShapeNode = lrModelElementInstance.Shape
+                    If lrShapeNode IsNot Nothing Then
+                        lrShapeNode.Selected = False
+                    End If
+                    lrModelElementInstance.SetAppropriateColour
+                Next
+
                 Me.PerformCleanup()
 
                 Call Me.ResetNodeAndLinkColors()
@@ -4502,7 +4742,7 @@ SkipORMReadingEditor:
                 '-------------------------------------------------------
                 Dim lrToolboxForm As frmToolboxORMVerbalisation
                 lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                If IsSomething(lrToolboxForm) Then
+                If lrToolboxForm IsNot Nothing Then
                     Call lrToolboxForm.VerbalisePage(Me.zrPage)
                 End If
 
@@ -4516,7 +4756,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -4531,11 +4771,12 @@ SkipORMReadingEditor:
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
                 Select Case arModelElement.ConceptType
                     Case Is = pcenumConceptType.ValueType
+#Region "ValueType"
                         Dim lrValueTypeInstance As FBM.ValueTypeInstance
                         lrValueTypeInstance = arModelElement
                         Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
@@ -4564,7 +4805,9 @@ SkipORMReadingEditor:
                         lrPropertyGridForm.zrSelectedObject = lrValueTypeInstance
                         lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
                         lrPropertyGridForm.PropertyGrid.SelectedObject = lrValueTypeInstance
+#End Region
                     Case Is = pcenumConceptType.EntityType
+#Region "Entity Type"
                         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                         lrEntityTypeInstance = arModelElement
                         Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
@@ -4598,7 +4841,9 @@ SkipORMReadingEditor:
                         End If
                         lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeInstance
                         lrPropertyGridForm.PropertyGrid.Refresh()
+#End Region
                     Case Is = pcenumConceptType.EntityTypeName
+#Region "Entity Type Name"
                         Dim lrEntityTypeName As FBM.EntityTypeName
                         lrEntityTypeName = arModelElement
                         Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
@@ -4630,15 +4875,20 @@ SkipORMReadingEditor:
                         End If
                         lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                         lrPropertyGridForm.PropertyGrid.SelectedObject = lrEntityTypeName.EntityTypeInstance
+                        lrPropertyGridForm.zrSelectedObject = lrEntityTypeName.EntityTypeInstance
                         lrPropertyGridForm.PropertyGrid.Refresh()
+#End Region
                     Case Is = pcenumConceptType.RoleConstraintRole
+#Region "Role Constraint Role"
                         Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                         lrRoleConstraintRoleInstance = arModelElement
                         Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                         Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
                         lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                         lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintRoleInstance.RoleConstraint
+#End Region
                     Case Is = pcenumConceptType.RoleConstraint
+#Region "Role Constraint"
                         Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                         lrRoleConstraintInstance = arModelElement
 
@@ -4649,7 +4899,18 @@ SkipORMReadingEditor:
                         lrPropertyGridForm.zrSelectedObject = arModelElement
                         lrPropertyGridForm.PropertyGrid.SelectedObjects = {} 'Part of the fix to the problem where ValueConstraint were being added to the wrong ValueType.
 
+                        Call lrRoleConstraintInstance.SetPropertyAttributes(Me, "MaximumFrequencyCount", False)
+                        Call lrRoleConstraintInstance.SetPropertyAttributes(Me, "MinimumFrequencyCount", False)
+
                         Select Case lrRoleConstraintInstance.RoleConstraintType
+
+                            Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                Dim lrFrequencyConstraintInstance As FBM.RoleConstraintInstance
+                                lrFrequencyConstraintInstance = arModelElement
+                                Call lrFrequencyConstraintInstance.SetPropertyAttributes(Me, "MaximumFrequencyCount", True)
+                                Call lrFrequencyConstraintInstance.SetPropertyAttributes(Me, "MinimumFrequencyCount", True)
+
+                                lrPropertyGridForm.PropertyGrid.SelectedObject = lrFrequencyConstraintInstance
                             Case Is = pcenumRoleConstraintType.FrequencyConstraint
                                 Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
                                 lrFrequencyConstraintInstance = arModelElement
@@ -4658,6 +4919,9 @@ SkipORMReadingEditor:
                                 Dim loMiscFilterAttribute5 As Attribute = New System.ComponentModel.CategoryAttribute("Value Constraint")
                                 Dim loMiscFilterAttribute6 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
                                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2, loMiscFilterAttribute3, loMiscFilterAttribute4, loMiscFilterAttribute5, loMiscFilterAttribute6})
+
+                                Call lrFrequencyConstraintInstance.SetPropertyAttributes(Me, "MaximumFrequencyCount", True)
+                                Call lrFrequencyConstraintInstance.SetPropertyAttributes(Me, "MinimumFrequencyCount", True)
 
                                 lrPropertyGridForm.PropertyGrid.SelectedObject = lrFrequencyConstraintInstance
                             Case Is = pcenumRoleConstraintType.RoleValueConstraint
@@ -4679,7 +4943,7 @@ SkipORMReadingEditor:
                             Case Else
                                 lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
                         End Select
-
+#End Region
 
                     Case Is = pcenumConceptType.FactType
                         Dim lrFactTypeInstance = CType(arModelElement, FBM.FactTypeInstance)
@@ -4737,6 +5001,7 @@ SkipORMReadingEditor:
                         If lrPropertyGridForm.PropertyGrid.SelectedObject IsNot Nothing Then
                             lrPropertyGridForm.PropertyGrid.SelectedObject = New Object
                         End If
+                        lrPropertyGridForm.zrSelectedObject = lrFactTypeInstance
                         lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute2})
                         lrPropertyGridForm.PropertyGrid.SelectedObject = arModelElement
 
@@ -4776,7 +5041,7 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4817,7 +5082,7 @@ SkipORMReadingEditor:
                 If prApplication.RightToolboxForms.FindAll(Function(x) x.Name = frmToolboxModelDictionary.Name).Count >= 1 Then
                     child = prApplication.RightToolboxForms.Find(Function(x) x.Name = frmToolboxModelDictionary.Name)
                     child.zrORMModel = prApplication.WorkingModel
-                    If IsSomething(prApplication.WorkingPage) _
+                    If prApplication.WorkingPage IsNot Nothing _
                     And child.zrLoadedModel IsNot prApplication.WorkingModel Then
                         Call child.LoadToolboxModelDictionary(prApplication.WorkingPage.Language)
                     End If
@@ -4856,7 +5121,7 @@ SkipORMReadingEditor:
             Dim lrRoleInstance As FBM.RoleInstance
             Dim lrOtherRoleInstance As FBM.RoleInstance
             lo_point = Me.DiagramView.ClientToDoc(e.Location)
-            If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                 '----------------------------------------------
                 'Mouse is over a ShapeNode
                 '----------------------------------------------
@@ -4922,10 +5187,18 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
+
+    ' Import the GetKeyState function from user32.dll
+    <DllImport("user32.dll")>
+    Public Shared Function GetKeyState(ByVal nVirtKey As Integer) As Short
+    End Function
+
+    ' Virtual keycode for the F key
+    Private Const VK_F As Integer = &H46
 
 
     Private Sub ORMDiagramView_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseUp
@@ -4939,6 +5212,12 @@ SkipORMReadingEditor:
         '  do a multi-select
         '----------------------------------------------------
         If Control.ModifierKeys And Keys.Control Then
+
+            'CodeSafe
+            For Each lrModelElementInstance In Me.zrPage.SelectedObject.ToArray
+                lrModelElementInstance.Shape.Selected = True
+            Next
+
             Exit Sub
         End If
 
@@ -4951,6 +5230,10 @@ SkipORMReadingEditor:
         '-------------------------------------------------------
         lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
+        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+            Call lrFactTypeInstance.SetAppropriateColour()
+        Next
+
         For Each lrRoleInstance In Me.zrPage.RoleInstance
             lrRoleInstance.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
             lrRoleInstance.RoleName.SetAppropriateColour()
@@ -4961,7 +5244,7 @@ SkipORMReadingEditor:
             Exit Sub
         End If
 
-        If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             '----------------------------------------------
             'Mouse is over a ShapeNode
             '----------------------------------------------
@@ -5018,6 +5301,7 @@ SkipORMReadingEditor:
             End Select
         End If
 
+
     End Sub
 
     Private Sub Diagram_NodeModified(ByVal sender As Object, ByVal e As MindFusion.Diagramming.NodeEventArgs) Handles Diagram.NodeModified
@@ -5034,7 +5318,7 @@ SkipORMReadingEditor:
             If Not e.Node.Tag.IsInstanceObjectType Then Exit Sub 'E.g. Properties TableNode.
 
 
-            If IsSomething(e.Node.Tag) Then
+            If e.Node.Tag IsNot Nothing Then
 
                 Dim lrUserAction As New tUserAction(e.Node.Tag, pcenumUserAction.MoveModelObject, Me.zrPage)
                 lrUserAction.PreActionModelObject = New tUndoRedoObject(e.Node.Bounds.X, e.Node.Bounds.Y)
@@ -5079,6 +5363,7 @@ SkipORMReadingEditor:
                         Call Me.SortJoiningFactTypes(e.Node.Tag)
 
                     Case Is = pcenumConceptType.FactType
+#Region "FactType"
                         Call Me.SortJoiningFactTypes(e.Node.Tag)
 
                         '-------------------------------------------------------------------
@@ -5097,9 +5382,17 @@ SkipORMReadingEditor:
                             Case Is = 1
                                 lrFactTypeInstance.SortRoleGroup()
                         End Select
+#End Region
                     Case Is = pcenumConceptType.FactTypeReading
                         Dim lrFactTypeReading As FBM.FactTypeReadingInstance = e.Node.Tag
                         lrFactTypeReading.Shape.AttachTo(lrFactTypeReading.FactType.Shape, AttachToNode.MiddleRight)
+
+                    Case Is = pcenumConceptType.ModelNote
+                        'Saze of the ConceptInstance set
+                        Dim lrModelNote As FBM.ModelNoteInstance = e.Node.Tag
+                        lrModelNote.Width = e.Node.Bounds.Width
+                        lrModelNote.Height = e.Node.Bounds.Height
+
                 End Select
             End If
 
@@ -5113,7 +5406,7 @@ SkipORMReadingEditor:
 
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End Try
             Next
 
@@ -5129,74 +5422,161 @@ SkipORMReadingEditor:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
-    Public Sub ProcessPopupToolSelector(ByRef arPage As FBM.Page, ByRef asInstructionType As String)
+    Public Sub ProcessPopupToolSelector(ByRef arPage As FBM.Page, ByRef asInstructionType As String, ByVal arPoint As Point)
 
         Dim lsMessage As String
 
         'CodeSafe 
-        If arPage.SelectedObject.Count = 0 Then Exit Sub
+        If arPage.SelectedObject.Count = 0 Then
 
-        Dim lrModelElement As FBM.ModelObject = arPage.SelectedObject(0)
-
-        Try
             Select Case asInstructionType
                 Case Is = "EntityType"
+#Region "New Entity Type"
+                    Dim lr_combobox_item As New tComboboxItem("0", "[Create New Entity Type]")
+                    Dim lrGenericSelection As New tGenericSelection
+                    Dim lrEntityType As FBM.EntityType
 
-                    Select Case lrModelElement.GetType
-                        Case Is = GetType(FBM.EntityTypeInstance)
+                    lrEntityType = arPage.Model.CreateEntityType(Nothing, False)
 
-                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
+                    '---------------------------------
+                    'Drop the EntityType on the Page
+                    '---------------------------------
+                    Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+                    Dim clientPosition As Point = Me.DiagramView.PointToClient(arPoint)
+                    Dim docPosition1 As PointF = DiagramView.ClientToDoc(New Point(clientPosition.X + 20, clientPosition.Y + 20))
+                    Dim docPosition As PointF = DiagramView.ClientToDoc(New Point(arPoint.X + 30, arPoint.Y + 30))
+                    Dim loDropPtF = New Point(docPosition.X, docPosition.Y)
+                    lrEntityTypeInstance = arPage.DropEntityTypeAtPoint(lrEntityType, loDropPtF)
 
-                            Dim lrFactType As FBM.FactType = lrEntityTypeInstance.EntityType.AddBinaryRelationToNEwEntityType(pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+                    'ReferenceMode
+                    If My.Settings.UseDefaultReferenceModeNewEntityTypes Then
+                        Call lrEntityType.SetReferenceMode(My.Settings.DefaultReferenceMode)
+                        Call lrEntityType.SetDataType(pcenumORMDataType.TextFixedLength, 50, 0, True)
+                    End If
 
-                            Dim lrFactTypeInstance As FBM.FactTypeInstance = arPage.DropFactTypeAtPoint(lrFactType, New PointF(lrEntityTypeInstance.ShapeMidPoint.X + 20, lrEntityTypeInstance.ShapeMidPoint.Y), False, True, True, False, True, False, False)
+                    arPage.Save()
 
-                            Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
+                    '======================================================================
+                    'Create an Error for the Entity Type
+                    Dim lsErrorMessage As String = "Entity Type Requires Reference Scheme Error - Entity Type '" & lrEntityTypeInstance.Id & "'."
+                    Dim lrModelError As New FBM.ModelError(pcenumModelErrors.EntityTypeRequiresReferenceSchemeError,
+                                                                    lsErrorMessage,
+                                                                    Nothing,
+                                                                    lrEntityType)
 
-                    End Select
+                    lrEntityTypeInstance.EntityType._ModelError.Add(lrModelError)
+                    arPage.Model.AddModelError(lrModelError)
+
+                    Dim lrUserAction As New tUserAction(lrEntityTypeInstance, pcenumUserAction.AddNewPageObjectToPage, arPage)
+                    lrUserAction.PreActionModelObject = lrEntityTypeInstance.Clone(arPage)
+                    lrUserAction.PostActionModelObject = lrEntityTypeInstance.Clone(arPage)
+                    prApplication.AddUndoAction(lrUserAction)
+#End Region
 
                 Case Is = "ValueType"
+#Region "New Value Type"
+                    Dim lr_combobox_item As New tComboboxItem("0", "[Create New Value Type]")
+                    Dim lrGenericSelection As New tGenericSelection
+                    Dim lrValueType As FBM.ValueType
 
-                    Select Case lrModelElement.GetType
-                        Case Is = GetType(FBM.EntityTypeInstance)
+                    lrValueType = arPage.Model.CreateValueType("New Value Type", True, ,,, True)
 
-                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
+                    '---------------------------------
+                    'Drop the ValueType on the Page
+                    '---------------------------------
+                    Dim lrValueTypeInstance As New FBM.ValueTypeInstance
+                    Dim clientPosition As Point = Me.DiagramView.PointToClient(arPoint)
+                    Dim docPosition1 As PointF = DiagramView.ClientToDoc(New Point(clientPosition.X + 20, clientPosition.Y + 20))
+                    Dim docPosition As PointF = DiagramView.ClientToDoc(New Point(arPoint.X + 30, arPoint.Y + 30))
+                    Dim loDropPtF = New Point(docPosition.X, docPosition.Y)
+                    lrValueTypeInstance = arPage.DropValueTypeAtPoint(lrValueType, loDropPtF)
 
-                            Dim lrValueType As FBM.ValueType = arPage.Model.CreateValueType("NewValueType", True,,,, True)
+                    arPage.Save()
 
-                            Dim lrFactType As FBM.FactType = lrEntityTypeInstance.EntityType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
-
-                            Dim lrFactTypeInstance As FBM.FactTypeInstance = arPage.DropFactTypeAtPoint(lrFactType, New PointF(lrEntityTypeInstance.ShapeMidPoint.X + 20, lrEntityTypeInstance.ShapeMidPoint.Y), False, True, True, False, True, False, False)
-
-                            Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
-
-                    End Select
-                Case Is = "Properties"
-
-                    Try
-                        Dim lrPropertyGridForm As frmToolboxProperties = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                        Call lrPropertyGridForm.Show()
-                        Call Me.DoPropertiesGridProcessing(lrModelElement)
-                    Catch ex As Exception
-
-                    End Try
-
+                    Dim lrUserAction As New tUserAction(lrValueTypeInstance, pcenumUserAction.AddNewPageObjectToPage, arPage)
+                    lrUserAction.PreActionModelObject = lrValueTypeInstance.Clone(arPage)
+                    lrUserAction.PostActionModelObject = lrValueTypeInstance.Clone(arPage)
+                    prApplication.AddUndoAction(lrUserAction)
+#End Region
             End Select
 
+        Else
+
+            Dim lrModelElement As FBM.ModelObject = arPage.SelectedObject(0)
+
+            Try
+                Select Case asInstructionType
+                    Case Is = "EntityType"
+
+                        Select Case lrModelElement.GetType
+                            Case Is = GetType(FBM.EntityTypeInstance)
+
+                                Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
+
+                                Dim lrFactType As FBM.FactType = lrEntityTypeInstance.EntityType.AddBinaryRelationToNEwEntityType(pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+
+                                Dim lrFactTypeInstance As FBM.FactTypeInstance = arPage.DropFactTypeAtPoint(lrFactType, New PointF(lrEntityTypeInstance.ShapeMidPoint.X + 20, lrEntityTypeInstance.ShapeMidPoint.Y), False, True, True, False, True, False, False)
+
+                                Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
+
+                                'FactTypeReadings
+                                Dim lrFactTypeReading = New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, New List(Of String) From {"has", ""})
+                                lrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup.GetReversed, New List(Of String) From {"is of", ""})
+                                lrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                        End Select
+
+                    Case Is = "ValueType"
+
+                        Select Case lrModelElement.GetType
+                            Case Is = GetType(FBM.EntityTypeInstance)
+
+                                Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
+
+                                Dim lrValueType As FBM.ValueType = arPage.Model.CreateValueType("NewValueType", True,,,, True)
+
+                                Dim lrFactType As FBM.FactType = lrEntityTypeInstance.EntityType.AddBinaryRelationToValueType(lrValueType, pcenumBinaryRelationMultiplicityType.ManyToOne, True)
+
+                                Dim lrFactTypeInstance As FBM.FactTypeInstance = arPage.DropFactTypeAtPoint(lrFactType, New PointF(lrEntityTypeInstance.ShapeMidPoint.X + 20, lrEntityTypeInstance.ShapeMidPoint.Y), False, True, True, False, True, False, False)
+
+                                Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
+
+                                'FactTypeReadings
+                                Dim lrFactTypeReading = New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, New List(Of String) From {"has", ""})
+                                lrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup.GetReversed, New List(Of String) From {"is of", ""})
+                                lrFactTypeInstance.FactType.AddFactTypeReading(lrFactTypeReading, True, True)
+
+                        End Select
+                    Case Is = "Properties"
+
+                        Try
+                            Dim lrPropertyGridForm As frmToolboxProperties = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+                            Call lrPropertyGridForm.Show()
+                            Call Me.DoPropertiesGridProcessing(lrModelElement)
+                        Catch ex As Exception
+
+                        End Try
+                End Select
 SkipProcessingPopupToolSelector:
 
-        Catch ex As Exception
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-        End Try
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+
+        End If
+
 
     End Sub
 
@@ -5208,6 +5588,8 @@ SkipProcessingPopupToolSelector:
         'NB PropertyGrid is called in DiagramView.MouseDown
         '--------------------------------------------------------------------------------
         Try
+            'CodeSafe
+            If e.Node.Tag Is Nothing OrElse e.Node.Tag.GetType = GetType(ORMPopupToolSelector) Then Exit Sub
 
             If My.Settings.UseClientServer Then
                 If Not prApplication.User.ProjectPermission.FindAll(Function(x) x.Permission = pcenumPermission.Alter).Count > 0 Then
@@ -5238,15 +5620,27 @@ SkipProcessingPopupToolSelector:
                         Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                     Case Is = pcenumConceptType.ValueType
                         Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
+                        CType(e.Node.Tag, FBM.ValueTypeInstance).SetAppropriateColour()
                     Case Is = pcenumConceptType.FactType
+#Region "FactType"
                         'Not done here, because when a Role is selected, the FactType of the Role is selected also.
                         '  This is so that when a Role is moved, the FactType(Instance) moves also.
                         Call e.Node.Tag.AdjustBorderHeight()
+
+                        'CodeSafe
+                        Call e.Node.Tag.NodeSelected
+
+                        If Control.ModifierKeys And Keys.Control Then
+                            Dim lrFactTypeInstance = CType(e.Node.Tag, FBM.FactTypeInstance)
+                            Call lrFactTypeInstance.SortRoleGroup()
+                        End If
+#End Region
                     Case Is = pcenumConceptType.FactTable
                         Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                     Case Is = pcenumConceptType.EntityTypeName
                         'N/A
                     Case Is = pcenumConceptType.Role
+#Region "Role"
                         If Not Me.zrPage.SelectedObject.Contains(e.Node.Tag) Then
                             Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                         End If
@@ -5258,6 +5652,7 @@ SkipProcessingPopupToolSelector:
                             lrRoleInstance.Shape.Selected = True
                             Call lrRoleInstance.NodeSelected()
                         End If
+#End Region
                     Case Is = pcenumConceptType.RoleName
                         Dim lrRoleNameInstance As FBM.RoleName = CType(e.Node.Tag, FBM.RoleName)
                         Call lrRoleNameInstance.NodeSelected()
@@ -5281,6 +5676,9 @@ SkipProcessingPopupToolSelector:
                         If Not Me.zrPage.SelectedObject.Contains(e.Node.Tag) Then
                             Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                         End If
+                    Case Is = pcenumConceptType.FactTypeDerivationText
+                        Dim lrFactTypeDerivationsText = CType(e.Node.Tag, FBM.FactTypeDerivationText)
+                        Call lrFactTypeDerivationsText.NodeSelected()
                     Case Else
                         'N/A
                 End Select
@@ -5290,6 +5688,11 @@ SkipProcessingPopupToolSelector:
                         Me.zrPage.SelectedObject.AddUnique(e.Node.Tag)
                 End Select
 
+            End If
+
+            'Classic ORM Layout
+            If Me.zrPage.SelectedObject.Count > 0 AndAlso (Control.ModifierKeys And Keys.Shift) = Keys.Shift Then
+                Me.zrPage.MoveSelectedValueTypesJoinedFactTypesToMidAndVerticalParallelToValueTypes()
             End If
 
 #Region "Popup Tool Selector"
@@ -5332,7 +5735,7 @@ SkipPopup:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 #End Region
 
@@ -5390,6 +5793,7 @@ SkipPopup:
                         Case Is = pcenumRoleConstraintType.RingConstraint
                             Me.DiagramView.ContextMenuStrip = ContextMenuStrip_RingConstraint
                         Case Is = pcenumRoleConstraintType.ExclusionConstraint,
+                                  pcenumRoleConstraintType.ExternalFrequencyConstraint,
                                   pcenumRoleConstraintType.ExternalUniquenessConstraint,
                                   pcenumRoleConstraintType.EqualityConstraint,
                                   pcenumRoleConstraintType.SubsetConstraint,
@@ -5409,6 +5813,8 @@ SkipPopup:
                     End Select
                 Case Is = GetType(FBM.ModelNoteInstance)
                     Me.DiagramView.ContextMenuStrip = Me.ContextMenuStripModelNote
+                Case Is = GetType(FBM.FactTypeDerivationText)
+                    Me.DiagramView.ContextMenuStrip = Me.ContextMenuStripDerivationTextEditor
                 Case Else
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
             End Select
@@ -5420,7 +5826,7 @@ SkipPopup:
 #Region "ORM Verbalisation"
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Select Case e.Node.Tag.GetType
                     Case Is = GetType(FBM.EntityTypeInstance)
@@ -5450,6 +5856,8 @@ SkipPopup:
                                 Call lrToolboxForm.VerbaliseRoleConstraintEqualityConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.ExclusionConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintExclusionConstraint(lrRoleConstraintInstance.RoleConstraint)
+                            Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                Call lrToolboxForm.VerbaliseRoleConstraintExternalFrequencyConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InclusiveORConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintInclusiveORConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
@@ -5480,7 +5888,7 @@ SkipPopup:
                             Dim lrPropertyGridForm As frmToolboxProperties
                             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                             If lrPropertyGridForm IsNot Nothing Then
-                                If IsSomething(lrPropertyGridForm) Then
+                                If lrPropertyGridForm IsNot Nothing Then
                                     lrPropertyGridForm.BringToFront()
                                 End If
                             End If
@@ -5494,7 +5902,7 @@ SkipPopup:
                             Dim lrPropertyGridForm As frmToolboxProperties
                             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                             If lrPropertyGridForm IsNot Nothing Then
-                                If IsSomething(lrPropertyGridForm) Then
+                                If lrPropertyGridForm IsNot Nothing Then
                                     lrPropertyGridForm.BringToFront()
                                 End If
                             End If
@@ -5548,7 +5956,7 @@ SkipPopup:
                             '20210801-VM-Removed below so can verbalise an IUC.
                             If lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                                 lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                                If IsSomething(lrToolboxForm) Then
+                                If lrToolboxForm IsNot Nothing Then
                                     'Special VerbalisationProcess
                                     Call lrToolboxForm.VerbaliseRoleConstraintInternalUniquenessConstraint(lrRoleConstraintInstance.RoleConstraint)
                                 End If
@@ -5650,13 +6058,13 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
     End Sub
 
-    Public Sub LoadORMModelPage(ByRef arPage As FBM.Page)
+    Public Sub LoadORMModelPage(ByRef arPage As FBM.Page, Optional ByVal abShowSubtypes As Boolean = True)
 
         '------------------------------------------------------------------------
         ' Displays an ORM Diagram based on the input parameters
@@ -5678,9 +6086,7 @@ SkipPopup:
         '------------------------------------------------------------------------
 
         Try
-            'Me.SetVisibleCore(False)
-
-            prApplication.ThrowErrorMessage("Entered frmDiagramORM.DisplayORMModelPage", pcenumErrorType.Information)
+            prApplication.ThrowMessage("Entered frmDiagramORM.DisplayORMModelPage", pcenumErrorType.Information)
 
             Dim loDroppedNode As ShapeNode = Nothing
             Dim lrValueTypeInstance As FBM.ValueTypeInstance
@@ -5693,6 +6099,8 @@ SkipPopup:
             Me.Tag = arPage
             Me.TabText = arPage.Name
             Me.zrPage.Diagram = Me.Diagram
+
+            Me.ToolStripStatusLabelModel.Text = Me.zrPage.Model.Name
 
             '===========================
             'Set the Zoom factor
@@ -5716,7 +6124,7 @@ SkipPopup:
             '   with the corresponding 'object' within the ORMModelPage object
             '------------------------------------------------------------------------
 
-            prApplication.ThrowErrorMessage("frmDiagramORM.DisplayORMModelPage, about to load the Instances.", pcenumErrorType.Information)
+            prApplication.ThrowMessage("frmDiagramORM.DisplayORMModelPage, about to load the Instances.", pcenumErrorType.Information)
 
             '----------------------------------------------
             'Display the EntityTypes within the ORMDiagram
@@ -5744,22 +6152,80 @@ SkipPopup:
             'Display the FactTypes
             '-----------------------
             Dim lrFactTypeInstance As FBM.FactTypeInstance
-            For Each lrFactTypeInstance In arPage.FactTypeInstance
+            For Each lrFactTypeInstance In arPage.FactTypeInstance.ToArray
+
+                'CodeSafe
+#Region "Fix RoleInstances joined to Nothing"
+                Dim larRoleInstance = From RoleInstance In lrFactTypeInstance.RoleGroup
+                                      Where RoleInstance.JoinedORMObject Is Nothing
+                                      Select RoleInstance
+
+                For Each lrRoleInstance In larRoleInstance
+                    lrRoleInstance.JoinedORMObject = lrRoleInstance.Role.JoinedORMObject.CloneInstance(Me.zrPage, True, False)
+                Next
+
+                larRoleInstance = From RoleInstance In lrFactTypeInstance.RoleGroup
+                                  Where Me.zrPage.GetAllPageObjects.Contains(RoleInstance.JoinedORMObject) = False
+                                  Select RoleInstance
+
+                For Each lrRoleInstance In larRoleInstance
+                    Select Case lrRoleInstance.Role.JoinedORMObject.GetType
+                        Case Is = GetType(FBM.EntityType)
+                            lrEntityTypeInstance = lrRoleInstance.Role.JoinsEntityType.CloneInstance(Me.zrPage, True, False)
+                            Call lrEntityTypeInstance.DisplayAndAssociate()
+                            lrRoleInstance.JoinedORMObject = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = lrRoleInstance.JoinedORMObject.Id)
+                    End Select
+                Next
+#End Region
+
                 '----------------------------------------------
                 '  Create the new ShapeNode for the FactType.
                 '----------------------------------------------            
                 Call lrFactTypeInstance.DisplayAndAssociate(Me.ViewFactTablesToolStripMenuItem.Checked,
                                                             My.Settings.ShowFactTypeNamesOnORMModelLoad)
+
+                If lrFactTypeInstance.FactType.isReferenceModeFactType And lrFactTypeInstance._Visible Then
+                    lrFactTypeInstance.MakeVisible()
+                End If
+
+                'CodeSafe - Make ReferenceModeEntityType points to FactTypeInstance if need be.
+                If lrFactTypeInstance.ReferenceModeEntityType IsNot Nothing Then
+                    lrEntityTypeInstance = Me.zrPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.ReferenceModeEntityType.Id)
+
+                    If lrEntityTypeInstance IsNot Nothing Then
+                        If lrEntityTypeInstance.ReferenceModeFactType Is Nothing Then
+                            lrEntityTypeInstance.ReferenceModeFactType = lrFactTypeInstance
+                        End If
+                        If Not lrEntityTypeInstance.ExpandReferenceMode Then
+                            Call lrEntityTypeInstance.HideTheReferenceScheme()
+                            lrEntityTypeInstance.SetExpandReferenceMode(False)
+                        End If
+                    End If
+                End If
             Next
 
             '-----------------------------------
             'Display any Subtype Relationships
-            '-----------------------------------        
+            '-----------------------------------
+#Region "Subtype Relationships"
             For Each lrEntityTypeInstance In arPage.EntityTypeInstance.FindAll(Function(x) x.SubtypeRelationship.Count > 0)
-                For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
-                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And x.Visible)
-                    If lrFactTypeInstance Is Nothing Then Continue For
-                    Call lrSubtypeRelationship.DisplayAndAssociate()
+
+                For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship.ToArray
+                    lrSubtypeRelationship.Visible = True
+                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And Not x.Visible)
+                    If lrFactTypeInstance Is Nothing And abShowSubtypes Then
+                        'Dropping the FactType displaces the SubtypeRelationsip.
+                        lrFactTypeInstance = arPage.DropFactTypeAtPoint(lrSubtypeRelationship.FactType, New PointF(10, 10), False, abVisible:=False, abIgnoreSubtypeRelationshipInstance:=True)
+                        Call lrSubtypeRelationship.DisplayAndAssociate()
+                        lrFactTypeInstance.SubtypeRelationshipInstance = lrSubtypeRelationship
+                        lrSubtypeRelationship.FactType = lrFactTypeInstance
+                    ElseIf lrFactTypeInstance IsNot Nothing And abShowSubtypes Then
+                        Call lrSubtypeRelationship.DisplayAndAssociate()
+                        lrFactTypeInstance.SubtypeRelationshipInstance = lrSubtypeRelationship
+                        lrSubtypeRelationship.FactType = lrFactTypeInstance
+                    Else
+                        Continue For
+                    End If
                 Next
             Next
             For Each lrValueTypeInstance In arPage.ValueTypeInstance
@@ -5767,8 +6233,21 @@ SkipPopup:
                     lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And x.Visible)
                     If lrFactTypeInstance Is Nothing Then Continue For
                     Call lrSubtypeRelationship.DisplayAndAssociate()
+                    lrFactTypeInstance.SubtypeRelationshipInstance = lrSubtypeRelationship
+                    lrSubtypeRelationship.FactType = lrFactTypeInstance
                 Next
             Next
+            For Each lrFactTypeInstance In arPage.FactTypeInstance
+                For Each lrSubtypeRelationship In lrFactTypeInstance.SubtypeRelationship
+                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And x.Visible)
+                    lrEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And x.Visible)
+                    If lrFactTypeInstance Is Nothing Then Continue For
+                    Call lrSubtypeRelationship.DisplayAndAssociate()
+                    lrFactTypeInstance.SubtypeRelationshipInstance = lrSubtypeRelationship
+                    lrSubtypeRelationship.FactType = lrFactTypeInstance
+                Next
+            Next
+#End Region
 
             '--------------------------------
             'ExpandedReferenceScheme
@@ -5860,10 +6339,39 @@ SkipPopup:
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
                 lrPropertyGridForm.PropertyGrid.SelectedObject = arPage
             End If
+
+            'Quality Checking
+            Try
+                Dim larVisibleReferenceModeFactTypeInstance = (From FactTypeInstance In Me.zrPage.FactTypeInstance
+                                                               Where FactTypeInstance.isReferenceModeFactType
+                                                               Where FactTypeInstance.Visible AndAlso FactTypeInstance.Shape.Visible
+                                                               From EntityTypeInstance In Me.zrPage.EntityTypeInstance
+                                                               Where EntityTypeInstance.ReferenceModeFactType.Id = FactTypeInstance.Id
+                                                               Where EntityTypeInstance.ReferenceModeIsHidden = False
+                                                               Select FactTypeInstance).ToList
+
+                Dim larHiddenFactTypeInstanceRolesShowing = (From FactTypeInstance In Me.zrPage.FactTypeInstance
+                                                             Where FactTypeInstance.isReferenceModeFactType
+                                                             Where Not FactTypeInstance.Visible
+                                                             From Role In FactTypeInstance.RoleGroup
+                                                             Where Role.Shape IsNot Nothing
+                                                             Where Role.Shape.Visible
+                                                             Select FactTypeInstance
+                                                             ).ToList
+
+                larVisibleReferenceModeFactTypeInstance.AddRange(larHiddenFactTypeInstanceRolesShowing)
+
+                For Each lrFactTypeInstance In larVisibleReferenceModeFactTypeInstance
+                    Call lrFactTypeInstance.Hide()
+                Next
+            Catch ex As Exception
+
+            End Try
+
 
             '--------------------------------------------------------------------------
             'Because ShapeItems are 'selected' during this process, calling the below
@@ -5879,14 +6387,19 @@ SkipPopup:
             arPage.SelectedObject.Clear()
             Me.PerformCleanup()
 
-            prApplication.ThrowErrorMessage("frmDiagramORM.DisplayORMModelPage setting the toolbox.", pcenumErrorType.Information)
             Call Me.SetToolbox()
 
             'Me.Diagram.ResizeToFitItems(1 )
             Me.Diagram.Invalidate()
             Me.zrPage.FormLoaded = True
 
-            prApplication.ThrowErrorMessage("frmDiagramORM.DisplayORMModelPage, finished loading the Page", pcenumErrorType.Information)
+            '-------------------------------------------------------------------------------------------
+            'Save the Model because placing the model elements on the Page makes the Page/Model dirty.
+            If Me.zrPage.Model.IsDirty Then
+                Me.zrPage.Model.Save()
+                'CodeSafe
+                Me.zrPage.IsDirty = False
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -5894,7 +6407,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5979,7 +6492,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6018,7 +6531,7 @@ SkipPopup:
 
             Dim lrPropertyGridForm As frmToolboxProperties
 
-            If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+            If prApplication.GetToolboxForm(frmToolboxProperties.Name) IsNot Nothing Then
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                 Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
@@ -6032,7 +6545,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -6060,7 +6573,7 @@ SkipPopup:
 
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
                 lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleInstance
             End If
@@ -6073,7 +6586,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6102,7 +6615,7 @@ SkipPopup:
             Call lrFactTypeInstance.SetPropertyAttributes(Me, "IsLinkFactType", lbShiftKeyDown)
 
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 If Me.Diagram.Selection.Items.Count > 0 Then
                     lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
                 Else
@@ -6116,7 +6629,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6292,7 +6805,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -6411,7 +6924,7 @@ SkipPopup:
                     Dim lrORMReadingEditor As frmToolboxORMReadingEditor
                     lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                    If IsSomething(lrORMReadingEditor) Then
+                    If lrORMReadingEditor IsNot Nothing Then
 
                         '-------------------------------------------------------------------------
                         'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
@@ -6432,13 +6945,9 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
-
-    End Sub
-
-    Private Sub Diagram_NodeSelecting(sender As Object, e As NodeValidationEventArgs) Handles Diagram.NodeSelecting
 
     End Sub
 
@@ -6464,8 +6973,91 @@ SkipPopup:
 
         lrModelObject = e.Node.Tag
 
-        Select Case lrModelObject.ConceptType
-            Case Is = pcenumConceptType.EntityTypeName
+
+        Select Case lrModelObject.GetType
+
+            Case Is = GetType(FBM.FactTypeReadingInstance)
+
+                Dim lrFactTypeReadingInstance = CType(lrModelObject, FBM.FactTypeReadingInstance)
+
+                Select Case lrFactTypeReadingInstance.FactType.Arity
+                    Case Is = 2
+#Region "Binary Fact Type"
+                        Dim pattern As String = "([a-z ]+) / ([a-z ]+)"
+                        Dim matches As Match = Regex.Match(e.NewText, pattern)
+
+                        If matches.Success Then
+                            Dim predicate1 As String = matches.Groups(1).Value.Trim()
+                            Dim predicate2 As String = matches.Groups(2).Value.Trim()
+
+                            Dim lrShapeNode As MindFusion.Diagramming.ShapeNode = Nothing
+                            lrShapeNode = lrFactTypeReadingInstance.Shape
+
+                            Dim larRole As New List(Of FBM.Role)
+                            For Each lrRoleInstance In lrFactTypeReadingInstance.FactType.RoleGroup
+                                larRole.Add(lrRoleInstance.Role)
+                            Next
+
+                            Dim lrFactType = lrFactTypeReadingInstance.FactType.FactType
+                            Dim lrFactTypeInstance = lrFactTypeReadingInstance.FactType
+
+#Region "First Predicate"
+                            Dim lrFactTypeReading = lrFactType.getFactTypeReadingByModelElementOrder(larRole.Select(Function(x) x.JoinedORMObject).ToList)
+
+                            If lrFactTypeReading IsNot Nothing Then
+                                lrFactTypeReading.PredicatePart(0).PredicatePartText = predicate1
+                                lrFactTypeReading.makeDirty()
+                                lrFactType.makeDirty()
+                            Else
+                                Dim lrSentence = New Language.Sentence($"{larRole(0).JoinedORMObject.Id} {predicate1} {larRole(1).JoinedORMObject.Id}")
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart(predicate1))
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                                Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                            End If
+
+                            lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.zrPage)
+
+                            If larRole(0).Id = lrFactTypeReading.PredicatePart.Find(Function(x) x.SequenceNr = 1).Role.Id Then
+                                lrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
+                                lrFactTypeInstance.FactTypeReadingShape.Shape = lrShapeNode
+                                lrFactTypeInstance.FactTypeReadingShape.RefreshShape()
+                            End If
+#End Region
+
+#Region "Second Predicate"
+                            larRole = larRole.GetReversed
+
+                            lrFactTypeReading = lrFactType.getFactTypeReadingByModelElementOrder(larRole.Select(Function(x) x.JoinedORMObject).ToList)
+
+                            If lrFactTypeReading IsNot Nothing Then
+                                lrFactTypeReading.PredicatePart(0).PredicatePartText = predicate2
+                                lrFactTypeReading.makeDirty()
+                                lrFactType.makeDirty()
+                            Else
+                                Dim lrSentence = New Language.Sentence($"{larRole(0).JoinedORMObject.Id} {predicate2} {larRole(1).JoinedORMObject.Id}")
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart(predicate2))
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                                Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+                            End If
+
+                            lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.zrPage)
+
+                            If larRole(0).Id = lrFactTypeReading.PredicatePart.Find(Function(x) x.SequenceNr = 1).Role.Id Then
+                                lrFactTypeInstance.FactTypeReadingShape = lrFactTypeReadingInstance
+                                lrFactTypeInstance.FactTypeReadingShape.Shape = lrShapeNode
+                                lrFactTypeInstance.FactTypeReadingShape.RefreshShape()
+                            End If
+#End Region
+
+#End Region
+                        End If
+                End Select
+
+
+            Case Is = GetType(FBM.EntityTypeName)
+#Region "EntityTypeName"
                 Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
                 Dim lrEntityTypeName As New FBM.EntityTypeName
                 lrEntityTypeName = e.Node.Tag
@@ -6479,12 +7071,27 @@ SkipPopup:
                     'Nothing to do. Name of the EntityType has not been changed.
                     '------------------------------------------------------------
                 Else
-                    Dim lrEntityTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityTypeInstance.Model, e.NewText, pcenumConceptType.EntityType)
-                    Dim lrValueTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityTypeInstance.Model, e.NewText, pcenumConceptType.ValueType)
-                    Dim lrFactTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityTypeInstance.Model, e.NewText, pcenumConceptType.FactType)
-                    Dim lrRoleConstraintDictionaryEntry As New FBM.DictionaryEntry(lrEntityTypeInstance.Model, e.NewText, pcenumConceptType.RoleConstraint)
+                    'Get the EntityType Name
+                    Dim lsEntityTypeName As String = e.NewText
+                    'User may have defined ReferenceMode as well
+                    Dim lsReferenceMode As String = Nothing
 
-                    If lrEntityTypeInstance.Model.ModelDictionary.Exists(AddressOf lrEntityTypeDictionaryEntry.EqualsByConceptTypeOnly) Then
+                    'Check for pattern, "Person (.Id)" for Reference Mode.
+                    Dim regex As New Regex("(\w+)\s*\(\s*\.(\w+)\s*\)")
+                    Dim match As Match = regex.Match(lsEntityTypeName)
+
+                    If match.Success Then
+                        ' Extract the matched groups
+                        lsEntityTypeName = match.Groups(1).Value
+                        lsReferenceMode = "." & match.Groups(2).Value
+                    End If
+
+                    Dim lrEntityTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityTypeInstance.Model, lsEntityTypeName, pcenumConceptType.EntityType)
+                    Dim lrValueTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityTypeInstance.Model, lsEntityTypeName, pcenumConceptType.ValueType)
+                    Dim lrFactTypeDictionaryEntry As New FBM.DictionaryEntry(lrEntityTypeInstance.Model, lsEntityTypeName, pcenumConceptType.FactType)
+                    Dim lrRoleConstraintDictionaryEntry As New FBM.DictionaryEntry(lrEntityTypeInstance.Model, lsEntityTypeName, pcenumConceptType.RoleConstraint)
+
+                    If lrEntityTypeInstance.Model.ModelDictionary.Exists(AddressOf lrEntityTypeDictionaryEntry.EqualsByConceptTypeOnly) And lsReferenceMode Is Nothing Then
                         MsgBox("An Entity Type with the name, '" & lrEntityTypeDictionaryEntry.Symbol & "', already exists in the Model, '" & lrEntityTypeInstance.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
                         lrEntityTypeInstance.EntityTypeNameShape.Text = e.OldText
                     ElseIf lrEntityTypeInstance.Model.ModelDictionary.Exists(AddressOf lrValueTypeDictionaryEntry.EqualsByConceptTypeOnly) Then
@@ -6497,13 +7104,21 @@ SkipPopup:
                         MsgBox("The name, '" & lrEntityTypeDictionaryEntry.Symbol & "', conflicts with a Role Constraint of the same name in the Model, '" & lrEntityTypeInstance.Model.Name & "'.", MsgBoxStyle.Exclamation, "Model Object Conflict")
                         lrEntityTypeInstance.EntityTypeNameShape.Text = e.OldText
                     Else
-                        If Not lrEntityTypeInstance.EntityType.SetName(e.NewText) Then
+                        If Not lrEntityTypeInstance.EntityType.SetName(lsEntityTypeName) Then
                             lrEntityTypeInstance.EntityTypeNameShape.Text = e.OldText
+                        Else
+                            'Set the ReferenceMode
+                            If lsReferenceMode IsNot Nothing Then
+                                Call lrEntityTypeInstance.EntityType.SetReferenceMode(lsReferenceMode)
+                            End If
                         End If
+
+
                     End If
                 End If
-
-            Case Is = pcenumConceptType.ValueType
+#End Region
+            Case Is = GetType(FBM.ValueTypeInstance)
+#Region "ValueType"
                 Dim lrValueTypeInstance As FBM.ValueTypeInstance
 
                 lrValueTypeInstance = e.Node.Tag
@@ -6536,8 +7151,9 @@ SkipPopup:
                         End If
                     End If
                 End If
-
-            Case Is = pcenumConceptType.RoleConstraint
+#End Region
+            Case Is = GetType(FBM.RoleConstraintInstance)
+#Region "RoleConstraint"
                 Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
                 lrRoleConstraintInstance = lrModelObject.CloneRoleConstraintInstance(Me.zrPage)
                 lrRoleConstraintInstance = Me.zrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
@@ -6545,9 +7161,9 @@ SkipPopup:
                 If Not lrRoleConstraintInstance.RoleConstraint.SetName(e.NewText) Then
                     lrRoleConstraintInstance.Name = e.OldText
                 End If
-
-            Case Is = pcenumConceptType.ModelNote
-
+#End Region
+            Case Is = GetType(FBM.ModelNoteInstance)
+#Region "ModelNote"
                 Dim lrModelNoteInstance As FBM.ModelNoteInstance
 
                 lrModelNoteInstance = e.Node.Tag
@@ -6555,7 +7171,9 @@ SkipPopup:
                 lrModelNoteInstance.Text = e.NewText
                 Call lrModelNoteInstance.ModelNote.SetText(Trim(e.NewText))
                 lrModelNoteInstance.Model.MakeDirty(True)
-
+#End Region
+            Case Is = GetType(FBM.FactTypeDerivationText)
+                'Moved to DiagramView.DestroyEditControl
             Case Else
 
         End Select
@@ -6582,7 +7200,7 @@ SkipPopup:
         End Select
 
         '=====================================================================================================================================
-        'Set the size of the editing box (used to change the Zoom factor here to 100%, but much better to modify the height of the edit box.
+        'Set the size of the editing box (We used to change the Zoom factor here to 100%, but much better to modify the height of the edit box.
         'See DiagramView_EnterInplaceEditMode.
 
     End Sub
@@ -6593,7 +7211,6 @@ SkipPopup:
         Dim loObject As New Object
 
         Try
-
             '---------------------------------------------------------------------------
             'If the ORM(FactType)ReadingEditor is loaded, then
             '  do the appropriate processing so that the data in the ReadingEditor grid
@@ -6602,7 +7219,7 @@ SkipPopup:
             Dim lrORMReadingEditor As frmToolboxORMReadingEditor
             lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-            If IsSomething(lrORMReadingEditor) Then
+            If lrORMReadingEditor IsNot Nothing Then
                 Select Case Me.zrPage.SelectedObject.Count
                     Case Is = 0
                         lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance
@@ -6613,25 +7230,30 @@ SkipPopup:
                         lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
                     Case Else
                         lrORMReadingEditor.zrPage = Me.zrPage
-                        Select Case Me.zrPage.SelectedObject(0).ConceptType
-                            Case Is = pcenumConceptType.FactType
-                                If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0) Then
-                                    lrORMReadingEditor.zrFactTypeInstance = Me.zrPage.SelectedObject(0)
-                                    Call lrORMReadingEditor.SetupForm()
-                                End If
-                            Case Is = pcenumConceptType.Role
-                                If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0).FactType Then
-                                    lrORMReadingEditor.zrFactTypeInstance = Me.zrPage.SelectedObject(0).FactType
-                                    Call lrORMReadingEditor.SetupForm()
-                                End If
-                        End Select
+
+                        'CodeSafe
+                        Me.zrPage.SelectedObject.RemoveAll(Function(x) x Is Nothing)
+                        If Me.zrPage.SelectedObject.Count > 0 Then
+                            Select Case Me.zrPage.SelectedObject(0).ConceptType
+                                Case Is = pcenumConceptType.FactType
+                                    If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0) Then
+                                        lrORMReadingEditor.zrFactTypeInstance = Me.zrPage.SelectedObject(0)
+                                        Call lrORMReadingEditor.SetupForm()
+                                    End If
+                                Case Is = pcenumConceptType.Role
+                                    If lrORMReadingEditor.zrFactTypeInstance IsNot Me.zrPage.SelectedObject(0).FactType Then
+                                        lrORMReadingEditor.zrFactTypeInstance = Me.zrPage.SelectedObject(0).FactType
+                                        Call lrORMReadingEditor.SetupForm()
+                                    End If
+                            End Select
+                        End If
                 End Select
             End If
 
             'Setup the Descriptions toolbox
             Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
             lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
-            If IsSomething(lrModelElementDescriptionsEditor) Then
+            If lrModelElementDescriptionsEditor IsNot Nothing Then
                 Select Case Me.zrPage.SelectedObject.Count
                     Case Is = 0
                         Call lrModelElementDescriptionsEditor.setDescriptions(Nothing)
@@ -6644,11 +7266,11 @@ SkipPopup:
             Dim lfrmToolboxConceptClassification As New frmToolboxConceptClassification
             lfrmToolboxConceptClassification = prApplication.GetToolboxForm(frmToolboxConceptClassification.Name)
             If lfrmToolboxConceptClassification IsNot Nothing Then
-                Select Case Me.zrPage.SelectedObject.Count
+                Select Case Me.zrPage.SelectedObject.Count + Me.Diagram.Selection.Items.Count
                     Case Is = 0
                         Call lfrmToolboxConceptClassification.SetupForm()
                     Case Else
-                        Call lfrmToolboxConceptClassification.SetupForm(Me.zrPage.SelectedObject(0).ModelLevelElement)
+                        Call lfrmToolboxConceptClassification.SetupForm(If(Me.zrPage.SelectedObject.Count > 0, Me.zrPage.SelectedObject(0).ModelLevelElement, Nothing))
                 End Select
             End If
 
@@ -6681,13 +7303,17 @@ SkipPopup:
                     '----------------------------------
                     'A MultiSelection has taken place
                     '----------------------------------
-                    If IsSomething(Me.zrPage) Then
+                    If Me.zrPage IsNot Nothing Then
                         '---------------------------------------------------------------
                         'WorkingPage exists. Sometimes, if the user 'closes' the form
                         '  the SelectionChanged gets triggered, but the WorkingPage
                         '  no longer exists.
                         '---------------------------------------------------------------
                         Me.zrPage.MultiSelectionPerformed = True
+
+                        Me.ToolStripButtonAllignLeft.Enabled = True
+                        Me.ToolStripButtonAllignCenter.Enabled = True
+                        Me.ToolStripButtonAllignRight.Enabled = True
                     End If
             End Select
 
@@ -6699,13 +7325,18 @@ SkipPopup:
                 'frmMain.ToolStripButtonCut.Enabled = True
             End If
 
+            'CodeSafe
+            For Each lrModelElementInstance In Me.zrPage.SelectedObject.ToArray
+                'lrModelElementInstance.Shape.Selected = True '20251224-VM-Was causing Morphing to hang.
+            Next
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6748,6 +7379,9 @@ SkipPopup:
                             loORMObject.y = loORMObject.shape.bounds.y
 
                             Select Case loORMObject.ConceptType
+                                Case Is = pcenumConceptType.EntityType
+                                    Call Me.SortJoiningFactTypes(loORMObject)
+                                    Call CType(loORMObject, FBM.EntityTypeInstance).ResetSubtypeRelationshipLinks()
                                 Case Is = pcenumConceptType.Role
                                     lrFactTypeInstance = loORMObject.FactType
                                     lrFactTypeInstance.X = loORMObject.Shape.Bounds.X
@@ -6839,7 +7473,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6901,7 +7535,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -6983,7 +7617,7 @@ SkipPopup:
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
                 If Me.Diagram.Selection.Items.Count > 0 Then
                     lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
@@ -7000,7 +7634,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -7022,11 +7656,21 @@ SkipPopup:
 
         Try
 
-            If Me.Diagram.Selection.Items.Count > 0 Then
-                lrEntityTypeInstance = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
-            Else
-                lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
-            End If
+            Try
+                If Me.Diagram.Selection.Items.Count > 0 Then
+                    Try
+                        lrEntityTypeInstance = Me.Diagram.Selection.Items(0).Tag
+                    Catch ex As Exception
+                        lrEntityTypeInstance = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
+                    End Try
+
+                Else
+                    lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+                End If
+            Catch ex As Exception
+                prApplication.ThrowMessage("Try selecting the Entity Type again.", pcenumErrorType.Warning, , False,,,, True,, True)
+                Exit Sub
+            End Try
 
             Call frmMain.LoadToolboxPropertyWindow(Me.DockPanel.ActivePane)
 
@@ -7035,7 +7679,7 @@ SkipPopup:
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
 
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
 
@@ -7075,7 +7719,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -7111,7 +7755,7 @@ SkipPopup:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -7126,7 +7770,7 @@ SkipPopup:
             '------------------------------------------------------------------------------------
             For liInd = 1 To Diagram.Nodes.Count
                 If Diagram.Nodes(liInd - 1).Selected Then
-                    If IsSomething(Diagram.Nodes(liInd - 1).Tag) And Not Diagram.Nodes(liInd - 1).Tag.GetType = GetType(TableNode) Then
+                    If Diagram.Nodes(liInd - 1).Tag IsNot Nothing And Not Diagram.Nodes(liInd - 1).Tag.GetType = GetType(TableNode) Then
                         Select Case Diagram.Nodes(liInd - 1).Tag.GetType
                             Case Is = GetType(FBM.EntityTypeInstance)
                                 Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
@@ -7158,7 +7802,7 @@ SkipPopup:
 
                 Else 'Non-Selected Nodes.
 
-                    If IsSomething(Diagram.Nodes(liInd - 1).Tag) Then
+                    If Diagram.Nodes(liInd - 1).Tag IsNot Nothing Then
                         Select Case Diagram.Nodes(liInd - 1).Tag.GetType
                             Case Is = GetType(FBM.EntityTypeInstance)
                                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
@@ -7207,6 +7851,17 @@ SkipPopup:
                                 Select Case Diagram.Nodes(liInd - 1).Tag.RoleConstraintType
                                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                                         Diagram.Nodes(liInd - 1).Pen.Color = Color.White
+                                    Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                        Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
+                                        lrRoleConstraintInstance = Diagram.Nodes(liInd - 1).Tag
+                                        lrRoleConstraintInstance.Shape.Pen.Color = Color.Purple
+                                        lrRoleConstraintInstance.Shape.Visible = True
+                                        lrRoleConstraintInstance.Shape.Image = Nothing
+                                        lrRoleConstraintInstance.Shape.Transparent = False
+                                        lrRoleConstraintInstance.Shape.Pen.Width = 0.6
+                                        'Diagram.Nodes(liInd - 1).Pen.Color = Color.Purple
+                                        'Diagram.Nodes(liInd - 1).Visible = True
+                                        Me.Diagram.Invalidate()
                                     Case Is = pcenumRoleConstraintType.EqualityConstraint,
                                                 pcenumRoleConstraintType.ExclusionConstraint,
                                                 pcenumRoleConstraintType.ExclusiveORConstraint,
@@ -7220,6 +7875,12 @@ SkipPopup:
                                         Diagram.Nodes(liInd - 1).Pen.Color = Color.White
                                 End Select
                                 Call Diagram.Nodes(liInd - 1).Tag.SetAppropriateColour()
+                            Case Is = GetType(FBM.RoleConstraintShape)
+                                Select Case Diagram.Nodes(liInd - 1).Tag.RoleConstraintType
+                                    Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                        Diagram.Nodes(liInd - 1).Pen.Color = Color.Purple
+                                        Diagram.Nodes(liInd - 1).Visible = True
+                                End Select
                             Case Is = GetType(FBM.RoleConstraintRoleInstance)
 
                                 Select Case Diagram.Nodes(liInd - 1).Tag.RoleConstraint.RoleConstraintType
@@ -7258,7 +7919,7 @@ SkipPopup:
             Next
 
             For liInd = 1 To Diagram.Links.Count
-                If IsSomething(Diagram.Links(liInd - 1).Tag) Then
+                If Diagram.Links(liInd - 1).Tag IsNot Nothing Then
                     Select Case Diagram.Links(liInd - 1).Tag.ConceptType
                         Case Is = pcenumConceptType.RoleConstraint
                             Select Case Diagram.Links(liInd - 1).Tag.RoleConstraintType
@@ -7294,7 +7955,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -7303,11 +7964,11 @@ SkipPopup:
 
         Try
 
-            If IsSomething(arObject) Then
+            If arObject IsNot Nothing Then
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
                     Dim lrModelObject As FBM.ModelObject
                     lrModelObject = arObject
                     lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
@@ -7350,7 +8011,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -7384,7 +8045,7 @@ SkipPopup:
             Case Is = 0
                 'Do Nothing
             Case Is < 0
-                If Control.ModifierKeys = Keys.Control Then
+                If (Control.ModifierKeys = Keys.Control) Or Boston.IsCtrlPressed Then
                     If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
                         frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
                     End If
@@ -7399,7 +8060,7 @@ SkipPopup:
                 End If
 
             Case Is > 0
-                If Control.ModifierKeys = Keys.Control Then
+                If (Control.ModifierKeys = Keys.Control) Or Boston.IsCtrlPressed Then
                     If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count Then
                         If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count - 1 Then
                             frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
@@ -7427,9 +8088,9 @@ SkipPopup:
 
         Select Case e.KeyValue
             Case Is = (e.Control And Keys.C)
-                Call frmMain.CopySelectedObjectsToClipboard()
+                Call frmMain.CopySelectedObjectsToClipboard(Me.zrPage)
             Case Is = (e.Control And Keys.V)
-                Call frmMain.PasteToCurrentPageFromClipboard()
+                Call frmMain.PasteToPageFromClipboard(Me.zrPage.Model, Me.zrPage)
             Case Is = (e.Alt And Keys.X)
                 If Me.zrPage.AreAllSelectedObjectsRoles Then
                     lo_point = Me.zrPage.GetMidOfSelectedObjects
@@ -7475,7 +8136,7 @@ SkipPopup:
             'Every EntityType at least 10,10 from the corner of the screen
             'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
             '    lrEntityTypeInstance.HasBeenMoved = False
-            '    If IsSomething(lrEntityTypeInstance.shape) Then
+            '    If lrEntityTypeInstance.shape IsNot Nothing Then
             '        lrEntityTypeInstance.shape.Move(Viev.Greater(10, lrEntityTypeInstance.shape.Bounds.X), _
             '                                        Viev.Greater(10, lrEntityTypeInstance.shape.Bounds.Y))
             '    End If
@@ -7483,7 +8144,7 @@ SkipPopup:
 
             'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
             '    lrFactTypeInstance.HasBeenMoved = False
-            '    If IsSomething(lrFactTypeInstance.Shape) Then
+            '    If lrFactTypeInstance.Shape IsNot Nothing Then
             '        lrFactTypeInstance.Shape.Move(Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.X), Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.Y))
             '    End If
             'Next
@@ -7528,13 +8189,17 @@ SkipPopup:
                 lrCentralModelElementInstance = arCentralModelElementInstance
             End If
 
-            Dim liX As Integer = Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 3)
-            Dim liY As Integer = Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 3)
+            Dim liX As Integer = Viev.Lesser(125, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 2)
+            Dim liY As Integer = Viev.Lesser(125, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 2)
 
             If CType(lrCentralModelElementInstance, Object).HasBeenMoved Then
                 '--------------------
-                'Moved as a SubType
+                'Moved as a SubType. move it anyway
                 '--------------------
+                If CType(lrCentralModelElementInstance, Object).Shape IsNot Nothing Then
+                    CType(lrCentralModelElementInstance, Object).Shape.Move(liX, liY)
+                    CType(lrCentralModelElementInstance, Object).HasBeenMoved = True
+                End If
             Else
                 If CType(lrCentralModelElementInstance, Object).Shape IsNot Nothing Then
                     CType(lrCentralModelElementInstance, Object).Shape.Move(liX, liY)
@@ -7542,7 +8207,7 @@ SkipPopup:
                 End If
             End If
 
-                Dim liDegrees As Integer
+            Dim liDegrees As Integer
             If lrCentralModelElementInstance.HasSubTypes Then
                 liDegrees = 270
             Else
@@ -7571,22 +8236,24 @@ SkipPopup:
                     lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject
                     liX = Viev.Greater(40, CType(lrCentralModelElementInstance, Object).Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 65)
                     liY = Viev.Greater(40, CType(lrCentralModelElementInstance, Object).Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 65)
-                    If Not lrObject.HasBeenMoved Then
+
+                    If Not lrObject Is lrCentralModelElementInstance Then
+                        'If Not lrObject.HasBeenMoved Then
                         lrObject.Shape.Move(liX, liY)
+                        'End If
+                        lrObject.HasBeenMoved = True
+
+                        If (lrObject.ConceptType = pcenumConceptType.EntityType) Then
+
+                            Dim lrChildEntityTypeInstance As FBM.EntityTypeInstance
+                            lrChildEntityTypeInstance = lrObject
+
+                            Call lrChildEntityTypeInstance.AutoLayout(False, False)
+
+                        End If
+
                     End If
-                    lrObject.HasBeenMoved = True
-
-                    If (lrObject.ConceptType = pcenumConceptType.EntityType) Then
-
-                        Dim lrChildEntityTypeInstance As FBM.EntityTypeInstance
-                        lrChildEntityTypeInstance = lrObject
-
-                        Call lrChildEntityTypeInstance.AutoLayout(False, False)
-
-                    End If
-
                 End If
-
 
                 liDegrees += 21
 
@@ -7633,7 +8300,7 @@ SkipPopup:
             'Next
 
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-                lrEntityTypeInstance.RepellNeighbouringPageObjects(1)
+                'lrEntityTypeInstance.RepellNeighbouringPageObjects(1)
             Next
 
             'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
@@ -7736,7 +8403,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -7790,7 +8457,7 @@ SkipPopup:
 
                 If Me.zrPage.do_selected_roles_span_minimum_for_FactType Then
 
-                    Dim lbRemoveExistingRoleConstraint As Boolean = False
+                    Dim lbRemoveExistingTotalInternalRoleConstraint As Boolean = False
 
                     If lrFactTypeInstance.FactType.InternalUniquenessConstraint.Count > 0 Then
                         '---------------------------------------------------
@@ -7813,7 +8480,7 @@ SkipPopup:
                                 Call Me.zrPage.SelectedObject(0).factType.FactType.RemoveInternalUniquenessConstraints(True)  'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
                             End If
                         ElseIf lrFactTypeInstance.FactType.InternalUniquenessConstraint(0).RoleConstraintRole.Count = lrFactTypeInstance.Arity Then
-                            lbRemoveExistingRoleConstraint = True 'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
+                            lbRemoveExistingTotalInternalRoleConstraint = True 'Because we are about to replace the TotalInternalUniquenessConstraint with one that spans FT.Arity-1 Roles.
                         End If
 
                     End If
@@ -7849,8 +8516,32 @@ SkipPopup:
                         'Create a Uniqueness Constraint for the selected Roles
                         '  using the RoleConstraint created for the Model
                         '------------------------------------------------------
-                        If lbRemoveExistingRoleConstraint Then
+                        If lbRemoveExistingTotalInternalRoleConstraint Then
                             Call lrFactTypeInstance.FactType.RemoveInternalUniquenessConstraints(True, True)
+
+                            If lrFactTypeInstance.Model.TargetDatabaseConnectionString.Trim <> "" Then
+                                If lrFactTypeInstance.Model.connectToDatabase(, False) Then
+
+                                    Dim lrBinaryManyToManyTable As RDS.Table = lrFactTypeInstance.FactType.getCorrespondingRDSTable
+                                    Dim lrTargetTable As RDS.Table = Nothing
+
+                                    Try
+                                        Dim lrResponsibleRole = larRole(0)
+
+                                        Dim lrModelElement = lrResponsibleRole.JoinedORMObject
+                                        lrTargetTable = lrModelElement.getCorrespondingRDSTable()
+
+                                        If lrTargetTable IsNot Nothing Then
+                                            Call lrFactTypeInstance.Model.MigrateManyToOneBinaryTableToForeignKeyOnTargetTable(lrBinaryManyToManyTable, lrTargetTable)
+                                        End If
+
+                                    Catch ex As Exception
+
+                                    End Try
+
+                                End If
+                            End If
+
                         End If
 
                         Call lrFactTypeInstance.FactType.CreateInternalUniquenessConstraint(larRole)
@@ -7916,7 +8607,7 @@ SkipPopup:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleInstance
         End If
 
@@ -7937,45 +8628,61 @@ SkipPopup:
 
     Public Sub select_all()
 
-        Dim liInd As Integer = 0
-        Dim lrValueTypeInstance As FBM.ValueTypeInstance
-        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-        Dim lrFactTypeInstance As FBM.FactTypeInstance
-        Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-        Dim lrModelNoteInstance As FBM.ModelNoteInstance
+        Try
+            Dim liInd As Integer = 0
+            Dim lrValueTypeInstance As FBM.ValueTypeInstance
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+            Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+            Dim lrModelNoteInstance As FBM.ModelNoteInstance
 
-        Me.zrPage.SelectedObject.Clear()
+            Me.zrPage.SelectedObject.Clear()
 
-        For Each lrValueTypeInstance In Me.zrPage.ValueTypeInstance
-            Me.zrPage.SelectedObject.Add(lrValueTypeInstance)
-        Next
+            For Each lrValueTypeInstance In Me.zrPage.ValueTypeInstance
+                Me.zrPage.SelectedObject.AddUnique(lrValueTypeInstance)
+                Call lrValueTypeInstance.NodeSelected()
+            Next
 
-        For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-            Me.zrPage.SelectedObject.Add(lrEntityTypeInstance)
-        Next
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+                Me.zrPage.SelectedObject.AddUnique(lrEntityTypeInstance)
+                Call lrEntityTypeInstance.NodeSelected()
+            Next
 
-        For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-            Me.zrPage.SelectedObject.Add(lrFactTypeInstance)
-        Next
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) Not x.isReferenceModeFactType)
+                Me.zrPage.SelectedObject.AddUnique(lrFactTypeInstance)
+                lrFactTypeInstance.Visible = True
+                Call lrFactTypeInstance.NodeSelected()
+            Next
 
-        For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
-            Select Case lrRoleConstraintInstance.RoleConstraintType
-                Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                    Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-                    For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                        'lrRoleConstraintRoleInstance.Shape.Selected = True
-                    Next
-                    Me.zrPage.SelectedObject.Add(lrRoleConstraintInstance)
-                Case Else
-                    'lrRoleConstraintInstance.Shape.Selected = True
-                    Me.zrPage.SelectedObject.Add(lrRoleConstraintInstance)
-            End Select
-        Next
+            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
+                Select Case lrRoleConstraintInstance.RoleConstraintType
+                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+                        Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
+                        For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
+                            'lrRoleConstraintRoleInstance.Shape.Selected = True
+                        Next
+                        Me.zrPage.SelectedObject.AddUnique(lrRoleConstraintInstance)
+                    Case Else
+                        'lrRoleConstraintInstance.Shape.Selected = True
+                        Me.zrPage.SelectedObject.AddUnique(lrRoleConstraintInstance)
+                End Select
+            Next
 
-        For Each lrModelNoteInstance In Me.zrPage.ModelNoteInstance
-            'lrModelNoteInstance.Shape.Selected = True
-            Me.zrPage.SelectedObject.Add(lrModelNoteInstance)
-        Next
+            For Each lrModelNoteInstance In Me.zrPage.ModelNoteInstance
+                'lrModelNoteInstance.Shape.Selected = True
+                Me.zrPage.SelectedObject.AddUnique(lrModelNoteInstance)
+            Next
+
+            Call Me.ResetNodeAndLinkColors()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -8053,7 +8760,7 @@ SkipPopup:
                     Call lrFact.makeDirty() 'Because we want this fact saved to the database
                     Call Me.zrPage.MakeDirty()
 
-                    If IsSomething(lrFact) Then
+                    If lrFact IsNot Nothing Then
                         '-------------------------------------------------------------
                         'Add the new Fact to the FactType                        
                         'Adds the new FactInstance to the FactTypeInstance by event.
@@ -8139,7 +8846,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -8212,7 +8919,7 @@ SkipPopup:
 
             lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
 
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
 
                 Call Directory.SetCurrentDirectory(Boston.MyPath)
                 loShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.ORMShapeLibrary)
@@ -8262,7 +8969,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8356,7 +9063,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8422,7 +9129,7 @@ SkipPopup:
         Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
         Me.HiddenDiagram.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
 
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
@@ -8434,6 +9141,7 @@ SkipPopup:
             '------------------------------------------------------------------
             Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
             lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
 
             Dim larEntityTypeInstance = From EntityTypeInstance In lrPage.EntityTypeInstance
                                         Where EntityTypeInstance.Id = lrEntityTypeInstance.Id
@@ -8506,7 +9214,7 @@ SkipPopup:
         Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
         Me.HiddenDiagram.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
             lrEnterpriseView = item.Tag
             prApplication.WorkingPage = lrEnterpriseView.Tag
@@ -8514,12 +9222,14 @@ SkipPopup:
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Actor/EntityType being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
-            lr_page = lrEnterpriseView.Tag
-            Dim lrValueTypeInstanceList = From ValueTypeInstance In lr_page.ValueTypeInstance
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
+
+            Dim lrValueTypeInstanceList = From ValueTypeInstance In lrPage.ValueTypeInstance
                                           Where ValueTypeInstance.Id = lrValueTypeInstance.Id
-                                          Select New FBM.ValueTypeInstance(lr_page.Model,
-                                                                    lr_page,
+                                          Select New FBM.ValueTypeInstance(lrPage.Model,
+                                                                    lrPage,
                                                                     pcenumLanguage.ORMModel,
                                                                     lrValueTypeInstance.Name,
                                                                     True,
@@ -8573,7 +9283,7 @@ SkipPopup:
             Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
             Me.HiddenDiagram.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
                 lrEnterpriseView = item.Tag 'Set when the ContextMenu.Opening event is triggered.            
                 Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
@@ -8584,6 +9294,7 @@ SkipPopup:
                 '------------------------------------------------------------------
                 Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
                 lrPage = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
 
                 Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
                 If lrPage.DiagramView IsNot Nothing Then
@@ -8698,7 +9409,7 @@ SkipPopup:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.HiddenDiagramView.SendToBack()
             Me.CircularProgressBar.SendToBack()
@@ -8734,7 +9445,7 @@ SkipPopup:
         Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
         Me.HiddenDiagram.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
             lrEnterpriseView = item.Tag
             prApplication.WorkingPage = lrEnterpriseView.Tag
@@ -8742,12 +9453,14 @@ SkipPopup:
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Actor/EntityType being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
-            lr_page = lrEnterpriseView.Tag
-            Dim lrFactTypeInstanceList = From FactTypeInstance In lr_page.FactTypeInstance
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
+
+            Dim lrFactTypeInstanceList = From FactTypeInstance In lrPage.FactTypeInstance
                                          Where FactTypeInstance.Id = lrFactTypeInstance.Id
-                                         Select New FBM.FactTypeInstance(lr_page.Model,
-                                                                    lr_page,
+                                         Select New FBM.FactTypeInstance(lrPage.Model,
+                                                                    lrPage,
                                                                     pcenumLanguage.ORMModel,
                                                                     lrFactTypeInstance.Name,
                                                                     True,
@@ -8801,7 +9514,7 @@ SkipPopup:
             Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
             Me.HiddenDiagram.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
                 lrEnterpriseView = item.Tag 'Set when the ContextMenu.Opening event is triggered.            
                 Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
@@ -8809,6 +9522,8 @@ SkipPopup:
 
                 Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
                 lrPage = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
+
                 Dim lrNode As PGS.Node
 
                 '-------------------------------------------------------------------------------------
@@ -8872,11 +9587,11 @@ SkipPopup:
                     Exit For
                 Next
 
-                If lrFactDataInstance.shape IsNot Nothing Then
+                If lrFactDataInstance.Shape IsNot Nothing Then
                     Me.MorphVector(0).EndSize = New Rectangle(lrFactDataInstance.X,
                                                               lrFactDataInstance.Y,
-                                                              lrFactDataInstance.shape.Bounds.Width,
-                                                              lrFactDataInstance.shape.Bounds.Height)
+lrFactDataInstance.Shape.Bounds.Width,
+lrFactDataInstance.Shape.Bounds.Height)
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                 End If
@@ -8949,7 +9664,7 @@ SkipPopup:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.HiddenDiagramView.SendToBack()
             Me.CircularProgressBar.SendToBack()
@@ -8984,7 +9699,7 @@ SkipPopup:
             Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
             Me.HiddenDiagram.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
                 lrEnterpriseView = item.Tag 'Set when the ContextMenu.Opening event is triggered.            
                 Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
@@ -8995,6 +9710,7 @@ SkipPopup:
                 '------------------------------------------------------------------
                 Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
                 lrPage = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
 
                 Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
                 If lrPage.DiagramView IsNot Nothing Then
@@ -9036,7 +9752,7 @@ SkipPopup:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9066,16 +9782,18 @@ SkipPopup:
 
             Me.HiddenDiagram.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
-                Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                lr_enterprise_view = item.Tag
-                frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-                prApplication.WorkingPage = lr_enterprise_view.Tag
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = item.Tag
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
+                prApplication.WorkingPage = lrEnterpriseView.Tag
 
                 '------------------------------------------------------------------
                 'Get the X,Y co-ordinates of the Actor/EntityType being morphed
                 '------------------------------------------------------------------
-                Dim lrPage As FBM.Page = lr_enterprise_view.Tag
+                Dim lrPage As FBM.Page = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
+
 
                 Dim lrFactDataInstance = From FactTypeInstance In lrPage.FactTypeInstance
                                          From FactInstance In FactTypeInstance.Fact
@@ -9091,7 +9809,7 @@ SkipPopup:
                 Me.MorphVector(0).EndPoint = New Point(lrActor.X, lrActor.Y)
                 Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
                 Me.MorphVector(0).EndSize = New Rectangle(0, 0, 10, 15)
-                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+                Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
                 Me.MorphVector(0).TargetImage = My.Resources.CMML.actor
                 Me.MorphTimer.Enabled = True
 
@@ -9103,7 +9821,7 @@ SkipPopup:
                 End If
 
                 Me.MorphStepTimer.Enabled = True
-                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
                 Me.MorphStepTimer.Start()
                 Me.MorphTimer.Start()
 
@@ -9115,7 +9833,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Call Me.HiddenDiagramView.SendToBack()
 
@@ -9170,6 +9888,7 @@ SkipPopup:
                 frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.MorphVector(0).EnterpriseTreeView.TreeNode
                 Call frmMain.zfrmModelExplorer.LoadSelectedPage(Me.MorphVector(0).ModelElementId)
                 Thread.Sleep(2000)
+                Me.HiddenDiagramView.SendToBack()
                 Me.DiagramView.BringToFront()
                 Me.Diagram.Invalidate()
                 'Me.MorphTimer.Enabled = False
@@ -9186,7 +9905,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -9200,11 +9919,12 @@ SkipPopup:
         Dim lrValueType As New FBM.ValueType
         Dim lrValueTypeInstance As New FBM.ValueTypeInstance
         Dim lo_menu_option As ToolStripItem
+        Dim lsMessage As String
 
         Try
             'CodeSafe
             If Me.zrPage.SelectedObject.Count = 0 Then Exit Sub
-            If Me.zrPage.SelectedObject(0).GetType <> GetType(FBM.ValueType) Then Exit Sub
+            If Me.zrPage.SelectedObject(0).GetType <> GetType(FBM.ValueTypeInstance) Then Exit Sub
 
 
             lrValueType = Me.zrPage.SelectedObject(0).ValueType
@@ -9241,16 +9961,16 @@ SkipPopup:
             '----------------------------------------------------------------
             Me.ToolStripMenuItem_ValueTypeMorph_ORMDiagram.DropDownItems.Clear()
 
-            '-----------------------------------------------------------------------------
-            'Clear the list of StateTransitionDiagrams that may relate to the ValueType
-            '-----------------------------------------------------------------------------
-            Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Clear()
-
             '--------------------------------------------------------
             'Load the ORMDiagrams that relate to the ValueType
             '  as selectable menuOptions
             '--------------------------------------------------------        
-            larPage_list = prApplication.CMML.get_orm_diagram_pages_for_value_type(lrValueType)
+#Region "ORM Diagram Pages"
+            '-----------------------------------------------------------------------------
+            'Clear the list of StateTransitionDiagrams that may relate to the ValueType
+            '-----------------------------------------------------------------------------
+            Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Clear()
+            larPage_list = prApplication.CMML.getORMDiagramPagesForValueType(lrValueType)
 
             For Each lr_page In larPage_list
                 '----------------------------------------------------------
@@ -9267,7 +9987,7 @@ SkipPopup:
                                                            Nothing,
                                                            lr_page.PageId)
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -9277,12 +9997,14 @@ SkipPopup:
                     AddHandler lo_menu_option.Click, AddressOf Me.MorphToORMDiagramValueType
                 End If
             Next
+#End Region
 
             '--------------------------------------------------------
-            'Load the ORMDiagrams that relate to the ValueType
+            'Load the StateTransitionDiagram Pages that relate to the ValueType
             '  as selectable menuOptions
             '--------------------------------------------------------        
-            larPage_list = prApplication.CMML.getSTDDiagramPagesForValueType(lrValueType)
+#Region "State Transition Diagram Pages"
+            larPage_list = prApplication.CMML.getStateTransitionDiagramPagesForValueType(lrValueType)
 
             For Each lr_page In larPage_list
                 '----------------------------------------------------------
@@ -9299,7 +10021,7 @@ SkipPopup:
                                                            Nothing,
                                                            lr_page.PageId)
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -9309,14 +10031,15 @@ SkipPopup:
                     AddHandler lo_menu_option.Click, AddressOf Me.morphToSTDiagram
                 End If
             Next
+#End Region
+
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9335,7 +10058,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -9347,7 +10070,7 @@ SkipPopup:
         Dim lrFactType As New FBM.FactType
         Dim lrFactTypeInstance As New FBM.FactTypeInstance
         Dim lo_menu_option As ToolStripItem
-
+        Dim lsMessage As String
 
         Me.ContextMenuStrip_FactType.ImageScalingSize = New Drawing.Size(16, 16)
 
@@ -9380,6 +10103,8 @@ SkipPopup:
         If lrFactTypeInstance.ShowFactTypeName Then Me.ToolStripMenuItemShowFactTypesName.Checked = True
 
         Me.ToolStripMenuItemShowFactTypesName.Checked = lrFactTypeInstance.ShowFactTypeName
+
+        Me.ToolStripMenuItemShowDerivationRuleEditor.Visible = lrFactTypeInstance.IsDerived
 
         '----------------------------------------------------------------------------------------------
         'If the FactType is a LinkFactType then the user can't remove the FactType from the Model,
@@ -9430,7 +10155,8 @@ SkipPopup:
         'Load the ORMDiagrams that relate to the FactType
         '  as selectable menuOptions
         '--------------------------------------------------------        
-        larPage_list = prApplication.CMML.get_orm_diagram_pages_for_FactType(lrFactType)
+#Region "ORM Diagram Pages"
+        larPage_list = prApplication.CMML.getORMDiagramPagesForFactType(lrFactType)
 
         For Each lr_page In larPage_list
             '----------------------------------------------------------
@@ -9442,7 +10168,7 @@ SkipPopup:
 
             lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lr_page.PageId)
 
-            If IsSomething(lrEnterpriseView) Then
+            If lrEnterpriseView IsNot Nothing Then
                 '---------------------------------------------------
                 'Add the Page(Name) to the MenuOption.DropDownItems
                 '---------------------------------------------------
@@ -9451,11 +10177,13 @@ SkipPopup:
                 AddHandler lo_menu_option.Click, AddressOf Me.MorphToORMDiagramFactType
             End If
         Next
+#End Region
 
         '--------------------------------------------------------
         'Load the ER Diagrams that relate to the FactType
         '  as selectable menuOptions
         '--------------------------------------------------------        
+#Region "ER Diagram Pages"
         larPage_list = prApplication.CMML.getERDiagramPagesForModelElementName(lrFactType.Model, lrFactType.Id)
 
         For Each lr_page In larPage_list
@@ -9468,7 +10196,7 @@ SkipPopup:
 
             lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lr_page.PageId)
 
-            If IsSomething(lrEnterpriseView) Then
+            If lrEnterpriseView IsNot Nothing Then
                 '---------------------------------------------------
                 'Add the Page(Name) to the MenuOption.DropDownItems
                 '---------------------------------------------------
@@ -9477,10 +10205,12 @@ SkipPopup:
                 AddHandler lo_menu_option.Click, AddressOf Me.morphToERDiagram
             End If
         Next
+#End Region
+
         If larPage_list.Count = 0 Then
             '----------------------------------------------------------------------------------
             'Provide and option for the User to create a PGS Page for the current Page.
-            Dim lsMessage As String = "Create an Entity Relationship Diagram for this current Page. No ERD Page currently exists for the model element you have selected."
+            lsMessage = "Create an Entity Relationship Diagram for this current Page. No ERD Page currently exists for the model element you have selected."
             lo_menu_option = Me.ERDiagramFromFactTypeToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ERD16x16)
             lo_menu_option.Tag = True
             AddHandler lo_menu_option.Click, AddressOf Me.createEntityRelationshipDiagramPageForCurrentPage
@@ -9490,6 +10220,7 @@ SkipPopup:
         '==================================================================================================
         'Load the Property Graph Schema Diagrams that relate to the EntityType, as selectable menuOptions
         '--------------------------------------------------------        
+#Region "Property Graph Schema Pages"
         larPage_list = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrFactType.Model, lrFactType.Id)
 
         For Each lrPage In larPage_list
@@ -9503,7 +10234,7 @@ SkipPopup:
 
             lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId) ' AddressOf lrEnterpriseView.Equals)
 
-            If IsSomething(lrEnterpriseView) Then
+            If lrEnterpriseView IsNot Nothing Then
                 '---------------------------------------------------
                 'Add the Page(Name) to the MenuOption.DropDownItems
                 '---------------------------------------------------
@@ -9514,11 +10245,12 @@ SkipPopup:
 
             Me.ERDiagramToolStripMenu.Enabled = True
         Next
+#End Region
 
         If larPage_list.Count = 0 Then
             '----------------------------------------------------------------------------------
             'Provide and option for the User to create a PGS Page for the current Page.
-            Dim lsMessage As String = "Create an Property Graph Schema for this current Page. No PGS Page currently exists for the model element you have selected."
+            lsMessage = "Create an Property Graph Schema for this current Page. No PGS Page currently exists for the model element you have selected."
             lo_menu_option = Me.PGSDiagramToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ERD16x16)
             lo_menu_option.Tag = True
             AddHandler lo_menu_option.Click, AddressOf Me.createPropertyGraphSchemaPageFromCurrentPage
@@ -9547,7 +10279,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9618,7 +10350,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9660,7 +10392,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -9678,6 +10410,10 @@ SkipPopup:
                 Me.zrPage.SelectedObject.Clear()
                 Exit Sub
             End Try
+
+            If Not MsgBox("Are you sure you want to remove the Model Element, " & lrEntityTypeInstance.Id & ", from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Exit Sub
+            End If
 
             With New WaitCursor
                 'Me.zrPage.SelectedObject.Remove(lrEntityTypeInstance)
@@ -9700,7 +10436,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9732,7 +10468,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -9745,6 +10481,10 @@ SkipPopup:
 
             lrValueTypeInstance = Me.zrPage.SelectedObject(0)
 
+            If Not MsgBox("Are you sure you want to remove the Model Element, " & lrValueTypeInstance.Id & ", from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Exit Sub
+            End If
+
             'Vm-20180329-The below probably not required.
             'Call lrValueTypeInstance.RemoveFromPage()
             Call lrValueTypeInstance.ValueType.RemoveFromModel(False, True, True)
@@ -9755,7 +10495,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9782,7 +10522,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9793,6 +10533,10 @@ SkipPopup:
             Dim lrFactTypeInstance As FBM.FactTypeInstance
 
             lrFactTypeInstance = Me.zrPage.SelectedObject(0)
+
+            If Not MsgBox("Are you sure you want to remove the Model Element, " & lrFactTypeInstance.Id & ", from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Exit Sub
+            End If
 
             If Not lrFactTypeInstance.FactType.UserCanSafelyRemoveFromModel Then
 
@@ -9825,7 +10569,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -9836,7 +10580,7 @@ SkipRemovalFromModel:
         MenuItemHelpTips.Checked = Not MenuItemHelpTips.Checked
 
         Me.LabelHelp.Visible = MenuItemHelpTips.Checked
-
+        Me.ResizeHelpTipsBox()
 
     End Sub
 
@@ -9854,7 +10598,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -9864,7 +10608,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
 
@@ -9884,7 +10628,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -9894,7 +10638,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
 
@@ -9914,7 +10658,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -9924,7 +10668,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
 
@@ -9944,7 +10688,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -9954,7 +10698,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
 
@@ -9974,7 +10718,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -9984,7 +10728,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
 
@@ -10004,7 +10748,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10014,7 +10758,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
 
@@ -10034,7 +10778,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10043,7 +10787,7 @@ SkipRemovalFromModel:
         '--------------------
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
@@ -10064,7 +10808,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10074,7 +10818,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
 
@@ -10094,7 +10838,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10104,7 +10848,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
 
@@ -10124,7 +10868,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10134,7 +10878,7 @@ SkipRemovalFromModel:
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
@@ -10155,7 +10899,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10164,7 +10908,7 @@ SkipRemovalFromModel:
         '--------------------
         Dim lrPropertyGridForm As frmToolboxProperties
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
             lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintInstance
         End If
@@ -10184,7 +10928,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10203,7 +10947,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10222,7 +10966,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10241,7 +10985,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10260,7 +11004,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10279,7 +11023,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10298,7 +11042,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10317,7 +11061,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10336,7 +11080,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10355,7 +11099,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10374,7 +11118,7 @@ SkipRemovalFromModel:
         '-------------------------------------------------------
         Dim lrToolboxForm As frmToolboxORMVerbalisation
         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             Call lrToolboxForm.VerbaliseRoleConstraintRingConstraint(lrRoleConstraintInstance.RoleConstraint)
         End If
 
@@ -10422,8 +11166,8 @@ SkipRemovalFromModel:
 
     Private Sub Diagram_ValidateAnchorPoint(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkValidationEventArgs) Handles Diagram.ValidateAnchorPoint
 
-        If IsSomething(e.Link) Then
-            If IsSomething(e.Link.Tag) Then
+        If e.Link IsNot Nothing Then
+            If e.Link.Tag IsNot Nothing Then
                 Select Case e.Link.Tag.ConceptType
                     Case Is = pcenumConceptType.Role
                         If e.ChangingOrigin Then
@@ -10466,7 +11210,7 @@ SkipRemovalFromModel:
 
         Dim lrPropertyGridForm As frmToolboxProperties
 
-        If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+        If prApplication.GetToolboxForm(frmToolboxProperties.Name) IsNot Nothing Then
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
             If Me.Diagram.Selection.Items.Count > 0 Then
@@ -10501,7 +11245,7 @@ SkipRemovalFromModel:
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
             End If
 
@@ -10509,7 +11253,7 @@ SkipRemovalFromModel:
             Dim lsMessage As String
             lsMessage = "Error: frmDiagramORM.ToolStripMenuItem10_Click"
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10524,7 +11268,7 @@ SkipRemovalFromModel:
         If ToolStripMenuItemSubtypeRelationships.Checked Then
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
                 For Each lrSubtypeInstance In lrEntityTypeInstance.SubtypeRelationship
-                    If IsSomething(lrSubtypeInstance.Link) Then
+                    If lrSubtypeInstance.Link IsNot Nothing Then
                         lrSubtypeInstance.Link.Visible = True
                     End If
                 Next
@@ -10532,7 +11276,7 @@ SkipRemovalFromModel:
         Else
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
                 For Each lrSubtypeInstance In lrEntityTypeInstance.SubtypeRelationship
-                    If IsSomething(lrSubtypeInstance.Link) Then
+                    If lrSubtypeInstance.Link IsNot Nothing Then
                         lrSubtypeInstance.Link.Visible = False
                     End If
                 Next
@@ -10550,24 +11294,24 @@ SkipRemovalFromModel:
 
         If ToolStripMenuItemRoleConstraints.Checked Then
             For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
-                If IsSomething(lrRoleConstraintInstance.Shape) Then
+                If lrRoleConstraintInstance.Shape IsNot Nothing Then
                     lrRoleConstraintInstance.Shape.Visible = True
                 End If
 
                 For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                    If IsSomething(lrRoleConstraintRoleInstance.Link) Then
+                    If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
                         lrRoleConstraintRoleInstance.Link.Visible = True
                     End If
                 Next
             Next
         Else
             For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
-                If IsSomething(lrRoleConstraintInstance.Shape) Then
+                If lrRoleConstraintInstance.Shape IsNot Nothing Then
                     lrRoleConstraintInstance.Shape.Visible = False
                 End If
 
                 For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                    If IsSomething(lrRoleConstraintRoleInstance.Link) Then
+                    If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
                         lrRoleConstraintRoleInstance.Link.Visible = False
                     End If
                 Next
@@ -10586,7 +11330,7 @@ SkipRemovalFromModel:
         If ToolStripMenuItemRoleNames.Checked Then
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                    If IsSomething(lrRoleInstance.RoleName.Shape) Then
+                    If lrRoleInstance.RoleName.Shape IsNot Nothing Then
                         lrRoleInstance.RoleName.Shape.Visible = True
                     End If
                 Next
@@ -10594,7 +11338,7 @@ SkipRemovalFromModel:
         Else
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                    If IsSomething(lrRoleInstance.RoleName.Shape) Then
+                    If lrRoleInstance.RoleName.Shape IsNot Nothing Then
                         lrRoleInstance.RoleName.Shape.Visible = False
                     End If
                 Next
@@ -10615,7 +11359,7 @@ SkipRemovalFromModel:
             If ToolStripMenuItemFactTypeReadings.Checked Then
                 For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                     If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
-                        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) And Not lrFactTypeInstance.isPreferredReferenceMode Then
+                        If lrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing And Not lrFactTypeInstance.isPreferredReferenceMode Then
                             lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
                         End If
                     End If
@@ -10623,7 +11367,7 @@ SkipRemovalFromModel:
             Else
                 For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                     If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
-                        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                        If lrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing Then
                             lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
                         End If
                     End If
@@ -10636,7 +11380,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10649,13 +11393,13 @@ SkipRemovalFromModel:
 
         If ToolStripMenuItemFactTypeNames.Checked Then
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeNameShape.Shape) And lrFactTypeInstance.ShowFactTypeName Then
+                If lrFactTypeInstance.FactTypeNameShape.Shape IsNot Nothing And lrFactTypeInstance.ShowFactTypeName Then
                     lrFactTypeInstance.FactTypeNameShape.Visible = True
                 End If
             Next
         Else
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeNameShape.Shape) Then
+                If lrFactTypeInstance.FactTypeNameShape.Shape IsNot Nothing Then
                     lrFactTypeInstance.FactTypeNameShape.Visible = False
                 End If
             Next
@@ -10718,7 +11462,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10742,7 +11486,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -10760,7 +11504,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10771,6 +11515,11 @@ SkipRemovalFromModel:
             Dim lrFrequencyConstraintInstance As FBM.FrequencyConstraint
             lrFrequencyConstraintInstance = Me.zrPage.SelectedObject(0)
 
+
+            If Not MsgBox("Are you sure you want to remove the Model Element, " & lrFrequencyConstraintInstance.Id & ", from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Exit Sub
+            End If
+
             'Call lrFrequencyConstraintInstance.RemoveFromPage()
             Call lrFrequencyConstraintInstance.RoleConstraint.RemoveFromModel()
 
@@ -10780,7 +11529,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10797,8 +11546,13 @@ SkipRemovalFromModel:
         End Try
 
         Try
+
             Using loWaitCursor As New WaitCursor
                 If lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+
+                    If Not MsgBox("Are you sure you want to remove the Model Element, " & lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraint.Id & ", from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                        Exit Sub
+                    End If
 
                     Dim lrFactType As FBM.FactType = lrRoleConstraintRoleInstance.Role.Role.FactType
                     If lrFactType.IsObjectified And lrFactType.InternalUniquenessConstraint.Count = 1 Then
@@ -10820,7 +11574,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10843,7 +11597,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10855,6 +11609,10 @@ SkipRemovalFromModel:
         Try
             lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
+            If Not MsgBox("Are you sure you want to remove the Model Element, " & lrRoleConstraintInstance.Id & ", from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Exit Sub
+            End If
+
             If lrRoleConstraintInstance.RoleConstraint.RemoveFromModel Then
 
                 Call Me.EnableSaveButton()
@@ -10862,7 +11620,7 @@ SkipRemovalFromModel:
                 Dim lrModelDictionaryForm As frmToolboxModelDictionary
                 lrModelDictionaryForm = prApplication.GetToolboxForm(frmToolboxModelDictionary.Name)
 
-                If IsSomething(lrModelDictionaryForm) Then
+                If lrModelDictionaryForm IsNot Nothing Then
                     Call lrModelDictionaryForm.LoadToolboxModelDictionary(Me.zrPage.Language, True)
                 End If
             End If
@@ -10875,7 +11633,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10995,7 +11753,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -11170,7 +11928,7 @@ SkipRemovalFromModel:
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 If Me.Diagram.Selection.Items.Count > 0 Then
                     lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
                 Else
@@ -11184,7 +11942,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -11210,7 +11968,7 @@ SkipRemovalFromModel:
             lrPage = Me.zrPage.CreatePropertyGraphSchema(Me.BackgroundWorker)
 
             If lrPage Is Nothing Then
-                prApplication.ThrowErrorMessage("The Page was not created successfully. Why not share your model with FactEngine and we'll investigate why.", pcenumErrorType.Warning, Nothing, False, False, True,, False, Nothing)
+                prApplication.ThrowMessage("The Page was not created successfully. Why not share your model with FactEngine and we'll investigate why.", pcenumErrorType.Warning, Nothing, False, False, True,, False, Nothing)
                 Exit Sub
             End If
             lrPage.Loaded = True
@@ -11221,7 +11979,7 @@ SkipRemovalFromModel:
             frmMain.Cursor = Cursors.Default
 
             Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
-            If IsSomething(lrPage) Then
+            If lrPage IsNot Nothing Then
                 lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
 
                 MsgBox("Added the new Property Graph Schema Page, '" & lrPage.Name & "', to the Model.")
@@ -11241,7 +11999,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         Finally
             Me.CircularProgressBar.Value = 0
             Me.CircularProgressBar.Text = "0%"
@@ -11282,6 +12040,7 @@ SkipRemovalFromModel:
         Dim lrModel As FBM.Model
         Dim lrEntityType As New FBM.EntityType
         Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+        Dim lsMessage As String
 
         Try
             Me.ContextMenuStrip_EntityType.ImageScalingSize = New Drawing.Size(16, 16)
@@ -11305,7 +12064,11 @@ SkipRemovalFromModel:
 
             If lrEntityType.HasSimpleReferenceScheme And Trim(lrEntityType.ReferenceMode) <> "" Then
                 Me.ExpandTheReferenceSchemeToolStripMenuItem.Text = "&Expand the Reference Scheme"
-                If lrEntityTypeInstance.ExpandReferenceMode = True Then
+                If lrEntityTypeInstance.ExpandReferenceMode = True Or
+                    (Not lrEntityTypeInstance.ExpandReferenceMode And
+                    lrEntityTypeInstance.ReferenceModeFactType IsNot Nothing AndAlso
+                    lrEntityTypeInstance.ReferenceModeFactType.Visible) Then
+
                     Me.ExpandTheReferenceSchemeToolStripMenuItem.Visible = False
                     Me.HideTheReferenceSchemeToolStripMenuItem.Visible = True
                 Else
@@ -11381,14 +12144,14 @@ SkipRemovalFromModel:
                 'Add the Page(Name) to the MenuOption.DropDownItems
                 '---------------------------------------------------
                 lo_menu_option = Me.ToolStripMenuItemUseCaseDiagramActor.DropDownItems.Add(lr_page.Name)
-                Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
                                                                Nothing,
                                                                lr_page.Model.ModelId,
                                                                pcenumLanguage.UMLUseCaseDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
-                lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
                 AddHandler lo_menu_option.Click, AddressOf Me.morphToUseCaseDiagramActor
             Next
 #End Region
@@ -11397,6 +12160,7 @@ SkipRemovalFromModel:
             'Load the ORMDiagrams that relate to the EntityType
             '  as selectable menuOptions
             '--------------------------------------------------------        
+#Region "ORM Diagram Pages"
             larPage_list = prApplication.CMML.getORMDiagramPagesForEntityType(lrEntityType)
 
             For Each lrPage In larPage_list
@@ -11416,7 +12180,7 @@ SkipRemovalFromModel:
 
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
 
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -11425,11 +12189,12 @@ SkipRemovalFromModel:
                     AddHandler lo_menu_option.Click, AddressOf Me.morphToORMDiagram
                 End If
             Next
+#End Region
 
 
             '----------------------------------------------------------------------------------
             'Provide and option for the User to create a PGS Page for the current Page.
-            Dim lsMessage As String = "Add an &ORM Diagram for the selected Entity Type."
+            lsMessage = "Add an &ORM Diagram for the selected Entity Type."
             lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ORM16x16)
             lo_menu_option.Tag = lrEntityTypeInstance.EntityType
             AddHandler lo_menu_option.Click, AddressOf Me.createORMDiagramPageForEntityType
@@ -11438,6 +12203,7 @@ SkipRemovalFromModel:
             '====================================================================================
             'Load the ERDiagrams that relate to the EntityType as selectable menuOptions
             '--------------------------------------------------------        
+#Region "ER Diagram Pages"
             larPage_list = prApplication.CMML.getERDiagramPagesForEntityType(lrEntityType)
 
             For Each lrPage In larPage_list
@@ -11455,9 +12221,9 @@ SkipRemovalFromModel:
                                                            Nothing,
                                                            lrPage.PageId)
 
-                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId) ' AddressOf lrEnterpriseView.Equals)
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
 
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -11468,6 +12234,7 @@ SkipRemovalFromModel:
 
                 Me.ERDiagramToolStripMenu.Enabled = True
             Next
+#End Region
 
             If larPage_list.Count = 0 Then
                 '----------------------------------------------------------------------------------
@@ -11482,6 +12249,7 @@ SkipRemovalFromModel:
             '==================================================================================================
             'Load the Property Graph Schema Diagrams that relate to the EntityType, as selectable menuOptions
             '--------------------------------------------------------        
+#Region "Property Graph Schema Pages"
             larPage_list = prApplication.CMML.getPGSDiagramPagesForEntityType(lrEntityType)
 
             For Each lrPage In larPage_list
@@ -11492,10 +12260,16 @@ SkipRemovalFromModel:
                 '  is now added for those hidden Pages.
                 '----------------------------------------------------------
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                                                           lrPage,
+                                                           lrModel.ModelId,
+                                                           pcenumLanguage.ORMModel,
+                                                           Nothing,
+                                                           lrPage.PageId)
 
-                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId) ' AddressOf lrEnterpriseView.Equals)
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId)
 
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -11506,6 +12280,7 @@ SkipRemovalFromModel:
 
                 Me.ERDiagramToolStripMenu.Enabled = True
             Next
+#End Region
 
             If larPage_list.Count = 0 Then
                 '----------------------------------------------------------------------------------
@@ -11520,12 +12295,10 @@ SkipRemovalFromModel:
 
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -11575,7 +12348,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -11588,7 +12361,6 @@ SkipRemovalFromModel:
         Dim lrRoleInstance As FBM.RoleInstance
 
         lrRoleInstance = Me.zrPage.SelectedObject(0)
-
         lrRoleInstance.Role.SetName(lrRoleInstance.JoinedORMObject.Name, True)
 
     End Sub
@@ -11641,7 +12413,7 @@ SkipRemovalFromModel:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End With
 
@@ -11676,7 +12448,7 @@ SkipRemovalFromModel:
                 Me.zrPage.Model.AllowCheckForErrors = True
 
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
-                If IsSomething(lrPage) Then
+                If lrPage IsNot Nothing Then
                     lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
 
                     MsgBox("Added the new Entity Relationship Diagram Page, '" & lrPage.Name & "' to the Model.")
@@ -11696,7 +12468,7 @@ SkipRemovalFromModel:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             Finally
                 Me.CircularProgressBar.Value = 0
                 Me.CircularProgressBar.Text = "0%"
@@ -11725,17 +12497,17 @@ SkipRemovalFromModel:
 
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                    If IsSomething(lrRoleInstance.RoleName.Shape) Then
+                    If lrRoleInstance.RoleName.Shape IsNot Nothing Then
                         lrRoleInstance.RoleName.Shape.Visible = False
                     End If
 
                     If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
-                        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) Then
-                            lrFactTypeInstance.FactTypeReadingShape.shape.Visible = False
+                        If lrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing Then
+                            lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
                         End If
                     End If
 
-                    If IsSomething(lrFactTypeInstance.FactTypeNameShape.Shape) Then
+                    If lrFactTypeInstance.FactTypeNameShape.Shape IsNot Nothing Then
                         lrFactTypeInstance.FactTypeNameShape.Visible = False
                     End If
                 Next
@@ -11751,7 +12523,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -11765,26 +12537,32 @@ SkipRemovalFromModel:
     ''' </summary>
     ''' <param name="arModelObject">The Model Element for which information will be shown in the Diagram Spy Page.</param>
     ''' <param name="abControlKeyPressed">If True...don't load associated FactTypes.</param>
-    Private Sub ShowSpyInformationForModelObject(ByRef arModelObject As FBM.ModelObject, Optional ByVal abControlKeyPressed As Boolean = False)
-
-        Me.Diagram.Links.Clear()
-        Me.Diagram.Nodes.Clear()
-        Me.Diagram.Invalidate()
-
-        Me.zrPage.ClearFast(True)
+    Private Sub ShowSpyInformationForModelObject(ByRef arModelObject As FBM.ModelObject,
+                                                 Optional ByVal abControlKeyPressed As Boolean = False,
+                                                 Optional ByVal abAltKeyPressed As Boolean = False)
 
         prApplication.WorkingModel = arModelObject.Model
-
-        Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(arModelObject.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)
         Dim loPt As New PointF(100, 100)
 
-        lrDiagramSpyPage.Form = New Windows.Forms.Form
-        lrDiagramSpyPage.Form = Me
-        lrDiagramSpyPage.ReferencedForm = Me
-        lrDiagramSpyPage.Diagram = Me.Diagram
-        lrDiagramSpyPage.DiagramView = Me.DiagramView
+        If Not abAltKeyPressed Then
 
-        Me.zrPage = lrDiagramSpyPage
+            Me.Diagram.Links.Clear()
+            Me.Diagram.Nodes.Clear()
+            Me.Diagram.Invalidate()
+
+            Me.zrPage.ClearFast(True)
+
+            Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(arModelObject.Model, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+
+            lrDiagramSpyPage.Form = New Windows.Forms.Form
+            lrDiagramSpyPage.Form = Me
+            lrDiagramSpyPage.ReferencedForm = Me
+            lrDiagramSpyPage.Diagram = Me.Diagram
+            lrDiagramSpyPage.DiagramView = Me.DiagramView
+
+            Me.zrPage = lrDiagramSpyPage
+
+        End If
 
         Select Case arModelObject.ConceptType
             Case Is = pcenumConceptType.ValueType
@@ -11842,7 +12620,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -11879,7 +12657,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -11892,6 +12670,10 @@ SkipRemovalFromModel:
         Try
             lrSubtypeRelationshipInstance = Me.zrPage.SelectedObject(0)
 
+            If Not MsgBox("Are you sure you want to remove the Model Element, " & lrSubtypeRelationshipInstance.Id & ", from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Exit Sub
+            End If
+
             Call lrSubtypeRelationshipInstance.SubtypeRelationship.RemoveFromModel()
 
         Catch ex As Exception
@@ -11900,7 +12682,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -11909,7 +12691,14 @@ SkipRemovalFromModel:
         Try
             Dim lrRoleInstance As FBM.RoleInstance
 
-            lrRoleInstance = Me.zrPage.SelectedObject(0)
+            Try
+                lrRoleInstance = Me.zrPage.SelectedObject(0)
+            Catch ex As Exception
+                'CodeSafe
+                prApplication.ThrowMessage("Oops. Please select that object again.", pcenumErrorType.Warning,, False,,,, True,, True)
+                Exit Sub
+            End Try
+
 
             Me.Cursor = Cursors.WaitCursor
             Call lrRoleInstance.FactType.FactType.RemoveRole(lrRoleInstance.Role, True, True)
@@ -11933,7 +12722,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -11997,7 +12786,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12072,7 +12861,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12108,7 +12897,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12140,7 +12929,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12159,6 +12948,10 @@ SkipRemovalFromModel:
         Try
             lrRoleConstraintInstance = Me.zrPage.SelectedObject(0)
 
+            If Not MsgBox("Are you sure you want to remove the Model Element, " & lrRoleConstraintInstance.Id & ", from the Model?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                Exit Sub
+            End If
+
             If lrRoleConstraintInstance.RoleConstraint.RemoveFromModel Then
 
                 Call Me.EnableSaveButton()
@@ -12166,7 +12959,7 @@ SkipRemovalFromModel:
                 Dim lrModelDictionaryForm As frmToolboxModelDictionary
                 lrModelDictionaryForm = prApplication.GetToolboxForm(frmToolboxModelDictionary.Name)
 
-                If IsSomething(lrModelDictionaryForm) Then
+                If lrModelDictionaryForm IsNot Nothing Then
                     Call lrModelDictionaryForm.LoadToolboxModelDictionary(Me.zrPage.Language, True)
                 End If
             End If
@@ -12177,7 +12970,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12199,7 +12992,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -12235,7 +13028,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12255,7 +13048,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12281,7 +13074,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -12331,7 +13124,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12361,7 +13154,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -12393,7 +13186,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12426,7 +13219,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12459,7 +13252,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12492,7 +13285,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12525,7 +13318,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12545,7 +13338,7 @@ SkipRemovalFromModel:
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintRoleInstance.RoleConstraint
                 lrPropertyGridForm.Show()
             End If
@@ -12556,7 +13349,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12586,7 +13379,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -12617,7 +13410,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -12656,13 +13449,18 @@ SkipRemovalFromModel:
 
     Private Sub ToolStripMenuItemModelNoteRemoveFromPageAndModel_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemModelNoteRemoveFromPageAndModel.Click
 
-        Dim lrModelNoteInstance As FBM.ModelNoteInstance
-        Dim lrModelNote As FBM.ModelNote
+        Try
+            Dim lrModelNoteInstance As FBM.ModelNoteInstance
+            Dim lrModelNote As FBM.ModelNote
 
-        lrModelNote = Me.zrPage.SelectedObject(0).ModelNote
-        lrModelNoteInstance = Me.zrPage.SelectedObject(0)
+            lrModelNote = Me.zrPage.SelectedObject(0).ModelNote
+            lrModelNoteInstance = Me.zrPage.SelectedObject(0)
 
-        Call lrModelNote.RemoveFromModel(True, False, True)
+            Call lrModelNote.RemoveFromModel(True, False, True)
+
+        Catch ex As Exception
+
+        End Try
 
     End Sub
 
@@ -12682,6 +13480,9 @@ SkipRemovalFromModel:
         'Interlink
         Me.ToolStripMenuItemInterlinkEditor.Enabled = (My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString)
 
+        'Diagram Spy Page to Page in the Model conversion
+        Me.MakeThisDiagramSpyPageAPageInTheModelToolStripMenuItem.Visible = (Me.zrPage.GetType = GetType(FBM.DiagramSpyPage))
+
         Me.ContextMenuStrip_Diagram.ImageScalingSize = New Drawing.Size(16, 16)
 
         loForm = frmMain.DockPanel.ActiveDocument
@@ -12697,7 +13498,7 @@ SkipRemovalFromModel:
                 '------------------------------------------------------------------------
                 Dim loORMDiagramForm As frmDiagramORM
                 loORMDiagramForm = loForm
-                If IsSomething(loORMDiagramForm.zrPage) Then
+                If loORMDiagramForm.zrPage IsNot Nothing Then
                     If lrPage.CopiedPageId <> loORMDiagramForm.zrPage.PageId Then
                         Me.ToolStripMenuItemPaste.Enabled = True
                     Else
@@ -12712,14 +13513,25 @@ SkipRemovalFromModel:
     End Sub
 
     Private Sub ToolStripMenuItemPaste_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemPaste.Click
-        Call frmMain.PasteToCurrentPageFromClipboard()
 
-        Me.ToolStripMenuItemPaste.Enabled = False
+        Try
+            Call frmMain.PasteToPageFromClipboard(Me.zrPage.Model, Me.zrPage)
+
+            Me.ToolStripMenuItemPaste.Enabled = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
     Private Sub CopyToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCopy.Click
 
-        Call frmMain.CopySelectedObjectsToClipboard()
+        Call frmMain.CopySelectedObjectsToClipboard(Me.zrPage)
 
     End Sub
 
@@ -12790,7 +13602,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12812,7 +13624,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -12846,7 +13658,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12866,7 +13678,7 @@ SkipRemovalFromModel:
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
 
                 Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                 Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
@@ -12884,7 +13696,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12918,7 +13730,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -12927,14 +13739,14 @@ SkipRemovalFromModel:
     Private Sub ToolStripMenuItemCopyMultiple_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCopyMultiple.Click
 
         Try
-            Call frmMain.CopySelectedObjectsToClipboard()
+            Call frmMain.CopySelectedObjectsToClipboard(Me.zrPage)
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -12948,11 +13760,13 @@ SkipRemovalFromModel:
 
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
 
-            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getOutgoingFactTypeReadings.FindAll(Function(x) x.FactType.IsLinkFactType = False)
+            For Each lrFactTypeReading In lrEntityTypeInstance.EntityType.getOutgoingFactTypeReadings.FindAll(Function(x) x.FactType.IsLinkFactType = False And x.FactType.isReferenceModeFactType = False)
 
                 If Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count = 0 Then
 
                     lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactTypeReading.FactType, New PointF(10, 10), False, False, True, False)
+                    Call lrFactTypeInstance.AdjustBorderHeight(True)
+                    Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(True)
 
                     larFactTypeInstance.Add(lrFactTypeInstance)
 
@@ -12971,7 +13785,7 @@ SkipRemovalFromModel:
 
                         End If
                     Else
-                        prApplication.ThrowErrorMessage("There was an error dropping the Fact Type, " & lrFactTypeReading.FactType.Id & ", on the Page.", pcenumErrorType.Warning,, False, False, True,, True)
+                        prApplication.ThrowMessage("There was an error dropping the Fact Type, " & lrFactTypeReading.FactType.Id & ", on the Page.", pcenumErrorType.Warning,, False, False, True,, True)
                     End If
                 ElseIf lrFactTypeReading.FactType.IsSubtypeRelationshipFactType And Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Id = lrFactTypeReading.FactType.Id).Count > 0 Then
                     Try
@@ -12985,12 +13799,10 @@ SkipRemovalFromModel:
                         Dim lrModelelementInstance As FBM.FactTypeInstance
 
                         lrModelElement = lrSubtypeRelationshipInstance.parentModelElement
-
                         If lrModelElement Is Nothing Then
                             lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
 
                             lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
-
                             If lrModelElement.GetType = GetType(FBM.EntityType) Then
                                 If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
                                     lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
@@ -13026,7 +13838,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -13075,7 +13887,6 @@ SkipRemovalFromModel:
                             lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
 
                             lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
-
                             If lrModelElement.GetType = GetType(FBM.EntityType) Then
                                 If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
                                     lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
@@ -13107,7 +13918,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -13117,7 +13928,7 @@ SkipRemovalFromModel:
         Try
             Dim lrEntityTypeInstance As FBM.EntityTypeInstance
             Dim lrFactTypeInstance As FBM.FactTypeInstance
-            Dim lrSubtypeRelationship As FBM.tSubtypeRelationship = Nothing
+            Dim lrSubtypeRelationship As FBM.SubtypeRelationship = Nothing
             Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
 
             lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
@@ -13172,7 +13983,6 @@ SkipRemovalFromModel:
                             lrModelElement = lrSubtypeRelationshipInstance.SubtypeRelationship.parentModelElement
 
                             lrSubtypeRelationshipInstance.parentModelElement = Me.zrPage.DropModelElementAtPoint(lrModelElement, New PointF(0, 0), True)
-
                             If lrModelElement.GetType = GetType(FBM.EntityType) Then
                                 If CType(lrModelElement, FBM.EntityType).IsObjectifyingEntityType Then
                                     lrModelElement = CType(lrModelElement, FBM.EntityType).ObjectifiedFactType
@@ -13204,7 +14014,7 @@ SkipRemovalFromModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -13223,7 +14033,7 @@ SkipRemovalFromModel:
             Dim loMiscFilterAttribute3 As Attribute = New System.ComponentModel.CategoryAttribute("DBName")
 
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute1, loMiscFilterAttribute2, loMiscFilterAttribute3})
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
             End If
 
@@ -13231,7 +14041,7 @@ SkipRemovalFromModel:
             Dim lsMessage As String
             lsMessage = "Error: frmDiagramORM.ToolStripMenuItem10_Click"
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -13285,7 +14095,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -13312,7 +14122,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -13332,7 +14142,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -13363,7 +14173,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -13434,7 +14244,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -13475,7 +14285,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -13499,7 +14309,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -13519,7 +14329,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -13535,7 +14345,7 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -13551,7 +14361,580 @@ SkipRemovalFromModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DiagramView_CreateEditControl(sender As Object, e As InPlaceEditEventArgs) Handles DiagramView.CreateEditControl
+
+        Try
+            'CodeSafe
+            If e.Node.Tag Is Nothing Then Exit Sub
+
+            Select Case e.Node.Tag.GetType
+                Case Is = GetType(FBM.FactTypeDerivationText)
+
+                    Dim lrFactTypeDerivationsText = CType(e.Node.Tag, FBM.FactTypeDerivationText)
+
+                    Dim loControl As New RichTextBox()
+                    loControl.Text = e.Item.GetTextToEdit().Trim
+
+                    Dim loRectangle As Rectangle = DiagramView.DocToClient(e.Node.Bounds)
+                    loControl.Bounds = loRectangle
+
+                    e.EditControl = loControl
+
+                    Select Case Me.zrPage.Model.DerivationSyntaxType
+                        Case Is = pcenumDerivationSyntaxType.FactEngine
+                            Me.zrTextHighlighter = New FEQL.TextHighlighter(loControl, Me.zrScanner, Me.zrParser)
+                        Case Is = pcenumDerivationSyntaxType.nORMa
+                            Me.zrNORMADerivationTextHighlighter = New ORMDerivation.TextHighlighter(loControl, Me.zrNORMADerivationScanner, Me.zrNORMADerivationParser)
+                    End Select
+
+                    'Highlight the text
+                    Me.mrDerivationsRichtextEditor = loControl
+                    Me.mrDerivationsRichtextEditor.Tag = lrFactTypeDerivationsText
+                    lrFactTypeDerivationsText.RichTextBox = loControl
+
+                    AddHandler Me.mrDerivationsRichtextEditor.TextChanged, AddressOf Me.DerivationsRichTextbox_TextChanged
+
+                    Me.DerivationsHighlighterTimer.Interval = 200
+                    Call Me.DerivationsHighlighterTimer.Start()
+
+                Case Else
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Sub DerivationsRichTextbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
+
+        Try
+            'CodeSafe
+            If Me.mrDerivationsRichtextEditor Is Nothing Then Exit Sub
+
+            Call Me.mrDerivationsRichtextEditor.Tag.SetSize
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DiagramView_DestroyEditControl(sender As Object, e As InPlaceEditEventArgs) Handles DiagramView.DestroyEditControl
+
+        Try
+            Select Case e.Node.GetType
+                Case Is = GetType(MindFusion.Diagramming.ShapeNode)
+                    Dim lrShapeNode = CType(e.Node, MindFusion.Diagramming.ShapeNode)
+
+                    Dim lrFactTypeDerivationText As FBM.FactTypeDerivationText
+
+                    lrFactTypeDerivationText = e.Node.Tag
+                    lrFactTypeDerivationText.RichTextBox = Nothing
+
+                    Call lrFactTypeDerivationText.FactTypeInstance.FactType.SetDerivationText(e.EditControl.Text, True)
+
+                    If lrFactTypeDerivationText.FactTypeInstance.FactType.DerivationRule Is Nothing Then
+
+                        Dim lrDerivationsProcessor As New Derivations.Processor
+                        Dim lrFactType = lrFactTypeDerivationText.FactTypeInstance.FactType
+
+                        lrFactType.DerivationRule = lrDerivationsProcessor.GenerateFBMDerivationRule(e.EditControl.Text, lrFactType)
+
+                    End If
+
+            End Select
+
+            If Me.zrTextHighlighter IsNot Nothing Then Me.zrTextHighlighter.Dispose()
+            If Me.zrNORMADerivationTextHighlighter IsNot Nothing Then Me.zrNORMADerivationTextHighlighter.Dispose()
+            e.EditControl.Dispose()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DerivationsHighlighterTimer_Tick(sender As Object, e As EventArgs) Handles DerivationsHighlighterTimer.Tick
+
+        Try
+            'CodeSafe
+            If Me.mrDerivationsRichtextEditor Is Nothing Then Exit Sub
+            If Me.mrDerivationsRichtextEditor.Tag Is Nothing Then Exit Sub
+
+            ' Call Me.mrDerivationsRichtextEditor.Tag.SetSize
+
+            Me.mrDerivationsRichtextEditor.SelectionStart = Me.mrDerivationsRichtextEditor.TextLength
+
+            ' To ensure the RichTextBox is focused and the cursor is visible:
+            Me.mrDerivationsRichtextEditor.Focus()
+
+            ' Scroll to the cursor position so it's visible if it's not currently:
+            Me.mrDerivationsRichtextEditor.ScrollToCaret()
+
+            Select Case Me.zrPage.Model.DerivationSyntaxType
+                Case Is = pcenumDerivationSyntaxType.FactEngine
+                    Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.mrDerivationsRichtextEditor.Text & " ")
+                    Call Me.zrTextHighlighter.HighlightTextInternal()
+
+                Case Is = pcenumDerivationSyntaxType.nORMa
+                    Me.zrNORMADerivationTextHighlighter.Tree = Me.zrNORMADerivationParser.Parse(Me.mrDerivationsRichtextEditor.Text & " ")
+
+                    Call Me.zrNORMADerivationTextHighlighter.HighlightTextInternal()
+            End Select
+
+            Me.DerivationsHighlighterTimer.Stop()
+            Me.DerivationsHighlighterTimer.Enabled = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+
+            'Code Safe
+            Me.DerivationsHighlighterTimer.Stop()
+        End Try
+
+    End Sub
+
+    Private Sub ConvertToFCOIMObjectTypeObjectifiedUnaryFactTypeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConvertToFCOIMObjectTypeObjectifiedUnaryFactTypeToolStripMenuItem.Click
+
+        Try
+            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = Me.zrPage.SelectedObject(0)
+
+            If Not lrEntityTypeInstance.EntityType.HasSimpleReferenceScheme Then
+                MsgBox("You can only convert Entity Types that have a Compound Reference Scheme to a Fact Type.")
+                Exit Sub
+            End If
+
+            If MsgBox("Are you sure you want to convert the Entity Type to a Fact Type?", MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2) = MsgBoxResult.Yes Then
+                With New WaitCursor
+                    Call lrEntityTypeInstance.EntityType.ConvertToFCOIMFactType()
+                End With
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DiagramView_DoubleClick(sender As Object, e As EventArgs) Handles DiagramView.DoubleClick
+
+        Try
+
+#Region "Popup Tool Selector"
+
+            Try
+
+                'CodeSafe
+                If Me.mbNodeJustDoubleClicked Then
+                    Me.mbNodeJustDoubleClicked = False
+                    Exit Sub
+                End If
+                'Check if has DobleClicked on Canvas
+                Dim clientPosition As Point = Me.DiagramView.PointToClient(Cursor.Position)
+                Dim loPoint As PointF = Me.DiagramView.ClientToDoc(clientPosition)
+                Dim clickedNode As DiagramNode = Me.Diagram.GetNodeAt(loPoint)
+
+                If clickedNode IsNot Nothing Then Exit Sub
+
+                Dim lrPopupToolSelector = New ORMPopupToolSelector()
+                lrPopupToolSelector.mrCMMLModel = Me.zrPage.Model.UML
+                Dim liX, liY As Integer
+
+                Dim screenPosition As Point = MousePosition
+
+                ' Convert screen coordinates to client coordinates relative to DiagramView
+                ' Convert screen coordinates to client coordinates relative to DiagramView
+                clientPosition = Me.DiagramView.PointToClient(screenPosition)
+
+                ' Convert client coordinates to diagram document coordinates
+                Dim docPosition As PointF = Me.DiagramView.ClientToDoc(clientPosition)
+
+                ' Extract the x and y positions
+                liX = docPosition.X
+                liY = docPosition.Y
+
+                lrPopupToolSelector.Type = pcenumConceptType.None
+                lrPopupToolSelector.moDiagram = Me.Diagram
+                lrPopupToolSelector.mrPage = Me.zrPage
+                lrPopupToolSelector.Tag = lrPopupToolSelector
+                If Me.mrPopupToolSelector IsNot Nothing Then
+                    Me.Diagram.Nodes.Remove(Me.mrPopupToolSelector.Node)
+                End If
+                Me.mrPopupToolSelector = lrPopupToolSelector
+                Dim lrControlNode As New MindFusion.Diagramming.WinForms.ControlNode(Me.DiagramView, lrPopupToolSelector)
+                lrControlNode.Tag = lrPopupToolSelector
+                lrPopupToolSelector.Node = lrControlNode
+                lrPopupToolSelector.Node.SetRect(New RectangleF(liX, liY, 10, 10), False)
+                Me.zrPage.Diagram.Nodes.Add(lrControlNode)
+                Call lrControlNode.Move(liX, liY)
+                'lrPopupToolSelector. Controls.RemoveAt(2)
+SkipPopup:
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+#End Region
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripButtonAllignLeft_Click(sender As Object, e As EventArgs) Handles ToolStripButtonAllignLeft.Click
+
+        Try
+            Dim liLeftX As Integer = -1
+
+            Try
+                Dim laiMovableConceptTypes = New List(Of pcenumConceptType) From {pcenumConceptType.ValueType, pcenumConceptType.EntityType, pcenumConceptType.FactType}
+
+                liLeftX = Me.zrPage.SelectedObject.Find(Function(x) laiMovableConceptTypes.Contains(x.ConceptType)).X
+
+                If liLeftX = -1 Then Exit Sub
+
+                For Each lrModelElement In Me.zrPage.SelectedObject
+
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.ValueTypeInstance)
+                            CType(lrModelElement, FBM.ValueTypeInstance).Move(liLeftX, CType(lrModelElement, FBM.ValueTypeInstance).Y, True, True)
+                        Case Is = GetType(FBM.EntityTypeInstance)
+                            CType(lrModelElement, FBM.EntityTypeInstance).Move(liLeftX, CType(lrModelElement, FBM.EntityTypeInstance).Y, True, True)
+                        Case Is = GetType(FBM.FactTypeInstance)
+                            CType(lrModelElement, FBM.FactTypeInstance).Move(liLeftX, CType(lrModelElement, FBM.FactTypeInstance).Y, True, True)
+                    End Select
+
+                Next
+
+            Catch ex As Exception
+                'We tried.
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripButtonAllignRight_Click(sender As Object, e As EventArgs) Handles ToolStripButtonAllignRight.Click
+
+
+        Try
+            Dim liLeftX As Integer = -1
+
+            Try
+                Dim laiMovableConceptTypes = New List(Of pcenumConceptType) From {pcenumConceptType.ValueType, pcenumConceptType.EntityType, pcenumConceptType.FactType}
+
+                liLeftX = Me.zrPage.SelectedObject.
+                          Where(Function(x) laiMovableConceptTypes.Contains(x.ConceptType)).
+                          Max(Function(x) x.X)
+
+                If liLeftX = -1 Then Exit Sub
+
+                For Each lrModelElement In Me.zrPage.SelectedObject
+
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.ValueTypeInstance)
+                            CType(lrModelElement, FBM.ValueTypeInstance).Move(liLeftX, CType(lrModelElement, FBM.ValueTypeInstance).Y, True, True)
+                        Case Is = GetType(FBM.EntityTypeInstance)
+                            CType(lrModelElement, FBM.EntityTypeInstance).Move(liLeftX, CType(lrModelElement, FBM.EntityTypeInstance).Y, True, True)
+                        Case Is = GetType(FBM.FactTypeInstance)
+                            CType(lrModelElement, FBM.FactTypeInstance).Move(liLeftX, CType(lrModelElement, FBM.FactTypeInstance).Y, True, True)
+                    End Select
+
+                Next
+
+            Catch ex As Exception
+                'We tried.
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripButtonAllignCenter_Click(sender As Object, e As EventArgs) Handles ToolStripButtonAllignCenter.Click
+
+        Try
+            Dim liLeftX As Integer = -1
+            Dim liMidX As Integer = -1
+
+            Try
+                Dim laiMovableConceptTypes = New List(Of pcenumConceptType) From {pcenumConceptType.ValueType, pcenumConceptType.EntityType, pcenumConceptType.FactType}
+
+                ' Find max and min X values
+                Dim maxX = Me.zrPage.SelectedObject.
+                           Where(Function(x) laiMovableConceptTypes.Contains(x.ConceptType)).
+                           Max(Function(x) x.X)
+
+                Dim minX = Me.zrPage.SelectedObject.
+                           Where(Function(x) laiMovableConceptTypes.Contains(x.ConceptType)).
+                           Min(Function(x) x.X)
+
+                ' Calculate mid-point
+                liMidX = (minX + maxX) \ 2
+
+                If liMidX = -1 Then Exit Sub
+
+                For Each lrModelElement In Me.zrPage.SelectedObject
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.ValueTypeInstance)
+                            CType(lrModelElement, FBM.ValueTypeInstance).Move(liMidX, CType(lrModelElement, FBM.ValueTypeInstance).Y, True, True)
+                        Case Is = GetType(FBM.EntityTypeInstance)
+                            CType(lrModelElement, FBM.EntityTypeInstance).Move(liMidX, CType(lrModelElement, FBM.EntityTypeInstance).Y, True, True)
+                        Case Is = GetType(FBM.FactTypeInstance)
+                            CType(lrModelElement, FBM.FactTypeInstance).Move(liMidX, CType(lrModelElement, FBM.FactTypeInstance).Y, True, True)
+                    End Select
+                Next
+
+            Catch ex As Exception
+                ' Handle exception here
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CreateTestCasesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateTestCasesToolStripMenuItem.Click
+
+        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+
+        Try
+
+            Try
+                If Me.Diagram.Selection.Items.Count > 0 Then
+                    lrEntityTypeInstance = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
+                Else
+                    lrEntityTypeInstance = Me.zrPage.SelectedObject(0)
+                End If
+            Catch ex As Exception
+                prApplication.ThrowMessage("Try selecting the Entity Type again.", pcenumErrorType.Warning, , False,,,, True,, True)
+                Exit Sub
+            End Try
+
+            Dim lfrmCreateTestCases As New frmCreateTestCases
+
+            lfrmCreateTestCases.mrModelElement = lrEntityTypeInstance.EntityType
+
+            lfrmCreateTestCases.ShowDialog()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub MakeThisDiagramSpyPageAPageInTheModelToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MakeThisDiagramSpyPageAPageInTheModelToolStripMenuItem.Click
+
+        Try
+            With New WaitCursor
+
+                '===============================================================================
+                'Create the Page
+                Dim lsPageName As String = Me.zrPage.Model.CreateUniquePageName("ORM-Page", 0)
+
+                Dim lrPage = New FBM.Page(Me.zrPage.Model, Nothing, lsPageName, pcenumLanguage.ORMModel)
+
+                lrPage.Loaded = True
+                Me.zrPage.Model.Page.Add(lrPage)
+
+                Me.zrPage.Model.AllowCheckForErrors = True
+
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
+
+                lrEnterpriseView = prApplication.MainForm.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
+
+                For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+                    Call lrPage.DropEntityTypeAtPoint(lrEntityTypeInstance.EntityType,
+                                                      New PointF(lrEntityTypeInstance.X, lrEntityTypeInstance.Y),
+                                                      True)
+                Next
+
+                For Each lrValueTypeInstance In Me.zrPage.ValueTypeInstance
+                    Call lrPage.DropValueTypeAtPoint(lrValueTypeInstance.ValueType,
+                                                     New PointF(lrValueTypeInstance.X, lrValueTypeInstance.Y),
+                                                     True, False, True)
+                Next
+
+                For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.IsObjectified)
+                    Call lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType,
+                                                    New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y),
+                                                    False, True, True, False, False, False, lrFactTypeInstance.ShowFactTypeName, False, False, lrFactTypeInstance.Visible, False)
+                Next
+
+                For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) Not x.IsObjectified)
+                    Call lrPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType,
+                                                    New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y),
+                                                    False, True, True, False, False, False, lrFactTypeInstance.ShowFactTypeName, False, False, lrFactTypeInstance.Visible, False)
+                Next
+
+                lrPage.Save(True, True)
+
+                Boston.ShowFlashCard("Added the new ORM Diagram Page, '" & lrPage.Name & "' to the Model.", pcColorPastelGreen)
+
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub RDFTriGWithSHACLToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RDFTriGWithSHACLToolStripMenuItem.Click
+
+        Try
+            Dim larModelElement As List(Of FBM.ModelObject) = Me.zrPage.GetAllPageModelElements(False, False)
+
+            Call prApplication.MainForm.LoadRDFGeneratorTool(Me.zrPage.Model, larModelElement)
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemShowDerivationRuleEditor_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemShowDerivationRuleEditor.Click
+
+        Try
+            Dim lrFactTypeInstance As FBM.FactTypeInstance
+
+            '------------------------------------------------------
+            'Get the Selected FactTypeInstance
+            '------------------------------------------------------                    
+            lrFactTypeInstance = Me.zrPage.SelectedObject(0)
+
+            Me.ToolStripMenuItemShowDerivationRuleEditor.Checked = Not Me.ToolStripMenuItemShowDerivationRuleEditor.Checked
+
+            If Me.ToolStripMenuItemShowDerivationRuleEditor.Checked Then
+
+
+                If lrFactTypeInstance.FactTypeDerivationText Is Nothing Then
+
+                    Call lrFactTypeInstance.DisplayAndAssociateDerivationText()
+                Else
+                    lrFactTypeInstance.FactTypeDerivationText.displayAndAssociate()
+                End If
+
+            Else
+                If lrFactTypeInstance.FactTypeDerivationText IsNot Nothing Then
+                    'Hide the Derivation Text editor.
+                    Dim lrDerivationTextEditor As FBM.FactTypeDerivationText = Nothing
+
+                    lrDerivationTextEditor = lrFactTypeInstance.FactTypeDerivationText
+
+                    Me.zrPage.Diagram.Nodes.Remove(lrDerivationTextEditor.Shape)
+
+                    lrFactTypeInstance.FactTypeDerivationText = Nothing
+                End If
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub HideToolStripMenuItem2_Click(sender As Object, e As EventArgs) Handles HideToolStripMenuItem2.Click
+
+        Try
+            Dim lrDerivationTextEditor As FBM.FactTypeDerivationText = Nothing
+
+            lrDerivationTextEditor = Me.Diagram.Selection.Items(0).Tag
+
+            Dim lrFactTypeInstance = lrDerivationTextEditor.FactTypeInstance
+
+            Me.zrPage.Diagram.Nodes.Remove(lrDerivationTextEditor.Shape)
+
+            lrFactTypeInstance.FactTypeDerivationText = Nothing
+
+            Me.ToolStripMenuItemShowDerivationRuleEditor.Checked = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
         End Try
 
     End Sub

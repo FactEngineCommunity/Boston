@@ -3,11 +3,67 @@ Imports MindFusion.Drawing
 Imports System.Xml.Serialization
 Imports System.ComponentModel
 Imports System.Drawing.Drawing2D
-Imports System.Reflection
 Imports Newtonsoft.Json
+Imports System.Globalization
+Imports System.Reflection
 
 Namespace FBM
-    <Serializable()> _
+
+
+#Region "Type Converter for 'Unbounded' Integer Property for MaximumFrequencyCount"
+    ' Custom converter for integer with "Unbounded"
+    Public Class UnboundedIntegerConverter
+        Inherits Int32Converter
+
+        Public Overrides Function ConvertTo(context As ITypeDescriptorContext,
+                                        culture As CultureInfo,
+                                        value As Object,
+                                        destinationType As Type) As Object
+            If destinationType Is GetType(String) Then
+                If CInt(value) = 0 Then
+                    Return "Unbounded"
+                End If
+            End If
+            Return MyBase.ConvertTo(context, culture, value, destinationType)
+        End Function
+
+        Public Overrides Function ConvertFrom(context As ITypeDescriptorContext,
+                                          culture As CultureInfo,
+                                          value As Object) As Object
+            Dim str As String = TryCast(value, String)
+            If str IsNot Nothing Then
+                If str.Trim().ToLower() = "unbounded" Then
+                    Return 0
+                End If
+            End If
+            Return MyBase.ConvertFrom(context, culture, value)
+        End Function
+
+        ' Let PropertyGrid know we have standard values
+        Public Overrides Function GetStandardValuesSupported(context As ITypeDescriptorContext) As Boolean
+            Return True
+        End Function
+
+        ' Allow free-text entry as well
+        Public Overrides Function GetStandardValuesExclusive(context As ITypeDescriptorContext) As Boolean
+            Return False
+        End Function
+
+        ' Supply dropdown list values
+        Public Overrides Function GetStandardValues(context As ITypeDescriptorContext) As StandardValuesCollection
+            Dim values As New List(Of Object)()
+            values.Add(0) ' Will display as "Unbounded"
+            values.Add(5)
+            values.Add(10)
+            values.Add(50)
+            values.Add(100)
+            Return New StandardValuesCollection(values)
+        End Function
+    End Class
+#End Region
+
+
+    <Serializable()>
     Public Class RoleConstraintInstance
         Inherits FBM.RoleConstraint
         Implements FBM.iRoleConstraintObject
@@ -83,6 +139,40 @@ Namespace FBM
             End Set
         End Property
 
+        <CategoryAttribute("Role Constraint Detail"),
+             Browsable(True),
+             [ReadOnly](False),
+             BindableAttribute(True),
+             DefaultValueAttribute(""),
+             DesignOnly(False),
+             DescriptionAttribute("Enter the Minimum cardinal range of the Frequency Constraint.")>
+        Public Overrides Property MinimumFrequencyCount() As Integer
+            Get
+                Return _MinimumFrequencyCount
+            End Get
+            Set(ByVal value As Integer)
+                _MinimumFrequencyCount = value
+            End Set
+        End Property
+
+        '<DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <CategoryAttribute("Role Constraint Detail"),
+             Browsable(True),
+             [ReadOnly](False),
+             BindableAttribute(True),
+             DefaultValueAttribute(""),
+             DesignOnly(False),
+             DescriptionAttribute("Enter the Maximum cardinal range of the Frequency Constraint.")>
+        <TypeConverter(GetType(UnboundedIntegerConverter))>
+        Public Overrides Property MaximumFrequencyCount() As Integer
+            Get
+                Return _MaximumFrequencyCount
+            End Get
+            Set(ByVal value As Integer)
+                _MaximumFrequencyCount = value
+            End Set
+        End Property
+
         <XmlIgnore()>
         Public Shadows ReadOnly Property Role As List(Of FBM.RoleInstance)
             Get
@@ -109,8 +199,35 @@ Namespace FBM
         <XmlIgnore()>
         Public Page As FBM.Page
 
+        <XmlIgnore()>
+        Public _X As Integer
         Public Property X As Integer Implements FBM.iRoleConstraintObject.X
+            Get
+                Return Me._X
+            End Get
+            Set(value As Integer)
+                Me._X = value
+                If Me.Shape IsNot Nothing Then
+                    Dim loRectangle As New Rectangle(Me.X, Me.Shape.Bounds.Y, Me.Shape.Bounds.Width, Me.Shape.Bounds.Height)
+                    Me.Shape.SetRect(loRectangle, False)
+                End If
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        Public _Y As Integer
         Public Property Y As Integer Implements FBM.iRoleConstraintObject.Y
+            Get
+                Return Me._Y
+            End Get
+            Set(value As Integer)
+                Me._Y = value
+                If Me.Shape IsNot Nothing Then
+                    Dim loRectangle As New Rectangle(Me.Shape.Bounds.X, Me.Y, Me.Shape.Bounds.Width, Me.Shape.Bounds.Height)
+                    Me.Shape.SetRect(loRectangle, False)
+                End If
+            End Set
+        End Property
 
         Public Height As Integer
         Public Width As Integer
@@ -152,6 +269,24 @@ Namespace FBM
             End Set
         End Property
 
+        Private Property iPageObject_Width As Integer Implements iPageObject.Width
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Private Property iPageObject_Height As Integer Implements iPageObject.Height
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         '20220211-VM-Was. See above 
         '<NonSerialized()>
         '<XmlIgnore()>
@@ -161,13 +296,16 @@ Namespace FBM
             '-------------------
             'Parameterless New
             '-------------------
+            Me.m_dctd = DynamicTypeDescriptor.ProviderInstaller.Install(Me)
         End Sub
 
         Public Sub New(ByRef arRoleConstraint As FBM.RoleConstraint)
 
+            Call Me.New
+
             Me.ConceptType = pcenumConceptType.RoleConstraint
 
-            If IsSomething(arRoleConstraint) Then
+            If arRoleConstraint IsNot Nothing Then
                 Me.Model = arRoleConstraint.Model
                 Me.RoleConstraint = New FBM.RoleConstraint
                 Me.RoleConstraint = arRoleConstraint
@@ -263,7 +401,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: FBM.RoleConstraintInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrRoleConstraintInstance
             End Try
@@ -316,7 +454,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tRoleConstraintInstance.CloneFrequencyConstraintInstance"
                 lsMessage &= vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrFrequencyConstraintInstance
             End Try
@@ -372,7 +510,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tRoleConstraintInstance.CloneFrequencyConstraintInstance"
                 lsMessage &= vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrRoleValueConstraintInstance
             End Try
@@ -431,7 +569,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tRoleConstraintInstance.CloneUniquenessConstraintInstance"
                 lsMessage &= vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrRoleConstraintInstance
             End Try
@@ -486,7 +624,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tRoleConstraintInstance.CloneFrequencyConstraintInstance"
                 lsMessage &= vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrValueConstraintInstance
             End Try
@@ -539,7 +677,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: FBM.RoleConstraintInstance.CloneRingConstraintInstance"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrRingConstraintInstance
             End Try
@@ -583,7 +721,12 @@ Namespace FBM
                         Dim larClosestModelElementInstance = (From RoleInstance In larRoleInstance
                                                               Select New With {.RoleInstance = RoleInstance, .Shape = RoleInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(Me.X - RoleInstance.X) ^ 2 + Math.Abs(Me.Y - RoleInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
 
-                        lrRoleConstraintRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                        If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
+                            If Not Me.Page.Diagram.Links.Contains(lrRoleConstraintRoleInstance.Link) Then
+                                Me.Page.Diagram.Links.Add(lrRoleConstraintRoleInstance.Link)
+                            End If
+                            lrRoleConstraintRoleInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                        End If
                         Me.Page.Diagram.Invalidate()
                     End If
                 Next
@@ -594,7 +737,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -667,7 +810,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -691,7 +834,7 @@ Namespace FBM
                                 lrRoleConstraintRole.ArgumentSequenceNr.ToString
                             End If
                         Catch ex As Exception
-                            prApplication.ThrowErrorMessage("Error setting Shadding/Numbering text for Role Constraint, " & Me.Id, pcenumErrorType.Warning, ex.StackTrace, True,,,,, ex)
+                            prApplication.ThrowMessage("Error setting Shadding/Numbering text for Role Constraint, " & Me.Id, pcenumErrorType.Warning, ex.StackTrace, True,,,,, ex)
                         End Try
                     Next
                     Dim lrArgument As FBM.RoleConstraintArgument
@@ -752,7 +895,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -788,7 +931,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -827,7 +970,7 @@ Namespace FBM
                             lsMessage &= vbCrLf & "RoleConstraint.Id: " & Me.Id
                             lsMessage.AppendDoubleLineBreak("Do you want Boston to remove this Role Constrataint? (recommended)")
 
-                            If prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                            If prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
                                 Me.RoleConstraint.RemoveFromModel(True, False, True, True, True, False)
                             End If
 
@@ -1029,6 +1172,15 @@ Namespace FBM
                             Case Is = pcenumRoleConstraintType.ExclusiveORConstraint
                                 loDroppedNode.Image = My.Resources.ORMShapes.exclusiveOr
                                 loDroppedNode.ToolTip = "Exclusive OR Constraint"
+                            Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+#Region "External Frequency Constraint"
+                                loDroppedNode.Image = Nothing
+                                loDroppedNode.Visible = True
+                                loDroppedNode.Transparent = False
+                                loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.Purple)
+                                loDroppedNode.Pen.Width = 0.5
+                                loDroppedNode.ToolTip = "External Frequency Constraint"
+#End Region
                             Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
                                 If (Me.IsDeontic = False) And (Me.IsPreferredIdentifier = False) Then
                                     loDroppedNode.Image = My.Resources.ORMShapes.externalUniqueness
@@ -1126,7 +1278,7 @@ Namespace FBM
 
 
                         loDroppedNode.Resize(10, 10)
-                        loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
+                        'loDroppedNode.Pen = New MindFusion.Drawing.Pen(Color.White)
                         loDroppedNode.Visible = True
                         loDroppedNode.ImageAlign = ImageAlign.Stretch
                         loDroppedNode.AllowOutgoingLinks = True
@@ -1148,7 +1300,9 @@ Namespace FBM
                             '-------------------------------------------------------------                                   
                             If lrRoleInstance.FactType.IsSubtypeRelationshipFactType Then
                                 'See tORMRoleConstraintLink for Draw method for the link.
+
                                 lrRoleConstraintRoleInstance.SubtypeConstraintInstance = lrRoleInstance.FactType.SubtypeRelationshipInstance
+
                             Else
                                 Dim lo_link As New DiagramLink(Me.Page.Diagram, Me.Shape, lrRoleInstance.Shape)
                                 lo_link.Visible = True
@@ -1187,7 +1341,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1227,7 +1381,7 @@ Namespace FBM
                         lsMessage = "There seems to be a problem with the Role Constraint, " & Me.Id & "."
                         lsMessage.AppendDoubleLineBreak("Please consider removing the Role Constraint from the Model from within the Model Dictionary and recreating the Role Constraint.")
                         lsMessage.AppendDoubleLineBreak("Click [Yes] if you would like Boston to remove the Role Constraint from the Model now.")
-                        If prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                        If prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
                             Call Me.RoleConstraint.RemoveFromModel(True, False, True, True, True, False)
                         End If
                         Exit Sub
@@ -1330,7 +1484,7 @@ Namespace FBM
                     '------------------------------------------------------------------------------------------------------------------
                     lrRoleConstraintRole.Shape = loDroppedShapeNode
 
-                    If lrRoleConstraintRole.Role.FactType.FactType.IsPreferredReferenceMode Then
+                    If lrRoleConstraintRole.Role.FactType.FactType.IsPreferredReferenceMode And Not lrRoleConstraintRole.Role.FactType._Visible Then
                         lrRoleConstraintRole.Shape.Visible = False
                     Else
                         lrRoleConstraintRole.Shape.Visible = True
@@ -1353,7 +1507,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1397,6 +1551,40 @@ Namespace FBM
 
         End Function
 
+        Private Shadows Sub _RoleConstraint_MinimumFrequencyCountChanged(aiNewMinimumFrequencyCount As Integer) Handles _RoleConstraint.MinimumFrequencyCountChanged
+
+            Try
+                Me.MinimumFrequencyCount = aiNewMinimumFrequencyCount
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Shadows Sub _RoleConstraint_MaximumFrequencyCountChanged(aiNewMaximumFrequencyCount As Integer) Handles _RoleConstraint.MaximumFrequencyCountChanged
+
+            Try
+                Me.MaximumFrequencyCount = aiNewMaximumFrequencyCount
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
         Public Overridable Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
                                             Optional ByVal asSelectedGridItemLabel As String = "")
 
@@ -1404,8 +1592,10 @@ Namespace FBM
             Try
                 Dim lrEntityType As FBM.EntityType
 
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
+#Region "Changed Property Item"
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+#Region "Name"
                         Case Is = "Name"
                             '------------------------------------------------
                             'Set the values in the underlying Model.EntityType
@@ -1419,6 +1609,7 @@ Namespace FBM
                                 Me.Id = Me.Name
                                 Me.Symbol = Me.Name
                             End If
+#End Region
                         Case Is = "ShortDescription"
                             Call Me.RoleConstraint.SetShortDescription(Me.ShortDescription)
                             Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).ShortDescription = Me.ShortDescription
@@ -1426,6 +1617,7 @@ Namespace FBM
                             Call Me.RoleConstraint.SetLongDescription(Me.LongDescription)
                             Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
                         Case Is = "IsPreferredIdentifier"
+#Region "IsPreferredIdentifier"
                             If Me.IsPreferredIdentifier Then
                                 Select Case Me.RoleConstraintType
                                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
@@ -1459,7 +1651,17 @@ Namespace FBM
                                                 lrEntityType.ReferenceModeValueType = New FBM.ValueType
                                                 lrEntityType.ReferenceModeValueType = lrValueType
 
-                                                lrEntityType.SetReferenceMode(lsReferenceMode, True)
+                                                lrEntityType.SetReferenceMode(lsReferenceMode, True) 'Simple Assignment
+
+                                            ElseIf Me.RoleConstraint.RoleConstraintRole(0).Role.FactType.GetOtherRoleOfBinaryFactType(Me.RoleConstraint.RoleConstraintRole(0).Role.Id).JoinedORMObject.ConceptType = pcenumConceptType.EntityType Then
+
+                                                lrEntityType = Me.RoleConstraint.RoleConstraintRole(0).Role.FactType.GetOtherRoleOfBinaryFactType(Me.RoleConstraint.RoleConstraintRole(0).Role.Id).JoinedORMObject
+
+                                                If lrEntityType.ReferenceMode.Trim = "" Then
+                                                    lrEntityType.PreferredIdentifierRCId = Me.RoleConstraint.Id
+                                                    lrEntityType.ReferenceModeRoleConstraint = Me.RoleConstraint
+                                                    lrEntityType._ReferenceModeFactType = Me.RoleConstraint.RoleConstraintRole(0).Role.FactType
+                                                End If
 
                                             End If
                                         End If
@@ -1530,9 +1732,11 @@ Namespace FBM
                             End If
 
                             Call Me.RoleConstraint.SetIsPreferredIdentifier(Me.IsPreferredIdentifier)
+#End Region
                         Case Is = "ValueRangeType"
                             Call Me.RoleConstraint.SetValueRangeType(Me.ValueRangeType, True)
                         Case Is = "IsDeontic"
+#Region "IsDeontic"
                             Me.RoleConstraint.IsDeontic = Me.IsDeontic
                             If Me.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RingConstraint Then
                                 If Me.IsDeontic Then
@@ -1588,23 +1792,43 @@ Namespace FBM
                                 End If
                             End If
                             Call Me.RoleConstraint.SetIsDeontic(Me.IsDeontic, True)
+#End Region
                         Case Is = "RingConstraintType"
 
                             Call Me.RoleConstraint.SetRingConstraintType(Me.RingConstraintType, True)
-
+                        Case Is = "MinimumFrequencyCount"
+#Region "MinimumFrequencyCount"
+                            Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType,
+                                                                  Me.Cardinality,
+                                                                  Me.MinimumFrequencyCount,
+                                                                  Me.MaximumFrequencyCount,
+                                                                  True)
+                            Call Me.EnableSaveButton()
+#End Region
+                        Case Is = "MaximumFrequencyCount"
+#Region "MaximumFrequencyCount"
+                            Call Me.RoleConstraint.SetCardinality(Me.CardinalityRangeType,
+                                                                  Me.Cardinality,
+                                                                  Me.MinimumFrequencyCount,
+                                                                  Me.MaximumFrequencyCount,
+                                                                  True)
+                            Call Me.EnableSaveButton()
+#End Region
                     End Select
 
-                    If IsSomething(Me.Page.Form) Then
+                    If Me.Page.Form IsNot Nothing Then
                         Me.Page.Diagram.Invalidate()
                         Call Me.EnableSaveButton()
                     End If
                 End If
+#End Region
 
                 '=====================================================================
                 'Shape drawing
                 '=====================================================================
                 Select Case Me.RoleConstraintType
                     Case Is = pcenumRoleConstraintType.ValueComparisonConstraint
+#Region "ValueComparisonConstraint"
                         Select Case Me.ValueRangeType
                             Case Is = pcenumValueRangeType.None
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison
@@ -1621,7 +1845,9 @@ Namespace FBM
                             Case Is = pcenumValueRangeType.NotEqual
                                 Me.Shape.Image = My.Resources.ORMShapes.value_comparison_not_equal
                         End Select
+#End Region
                     Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
+#Region "ExternalUniquenessConstraint"
                         If (Me.IsDeontic = False) And (Me.IsPreferredIdentifier = False) Then
                             Me.Shape.Image = My.Resources.ORMShapes.externalUniqueness
                         ElseIf Me.IsDeontic And (Me.IsPreferredIdentifier = False) Then
@@ -1631,38 +1857,57 @@ Namespace FBM
                         ElseIf (Me.IsDeontic = False) And Me.IsPreferredIdentifier Then
                             Me.Shape.Image = My.Resources.ORMShapes.preferred_uniqueness
                         End If
+#End Region
                     Case Is = pcenumRoleConstraintType.EqualityConstraint
+#Region "EqualityConstraint"
                         Select Case Me.IsDeontic
                             Case Is = True
                                 Me.Shape.Image = My.Resources.ORMShapes.deontic_equality
                             Case Else
                                 Me.Shape.Image = My.Resources.ORMShapes.equality
                         End Select
+#End Region
                     Case Is = pcenumRoleConstraintType.ExclusionConstraint
+#Region "ExclusionConstraint"
                         Select Case Me.IsDeontic
                             Case Is = True
                                 Me.Shape.Image = My.Resources.ORMShapes.deontic_exclusion
                             Case Else
                                 Me.Shape.Image = My.Resources.ORMShapes.exclusion
                         End Select
-
+#End Region
                     Case Is = pcenumRoleConstraintType.ExclusiveORConstraint
+#Region "ExclusiveORConstraint"
                         Select Case Me.IsDeontic
                             Case Is = True
                                 Me.Shape.Image = My.Resources.ORMShapes.deontic_exclusiveOr
                             Case Else
                                 Me.Shape.Image = My.Resources.ORMShapes.exlusiveOR
                         End Select
-
+#End Region
+                    Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+#Region "ExternalFrequencyConstraint"
+                        If (Me.MinimumFrequencyCount = 0) And (Me.MaximumFrequencyCount > 0) Then
+                            Me.Shape.Text = "<=" & Me.MaximumFrequencyCount
+                        ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount = 0) Then
+                            Me.Shape.Text = ">=" & Me.MinimumFrequencyCount
+                        ElseIf Me.MinimumFrequencyCount = Me.MaximumFrequencyCount Then
+                            Me.Shape.Text = Me.MinimumFrequencyCount
+                        ElseIf (Me.MinimumFrequencyCount > 0) And (Me.MaximumFrequencyCount > 0) Then
+                            Me.Shape.Text = Me.MinimumFrequencyCount.ToString & "..." & Me.MaximumFrequencyCount.ToString
+                        End If
+#End Region
                     Case Is = pcenumRoleConstraintType.InclusiveORConstraint
+#Region "InclusiveORConstraint"
                         Select Case Me.IsDeontic
                             Case Is = True
                                 Me.Shape.Image = My.Resources.ORMShapes.deontic_inclusive_or
                             Case Else
                                 Me.Shape.Image = My.Resources.ORMShapes.inclusive_or
                         End Select
-
+#End Region
                     Case Is = pcenumRoleConstraintType.RingConstraint
+#Region "RingConstraint"
                         Select Case Me.RingConstraintType
                             Case Is = pcenumRingConstraintType.AcyclicIntransitive
                                 Me.Shape.Image = My.Resources.ORMShapes.acyclic_intransitive
@@ -1715,9 +1960,9 @@ Namespace FBM
                             Case Is = pcenumRingConstraintType.Transitive
                                 Me.Shape.Image = My.Resources.ORMShapes.transative
                         End Select
-
+#End Region
                     Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-
+#Region "InternalUniquenessConstraint"
                         'CodeSafe
                         If Me.RoleConstraintRole.Count = 0 Then Exit Sub
 
@@ -1766,8 +2011,8 @@ Namespace FBM
                                 lrRoleConstraintRole.Shape.Shape = lrShape
                             Next
 
-
                         ElseIf Me.IsPreferredIdentifier Then
+#Region "IsPreferredIdentifier"
                             '-------------------------------------
                             'For preferred uniqueness constraint
                             '-------------------------------------
@@ -1799,6 +2044,7 @@ Namespace FBM
                             For Each lrRoleConstraintRole In Me.RoleConstraintRole
                                 lrRoleConstraintRole.Shape.Shape = lrShape
                             Next
+#End Region
                         Else
                             Dim loRectangle As New Rectangle(Me.RoleConstraintRole(0).Shape.Bounds.X,
                                                              Me.RoleConstraintRole(0).Shape.Bounds.Y,
@@ -1830,11 +2076,11 @@ Namespace FBM
                                                                     (lrRoleConstraintRoleInstance.Role.Shape.Bounds.Y - 3.5) - ((Me.LevelNr - 1) * 2))
 
                         Next
-
-
+#End Region
                 End Select
 
                 If Me.IsDeontic Then
+#Region "IsDeontic"
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     Select Case Me.RoleConstraintType
                         Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint,
@@ -1846,33 +2092,37 @@ Namespace FBM
                                   pcenumRoleConstraintType.SubsetConstraint
 
                             For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
-                                If IsSomething(lrRoleConstraintRoleInstance.Link) Then
+                                If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
                                     lrRoleConstraintRoleInstance.Link.Pen.Color = Color.Blue
                                 End If
                             Next
                     End Select
+#End Region
                 Else
+#Region "Not Decontic"
                     Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
                     Select Case Me.RoleConstraintType
                         Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint,
                                   pcenumRoleConstraintType.EqualityConstraint,
                                   pcenumRoleConstraintType.ExclusionConstraint,
                                   pcenumRoleConstraintType.ExclusiveORConstraint,
+                                  pcenumRoleConstraintType.ExternalFrequencyConstraint,
                                   pcenumRoleConstraintType.InclusiveORConstraint,
                                   pcenumRoleConstraintType.RingConstraint,
                                   pcenumRoleConstraintType.SubsetConstraint
 
                             For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
-                                If IsSomething(lrRoleConstraintRoleInstance.Link) Then
+                                If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
                                     lrRoleConstraintRoleInstance.Link.Pen.Color = Color.Purple
                                 End If
                             Next
                     End Select
+#End Region
                 End If
 
-                If IsSomething(Me.Page) Then
+                If Me.Page IsNot Nothing Then
                     Call Me.Page.Invalidate()
-                    If IsSomething(Me.Page.Diagram) Then
+                    If Me.Page.Diagram IsNot Nothing Then
                         Call Me.Page.Diagram.Invalidate()
                     End If
                 End If
@@ -1884,7 +2134,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1912,7 +2162,7 @@ Namespace FBM
                 End Select
 
                 For Each lrRoleConstraintRoleInstance In Me.RoleConstraintRole
-                    If IsSomething(Me.Page.Diagram) Then
+                    If Me.Page.Diagram IsNot Nothing Then
                         Me.Page.Diagram.Nodes.Remove(lrRoleConstraintRoleInstance.Shape)
                     End If
                     If lrRoleConstraintRoleInstance.Role IsNot Nothing Then
@@ -1935,7 +2185,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1988,7 +2238,7 @@ Namespace FBM
             Try
                 Me.IsPreferredIdentifier = abNewIsPreferredIdentifier
 
-                If IsSomething(Me.Page) Then
+                If Me.Page IsNot Nothing Then
                     Call Me.RefreshShape()
                 End If
 
@@ -1998,7 +2248,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2052,7 +2302,15 @@ Namespace FBM
         Public Sub NodeDeselected() Implements FBM.iRoleConstraintObject.NodeDeselected
 
             If Me.Shape IsNot Nothing Then
-                Me.Shape.Transparent = True
+                Select Case Me.RoleConstraintType
+                    Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                        Me.Shape.Image = Nothing
+                        Me.Shape.Transparent = False
+                        Me.Shape.Pen.Width = 0.6
+                    Case Else
+                        Me.Shape.Transparent = True
+                End Select
+
             End If
 
         End Sub
@@ -2065,7 +2323,7 @@ Namespace FBM
         End Sub
 
         Private Sub RoleConstraint_RoleConstraintRoleAdded(ByRef arRoleConstraintRole As RoleConstraintRole,
-                                                           ByRef arSubtypeRelationship As FBM.tSubtypeRelationship) Handles _RoleConstraint.RoleConstraintRoleAdded
+                                                           ByRef arSubtypeRelationship As FBM.SubtypeRelationship) Handles _RoleConstraint.RoleConstraintRoleAdded
 
             Try
                 Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
@@ -2137,7 +2395,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2180,7 +2438,7 @@ Namespace FBM
                     Exit Sub
                 End If
 
-                If IsSomething(lrRoleConstraintRoleInstanceToRemove.Link) Then
+                If lrRoleConstraintRoleInstanceToRemove.Link IsNot Nothing Then
                     Me.Page.Diagram.Links.Remove(lrRoleConstraintRoleInstanceToRemove.Link)
                 End If
 
@@ -2206,7 +2464,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -2231,8 +2489,18 @@ Namespace FBM
                         Me.Shape.Visible = True
                         Me.Shape.Pen.Color = Color.Red
                     Else
-                        Me.Shape.Transparent = True
-                        Me.Shape.Pen.Color = Color.White
+                        Select Case Me.RoleConstraintType
+                            Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                Me.Shape.Transparent = False
+                                Me.Shape.Pen.Color = Color.Purple
+                                Me.Shape.Image = Nothing
+                                Me.Shape.Pen.Width = 0.6
+                                Me.Shape.Visible = True
+                            Case Else
+                                Me.Shape.Transparent = True
+                                Me.Shape.Pen.Color = Color.White
+                        End Select
+
                     End If
                 End If
             End If
@@ -2285,7 +2553,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

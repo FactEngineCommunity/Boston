@@ -1,4 +1,6 @@
-﻿Imports System.Reflection
+﻿Imports System.ComponentModel
+Imports System.Linq.Expressions
+Imports System.Reflection
 
 Namespace ERD
 
@@ -13,6 +15,99 @@ Namespace ERD
         Public Page As FBM.Page
 
         Public Id As String = ""
+
+        ''' <summary>
+        ''' Can be either an RDS.Relation (Foreign Key Reference) or a RDS.Table (E.g. A Many-to-Many table as a Property Graph Edge Type equivalent).
+        ''' </summary>
+        Public ModelElement As Object
+
+        Public Shadows _GraphLabel As New FEStrings.StringCollection
+
+        <CategoryAttribute("Relation"),
+        Browsable(True),
+        [ReadOnly](False),
+        DescriptionAttribute("The equivalent Graph label in the Graph View."),
+        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Shadows Property GraphLabel() As FEStrings.StringCollection  'NB This is what is edited in the PropertyGrid
+            Get
+                Dim lasGraphLabel() As String = {}
+
+                If Me.RDSTable IsNot Nothing Then
+                    lasGraphLabel = (From MEGraphLabel In Me.RDSTable.FBMModelElement.GraphLabel
+                                     Select MEGraphLabel.Label).ToArray
+                ElseIf Me.RDSRelation IsNot Nothing Then
+                    lasGraphLabel = (From MEGraphLabel In Me.RDSRelation.ResponsibleFactType.GraphLabel
+                                     Select MEGraphLabel.Label).ToArray
+                End If
+
+                Me._GraphLabel.Clear()
+                Me._GraphLabel.AddRange(lasGraphLabel)
+
+                Return Me._GraphLabel
+
+            End Get
+            Set(ByVal Value As FEStrings.StringCollection)
+
+                Me._GraphLabel = Value
+
+                Dim lrModelElement As FBM.ModelObject = Nothing
+
+                If Me.RDSTable IsNot Nothing Then
+                    lrModelElement = Me.RDSTable.FBMModelElement
+                ElseIf Me.RDSRelation IsNot Nothing Then
+                    lrModelElement = Me.RDSRelation.ResponsibleFactType
+                End If
+
+                ' Find synonyms that are in the model but not in the new value
+                Dim graphLabelsToRemove = (From MEGraphLabel In lrModelElement.GraphLabel
+                                           Where MEGraphLabel.ModelElementId = Me.Id AndAlso Not Value.Contains(MEGraphLabel.Label)).ToList()
+
+                ' Remove synonyms that are no longer present in the new value
+                For Each graphLabelToRemove In graphLabelsToRemove
+                    lrModelElement.GraphLabel.Remove(graphLabelToRemove)
+                Next
+
+                ' Add new synonyms that are not in the model
+                For Each graphLabelToAdd In Value
+                    If Not lrModelElement.GraphLabel.Any(Function(s) s.ModelElementId = lrModelElement.Id AndAlso s.Label = graphLabelToAdd) Then
+                        lrModelElement.GraphLabel.Add(New RDS.GraphLabel(lrModelElement, graphLabelToAdd))
+                    End If
+                Next
+
+            End Set
+
+        End Property
+
+        Private _RelationshipType As String = "HAS" 'Relationship Type as in Property Graph Schema RT...e.g. (Person)-[:LIKES]->(Film). HAS, IS_FOR, IS_IN etc
+
+        <Browsable(True),
+     Description("The type of relationship in the graph."),
+     Category("Relationship"),
+     DefaultValue("HAS"),
+     DisplayName("Relationship Type")>
+        Public Property RelationshipType As String
+            Get
+                'Code Safe
+                If Me._GraphLabel.Count = 0 Then
+                    Me._GraphLabel.Add("HAS")
+                End If
+
+                Return Me._GraphLabel(0)
+            End Get
+            Set(value As String)
+                'Code Safe
+                If Me._GraphLabel.Count = 0 Then
+                    Me._GraphLabel.Add(value)
+                Else
+                    Me._GraphLabel(0) = value 'Relationship Types are singular in Property Graph Schemas, as opposed Node Types that can have multiple Labels.
+                End If
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' The TreeNode within the Schema TreeView.
+        ''' </summary>
+        Public TreeNode As TreeNode
 
         Public OriginEntity As FBM.FactDataInstance
         Public OriginAttribute As New List(Of ERD.Attribute)
@@ -31,6 +126,48 @@ Namespace ERD
 
         Public IsPGSRelationNode As Boolean = False
         Public ActualPGSNode As PGS.Node
+
+        Private _EnforcesOnCascadeUpdate As Boolean = False
+        <Browsable(True),
+        [ReadOnly](False),
+        CategoryAttribute("Relationship"),
+        DescriptionAttribute("The Relationship enforces On Cascade Update.")>
+        Public Property EnforcesOnCascadeUpdate As Boolean
+            Get
+                Return Me._EnforcesOnCascadeUpdate
+            End Get
+            Set(value As Boolean)
+                Me._EnforcesOnCascadeUpdate = value
+            End Set
+        End Property
+
+        Private _EnforcesOnCascadeDelete As Boolean = False
+        <Browsable(True),
+        [ReadOnly](False),
+        CategoryAttribute("Relationship"),
+        DescriptionAttribute("The Relationship enforces On Cascade Delete.")>
+        Public Property EnforcesOnCascadeDelete As Boolean
+            Get
+                Return Me._EnforcesOnCascadeDelete
+            End Get
+            Set(value As Boolean)
+                Me._EnforcesOnCascadeDelete = value
+            End Set
+        End Property
+
+        Private _EnforcesReferentialIntegrity As Boolean = False
+        <Browsable(True),
+        [ReadOnly](False),
+        CategoryAttribute("Relationship"),
+        DescriptionAttribute("The Relationship enforces On Cascade Update.")>
+        Public Property EnforcesReferentialIntegrity As Boolean
+            Get
+                Return Me._EnforcesReferentialIntegrity
+            End Get
+            Set(value As Boolean)
+                Me._EnforcesReferentialIntegrity = value
+            End Set
+        End Property
 
         Private _Link As Object
         Public Property Link As Object 'ERD.Link
@@ -78,7 +215,8 @@ Namespace ERD
                        ByRef arDestinationEntity As FBM.FactDataInstance,
                        ByVal aiDestinationMultiplicity As pcenumCMMLMultiplicity,
                        ByVal abDestinationMandatory As Boolean,
-                       Optional ByRef abCorrespondingTable As RDS.Table = Nothing)
+                       Optional ByRef arCorrespondingRDSTable As RDS.Table = Nothing,
+                       Optional ByRef arCorrespondingRDSRelation As RDS.Relation = Nothing)
 
             Me.Model = arModel
             Me.Page = arPage
@@ -92,6 +230,14 @@ Namespace ERD
             Me.DestinationEntity = arDestinationEntity
             Me.DestinationMultiplicity = aiDestinationMultiplicity
             Me.DestinationMandatory = abDestinationMandatory
+
+            If arCorrespondingRDSTable IsNot Nothing Then
+                Me.ModelElement = arCorrespondingRDSTable
+                Me.RDSTable = arCorrespondingRDSTable
+            Else
+                Me.ModelElement = arCorrespondingRDSRelation
+                Me.RDSRelation = arCorrespondingRDSRelation
+            End If
 
         End Sub
 
@@ -139,7 +285,7 @@ Namespace ERD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -177,7 +323,7 @@ Namespace ERD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -198,7 +344,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -239,7 +385,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -250,6 +396,133 @@ Namespace ERD
             Me.RelationFactType = arNewResponsibleFactType
 
         End Sub
+
+        Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
+                                Optional ByVal asSelectedGridItemLabel As String = "")
+
+            Try
+                Dim lrResponsibleFactType As FBM.FactType = Nothing 'The FactType responsible for the EdgeType/Relationship.
+
+                '------------------------------------------------
+                'Set the values in the underlying RDS.Relation
+                '------------------------------------------------
+                If aoChangedPropertyItem IsNot Nothing Then
+                    Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
+
+                        Case Is = "EnforcesOnCascadeUpdate"
+                            Call Me.RDSRelation.SetEnforcesOnCascadeUpdate(Me.EnforcesOnCascadeUpdate)
+
+                        Case Is = "EnforcesOnCascadeDelete"
+                            Call Me.RDSRelation.SetEnforcesOnCascadeDelete(Me.EnforcesOnCascadeDelete)
+
+                        Case Is = "EnforcesReferentialIntegrity"
+                            Call Me.RDSRelation.SetEnforcesReferentialIntegrity(Me.EnforcesReferentialIntegrity)
+
+                        Case Is = "Value"
+                            With New WaitCursor
+                                Select Case asSelectedGridItemLabel
+                                    Case Is = "GraphLabel"
+#Region "GraphLabel"
+                                        'GraphLabel processing.
+                                        Select Case Me.ModelElement.GetType
+                                            Case Is = GetType(RDS.Relation)
+                                                Call Me.RDSRelation.ResponsibleFactType.ModifyOrAddGraphLabel(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                                            Case Is = GetType(RDS.Table)
+                                                Call Me.RDSTable.FBMModelElement.ModifyOrAddGraphLabel(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                                        End Select
+
+                                        '-------------------------------------------------------------------------------------------------------------------------------
+                                        'Removing an item using the UITypeEditor does not trigger a return of aoChangedPropertyItem (As PropertyValueChangedEventArgs).
+                                        '  So we must check each time (back here) whether there is an item to remove from the GraphLabels list for the [ModelElement]Instance.
+                                        Dim lrDataStore As New DataStore.Store
+
+                                        Select Case Me.ModelElement.GetType
+                                            Case Is = GetType(RDS.Relation)
+                                                lrResponsibleFactType = Me.RDSRelation.ResponsibleFactType
+                                            Case Is = GetType(RDS.Table)
+                                                lrResponsibleFactType = Me.RDSTable.FBMModelElement
+                                        End Select
+
+                                        For Each lsGraphLabel In lrResponsibleFactType.GraphLabel.FindAll(Function(x) x.Label <> aoChangedPropertyItem.ChangedItem.Value).Select(Function(x) x.Label).ToArray
+                                            If lsGraphLabel IsNot Nothing Then
+                                                If Not Me._GraphLabel.Contains(lsGraphLabel) Then
+                                                    Select Case Me.ModelElement.GetType
+                                                        Case Is = GetType(RDS.Relation)
+                                                            Call Me.RDSRelation.ResponsibleFactType.GraphLabel.RemoveAll(Function(x) x.ModelElement.Id = Me.RDSRelation.ResponsibleFactType.Id And x.Label = lsGraphLabel)
+                                                            Dim lsModelId = Me.RDSRelation.Model.Model.ModelId
+                                                            Dim lsLocalGraphLabel = lsGraphLabel
+                                                            Dim whereClause As Expression(Of Func(Of RDS.GraphLabel, Boolean)) = Function(t) t.ModelId = lsModelId And t.ModelElementId = Me.RDSRelation.ResponsibleFactType.Id And t.Label = lsLocalGraphLabel
+                                                            lrDataStore.Delete(Of RDS.GraphLabel)(whereClause)
+                                                        Case Is = GetType(RDS.Table)
+                                                            Call Me.RDSTable.FBMModelElement.GraphLabel.RemoveAll(Function(x) x.ModelElement.Id = Me.RDSTable.FBMModelElement.Id And x.Label = lsGraphLabel)
+                                                            Dim lsModelId = Me.RDSRelation.Model.Model.ModelId
+                                                            Dim lsLocalGraphLabel = lsGraphLabel
+                                                            Dim whereClause As Expression(Of Func(Of RDS.GraphLabel, Boolean)) = Function(t) t.ModelId = lsModelId And t.ModelElementId = Me.RDSTable.FBMModelElement.Id And t.Label = lsLocalGraphLabel
+                                                            lrDataStore.Delete(Of RDS.GraphLabel)(whereClause)
+                                                    End Select
+                                                End If
+                                            End If
+                                        Next
+#End Region
+                                    Case Else
+                                        'No other collections at this stage.
+                                End Select
+                            End With
+                    End Select
+                End If
+
+                '=======================================================================================
+                'Graphics
+                If Me.TreeNode IsNot Nothing Then
+
+                    Dim lrOriginTable As RDS.Table = Nothing
+                    Dim lrDestinationTable As RDS.Table = Nothing
+                    lrResponsibleFactType = Me.RDSRelation.ResponsibleFactType
+
+                    Select Case Me.ModelElement.GetType
+                        Case Is = GetType(RDS.Relation)
+                            If Me.RDSRelation.ResponsibleFactType.IsLinkFactType Then
+
+                                Dim lrObjectifyingFactType = (From FactType In Me.Model.FactType
+                                                              Where FactType.getLinkFactTypes.Contains(Me.RDSRelation.ResponsibleFactType)
+                                                              Select FactType).First
+
+                                lrResponsibleFactType = lrObjectifyingFactType
+
+                                Dim larRelationshipRole = (From Role In lrObjectifyingFactType.RoleGroup.FindAll(Function(x) x.JoinsValueType Is Nothing)
+                                                           Select Role).ToList
+
+                                lrOriginTable = larRelationshipRole(0).JoinedORMObject.getCorrespondingRDSTable
+                                lrDestinationTable = larRelationshipRole(1).JoinedORMObject.getCorrespondingRDSTable
+                            Else
+                                lrOriginTable = Me.RDSRelation.OriginTable
+                                lrDestinationTable = Me.RDSRelation.DestinationTable
+
+                            End If
+                        Case Is = GetType(RDS.Table)
+                            Dim larRDSTable = From Column In Me.RDSTable.Column
+                                              Where Column.Relation.Count <> 0
+                                              Select Column.Relation(0).DestinationTable
+
+                            'If the RDS Table joins more than two RDS Tables, then something will have gone wrong. But is tightly controlled within this app.
+                            lrOriginTable = larRDSTable(0)
+                            lrDestinationTable = larRDSTable(1)
+                    End Select
+
+                    Me.TreeNode.Text = $"({lrOriginTable.Name})-[:{lrResponsibleFactType.GraphLabel(0).Label}]->({lrDestinationTable.Name})"
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
 
 
         Public Sub removeFromPage()
@@ -275,7 +548,7 @@ Namespace ERD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -306,7 +579,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -338,9 +611,65 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
+        End Sub
+
+        Private Sub RDSRelation_EnforcesOnCascadeUpdateChanged(abNewEnforcesOnCascadeUpdate As Boolean) Handles RDSRelation.EnforcesOnCascadeUpdateChanged
+
+            Try
+                Me.EnforcesOnCascadeUpdate = abNewEnforcesOnCascadeUpdate
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub RDSRelation_EnforcesOnCascadeDeleteChanged(abNewEnforcesOnCascadeDelete As Boolean) Handles RDSRelation.EnforcesOnCascadeDeleteChanged
+
+            Try
+                Me.EnforcesOnCascadeDelete = abNewEnforcesOnCascadeDelete
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub RDSRelation_EnforcesReferentialIntegrityChanged(abNewEnforcesReferentialIntegrity As Boolean) Handles RDSRelation.EnforcesReferentialIntegrityChanged
+
+            Try
+                Me.EnforcesReferentialIntegrity = abNewEnforcesReferentialIntegrity
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub RDSRelation_GraphLabelAdded(asNewGraphLabel As String) Handles RDSRelation.GraphLabelAdded
+            Me._GraphLabel.Add(asNewGraphLabel)
+        End Sub
+
+        Private Sub RDSTable_GraphLabelAdded(asNewGraphLabel As String) Handles RDSTable.GraphLabelAdded
+            Me._GraphLabel.Add(asNewGraphLabel)
         End Sub
 
     End Class

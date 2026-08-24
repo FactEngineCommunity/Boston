@@ -15,11 +15,11 @@ Namespace FBM
         [ReadOnly](False),
         DescriptionAttribute("The list of Values that Objects of the associated Role may take."),
         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
-        Public Shadows Property ValueConstraint() As Viev.Strings.StringCollection  'NB This is what is edited in the PropertyGrid
+        Public Shadows Property ValueConstraint() As FEStrings.StringCollection  'NB This is what is edited in the PropertyGrid
             Get
                 Return Me._ValueConstraintList
             End Get
-            Set(ByVal Value As Viev.Strings.StringCollection)
+            Set(ByVal Value As FEStrings.StringCollection)
                 Me._ValueConstraintList = Value
             End Set
         End Property
@@ -189,7 +189,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace)
             End Try
 
         End Sub
@@ -199,7 +199,7 @@ Namespace FBM
 
             Try
 
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "Name"
                             '------------------------------------------------
@@ -253,7 +253,7 @@ Namespace FBM
 
                 Me.Shape.Resize(StringSize.Width, StringSize.Height)
 
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     If Me.RoleConstraint.HasModelError Then
                         Me.Shape.HandlesStyle = HandlesStyle.InvisibleMove
                         Me.Shape.Transparent = False
@@ -270,7 +270,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -279,7 +279,7 @@ Namespace FBM
 
         Public Overloads Sub SetAppropriateColour()
 
-            If IsSomething(Me.Shape) Then
+            If Me.Shape IsNot Nothing Then
                 If Me.Shape.Selected Then
                     Me.Shape.Pen.Color = Color.Blue
                 Else
@@ -311,7 +311,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -328,7 +328,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -345,7 +345,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -361,7 +361,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -378,7 +378,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

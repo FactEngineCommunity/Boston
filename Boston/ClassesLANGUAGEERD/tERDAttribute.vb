@@ -3,7 +3,7 @@ Imports System.ComponentModel
 
 Namespace ERD
 
-    <Serializable()> _
+    <Serializable()>
     Public Class Attribute
         Inherits FBM.FactDataInstance
         Implements IEquatable(Of ERD.Attribute)
@@ -36,27 +36,88 @@ Namespace ERD
             End Set
         End Property
 
+        Public TreeNode As TreeNode 'The TreeNode within the Schema Viewer that represents the Property/Column/Attribute.
+
         Public Multiplicity As New UML.Multiplicity
         Public IsIdentityIdentifier As Boolean = False
         Public PreferredIdentityIdentifier As New List(Of String)
 
         Public WithEvents ModelFactType As FBM.FactType
 
-        Public _DataType As String = ""
+        Public _DataType As pcenumORMDataType
         <CategoryAttribute("Attribute"),
-        [ReadOnly](True),
+        Browsable(True),
+        [ReadOnly](False),
+        BindableAttribute(True),
         DefaultValueAttribute(GetType(String), ""),
-        DescriptionAttribute("The data type of the Attribute.")>
-        Public Overridable Property DataType() As String
+        DesignOnly(False),
+        DescriptionAttribute("The data type of the Attribute."),
+        TypeConverter(GetType(Enumeration.EnumDescConverter))>
+        Public Overridable Property DataType() As pcenumORMDataType
             Get
-                If Me.Column IsNot Nothing Then
-                    Return Me.Column.getMetamodelDataType.ToString '_DataType
+                Return Me._DataType
+            End Get
+            Set(ByVal value As pcenumORMDataType)
+                Me._DataType = value
+            End Set
+        End Property
+
+        Public _DataTypeLength As pcenumORMDataType
+        <CategoryAttribute("Attribute"),
+        Browsable(False),
+        [ReadOnly](False),
+        BindableAttribute(True),
+        DesignOnly(False),
+        DescriptionAttribute("The permissable length of a value of the Attribute.")>
+        Public Overridable Property DataTypeLength() As Integer
+            Get
+                Return Me._DataTypeLength
+            End Get
+            Set(ByVal value As Integer)
+                Me._DataTypeLength = value
+            End Set
+        End Property
+
+        Public _DataTypePrecision As pcenumORMDataType
+        <CategoryAttribute("Attribute"),
+        Browsable(False),
+        [ReadOnly](False),
+        BindableAttribute(True),
+        DesignOnly(False),
+        DescriptionAttribute("The precision of a value of the Attribute.")>
+        Public Overridable Property DataTypePrecision() As Integer
+            Get
+                Return Me._DataTypePrecision
+            End Get
+            Set(ByVal value As Integer)
+                Me._DataTypePrecision = value
+            End Set
+        End Property
+
+        Private _DBDataType As String = Nothing
+        ''' <summary>
+        ''' Gets the Value Type's DBDataType, else _DBDataType, Default "STRING"
+        ''' </summary>
+        ''' <returns></returns>
+        <CategoryAttribute("DB Level"),
+        [ReadOnly](False),
+        BindableAttribute(True),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("The Data Type in the underlying target database."),
+        TypeConverter(GetType(RDS.DataTypeConverter))>
+        Public Property DBDataType As String
+            Get
+                'CodeSafe
+                If _DBDataType Is Nothing Then
+                    If Me.Column Is Nothing Then Return ""
+
+                    Return Me.Column.DBDataType
                 Else
-                    Return "Unkown, Column not set"
+                    Return Me._DBDataType
                 End If
             End Get
             Set(ByVal value As String)
-                Me._DataType = value
+                Me._DBDataType = value
             End Set
         End Property
 
@@ -77,9 +138,13 @@ Namespace ERD
         Public _PartOfPrimaryKey As Boolean = False
         Public Overridable Property PartOfPrimaryKey() As Boolean
             Get
-                If Me.Column IsNot Nothing Then
+                'CodeSafe
+                If Me.Column Is Nothing Then
+                    Return False 'What choice do we have? This needs to be here, without throwing an error, because the dynamic property type descriptor called in me.New references this Property before Column is set.
+                ElseIf Me.Column IsNot Nothing Then
                     Return Me.Column.isPartOfPrimaryKey
                 Else
+                    'Won't ever get hit. 20231113-VM-Check to see if similar functionality is in Colum.isPartOfPrimaryKey. If so...just delete this code.
                     Dim lbIsPartOfPrimaryKey = (From Index In Me.Column.Index
                                                 Where Index.IsPrimaryKey
                                                 Select Index).Count > 0
@@ -93,8 +158,15 @@ Namespace ERD
         End Property
 
         Public _Mandatory As Boolean = False
+        <CategoryAttribute("Attribute"),
+        [ReadOnly](False),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("True if the Attribute is required to be populated.")>
         Public Overridable Property Mandatory() As Boolean
             Get
+                'CodeSafe
+                If Me.Column Is Nothing Then Return False 'Needs to be here. See me.New: Dynamic Type Descriptor references this member before Me.Column is set.
+
                 Return Me.Column.IsMandatory
             End Get
             Set(ByVal value As Boolean)
@@ -154,7 +226,7 @@ Namespace ERD
 
         Public ReadOnly Property IsPartOfRelation() As Boolean
             Get
-                Return IsSomething(Me.Relation)
+                Return Me.Relation IsNot Nothing
             End Get
         End Property
 
@@ -166,6 +238,9 @@ Namespace ERD
 
         Public Overrides Property ModelError() As System.Collections.Generic.List(Of FBM.ModelError)
             Get
+                'CodeSafe
+                If Me.Column Is Nothing Then Return New List(Of FBM.ModelError) 'Needs to be here. See me.New: Dynamic Type Descriptor references this member before Me.Column is set.
+
                 Dim larModelError As New List(Of FBM.ModelError)
 
                 If Me.Column.ActiveRole.JoinsValueType IsNot Nothing Then
@@ -184,6 +259,18 @@ Namespace ERD
                     larModelError.AddUnique(lrModelError)
                 End If
 
+                If Not Me.Model.DatabaseConnection.ColumnExists(Me.Entity.RDSTable.DBName, Me.Column.DBName) Then
+
+                    Dim lsErrorMessage = "Attribute/Column does not exist in the database for Table, " & Me.Entity.RDSTable.DBName & ": '" & Me.Column.ActiveRole.JoinsValueType.Name & "'."
+
+                    Dim lrModelError = New FBM.ModelError(pcenumModelErrors.RDSColumnNotInDatabase,
+                                                          lsErrorMessage,
+                                                          Nothing,
+                                                          Me.Column.ActiveRole.JoinsValueType)
+
+                    larModelError.AddUnique(lrModelError)
+                End If
+
                 Return larModelError
             End Get
             Set(value As System.Collections.Generic.List(Of FBM.ModelError))
@@ -191,10 +278,14 @@ Namespace ERD
             End Set
         End Property
 
+        ''' <summary>
+        ''' Parameterless Constructor.
+        ''' </summary>
         Public Sub New()
 
             Me.Id = System.Guid.NewGuid.ToString
             Me.Name = Me.Id
+            Me.m_dctd = DynamicTypeDescriptor.ProviderInstaller.Install(Me)
 
         End Sub
 
@@ -214,6 +305,43 @@ Namespace ERD
 
         End Sub
 
+        Public Sub New(ByRef arRDSColumn As RDS.Column)
+
+            Try
+                Me.Column = arRDSColumn
+                Me.Name = arRDSColumn.Name
+
+                Me.DataType = arRDSColumn.getMetamodelDataType
+                Me.DataTypeLength = arRDSColumn.getMetamodelDataTypeLength
+                Me.DataTypePrecision = arRDSColumn.getMetamodelDataTypePrecision
+                Me.Model = arRDSColumn.Model.Model
+                Me.Id = arRDSColumn.Id
+                Me.Entity = Nothing
+                Me.AttributeName = arRDSColumn.Name
+                Me.ResponsibleRole = arRDSColumn.Role
+                Me.ActiveRole = arRDSColumn.ActiveRole
+                Me.ResponsibleFactType = Me.ResponsibleRole.FactType
+                Me.Mandatory = arRDSColumn.IsMandatory
+                'Me.OrdinalPosition = arRDSColumn.OrdinalPosition
+                Me.PartOfPrimaryKey = arRDSColumn.isPartOfPrimaryKey
+                Me.IsDerivationParameter = arRDSColumn.IsDerivationParameter
+                Me.Page = Me.Page
+
+                Me.Column = arRDSColumn
+                Me.SupertypeColumn = arRDSColumn.SupertypeColumn
+                Me.DBName = arRDSColumn.DBName 'ActiveRole.JoinedORMObject.DBName
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,)
+            End Try
+
+        End Sub
+
         Public Sub New(ByRef arColumn As RDS.Column, ByRef arPage As FBM.Page)
 
             Try
@@ -223,6 +351,7 @@ Namespace ERD
                 Me.Id = arColumn.Id
                 Me.Entity = arPage.ERDiagram.Entity.Find(Function(x) x.Name = Me.Name)
                 Me.AttributeName = arColumn.Name
+                Me.DBName = arColumn.DBName
                 Me.ResponsibleRole = arColumn.Role
                 Me.ActiveRole = arColumn.ActiveRole
                 Me.ResponsibleFactType = Me.ResponsibleRole.FactType
@@ -238,7 +367,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -274,7 +403,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -300,10 +429,13 @@ Namespace ERD
                 Dim lsPartOfPrimaryKey As String = ""
                 Dim lsMandatory As String = ""
 
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "DBName"
-                            Call Me.Column.ActiveRole.JoinedORMObject.SetDBName(Me.DBName)
+                            Me.Column.SetDBName(Me.DBName)
+                            If Me.Column.Relation.Count = 0 Then
+                                Call Me.Column.ActiveRole.JoinedORMObject.SetDBName(Me.DBName)
+                            End If
                         Case Is = "Name"
                             '-----------------------------------------------------------------------------------------------------------------
                             'If the Attribute is not part of a Relation, the the Attribute has a corresponding ValueType at the Model level.
@@ -316,18 +448,46 @@ Namespace ERD
                                 Me.AttributeName = Me.Column.Name
                                 MsgBox("You can't have a zero length Attribute name.")
                             End If
+                        Case Is = "DataType"
+
+                            Me._DBDataType = Nothing
+                            Call Me.Column.SetDataType(Me.DataType)
+
+                        Case Is = "DBDataType"
+
+                            Dim liORMDataType = Me.Column.Model.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(Me.DBDataType)
+                            Call Me.Column.SetDataType(liORMDataType)
+
+                        Case Is = "DataTypeLength"
+
+                            Call Me.Column.SetDataTypeLength(Me.DataTypeLength)
+
+                        Case Is = "DataTypePrecision"
+
+                            Call Me.Column.SetDataTypePrecision(Me.DataTypePrecision)
+
                         Case Is = "IsDerivationParameter"
                             Call Me.Column.setIsDerivationParameter(Me.IsDerivationParameter)
+
+                        Case Is = "Mandatory"
+                            Call Me.Column.setMandatory(Not Me.Column.IsMandatory)
                     End Select
                 End If
 
 
                 'CodeSafe
                 If Me.Cell Is Nothing Then Exit Sub
+                'Check to see if the table still exists
+                If Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Entity.RDSTable.Name) Is Nothing Then
+                    Exit Sub
+                End If
 
                 If Me.Entity.RDSTable.HasPrimaryKeyIndex Then
                     If Me.Column.isPartOfPrimaryKey Then
-                        lsPartOfPrimaryKey = "#"
+                        If Me.Column.Table.IsPartOfPrimarySubtypeRelationshipPath(Me.Entity.RDSTable) Then
+                            lsPartOfPrimaryKey = "#"
+                        End If
+
                         '20220315-VM-Commented out. If all seems okay then remove completely.
                         'ElseIf Me.Entity.RDSTable.Index.Find(Function(x) x.IsPrimaryKey).Column.Contains(Me.Column) Then
                         '    lsPartOfPrimaryKey = "#"
@@ -398,6 +558,10 @@ Namespace ERD
                     Me.Cell.TextColor = Color.Black
                 End If
 
+                If Me.Column.FactType IsNot Nothing AndAlso Me.Column.FactType.IsDerived Then
+                    Me.Cell.TextColor = Color.MediumSlateBlue
+                End If
+
                 If Me.Cell.Table.Rows.Count > 0 Then
                     Try
                         Me.Cell.Table.ResizeToFitText(True)
@@ -417,12 +581,12 @@ Namespace ERD
 
 
             Catch ex As Exception
-                    Dim lsMessage1 As String
+                Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -494,7 +658,7 @@ Namespace ERD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -598,7 +762,7 @@ Namespace ERD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -620,7 +784,7 @@ Namespace ERD
 
                         lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                         lsMessage &= vbCrLf & vbCrLf & ex.Message
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                     End Try
                 End If
             Catch ex As Exception
@@ -629,7 +793,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -645,7 +809,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -667,7 +831,7 @@ Namespace ERD
 
                         lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                         lsMessage &= vbCrLf & vbCrLf & ex.Message
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                     End Try
                 End If
             Catch ex As Exception
@@ -676,15 +840,15 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
 
-        Private Sub Column_DataTypeChanged() Handles Column.DataTypeChanged
+        Private Sub Column_DataTypeChanged(ByVal aiORMDataType As pcenumORMDataType) Handles Column.DataTypeChanged
 
             Try
-                Call Me.RefreshShape()
+                Me._DataType = aiORMDataType
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -692,7 +856,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -707,10 +871,88 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
+
+        Public Shadows Sub SetAppropriateColour()
+
+            Try
+                Me.Cell.TextColor = Color.Black
+                If Me.Column.FactType IsNot Nothing AndAlso Me.Column.FactType.IsDerived Then
+                    Me.Cell.TextColor = Color.MediumSlateBlue
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+            End Try
+
+        End Sub
+
+        Private Sub Column_DataTypeLengthChanged(aiNewDataTypeLength As Integer) Handles Column.DataTypeLengthChanged
+
+            Try
+                Me._DataTypeLength = aiNewDataTypeLength
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub Column_DataTypePrecisionChanged(aiNewDataTypePrecision As Integer) Handles Column.DataTypePrecisionChanged
+
+            Try
+                Me._DataTypePrecision = aiNewDataTypePrecision
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub Column_DBNameChanged(asNewDBName As String) Handles Column.DBNameChanged
+
+            Try
+                Me.DBName = asNewDBName
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            End Try
+
+        End Sub
+
+        Private Sub SupertypeColumn_NameChanged(asNewName As String) Handles SupertypeColumn.NameChanged
+
+            Me.AttributeName = asNewName
+
+            If Me.Cell IsNot Nothing Then
+                Call Me.RefreshShape()
+            End If
+
+        End Sub
+
     End Class
 
 End Namespace

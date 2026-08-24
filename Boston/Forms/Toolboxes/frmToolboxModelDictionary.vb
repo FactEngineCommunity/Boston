@@ -1,4 +1,5 @@
 ﻿Imports System.Reflection
+Imports Boston.FBM
 
 Public Class frmToolboxModelDictionary
 
@@ -21,7 +22,7 @@ Public Class frmToolboxModelDictionary
 
     End Sub
 
-    Private Sub frmModelDictionaryLoad(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub frmModelDictionaryLoad(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Call SetupForm()
 
@@ -38,28 +39,31 @@ Public Class frmToolboxModelDictionary
             Me.ComboBoxView.SelectedIndex = 0
         End If
 
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language)
         Else
             Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel)
         End If
 
-        If IsSomething(prApplication.WorkingModel) Then
+        If prApplication.WorkingModel IsNot Nothing Then
             Me.zrORMModel = prApplication.WorkingModel
         End If
 
-        If IsSomething(Me.zrORMModel) Then
+        If Me.zrORMModel IsNot Nothing Then
             Me.LabelModelName.Text = Me.zrORMModel.Name
         End If
 
         Me.CheckBoxShowModelDictionary.Visible = My.Settings.SuperuserMode
         Me.CheckBoxShowCoreModelElements.Visible = My.Settings.SuperuserMode
 
+        'ThemeManager.InitializeThemes()
+        'ThemeManager.ApplyTheme(Me, piGlobalTheme)
+
     End Sub
 
     Private Sub frm_model_dictionary_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language)
         Else
             Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel)
@@ -70,7 +74,7 @@ Public Class frmToolboxModelDictionary
     Public Sub LoadToolboxModelDictionary(ByVal ailanguage As pcenumLanguage, Optional ByVal abForceReload As Boolean = False)
 
         Try
-            If IsSomething(Me.zrLoadedModel) And Not abForceReload Then
+            If Me.zrLoadedModel IsNot Nothing And Not abForceReload Then
                 If prApplication.WorkingPage Is Nothing Then Exit Sub
                 If (Me.zrLoadedModel Is Me.zrORMModel) And (prApplication.WorkingPage.Language = Me.ziLoadedLanguage) Then
                     Exit Sub
@@ -80,11 +84,11 @@ Public Class frmToolboxModelDictionary
             Me.TreeView1.Nodes.Clear()
             Me.Refresh()
 
-            If IsSomething(prApplication.WorkingModel) Then
+            If prApplication.WorkingModel IsNot Nothing Then
                 Me.zrORMModel = prApplication.WorkingModel
             End If
 
-            If IsSomething(Me.zrORMModel) Then
+            If Me.zrORMModel IsNot Nothing Then
                 Me.LabelModelName.Text = Me.zrORMModel.Name
             End If
 
@@ -138,11 +142,19 @@ Public Class frmToolboxModelDictionary
 
             prApplication.WorkingModel.RDS.Table.Sort(AddressOf RDS.Table.CompareName)
 
+            Dim larSearchString() As String = {}
+            If asSearchString IsNot Nothing Then
+                larSearchString = asSearchString.Split(" ")
+            End If
+
             Dim larTable As List(Of RDS.Table)
             If asSearchString Is Nothing Then
                 larTable = prApplication.WorkingModel.RDS.Table
             Else
-                larTable = prApplication.WorkingModel.RDS.Table.FindAll(Function(x) x.Name.LCase.StartsWith(asSearchString.LCase) Or x.Name.LCase.Contains(asSearchString.LCase))
+                'larTable = prApplication.WorkingModel.RDS.Table.FindAll(Function(x) x.Name.LCase.StartsWith(asSearchString.LCase) Or x.Name.LCase.Contains(asSearchString.LCase))
+                larTable = prApplication.WorkingModel.RDS.Table.FindAll(Function(x) _
+                                                                          larSearchString.Any(Function(s) x.Name.StartsWith(s)) Or
+                                                                          x.Name.StartsWith(asSearchString) Or x.Name.Contains(asSearchString))
             End If
 
             'Display ModelElementCount
@@ -151,7 +163,7 @@ Public Class frmToolboxModelDictionary
             Dim loColumnNode As New TreeNode
             For Each lrEntity In larTable
                 'loNode = New TreeNode
-                loNode = Me.TreeView1.Nodes("Entity").Nodes.Add("Entity" & lrEntity.Name, lrEntity.Name, 0, 0)
+                loNode = Me.TreeView1.Nodes("Entity").Nodes.Add("Entity" & lrEntity.Name, lrEntity.Name, 33, 33)
                 loNode.Tag = lrEntity
 
                 For Each lrColumn In lrEntity.Column
@@ -170,7 +182,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -181,7 +193,7 @@ Public Class frmToolboxModelDictionary
         Dim loSubNode As TreeNode
 
         Try
-            Dim lsSearchString = LCase(asSearchString)
+            Dim lsSearchString = asSearchString
 
             loNode = Me.TreeView1.Nodes.Add("ObjectType", "Object Type", 0, 0)
             loNode.Tag = New tEnterpriseEnterpriseView(pcenumMenuType.modelORMModel, Nothing)
@@ -213,8 +225,17 @@ Public Class frmToolboxModelDictionary
             Dim larEntityType As New List(Of FBM.EntityType)
             Call prApplication.WorkingModel.EntityType.Sort(AddressOf FBM.EntityType.CompareEntityTypeNames)
 
+
+            Dim larSearchString() As String = {}
+            If lsSearchString IsNot Nothing Then
+                larSearchString = lsSearchString.Split(" ")
+            End If
+
             If asSearchString IsNot Nothing Then
-                larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
+                'larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
+                larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) _
+                                                                          larSearchString.Any(Function(s) x.Id.StartsWith(s)) Or
+                                                                          x.Id.StartsWith(lsSearchString) Or x.Id.Contains(lsSearchString))
             ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larEntityType = prApplication.WorkingModel.EntityType.FindAll(Function(x) Not x.IsObjectifyingEntityType)
             Else
@@ -228,13 +249,18 @@ Public Class frmToolboxModelDictionary
                     loNode = Me.TreeView1.Nodes("ObjectType").Nodes.Add("EntityType" & lrEntityType.Name, lrEntityType.Name, 0, 0)
                 End If
                 loNode.Tag = lrEntityType
+                loNode.ForeColor = Color.SteelBlue
+                loNode.NodeFont = New Font(loNode.TreeView.Font, FontStyle.Bold)
             Next
 
             Dim lrValueType As New FBM.ValueType
             Dim larValueType As New List(Of FBM.ValueType)
             Call prApplication.WorkingModel.ValueType.Sort(AddressOf FBM.ValueType.CompareValueTypeNames)
             If asSearchString IsNot Nothing Then
-                larValueType = prApplication.WorkingModel.ValueType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
+                'larValueType = prApplication.WorkingModel.ValueType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
+                larValueType = prApplication.WorkingModel.ValueType.FindAll(Function(x) _
+                                                                          larSearchString.Any(Function(s) x.Id.StartsWith(s)) Or
+                                                                          x.Id.StartsWith(lsSearchString) Or x.Id.Contains(lsSearchString))
             ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larValueType = prApplication.WorkingModel.ValueType
             Else
@@ -244,13 +270,17 @@ Public Class frmToolboxModelDictionary
                 loNode = New TreeNode
                 loNode = Me.TreeView1.Nodes("ObjectType").Nodes.Add("ValueType" & lrValueType.Name, lrValueType.Name, 1, 1)
                 loNode.Tag = lrValueType
+                loNode.ForeColor = Color.SeaGreen
             Next
 
             Dim larFactType As New List(Of FBM.FactType)
             Dim lrFactType As New FBM.FactType
             Call prApplication.WorkingModel.FactType.Sort(AddressOf FBM.FactType.CompareFactTypeNames)
             If asSearchString IsNot Nothing Then
-                larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
+                'larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
+                larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) _
+                                                                          larSearchString.Any(Function(s) x.Id.StartsWith(s)) Or
+                                                                          x.Id.StartsWith(lsSearchString) Or x.Id.Contains(lsSearchString))
             ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larFactType = prApplication.WorkingModel.FactType.FindAll(Function(x) x.IsLinkFactType = False)
             Else
@@ -275,8 +305,10 @@ Public Class frmToolboxModelDictionary
                 Else
                     loNode = New TreeNode
                     If lrFactType.IsSubtypeRelationshipFactType Then
+                        'Subtype Relationship
                         loNode = Me.TreeView1.Nodes("FactType").Nodes.Add("FactType" & lrFactType.Name, lrFactType.Name, 17, 17)
                     ElseIf lrFactType.Arity = 1 Then
+                        'Unary Fact Type
                         If lrFactType.IsDerived Then
                             loNode = Me.TreeView1.Nodes("FactType").Nodes.Add("FactType" & lrFactType.Name, lrFactType.Name, 19, 19)
                         Else
@@ -287,6 +319,11 @@ Public Class frmToolboxModelDictionary
                             loNode = Me.TreeView1.Nodes("FactType").Nodes.Add("FactType" & lrFactType.Name, lrFactType.Name, 18, 18)
                         Else
                             loNode = Me.TreeView1.Nodes("FactType").Nodes.Add("FactType" & lrFactType.Name, lrFactType.Name, 2, 2)
+
+                            If lrFactType.getLinkFactTypes.Count > 0 Then
+                                Dim loNode1 = loNode.Nodes.Add("LinkFactTypes" & lrFactType.Name, "Implied Fact Types")
+                                loNode1.Tag = "LinkFactTypesHolderNode"
+                            End If
                         End If
                     End If
                     loNode.Tag = lrFactType
@@ -300,6 +337,10 @@ Public Class frmToolboxModelDictionary
                 If Me.TreeView1.Nodes("ObjectType").Nodes.Find("LinkFactTypes" & lrObjectifiedFactType.Id, True).Count > 0 Then
                     loNode = Me.TreeView1.Nodes("ObjectType").Nodes.Find("LinkFactTypes" & lrObjectifiedFactType.Id, True)(0).Nodes.Add("FactType" & lrFactType.Name, lrFactType.Name, 2, 2)
                     loNode.Tag = lrFactType
+                ElseIf Me.TreeView1.Nodes("FactType").Nodes.Find("LinkFactTypes" & lrObjectifiedFactType.Id, True).Count > 0 Then
+                    'FactType is not really Objectified, but none-the-less has Link Fact Types (E.g. Has multi-role Internal Uniqueness Constraint).
+                    loNode = Me.TreeView1.Nodes("FactType").Nodes.Find("LinkFactTypes" & lrObjectifiedFactType.Id, True)(0).Nodes.Add("FactType" & lrFactType.Name, lrFactType.Name, 2, 2)
+                    loNode.Tag = lrFactType
                 End If
             Next
 
@@ -307,7 +348,10 @@ Public Class frmToolboxModelDictionary
             Dim larRoleConstraint As New List(Of FBM.RoleConstraint)
             Dim liImageIndex As Integer = 0
             If asSearchString IsNot Nothing Then
-                larRoleConstraint = prApplication.WorkingModel.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
+                'larRoleConstraint = prApplication.WorkingModel.RoleConstraint.FindAll(Function(x) x.Id.StartsWith(lsSearchString) Or x.Id.LCase.Contains(lsSearchString))
+                larRoleConstraint = prApplication.WorkingModel.RoleConstraint.FindAll(Function(x) _
+                                                                                          larSearchString.Any(Function(s) x.Id.StartsWith(s)) Or
+                                                                                          x.Id.StartsWith(lsSearchString) Or x.Id.Contains(lsSearchString))
             ElseIf Me.CheckBoxShowCoreModelElements.Checked Then
                 larRoleConstraint = prApplication.WorkingModel.RoleConstraint
             Else
@@ -388,7 +432,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -451,7 +495,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -473,11 +517,19 @@ Public Class frmToolboxModelDictionary
 
             prApplication.WorkingModel.RDS.Table.Sort(AddressOf RDS.Table.CompareName)
 
+            Dim larSearchString() As String = {}
+            If asSearchString IsNot Nothing Then
+                larSearchString = asSearchString.Split(" ")
+            End If
+
             Dim larTable As List(Of RDS.Table)
             If asSearchString Is Nothing Then
                 larTable = prApplication.WorkingModel.RDS.Table
             Else
-                larTable = prApplication.WorkingModel.RDS.Table.FindAll(Function(x) x.Name.LCase.StartsWith(asSearchString.LCase) Or x.Name.LCase.Contains(asSearchString.LCase))
+                'larTable = prApplication.WorkingModel.RDS.Table.FindAll(Function(x) x.Name.LCase.StartsWith(asSearchString.LCase) Or x.Name.LCase.Contains(asSearchString.LCase))
+                larTable = prApplication.WorkingModel.RDS.Table.FindAll(Function(x) _
+                                                                          larSearchString.Any(Function(s) x.Name.StartsWith(s)) Or
+                                                                          x.Name.StartsWith(asSearchString) Or x.Name.Contains(asSearchString))
             End If
 
             'Display ModelElementCount
@@ -510,7 +562,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -545,7 +597,7 @@ Public Class frmToolboxModelDictionary
                     '--------------------------------------------
                     'Show the Descriptions for the ModelElement
                     '--------------------------------------------
-                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                    If lrModelElementDescriptionsEditor IsNot Nothing Then
                         Call lrModelElementDescriptionsEditor.setDescriptions(lrModelElement)
                     End If
                 Case Is = GetType(FBM.ValueType).ToString
@@ -559,14 +611,14 @@ Public Class frmToolboxModelDictionary
                     '--------------------------------------------------------------
                     'Show the Verbalisation if the Verbalisation Toolbox is open.
                     '--------------------------------------------------------------
-                    If IsSomething(lrORMToolboxVerbalisation) Then
+                    If lrORMToolboxVerbalisation IsNot Nothing Then
                         lrORMToolboxVerbalisation.VerbaliseValueType(lrDiagramElement)
                     End If
 
                     '--------------------------------------------
                     'Show the Descriptions for the ModelElement
                     '--------------------------------------------
-                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                    If lrModelElementDescriptionsEditor IsNot Nothing Then
                         Call lrModelElementDescriptionsEditor.setDescriptions(lrDiagramElement)
                     End If
 #End Region
@@ -581,14 +633,14 @@ Public Class frmToolboxModelDictionary
                     '--------------------------------------------------------------
                     'Show the Verbalisation if the Verbalisation Toolbox is open.
                     '--------------------------------------------------------------
-                    If IsSomething(lrORMToolboxVerbalisation) Then
+                    If lrORMToolboxVerbalisation IsNot Nothing Then
                         lrORMToolboxVerbalisation.VerbaliseEntityType(lrDiagramElement)
                     End If
 
                     '--------------------------------------------
                     'Show the Descriptions for the ModelElement
                     '--------------------------------------------
-                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                    If lrModelElementDescriptionsEditor IsNot Nothing Then
                         Call lrModelElementDescriptionsEditor.setDescriptions(lrDiagramElement)
                     End If
 #End Region
@@ -597,7 +649,7 @@ Public Class frmToolboxModelDictionary
                     '--------------------------------------------------------------
                     'Show the Verbalisation if the Verbalisation Toolbox is open.
                     '--------------------------------------------------------------
-                    If IsSomething(lrORMToolboxVerbalisation) Then
+                    If lrORMToolboxVerbalisation IsNot Nothing Then
                         lrORMToolboxVerbalisation.VerbaliseFactType(lrDiagramElement)
                     End If
                     If prApplication.WorkingPage IsNot Nothing Then
@@ -628,7 +680,7 @@ Public Class frmToolboxModelDictionary
                     Dim lrORMReadingEditor As frmToolboxORMReadingEditor
                     lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                    If IsSomething(lrORMReadingEditor) Then
+                    If lrORMReadingEditor IsNot Nothing Then
                         Dim lrFactType As FBM.FactType
                         lrFactType = lrDiagramElement
                         If prApplication.WorkingPage IsNot Nothing Then
@@ -645,16 +697,16 @@ Public Class frmToolboxModelDictionary
                     '--------------------------------------------
                     'Show the Descriptions for the ModelElement
                     '--------------------------------------------
-                    If IsSomething(lrModelElementDescriptionsEditor) Then
+                    If lrModelElementDescriptionsEditor IsNot Nothing Then
                         Call lrModelElementDescriptionsEditor.setDescriptions(lrDiagramElement)
                     End If
 
 #End Region
                 Case Is = GetType(RDS.Column).ToString
-
+#Region "Column"
                     Dim lrColumn As RDS.Column = lrDiagramElement
 
-                    If IsSomething(lrORMToolboxVerbalisation) Then
+                    If lrORMToolboxVerbalisation IsNot Nothing Then
                         lrORMToolboxVerbalisation.VerbaliseColumn(lrColumn)
                     End If
 
@@ -663,7 +715,7 @@ Public Class frmToolboxModelDictionary
                         Dim lrORMReadingEditor As frmToolboxORMReadingEditor
                         lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                        If IsSomething(lrORMReadingEditor) Then
+                        If lrORMReadingEditor IsNot Nothing Then
                             Dim lrFactType As FBM.FactType
                             lrFactType = lrColumn.FactType
                             If prApplication.WorkingPage IsNot Nothing Then
@@ -677,9 +729,9 @@ Public Class frmToolboxModelDictionary
                             End If
                         End If
                     End If
-
+#End Region
                 Case Is = GetType(RDS.Table).ToString
-                    If IsSomething(lrORMToolboxVerbalisation) Then
+                    If lrORMToolboxVerbalisation IsNot Nothing Then
                         lrORMToolboxVerbalisation.VerbaliseTable(lrDiagramElement)
                     End If
                 Case Is = GetType(FBM.RoleConstraint).ToString
@@ -688,6 +740,24 @@ Public Class frmToolboxModelDictionary
                         Select Case lrRoleConstraint.RoleConstraintType
                             Case = pcenumRoleConstraintType.InternalUniquenessConstraint
                                 lrORMToolboxVerbalisation.VerbaliseRoleConstraintInternalUniquenessConstraint(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.ExternalUniquenessConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintUniquenessConstraint(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.SubsetConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintSubset(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.EqualityConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintEqualityConstraint(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.ExclusionConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintExclusionConstraint(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintExternalFrequencyConstraint(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintFrequencyConstraint(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.InclusiveORConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintInclusiveORConstraint(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.RingConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintRingConstraint(lrDiagramElement)
+                            Case Is = pcenumRoleConstraintType.ValueComparisonConstraint
+                                lrORMToolboxVerbalisation.VerbaliseRoleConstraintValueComparisonConstraint(lrDiagramElement)
                             Case Else
                                 'not implemented
                         End Select
@@ -698,7 +768,7 @@ Public Class frmToolboxModelDictionary
             'PropertyGrid
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
 
                 Dim myHiddenMiscAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
 
@@ -734,7 +804,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -746,6 +816,8 @@ Public Class frmToolboxModelDictionary
         '    DoDragDrop(e.Item, DragDropEffects.Move)
         'ElseIf e.Button = Windows.Forms.MouseButtons.Left Then        
         'End If
+
+        Me.TreeView1.AllowDrop = True
 
         If My.Settings.UseClientServer Then
             If Not prApplication.User.ProjectPermission.FindAll(Function(x) x.Permission = pcenumPermission.Alter).Count > 0 Then
@@ -768,7 +840,7 @@ Public Class frmToolboxModelDictionary
         Try
             Dim loModelObject As Object = Nothing
 
-            If IsSomething(Me.TreeView1.GetNodeAt(e.Location)) Then
+            If Me.TreeView1.GetNodeAt(e.Location) IsNot Nothing Then
                 Me.TreeView1.SelectedNode = Me.TreeView1.GetNodeAt(e.Location)
             End If
 
@@ -777,16 +849,24 @@ Public Class frmToolboxModelDictionary
                 'Select the node under the Mouse
                 '---------------------------------
                 Me.TreeView1.SelectedNode = Me.TreeView1.GetNodeAt(e.Location)
-                If IsSomething(Me.TreeView1.SelectedNode) Then
+                If Me.TreeView1.SelectedNode IsNot Nothing Then
                     If TypeOf (Me.TreeView1.SelectedNode.Tag) Is tEnterpriseEnterpriseView Then
-                        '------------
-                        'Do nothing
-                        '------------
-                        Me.TreeView1.ContextMenuStrip = Nothing
+
+                        Dim lrEnterpriseView As tEnterpriseEnterpriseView = Me.TreeView1.SelectedNode.Tag
+
+                        If lrEnterpriseView.MenuType = pcenumMenuType.pageERD And My.Settings.ERDAllowAddEntityTableForm Then
+                            Me.TreeView1.ContextMenuStrip = Me.ContextMenuEntity
+                        Else
+                            '------------
+                            'Do nothing
+                            '------------
+                            Me.TreeView1.ContextMenuStrip = Nothing
+                        End If
+
                     Else
                         loModelObject = Me.TreeView1.SelectedNode.Tag
                         Me.ToolStripMenuItemViewOnPage.DropDownItems.Clear()
-                        If IsSomething(loModelObject) Then
+                        If loModelObject IsNot Nothing Then
                             '-----------------------------------------------
                             'Establish the ContextMenu for the SelectedNode
                             '-----------------------------------------------
@@ -807,6 +887,10 @@ Public Class frmToolboxModelDictionary
                                     Call LoadPagesForRoleConstraint(Me.ToolStripMenuItemViewOnPage, loModelObject.Id)
                                 Case Is = GetType(RDS.Table)
                                     Dim lrTable As RDS.Table = loModelObject
+
+                                    'CodeSafe
+                                    If lrTable.FBMModelElement Is Nothing Then Exit Select
+
                                     Select Case lrTable.FBMModelElement.GetType
                                         Case Is = GetType(FBM.EntityType)
                                             Call LoadPagesForEntityType(Me.ToolStripMenuItemViewOnPage, lrTable.Name)
@@ -838,7 +922,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -877,29 +961,29 @@ Public Class frmToolboxModelDictionary
             larPage.AddRange(larORMPage.ToList)
             larPage.AddRange(larERDPage.ToList)
 
-            If IsSomething(larPage) Then
+            If larPage IsNot Nothing Then
                 For Each lrPage In larPage
 
                     Dim loToolStripMenuItem As ToolStripMenuItem
-                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                    Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                lrPage,
                                                                lrPage.Model.ModelId,
                                                                lrPage.Language,
                                                                Nothing, lrPage.PageId)
 
 
-                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
 
-                    If IsSomething(lr_enterprise_view) Then
+                    If lrEnterpriseView IsNot Nothing Then
                         '---------------------------------------------------
                         'Add the Page(Name) to the MenuOption.DropDownItems
                         '---------------------------------------------------
-                        lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asEntityTypeId)
+                        lrEnterpriseView.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asEntityTypeId)
 
                         loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                        loToolStripMenuItem.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                        loToolStripMenuItem.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
                         AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
                         aoMenuStripItem.Enabled = True
                         Select Case lrPage.Language
@@ -925,7 +1009,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
         End Try
 
     End Sub
@@ -933,16 +1017,16 @@ Public Class frmToolboxModelDictionary
     Sub OpenORMDiagram(ByVal sender As Object, ByVal e As EventArgs)
 
         Try
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
             Dim item As ToolStripItem = CType(sender, ToolStripItem)
 
             '---------------------------------------------------------------------------
             'Find and select the TreeViewNode in the EnterpriseTreeViewer for the Page
             '---------------------------------------------------------------------------
-            lr_enterprise_view = item.Tag
-            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
+            lrEnterpriseView = item.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
             prApplication.WorkingPage = New FBM.Page
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+            prApplication.WorkingPage = lrEnterpriseView.Tag
             Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
 
         Catch ex As Exception
@@ -951,7 +1035,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -978,22 +1062,22 @@ Public Class frmToolboxModelDictionary
                           Select Page Distinct
                           Order By Page.Name
 
-            If IsSomething(larPage) Then
+            If larPage IsNot Nothing Then
                 For Each lrPage In larPage
 
                     Dim loToolStripMenuItem As ToolStripMenuItem
-                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                    Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                lrPage,
                                                                lrPage.Model.ModelId,
                                                                pcenumLanguage.ORMModel,
                                                                Nothing, lrPage.PageId)
 
-                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                    lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asValueTypeId)
+                    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    lrEnterpriseView.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asValueTypeId)
                     loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                    loToolStripMenuItem.Tag = lr_enterprise_view
+                    loToolStripMenuItem.Tag = lrEnterpriseView
 
                     AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
                 Next
@@ -1009,7 +1093,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
         End Try
 
     End Sub
@@ -1035,22 +1119,22 @@ Public Class frmToolboxModelDictionary
                           Select Page Distinct
                           Order By Page.Name
 
-            If IsSomething(larPage) Then
+            If larPage IsNot Nothing Then
                 For Each lrPage In larPage
 
                     Dim loToolStripMenuItem As ToolStripMenuItem
-                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                    Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                lrPage,
                                                                lrPage.Model.ModelId,
                                                                pcenumLanguage.ORMModel,
                                                                Nothing, lrPage.PageId)
 
-                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                    lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asFactTypeId)
+                    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    lrEnterpriseView.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asFactTypeId)
                     loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                    loToolStripMenuItem.Tag = lr_enterprise_view
+                    loToolStripMenuItem.Tag = lrEnterpriseView
 
                     AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
                 Next
@@ -1066,7 +1150,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1093,25 +1177,25 @@ Public Class frmToolboxModelDictionary
                           Select Page Distinct
                           Order By Page.Name
 
-            If IsSomething(larPage) Then
+            If larPage IsNot Nothing Then
                 For Each lrPage In larPage
 
                     Dim loToolStripMenuItem As ToolStripMenuItem
 
 
-                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                    Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                lrPage,
                                                                lrPage.Model.ModelId,
                                                                lrPage.Language,
                                                                Nothing, lrPage.PageId)
 
-                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
 
-                    If lr_enterprise_view IsNot Nothing Then
-                        lr_enterprise_view.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asRoleConstraintId)
+                    If lrEnterpriseView IsNot Nothing Then
+                        lrEnterpriseView.FocusModelElement = prApplication.WorkingModel.GetModelObjectByName(asRoleConstraintId)
                         loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                        loToolStripMenuItem.Tag = lr_enterprise_view
+                        loToolStripMenuItem.Tag = lrEnterpriseView
 
                         AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
                     End If
@@ -1128,7 +1212,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1147,6 +1231,14 @@ Public Class frmToolboxModelDictionary
                     lrModelObject = Me.TreeView1.SelectedNode.Tag
             End Select
 
+            'CodeSafe
+            If lrModelObject Is Nothing Then
+                If Me.TreeView1.SelectedNode IsNot Nothing Then
+                    Me.TreeView1.SelectedNode.Remove()
+                End If
+                Exit Sub
+            End If
+
 
             lsMessage = "The " & lrModelObject.ConceptType.ToString & ", '" & lrModelObject.Name & "', will be removed from the Model and all Pages."
             lsMessage &= vbCrLf & vbCrLf
@@ -1161,7 +1253,7 @@ Public Class frmToolboxModelDictionary
                     '  the whole tree will be refreshed in this form, so no TreeNode will be selected.
                     '  i.e. The node that would otherwise need to be removed, is likely already removed by the refresh.
                     '----------------------------------------------------------------------------------------------------
-                    If IsSomething(Me.TreeView1.SelectedNode) Then
+                    If Me.TreeView1.SelectedNode IsNot Nothing Then
                         Me.TreeView1.SelectedNode.Remove()
                     End If
 
@@ -1186,13 +1278,13 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
 
     End Sub
 
-    Private Sub LabelModelName_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles LabelModelName.DoubleClick
+    Private Sub LabelModelName_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles LabelModelName.Click
 
         MsgBox("ModelId: " & Me.zrORMModel.ModelId)
 
@@ -1209,16 +1301,22 @@ Public Class frmToolboxModelDictionary
                           GetType(FBM.ValueType),
                           GetType(FBM.FactType)
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
+                    Me.ToolStripMenuItemCopyModelElement.Enabled = True
                 Case Is = GetType(RDS.Column)
                     Me.ViewInGlossaryToolStripMenuItem.Enabled = False
                     Me.ToolStripMenuItemMakeNewPageForThisModelElement.Enabled = False
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
+                    Me.ToolStripMenuItemCopyModelElement.Enabled = False
                 Case Is = GetType(RDS.Table)
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
                     Me.ToolStripMenuItemRemoveFromModel.Enabled = True
                     Me.ToolStripMenuItemViewOnPage.Enabled = True
+                    Me.ToolStripMenuItemCopyModelElement.Enabled = False
+                    Me.ToolStripMenuItemEditEntity.Enabled = My.Settings.ERDAllowAddEntityTableForm
+                    Me.ToolStripMenuItemViewInDiagramSpy.Enabled = True
                 Case Else
                     Me.ToolStripMenuItemViewInDiagramSpy.Enabled = False
+                    Me.ToolStripMenuItemCopyModelElement.Enabled = False
 
             End Select
 
@@ -1232,7 +1330,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1240,7 +1338,7 @@ Public Class frmToolboxModelDictionary
     Private Sub zrORMModel_MadeDirty(ByVal abGlobalBroadcast As Boolean) Handles zrORMModel.MadeDirty
 
         If abGlobalBroadcast Then
-            If IsSomething(prApplication.WorkingPage) Then
+            If prApplication.WorkingPage IsNot Nothing Then
                 Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
             Else
                 Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel, True)
@@ -1251,7 +1349,7 @@ Public Class frmToolboxModelDictionary
 
     Private Sub zrORMModel_StructureModified() Handles zrORMModel.StructureModified
 
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
         Else
             Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel, True)
@@ -1276,18 +1374,44 @@ Public Class frmToolboxModelDictionary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
 
     Public Sub FindTreeNode(ByVal asSearchString As String)
 
-        For Each lrTreeNode In Me.TreeView1.Nodes
-            If Me.FindTreeNodeRecursive(lrTreeNode, asSearchString) Then
-                Exit For
+        Try
+            If Me.zrLoadedModel IsNot Nothing Then
+                Dim lrModelElement As FBM.ModelObject = Me.zrLoadedModel.GetModelObjectByName(asSearchString)
+
+                If lrModelElement IsNot Nothing Then
+
+                    Select Case lrModelElement.GetType
+                        Case Is = GetType(FBM.FactType)
+                            Me.ComboBoxView.SelectedIndex = 0
+                            Call Me.LoadORMModelDictionary(asSearchString)
+                            Call Me.LoadTree(asSearchString)
+                    End Select
+                End If
             End If
-        Next
+
+            Me.SearchTextbox.TextBox.Text = asSearchString.Trim
+
+            For Each lrTreeNode In Me.TreeView1.Nodes
+                If Me.FindTreeNodeRecursive(lrTreeNode, asSearchString) Then
+                    Exit For
+                End If
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1313,7 +1437,7 @@ Public Class frmToolboxModelDictionary
 
     Private Sub CheckBoxShowCoreModelElements_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxShowCoreModelElements.CheckedChanged
 
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
         Else
             Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel)
@@ -1323,7 +1447,7 @@ Public Class frmToolboxModelDictionary
 
     Private Sub CheckBoxShowModelDictionary_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxShowModelDictionary.CheckedChanged
 
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             Call Me.LoadToolboxModelDictionary(prApplication.WorkingPage.Language, True)
         Else
             Call Me.LoadToolboxModelDictionary(pcenumLanguage.ORMModel)
@@ -1356,7 +1480,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1373,7 +1497,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1386,9 +1510,12 @@ Public Class frmToolboxModelDictionary
             Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrLoadedModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
 
             Dim lrModelObject As FBM.ModelObject = Nothing
+            Dim lrTable As RDS.Table = Nothing
 
             Try
                 Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                    Case Is = GetType(RDS.Table)
+                        lrTable = Me.TreeView1.SelectedNode.Tag
                     Case Is = GetType(RDS.Column)
                         Dim lrColumn As RDS.Column = Me.TreeView1.SelectedNode.Tag
                         lrModelObject = lrColumn.FactType
@@ -1400,7 +1527,13 @@ Public Class frmToolboxModelDictionary
                     prApplication.ActivePages.Find(Function(x) x.Tag.GetType Is GetType(FBM.DiagramSpyPage)).Close()
                 End If
 
-                Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelObject)
+                Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                    Case Is = GetType(RDS.Table)
+                        Call frmMain.LoadERDDiagramSpy(lrTable)
+                    Case Else
+                        Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelObject)
+                End Select
+
             Catch ex As Exception
 
             End Try
@@ -1412,7 +1545,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1498,7 +1631,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1552,7 +1685,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1584,7 +1717,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1617,7 +1750,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 
@@ -1638,7 +1771,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1680,7 +1813,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1711,7 +1844,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1727,7 +1860,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1755,7 +1888,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1783,7 +1916,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1799,7 +1932,7 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1830,8 +1963,191 @@ Public Class frmToolboxModelDictionary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
+
+    Private Sub CopyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCopyModelElement.Click
+
+        Try
+            Dim lrModelElement As FBM.ModelObject = Nothing
+
+            If Me.zrLoadedModel Is Nothing Then Me.zrLoadedModel = Me.zrORMModel
+
+            lrModelElement = Me.zrLoadedModel.GetModelObjectByName(Me.TreeView1.SelectedNode.Tag.Id)
+
+            Dim lrCopyFromPage As New FBM.Page(lrModelElement.Model, "CopyFromPage", "CopyFromPage", pcenumLanguage.ORMModel)
+
+#Region "Add to Page and Copy to Clipboard"
+            lrCopyFromPage.SelectedObject.Clear()
+            Select Case lrModelElement.GetType
+
+                Case Is = GetType(FBM.ValueType)
+                    Dim lrValueTypeInstance = CType(lrModelElement, FBM.ValueType).CloneInstance(lrCopyFromPage, True, True)
+                    lrCopyFromPage.SelectedObject.Add(lrValueTypeInstance)
+
+                Case Is = GetType(FBM.EntityType)
+                    Dim lrEntityTypeInstance = CType(lrModelElement, FBM.EntityType).CloneInstance(lrCopyFromPage, True, True, False)
+                    lrCopyFromPage.SelectedObject.Add(lrEntityTypeInstance)
+
+                Case Is = GetType(FBM.FactType)
+                    Dim lrFactTypeInstance = CType(lrModelElement, FBM.FactType).CloneInstance(lrCopyFromPage, True)
+                    lrCopyFromPage.SelectedObject.Add(lrFactTypeInstance)
+
+            End Select
+
+            Call frmMain.CopySelectedObjectsToClipboard(lrCopyFromPage)
+#End Region
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemAddEntityTable_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemAddEntityTable.Click
+
+        Try
+            Dim lrTable As RDS.Table = Me.TreeView1.SelectedNode.Tag
+
+            Dim lfrmCRUDAddEditEntityTableForm = frmMain.LoadCRUDERDAddEditEntityTableForm(Me.zrORMModel)
+
+            lfrmCRUDAddEditEntityTableForm.mrRDSTable = lrTable
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub EditEntityToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemEditEntity.Click
+
+
+        Try
+            'CodeSafe
+            If TypeOf Me.TreeView1.SelectedNode.Tag IsNot RDS.Table Then Exit Sub
+
+            Dim lrTable As RDS.Table = Me.TreeView1.SelectedNode.Tag
+
+            Dim lfrmCRUDAddEditEntityTableForm = frmMain.LoadCRUDERDAddEditEntityTableForm(Me.zrORMModel, lrTable)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ComboBoxView_DrawItem(sender As Object, e As DrawItemEventArgs) Handles ComboBoxView.DrawItem
+        ' Set the item height
+        Me.ComboBoxView.ItemHeight = 20
+
+        ' Determine if the item is selected or hovered
+        Dim isHovered As Boolean = (e.State And DrawItemState.HotLight) = DrawItemState.HotLight
+        Dim isSelected As Boolean = (e.State And DrawItemState.Selected) = DrawItemState.Selected
+
+        ' Set the background color based on the state
+        If isSelected Then
+            e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(224, 243, 255)), e.Bounds)
+        ElseIf isHovered Then
+            ' Use a light pastel blue color when hovering over an item
+            e.Graphics.FillRectangle(New SolidBrush(Color.FromArgb(173, 216, 230)), e.Bounds)
+        Else
+            e.Graphics.FillRectangle(SystemBrushes.Window, e.Bounds)
+        End If
+
+        ' Draw the focus rectangle
+        e.DrawFocusRectangle()
+
+        ' Check if the item index is valid
+        If e.Index >= 0 Then
+            Dim liImageIndex As Integer = 1
+
+            ' Select the image index based on the item index
+            Select Case e.Index
+                Case 0
+                    liImageIndex = 31
+                Case 1
+                    liImageIndex = 12
+                Case 2
+                    liImageIndex = 30
+                Case 3
+                    liImageIndex = 32
+            End Select
+
+            ' Draw the image from the ImageList
+            Dim image As Image = Me.ImageList.Images(liImageIndex)
+            ' Calculate image location
+            Dim imageLocation As New Point(e.Bounds.Left + 2, e.Bounds.Top + (e.Bounds.Height - image.Height) / 2)
+            e.Graphics.DrawImage(image, imageLocation)
+
+            ' Draw the text
+            Dim textLocation As New Point(imageLocation.X + image.Width + 5, e.Bounds.Top - 2 + (e.Bounds.Height - TextRenderer.MeasureText(ComboBoxView.Items(e.Index).ToString(), e.Font).Height) / 2)
+            e.Graphics.DrawString(ComboBoxView.Items(e.Index).ToString(), e.Font, Brushes.Black, textLocation)
+        End If
+    End Sub
+
+    Private Sub DynamicDataEntryFormToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DynamicDataEntryFormToolStripMenuItem.Click
+
+        Try
+            Dim lrTable As RDS.Table
+
+            Select Case Me.TreeView1.SelectedNode.Tag.GetType
+                Case Is = GetType(RDS.Table)
+
+                    lrTable = Me.TreeView1.SelectedNode.Tag
+                    Call prApplication.MainForm.LoadDynamicCRUDForm(lrTable, Nothing)
+
+                Case Is = GetType(FBM.EntityType)
+
+                    Dim lrEntityType As FBM.EntityType = Me.TreeView1.SelectedNode.Tag
+                    lrTable = lrEntityType.getCorrespondingRDSTable
+
+                    Call prApplication.MainForm.LoadDynamicCRUDForm(lrTable, Nothing)
+
+                Case Is = GetType(FBM.FactType)
+
+                    Dim lrFactType As FBM.FactType = Me.TreeView1.SelectedNode.Tag
+
+                    If lrFactType.IsObjectified Then
+                        lrTable = lrFactType.getCorrespondingRDSTable
+
+                        Call prApplication.MainForm.LoadDynamicCRUDForm(lrTable, Nothing)
+                    End If
+
+                Case Is = GetType(PGS.Node)
+
+                    Debugger.Break()
+
+                Case Else
+                    Exit Sub
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
 End Class

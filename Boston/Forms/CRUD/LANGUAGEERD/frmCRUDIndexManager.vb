@@ -91,24 +91,34 @@ Public Class frmCRUDIndexManager
 
     Public Sub SetupForm()
 
-        Me.LabelPromptTableNodeTypeName.Text = Me.mrTable.Name
-        Me.LabelPromotModelName.Text = Me.mrTable.Model.Model.Name
+        Try
+            Me.LabelPromptTableNodeTypeName.Text = Me.mrTable.Name
+            Me.LabelPromotModelName.Text = Me.mrTable.Model.Model.Name
 
-        'Used for applying back to the mrTable, and populating Index and Column DataGridViews.
-        Me.mrApplyTable = Me.mrTable.Clone()
+            'Used for applying back to the mrTable, and populating Index and Column DataGridViews.
+            Me.mrApplyTable = Me.mrTable.Clone(True)
 
-        Call Me.DataGridViewIndexes.Columns.Add("Index", "Index")
+            Call Me.DataGridViewIndexes.Columns.Add("Index", "Index")
 
-        Dim loColumn As New DataGridViewComboBoxColumn()
-        loColumn.Name = "Type"
-        loColumn.DataSource = [Enum].GetValues(GetType(IndexType))
-        loColumn.ValueType = GetType(Object) 'GetType(IndexType)
+            Dim loColumn As New DataGridViewComboBoxColumn()
+            loColumn.Name = "Type"
+            loColumn.DataSource = [Enum].GetValues(GetType(IndexType))
+            loColumn.ValueType = GetType(Object) 'GetType(IndexType)
 
-        Call Me.DataGridViewIndexes.Columns.Add(loColumn)
+            Call Me.DataGridViewIndexes.Columns.Add(loColumn)
 
-        Call Me.LoadIndexes()
+            Call Me.LoadIndexes()
 
-        Call Me.LoadColumns()
+            Call Me.LoadColumns()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -127,7 +137,14 @@ Public Class frmCRUDIndexManager
                 lbPartOfSelectedIndex = False
 
                 If Me.DataGridViewIndexes.Rows.Count > 0 Then
-                    If CType(Me.DataGridViewIndexes.Rows(0).Tag, RDS.Index).Column.Find(Function(x) x.Id = lrColumn.Id) IsNot Nothing Then
+
+                    Dim lrIndex = CType(Me.DataGridViewIndexes.Rows(0).Tag, RDS.Index)
+
+                    'CodeSafe: Remove Columns that are Nothing.
+                    lrIndex.Column.RemoveAll(Function(x) x Is Nothing)
+                    lrIndex.Column.RemoveAll(Function(x) Not Me.mrApplyTable.Column.Contains(x))
+
+                    If lrIndex.Column.Find(Function(x) x.Id = lrColumn.Id) IsNot Nothing Then
                         lbPartOfSelectedIndex = True
                     End If
                 End If
@@ -149,7 +166,7 @@ Public Class frmCRUDIndexManager
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -192,7 +209,7 @@ Public Class frmCRUDIndexManager
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -222,7 +239,7 @@ Public Class frmCRUDIndexManager
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -243,6 +260,9 @@ Public Class frmCRUDIndexManager
 
                 Dim lrIndex As RDS.Index = Me.DataGridViewIndexes.Rows(liRowNr).Tag
 
+                'CodeSafe
+                lrIndex.Model = Me.mrTable.Model
+
                 '--------------------------------------------------------------------------------
                 'Get the Actual Index...if it exists. NB lrActualIndex might be Nothing
                 Dim lsNewIndexName = Me.DataGridViewIndexes.Rows(liRowNr).Cells(0).Value
@@ -260,6 +280,45 @@ Public Class frmCRUDIndexManager
 
                     If larIndex.Count > 0 Then
                         lrActualIndex = larIndex(0)
+                    End If
+                End If
+
+#Region "CodeSafe: Remove duplicate Columns from Index"
+                'CodeSafe - Remove dulicate Columns
+                If lrActualIndex IsNot Nothing Then
+
+                    Dim duplicateColumns = lrActualIndex.Column _
+                                                            .GroupBy(Function(col) col) _
+                                                            .Where(Function(g) g.Count() > 1) _
+                                                            .Select(Function(g) g.Key)
+
+                    For Each duplicate In duplicateColumns
+                        lrActualIndex.removeColumn(duplicate)
+                        lrActualIndex.addColumn(duplicate)
+                        Me.mrTable.Model.Model.Save()
+                    Next
+
+                    'CodeSafe - Remove Columns not in Table
+                    Dim larRedundantColumn = lrActualIndex.Column.FindAll(Function(x) Not Me.mrTable.Column.Contains(x))
+                    For Each lrColumn In larRedundantColumn.ToArray
+                        lrActualIndex.removeColumn(lrColumn)
+                    Next
+
+                End If
+
+#End Region
+
+                Dim larClashingIndexNameIndex = From Index In Me.mrTable.Index
+                                                Where Index.Name = lsNewIndexName
+                                                Select Index
+
+                If larClashingIndexNameIndex.Count > 0 AndAlso larClashingIndexNameIndex(0) IsNot lrActualIndex Then
+                    MsgBox("There already exists another Index with the name: " & lsNewIndexName)
+                    Exit Sub
+                Else
+                    'Commit the Name to the Model
+                    If lrActualIndex IsNot Nothing Then
+                        lrActualIndex.setName(lsNewIndexName)
                     End If
                 End If
 
@@ -291,6 +350,19 @@ ProcessExistingIndex:
 #Region "Existing Index - Entity Type"
                         Dim lrEntityType As FBM.EntityType = Me.mrTable.FBMModelElement
 #Region "Prechecks"
+
+#Region "Remove unneeded Columns"
+                        If lrActualIndex.Column.Count <> lrIndex.Column.Count Then
+
+                            For Each lrColumn In lrActualIndex.Column.ToArray
+                                If Not lrIndex.Column.Contains(lrColumn) Then
+                                    lrActualIndex.removeColumn(lrColumn)
+                                End If
+                            Next
+
+                        End If
+#End Region
+
                         'Check doesn't clash with an existing Index.
                         Dim larIndex = From Index In Me.mrTable.Index
                                        Where Index.EqualsByColumns(lrIndex)
@@ -300,27 +372,65 @@ ProcessExistingIndex:
                         If larIndex.Count > 0 Then
                             lsMessage = "An Index already exists for the Column/Properties selected."
 
-                            If lrEntityType.HasSimpleReferenceScheme Then
+                            If lrEntityType.HasSimpleReferenceScheme And lrActualIndex.Table.Index.FindAll(Function(x) x.IsPrimaryKey).Count = 1 Then
                                 lsMessage.AppendDoubleLineBreak("Use the Properties Grid toolbox to remove a Preferred Identifier (Reference Mode) for a model element.")
+                                MsgBox(lsMessage)
+                                Call Me.RevertToActualIndex(lrActualIndex)
+                                Exit Sub
+
+                            ElseIf Me.mrTable.Index.Count = 1 And Not Me.mrTable.HasPrimaryKeyIndex And lrIndex.IsPrimaryKey And Not lrActualIndex.IsPrimaryKey Then
+
+                                If lrActualIndex.ResponsibleRoleConstraint Is Nothing Then
+                                    Call lrActualIndex.getResponsibleRoleConstraintFromORMModel()
+                                End If
+                                If lrActualIndex.ResponsibleRoleConstraint IsNot Nothing Then
+                                    Call lrActualIndex.ResponsibleRoleConstraint.SetIsPreferredIdentifier(True, True, Nothing)
+                                End If
+                            ElseIf lrIndex.Type <> lrActualIndex.Type Then
+                                If lrActualIndex.ResponsibleRoleConstraint Is Nothing Then
+                                    Call lrActualIndex.getResponsibleRoleConstraintFromORMModel()
+                                End If
+                                If lrActualIndex.ResponsibleRoleConstraint IsNot Nothing Then
+                                    Select Case lrIndex.Type
+                                        Case Is = pcenumODBCIndexType.PrimaryKey
+                                            Call lrActualIndex.ResponsibleRoleConstraint.SetIsPreferredIdentifier(True, True, Nothing)
+                                        Case Is = pcenumODBCIndexType.Unique
+                                            Call lrActualIndex.ResponsibleRoleConstraint.SetIsPreferredIdentifier(False, True, Nothing)
+                                    End Select
+                                End If
+                            Else
+                                MsgBox(lsMessage)
+                                Call Me.RevertToActualIndex(lrActualIndex)
+                                Exit Sub
                             End If
-                            MsgBox(lsMessage)
-                            Call Me.RevertToActualIndex(lrActualIndex)
-                            Exit Sub
+
                         End If
 #End Region
-
-
 
                         larRole = New List(Of FBM.Role)
                         Dim lrFactType As FBM.FactType = Nothing
 
-                        For Each lrColumn In lrIndex.Column
+                        For Each lrColumn In lrIndex.Column.ToArray
                             lrFactType = lrColumn.FactType
                             If lrColumn.FactType Is Nothing Then
                                 lrFactType = lrColumn.Role.FactType
                             End If
+
+#Region "Check if Columns should actually be part of Index"
+                            '20240312-VM-Shouldn't really stop the user from adding columns. Remove after 6 months if not missed.
+                            'If lrEntityType.HasSimpleReferenceScheme Then
+                            '    If lrFactType.Id <> lrEntityType.ReferenceModeFactType.Id Then
+                            '        lrIndex.removeColumn(lrColumn)
+                            '        'Actual Index for that matter too.
+                            '        lrActualIndex.removeColumn(lrColumn)
+                            '        GoTo SkipColumnExistingIndex
+                            '    End If
+                            'End If
+#End Region
+
                             Dim lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrColumn.Role.Id)
                             larRole.AddUnique(lrRole)
+SkipColumnExistingIndex:
                         Next
 
                         lrRoleConstraint = lrActualIndex.getResponsibleRoleConstraintFromORMModel()
@@ -328,6 +438,58 @@ ProcessExistingIndex:
                         If lrRoleConstraint IsNot Nothing Then
                             If lrRoleConstraint.IsPreferredIdentifier Then
                                 lsMessage = "Use the Properties Grid toolbox to remove a Preferred Identifier (Reference Mode) for a model element."
+                                'CodeSafe
+                                If lrActualIndex.Column.Count = 0 And lrIndex.Column.Count > 0 Then
+                                    'Something is wrong. Ask the user if they want to fix it.
+                                    lsMessage = "Boston found an error with the existing Index, it has no Columns."
+                                    lsMessage.AppendDoubleLineBreak("Add the Columns you just selected to the existing Index?")
+                                    If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                                        For Each lrColumn In lrIndex.Column
+                                            Call lrActualIndex.addColumn(lrColumn, True)
+                                        Next
+                                        Me.mrTable.Model.Model.Save()
+                                    End If
+                                End If
+
+#Region "Remove unnecessary Columns"
+                                If lrActualIndex.Column.Count <> lrIndex.Column.Count Then
+
+                                    For Each lrColumn In lrActualIndex.Column.ToArray
+                                        If Not lrIndex.Column.Contains(lrColumn) Then
+                                            lrActualIndex.removeColumn(lrColumn)
+                                        End If
+                                    Next
+
+                                End If
+
+#End Region
+
+#Region "Add new Columns"
+                                If lrActualIndex.Column.Count <> lrIndex.Column.Count Then
+
+                                    For Each lrColumn In lrIndex.Column.ToArray
+                                        If Not lrActualIndex.Column.Contains(lrColumn) Then
+                                            lrActualIndex.addColumn(lrColumn)
+                                        End If
+                                    Next
+
+                                ElseIf lrActualIndex.Column.Except(lrIndex.Column).Any() OrElse lrIndex.Column.Except(lrActualIndex.Column).Any() Then
+
+                                    For Each lrColumn In lrActualIndex.Column.Except(lrIndex.Column)
+
+                                        lrActualIndex.removeColumn(lrColumn)
+
+                                    Next
+
+                                    For Each lrColumn In lrIndex.Column.Except(lrActualIndex.Column)
+
+                                        lrActualIndex.addColumn(lrColumn)
+
+                                    Next
+
+                                End If
+#End Region
+
                                 Call Me.RevertToActualIndex(lrActualIndex)
                                 Exit Sub
                             Else
@@ -370,6 +532,18 @@ ProcessExistingIndex:
                                 End If
 
                             End If
+                        Else
+#Region "Remove unnecessary Columns"
+                            If lrActualIndex.Column.Count <> lrIndex.Column.Count Then
+
+                                For Each lrColumn In lrActualIndex.Column.ToArray
+                                    If Not lrIndex.Column.Contains(lrColumn) Then
+                                        lrActualIndex.removeColumn(lrColumn)
+                                    End If
+                                Next
+
+                            End If
+#End Region
                         End If
 #End Region
                     Case Is = GetType(FBM.FactType)
@@ -519,11 +693,11 @@ ProcessNewIndex:
                                 lsRoleConstraintName = Me.mrTable.Model.Model.CreateUniqueRoleConstraintName("ExternalUniquenessConstraint", 0)
 
                                 lrRoleConstraint = New FBM.RoleConstraint(Me.mrTable.Model.Model,
-                                                                          lsRoleConstraintName,
-                                                                          True,
-                                                                          liRoleConstraintType,
-                                                                          larRole,
-                                                                          True)
+                                                                        lsRoleConstraintName,
+                                                                        True,
+                                                                        liRoleConstraintType,
+                                                                        larRole,
+                                                                        True)
 
                                 Call Me.mrTable.Model.Model.AddRoleConstraint(lrRoleConstraint, True, True, Nothing, False, Nothing, False)
 
@@ -534,9 +708,46 @@ ProcessNewIndex:
                                     Call lrEntityType.SetCompoundReferenceSchemeRoleConstraint(lrRoleConstraint)
                                 End If
                             Else
-                                lrRoleConstraint = larRole(0).FactType.CreateInternalUniquenessConstraint(larRole, lrNewIndex.IsPrimaryKey, True, True, False, Nothing, True, False)
+                                lrRoleConstraint = larRole(0).FactType.CreateInternalUniquenessConstraint(larRole,
+                                                                                                         lrNewIndex.IsPrimaryKey,
+                                                                                                         True,
+                                                                                                         True,
+                                                                                                         False,
+                                                                                                         Nothing,
+                                                                                                         True,
+                                                                                                         False)
+
+                                If lrNewIndex.IsPrimaryKey And larRole.Count = 1 Then
+
+                                    Dim lrModelElement = larRole(0).JoinedORMObject
+
+                                    Dim lsReferenceMode = ".Id"
+
+                                    'Example code to get Reference Model from ModelElementName
+                                    'Dim items As Array
+                                    'items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
+                                    'Dim item As pcenumReferenceModeEndings
+                                    'For Each item In items
+                                    '    If lsValueTypeName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                                    '        lsReferenceMode = GetEnumDescription(item).Trim({"."c})
+                                    '        Exit For
+                                    '    Else
+                                    '        lsReferenceMode = lsValueTypeName
+                                    '    End If
+                                    'Next
+
+                                    lrEntityType.ReferenceMode = lsReferenceMode
+                                    lrEntityType.PreferredIdentifierRCId = lrRoleConstraint.Id
+                                    lrEntityType.ReferenceModeRoleConstraint = lrRoleConstraint
+                                    lrEntityType.ReferenceModeFactType = larRole(0).FactType
+                                    lrEntityType.ReferenceModeValueType = lrIndex.Column(0).ActiveRole.JoinsValueType
+                                    lrEntityType.SetReferenceMode(lsReferenceMode, True,,, lrEntityType.ReferenceModeValueType.DataType)
+
+                                End If
+
                                 Call Me.mrTable.Model.Model.MakeDirty(True, True)
                             End If
+
 #End Region
                         Case Is = GetType(FBM.FactType)
 #Region "New Index - Fact Type"
@@ -584,9 +795,20 @@ ProcessNewIndex:
                                     MsgBox("An equivalent Index already exists against this Table/Node Type. Modify the Index.")
                                     Exit Sub
                                 Else
-                                    '----------------------
-                                    'Create the new Index
-                                    lrRoleConstraint = larRole(0).FactType.CreateInternalUniquenessConstraint(larRole, lrNewIndex.IsPrimaryKey, True, True, False, Nothing, True, False)
+                                    Dim larRoleConstraint = From RoleConstraint In Me.mrTable.Model.Model.RoleConstraint
+                                                            Let roleHashSet = New HashSet(Of FBM.Role)(RoleConstraint.Role)
+                                                            Where RoleConstraint.Role.Count = larRole.Count AndAlso roleHashSet.SetEquals(larRole)
+                                                            Select RoleConstraint
+
+                                    If larRoleConstraint.Count > 0 Then
+                                        lrRoleConstraint = larRoleConstraint.First
+                                        lrNewIndex.ResponsibleRoleConstraint = lrRoleConstraint
+                                        Call Me.mrTable.addIndex(lrNewIndex)
+                                    Else
+                                        '----------------------
+                                        'Create the new Index
+                                        lrRoleConstraint = larRole(0).FactType.CreateInternalUniquenessConstraint(larRole, lrNewIndex.IsPrimaryKey, True, True, False, Nothing, True, False)
+                                    End If
                                 End If
                             ElseIf Not lrFactType.ContainsAllRoles(larRole) Then
 
@@ -594,11 +816,11 @@ ProcessNewIndex:
                                 lsRoleConstraintName = Me.mrTable.Model.Model.CreateUniqueRoleConstraintName("ExternalUniquenessConstraint", 0)
 
                                 lrRoleConstraint = New FBM.RoleConstraint(Me.mrTable.Model.Model,
-                                                                          lsRoleConstraintName,
-                                                                          True,
-                                                                          liRoleConstraintType,
-                                                                          larRole,
-                                                                          True)
+                                                                        lsRoleConstraintName,
+                                                                        True,
+                                                                        liRoleConstraintType,
+                                                                        larRole,
+                                                                        True)
 
                                 Call Me.mrTable.Model.Model.AddRoleConstraint(lrRoleConstraint, True, True, Nothing, False, Nothing, False)
 
@@ -618,12 +840,26 @@ EndProcessing:
             End If
 #End Region
 
+            'Database processing.
+            'Do database processing. Likely have no choice, especially for SQLite.
+            If Me.mrTable.Model.Model.IsDatabaseSynchronised Then
+                Select Case Me.mrTable.Model.Model.TargetDatabaseType
+                    Case Is = pcenumDatabaseType.SQLite
+                        If Me.mrTable.Column.Count > 0 Then
+                            Call Me.mrTable.Model.Model.DatabaseConnection.recreateTable(Me.mrTable)
+                        End If
+                    Case Else
+                        'Think what to do here.
+                End Select
+            End If
+
+
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -665,7 +901,7 @@ EnableRevert:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -704,7 +940,7 @@ EnableRevert:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -727,6 +963,14 @@ EnableRevert:
                     If Me.DataGridViewIndexes.Rows(e.RowIndex).Tag IsNot Nothing Then
                         If loValue = IndexType.Primary Then
                             Me.DataGridViewIndexes.Rows(e.RowIndex).Tag.IsPrimaryKey = True
+
+                            Dim lsIndexName = CType(Me.DataGridViewIndexes.Rows(e.RowIndex).Cells(0).Value, String)
+
+                            If lsIndexName.EndsWith("UC") Then
+                                Dim lsNewIndexName = lsIndexName.Substring(0, lsIndexName.Length - 2) & "PK"
+                                Me.DataGridViewIndexes.Rows(e.RowIndex).Cells(0).Value = lsNewIndexName
+                                Me.mrSelectedIndex.Name = lsNewIndexName
+                            End If
                         Else
                             Me.DataGridViewIndexes.Rows(e.RowIndex).Tag.IsPrimaryKey = False
                         End If
@@ -739,7 +983,7 @@ EnableRevert:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -815,6 +1059,7 @@ EnableRevert:
             Else
                 If MsgBox("Boston could not find the responsible Role Constraint for this Index. Do you want to remove the Index from the Table anyway?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes And lrActualIndex IsNot Nothing Then
                     Me.mrApplyTable.removeIndex(lrActualIndex)
+                    Me.mrTable.removeIndex(lrActualIndex)
                 End If
             End If
 
@@ -824,7 +1069,7 @@ EnableRevert:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -869,7 +1114,7 @@ EnableRevert:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -893,7 +1138,7 @@ EnableRevert:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -902,6 +1147,12 @@ EnableRevert:
 
         Try
             If e.ColumnIndex = 0 Then
+
+                'CodeSafe
+                If Me.DataGridViewIndexes.Rows(e.RowIndex).Cells(e.ColumnIndex).Value <> Me.DataGridViewIndexes.Rows(e.RowIndex).Tag.Name Then
+                    Me.DataGridViewIndexes.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = Me.DataGridViewIndexes.Rows(e.RowIndex).Tag.Name
+                End If
+
                 Me.msOriginalIndexNameCellBeginEdit = Me.DataGridViewIndexes.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
             End If
 
@@ -911,7 +1162,7 @@ EnableRevert:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -938,9 +1189,14 @@ EnableRevert:
                     Exit Sub
                 End If
 
-                lrCandidateIndex.Name = lsNewIndexName
+                '20231123-Remove-lrCandidateIndex.Name = lsNewIndexName
 
                 Me.ButtonApply.Enabled = True
+
+            ElseIf e.ColumnIndex = 1 Then
+
+                Me.ButtonApply.Enabled = True
+
             End If
 
         Catch ex As Exception
@@ -949,7 +1205,28 @@ EnableRevert:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DataGridViewIndexes_EditingControlShowing(sender As Object, e As DataGridViewEditingControlShowingEventArgs) Handles DataGridViewIndexes.EditingControlShowing
+
+        Try
+
+            If TypeOf e.Control Is ComboBox Then
+
+                ' Add the event handler
+                'AddHandler DirectCast(e.Control, ComboBox).SelectedIndexChanged, AddressOf Me.Hello
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

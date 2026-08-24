@@ -69,7 +69,6 @@ Partial Class frmCSVLoader
         Me.txtLastAccessTime = New System.Windows.Forms.TextBox()
         Me.btnGetDetails = New System.Windows.Forms.Button()
         Me.Label4 = New System.Windows.Forms.Label()
-        Me.btnClose = New System.Windows.Forms.Button()
         Me.TabControl = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.txtUNCPath = New System.Windows.Forms.TextBox()
@@ -81,13 +80,14 @@ Partial Class frmCSVLoader
         Me.txtName = New System.Windows.Forms.TextBox()
         Me.txtExt = New System.Windows.Forms.TextBox()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.ButtonFinish = New System.Windows.Forms.Button()
         Me.Panel5 = New System.Windows.Forms.Panel()
         Me.LabelTableName = New System.Windows.Forms.Label()
         Me.LabelPromptTable = New System.Windows.Forms.Label()
         Me.LabelModelName = New System.Windows.Forms.Label()
         Me.LabelPromptModel = New System.Windows.Forms.Label()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-        Me.ButtonFinish = New System.Windows.Forms.Button()
+        Me.CheckBoxCreateNewTable = New System.Windows.Forms.CheckBox()
         Me.Panel2.SuspendLayout()
         CType(Me.numMax, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.numDataRow, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -192,6 +192,7 @@ Partial Class frmCSVLoader
         '
         'Panel3
         '
+        Me.Panel3.Controls.Add(Me.CheckBoxCreateNewTable)
         Me.Panel3.Controls.Add(Me.label17)
         Me.Panel3.Controls.Add(Me.numMax)
         Me.Panel3.Controls.Add(Me.numDataRow)
@@ -473,16 +474,6 @@ Partial Class frmCSVLoader
         Me.Label4.Text = "Extension:"
         Me.Label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
-        'btnClose
-        '
-        Me.btnClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnClose.Location = New System.Drawing.Point(574, 10)
-        Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(75, 23)
-        Me.btnClose.TabIndex = 1
-        Me.btnClose.Text = "&Close"
-        Me.btnClose.UseVisualStyleBackColor = True
-        '
         'TabControl
         '
         Me.TabControl.Controls.Add(Me.TabPageImportCSV)
@@ -523,7 +514,7 @@ Partial Class frmCSVLoader
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(755, 351)
+        Me.TabPage1.Size = New System.Drawing.Size(729, 356)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "File Properties"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -596,12 +587,20 @@ Partial Class frmCSVLoader
         'Panel1
         '
         Me.Panel1.Controls.Add(Me.ButtonFinish)
-        Me.Panel1.Controls.Add(Me.btnClose)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel1.Location = New System.Drawing.Point(3, 466)
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(737, 42)
         Me.Panel1.TabIndex = 6
+        '
+        'ButtonFinish
+        '
+        Me.ButtonFinish.Location = New System.Drawing.Point(656, 9)
+        Me.ButtonFinish.Name = "ButtonFinish"
+        Me.ButtonFinish.Size = New System.Drawing.Size(74, 23)
+        Me.ButtonFinish.TabIndex = 2
+        Me.ButtonFinish.Text = "&Close"
+        Me.ButtonFinish.UseVisualStyleBackColor = True
         '
         'Panel5
         '
@@ -670,14 +669,15 @@ Partial Class frmCSVLoader
         Me.TableLayoutPanel1.Size = New System.Drawing.Size(743, 511)
         Me.TableLayoutPanel1.TabIndex = 33
         '
-        'ButtonFinish
+        'CheckBoxCreateNewTable
         '
-        Me.ButtonFinish.Location = New System.Drawing.Point(656, 9)
-        Me.ButtonFinish.Name = "ButtonFinish"
-        Me.ButtonFinish.Size = New System.Drawing.Size(74, 23)
-        Me.ButtonFinish.TabIndex = 2
-        Me.ButtonFinish.Text = "&Finish"
-        Me.ButtonFinish.UseVisualStyleBackColor = True
+        Me.CheckBoxCreateNewTable.AutoSize = True
+        Me.CheckBoxCreateNewTable.Location = New System.Drawing.Point(100, 62)
+        Me.CheckBoxCreateNewTable.Name = "CheckBoxCreateNewTable"
+        Me.CheckBoxCreateNewTable.Size = New System.Drawing.Size(112, 17)
+        Me.CheckBoxCreateNewTable.TabIndex = 20
+        Me.CheckBoxCreateNewTable.Text = "&Create New Table"
+        Me.CheckBoxCreateNewTable.UseVisualStyleBackColor = True
         '
         'frmCSVLoader
         '
@@ -751,7 +751,6 @@ Partial Class frmCSVLoader
     Friend WithEvents txtLastAccessTime As System.Windows.Forms.TextBox
     Friend WithEvents btnGetDetails As System.Windows.Forms.Button
     Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents btnClose As System.Windows.Forms.Button
     Friend WithEvents TabControl As System.Windows.Forms.TabControl
     Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
     Friend WithEvents txtFullName As System.Windows.Forms.TextBox
@@ -772,6 +771,7 @@ Partial Class frmCSVLoader
     Friend WithEvents LabelModelName As Label
     Friend WithEvents LabelPromptModel As Label
     Friend WithEvents ButtonFinish As Button
+    Friend WithEvents CheckBoxCreateNewTable As CheckBox
 End Class
 
 

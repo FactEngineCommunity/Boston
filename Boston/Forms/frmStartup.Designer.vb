@@ -24,26 +24,35 @@ Partial Class frmStartup
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmStartup))
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
+        Me.MyWebClient1 = New AutoUpdaterDotNET.MyWebClient()
         Me.SuspendLayout()
         '
         'WebBrowser
         '
         Me.WebBrowser.Dock = System.Windows.Forms.DockStyle.Fill
         Me.WebBrowser.Location = New System.Drawing.Point(0, 0)
-        Me.WebBrowser.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.WebBrowser.MinimumSize = New System.Drawing.Size(30, 31)
+        Me.WebBrowser.MinimumSize = New System.Drawing.Size(20, 20)
         Me.WebBrowser.Name = "WebBrowser"
-        Me.WebBrowser.Size = New System.Drawing.Size(1266, 863)
+        Me.WebBrowser.Size = New System.Drawing.Size(844, 561)
         Me.WebBrowser.TabIndex = 0
+        '
+        'MyWebClient1
+        '
+        Me.MyWebClient1.BaseAddress = ""
+        Me.MyWebClient1.CachePolicy = Nothing
+        Me.MyWebClient1.Credentials = Nothing
+        Me.MyWebClient1.Encoding = CType(resources.GetObject("MyWebClient1.Encoding"), System.Text.Encoding)
+        Me.MyWebClient1.Headers = CType(resources.GetObject("MyWebClient1.Headers"), System.Net.WebHeaderCollection)
+        Me.MyWebClient1.QueryString = CType(resources.GetObject("MyWebClient1.QueryString"), System.Collections.Specialized.NameValueCollection)
+        Me.MyWebClient1.UseDefaultCredentials = False
         '
         'frmStartup
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1266, 863)
+        Me.ClientSize = New System.Drawing.Size(844, 561)
         Me.Controls.Add(Me.WebBrowser)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Name = "frmStartup"
         Me.TabText = "Startup"
         Me.Text = "Startup"
@@ -51,4 +60,5 @@ Partial Class frmStartup
 
     End Sub
     Friend WithEvents WebBrowser As System.Windows.Forms.WebBrowser
+    Friend WithEvents MyWebClient1 As AutoUpdaterDotNET.MyWebClient
 End Class

@@ -8,6 +8,8 @@ Imports System.Xml.Serialization
 
 
 Namespace VAQL
+
+
 #Region "ParseTree"
     <Serializable()>
     Public Class ParseErrors
@@ -103,7 +105,24 @@ Namespace VAQL
         End Sub
 
         Public Sub New(ByVal message As String, ByVal code As Integer, ByVal node As ParseNode)
-            Me.New(message, code, 0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
+            If node Is Nothing Then
+                m_message = message
+                m_code = code
+                m_line = 0
+                m_col = 0
+                m_pos = 0
+                m_length = 0
+                m_expected_token = ""
+            Else
+                m_message = message
+                m_code = code
+                m_line = 0
+                m_col = node.Token.StartPos
+                m_pos = node.Token.EndPos
+                m_length = node.Token.Length
+                m_expected_token = ""
+            End If
+
         End Sub
 
         Public Function Clone() As Object Implements ICloneable.Clone
@@ -354,6 +373,27 @@ Namespace VAQL
                 Case TokenType.NATURALLANGUAGEPROMPT
                     Value = EvalNATURALLANGUAGEPROMPT(tree, paramlist)
                     Exit Select
+                Case TokenType.JSON
+                    Value = EvalJSON(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONBOOLEAN
+                    Value = EvalJSONBOOLEAN(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONPRIMITIVE
+                    Value = EvalJSONPRIMITIVE(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONCONTAINER
+                    Value = EvalJSONCONTAINER(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONARRAY
+                    Value = EvalJSONARRAY(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONOBJECT
+                    Value = EvalJSONOBJECT(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONMEMBER
+                    Value = EvalJSONMEMBER(tree, paramlist)
+                    Exit Select
                 Case TokenType.ADDITIONALVALUECONSTRAINTVALUE
                     Value = EvalADDITIONALVALUECONSTRAINTVALUE(tree, paramlist)
                     Exit Select
@@ -372,6 +412,9 @@ Namespace VAQL
                 Case TokenType.BINARYPREDICATECLAUSE
                     Value = EvalBINARYPREDICATECLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.INTERNALUNIQUENESSDETERMINER
+                    Value = EvalINTERNALUNIQUENESSDETERMINER(tree, paramlist)
+                    Exit Select
                 Case TokenType.DATATYPE
                     Value = EvalDATATYPE(tree, paramlist)
                     Exit Select
@@ -380,6 +423,9 @@ Namespace VAQL
                     Exit Select
                 Case TokenType.DATATYPEPRECISION
                     Value = EvalDATATYPEPRECISION(tree, paramlist)
+                    Exit Select
+                Case TokenType.DATATYPEPRECISIONANDSCALE
+                    Value = EvalDATATYPEPRECISIONANDSCALE(tree, paramlist)
                     Exit Select
                 Case TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
                     Value = EvalENTITYTYPEISIDENTIFIEDBYITSCLAUSE(tree, paramlist)
@@ -393,8 +439,20 @@ Namespace VAQL
                 Case TokenType.FACTTYPECLAUSE
                     Value = EvalFACTTYPECLAUSE(tree, paramlist)
                     Exit Select
+                Case TokenType.FACTTYPEREADING
+                    Value = EvalFACTTYPEREADING(tree, paramlist)
+                    Exit Select
+                Case TokenType.FACTTYPEREADINGSET
+                    Value = EvalFACTTYPEREADINGSET(tree, paramlist)
+                    Exit Select
+                Case TokenType.FACTTYPEREADINGSEQUENCE
+                    Value = EvalFACTTYPEREADINGSEQUENCE(tree, paramlist)
+                    Exit Select
                 Case TokenType.FRONTREADINGTEXTCLAUSE
                     Value = EvalFRONTREADINGTEXTCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.GRAPHNODE
+                    Value = EvalGRAPHNODE(tree, paramlist)
                     Exit Select
                 Case TokenType.IDENTIFIERMODELELEMENT
                     Value = EvalIDENTIFIERMODELELEMENT(tree, paramlist)
@@ -429,6 +487,9 @@ Namespace VAQL
                 Case TokenType.QUOTEDMODELELEMENTNAME
                     Value = EvalQUOTEDMODELELEMENTNAME(tree, paramlist)
                     Exit Select
+                Case TokenType.THATPREDICATEREADING
+                    Value = EvalTHATPREDICATEREADING(tree, paramlist)
+                    Exit Select
                 Case TokenType.UNARYPREDICATECLAUSE
                     Value = EvalUNARYPREDICATECLAUSE(tree, paramlist)
                     Exit Select
@@ -450,11 +511,35 @@ Namespace VAQL
                 Case TokenType.ADDOBJECTTYPETOPAGESTMT
                     Value = EvalADDOBJECTTYPETOPAGESTMT(tree, paramlist)
                     Exit Select
+                Case TokenType.BINARYFACTTYPEREADING
+                    Value = EvalBINARYFACTTYPEREADING(tree, paramlist)
+                    Exit Select
+                Case TokenType.CREATENODESTMT
+                    Value = EvalCREATENODESTMT(tree, paramlist)
+                    Exit Select
                 Case TokenType.CREATEPAGESTMT
                     Value = EvalCREATEPAGESTMT(tree, paramlist)
                     Exit Select
                 Case TokenType.CREATESTMT
                     Value = EvalCREATESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.CREATETABLEINSTANCESTMT
+                    Value = EvalCREATETABLEINSTANCESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.DUALBINARYFACTTYPEREADINGSTMT
+                    Value = EvalDUALBINARYFACTTYPEREADINGSTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.EQUALITYCONSTRAINT
+                    Value = EvalEQUALITYCONSTRAINT(tree, paramlist)
+                    Exit Select
+                Case TokenType.EXCLUSIONCONSTRAINT
+                    Value = EvalEXCLUSIONCONSTRAINT(tree, paramlist)
+                    Exit Select
+                Case TokenType.EXCLUSIVEORCONSTRAINT
+                    Value = EvalEXCLUSIVEORCONSTRAINT(tree, paramlist)
+                    Exit Select
+                Case TokenType.INCLUSIVEORCONSTRAINT
+                    Value = EvalINCLUSIVEORCONSTRAINT(tree, paramlist)
                     Exit Select
                 Case TokenType.FACTSTMT
                     Value = EvalFACTSTMT(tree, paramlist)
@@ -473,6 +558,9 @@ Namespace VAQL
                     Exit Select
                 Case TokenType.MODELELEMENTLEADINGSTMT
                     Value = EvalMODELELEMENTLEADINGSTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.SUBSETCONSTRAINTSTMT
+                    Value = EvalSUBSETCONSTRAINTSTMT(tree, paramlist)
                     Exit Select
                 Case TokenType.BASEPRODUCTION
                     Value = EvalBASEPRODUCTION(tree, paramlist)
@@ -524,6 +612,34 @@ Namespace VAQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalJSON(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONBOOLEAN(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONPRIMITIVE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONCONTAINER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONARRAY(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONOBJECT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONMEMBER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalADDITIONALVALUECONSTRAINTVALUE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -548,6 +664,10 @@ Namespace VAQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalINTERNALUNIQUENESSDETERMINER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalDATATYPE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -557,6 +677,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalDATATYPEPRECISION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDATATYPEPRECISIONANDSCALE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -576,7 +700,23 @@ Namespace VAQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalFACTTYPEREADING(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFACTTYPEREADINGSET(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFACTTYPEREADINGSEQUENCE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalFRONTREADINGTEXTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalGRAPHNODE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -624,6 +764,10 @@ Namespace VAQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalTHATPREDICATEREADING(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalUNARYPREDICATECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
@@ -652,11 +796,43 @@ Namespace VAQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalBINARYFACTTYPEREADING(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCREATENODESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalCREATEPAGESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
         Protected Overridable Function EvalCREATESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCREATETABLEINSTANCESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalDUALBINARYFACTTYPEREADINGSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalEQUALITYCONSTRAINT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalEXCLUSIONCONSTRAINT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalEXCLUSIVEORCONSTRAINT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalINCLUSIVEORCONSTRAINT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -681,6 +857,10 @@ Namespace VAQL
         End Function
 
         Protected Overridable Function EvalMODELELEMENTLEADINGSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalSUBSETCONSTRAINTSTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

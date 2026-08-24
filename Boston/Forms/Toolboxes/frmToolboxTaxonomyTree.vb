@@ -25,7 +25,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -78,7 +78,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -111,7 +111,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -127,12 +127,12 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
 
-    Private Sub mrModel_SubtypeRelationshipAdded(ByRef arSubtypeRelationship As tSubtypeRelationship) Handles mrModel.SubtypeRelationshipAdded
+    Private Sub mrModel_SubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.SubtypeRelationship) Handles mrModel.SubtypeRelationshipAdded
 
         Try
             'CodeSafe
@@ -146,7 +146,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -162,12 +162,12 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
 
-    Private Sub mrModel_SubtypeRelationshipRemoved(ByRef arSubtypeRelationship As tSubtypeRelationship) Handles mrModel.SubtypeRelationshipRemoved
+    Private Sub mrModel_SubtypeRelationshipRemoved(ByRef arSubtypeRelationship As FBM.SubtypeRelationship) Handles mrModel.SubtypeRelationshipRemoved
 
         Try
             Call Me.GenerateTreeLayout()
@@ -178,7 +178,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -201,7 +201,7 @@ Public Class frmToolboxTaxonomyTree
                         '--------------------------------------------------------------
                         'Show the Verbalisation if the Verbalisation Toolbox is open.
                         '--------------------------------------------------------------
-                        If IsSomething(lrORMToolboxVerbalisation) Then
+                        If lrORMToolboxVerbalisation IsNot Nothing Then
                             lrORMToolboxVerbalisation.VerbaliseValueType(e.Node.Tag)
                         End If
 
@@ -210,23 +210,23 @@ Public Class frmToolboxTaxonomyTree
                         '--------------------------------------------------------------
                         'Show the Verbalisation if the Verbalisation Toolbox is open.
                         '--------------------------------------------------------------
-                        If IsSomething(lrORMToolboxVerbalisation) Then
+                        If lrORMToolboxVerbalisation IsNot Nothing Then
                             lrORMToolboxVerbalisation.VerbaliseEntityType(e.Node.Tag)
                         End If
                     Case Is = GetType(FBM.FactType).ToString
                         '--------------------------------------------------------------
                         'Show the Verbalisation if the Verbalisation Toolbox is open.
                         '--------------------------------------------------------------
-                        If IsSomething(lrORMToolboxVerbalisation) Then
+                        If lrORMToolboxVerbalisation IsNot Nothing Then
                             lrORMToolboxVerbalisation.VerbaliseFactType(e.Node.Tag)
                         End If
 
                     Case Is = GetType(RDS.Column).ToString
-                        If IsSomething(lrORMToolboxVerbalisation) Then
+                        If lrORMToolboxVerbalisation IsNot Nothing Then
                             lrORMToolboxVerbalisation.VerbaliseColumn(e.Node.Tag)
                         End If
                     Case Is = GetType(RDS.Table).ToString
-                        If IsSomething(lrORMToolboxVerbalisation) Then
+                        If lrORMToolboxVerbalisation IsNot Nothing Then
                             lrORMToolboxVerbalisation.VerbaliseTable(e.Node.Tag)
                         End If
                     Case Is = GetType(FBM.RoleConstraint).ToString
@@ -257,7 +257,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -269,7 +269,7 @@ Public Class frmToolboxTaxonomyTree
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
 
-            If IsSomething(lrPropertyGridForm) And IsSomething(Me.TreeView.SelectedNode) Then
+            If lrPropertyGridForm IsNot Nothing And Me.TreeView.SelectedNode IsNot Nothing Then
                 Dim lrModelObject As FBM.ModelObject
                 lrModelObject = Me.TreeView.SelectedNode.Tag
                 lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
@@ -509,7 +509,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -528,7 +528,7 @@ Public Class frmToolboxTaxonomyTree
 
             Dim lrPropertyGridForm As frmToolboxProperties
 
-            If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+            If prApplication.GetToolboxForm(frmToolboxProperties.Name) IsNot Nothing Then
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
                 If Me.TreeView.SelectedNode IsNot Nothing Then
@@ -559,7 +559,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -580,7 +580,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
 
@@ -610,7 +610,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -628,7 +628,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -654,7 +654,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -670,7 +670,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -706,7 +706,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -724,7 +724,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -763,7 +763,7 @@ Public Class frmToolboxTaxonomyTree
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

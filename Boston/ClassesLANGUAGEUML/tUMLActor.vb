@@ -93,7 +93,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lr_actor
@@ -142,7 +142,7 @@ Namespace UML
                 Return aoA.SequenceNr - aoB.SequenceNr
 
             Catch ex As Exception
-                prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -218,7 +218,7 @@ Namespace UML
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -231,11 +231,11 @@ Namespace UML
             '---------------------------------------------------------------------
             Try
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.NameShape.Shape) Then
+                    If Me.NameShape.Shape IsNot Nothing Then
                         If Me.NameShape.Shape.Text <> "" Then
                             Me.NameShape.Shape.Text = Trim(Me.FactData.Data)
 
@@ -270,7 +270,7 @@ Namespace UML
         Public Overloads Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
 
             Try
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     If Me.Shape.Selected Then
                         Me.Shape.Pen.Color = Color.Blue
                     Else
@@ -284,7 +284,7 @@ Namespace UML
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -312,7 +312,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Try
@@ -322,7 +322,10 @@ Namespace UML
 
         End Sub
 
-        Public Overrides Function setName(asNewName As String, Optional abBroadcastInterfaceEvent As Boolean = True, Optional abSuppressModelSave As Boolean = False) As Boolean
+        Public Overrides Function setName(asNewName As String,
+                                          Optional abBroadcastInterfaceEvent As Boolean = True,
+                                          Optional abSuppressModelSave As Boolean = False,
+                                          Optional ByVal abSetDBNameAsNewName As Boolean = False) As Boolean
 
             Try
                 Call Me.CMMLActor.FBMModelElement.setName(asNewName, abBroadcastInterfaceEvent, abSuppressModelSave)
@@ -333,7 +336,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

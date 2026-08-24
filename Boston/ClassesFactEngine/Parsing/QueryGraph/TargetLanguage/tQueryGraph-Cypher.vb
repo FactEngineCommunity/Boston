@@ -140,7 +140,7 @@ StartMatch:
                         End If
                     End If
                     'Predicate/Edge
-                    lsCypherQuery &= "-[" & LCase(lrQueryEdge.FBMFactType.DBName) & lrQueryEdge.Alias & ":" & lrQueryEdge.FBMFactType.DBName & "]-"
+                    lsCypherQuery &= "-[" & LCase(lrQueryEdge.FBMFactType.DBName) & lrQueryEdge.Alias & ":" & lrQueryEdge.FBMFactType.PropertyGraphLabel & "]-"
                     'TargetNode
                     lsCypherQuery &= "(" & LCase(lrQueryEdge.TargetNode.Name) & lrQueryEdge.TargetNode.Alias & ":" & lrQueryEdge.TargetNode.Name & ")"
 
@@ -426,18 +426,18 @@ StartMatch:
                     For Each lrColumn In Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns
                         lsCypherQuery &= Viev.NullVal(lbIntialWhere, "") & LCase(lrTargetTable.DatabaseName) & Viev.NullVal(Me.HeadNode.Alias, "") & "." & lrColumn.Name & Me.HeadNode.getTargetSQLComparator & "'" & Me.HeadNode.IdentifierList(liInd) & "'" & vbCrLf
                         If liInd < Me.HeadNode.RDSTable.getFirstUniquenessConstraintColumns.Count - 1 Then
-                            lsCypherQuery &= "AND "
+                            lsCypherQuery &= " AND "
                         End If
                         liInd += 1
                     Next
-                    lbIntialWhere = "AND "
+                    lbIntialWhere = " AND "
                 End If
 
                 liInd = 0
                 For Each lrQueryEdge In larConditionalQueryEdges.FindAll(Function(x) Not (x.IsSubQueryLeader Or x.IsPartOfSubQuery))
 
                     'lsCypherQuery &= String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
-                    lbIntialWhere = lrQueryEdge.WhichClause.getAndOr(Boston.returnIfTrue(liInd = 0, NullVal(lbIntialWhere, ""), "AND")) & " " & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
+                    lbIntialWhere = lrQueryEdge.WhichClause.getAndOr(Boston.returnIfTrue(liInd = 0, NullVal(lbIntialWhere, ""), " AND ")) & " " & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
 
                     Select Case lrQueryEdge.WhichClauseSubType
                         Case Is = FactEngine.Constants.pcenumWhichClauseType.IsPredicateNodePropertyIdentification
@@ -782,7 +782,7 @@ StartMatch:
 
                                                     For Each lsIdentifier In lrQueryEdge.IdentifierList
                                                         If liInd > 0 Then
-                                                            lsCypherQuery &= "AND "
+                                                            lsCypherQuery &= " AND "
                                                             lbIntialWhere = ""
                                                         End If
 
@@ -804,7 +804,7 @@ StartMatch:
                                             End Select
                                         End If
 
-                                        lbIntialWhere = lrQueryEdge.WhichClause.getAndOr("AND") & " " & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
+                                        lbIntialWhere = lrQueryEdge.WhichClause.getAndOr(" AND ") & " " & String.Join("", lrQueryEdge.WhichClause.WHICHCLAUSEBROPEN.ToArray)
                                     End If
                             End Select
                     End Select

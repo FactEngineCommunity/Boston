@@ -5,6 +5,7 @@ Imports System.Reflection
 Imports Humanizer
 Imports <xmlns:orm="http://schemas.neumont.edu/ORM/2006-04/ORMCore">
 Imports <xmlns:ormDiagram="http://schemas.neumont.edu/ORM/2006-04/ORMDiagram">
+Imports Boston.NORMA.Model
 
 Namespace NORMA
 
@@ -55,7 +56,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return pcenumORMDataType.TextVariableLength
             End Try
@@ -77,7 +78,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -96,7 +97,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return 0
             End Try
 
@@ -169,7 +170,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -231,7 +232,7 @@ Namespace NORMA
                                     Catch
                                         'Not a biggie.
                                     End Try
-                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
+                                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
                                 End Try
                             End If
                         End If
@@ -256,7 +257,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -282,7 +283,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -325,7 +326,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return pcenumConceptType.Unknown
             End Try
@@ -392,7 +393,7 @@ Namespace NORMA
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -502,7 +503,7 @@ Namespace NORMA
                                         If lrFactType.IsObjectified Then
                                             lrSupertypeEntityType = lrFactType.ObjectifyingEntityType
                                         Else
-                                            prApplication.ThrowErrorMessage("Tried to load a Supertype that is a Fact Type that is not Objectified", pcenumErrorType.Warning, Nothing, False, False, True)
+                                            prApplication.ThrowMessage("Tried to load a Supertype that is a Fact Type that is not Objectified", pcenumErrorType.Warning, Nothing, False, False, True)
                                             GoTo SkippedSubtypeRelationship
                                         End If
 
@@ -515,7 +516,7 @@ Namespace NORMA
 
                             Boston.WriteToStatusBar("Creating Subtype Relationship between " & lrEntityType.Id & " and " & lrSupertypeEntityType.Id)
 
-                            Dim lrSubtypeRelationship As FBM.tSubtypeRelationship = Nothing
+                            Dim lrSubtypeRelationship As FBM.SubtypeRelationship = Nothing
                             lrSubtypeRelationship = lrEntityType.CreateSubtypeRelationship(lrSupertypeEntityType,
                                                                                            False,
                                                                                            lsSubtypeRoleId,
@@ -555,7 +556,7 @@ SkippedSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -659,7 +660,7 @@ SkippedSubtypeRelationship:
                                         If lrFactType.IsObjectified Then
                                             lrSupertypeModelElement = lrFactType.ObjectifyingEntityType
                                         Else
-                                            prApplication.ThrowErrorMessage("Tried to load a Supertype that is a Fact Type that is not Objectified", pcenumErrorType.Warning, Nothing, False, False, True)
+                                            prApplication.ThrowMessage("Tried to load a Supertype that is a Fact Type that is not Objectified", pcenumErrorType.Warning, Nothing, False, False, True)
                                             GoTo SkippedSubtypeRelationship
                                         End If
                                 End Select
@@ -668,11 +669,12 @@ SkippedSubtypeRelationship:
                             Dim lsSubtypeRoleId As String = loElement.<orm:FactRoles>.<orm:SubtypeMetaRole>.AsEnumerable.First.Attribute("id").Value
                             Dim lsSupertypeRoleId As String = loElement.<orm:FactRoles>.<orm:SupertypeMetaRole>.AsEnumerable.First.Attribute("id").Value
 
-                            Dim lrSubtypeRelationship As FBM.tSubtypeRelationship = Nothing
+                            Dim lrSubtypeRelationship As FBM.SubtypeRelationship = Nothing
                             lrSubtypeRelationship = lrValueType.CreateSubtypeRelationship(lrSupertypeModelElement,
                                                                                           False,
                                                                                           lsSubtypeRoleId,
-                                                                                          lsSupertypeRoleId)
+                                                                                          lsSupertypeRoleId,
+                                                                                          False)
                             Try
                                 lrSubtypeRelationship.IsPrimarySubtypeRelationship = CBool(loElement.Attribute("PreferredIdentificationPath").Value)
                             Catch ex As Exception
@@ -690,7 +692,7 @@ SkippedSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -758,7 +760,7 @@ SkippedSubtypeRelationship:
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
                                                       Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
                                 lrJoinedEntityType = lrFactType.Model.EntityType.Find(AddressOf lrModelObject.EqualsByName)
                             Else
@@ -772,7 +774,7 @@ SkippedSubtypeRelationship:
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
                                                       Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
                                 lrValueType = lrFactType.Model.ValueType.Find(AddressOf lrModelObject.EqualsByName)
                             Else
@@ -786,7 +788,7 @@ SkippedSubtypeRelationship:
                                                       Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
                                                       Select ModelInformation
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name").Value
                                 lrJoinedFactType = lrFactType.Model.FactType.Find(AddressOf lrModelObject.EqualsByName)
                             Else
@@ -801,7 +803,7 @@ SkippedSubtypeRelationship:
                                                       Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
                                                       Select ModelInformation
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name").Value
 
                                 Dim loXMLNestedPredicateElement As IEnumerable(Of XElement)
@@ -827,7 +829,7 @@ SkippedSubtypeRelationship:
                                 lrJoinedFactType = Nothing
                             End If
 
-                            If IsSomething(lrJoinedEntityType) Then
+                            If lrJoinedEntityType IsNot Nothing Then
                                 '---------------------------------------------------------
                                 'Check to see if the Role already exists in the FactType
                                 '---------------------------------------------------------
@@ -845,7 +847,7 @@ SkippedSubtypeRelationship:
                                     lrRole.Name = lrRoleXElement.Attribute("Name").Value
                                     lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
                                 End If
-                            ElseIf IsSomething(lrValueType) Then
+                            ElseIf lrValueType IsNot Nothing Then
                                 '---------------------------------------------------------
                                 'Check to see if the Role already exists in the FactType
                                 '---------------------------------------------------------
@@ -866,7 +868,7 @@ SkippedSubtypeRelationship:
                                         lrRole.NORMALinksToUnaryFactTypeValueType = True
                                     End If
                                 End If
-                            ElseIf IsSomething(lrJoinedFactType) Then
+                            ElseIf lrJoinedFactType IsNot Nothing Then
                                 '---------------------------------------------------------
                                 'Check to see if the Role already exists in the FactType
                                 '---------------------------------------------------------
@@ -895,7 +897,7 @@ SkippedSubtypeRelationship:
                             '    Dim lsMessage As String = ""
                             '    lsMessage = "Warning: Error loading NORMA XML (.orm) file"
                             '    lsMessage &= vbCrLf & "NORMA Role.Id: " & lrRole.Id
-                            '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            '    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                             'End If
 
                             If lrRoleXElement.<orm:ValueRestriction>.Count > 0 Then
@@ -958,7 +960,7 @@ SkippedSubtypeRelationship:
                         '---------------------------------
                         Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             'Need to remove NORMAUnaryFactTypeValueTypes before Objectifying.
                             For Each lrRole In lrFactType.RoleGroup.ToArray
                                 If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
@@ -988,10 +990,156 @@ SkippedSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
+
+        End Function
+
+        Private Function LoadPathedRoleValueRestriction(
+    ByVal arPathedRoleXElement As XElement) As FBM.PathedRoleValueRestriction
+
+            Dim loValueRestrictionXElement As XElement =
+        arPathedRoleXElement.<orm:ValueRestriction>.FirstOrDefault
+
+            If loValueRestrictionXElement Is Nothing Then Return Nothing
+
+            Dim loConstraintXElement As XElement =
+        loValueRestrictionXElement.
+            <orm:PathedRoleConditionValueConstraint>.FirstOrDefault
+
+            If loConstraintXElement Is Nothing Then Return Nothing
+
+            Dim lrRestriction As New FBM.PathedRoleValueRestriction
+            Dim lrConstraint As New FBM.PathedRoleConditionValueConstraint
+
+            If loConstraintXElement.Attribute("id") IsNot Nothing Then
+                lrConstraint.id = loConstraintXElement.Attribute("id").Value
+            End If
+
+            For Each loRangeXElement As XElement In
+        loConstraintXElement.<orm:ValueRanges>.<orm:ValueRange>
+
+                Dim lrRange As New FBM.PathedRoleValueRange
+
+                If loRangeXElement.Attribute("id") IsNot Nothing Then
+                    lrRange.id = loRangeXElement.Attribute("id").Value
+                End If
+                If loRangeXElement.Attribute("MinValue") IsNot Nothing Then
+                    lrRange.MinValue = loRangeXElement.Attribute("MinValue").Value
+                End If
+                If loRangeXElement.Attribute("InvariantMinValue") IsNot Nothing Then
+                    lrRange.InvariantMinValue =
+                loRangeXElement.Attribute("InvariantMinValue").Value
+                End If
+                If loRangeXElement.Attribute("MaxValue") IsNot Nothing Then
+                    lrRange.MaxValue = loRangeXElement.Attribute("MaxValue").Value
+                End If
+                If loRangeXElement.Attribute("InvariantMaxValue") IsNot Nothing Then
+                    lrRange.InvariantMaxValue =
+                loRangeXElement.Attribute("InvariantMaxValue").Value
+                End If
+                If loRangeXElement.Attribute("MinInclusion") IsNot Nothing Then
+                    lrRange.MinInclusion =
+                loRangeXElement.Attribute("MinInclusion").Value
+                End If
+                If loRangeXElement.Attribute("MaxInclusion") IsNot Nothing Then
+                    lrRange.MaxInclusion =
+                loRangeXElement.Attribute("MaxInclusion").Value
+                End If
+
+                lrConstraint.ValueRange.Add(lrRange)
+
+            Next
+
+            lrRestriction.PathedRoleConditionValueConstraint = lrConstraint
+            Return lrRestriction
+
+        End Function
+
+        Private Function LoadRoleSubPath(ByVal arSubPathXElement As XElement,
+                                         ByRef arModel As FBM.Model,
+                                         ByRef arNORMAXMLDOC As XDocument) As FBM.RoleSubPath
+
+            Dim lrRoleSubPath As New FBM.RoleSubPath
+
+            If arSubPathXElement.Attribute("id") IsNot Nothing Then
+                lrRoleSubPath.Id = arSubPathXElement.Attribute("id").Value
+            End If
+
+            If arSubPathXElement.Attribute("SplitCombinationOperator") IsNot Nothing Then
+                lrRoleSubPath.SplitCombinationOperator = arSubPathXElement.Attribute("SplitCombinationOperator").Value
+            End If
+
+            Dim loRootXElement As XElement = arSubPathXElement.<orm:RootObjectType>.FirstOrDefault
+
+            If loRootXElement IsNot Nothing AndAlso loRootXElement.Attribute("ref") IsNot Nothing Then
+
+                Dim lrRoot As New FBM.RootObjectType
+
+                If loRootXElement.Attribute("id") IsNot Nothing Then
+                    lrRoot.id = loRootXElement.Attribute("id").Value
+                End If
+
+                lrRoot.ref = loRootXElement.Attribute("ref").Value
+
+                lrRoot.BostonModelElement = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lrRoot.ref)
+
+                If lrRoot.BostonModelElement Is Nothing Then
+                    lrRoot.BostonModelElement = arModel.ValueType.Find(Function(x) x.NORMAReferenceId = lrRoot.ref)
+                End If
+
+                If lrRoot.BostonModelElement Is Nothing Then
+                    lrRoot.BostonModelElement = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrRoot.ref)
+                End If
+
+                If loRootXElement.Attribute("IsNegated") IsNot Nothing Then
+                    lrRoot.IsNegated = Convert.ToBoolean(loRootXElement.Attribute("IsNegated").Value)
+                End If
+
+                lrRoleSubPath.RootObjectType = lrRoot
+            End If
+
+            For Each loPathedRoleXElement As XElement In arSubPathXElement.<orm:PathedRoles>.<orm:PathedRole>
+
+                Dim lrPathedRole As New FBM.PathedRole
+
+                If loPathedRoleXElement.Attribute("id") IsNot Nothing Then
+                    lrPathedRole.id =
+                loPathedRoleXElement.Attribute("id").Value
+                End If
+
+                If loPathedRoleXElement.Attribute("ref") IsNot Nothing Then
+                    lrPathedRole.Ref =
+                loPathedRoleXElement.Attribute("ref").Value
+                End If
+
+                If loPathedRoleXElement.Attribute("IsNegated") IsNot Nothing Then
+                    lrPathedRole.IsNegated =
+                Convert.ToBoolean(loPathedRoleXElement.Attribute("IsNegated").Value)
+                End If
+
+                If loPathedRoleXElement.Attribute("Purpose") IsNot Nothing Then
+                    lrPathedRole.Purpose =
+                loPathedRoleXElement.Attribute("Purpose").Value
+                End If
+
+                lrPathedRole.ValueRestriction = LoadPathedRoleValueRestriction(loPathedRoleXElement)
+
+                lrRoleSubPath.PathedRole.Add(lrPathedRole)
+            Next
+
+            For Each loChildSubPathXElement As XElement In arSubPathXElement.<orm:SubPaths>.<orm:SubPath>
+
+                lrRoleSubPath.SubPath.Add(
+                                            LoadRoleSubPath(
+                                                loChildSubPathXElement,
+                                                arModel,
+                                                arNORMAXMLDOC))
+            Next
+
+            Return lrRoleSubPath
 
         End Function
 
@@ -1074,7 +1222,7 @@ SkippedSubtypeRelationship:
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
                                                       Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
                                 lrJoinedEntityType = arModel.EntityType.Find(AddressOf lrModelObject.EqualsByName)
                             Else
@@ -1088,7 +1236,7 @@ SkippedSubtypeRelationship:
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
                                                       Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
                                 lrValueType = arModel.ValueType.Find(AddressOf lrModelObject.EqualsByName)
                             Else
@@ -1103,7 +1251,7 @@ SkippedSubtypeRelationship:
                                                       Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
                                                       Select ModelInformation
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
                                 lrModelObject.Name = loXMLElementQueryResult(0).Attribute("Name")
                                 lrJoinedFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrModelObject.NORMAReferenceId) '20220127-VM-was AddressOf lrModelObject.EqualsByName)
                             Else
@@ -1118,7 +1266,7 @@ SkippedSubtypeRelationship:
                                                       Where ModelInformation.Attribute("id") = lrModelObject.NORMAReferenceId
                                                       Select ModelInformation
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
 
                                 Dim lrModelObject2 As New FBM.ModelObject
                                 lrModelObject2.Id = loXMLElementQueryResult(0).Attribute("Name").Value
@@ -1147,7 +1295,7 @@ SkippedSubtypeRelationship:
                                 lrJoinedFactType = Nothing
                             End If
 
-                            If IsSomething(lrJoinedEntityType) Then
+                            If lrJoinedEntityType IsNot Nothing Then
                                 '---------------------------------------------------------
                                 'Check to see if the Role already exists in the FactType
                                 '---------------------------------------------------------
@@ -1165,7 +1313,7 @@ SkippedSubtypeRelationship:
                                     lrRole.Name = lrRoleXElement.Attribute("Name").Value
                                     lrRole.Mandatory = Convert.ToBoolean(lrRoleXElement.Attribute("_IsMandatory").Value)
                                 End If
-                            ElseIf IsSomething(lrValueType) Then
+                            ElseIf lrValueType IsNot Nothing Then
                                 '---------------------------------------------------------
                                 'Check to see if the Role already exists in the FactType
                                 '---------------------------------------------------------
@@ -1186,7 +1334,7 @@ SkippedSubtypeRelationship:
                                         lrRole.NORMALinksToUnaryFactTypeValueType = True
                                     End If
                                 End If
-                            ElseIf IsSomething(lrJoinedFactType) Then
+                            ElseIf lrJoinedFactType IsNot Nothing Then
                                 '---------------------------------------------------------
                                 'Check to see if the Role already exists in the FactType
                                 '---------------------------------------------------------
@@ -1215,7 +1363,7 @@ SkippedSubtypeRelationship:
                             '    Dim lsMessage As String = ""
                             '    lsMessage = "Warning: Error loading NORMA XML (.orm) file"
                             '    lsMessage &= vbCrLf & "NORMA Role.Id: " & lrRole.Id
-                            '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            '    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                             'End If
 
 SkipRole: 'Used when NORMA file has a 'Missing' Role.
@@ -1289,7 +1437,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         '---------------------------------
                         Call Me.LoadFactTypeFacts(lrFactType, arNORMAXMLDOC, loElement)
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             'Need to remove NORMAUnaryFactTypeValueTypes before Objectifying.
                             For Each lrRole In lrFactType.RoleGroup.ToArray
                                 If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
@@ -1325,9 +1473,536 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                             End If
                         End If
 
+                        '---------------------------------------------
+                        'Load the Derivation Rule (if the FactType is derived)
+                        '---------------------------------------------
+#Region "Derivation Rule"
+
+                        Try
+                            Dim loDerivationRuleXElement As XElement = loElement.<orm:DerivationRule>.FirstOrDefault
+                            If loDerivationRuleXElement IsNot Nothing Then
+
+                                Dim lrDerivationRule As New FBM.DerivationRule
+                                Dim lrFactTypeDerivationPath As New FBM.FactTypeDerivationPath
+                                Dim lrPathComponents As New FBM.PathComponents
+
+                                Dim loFactTypeDerivationPathXElement As XElement = loDerivationRuleXElement.<orm:FactTypeDerivationPath>.FirstOrDefault
+                                If loFactTypeDerivationPathXElement IsNot Nothing Then
+
+                                    If loFactTypeDerivationPathXElement.Attribute("id") IsNot Nothing Then
+                                        lrFactTypeDerivationPath.Id = loFactTypeDerivationPathXElement.Attribute("id").Value
+                                    End If
+                                    If loFactTypeDerivationPathXElement.Attribute("Name") IsNot Nothing Then
+                                        lrFactTypeDerivationPath.Name = loFactTypeDerivationPathXElement.Attribute("Name").Value
+                                    End If
+
+                                    '-------------------------------
+                                    'RolePath (PathComponents)
+                                    '-------------------------------
+                                    Dim loRolePathXElementQuery =
+                                        loFactTypeDerivationPathXElement.<orm:PathComponents>.<orm:RolePath>
+
+                                    For Each loRolePathXElement As XElement In loRolePathXElementQuery
+
+                                        Dim lrRolePath As New FBM.RolePath
+
+                                        If loRolePathXElement.Attribute("id") IsNot Nothing Then
+                                            lrRolePath.Id = loRolePathXElement.Attribute("id").Value
+                                        End If
+                                        If loRolePathXElement.Attribute("SplitCombinationOperator") IsNot Nothing Then
+                                            lrRolePath.SplitCombinationOperator = loRolePathXElement.Attribute("SplitCombinationOperator").Value
+                                        End If
+
+                                        '-------------------------------
+                                        'RootObjectType (ref -> ObjectType)
+                                        '-------------------------------
+                                        Dim loRootObjectTypeXElement As XElement = loRolePathXElement.<orm:RootObjectType>.FirstOrDefault
+                                        If loRootObjectTypeXElement IsNot Nothing AndAlso loRootObjectTypeXElement.Attribute("ref") IsNot Nothing Then
+
+                                            Dim lsRootObjectTypeNORMARefId As String = loRootObjectTypeXElement.Attribute("ref").Value
+                                            Dim lrRootObjectType As FBM.ModelObject = Nothing
+
+                                            'Try EntityType
+                                            Dim loRootEntityTypeXElementQuery =
+                                                From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
+                                                Where ModelInformation.Attribute("id").Value = lsRootObjectTypeNORMARefId
+                                                Select ModelInformation
+
+                                            If loRootEntityTypeXElementQuery.Count > 0 Then
+                                                Dim lsRootName As String = loRootEntityTypeXElementQuery(0).Attribute("Name").Value
+                                                lrRootObjectType = arModel.EntityType.Find(Function(x) x.Name = lsRootName)
+                                            End If
+
+                                            'Try ValueType
+                                            If lrRootObjectType Is Nothing Then
+                                                Dim loRootValueTypeXElementQuery =
+                                                    From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
+                                                    Where ModelInformation.Attribute("id").Value = lsRootObjectTypeNORMARefId
+                                                    Select ModelInformation
+
+                                                If loRootValueTypeXElementQuery.Count > 0 Then
+                                                    Dim lsRootName As String = loRootValueTypeXElementQuery(0).Attribute("Name").Value
+                                                    lrRootObjectType = arModel.ValueType.Find(Function(x) x.Name = lsRootName)
+                                                End If
+                                            End If
+
+                                            'Try ObjectifiedType (Root may point at objectified fact-as-object)
+                                            If lrRootObjectType Is Nothing Then
+                                                Dim loRootObjectifiedTypeXElementQuery =
+                                                    From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ObjectifiedType>
+                                                    Where ModelInformation.Attribute("id").Value = lsRootObjectTypeNORMARefId
+                                                    Select ModelInformation
+
+                                                If loRootObjectifiedTypeXElementQuery.Count > 0 Then
+                                                    Dim loNestedPredicateXElement As XElement = loRootObjectifiedTypeXElementQuery(0).<orm:NestedPredicate>.FirstOrDefault
+                                                    If loNestedPredicateXElement IsNot Nothing AndAlso loNestedPredicateXElement.Attribute("ref") IsNot Nothing Then
+                                                        Dim lsNestedPredicateRef As String = loNestedPredicateXElement.Attribute("ref").Value
+                                                        Dim lrNestedFactType As FBM.FactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lsNestedPredicateRef)
+
+                                                        If lrNestedFactType IsNot Nothing Then
+                                                            If lrNestedFactType.IsObjectified AndAlso lrNestedFactType.ObjectifyingEntityType IsNot Nothing Then
+                                                                lrRootObjectType = lrNestedFactType.ObjectifyingEntityType
+                                                            Else
+                                                                lrRootObjectType = lrNestedFactType
+                                                            End If
+                                                        End If
+                                                    End If
+                                                End If
+                                            End If
+
+                                            If lrRootObjectType Is Nothing Then
+                                                lrRootObjectType = New FBM.ModelObject
+                                                lrRootObjectType.NORMAReferenceId = lsRootObjectTypeNORMARefId
+                                                lrRootObjectType.Name = lsRootObjectTypeNORMARefId
+                                                lrRootObjectType.Id = lsRootObjectTypeNORMARefId
+                                            End If
+
+                                            lrRolePath.RootObjectType = New FBM.RootObjectType
+                                            lrRolePath.RootObjectType.id = loRootObjectTypeXElement.Attribute("id").Value
+                                            lrRolePath.RootObjectType.ref = loRootObjectTypeXElement.Attribute("ref").Value
+                                            If loRootObjectTypeXElement.Attribute("IsNegated") IsNot Nothing Then
+                                                lrRolePath.RootObjectType.IsNegated = loRootObjectTypeXElement.Attribute("IsNegated").Value
+                                            End If
+                                            lrRolePath.RootObjectType.BostonModelElement = lrRootObjectType
+
+                                        End If
+
+                                        '=========================================================
+                                        'NEW: PathedRoles are now on RolePath (not on SubPath)
+                                        '=========================================================
+                                        Dim loPathedRoleAtRolePathQuery =
+                                            From PathedRole In loRolePathXElement.<orm:PathedRoles>.<orm:PathedRole>
+                                            Select PathedRole
+
+                                        For Each loPathedRoleXElement As XElement In loPathedRoleAtRolePathQuery
+
+                                            Dim lrPathedRole As New FBM.PathedRole
+
+                                            If loPathedRoleXElement.Attribute("id") IsNot Nothing Then
+                                                lrPathedRole.id = loPathedRoleXElement.Attribute("id").Value
+                                            End If
+                                            If loPathedRoleXElement.Attribute("ref") IsNot Nothing Then
+                                                lrPathedRole.Ref = loPathedRoleXElement.Attribute("ref").Value
+                                            End If
+                                            If loPathedRoleXElement.Attribute("IsNegated") IsNot Nothing Then
+                                                lrPathedRole.IsNegated = loPathedRoleXElement.Attribute("IsNegated").Value
+                                            End If
+                                            If loPathedRoleXElement.Attribute("Purpose") IsNot Nothing Then
+                                                lrPathedRole.Purpose = loPathedRoleXElement.Attribute("Purpose").Value
+                                            End If
+
+                                            lrRolePath.PathedRole.Add(lrPathedRole)
+
+                                        Next 'PathedRole (RolePath)
+
+                                        '-------------------------------
+                                        'SubPaths (keep reading, in case NORMA still emits them)
+                                        '-------------------------------
+                                        Dim loSubPathXElementQuery =
+                                            From SubPath In loRolePathXElement.<orm:SubPaths>.<orm:SubPath>
+                                            Select SubPath
+
+                                        For Each loSubPathXElement As XElement In loSubPathXElementQuery
+
+                                            lrRolePath.SubPath.Add(
+                                                                    LoadRoleSubPath(
+                                                                        loSubPathXElement,
+                                                                        arModel,
+                                                                        arNORMAXMLDOC))
+
+                                        Next 'SubPath
+
+                                        '-------------------------------
+                                        'ObjectUnifiers
+                                        '-------------------------------
+                                        Dim loObjectUnifiersXElement As XElement = loRolePathXElement.<orm:ObjectUnifiers>.FirstOrDefault
+                                        If loObjectUnifiersXElement IsNot Nothing Then
+
+                                            Dim loObjectUnifierXElementQuery =
+                                                From loObjectUnifier In loObjectUnifiersXElement.<orm:ObjectUnifier>
+                                                Select loObjectUnifier
+
+                                            For Each loObjectUnifierXElement As XElement In loObjectUnifierXElementQuery
+
+                                                Dim lrObjectUnifier As New FBM.ObjectUnifier
+
+                                                If loObjectUnifierXElement.Attribute("id") IsNot Nothing Then
+                                                    lrObjectUnifier.id = loObjectUnifierXElement.Attribute("id").Value
+                                                End If
+
+                                                '-----------------------------------------
+                                                ' PathedRole refs inside ObjectUnifier
+                                                '-----------------------------------------
+                                                Dim loObjectUnifierPathedRoleXElementQuery =
+                                                    From loPathedRole In loObjectUnifierXElement.<orm:PathedRole>
+                                                    Select loPathedRole
+
+                                                For Each loObjectUnifierPathedRoleXElement As XElement In loObjectUnifierPathedRoleXElementQuery
+
+                                                    Dim lrPathedRoleReference As New FBM.PathedRoleReference
+
+                                                    If loObjectUnifierPathedRoleXElement.Attribute("ref") IsNot Nothing Then
+                                                        lrPathedRoleReference.Ref = loObjectUnifierPathedRoleXElement.Attribute("ref").Value
+                                                    End If
+
+                                                    lrObjectUnifier.PathedRoles.Add(lrPathedRoleReference)
+
+                                                Next 'PathedRole ref
+
+                                                '-----------------------------------------
+                                                ' PathRoot refs inside ObjectUnifier
+                                                '-----------------------------------------
+                                                Dim loObjectUnifierPathRootXElementQuery =
+                                                    From loPathRoot In loObjectUnifierXElement.<orm:PathRoot>
+                                                    Select loPathRoot
+
+                                                For Each loObjectUnifierPathRootXElement As XElement In loObjectUnifierPathRootXElementQuery
+
+                                                    Dim lrPathRootReference As New FBM.PathRootReference
+
+                                                    If loObjectUnifierPathRootXElement.Attribute("ref") IsNot Nothing Then
+                                                        lrPathRootReference.Ref = loObjectUnifierPathRootXElement.Attribute("ref").Value
+                                                    End If
+
+                                                    lrObjectUnifier.PathRoots.Add(lrPathRootReference)
+
+                                                Next 'PathRoot ref
+
+                                                lrRolePath.ObjectUnifier.Add(lrObjectUnifier)
+
+                                            Next 'ObjectUnifier
+
+                                        End If 'ObjectUnifiers
+
+                                        '-------------------------------
+                                        'CalculatedValues (typed)
+                                        '-------------------------------
+                                        Dim loCalculatedValuesXElement As XElement = loRolePathXElement.<orm:CalculatedValues>.FirstOrDefault
+                                        If loCalculatedValuesXElement IsNot Nothing Then
+
+                                            Dim loCalculatedValueXElementQuery =
+                                                From CalculatedValue In loCalculatedValuesXElement.<orm:CalculatedValue>
+                                                Select CalculatedValue
+
+                                            For Each loCalculatedValueXElement As XElement In loCalculatedValueXElementQuery
+
+                                                Dim lrCalculatedValue As New FBM.CalculatedValue
+
+                                                If loCalculatedValueXElement.Attribute("id") IsNot Nothing Then
+                                                    lrCalculatedValue.Id = loCalculatedValueXElement.Attribute("id").Value
+                                                End If
+
+                                                'Function ref
+                                                Dim loFunctionXElement As XElement = loCalculatedValueXElement.<orm:Function>.FirstOrDefault
+                                                If loFunctionXElement IsNot Nothing Then
+                                                    lrCalculatedValue.Function = New FBM.FunctionRef
+                                                    If loFunctionXElement.Attribute("ref") IsNot Nothing Then
+                                                        lrCalculatedValue.Function.Ref = loFunctionXElement.Attribute("ref").Value
+                                                    End If
+                                                End If
+
+                                                'AggregationContext
+                                                Dim loAggregationContextXElement As XElement = loCalculatedValueXElement.<orm:AggregationContext>.FirstOrDefault
+                                                If loAggregationContextXElement IsNot Nothing Then
+
+                                                    Dim lrAggregationContext As New FBM.AggregationContext
+
+                                                    Dim loAggregationPathRootXElement As XElement = loAggregationContextXElement.<orm:PathRoot>.FirstOrDefault
+                                                    If loAggregationPathRootXElement IsNot Nothing AndAlso loAggregationPathRootXElement.Attribute("ref") IsNot Nothing Then
+                                                        lrAggregationContext.PathRoot = New FBM.PathRootReference With {
+                                                            .Ref = loAggregationPathRootXElement.Attribute("ref").Value
+                                                        }
+                                                    End If
+
+                                                    lrCalculatedValue.AggregationContext = lrAggregationContext
+
+                                                End If
+
+                                                'Inputs
+                                                Dim loInputsXElement As XElement = loCalculatedValueXElement.<orm:Inputs>.FirstOrDefault
+                                                If loInputsXElement IsNot Nothing Then
+
+                                                    Dim lrInputs As New FBM.Inputs
+
+                                                    Dim loInputXElementQuery =
+                                                        From Input In loInputsXElement.<orm:Input>
+                                                        Select Input
+
+                                                    For Each loInputXElement As XElement In loInputXElementQuery
+
+                                                        Dim lrInput As New FBM.Input
+
+                                                        If loInputXElement.Attribute("id") IsNot Nothing Then
+                                                            lrInput.Id = loInputXElement.Attribute("id").Value
+                                                        End If
+
+                                                        'Parameter ref
+                                                        Dim loParameterXElement As XElement = loInputXElement.<orm:Parameter>.FirstOrDefault
+                                                        If loParameterXElement IsNot Nothing Then
+                                                            lrInput.Parameter = New FBM.ParameterRef
+                                                            If loParameterXElement.Attribute("ref") IsNot Nothing Then
+                                                                lrInput.Parameter.Ref = loParameterXElement.Attribute("ref").Value
+                                                            End If
+                                                        End If
+
+                                                        'Source (choice)
+                                                        Dim loSourceXElement As XElement = loInputXElement.<orm:Source>.FirstOrDefault
+                                                        If loSourceXElement IsNot Nothing Then
+
+                                                            Dim lrSource As New FBM.Source
+
+                                                            Dim loPathRootXElement As XElement = loSourceXElement.<orm:PathRoot>.FirstOrDefault
+                                                            If loPathRootXElement IsNot Nothing AndAlso loPathRootXElement.Attribute("ref") IsNot Nothing Then
+
+                                                                lrSource.Item = New FBM.PathRootReference With {
+                                                                                                            .Ref = loPathRootXElement.Attribute("ref").Value
+                                                                                                                }
+                                                            Else
+
+                                                                Dim loPathedRoleRefXElement As XElement = loSourceXElement.<orm:PathedRole>.FirstOrDefault
+                                                                If loPathedRoleRefXElement IsNot Nothing Then
+                                                                    Dim lrPathedRoleRef As New FBM.PathedRoleRef
+                                                                    If loPathedRoleRefXElement.Attribute("ref") IsNot Nothing Then
+                                                                        lrPathedRoleRef.Ref = loPathedRoleRefXElement.Attribute("ref").Value
+                                                                    End If
+                                                                    lrSource.Item = lrPathedRoleRef
+                                                                Else
+                                                                    Dim loCalculatedValueRefXElement As XElement = loSourceXElement.<orm:CalculatedValue>.FirstOrDefault
+                                                                    If loCalculatedValueRefXElement IsNot Nothing AndAlso loCalculatedValueRefXElement.Attribute("ref") IsNot Nothing Then
+                                                                        Dim lrCalculatedValueRef As New FBM.CalculatedValueRef
+                                                                        lrCalculatedValueRef.Ref = loCalculatedValueRefXElement.Attribute("ref").Value
+                                                                        lrSource.Item = lrCalculatedValueRef
+                                                                    Else
+                                                                        Dim loConstantXElement As XElement = loSourceXElement.<orm:Constant>.FirstOrDefault
+                                                                        If loConstantXElement IsNot Nothing Then
+                                                                            Dim lrConstant As New FBM.Constant
+                                                                            If loConstantXElement.Attribute("id") IsNot Nothing Then
+                                                                                lrConstant.Id = loConstantXElement.Attribute("id").Value
+                                                                            End If
+                                                                            Dim loValueXElement As XElement = loConstantXElement.<orm:Value>.FirstOrDefault
+                                                                            If loValueXElement IsNot Nothing Then
+                                                                                lrConstant.Value = loValueXElement.Value
+                                                                            End If
+                                                                            lrSource.Item = lrConstant
+                                                                        End If
+                                                                    End If
+                                                                End If
+
+                                                            End If
+                                                            lrInput.Source = lrSource
+
+                                                        End If 'Source
+
+                                                        lrInputs.Input.Add(lrInput)
+
+                                                    Next 'Input
+
+                                                    lrCalculatedValue.Inputs = lrInputs
+
+                                                End If 'Inputs
+
+                                                lrRolePath.CalculatedValues.Add(lrCalculatedValue)
+
+                                            Next 'CalculatedValue
+
+                                        End If 'CalculatedValues
+
+
+                                        '-------------------------------
+                                        'Conditions (typed)
+                                        '-------------------------------
+                                        Dim loConditionsXElement As XElement = loRolePathXElement.<orm:Conditions>.FirstOrDefault
+                                        If loConditionsXElement IsNot Nothing Then
+
+                                            Dim lrConditions As New FBM.Conditions
+
+                                            Dim larConditionNodes As New List(Of FBM.ConditionNode)
+
+                                            'We accept multiple top-level nodes under <Conditions>.
+                                            For Each loTopNode As XElement In loConditionsXElement.Elements()
+
+                                                Dim lrNode As FBM.ConditionNode = Nothing
+
+                                                Select Case loTopNode.Name.LocalName
+
+                                                    Case "And"
+                                                        lrNode = LoadConditionAnd(loTopNode)
+
+                                                    Case "Or"
+                                                        lrNode = LoadConditionOr(loTopNode)
+
+                                                    Case "Not"
+                                                        lrNode = LoadConditionNot(loTopNode)
+
+                                                    Case "Equals"
+                                                        lrNode = LoadConditionBinaryComparison(New FBM.ConditionEquals, loTopNode)
+
+                                                    Case "NotEquals"
+                                                        lrNode = LoadConditionBinaryComparison(New FBM.ConditionNotEquals, loTopNode)
+
+                                                    Case "GreaterThan"
+                                                        lrNode = LoadConditionBinaryComparison(New FBM.ConditionGreaterThan, loTopNode)
+
+                                                    Case "GreaterThanOrEqual"
+                                                        lrNode = LoadConditionBinaryComparison(New FBM.ConditionGreaterThanOrEqual, loTopNode)
+
+                                                    Case "LessThan"
+                                                        lrNode = LoadConditionBinaryComparison(New FBM.ConditionLessThan, loTopNode)
+
+                                                    Case "LessThanOrEqual"
+                                                        lrNode = LoadConditionBinaryComparison(New FBM.ConditionLessThanOrEqual, loTopNode)
+
+                                                    Case "CalculatedCondition"
+                                                        Dim lrCalculatedCondition As New FBM.CalculatedCondition
+                                                        If loTopNode.Attribute("ref") IsNot Nothing Then
+                                                            lrCalculatedCondition.Ref = loTopNode.Attribute("ref").Value
+                                                        End If
+                                                        lrNode = lrCalculatedCondition
+
+                                                    Case Else
+                                                        'Unknown condition node shape. Ignore for now.
+                                                End Select
+
+                                                If lrNode IsNot Nothing Then
+                                                    larConditionNodes.Add(lrNode)
+                                                End If
+
+                                            Next
+
+                                            lrConditions.Items = larConditionNodes
+                                            lrRolePath.Conditions = lrConditions
+
+                                        End If 'Conditions
+
+                                        lrPathComponents.RolePaths.Add(lrRolePath)
+
+                                    Next 'RolePath
+
+                                    lrFactTypeDerivationPath.PathComponents = lrPathComponents
+
+                                    '-------------------------------
+                                    'DerivationProjections
+                                    '-------------------------------
+                                    Dim loProjectionXElementQuery =
+                                                From loDerivationProjection In loFactTypeDerivationPathXElement.<orm:DerivationProjections>.<orm:DerivationProjection>
+                                                Select loDerivationProjection
+
+                                    For Each loProjectionXElement As XElement In loProjectionXElementQuery
+
+                                        Dim lrProjection As New FBM.DerivationProjection
+
+                                        If loProjectionXElement.Attribute("id") IsNot Nothing Then
+                                            lrProjection.Id = loProjectionXElement.Attribute("id").Value
+                                        End If
+
+                                        If loProjectionXElement.Attribute("ref") IsNot Nothing Then
+                                            lrProjection.Ref = loProjectionXElement.Attribute("ref").Value
+                                        End If
+
+                                        '-----------------------------------------
+                                        ' RoleProjection (0..n) inside this projection
+                                        '-----------------------------------------
+                                        Dim loRoleProjectionXElementQuery =
+                                                        From loRoleProjection In loProjectionXElement.<orm:RoleProjection>
+                                                        Select loRoleProjection
+
+                                        For Each loRoleProjectionXElement As XElement In loRoleProjectionXElementQuery
+
+                                            Dim lrRoleProjection As New FBM.RoleProjection
+
+                                            If loRoleProjectionXElement.Attribute("id") IsNot Nothing Then
+                                                lrRoleProjection.Id = loRoleProjectionXElement.Attribute("id").Value
+                                            End If
+
+                                            If loRoleProjectionXElement.Attribute("ref") IsNot Nothing Then
+                                                lrRoleProjection.Ref = loRoleProjectionXElement.Attribute("ref").Value
+                                            End If
+
+                                            '-----------------------------------------
+                                            ' DerivationSource (exactly one wrapper node)
+                                            '-----------------------------------------
+                                            Dim loDerivationSourceXElement As XElement = loRoleProjectionXElement.<orm:DerivationSource>.FirstOrDefault()
+
+                                            If loDerivationSourceXElement IsNot Nothing Then
+
+                                                Dim lrDerivationSource As New FBM.DerivationSource
+
+                                                ' PathRoot source
+                                                Dim loPathRootXElement As XElement = loDerivationSourceXElement.<orm:PathRoot>.FirstOrDefault()
+                                                If loPathRootXElement IsNot Nothing AndAlso loPathRootXElement.Attribute("ref") IsNot Nothing Then
+                                                    lrDerivationSource.PathRoot = New FBM.PathRootReference With {
+                                                                                                .Ref = loPathRootXElement.Attribute("ref").Value
+                                                                                            }
+                                                End If
+
+                                                ' PathedRole source
+                                                Dim loPathedRoleXElement As XElement = loDerivationSourceXElement.<orm:PathedRole>.FirstOrDefault()
+                                                If loPathedRoleXElement IsNot Nothing AndAlso loPathedRoleXElement.Attribute("ref") IsNot Nothing Then
+                                                    lrDerivationSource.PathedRole = New FBM.PathedRoleReference With {
+                                                                                                .Ref = loPathedRoleXElement.Attribute("ref").Value
+                                                                                            }
+                                                End If
+
+                                                ' CalculatedValue source
+                                                Dim loCalculatedValueXElement As XElement = loDerivationSourceXElement.<orm:CalculatedValue>.FirstOrDefault()
+                                                If loCalculatedValueXElement IsNot Nothing AndAlso loCalculatedValueXElement.Attribute("ref") IsNot Nothing Then
+                                                    lrDerivationSource.CalculatedValue = New FBM.CalculatedValueReference With {
+                                                                                                        .Ref = loCalculatedValueXElement.Attribute("ref").Value
+                                                                                                    }
+                                                End If
+
+                                                lrRoleProjection.DerivationSource = lrDerivationSource
+
+                                            End If
+
+                                            lrProjection.RoleProjection.Add(lrRoleProjection)
+
+                                        Next 'RoleProjection
+
+                                        lrFactTypeDerivationPath.Projection.Add(lrProjection)
+
+                                    Next 'DerivationProjection
+
+                                End If 'FactTypeDerivationPath
+
+                                lrDerivationRule.FactTypeDerivationPath = lrFactTypeDerivationPath
+                                lrFactType.DerivationRule = lrDerivationRule
+                                lrFactType.IsDerived = True
+
+                            End If 'DerivationRule exists
+
+                        Catch ex As Exception
+                            'Derivation import should never prevent FactTypes loading.
+                        End Try
+
+#End Region
+
+
                     End If 'FactType exists in Model
                 Next 'FactType
 
+
+#Region "Faulty Fact Types"
                 Dim larFaultyFactTypes = From FactType In arModel.FactType
                                          From Role In FactType.RoleGroup
                                          Where Role.JoinedORMObject Is Nothing
@@ -1359,13 +2034,204 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         Next 'Seach in NORMAXMLDOC
                     Next 'Role
                 Next 'FaultyFactType
+#End Region
+
+#Region "Derivation Text"
+
+                Dim larDerivedFactType = From FactType In arModel.FactType
+                                         Where FactType.IsDerived
+                                         Where FactType.DerivationText.Trim = ""
+                                         Select FactType
+
+                For Each lrDerivedFactType In larDerivedFactType
+
+                    lrDerivedFactType.DerivationText = BostonDerivationRenderer.RenderDerivationEnglish(arModel, lrDerivedFactType)
+
+                Next
+#End Region
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Function LoadConditionAnd(ByVal aoAndXElement As XElement) As FBM.ConditionAnd
+            Dim lrAnd As New FBM.ConditionAnd
+            For Each loChild As XElement In aoAndXElement.Elements()
+                Dim lrChild As FBM.ConditionNode = LoadConditionNode(loChild)
+                If lrChild IsNot Nothing Then
+                    lrAnd.Items.Add(lrChild)
+                End If
+            Next
+            Return lrAnd
+        End Function
+
+        Private Function LoadConditionOr(ByVal aoOrXElement As XElement) As FBM.ConditionOr
+            Dim lrOr As New FBM.ConditionOr
+            For Each loChild As XElement In aoOrXElement.Elements()
+                Dim lrChild As FBM.ConditionNode = LoadConditionNode(loChild)
+                If lrChild IsNot Nothing Then
+                    lrOr.Items.Add(lrChild)
+                End If
+            Next
+            Return lrOr
+        End Function
+
+        Private Function LoadConditionNot(ByVal aoNotXElement As XElement) As FBM.ConditionNot
+            Dim lrNot As New FBM.ConditionNot
+            Dim loChild As XElement = aoNotXElement.Elements().FirstOrDefault
+            If loChild IsNot Nothing Then
+                lrNot.Item = LoadConditionNode(loChild)
+            End If
+            Return lrNot
+        End Function
+
+        Private Function LoadConditionNode(ByVal aoNodeXElement As XElement) As FBM.ConditionNode
+
+            Select Case aoNodeXElement.Name.LocalName
+
+                Case "And"
+                    Return LoadConditionAnd(aoNodeXElement)
+
+                Case "Or"
+                    Return LoadConditionOr(aoNodeXElement)
+
+                Case "Not"
+                    Return LoadConditionNot(aoNodeXElement)
+
+                Case "Equals"
+                    Return LoadConditionBinaryComparison(New FBM.ConditionEquals, aoNodeXElement)
+
+                Case "NotEquals"
+                    Return LoadConditionBinaryComparison(New FBM.ConditionNotEquals, aoNodeXElement)
+
+                Case "GreaterThan"
+                    Return LoadConditionBinaryComparison(New FBM.ConditionGreaterThan, aoNodeXElement)
+
+                Case "GreaterThanOrEqual"
+                    Return LoadConditionBinaryComparison(New FBM.ConditionGreaterThanOrEqual, aoNodeXElement)
+
+                Case "LessThan"
+                    Return LoadConditionBinaryComparison(New FBM.ConditionLessThan, aoNodeXElement)
+
+                Case "LessThanOrEqual"
+                    Return LoadConditionBinaryComparison(New FBM.ConditionLessThanOrEqual, aoNodeXElement)
+
+                Case Else
+                    Return Nothing
+
+            End Select
+
+        End Function
+
+        Private Function LoadConditionBinaryComparison(Of T As {FBM.ConditionBinaryComparison, New})(
+    ByVal arComparison As T,
+    ByVal aoComparisonXElement As XElement) As T
+
+            Dim loLeftXElement As XElement = aoComparisonXElement.<orm:Left>.FirstOrDefault
+            Dim loRightXElement As XElement = aoComparisonXElement.<orm:Right>.FirstOrDefault
+
+            If loLeftXElement IsNot Nothing Then
+                arComparison.Left = LoadConditionValueContainer(loLeftXElement)
+            End If
+
+            If loRightXElement IsNot Nothing Then
+                arComparison.Right = LoadConditionValueContainer(loRightXElement)
+            End If
+
+            Return arComparison
+
+        End Function
+
+        Private Function LoadConditionValueContainer(ByVal aoContainerXElement As XElement) As FBM.ConditionValueContainer
+
+            Dim lrContainer As New FBM.ConditionValueContainer
+
+            'We accept the first child inside <Left> or <Right> (or other container usage).
+            Dim loItemXElement As XElement = aoContainerXElement.Elements().FirstOrDefault
+            If loItemXElement Is Nothing Then
+                Return lrContainer
+            End If
+
+            Select Case loItemXElement.Name.LocalName
+
+                Case "PathedRole"
+                    Dim lrRef As New FBM.PathedRoleRef
+                    If loItemXElement.Attribute("ref") IsNot Nothing Then
+                        lrRef.Ref = loItemXElement.Attribute("ref").Value
+                    End If
+                    lrContainer.Item = lrRef
+
+                Case "CalculatedValue"
+                    Dim lrRef As New FBM.CalculatedValueRef
+                    If loItemXElement.Attribute("ref") IsNot Nothing Then
+                        lrRef.Ref = loItemXElement.Attribute("ref").Value
+                    End If
+                    lrContainer.Item = lrRef
+
+                Case "Constant"
+                    Dim lrConstant As New FBM.Constant
+                    If loItemXElement.Attribute("id") IsNot Nothing Then
+                        lrConstant.Id = loItemXElement.Attribute("id").Value
+                    End If
+                    Dim loValueXElement As XElement = loItemXElement.<orm:Value>.FirstOrDefault
+                    If loValueXElement IsNot Nothing Then
+                        lrConstant.Value = loValueXElement.Value
+                    End If
+                    lrContainer.Item = lrConstant
+
+                Case Else
+                    'Unknown operand shape. Leave empty.
+
+            End Select
+
+            Return lrContainer
+
+        End Function
+
+        Public Sub LoadFunctions(ByRef arModel As FBM.Model, ByRef arNORMAXMLDOC As XDocument)
+
+            Dim lrFunction As New FBM.Function
+            Dim loEnumElementQueryResult As IEnumerable(Of XElement)
+            Dim loElement As XElement
+
+            Try
+                loEnumElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Functions>.<orm:Function>
+                                           Select ModelInformation
+
+                For Each loElement In loEnumElementQueryResult
+
+                    lrFunction = New FBM.Function(arModel)
+                    lrFunction.id = loElement.Attribute("id").Value
+                    lrFunction.Name = loElement.Attribute("Name").Value
+                    lrFunction.IsBoolean = If(loElement.Attribute("IsBoolean") IsNot Nothing, Convert.ToBoolean(loElement.Attribute("IsBoolean").Value), False)
+                    lrFunction.OperatorSymbol = If(loElement.Attribute("OperatorSymbol") IsNot Nothing, loElement.Attribute("OperatorSymbol").Value, "")
+
+                    For Each lrParameterXElement In loElement.<orm:Parameters>.<orm:Parameter>
+
+                        Dim lrParameter As New FBM.Parameter
+                        lrParameter.id = lrParameterXElement.Attribute("id").Value
+                        lrParameter.Name = lrParameterXElement.Attribute("Name").Value
+                        lrParameter.BagInput = If(lrParameterXElement.Attribute("BagInput") IsNot Nothing, Convert.ToBoolean(lrParameterXElement.Attribute("BagInput").Value), False)
+
+                        lrFunction.Parameters.Add(lrParameter)
+                    Next
+
+                    arModel.Function.Add(lrFunction)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
             End Try
 
         End Sub
@@ -1417,7 +2283,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1457,7 +2323,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                     '--------------------------------
                     lrRole.Id = lrRoleXElement.Attribute("ref").Value
                     lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                    If IsSomething(lrRole) Then
+                    If lrRole IsNot Nothing Then
                         If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                             '------------------------------------------
                             'Don't add the Role to the RoleConstraint
@@ -1472,7 +2338,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         lsMessage = "Warning: Loading NORMA XML (.orm) file"
                         lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                         lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                     End If
                 Next
 
@@ -1503,7 +2369,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1539,7 +2405,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         '--------------------------------
                         lrRole.Id = lrRoleXElement.Attribute("ref").Value
                         lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                        If IsSomething(lrRole) Then
+                        If lrRole IsNot Nothing Then
                             If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                 '------------------------------------------
                                 'Don't add the Role to the RoleConstraint
@@ -1555,7 +2421,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                                 lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                 lsMessage &= vbCrLf & " No Role found for RoleConstraint.Name: " & loElement.Attribute("Name").Value
                                 lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                             End If
                         End If
                     Next
@@ -1619,7 +2485,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                         '--------------------------------
                         lrRole.Id = lrRoleXElement.Attribute("ref").Value
                         lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                        If IsSomething(lrRole) Then
+                        If lrRole IsNot Nothing Then
                             If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                 '------------------------------------------
                                 'Don't add the Role to the RoleConstraint
@@ -1634,7 +2500,7 @@ SkipRole: 'Used when NORMA file has a 'Missing' Role.
                                 lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                 lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: " & loElement.Attribute("Name").Value
                                 lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                             End If
                         End If
                     Next
@@ -1675,7 +2541,7 @@ SkipRoleConstraint:
 
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, False, False, True)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, False, False, True)
                 End Try
             Next
 
@@ -1723,7 +2589,7 @@ SkipRoleConstraint:
                             '--------------------------------
                             lrRole.Id = lrRoleXElement.Attribute("ref").Value
                             lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                            If IsSomething(lrRole) Then
+                            If lrRole IsNot Nothing Then
                                 If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                     '------------------------------------------
                                     'Don't add the Role to the RoleConstraint
@@ -1738,7 +2604,7 @@ SkipRoleConstraint:
                                 lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                 lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                                 lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                             End If
 
                         Next
@@ -1839,7 +2705,7 @@ SkipRoleConstraint:
                                 '--------------------------------
                                 lrRole.Id = lrRoleXElement.Attribute("ref").Value
                                 lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                                If IsSomething(lrRole) Then
+                                If lrRole IsNot Nothing Then
                                     If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                         '------------------------------------------
                                         'Don't add the Role to the RoleConstraint
@@ -1854,7 +2720,7 @@ SkipRoleConstraint:
                                     lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                     lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                                     lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                                 End If
 
                             Next
@@ -1955,7 +2821,7 @@ SkipRoleConstraint:
                         '--------------------------------
                         lrRole.Id = lrRoleXElement.Attribute("ref").Value
                         lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                        If IsSomething(lrRole) Then
+                        If lrRole IsNot Nothing Then
                             If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                 '------------------------------------------
                                 'Don't add the Role to the RoleConstraint
@@ -1970,7 +2836,7 @@ SkipRoleConstraint:
                             lsMessage = "Warning: Loading NORMA XML (.orm) file"
                             lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                             lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                         End If
 
                     Next
@@ -2066,7 +2932,7 @@ SkipRoleConstraint:
                                 '--------------------------------
                                 lrRole.Id = lrRoleXElement.Attribute("ref").Value
                                 lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                                If IsSomething(lrRole) Then
+                                If lrRole IsNot Nothing Then
                                     If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                         '------------------------------------------
                                         'Don't add the Role to the RoleConstraint
@@ -2081,7 +2947,7 @@ SkipRoleConstraint:
                                     lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                     lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                                     lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                                 End If
 
                             Next
@@ -2201,7 +3067,7 @@ SkipRoleConstraint:
                         '--------------------------------
                         lrRole.Id = lrRoleXElement.Attribute("ref").Value
                         lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                        If IsSomething(lrRole) Then
+                        If lrRole IsNot Nothing Then
                             If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                 '------------------------------------------
                                 'Don't add the Role to the RoleConstraint
@@ -2216,7 +3082,7 @@ SkipRoleConstraint:
                             lsMessage = "Warning: Loading NORMA XML (.orm) file"
                             lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                             lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                         End If
 
                     Next
@@ -2313,7 +3179,7 @@ SkippedRole:
                         lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                         lsMessage &= vbCrLf & vbCrLf & "Error trying to set RoleId for Link Fact Type for Fact Type: " & loElement.Attribute("_Name").Value
                         lsMessage &= vbCrLf & vbCrLf & ex.Message
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                     End Try
                 Next
 
@@ -2323,7 +3189,7 @@ SkippedRole:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2372,7 +3238,7 @@ SkippedRole:
                                 '--------------------------------
                                 lrRole.Id = lrRoleXElement.Attribute("ref").Value
                                 lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                                If IsSomething(lrRole) Then
+                                If lrRole IsNot Nothing Then
                                     If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                         '------------------------------------------
                                         'Don't add the Role to the RoleConstraint
@@ -2387,7 +3253,7 @@ SkippedRole:
                                     lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                     lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                                     lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                                 End If
 
                             Next
@@ -2481,7 +3347,7 @@ SkippedRole:
                             '--------------------------------
                             lrRole.Id = lrRoleXElement.Attribute("ref").Value
                             lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                            If IsSomething(lrRole) Then
+                            If lrRole IsNot Nothing Then
                                 If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                     '------------------------------------------
                                     'Don't add the Role to the RoleConstraint
@@ -2496,7 +3362,7 @@ SkippedRole:
                                 lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                 lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                                 lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                             End If
 
                         Next
@@ -2558,7 +3424,7 @@ SkippedRole:
 
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End Try
             Next 'Ring Constraint
 
@@ -2608,7 +3474,7 @@ SkippedRole:
                             '--------------------------------
                             lrRole.Id = lrRoleXElement.Attribute("ref").Value
                             lrRole = arModel.Role.Find(AddressOf lrRole.Equals)
-                            If IsSomething(lrRole) Then
+                            If lrRole IsNot Nothing Then
                                 If lrRole.NORMALinksToUnaryFactTypeValueType = True Then
                                     '------------------------------------------
                                     'Don't add the Role to the RoleConstraint
@@ -2623,7 +3489,7 @@ SkippedRole:
                                 lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                 lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                                 lsMessage &= vbCrLf & " Role.Id: " & lrRoleXElement.Attribute("ref").Value
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                             End If
 
                         Next
@@ -2664,7 +3530,7 @@ SkippedRole:
                                     lsMessage = "Warning: Loading NORMA XML (.orm) file"
                                     lsMessage &= vbCrLf & " No Role found for RoleConstraint.Id: "
                                     lsMessage &= vbCrLf & " Role.Id: " & loPathedRoleXElement.Attribute("ref").Value
-                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                                 End If
                             Next
 
@@ -2785,7 +3651,7 @@ SkippedRole:
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:EntityType>
                                                   Where ModelInformation.Attribute("id") = lrEntityType.NORMAReferenceId
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             lrEntityType.Name = loXMLElementQueryResult(0).Attribute("Name")
                             lrEntityType = arModel.EntityType.Find(Function(x) x.NORMAReferenceId = lrEntityType.NORMAReferenceId)
                             Dim expandReferenceModeAttribute = lrObjectTypeShapeXElement.Attribute("ExpandRefMode")
@@ -2805,7 +3671,7 @@ SkippedRole:
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Objects>.<orm:ValueType>
                                                   Where ModelInformation.Attribute("id") = lrValueType.NORMAReferenceId
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             lrValueType.Name = loXMLElementQueryResult(0).Attribute("Name")
                             lrValueType = arModel.ValueType.Find(Function(x) x.NORMAReferenceId = lrValueType.NORMAReferenceId)
                         Else
@@ -2824,14 +3690,14 @@ SkippedRole:
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Facts>.<orm:Fact>
                                                   Where ModelInformation.Attribute("id") = lrFactType.NORMAReferenceId
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             lrFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrFactType.NORMAReferenceId)
                         Else
                             lrFactType = Nothing
                         End If
 #End Region
 
-                        If IsSomething(lrEntityType) Then
+                        If lrEntityType IsNot Nothing Then
 #Region "EntityType"
                             lrEntityTypeInstance = New FBM.EntityTypeInstance
                             lrEntityTypeInstance = lrEntityType.CloneInstance(lrPage, False, True, True)
@@ -2845,9 +3711,10 @@ SkippedRole:
                             lrEntityTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
                             lrEntityTypeInstance.Visible = True
 
-                            lrEntityTypeInstance.HideReferenceMode = lrEntityType.HideReferenceMode
+                            lrEntityTypeInstance.HideReferenceMode = lrEntityType.HideReferenceMode 'Sets a Flag against the EntityTypeInstance.
+
 #End Region
-                        ElseIf IsSomething(lrValueType) Then
+                        ElseIf lrValueType IsNot Nothing Then
 #Region "ValueTypes"
                             Dim lrValueTypeInstance As New FBM.ValueTypeInstance
                             lrValueTypeInstance = lrValueType.CloneInstance(lrPage, False, True)
@@ -2862,7 +3729,7 @@ SkippedRole:
                             lrValueTypeInstance.X = Int(CSng(Trim(lsBounds(0))) * ldblScalar)
                             lrValueTypeInstance.Y = Int(CSng(Trim(lsBounds(1))) * ldblScalar)
 #End Region
-                        ElseIf IsSomething(lrFactType) Then
+                        ElseIf lrFactType IsNot Nothing Then
 #Region "FactTypes"
                             lrFactTypeInstance = New FBM.FactTypeInstance
                             lrFactTypeInstance = lrFactType.CloneInstance(lrPage, False)
@@ -2910,7 +3777,7 @@ SkippedRole:
 
                         lrFactType = arModel.FactType.Find(Function(x) x.NORMAReferenceId = lrFactType.NORMAReferenceId)
 
-                        If IsSomething(lrFactType) Then
+                        If lrFactType IsNot Nothing Then
 
                             lsBounds = lrObjectTypeShapeXElement.Attribute("AbsoluteBounds").Value.Split(",")
 
@@ -2976,7 +3843,7 @@ LoadFactTypeInstance:
                             End If
 
 
-                        End If 'IsSomething(lrFactType)
+                        End If 'lrFactType IsNot Nothing
                     Next 'FactTypeShape in NORMA XML 
 #End Region
 
@@ -3058,7 +3925,7 @@ LoadFactTypeInstance:
                                 Catch ex1 As Exception
                                     'Not a biggie.
                                 End Try
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                             End Try
                         Next
                     Next
@@ -3082,7 +3949,7 @@ LoadFactTypeInstance:
                     '        For Each lrRoleConstraintRole In lrRoleConstraint.RoleConstraintRole
                     '            lrRoleInstance = New FBM.RoleInstance(arModel, lrPage, lrRoleConstraintRole.Role)
                     '            lrRoleInstance = lrPage.RoleInstance.Find(AddressOf lrRoleInstance.Equals)
-                    '            If IsSomething(lrRoleInstance) Then
+                    '            If lrRoleInstance IsNot Nothing Then
                     '                '---------------------------------------
                     '                'Okay, the RoleInstance is on the Page
                     '                '---------------------------------------
@@ -3132,7 +3999,7 @@ LoadFactTypeInstance:
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:RingConstraint>
                                                   Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
                             lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
@@ -3175,7 +4042,7 @@ LoadFactTypeInstance:
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:FrequencyConstraint>
                                                   Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
                             lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
@@ -3315,7 +4182,7 @@ SkipRoleValueConstraint2:
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:UniquenessConstraint>
                                                   Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
                             lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
@@ -3359,7 +4226,7 @@ SkipRoleValueConstraint2:
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:SubsetConstraint>
                                                       Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
 
                                 lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
@@ -3384,7 +4251,7 @@ SkipRoleValueConstraint2:
 
                         lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                         lsMessage &= vbCrLf & vbCrLf & ex.Message
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                     End Try
 
                     '------------------
@@ -3404,7 +4271,7 @@ SkipRoleValueConstraint2:
                             loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:MandatoryConstraint>
                                                       Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
                                 If loXMLElementQueryResult.<orm:ExclusiveOrExclusionConstraint>.Count = 0 Then
                                     lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
                                     lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
@@ -3432,7 +4299,7 @@ SkipRoleValueConstraint2:
 
                             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                             lsMessage &= vbCrLf & vbCrLf & ex.Message
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
                         End Try
 SkipExclusiveOrExternalRoleConstraint:
                     Next
@@ -3455,7 +4322,7 @@ SkipExclusiveOrExternalRoleConstraint:
                                                   Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
                         If loXMLElementQueryResult.<orm:ExclusiveOrExclusionConstraint>.Count = 1 Then
-                            If IsSomething(loXMLElementQueryResult(0)) Then
+                            If loXMLElementQueryResult(0) IsNot Nothing Then
 
                                 lrRoleConstraint.NORMAReferenceId = loXMLElementQueryResult(0).<orm:ExclusiveOrExclusionConstraint>(0).Attribute("ref").Value
 
@@ -3508,7 +4375,7 @@ SkipExclusiveOrExternalRoleConstraint:
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:ExclusionConstraint>
                                                   Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
 
                             Try
                                 lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
@@ -3535,7 +4402,7 @@ SkipExclusiveOrExternalRoleConstraint:
                                 lsMessage.AppendLine("")
                                 lsMessage &= "Error: " & mb.ReflectedType.Name & "." & mb.Name
                                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, True)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, True)
                             End Try
                         Else
                             lrRoleConstraint = Nothing
@@ -3558,7 +4425,7 @@ SkipExclusiveOrExternalRoleConstraint:
                         loXMLElementQueryResult = From ModelInformation In arNORMAXMLDOC.Elements.<orm:ORMModel>.<orm:Constraints>.<orm:EqualityConstraint>
                                                   Where ModelInformation.Attribute("id") = lrRoleConstraint.NORMAReferenceId
 
-                        If IsSomething(loXMLElementQueryResult(0)) Then
+                        If loXMLElementQueryResult(0) IsNot Nothing Then
                             lrRoleConstraint.Name = loXMLElementQueryResult(0).Attribute("Name")
                             lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.NORMAReferenceId = lrRoleConstraint.NORMAReferenceId)
 
@@ -3627,7 +4494,7 @@ SkipExclusiveOrExternalRoleConstraint:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3641,7 +4508,7 @@ SkipExclusiveOrExternalRoleConstraint:
             Dim lrPredicatePartXElement As XElement
             Dim lrPredicatePartRoleXElement As XElement
             Dim lrFactTypeReading As FBM.FactTypeReading
-            Dim lasPredicateParts() As String
+            Dim lasPredicateParts As List(Of String)
             Dim lrPredicatePart As FBM.PredicatePart = Nothing
             Dim lrRoleHashTable As New Hashtable()
 
@@ -3656,7 +4523,8 @@ SkipExclusiveOrExternalRoleConstraint:
 
                         'MsgBox(lrPredicatePartXElement.Value)
                         Dim lsNORMAPredicateList As New Regex("(\{.*?\})|([a-z][A-Z]\s)")
-                        lasPredicateParts = lsNORMAPredicateList.Split(lrPredicatePartXElement.Value).Where(Function(s) Not String.IsNullOrEmpty(s)).ToArray()
+                        lasPredicateParts = lsNORMAPredicateList.Split(lrPredicatePartXElement.Value).Where(Function(s) Not String.IsNullOrEmpty(s)).ToList
+                        lasPredicateParts.RemoveAll(Function(x) x = " ")
 
                         Dim liRoleSequenceNr As Integer = 0
                         lrRoleHashTable.Clear()
@@ -3695,7 +4563,7 @@ SkipExclusiveOrExternalRoleConstraint:
                                 liCharPosition += 1
                             Next
 
-                            lsNORMAPredicatePart2 = LCase(lsNORMAPredicatePart2)
+                            lsNORMAPredicatePart2 = LCase(lsNORMAPredicatePart2.Trim)
 
                             'If lrHashList.Contains(lsPredicatePart) Then
                             If lsNORMAPredicatePart2 Like "{#}" Then
@@ -3753,7 +4621,7 @@ SkipExclusiveOrExternalRoleConstraint:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3888,7 +4756,7 @@ SkipExclusiveOrExternalRoleConstraint:
 
                                     lrObjectifiedObjectTypeFact = lrRole.JoinsFactType.Fact.Find(AddressOf lrObjectifiedObjectTypeFact.EqualsByData)
 
-                                    If IsSomething(lrObjectifiedObjectTypeFact) Then
+                                    If lrObjectifiedObjectTypeFact IsNot Nothing Then
                                         lrFactData.Data = lrObjectifiedObjectTypeFact.Id
                                     Else
                                         If lrRole.JoinsFactType.Fact.Count > 0 Then
@@ -3919,7 +4787,7 @@ SkipExclusiveOrExternalRoleConstraint:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4076,7 +4944,7 @@ SkippedModelElement:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try

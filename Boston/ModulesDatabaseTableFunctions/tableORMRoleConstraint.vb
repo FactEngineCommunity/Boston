@@ -43,7 +43,7 @@ Namespace TableRoleConstraint
                 Dim lsMessage As String
                 lsMessage = "Error: TableRoleConstraint.AddRoleConstraint: "
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -217,7 +217,7 @@ LastResortObjectifyingEntityType:
                                 lrEntityType.ObjectifiedFactType = lrFactType
                                 lrFactType.Model.IsDirty = True
 
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False,, True)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False,, True)
                             End If
 
                         End If
@@ -234,7 +234,7 @@ LastResortObjectifyingEntityType:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return larFactType
             End Try
@@ -329,7 +329,7 @@ LastResortObjectifyingEntityType:
                         arRoleConstraint.RoleConstraintRole = TableRoleConstraintRole.getRoleConstraintRoles_by_RoleConstraint(arRoleConstraint)
 
                         If arRoleConstraint.RoleConstraintRole.Count = 0 Then
-                            prApplication.ThrowErrorMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & arRoleConstraint.Id, pcenumErrorType.Information)
+                            prApplication.ThrowMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & arRoleConstraint.Id, pcenumErrorType.Information)
                         Else
                             lrFactType = arRoleConstraint.Role(0).FactType
                             lrFactType = arRoleConstraint.Model.FactType.Find(AddressOf lrFactType.Equals)
@@ -358,7 +358,7 @@ LastResortObjectifyingEntityType:
 
                                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                             End Try
 
                         End If
@@ -376,7 +376,7 @@ LastResortObjectifyingEntityType:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return arRoleConstraint
             End Try
@@ -494,8 +494,10 @@ LastResortObjectifyingEntityType:
                         '----------------------------------------------------------
                         lrRoleConstraint.RoleConstraintRole = TableRoleConstraintRole.getRoleConstraintRoles_by_RoleConstraint(lrRoleConstraint)
 
+#Region "RoleConstraintRole"
                         If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
-                            prApplication.ThrowErrorMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
+                            lsMessage = "No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id & ". Model: " & lrRoleConstraint.Model.Name
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information)
                         Else
                             lrFactType = lrRoleConstraint.Role(0).FactType
                             lrFactType = arModel.FactType.Find(AddressOf lrFactType.Equals)
@@ -524,11 +526,12 @@ LastResortObjectifyingEntityType:
 
                                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                                lsMessage.AppendLine($"Role Constraint: {lrRoleConstraint.Id}. Model: {lrRoleConstraint.Model.Name}")
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                             End Try
 
                         End If
-
+#End Region
 
                         GetRoleConstraintsByModel.Add(lrRoleConstraint)
                         lREcordset.MoveNext()
@@ -540,7 +543,7 @@ LastResortObjectifyingEntityType:
             Catch ex As Exception
                 lsMessage = "Error: TableRoleConstraint.GetRoleConstraintsByModel: "
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -580,8 +583,9 @@ LastResortObjectifyingEntityType:
                         lsId = Trim(lREcordset("RoleId").Value)
                         lrRole = arRoleConstraint.Model.Role.Find(Function(x) x.Id = lsId)
 
-                        If Not IsSomething(lrRole) Then
+                        If Not lrRole IsNot Nothing Then
                             lsMessage = "No Role found in Model for Role.Id = '" & Trim(lREcordset("RoleId").Value) & "'" & vbCrLf & "RoleConstraint.Id: " & Trim(arRoleConstraint.Id)
+                            lsMessage.AppendLine("Model: " & arRoleConstraint.Model.Name & ". ModelId: " & arRoleConstraint.Model.ModelId)
                             Throw New Exception(lsMessage)
                         End If
 
@@ -598,7 +602,7 @@ LastResortObjectifyingEntityType:
                 Dim lsMessage1 As String
                 lsMessage1 = "Error: TableRoleConstraint.getRolesForRoleConstraint: "
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -657,7 +661,7 @@ LastResortObjectifyingEntityType:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 

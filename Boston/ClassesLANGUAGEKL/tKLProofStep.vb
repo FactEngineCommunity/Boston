@@ -12,7 +12,7 @@
 
         Me.StepNr = aiStep_nr
         Me.ProofRule = aiProof_rule
-        If IsSomething(ao_model_object) Then
+        If ao_model_object IsNot Nothing Then
             Me.ModelObject = ao_model_object
         End If
 

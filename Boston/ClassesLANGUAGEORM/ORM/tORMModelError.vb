@@ -6,9 +6,9 @@ Namespace FBM
         Implements IEquatable(Of ModelError)
         'Implements ICloneable
 
-        <XmlIgnore()> _
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
-        Public _error_id As String = ""
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _error_id As pcenumModelErrors = pcenumModelErrors.DataTypeNotSpecifiedError
         Public Property ErrorId() As pcenumModelErrors
             Get
                 Return _error_id
@@ -52,15 +52,15 @@ Namespace FBM
             '-------------------
         End Sub
 
-        Public Sub New(ByVal asErrorId As pcenumModelErrors,
+        Public Sub New(ByVal aiErrorId As pcenumModelErrors,
                        ByRef arModelObject As FBM.ModelObject)
 
-            Me.ErrorId = asErrorId
+            Me.ErrorId = aiErrorId
             Me.ModelObject = arModelObject
 
         End Sub
 
-        Public Sub New(ByVal asErrorId As String,
+        Public Sub New(ByVal aiErrorId As pcenumModelErrors,
                        ByVal asErrorDescription As String,
                        Optional ByRef arDictionaryEntry As FBM.DictionaryEntry = Nothing,
                        Optional ByRef arModelObject As FBM.ModelObject = Nothing,
@@ -68,26 +68,26 @@ Namespace FBM
                        Optional ByVal aiSubErrorId As pcenumModelSubErrorType = pcenumModelSubErrorType.None,
                        Optional ByRef arCMMLModelElement As Object = Nothing)
 
-            Me._error_id = asErrorId
+            Me._error_id = aiErrorId
             Me._error_description = asErrorDescription
             Me._SubError_id = aiSubErrorId
             Me.CMMLModelElement = arCMMLModelElement
 
             '20220530-VM-Eventually can get rid of Me._error_description = asErrorDescription, above. Try/Catch for now
             Try
-                Select Case asErrorId
-                    Case Is = "105"
+                Select Case aiErrorId
+                    Case Is = pcenumModelErrors.EntityTypeRequiresReferenceSchemeError
                         Me._error_description = "Entity Type Requires Reference Scheme Error - "
                         Me._error_description &= "Entity Type: '" & arModelObject.Id & "'."
                 End Select
             Catch
             End Try
 
-            If IsSomething(arDictionaryEntry) Then
+            If arDictionaryEntry IsNot Nothing Then
                 Me.DictionaryEntry = arDictionaryEntry
             End If
 
-            If IsSomething(arModelObject) Then
+            If arModelObject IsNot Nothing Then
                 Me.ModelObject = arModelObject
             End If
 

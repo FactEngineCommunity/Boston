@@ -72,7 +72,7 @@ Namespace FBM
                     Dim lsMessage As String = "FactData item does not have a Concept."
                     lsMessage &= vbCrLf & vbCrLf & "Fact.Id: " & Me.Fact.Id
                     lsMessage &= vbCrLf & "FactType.Id: " & Me.Fact.FactType.Id
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                     Return "DummyValue"
                 End Try
             End Get
@@ -90,7 +90,7 @@ Namespace FBM
 
                     lsOriginalSymbol = Me.Concept.Symbol
 
-                    'Call prApplication.ThrowErrorMessage("....This is the fact being modified..." & Me.Fact.Symbol, pcenumErrorType.Information)
+                    'Call prApplication.ThrowMessage("....This is the fact being modified..." & Me.Fact.Symbol, pcenumErrorType.Information)
                     If lsOriginalSymbol = value Then Exit Property 'Nothing to do here
 
 
@@ -126,7 +126,7 @@ Namespace FBM
                         ''    ' We were going to remove the OriginalDictionaryEntry anyway.
                         ''    '--------------------------------------------------------------------------------------------------------------
                         ''    lsMessage = "Original DictionaryEntry for FactData.Concept not found in the ModelDictionary"
-                        ''    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                        ''    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
                         ''End If
 
                         ''Me.Concept = lrNewDictionaryEntry.Concept
@@ -139,12 +139,12 @@ Namespace FBM
                         Call Me.SwitchConcept(lrNewDictionaryEntry.Concept, pcenumConceptType.Value)
 
                         'lsDebugMessage = "FactData.Data.Set"
-                        'If IsSomething(Me.FactType) Then
+                        'If Me.FactType IsNot Nothing Then
                         '    lsDebugMessage &= vbCrLf & "FactType.Id: " & Me.FactType.Id
                         'Else
                         '    lsDebugMessage &= vbCrLf & "FactType.Id: Nothing"
                         'End If
-                        'If IsSomething(Me.Fact) Then
+                        'If Me.Fact IsNot Nothing Then
                         '    lsDebugMessage &= vbCrLf & "Fact.Symbol: " & Me.Fact.Symbol
                         'Else
                         '    lsDebugMessage &= vbCrLf & "Fact.Symbol: Nothing"
@@ -152,7 +152,7 @@ Namespace FBM
                         'lsDebugMessage &= vbCrLf & "Role.Id: " & Me.Role.Id
                         'lsDebugMessage &= vbCrLf & "Original Data/Concept.Symbol: " & Me.Data
                         'lsDebugMessage &= vbCrLf & "New Data/Concept.Symbol: '" & lrNewDictionaryEntry.Symbol & "' already exists in the ModelDictionary"
-                        'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+                        'Call prApplication.ThrowMessage(lsDebugMessage, pcenumErrorType.Information)
 
                     Else
                         '-------------------------------------------------------------------------
@@ -164,7 +164,7 @@ Namespace FBM
                         '-------------------------------------------------------------------------
                         'lrOriginalDictionaryEntry = New FBM.DictionaryEntry(Me.Model, lsOriginalSymbol, pcenumConceptType.Value)
                         lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = lsOriginalSymbol And x.isValue) ' lrOriginalDictionaryEntry.Equals)
-                        If lrOriginalDictionaryEntry IsNot Nothing Then ' IsSomething(Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)) Then
+                        If lrOriginalDictionaryEntry IsNot Nothing Then ' Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals) IsNot Nothing Then
                             'lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
                             Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, pcenumConceptType.Value, True)
                         End If
@@ -182,7 +182,7 @@ Namespace FBM
                         RaiseEvent ConceptSymbolUpdated()
 
                         lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
-                        'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+                        'Call prApplication.ThrowMessage(lsDebugMessage, pcenumErrorType.Information)
                     End If
 
                     Call Me.Model.MakeDirty(False, False)
@@ -193,7 +193,7 @@ Namespace FBM
 
                     lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End Try
             End Set
         End Property
@@ -224,6 +224,14 @@ Namespace FBM
             Me.ConceptType = pcenumConceptType.RoleData
         End Sub
 
+        ''' <summary>
+        ''' Used in rare cases where we just need data on the FactData. See ORMQL.Recordset.
+        ''' </summary>
+        ''' <param name="arConcept"></param>
+        Public Sub New(ByRef arConcept As FBM.Concept)
+            Me.Concept = arConcept
+        End Sub
+
         Public Sub New(ByRef arRole As FBM.Role,
                        ByRef arConcept As FBM.Concept,
                        Optional ByRef arFact As FBM.Fact = Nothing,
@@ -247,7 +255,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -271,7 +279,7 @@ Namespace FBM
                     lrFactData.Data = .Data
                 End If
                 lrFactData.FactType = .FactType
-                If IsSomething(arFact) Then
+                If arFact IsNot Nothing Then
                     lrFactData.Fact = arFact
                 End If
                 lrFactData.Concept = .Concept
@@ -365,11 +373,11 @@ Namespace FBM
                     'Concept - See lrFactData.Data below
                     lrFactData.Model = arModel
                     lrFactData.ConceptType = .ConceptType
-                    If IsSomething(arFactType) Then
+                    If arFactType IsNot Nothing Then
                         lrFactData.FactType = arFactType
                     End If
 
-                    If IsSomething(arFact) Then
+                    If arFact IsNot Nothing Then
                         lrFactData.Fact = arFact
                     End If
 
@@ -387,7 +395,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tRoleData.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrFactData
             End Try
@@ -446,8 +454,16 @@ Namespace FBM
                     End If
 
                     'CodeSafe: Add the Clone and add the RoleInstance to the Page if it does not exist
-                    If lrFactDataInstance.Role.Data.FindAll(Function(x) x.Role Is Nothing).Count > 0 Then
-                        lrFactDataInstance.Role = Me.Role.CloneInstance(arPage, True)
+                    If lrFactDataInstance.Role Is Nothing Then
+                        Try
+                            lrFactDataInstance.Role = Me.Role.CloneInstance(arPage, True)
+                        Catch ex As Exception
+                            'We tried
+                        End Try
+                    Else
+                        If lrFactDataInstance.Role.Data.FindAll(Function(x) x.Role Is Nothing).Count > 0 Then
+                            lrFactDataInstance.Role = Me.Role.CloneInstance(arPage, True)
+                        End If
                     End If
 
                     '--------------------------------------------
@@ -455,13 +471,16 @@ Namespace FBM
                     '--------------------------------------------
                     lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = .Role.FactType.Id)
 
-                    If IsSomething(arFactInstance) Then
+                    If arFactInstance IsNot Nothing Then
                         lrFactDataInstance.Fact = arFactInstance
                     Else
                         '--------------------------------
                         'Find the Fact for the FactData
                         '--------------------------------
-                        lrFactDataInstance.Fact = lrFactTypeInstance.Fact.Find(Function(x) x.Id = .Fact.Id)
+                        If lrFactTypeInstance IsNot Nothing Then
+                            lrFactDataInstance.Fact = lrFactTypeInstance.Fact.Find(Function(x) x.Id = .Fact.Id)
+                            'It's hard to imagine when lrFactTypeInstance is nothing, but we can Clone a FactData instance without it necessarily being associated with a FactTypeInstance.
+                        End If
                     End If
 
                 End With
@@ -474,7 +493,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -520,7 +539,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -545,7 +564,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -614,7 +633,7 @@ Namespace FBM
                 lsMessage &= vbCrLf & "RoleId: " & Me.Role.Id
                 lsMessage &= vbCrLf & ". FactSymbol(Id): " & Me.Fact.Symbol
                 lsMessage &= vbCrLf & ". Value: " & Me.Data
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -627,6 +646,9 @@ Namespace FBM
         ''' <param name="value"></param>
         ''' <remarks>NB Initial setting of the FactData.Concept.Symbol should be done via the Set method of FactData.Data</remarks>
         Public Sub setData(ByVal value As String, ByVal aiConceptType As pcenumConceptType, ByVal abAddToModelDictionary As Boolean)
+
+            'CodeSafe
+            If value Is Nothing Then value = ""
 
             Me.Concept = New FBM.Concept(value)
 
@@ -644,7 +666,7 @@ Namespace FBM
 
         '    Try
 
-        '        Call prApplication.ThrowErrorMessage("....This is the fact being modified..." & Me.Fact.Symbol, pcenumErrorType.Information)
+        '        Call prApplication.ThrowMessage("....This is the fact being modified..." & Me.Fact.Symbol, pcenumErrorType.Information)
 
         '        '---------------------------------------------------------------------------------------------------------------------------------
         '        'Code Safe: If the new Concept (being switched to) already exists in the Model, then switch the Concept to that DictionaryEntry.
@@ -652,7 +674,7 @@ Namespace FBM
 
         '        lrNewDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrNewDictionaryEntry.Equals)
 
-        '        If IsSomething(lrNewDictionaryEntry) Then
+        '        If lrNewDictionaryEntry IsNot Nothing Then
         '            '----------------------------------------------------------------------------
         '            'The NewConcept exists in the ModelDictionary
         '            '  Substitute the existing Concept for a ModelDictionary entry (Concept) that
@@ -661,12 +683,12 @@ Namespace FBM
         '            Me.Concept = lrNewDictionaryEntry.Concept
 
         '            lsDebugMessage = "FactData.Data.Set"
-        '            If IsSomething(Me.FactType) Then
+        '            If Me.FactType IsNot Nothing Then
         '                lsDebugMessage &= vbCrLf & "FactType.Id: " & Me.FactType.Id
         '            Else
         '                lsDebugMessage &= vbCrLf & "FactType.Id: Nothing"
         '            End If
-        '            If IsSomething(Me.Fact) Then
+        '            If Me.Fact IsNot Nothing Then
         '                lsDebugMessage &= vbCrLf & "Fact.Symbol: " & Me.Fact.Symbol
         '            Else
         '                lsDebugMessage &= vbCrLf & "Fact.Symbol: Nothing"
@@ -674,7 +696,7 @@ Namespace FBM
         '            lsDebugMessage &= vbCrLf & "Role.Id: " & Me.Role.Id
         '            lsDebugMessage &= vbCrLf & "Original Data/Concept.Symbol: " & Me.Data
         '            lsDebugMessage &= vbCrLf & "New Data/Concept.Symbol: '" & lrNewDictionaryEntry.Symbol & "' already exists in the ModelDictionary"
-        '            Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+        '            Call prApplication.ThrowMessage(lsDebugMessage, pcenumErrorType.Information)
 
         '        Else
         '            '-------------------------------------------------------
@@ -690,7 +712,7 @@ Namespace FBM
         '            Me.Concept = lrDictionaryEntry.Concept
 
         '            lsDebugMessage = "Setting FactData.Concept.Symbol to new Concept/DictionaryEntry: " & asNewInstance
-        '            Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+        '            Call prApplication.ThrowMessage(lsDebugMessage, pcenumErrorType.Information)
         '        End If
         '        RaiseEvent updated()
         '        Call Me.Model.MakeDirty()
@@ -699,7 +721,7 @@ Namespace FBM
         '        Dim lsMessage As String
         '        lsMessage = "Error: FBM.tFactData.SwitchConcept"
         '        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,,ex)
+        '        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,,ex)
         '    End Try
         'End Sub
 
@@ -713,7 +735,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

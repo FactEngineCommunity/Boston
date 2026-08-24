@@ -107,6 +107,9 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Overloads Property Data() As String
             Get
+                'CodeSafe
+                If Me.Concept Is Nothing Then Return "" 'Needs to be here. See ERD.Attribute.New: Dynamic Type Descriptor on ERD.Attribute. References this member before Me.Column is set.
+
                 Return Me.Concept.Symbol
             End Get
             Set(ByVal value As String)
@@ -118,7 +121,7 @@ Namespace FBM
 
                 lrNewDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrNewDictionaryEntry.Equals)
 
-                If IsSomething(lrNewDictionaryEntry) Then
+                If lrNewDictionaryEntry IsNot Nothing Then
                     '----------------------------------------------------------------------------
                     'The NewConcept exists in the ModelDictionary
                     '  Substitute the existing Concept for a ModelDictionary entry (Concept) that
@@ -139,7 +142,7 @@ Namespace FBM
                     If Me.Model.Loaded And Me.Page.Loaded Then Call Me.makeDirty()
 
                     'lsDebugMessage = "Setting FactData.Concept.Symbol to new Concep/DictionaryEntry: " & value
-                    'Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+                    'Call prApplication.ThrowMessage(lsDebugMessage, pcenumErrorType.Information)
                 End If
             End Set
         End Property
@@ -153,7 +156,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._X = value
-                If IsSomething(Me.FactDataInstance) Then
+                If Me.FactDataInstance IsNot Nothing Then
                     Me.FactDataInstance._X = value
                 End If
             End Set
@@ -167,7 +170,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._Y = value
-                If IsSomething(Me.FactDataInstance) Then
+                If Me.FactDataInstance IsNot Nothing Then
                     Me.FactDataInstance._Y = value
                 End If
             End Set
@@ -194,7 +197,10 @@ Namespace FBM
         <JsonIgnore()>
         Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
             Get
-                Throw New NotImplementedException()
+                'CodeSafe
+                Return 1 'Needs to be here. See ER.Attribute.New: Dynamic Type Descriptor on ERD.Attribute references this member before Me.Column is set.
+                'Also, doesn't hurt to be 1. 0, for instance is dangerous for InstanceNumber of a ConceptInstance on a Page.
+                'Was Throw New NotImplementedException(). See above
             End Get
             Set(value As Integer)
                 Throw New NotImplementedException()
@@ -202,7 +208,7 @@ Namespace FBM
         End Property
 
         Private _Visible As Boolean = True
-        Public Property Visible As Boolean Implements iPageObject.Visible
+        Public Overridable Property Visible As Boolean Implements iPageObject.Visible
             Get
                 Return Me._Visible
             End Get
@@ -211,6 +217,24 @@ Namespace FBM
                 If Me.Shape IsNot Nothing Then
                     Me.Shape.Visible = value
                 End If
+            End Set
+        End Property
+
+        Public Property Width As Integer Implements iPageObject.Width
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Height As Integer Implements iPageObject.Height
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
             End Set
         End Property
 
@@ -256,37 +280,45 @@ Namespace FBM
                 lsFactId = arFactInstance.Id
                 Me.FactData = lrRole.Data.Find(Function(x) x.Role.Id = lrRole.Id And x.Fact.Id = lsFactId)
                 If Me.FactData Is Nothing Then
-                    lsMessage = "Error: Cannot find Role.Data (at Model level) to link FactDataInstance.FactData to: "
-                    lsMessage &= vbCrLf & vbCrLf & "Expecting to find:"
-                    lsMessage &= vbCrLf & "Role.Id: " & lrRole.Id
-                    lsMessage &= vbCrLf & "Role.Name: " & lrRole.Name
-                    If IsSomething(arFactInstance.Fact) Then
-                        lsMessage &= vbCrLf & "Fact.Id: " & Viev.NullVal(arFactInstance.Fact.Id, "")
-                    Else
-                        lsMessage &= vbCrLf & "Fact.Id: NULL"
+
+                    Me.FactData = arFactInstance.Fact.Data.Find(Function(x) x.Role.Id = lrRole.Id And x.Fact.Id = lsFactId)
+                    lrRole.Data.AddUnique(Me.FactData)
+
+                    If Me.FactData Is Nothing Then
+
+                        lsMessage = "Error: Cannot find Role.Data (at Model level) to link FactDataInstance.FactData to: "
+                        lsMessage &= vbCrLf & vbCrLf & "Expecting to find:"
+                        lsMessage &= vbCrLf & "Role.Id: " & lrRole.Id
+                        lsMessage &= vbCrLf & "Role.Name: " & lrRole.Name
+                        If arFactInstance.Fact IsNot Nothing Then
+                            lsMessage &= vbCrLf & "Fact.Id: " & Viev.NullVal(arFactInstance.Fact.Id, "")
+                        Else
+                            lsMessage &= vbCrLf & "Fact.Id: NULL"
+                        End If
+                        lsMessage &= vbCrLf & "On FactType.Id: " & lrRole.FactType.Id
+                        lsMessage &= vbCrLf & "arRoleInstance.Role.Data.Count: " & lrRole.Data.Count.ToString
+                        lsMessage &= vbCrLf & "FactInstance.Enumerated = " & arFactInstance.EnumerateAsBracketedFact
+                        lsMessage &= vbCrLf & "Role.Data expanded:"
+                        '------------------------
+                        'Expand the lrRole.Data
+                        '------------------------
+                        Dim liInd As Integer = 1
+                        For Each lrFactData In lrRole.Data
+                            lsMessage &= vbCrLf & "FactData" & liInd
+                            lsMessage &= vbCrLf & "Role.Id: " & lrFactData.Role.Id
+                            lsMessage &= vbCrLf & "Fact.Id: " & lrFactData.Fact.Id
+                            liInd += 1
+                        Next
+                        Throw New ApplicationException(lsMessage)
                     End If
-                    lsMessage &= vbCrLf & "On FactType.Id: " & lrRole.FactType.Id
-                    lsMessage &= vbCrLf & "arRoleInstance.Role.Data.Count: " & lrRole.Data.Count.ToString
-                    lsMessage &= vbCrLf & "FactInstance.Enumerated = " & arFactInstance.EnumerateAsBracketedFact
-                    lsMessage &= vbCrLf & "Role.Data expanded:"
-                    '------------------------
-                    'Expand the lrRole.Data
-                    '------------------------
-                    Dim liInd As Integer = 1
-                    For Each lrFactData In lrRole.Data
-                        lsMessage &= vbCrLf & "FactData" & liInd
-                        lsMessage &= vbCrLf & "Role.Id: " & lrFactData.Role.Id
-                        lsMessage &= vbCrLf & "Fact.Id: " & lrFactData.Fact.Id
-                        liInd += 1
-                    Next
-                    Throw New ApplicationException(lsMessage)
                 End If
 
                 Me.JoinedObjectType = arRoleInstance.JoinedORMObject
 
+
             Catch ex As Exception
                 lsMessage = "Error: tFactDataInstance.New: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -363,7 +395,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return lrFactDataInstance
             End Try
@@ -393,7 +425,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -454,7 +486,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrBPMNActor
@@ -492,7 +524,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrUCDActor
@@ -534,6 +566,7 @@ Namespace FBM
             lrConceptInstance.RoleId = Me.Role.Id
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
+            lrConceptInstance.ConceptType = pcenumConceptType.Value
 
             Return lrConceptInstance
 
@@ -725,7 +758,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrProcess
@@ -760,7 +793,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrProcess
@@ -777,7 +810,7 @@ Namespace FBM
 
             lrNewDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrNewDictionaryEntry.Equals)
 
-            If IsSomething(lrNewDictionaryEntry) Then
+            If lrNewDictionaryEntry IsNot Nothing Then
                 '--------------------------------------------------------------
                 'The NewDictionaryEntry already exists in the ModelDictionary.
                 '  The FactDataInstance will point to this DictionaryEntry.
@@ -853,11 +886,11 @@ Namespace FBM
         '    Try
         '        'Me.concept = Me.FactData.concept
 
-        '        If IsSomething(Me.Page.Diagram) Then
+        '        If Me.Page.Diagram IsNot Nothing Then
         '            '------------------
         '            'Diagram is set.
         '            '------------------
-        '            If IsSomething(Me.TableShape) Then
+        '            If Me.TableShape IsNot Nothing Then
         '                If Me.Cell.Text <> "" Then
         '                    '---------------------------------------------------------------------------------
         '                    'Is the type of EntityTypeInstance that 
@@ -868,7 +901,7 @@ Namespace FBM
         '                    '---------------------------------------------------------------------------------
         '                    Me.Cell.Text = Trim(Me.FactData.Concept.Symbol)
         '                End If
-        '            ElseIf IsSomething(Me.shape) Then
+        '            ElseIf Me.shape IsNot Nothing Then
         '                '---------------------------------------------------------------------------------
         '                'Is the type of EntityTypeInstance that 
         '                '  shows the EntityTypeName within the
@@ -914,11 +947,11 @@ Namespace FBM
                 Me.Page.IsDirty = True
             End If
 
-            If IsSomething(Me.Page.Diagram) Then
+            If Me.Page.Diagram IsNot Nothing Then
                 '------------------
                 'Diagram is set.
                 '------------------
-                If IsSomething(Me.Cell) Then
+                If Me.Cell IsNot Nothing Then
                     If Me.Cell.Text <> "" Then
                         '---------------------------------------------------------------------------------
                         'Is the type of EntityTypeInstance that 
@@ -971,11 +1004,11 @@ Namespace FBM
 
                 'Call TableConceptInstance.ModifySymbol(lrConceptInstance, Me.FactData.Concept.Symbol)
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.Cell) Then
+                    If Me.Cell IsNot Nothing Then
                         If Me.Cell.Text <> "" Then
                             '---------------------------------------------------------------------------------
                             'Is the type of EntityTypeInstance that 
@@ -995,7 +1028,7 @@ Namespace FBM
                 lsMessage = "Error: t_ORM_role_data_instance.update_from_model"
                 lsMessage &= vbCrLf & vbCrLf & "FactTypeId: " & Me.Role.FactType.FactType.Id & ", ValueSymbol:" & Me.Concept.Symbol & ", PageId:" & Me.Page.PageId
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1015,7 +1048,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return False
             End Try
@@ -1024,7 +1057,8 @@ Namespace FBM
 
         Public Overrides Function setName(ByVal asNewName As String,
                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
+                                          Optional ByVal abSuppressModelSave As Boolean = False,
+                                          Optional ByVal abSetDBNameAsNewName As Boolean = False) As Boolean
 
             '----------------------------------------------------------------------------------------------
             'Modify the FactData referenced by the FactData instance.
@@ -1045,7 +1079,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 Return False
             End Try
 
@@ -1115,7 +1149,7 @@ Namespace FBM
                     Call TableConceptInstance.ModifySymbol(lrConceptInstance, asNewInstance)
                 End If
 
-                If IsSomething(lrNewDictionaryEntry) Then
+                If lrNewDictionaryEntry IsNot Nothing Then
                     '----------------------------------------------------------------------------
                     'The NewConcept exists in the ModelDictionary
                     '  Substitute the existing Concept for a ModelDictionary entry (Concept) that
@@ -1144,14 +1178,14 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: FBM.tFactData.SwitchConcept"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
 
         Public Overrides Sub makeDirty()
             Me.isDirty = True
-            Me.Page.IsDirty = True
+            If Me.Page IsNot Nothing Then Me.Page.IsDirty = True
             If Me.Fact IsNot Nothing Then
                 Me.Fact.isDirty = True
                 If Me.Fact.FactType IsNot Nothing Then
@@ -1273,7 +1307,7 @@ Namespace FBM
         End Sub
 
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
-            Throw New NotImplementedException()
+            Throw New NotImplementedException
         End Sub
 
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
@@ -1293,7 +1327,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

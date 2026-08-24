@@ -92,7 +92,7 @@ Namespace TableValueTypeInstance
 
                     'CodeSafe
                     If lrValueTypeInstance.ValueType Is Nothing Then
-                        prApplication.ThrowErrorMessage("The Value Type Instance, '" & lrValueTypeInstance.Id & "', on Page, '" & arPage.Name & "', has no corresponding Value Type in the model. Boston will try and fix this.", pcenumErrorType.Critical)
+                        prApplication.ThrowMessage("The Value Type Instance, '" & lrValueTypeInstance.Id & "', on Page, '" & arPage.Name & "', has no corresponding Value Type in the model. Boston will try and fix this.", pcenumErrorType.Critical)
 
                         lrValueTypeInstance.ValueType = arPage.Model.ValueType.Find(Function(x) LCase(x.Id) = LCase(lrValueTypeInstance.Id))
 
@@ -143,7 +143,7 @@ Namespace TableValueTypeInstance
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

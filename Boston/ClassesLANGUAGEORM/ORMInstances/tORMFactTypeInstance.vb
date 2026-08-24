@@ -5,6 +5,7 @@ Imports MindFusion.Drawing
 Imports MindFusion.Diagramming.Layout
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports System.Linq.Expressions
 Imports Newtonsoft.Json
 
 Namespace FBM
@@ -21,8 +22,8 @@ Namespace FBM
         'The FactType for which the FactTypeIstance acts as View/Proxy.
         <XmlIgnore()> _
         Private WithEvents _FactType As New FBM.FactType
-        <XmlIgnore()> _
-        <Browsable(False)> _
+        <XmlIgnore()>
+        <Browsable(False)>
         Public Property FactType() As FBM.FactType
             Get
                 Return Me._FactType
@@ -47,6 +48,134 @@ Namespace FBM
                 _Name = value
             End Set
         End Property
+
+#Region "Graph - GraphLabel | Source | Target"
+        Public Shadows _GraphLabel As New FEStrings.StringCollection
+
+        <CategoryAttribute("Relation"),
+        Browsable(True),
+        [ReadOnly](False),
+        DescriptionAttribute("The equivalent Graph label in the Graph View."),
+        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Shadows Property GraphLabel() As FEStrings.StringCollection  'NB This is what is edited in the PropertyGrid
+            Get
+                Dim lasGraphLabel() As String = {}
+
+
+                lasGraphLabel = (From MEGraphLabel In Me.FactType.GraphLabel
+                                 Select MEGraphLabel.Label).ToArray
+
+                Me._GraphLabel.Clear()
+                Me._GraphLabel.AddRange(lasGraphLabel)
+
+                Return Me._GraphLabel
+
+            End Get
+            Set(ByVal Value As FEStrings.StringCollection)
+
+                Me._GraphLabel = Value
+
+                ' Find synonyms that are in the model but not in the new value
+                Dim graphLabelsToRemove = (From MEGraphLabel In Me.FactType.GraphLabel
+                                           Where MEGraphLabel.ModelElementId = Me.Id AndAlso Not Value.Contains(MEGraphLabel.Label)).ToList()
+
+                ' Remove synonyms that are no longer present in the new value
+                For Each graphLabelToRemove In graphLabelsToRemove
+                    Me.FactType.GraphLabel.Remove(graphLabelToRemove)
+                Next
+
+                ' Add new synonyms that are not in the model
+                For Each graphLabelToAdd In Value
+                    If Not Me.FactType.GraphLabel.Any(Function(s) s.ModelElementId = Me.FactType.Id AndAlso s.Label = graphLabelToAdd) Then
+                        Me.FactType.GraphLabel.Add(New RDS.GraphLabel(Me.FactType, graphLabelToAdd))
+                    End If
+                Next
+
+            End Set
+
+        End Property
+
+        Public Shadows _Source As String = Nothing
+
+        <CategoryAttribute("Relation"),
+        Browsable(True),
+        [ReadOnly](False),
+        DescriptionAttribute("The Source of a Relationship in the Graph View."),
+        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Shadows Property Source As String
+            Get
+                If Me.FactType.IsLinkFactType Then
+                    Return Me.FactType.RoleGroup(0).JoinedORMObject.Id
+                Else
+                    Return Me._Source
+                End If
+            End Get
+            Set(ByVal Value As String)
+
+                Dim lrTable As RDS.Table = Me.FactType.getCorrespondingRDSTable(Nothing, True)
+
+                If Me.FactType.IsLinkFactType Then
+                    'Ignore. Cannot change the Source of a LinkFactType FactType, because is a ForeignKey, rather than a many-to-many FactType/Table.
+                ElseIf lrTable IsNot Nothing AndAlso Not lrTable.isPGSRelation Then
+                    'Ignore. Could not possibly be a many-to-many Relationship
+                ElseIf lrTable IsNot Nothing AndAlso lrTable.isPGSRelation Then
+
+                    Dim lasNodeNames = (From Role In Me.FactType.RoleGroup
+                                        Where Role.JoinsValueType Is Nothing
+                                        Select Role.JoinedORMObject.Id).ToList
+
+                    If lasNodeNames.Contains(Value) Then
+                        Me._Source = Value
+                    End If
+                Else
+                    Me._Source = Value
+                End If
+
+            End Set
+
+        End Property
+
+        Public Shadows _Target As String = Nothing
+
+        <CategoryAttribute("Relation"),
+        Browsable(True),
+        [ReadOnly](False),
+        DescriptionAttribute("The Source of a Relationship in the Graph View."),
+        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Shadows Property Target As String
+            Get
+                If Me.FactType.IsLinkFactType Then
+                    Return Me.FactType.RoleGroup(1).JoinedORMObject.Id
+                Else
+                    Return Me._Target
+                End If
+            End Get
+            Set(ByVal Value As String)
+
+                Dim lrTable As RDS.Table = Me.FactType.getCorrespondingRDSTable(Nothing, True)
+
+                If Me.FactType.IsLinkFactType Then
+                    'Ignore. Cannot change the Target of a LinkFactType FactType, because is a ForeignKey, rather than a many-to-many FactType/Table.
+                ElseIf lrTable IsNot Nothing AndAlso Not lrTable.isPGSRelation Then
+                    'Ignore. Could not possibly be a many-to-many Relationship
+                ElseIf lrTable IsNot Nothing AndAlso lrTable.isPGSRelation Then
+
+                    Dim lasNodeNames = (From Role In Me.FactType.RoleGroup
+                                        Where Role.JoinsValueType Is Nothing
+                                        Select Role.JoinedORMObject.Id).ToList
+
+                    If lasNodeNames.Contains(Value) Then
+                        Me._Target = Value
+                    End If
+                Else
+                    Me._Target = Value
+                End If
+
+            End Set
+
+        End Property
+
+#End Region
 
         Private _InstanceNumber As Integer = 1
         Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
@@ -89,6 +218,22 @@ Namespace FBM
             End Get
             Set(value As Boolean)
                 Me._IsLinkFactType = value
+            End Set
+        End Property
+
+        <XmlIgnore>
+        <Browsable(False)>
+        Private _IsImplied As Boolean = False
+
+        <XmlIgnore()>
+        <CategoryAttribute("Fact Type"),
+        Browsable(False)>
+        Public Property IsImplied As Boolean
+            Get
+                Return Me._IsLinkFactType Or Me._IsImplied Or Me.FactType?.IsObjectifyingFactType
+            End Get
+            Set(value As Boolean)
+                Me._IsImplied = value
             End Set
         End Property
 
@@ -194,7 +339,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._X = value
-                'If IsSomething(Me.Shape) Then
+                'If Me.Shape IsNot Nothing Then
                 '    Dim loRectangle As New Rectangle(Me.X, Me.Shape.Bounds.Y, Me.Shape.Bounds.Width, Me.Shape.Bounds.Height)
                 '    Me.Shape.SetRect(loRectangle, False)
                 'End If
@@ -209,7 +354,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._Y = value
-                'If IsSomething(Me.Shape) Then
+                'If Me.Shape IsNot Nothing Then
                 '    Dim loRectangle As New Rectangle(Me.Shape.Bounds.X, Me.Y, Me.Shape.Bounds.Width, Me.Shape.Bounds.Height)
                 '    Me.Shape.SetRect(loRectangle, False)
                 'End If
@@ -227,7 +372,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Boolean)
                 Me._HasBeenMoved = value
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     Me.X = Me.Shape.Bounds.X
                     Me.Y = Me.Shape.Bounds.Y
                 End If
@@ -308,7 +453,7 @@ Namespace FBM
                             Dim lrTopmostEntityType As FBM.EntityType = Me.ObjectifyingEntityType.EntityType.GetTopmostSupertype
                             Return lrTopmostEntityType.ReferenceModeValueType.DataType
                         Catch ex As Exception
-                            prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical)
+                            prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical)
                         End Try
                     Else
                         Return pcenumORMDataType.DataTypeNotSet
@@ -334,9 +479,13 @@ Namespace FBM
          DescriptionAttribute("The 'Data Type Precision' of the Data Type for this Objectified Fact Type.")>
         Public Property DataTypePrecision() As Integer
             Get
-                If Me.IsObjectified Then
+                If Me.IsObjectified AndAlso Me.ObjectifyingEntityType IsNot Nothing Then
                     If Me.ObjectifyingEntityType.HasSimpleReferenceScheme Then
                         Dim lrTopmostEntityType As FBM.EntityType = Me.ObjectifyingEntityType.GetTopmostSupertype
+
+                        'CodeSafe
+                        If lrTopmostEntityType.ReferenceModeValueType Is Nothing Then Return 0
+
                         Return lrTopmostEntityType.ReferenceModeValueType.DataTypePrecision
                     Else
                         Return 0
@@ -362,9 +511,13 @@ Namespace FBM
          DescriptionAttribute("The 'Data Type Length' of the Data Type of this Objectified Fact Type.")>
         Public Property DataTypeLength() As Integer
             Get
-                If Me.IsObjectified Then
+                If Me.IsObjectified AndAlso Me.ObjectifyingEntityType IsNot Nothing Then
                     If Me.ObjectifyingEntityType.HasSimpleReferenceScheme Then
                         Dim lrTopmostEntityType As FBM.EntityType = Me.ObjectifyingEntityType.GetTopmostSupertype
+
+                        'CodeSafe
+                        If lrTopmostEntityType.ReferenceModeValueType Is Nothing Then Return 0
+
                         Return lrTopmostEntityType.ReferenceModeValueType.DataTypeLength
                     Else
                         Return 0
@@ -418,7 +571,7 @@ Namespace FBM
             End Set
         End Property
 
-        Private _Visible As Boolean = False
+        Public _Visible As Boolean = False
         Public Property Visible As Boolean Implements iPageObject.Visible
             Get
                 If Me.Shape Is Nothing Then
@@ -435,6 +588,24 @@ Namespace FBM
                 If Me.Shape IsNot Nothing Then
                     Me.Shape.Visible = value
                 End If
+            End Set
+        End Property
+
+        Public Property Width As Integer Implements iPageObject.Width
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Height As Integer Implements iPageObject.Height
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
             End Set
         End Property
 
@@ -476,7 +647,7 @@ Namespace FBM
                 Me.Id = System.Guid.NewGuid.ToString
             End If
 
-            If IsSomething(asFactTypeName) Then
+            If asFactTypeName IsNot Nothing Then
                 Me.Name = asFactTypeName
             Else
                 Me.Name = "New Fact Type"
@@ -640,7 +811,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: FBM.tFactTypeInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrFactTypeInstance
             End Try
@@ -680,10 +851,9 @@ Namespace FBM
 
         Public Sub MouseDown() Implements FBM.iPageObject.MouseDown
 
-            Me.Page.SelectedObject.Add(Me)
+            Me.Page.SelectedObject.AddUnique(Me)
             Me.Shape.Pen.Color = Color.Blue
             Me.Shape.Selected = True
-
         End Sub
 
         Public Sub MouseMove() Implements FBM.iPageObject.MouseMove
@@ -706,7 +876,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -745,6 +915,13 @@ Namespace FBM
             'See also Me.Selected for setting appropriate color
             '----------------------------------------------------------------------------------------------
 
+            'CodeSafe - Make Sure
+            If Not Me.Shape.Selected Then
+                Me.Shape.Selected = True
+            End If
+
+            Call Me.SetAppropriateColour()
+
         End Sub
 
         Public Sub AddRoleInstance(ByRef arRoleInstance As FBM.RoleInstance)
@@ -764,7 +941,7 @@ Namespace FBM
 
                 If Me.Arity = 2 Then Exit Sub
 
-                For Each lrRoleInstance In Me.RoleGroup.FindAll(Function(x) laiConceptType.Contains(x.JoinedORMObject.ConceptType))
+                For Each lrRoleInstance In Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject IsNot Nothing AndAlso laiConceptType.Contains(x.JoinedORMObject.ConceptType))
 
                     Call Me.getBlankCellCloseBy(liNewX, liNewY)
 
@@ -787,7 +964,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -931,7 +1108,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -993,7 +1170,7 @@ Namespace FBM
 
             Me.Page.FactInstance.AddUnique(lrFactInstance)
 
-            If IsSomething(Me.FactTable) And abResortFactTable And Me.Page.Diagram IsNot Nothing Then
+            If Me.FactTable IsNot Nothing And abResortFactTable And Me.Page.Diagram IsNot Nothing Then
                 If Me.FactTable.TableShape.Visible And Me.Page.Diagram.Nodes.Contains(Me.FactTable.TableShape) Then
                     Call Me.FactTable.ResortFactTable()
                 End If
@@ -1100,20 +1277,20 @@ ReattachRoles:
                     If Me.FactTypeReadingShape.Shape IsNot Nothing And abMoveFactTypeReadingShape Then
                         '20220715-VM-Commented out.
                         If Not Me.IsObjectified Then
-                            Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 2) 'FactTypeReadingShape.Shape.Bounds.Y)
+                            Me.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 2, False) 'FactTypeReadingShape.Shape.Bounds.Y)
                         Else
-                            Me.FactTypeReadingShape.Shape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height)) 'FactTypeReadingShape.Shape.Bounds.Y)
+                            Me.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height), False) 'FactTypeReadingShape.Shape.Bounds.Y)
                         End If
 
                     Else
                         'NB Same code in DisplayAndAssociate
                         If Not Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 80) And Me.Arity = 1 Then
-                            Me.FactTypeReadingShape.Move(Me.Shape.Bounds.X + Me.Shape.Bounds.Width + 1, Me.Y, True) 'FactTypeReadingShape.Shape.Bounds.Y)
+                            Me.FactTypeReadingShape.Move(Me.Shape.Bounds.X + Me.Shape.Bounds.Width + 1, Me.Shape.Bounds.Y, True) 'FactTypeReadingShape.Shape.Bounds.Y)
                         ElseIf Not Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 50) And Me.Arity > 1 Then
-                            Me.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Y + Me.Shape.Bounds.Height) - 6, True)
+                            Me.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) - 6, True)
                         End If
                         If Me.ShapeIsWithinRadius(Me.FactTypeReadingShape.ShapeMidPoint, 4) Then
-                            Me.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Y + Me.Shape.Bounds.Height) + 2, True)
+                            Me.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Shape.Bounds.Y + Me.Shape.Bounds.Height) + 2, True)
                         End If
                     End If
                 End If
@@ -1136,7 +1313,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1147,17 +1324,23 @@ ReattachRoles:
                 Dim loFactTypeDerivationTextShape As ShapeNode
                 Dim lsDerivationText As String = ""
 
+                Select Case Me.Model.DerivationSyntaxType
+                    Case Is = pcenumDerivationSyntaxType.FactEngine
+                        If Me.FactType.IsManyTo1BinaryFactType Then
+                            '-----------------------------------------------------------------------------------------------
+                            'That's good, because needs to be at least that for Derived Fact Type.
+                            Dim lrRole As FBM.Role
+                            lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
+                            lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
+                            lsDerivationText &= vbCrLf & Me.DerivationText
+                        Else
+                            lsDerivationText = "* " & Me.DerivationText
+                        End If
+                    Case Is = pcenumDerivationSyntaxType.nORMa
+                        lsDerivationText = Me.DerivationText
+                End Select
 
-                If Me.FactType.IsManyTo1BinaryFactType Then
-                    '-----------------------------------------------------------------------------------------------
-                    'That's good, because needs to be at least that for Derived Fact Type.
-                    Dim lrRole As FBM.Role
-                    lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
-                    lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
-                    lsDerivationText &= vbCrLf & Me.DerivationText
-                Else
-                    lsDerivationText = "* " & Me.DerivationText
-                End If
+
 
                 Dim StringSize As New SizeF
 
@@ -1207,7 +1390,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1238,7 +1421,7 @@ ReattachRoles:
 
             lrFactInstance = Me.Fact.Find(AddressOf arFactInstance.Equals)
 
-            If IsSomething(lrFactInstance) Then
+            If lrFactInstance IsNot Nothing Then
                 '---------------------------------------------------
                 'Remove the FactInstance from the FactTypeInstance
                 '---------------------------------------------------
@@ -1253,7 +1436,7 @@ ReattachRoles:
                 End If
             End If
 
-            If IsSomething(Me.FactTable) And Not Me.FactType.IsMDAModelElement Then
+            If Me.FactTable IsNot Nothing And Not Me.FactType.IsMDAModelElement Then
                 Call Me.FactTable.ResortFactTable()
             End If
 
@@ -1270,7 +1453,7 @@ ReattachRoles:
 
             lrFactInstance = Me.Fact.Find(Function(x) x.Id = lrFact.Id)
 
-            If IsSomething(lrFactInstance) Then
+            If lrFactInstance IsNot Nothing Then
                 '---------------------------------------------------
                 'Remove the FactInstance from the FactTypeInstance
                 '---------------------------------------------------
@@ -1285,7 +1468,7 @@ ReattachRoles:
                 End If
             End If
 
-            If IsSomething(Me.FactTable) And Me.Page.Language = pcenumLanguage.ORMModel Then
+            If Me.FactTable IsNot Nothing And Me.Page.Language = pcenumLanguage.ORMModel Then
                 Call Me.FactTable.ResortFactTable()
             End If
 
@@ -1392,14 +1575,24 @@ ReattachRoles:
                 If Me.Page.Diagram IsNot Nothing Then
                     If Me.Shape IsNot Nothing Then
                         Call Me.Shape.ZBottom()
-                        Me.Shape.Visible = False
+                        Try
+                            Me.Shape.Visible = False
+                        Catch ex As Exception
+                            'Mindfusion plays up.
+                        End Try
+
                         For Each lrRoleInstance In Me.RoleGroup
-                            Call lrRoleInstance.Link.ZBottom()
-                            lrRoleInstance.Shape.Visible = False
-                            lrRoleInstance.Link.Visible = False
+                            Try
+                                lrRoleInstance.Shape.Visible = False
+                                Call lrRoleInstance.Link.ZBottom()
+                                lrRoleInstance.Link.Visible = False
+                            Catch ex As Exception
+                                'Link might be nothing
+                            End Try
+SkipRole:
                         Next
 
-                        If Me.FactTypeReadingShape.Shape IsNot Nothing Then
+                        If Me.FactTypeReadingShape IsNot Nothing AndAlso Me.FactTypeReadingShape.Shape IsNot Nothing Then
                             Call Me.FactTypeReadingShape.Shape.ZBottom()
                             Me.FactTypeReadingShape.Shape.Visible = False
                         End If
@@ -1438,7 +1631,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1493,7 +1686,7 @@ ReattachRoles:
                 If Me.FactType.FactTypeReading.Count > 0 Then
 
                     lrFactTypeReading = Me.FactType.FactTypeReading.Find(AddressOf lrFactTypeReading.MatchesByRoles)
-                    If IsSomething(lrFactTypeReading) Then
+                    If lrFactTypeReading IsNot Nothing Then
                         If Me.Page.Diagram IsNot Nothing Then
                             Try
                                 Me.Page.Diagram.Nodes.Remove(Me.FactTypeReadingShape.Shape)
@@ -1579,7 +1772,7 @@ ReattachRoles:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1705,7 +1898,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return False
             End Try
 
@@ -1814,7 +2007,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -1874,7 +2067,7 @@ ReattachRoles:
                     lsMessage = "Error: FBM.tFactTypeInstance.Save: "
                     lsMessage &= vbCrLf & "FactTypeId: " & Me.Id
                     lsMessage &= vbCrLf & vbCrLf & arErr.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, arErr.StackTrace)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, arErr.StackTrace)
                 End Try
             Next
 
@@ -1886,10 +2079,27 @@ ReattachRoles:
 
             Try
                 If Me.Shape IsNot Nothing Then
-                    Me.Shape.Pen.Color = Color.Blue
+
+                    If Me.Shape.Selected Then
+                        Me.Shape.Pen.Color = Color.Blue
+                        Me.Shape.Pen.Width = 0.7
+                    Else
+                        Me.Shape.Pen.Width = 0.5
+                        If Me.FactType.HasModelError Then
+                            Me.Shape.Visible = True
+                            Me.Shape.Pen.Color = Color.Red
+                        Else
+                            If Me.IsObjectified Then
+                                Me.Shape.Pen.Color = Color.Navy
+                            Else
+                                Me.Shape.Pen.Color = Color.White
+                            End If
+                        End If
+                    End If
+
                 End If
 
-                If IsSomething(Me.FactTable.TableShape) Then
+                If Me.FactTable.TableShape IsNot Nothing Then
                     If Me.FactTable.TableShape IsNot Nothing Then
                         Me.FactTable.TableShape.Pen.Color = Color.Black
                         Me.FactTable.TableShape.ZTop()
@@ -1917,13 +2127,19 @@ ReattachRoles:
                     End If
                 Next
 
+                If Me.FactType.IsDerived AndAlso Me.FactTypeDerivationText IsNot Nothing AndAlso Me.FactTypeDerivationText.Shape IsNot Nothing Then
+                    Me.FactTypeDerivationText.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.FromArgb(243, 238, 234))
+                    Me.FactTypeDerivationText.Shape.Pen.Color = Color.White
+                    Me.FactTypeDerivationText.Shape.Transparent = False
+                End If
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1969,7 +2185,7 @@ ReattachRoles:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1991,7 +2207,7 @@ ReattachRoles:
                     lrRoleInstance = Me.RoleGroup(0)
                     'Redraw Link to nearest ConceptInstance
                     If lrRoleInstance.JoinedORMObject IsNot Nothing Then
-                        Dim larModelElementInstance = From ModelElementInstance In Me.Page.GetAllPageObjects(False, False, lrRoleInstance.JoinedORMObject)
+                        Dim larModelElementInstance = From ModelElementInstance In Me.Page.GetAllPageObjects(False, False, lrRoleInstance.JoinedORMObject, True)
                                                       Select ModelElementInstance
 
                         If larModelElementInstance.Count > 1 Then
@@ -2003,13 +2219,14 @@ ReattachRoles:
                             lrRoleInstance.JoinedORMObject = larClosestModelElementInstance.First.ModelElementInstance
                             Me.Page.Diagram.Invalidate()
                         End If
+
                     End If
 
                     Exit Sub
 #End Region
                 End If
 
-                If Me.Shape IsNot Nothing AndAlso Me.Shape.Visible = True Then
+                If Me.Shape IsNot Nothing AndAlso Me.Arity > 0 AndAlso Me.RoleGroup(0).Visible = True Then
                     If Me.FactType.RoleGroup.FindAll(Function(x) x.JoinedORMObject Is Nothing).Count > 0 Or (Me.RoleGroup.Count = 0) Then
                         '----------------------------------------------------------------------------------------------
                         'Likely that the user has dragged a multiRole FactType onto the canvas and hasn't
@@ -2038,8 +2255,11 @@ ReattachRoles:
                             lbIsVisible = lrRoleInstance.Shape.Visible
                             lrRoleInstance.Shape.Detach()
                             lrRoleInstance.Shape.Move((Me.Shape.Bounds.X + 3) + ((liCounter - 1) * 6), Me.Shape.Bounds.Y + 4 + ((Me.FactType.GetHighestConstraintLevel - 1) * 1.6))
-                            lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.BottomCenter)
                             lrRoleInstance.Shape.Visible = lbIsVisible
+                            Try
+                                lrRoleInstance.Shape.AttachTo(Me.Shape, AttachToNode.BottomCenter)
+                            Catch
+                            End Try
                         End If
                         lrRoleInstance.SequenceNr = liCounter
 
@@ -2115,7 +2335,7 @@ ReattachRoles:
                     Next
 
                     Call Me.ResetAnchorsForRoleGroup()
-                    If IsSomething(Me.FactTable.TableShape) And IsSomething(Me.FactTable.FactTypeInstance) Then
+                    If Me.FactTable.TableShape IsNot Nothing And Me.FactTable.FactTypeInstance IsNot Nothing Then
                         If Me.FactTable.TableShape.Visible Then
                             Call Me.FactTable.ResortFactTable()
                         End If
@@ -2123,13 +2343,52 @@ ReattachRoles:
 
                 End If
 
+#Region "External Constraints - Reroute to nearest Role"
+
+                For Each lrRoleInstance In Me.RoleGroup
+
+                    Dim larRoleInstance = From FactTypeInstance In Me.Page.FactTypeInstance
+                                          From RoleInstance In FactTypeInstance.RoleGroup
+                                          Where RoleInstance.Id = lrRoleInstance.Id
+                                          Select RoleInstance
+
+                    'Where FactTypeInstance.Shape.Visible = True
+
+
+                    If larRoleInstance.Count > 1 Then
+
+                        Dim larRoleConstraintRoleInstance = From RoleConstraintInstance In Me.Page.RoleConstraintInstance
+                                                            From RoleConstraintRoleInstance In RoleConstraintInstance.RoleConstraintRole
+                                                            Where RoleConstraintInstance.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint
+                                                            Where RoleConstraintRoleInstance.Role.Id = lrRoleInstance.Id
+                                                            Select New With {.RoleConstraintInstance = RoleConstraintInstance, .RoleConstraintRoleInstance = RoleConstraintRoleInstance}
+
+                        For Each lrRoleConstraintRoleInstance In larRoleConstraintRoleInstance
+
+                            Dim larClosestRoleInstance = (From RoleInstance In larRoleInstance
+                                                          Select New With {.RoleInstance = RoleInstance, .Shape = RoleInstance.Shape, .Hypotenuse = Math.Sqrt(Math.Abs(RoleInstance.X - lrRoleConstraintRoleInstance.RoleConstraintInstance.X) ^ 2 + Math.Abs(RoleInstance.Y - lrRoleConstraintRoleInstance.RoleConstraintInstance.Y) ^ 2)}).OrderBy(Function(x) x.Hypotenuse)
+
+                            If lrRoleConstraintRoleInstance.RoleConstraintRoleInstance.Link IsNot Nothing Then
+                                lrRoleConstraintRoleInstance.RoleConstraintRoleInstance.Link.Destination = larClosestRoleInstance.First.Shape
+                                Me.Page.Diagram.Invalidate()
+                            End If
+
+                        Next
+
+                    End If
+
+
+                Next
+
+#End Region
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2144,7 +2403,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -2210,7 +2469,7 @@ ReattachRoles:
                 Dim lsMessage As String
                 lsMessage = "Error: tFactTypeInstance.DoAllRolesLinkToSameModelObject"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 DoAllRolesLinkToSameModelObject = False
             End Try
@@ -2228,6 +2487,21 @@ ReattachRoles:
             Try
                 loa = aoA.JoinedORMObject
                 lob = aoB.JoinedORMObject
+
+                'CodeSafe
+#Region "Rarely a Role is not joined to an instance by a FBM.ModelObject"
+                If loa.GetType = GetType(FBM.ModelObject) Or lob.GetType = GetType(FBM.ModelObject) Then
+                    Try
+                        Return loa.x
+                    Catch ex As Exception
+                        Try
+                            Return lob.x
+                        Catch ex1 As Exception
+                            Return 1
+                        End Try
+                    End Try
+                End If
+#End Region
 
                 '--------------------------------------------------------------------------------------------
                 'JoinedORMObject may be nothing when dropping a new Role onto an existing FactType(Instance)
@@ -2250,7 +2524,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -2284,7 +2558,7 @@ ReattachRoles:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2356,11 +2630,11 @@ ReattachRoles:
 
                     Dim lrRoleInstance As FBM.RoleInstance = Me.RoleGroup(liInd - 1)
 
-                    If IsSomething(lrRoleInstance.Shape) Then
+                    If lrRoleInstance.Shape IsNot Nothing Then
                         lrRoleInstance.Shape.AnchorPattern = apat1
                     End If
 
-                    If IsSomething(lrRoleInstance.Link) Then
+                    If lrRoleInstance.Link IsNot Nothing Then
                         '-----------------------------------------------------------------------
                         'Because this method may be called for Roles that do not yet have links
                         '-----------------------------------------------------------------------
@@ -2376,7 +2650,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -2406,7 +2680,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -2426,8 +2700,21 @@ ReattachRoles:
                     'Is already Displayed and Associated on the Page.
                     '  Used when recursively loading FactTypeInstances onto a Page.
                     'OR
-                    'Is a SubtypeRelationshipFactType, which are hidden.
+                    'Is a SubtypeRelationshipFactType, which are normally hidden.
                     '----------------------------------------------------------------
+                    Dim larDuplicateFactTypeOnPageWithSubtypeRelationship = From FactType In Me.Page.FactTypeInstance
+                                                                            Where FactType IsNot Me
+                                                                            Where FactType.SubtypeRelationshipInstance IsNot Nothing
+                                                                            Select FactType
+
+                    If larDuplicateFactTypeOnPageWithSubtypeRelationship.Count > 0 Then Exit Sub
+
+                    If Me.IsSubtypeRelationshipFactType Then
+                        Dim lrSubtypeRelationship = Me.FactType.RepresentsSubtypeRelationship
+
+                        Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(Me.Page, True)
+                        Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                    End If
                 Else
                     'CodeSafe
                     If Me.Page.Diagram Is Nothing Then Exit Sub
@@ -2442,7 +2729,7 @@ ReattachRoles:
                     If Me.isPreferredReferenceMode Then
                         loFactTypeNode.Visible = False
                     Else
-                        loFactTypeNode.Visible = True 'VM just for initial testing. Set this back to false when Roles are implemented.
+                        loFactTypeNode.Visible = True
                     End If
                     If Me.IsObjectified Then
                         loFactTypeNode.ShadowOffsetX = 1
@@ -2476,6 +2763,7 @@ ReattachRoles:
                     StringSize = Me.Page.Diagram.MeasureString(Trim(lsFactTypeName), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                     StringSize.Height += 5
 
+#Region "Fact Type Name"
                     If Me.FactTypeName IsNot Nothing Then
                         loFactTypeName = Me.Page.Diagram.Factory.CreateShapeNode(Me.FactTypeName.X, Me.FactTypeName.Y, StringSize.Width, StringSize.Height) 'Me.FactTypeName.X, Me.FactTypeName.Y, StringSize.Width, StringSize.Height)
                     Else
@@ -2500,6 +2788,7 @@ ReattachRoles:
                     If Math.Abs(Me.FactTypeNameShape.Bounds.X - Me.Shape.Bounds.X) > 40 Or Math.Abs(Me.FactTypeNameShape.Bounds.Y - Me.Shape.Bounds.Y) > 40 Then
                         Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 5, Me.Shape.Bounds.Y - 10)
                     End If
+#End Region
 
                     '---------------------------------------------------------------------------
                     'Attach the FactTypeName ShapeNode to the FactTypeInstance ShapeNode
@@ -2524,62 +2813,9 @@ ReattachRoles:
 
                     '==========================================================================================================
                     'FactTypeDerivationText
-                    If Me.FactType.IsDerived Then
+                    If Me.FactType.IsDerived And 1 = 2 Then '20260802-VM-Was filling up the screen with derivations. A better approach is Right-Click on the FT, and [Show Derivation Text] or just view it in the ORM Verbaliser toolbox.
 #Region "Derivation Text"
-                        Dim loFactTypeDerivationTextShape As ShapeNode
-                        Dim lsDerivationText As String = ""
-
-
-                        If Me.FactType.IsManyTo1BinaryFactType Then
-                            '-----------------------------------------------------------------------------------------------
-                            'That's good, because needs to be at least that for Derived Fact Type.
-                            Dim lrRole As FBM.Role
-                            lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
-                            lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
-                            lsDerivationText &= vbCrLf & Me.DerivationText
-                        Else
-                            lsDerivationText = "* " & Me.DerivationText
-                        End If
-
-                        StringSize = Me.Page.Diagram.MeasureString(Trim(lsDerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                        StringSize.Height += 2
-
-                        If StringSize.Width > 70 Then
-                            StringSize = New SizeF(70, (StringSize.Height + 2) * lsDerivationText.Length / 100)
-                        End If
-
-                        loFactTypeDerivationTextShape = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y + Me.Shape.Bounds.Height + 5, StringSize.Width, StringSize.Height)
-                        loFactTypeDerivationTextShape.Shape = MindFusion.Diagramming.Shapes.Rectangle
-                        loFactTypeDerivationTextShape.HandlesStyle = HandlesStyle.MoveOnly
-                        loFactTypeDerivationTextShape.EnableStyledText = True
-                        loFactTypeDerivationTextShape.Locked = False
-                        loFactTypeDerivationTextShape.TextFormat.Alignment = StringAlignment.Near
-                        loFactTypeDerivationTextShape.Text = lsDerivationText
-                        Call loFactTypeDerivationTextShape.ResizeToFitText(FitSize.KeepWidth)
-                        loFactTypeDerivationTextShape.TextColor = Color.Black
-                        loFactTypeDerivationTextShape.Transparent = True
-                        loFactTypeDerivationTextShape.AllowIncomingLinks = False
-                        loFactTypeDerivationTextShape.AllowOutgoingLinks = False
-                        loFactTypeDerivationTextShape.ZTop()
-
-                        If Me.FactTypeDerivationText Is Nothing Then
-                            Me.FactTypeDerivationText = New FBM.FactTypeDerivationText(Me.Model, Me.Page, Me)
-                            Me.FactTypeDerivationText.InstanceNumber = Me.InstanceNumber
-                        End If
-
-                        Me.FactTypeDerivationText.Shape = loFactTypeDerivationTextShape
-                        loFactTypeDerivationTextShape.Tag = Me.FactTypeDerivationText
-
-                        If Me.FactTypeDerivationText.X = 0 Then Me.FactTypeDerivationText.X = Me.X
-                        If Me.FactTypeDerivationText.Y = 0 Then Me.FactTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
-
-                        Me.FactTypeDerivationText.Shape.Move(Me.FactTypeDerivationText.X,
-                                                             Me.FactTypeDerivationText.Y)
-
-                        Me.Page.Diagram.Nodes.Add(Me.FactTypeDerivationText.Shape)
-
-                        Me.FactTypeDerivationText.Shape.Visible = Me.IsDerived
-                        Call Me.FactTypeDerivationText.Shape.ZBottom()
+                        Call Me.DisplayAndAssociateDerivationText()
 #End Region
                     End If
 
@@ -2662,25 +2898,105 @@ ReattachRoles:
                 Dim lsMessage As String
                 lsMessage = "Error: tFactTypeInstance.DisplayAndAssociate"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
         End Sub
 
-        Private Sub MakeVisible()
+        Public Sub DisplayAndAssociateDerivationText()
+
+            Try
+                Dim StringSize As New SizeF
+
+                Dim loFactTypeDerivationTextShape As ShapeNode
+                Dim lsDerivationText As String = ""
+
+
+                Select Case Me.Model.DerivationSyntaxType
+                    Case Is = pcenumDerivationSyntaxType.FactEngine
+                        If Me.FactType.IsManyTo1BinaryFactType Then
+                            '-----------------------------------------------------------------------------------------------
+                            'That's good, because needs to be at least that for Derived Fact Type.
+                            Dim lrRole As FBM.Role
+                            lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
+                            lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
+                            lsDerivationText &= vbCrLf & Me.DerivationText
+                        Else
+                            lsDerivationText = "* " & Me.DerivationText
+                        End If
+
+                    Case Is = pcenumDerivationSyntaxType.nORMa
+                        lsDerivationText = Me.DerivationText
+                End Select
+
+                StringSize = Me.Page.Diagram.MeasureString(Trim(lsDerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                StringSize.Height += 2
+
+                If StringSize.Width > 70 Then
+                    StringSize = New SizeF(70, (StringSize.Height + 2) * lsDerivationText.Length / 100)
+                End If
+
+                loFactTypeDerivationTextShape = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y + Me.Shape.Bounds.Height + 5, StringSize.Width, StringSize.Height)
+                loFactTypeDerivationTextShape.Shape = MindFusion.Diagramming.Shapes.Rectangle
+                loFactTypeDerivationTextShape.HandlesStyle = HandlesStyle.MoveOnly
+                loFactTypeDerivationTextShape.EnableStyledText = True
+                loFactTypeDerivationTextShape.Locked = False
+                loFactTypeDerivationTextShape.TextFormat.Alignment = StringAlignment.Near
+                loFactTypeDerivationTextShape.Text = lsDerivationText
+                Call loFactTypeDerivationTextShape.ResizeToFitText(FitSize.KeepWidth)
+                loFactTypeDerivationTextShape.TextColor = Color.Black
+                loFactTypeDerivationTextShape.Transparent = True
+                loFactTypeDerivationTextShape.AllowIncomingLinks = False
+                loFactTypeDerivationTextShape.AllowOutgoingLinks = False
+                loFactTypeDerivationTextShape.ZTop()
+
+                If Me.FactTypeDerivationText Is Nothing Then
+                    Me.FactTypeDerivationText = New FBM.FactTypeDerivationText(Me.Model, Me.Page, Me)
+                    Me.FactTypeDerivationText.InstanceNumber = Me.InstanceNumber
+                End If
+                'CodeSafe
+                Me.FactTypeDerivationText.Page = Me.Page
+
+                Me.FactTypeDerivationText.Shape = loFactTypeDerivationTextShape
+                loFactTypeDerivationTextShape.Tag = Me.FactTypeDerivationText
+
+                If Me.FactTypeDerivationText.X = 0 Then Me.FactTypeDerivationText.X = Me.X
+                If Me.FactTypeDerivationText.Y = 0 Then Me.FactTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
+
+                Me.FactTypeDerivationText.Shape.Move(Me.FactTypeDerivationText.X,
+                                                     Me.FactTypeDerivationText.Y)
+
+                Me.Page.Diagram.Nodes.Add(Me.FactTypeDerivationText.Shape)
+
+                Me.FactTypeDerivationText.Shape.Visible = Me.IsDerived
+                Call Me.FactTypeDerivationText.Shape.ZBottom()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+            End Try
+
+        End Sub
+
+
+        Public Sub MakeVisible()
 
             Try
                 'CodeSafe
                 If Me.Page.Diagram Is Nothing Then Exit Sub
 
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
 
                     Me.Shape.Visible = True
                     Me.FactTypeNameShape.Visible = True
 
                     If Me.FactTypeReadingShape IsNot Nothing Then
-                        If IsSomething(Me.FactTypeReadingShape.Shape) Then
+                        If Me.FactTypeReadingShape.Shape IsNot Nothing Then
                             Me.FactTypeReadingShape.Shape.Visible = True
                         End If
                     End If
@@ -2700,7 +3016,7 @@ ReattachRoles:
                                 End If
                             Next
                         Next
-                        If lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.ValueType Then
+                        If Me.isReferenceModeFactType And lrRoleInstance.TypeOfJoin = pcenumRoleJoinType.ValueType Then
                             Dim lrValueTypeInstance As FBM.ValueTypeInstance = lrRoleInstance.JoinedORMObject
                             lrValueTypeInstance.X = Me.X + (3 * Me.Shape.Bounds.Width)
                             lrValueTypeInstance.Y = Me.Y
@@ -2725,7 +3041,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2739,7 +3055,7 @@ ReattachRoles:
             Dim lsMessage As String
 
             Try
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "Name"
                             If Me.FactType.Name = Me.Name Then
@@ -2856,6 +3172,42 @@ ReattachRoles:
                             Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
                         Case Is = "IsSubtypeStateControlling"
                             Call Me.FactType.SetIsSubtypeStateControlling(Me.IsSubtypeStateControlling, True)
+                        Case Is = "Value"
+                            With New WaitCursor
+                                Select Case asSelectedGridItemLabel
+                                    Case Is = "GraphLabel"
+#Region "GraphLabel"
+                                        'GraphLabel processing.
+
+                                        Call Me.FactType.ModifyOrAddGraphLabel(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+
+                                        '-------------------------------------------------------------------------------------------------------------------------------
+                                        'Removing an item using the UITypeEditor does not trigger a return of aoChangedPropertyItem (As PropertyValueChangedEventArgs).
+                                        '  So we must check each time (back here) whether there is an item to remove from the GraphLabels list for the [ModelElement]Instance.
+                                        Dim lrDataStore As New DataStore.Store
+
+
+                                        For Each lsGraphLabel In Me.FactType.GraphLabel.FindAll(Function(x) x.Label <> aoChangedPropertyItem.ChangedItem.Value).Select(Function(x) x.Label).ToArray
+                                            If lsGraphLabel IsNot Nothing Then
+                                                If Not Me._GraphLabel.Contains(lsGraphLabel) Then
+
+                                                    Call Me.FactType.GraphLabel.RemoveAll(Function(x) x.ModelElement.Id = Me.FactType.Id And x.Label = lsGraphLabel)
+                                                    Dim lsModelId = Me.Model.ModelId
+                                                    Dim lsLocalGraphLabel = lsGraphLabel
+                                                    Dim whereClause As Expression(Of Func(Of RDS.GraphLabel, Boolean)) = Function(t) t.ModelId = lsModelId And t.ModelElementId = Me.FactType.Id And t.Label = lsLocalGraphLabel
+                                                    lrDataStore.Delete(Of RDS.GraphLabel)(whereClause)
+                                                End If
+                                            End If
+                                        Next
+#End Region
+                                    Case Else
+                                        'No other collections at this stage.
+                                End Select
+                            End With
+                        Case Is = "Source"
+                            Call Me.FactType.SetSource(Me.Source)
+                        Case Is = "Target"
+                            Call Me.FactType.SetTarget(Me.Target)
                     End Select
 
                     Call Me.EnableSaveButton()
@@ -2903,7 +3255,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2929,9 +3281,29 @@ ReattachRoles:
                     If Me.FactTypeDerivationText.Shape Is Nothing Then
                         Call Me.CreateDerivationTextShape()
                     Else
-                        Me.FactTypeDerivationText.Shape.Text = asDerivationText
+                        Dim lsDerivationText As String = ""
+
+                        Select Case Me.Model.DerivationSyntaxType
+                            Case Is = pcenumDerivationSyntaxType.FactEngine
+                                If Me.FactType.IsManyTo1BinaryFactType Then
+                                    '-----------------------------------------------------------------------------------------------
+                                    'That's good, because needs to be at least that for Derived Fact Type.
+                                    Dim lrRole As FBM.Role
+                                    lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
+                                    lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
+                                    lsDerivationText &= vbCrLf & Me.DerivationText
+                                Else
+                                    lsDerivationText = "* " & Me.DerivationText
+                                End If
+                            Case Is = pcenumDerivationSyntaxType.nORMa
+                                lsDerivationText = Me.DerivationText
+                        End Select
+
+                        Me.FactTypeDerivationText.Shape.Text = lsDerivationText
                     End If
                 End If
+
+                Call Me.FactTypeDerivationText.SetSize
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -2939,7 +3311,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2956,7 +3328,7 @@ ReattachRoles:
             '  current page
             '-----------------------------------------------------------
             If Me.Page.Loaded And Me.Page.Language = pcenumLanguage.ORMModel Then
-                If IsSomething(Me.FactTable.TableShape) And IsSomething(Me.FactTable.FactTypeInstance) Then
+                If Me.FactTable.TableShape IsNot Nothing And Me.FactTable.FactTypeInstance IsNot Nothing Then
                     Call Me.FactTable.ResortFactTable()
                 End If
             End If
@@ -2971,7 +3343,7 @@ ReattachRoles:
 
                 Call Me.FindSuitableFactTypeReading()
 
-                Dim lrModelError As New FBM.ModelError(115, Me.FactType)
+                Dim lrModelError As New FBM.ModelError(pcenumModelErrors.FactTypeRequiresReadingError, Me.FactType)
                 lrModelError = Me.FactType.ModelError.Find(Function(x) x.ErrorId = lrModelError.ErrorId And x.ModelObject.Id = Me.FactType.Id)
                 Me.FactType._ModelError.Remove(lrModelError)
                 Call Me.Model.RemoveModelError(lrModelError)
@@ -2984,7 +3356,7 @@ ReattachRoles:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3015,7 +3387,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3036,7 +3408,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3085,7 +3457,7 @@ ReattachRoles:
 
                 Me.InternalUniquenessConstraint.Add(lrRoleConstraintInstance)
 
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     If lbAddToPage Then lrRoleConstraintInstance.DisplayAndAssociate()
                     Call Me.AdjustBorderHeight()
                 End If
@@ -3106,7 +3478,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3156,7 +3528,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -3212,7 +3584,7 @@ ReattachRoles:
                     Me.ObjectifyingEntityType.IsObjectifyingEntityType = False
                 End If
 
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     Me.Shape.Pen.Color = Color.White
                 End If
 
@@ -3222,7 +3594,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -3230,59 +3602,71 @@ ReattachRoles:
 
         Private Sub _FactType_Objectified() Handles _FactType.Objectified
 
-            Me.IsObjectified = True
+            Try
+                Me.IsObjectified = True
 
-            Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+                Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
 
-            If Me.Page.EntityTypeInstance.Exists(Function(x) x.Id = Me.FactType.ObjectifyingEntityType.Id) Then
-                '-------------------------------------------------------------------------------------------
-                'The Objectifying EntityType is already on the Page.
-                '-----------------------------------------------------
-                Me.ObjectifyingEntityType = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.FactType.ObjectifyingEntityType.Id)
-            Else
-                lrEntityTypeInstance = Me.FactType.ObjectifyingEntityType.CloneInstance(Me.Page, True)
+                If Me.Page.EntityTypeInstance.Exists(Function(x) x.Id = Me.FactType.ObjectifyingEntityType.Id) Then
+                    '-------------------------------------------------------------------------------------------
+                    'The Objectifying EntityType is already on the Page.
+                    '-----------------------------------------------------
+                    Me.ObjectifyingEntityType = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.FactType.ObjectifyingEntityType.Id)
+                Else
+                    lrEntityTypeInstance = Me.FactType.ObjectifyingEntityType.CloneInstance(Me.Page, True)
 
-                Me.ObjectifyingEntityType = lrEntityTypeInstance
-                Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
+                    Me.ObjectifyingEntityType = lrEntityTypeInstance
+                    Me.ObjectifyingEntityType.IsObjectifyingEntityType = True
 
-                Me.Page.MakeDirty()
-                Me.Model.Save()
-            End If
-
-            If Me.Page IsNot Nothing Then
-                If Me.Page.Diagram IsNot Nothing Then
-                    Me.ObjectifyingEntityType.Hide()
+                    Me.Page.MakeDirty()
+                    Me.Model.Save()
                 End If
-            End If
 
-            If IsSomething(Me.Shape) Then
-                Me.Shape.Pen.Color = Color.Black
-
-                '----------------------------------
-                'Position the name of the FactType
-                '----------------------------------
-                Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 15, Me.Shape.Bounds.Top - CInt(1.5 * Me.FactTypeNameShape.Bounds.Height))
-                Me.FactTypeNameShape.Visible = Me.IsObjectified
-
-                Me.Shape.ShadowOffsetX = 1
-                Me.Shape.ShadowOffsetY = 1
-                Me.Shape.ShadowColor = Color.LightGray
-
-
-                '--------------------------------------------------------------
-                'Push any RoleName that are within the bounds of the FactType
-                '  outside the bounds of the FactType
-                '--------------------------------------------------------------
-                Dim lo_role_instance As FBM.RoleInstance
-                For Each lo_role_instance In Me.RoleGroup
-                    If (lo_role_instance.RoleName.Shape.Bounds.Y > Me.Shape.Bounds.Top) And (lo_role_instance.RoleName.Shape.Bounds.Y < Me.Shape.Bounds.Bottom) Then
-                        '------------------------------------------------------
-                        'RoleName is within verticle bounds of FactType shape
-                        '------------------------------------------------------
-                        lo_role_instance.RoleName.Shape.Move(lo_role_instance.RoleName.Shape.Bounds.X, Me.Shape.Bounds.Top - CInt(1.2 * lo_role_instance.RoleName.Shape.Bounds.Height))
+                If Me.Page IsNot Nothing Then
+                    If Me.Page.Diagram IsNot Nothing Then
+                        Me.ObjectifyingEntityType.Hide()
                     End If
-                Next
-            End If
+                End If
+
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Pen.Color = Color.Black
+
+                    '----------------------------------
+                    'Position the name of the FactType
+                    '----------------------------------
+                    Me.FactTypeNameShape.Move(Me.Shape.Bounds.X - 15, Me.Shape.Bounds.Top - CInt(1.5 * Me.FactTypeNameShape.Bounds.Height))
+                    Me.FactTypeNameShape.Visible = Me.IsObjectified
+
+                    Me.Shape.ShadowOffsetX = 1
+                    Me.Shape.ShadowOffsetY = 1
+                    Me.Shape.ShadowColor = Color.LightGray
+
+
+                    '--------------------------------------------------------------
+                    'Push any RoleName that are within the bounds of the FactType
+                    '  outside the bounds of the FactType
+                    '--------------------------------------------------------------
+                    Dim lo_role_instance As FBM.RoleInstance
+                    For Each lo_role_instance In Me.RoleGroup
+                        If (lo_role_instance.RoleName.Shape.Bounds.Y > Me.Shape.Bounds.Top) And (lo_role_instance.RoleName.Shape.Bounds.Y < Me.Shape.Bounds.Bottom) Then
+                            '------------------------------------------------------
+                            'RoleName is within verticle bounds of FactType shape
+                            '------------------------------------------------------
+                            lo_role_instance.RoleName.Shape.Move(lo_role_instance.RoleName.Shape.Bounds.X, Me.Shape.Bounds.Top - CInt(1.2 * lo_role_instance.RoleName.Shape.Bounds.Height))
+                        End If
+                    Next
+                End If
+
+                Call Me.AdjustBorderHeight(True)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 
@@ -3320,7 +3704,7 @@ ReattachRoles:
                     lrFactInstance.Id = lrFact.Id
                     lrFactInstance.Symbol = lrFact.Symbol
                     lrFactInstance = Me.Fact.Find(AddressOf lrFactInstance.EqualsById)
-                    If IsSomething(lrFactInstance) Then
+                    If lrFactInstance IsNot Nothing Then
                         lrFactInstance.Data.Add(lrFactDataInstance)
                     End If
                 Next
@@ -3343,7 +3727,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3356,7 +3740,7 @@ ReattachRoles:
                 lrRoleInstance.Id = arRole.Id
                 lrRoleInstance = Me.RoleGroup.Find(AddressOf lrRoleInstance.Equals)
 
-                If IsSomething(lrRoleInstance) Then
+                If lrRoleInstance IsNot Nothing Then
                     Call Me.RemoveRole(lrRoleInstance)
                 End If
 
@@ -3374,7 +3758,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3388,7 +3772,7 @@ ReattachRoles:
 
         Private Sub _FactType_ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean, ByRef arPage As FBM.Page) Handles _FactType.ShowFactTypeNameChanged
 
-            If Me.Page Is arPage Then
+            If Me.Page Is arPage Or arPage Is Nothing Then
                 Me.ShowFactTypeName = abNewShowFactTypeName
 
                 Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.FactType.Id, pcenumConceptType.FactTypeName)
@@ -3438,7 +3822,7 @@ ReattachRoles:
                 '  current page
                 '-----------------------------------------------------------
                 If Me.Page.Loaded Then
-                    If IsSomething(Me.FactTable.TableShape) And IsSomething(Me.FactTable.FactTypeInstance) Then
+                    If Me.FactTable.TableShape IsNot Nothing And Me.FactTable.FactTypeInstance IsNot Nothing Then
                         Call Me.FactTable.ResortFactTable(True)
                     End If
                 End If
@@ -3451,21 +3835,21 @@ ReattachRoles:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
         'Private Sub ModelUpdated() Handles Model.ModelUpdated
 
-        '    If IsSomething(Me.Page) Then
+        '    If Me.Page IsNot Nothing Then
         '        '----------------------------------------------------------------
         '        'The FactTypeInstance is loaded onto a Page.
         '        '  NB FactTypeInstances may be loaded that are not on a Page.
         '        '  The reason for this is that other ModelObjects may reference
         '        '  a FactTypeInstance (within the model, but not be on a Page.
         '        '----------------------------------------------------------------
-        '        If IsSomething(Me.Page.diagram) Then
+        '        If Me.Page.diagram IsNot Nothing Then
         '            '---------------------------------------------
         '            'Instance is on a Page that is loaded 
         '            '  and displayed on a Form/Diagram
@@ -3716,7 +4100,7 @@ ReattachRoles:
         '                lrFactInstance = Me.FactType.Fact(liInd - 1).CloneInstance(Me.Page)
         '                Me.Fact.Add(lrFactInstance)
         '            Next
-        '            If IsSomething(Me.FactTable) And Me.Page.loaded Then
+        '            If Me.FactTable IsNot Nothing And Me.Page.loaded Then
         '                Me.SortRoleGroup()
         '                Me.FactTable.TableShape.ResizeToFitText(True)
         '            End If
@@ -3747,7 +4131,7 @@ ReattachRoles:
         '            For Each lrFactInstance In larFactInstanceRemovalList
         '                Me.Fact.Remove(lrFactInstance)
         '            Next
-        '            If IsSomething(Me.FactTable) And Me.Page.loaded Then
+        '            If Me.FactTable IsNot Nothing And Me.Page.loaded Then
         '                Me.SortRoleGroup()
         '                Me.FactTable.TableShape.ResizeToFitText(True)
         '            End If
@@ -3757,6 +4141,22 @@ ReattachRoles:
         'End Sub
 
         Public Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
+
+            Try
+                If Me.FactType.IsDerived AndAlso Me.FactTypeDerivationText IsNot Nothing AndAlso Me.FactTypeDerivationText.Shape IsNot Nothing Then
+                    Me.FactTypeDerivationText.Shape.Pen.Color = Color.White
+                    Me.FactTypeDerivationText.Shape.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                    Me.FactTypeDerivationText.Shape.HandlesStyle = HandlesStyle.MoveOnly
+                    Me.FactTypeDerivationText.Shape.Transparent = True
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 
@@ -3773,10 +4173,12 @@ ReattachRoles:
 
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
 
-            If IsSomething(Me.Shape) Then
+            If Me.Shape IsNot Nothing Then
                 If Me.Shape.Selected Then
                     Me.Shape.Pen.Color = Color.Blue
+                    Me.Shape.Pen.Width = 0.7
                 Else
+                    Me.Shape.Pen.Width = 0.5
                     If Me.FactType.HasModelError Then
                         Me.Shape.Visible = True
                         Me.Shape.Pen.Color = Color.Red
@@ -3811,7 +4213,7 @@ ReattachRoles:
                 Next
                 lrFactTypeReading = Me.FactType.FindSuitableFactTypeReadingByRoles(larRole)
 
-                If IsSomething(lrFactTypeReading) Then
+                If lrFactTypeReading IsNot Nothing Then
                     lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(Me.Page)
                     If Me.FactTypeReadingShape Is Nothing Then
                         Me.FactTypeReadingShape = New FBM.FactTypeReadingInstance(Me, lrFactTypeReading)
@@ -3820,8 +4222,8 @@ ReattachRoles:
                     Me.FactTypeReadingShape = lrFactTypeReadingInstance
                     Me.FactTypeReadingShape.RefreshShape()
                 Else
-                    If IsSomething(Me.FactTypeReadingShape) Then
-                        If IsSomething(Me.FactTypeReadingShape.Shape) Then
+                    If Me.FactTypeReadingShape IsNot Nothing Then
+                        If Me.FactTypeReadingShape.Shape IsNot Nothing Then
                             Me.FactTypeReadingShape.Shape.Text = ""
                         End If
                     End If
@@ -3832,7 +4234,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3886,7 +4288,7 @@ ReattachRoles:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3992,7 +4394,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4045,7 +4447,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, abThrowtoMSGBox:=True, abUseFlashCard:=True)
             End Try
 
         End Sub
@@ -4081,7 +4483,7 @@ ReattachRoles:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4115,7 +4517,7 @@ ReattachRoles:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
 
@@ -4147,7 +4549,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4166,7 +4568,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4194,7 +4596,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4232,7 +4634,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4247,7 +4649,7 @@ ReattachRoles:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

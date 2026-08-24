@@ -5,6 +5,8 @@ Namespace DataLineage
     Public Class DataLineageItemProperty
         Implements IEquatable(Of DataLineageItemProperty)
 
+        Public DataLineageItem As DataLineage.DataLineageItem
+
         Public Model As FBM.Model
 
         Public Name As String 'DataLineageItemName
@@ -30,12 +32,14 @@ Namespace DataLineage
         ''' <param name="asPropertyType">E.g. "Document", "Page Number", "Target", "Source"</param>
         ''' <param name="asProperty">E.g. "Document", "Page Number", "Target", "Source"</param>
         ''' <param name="aiLineageSetNumber">E.g. 1 (mostly). Counter for the Data Lineage Category allocated against a Data Lineage Item and where a Data Lineage Category can be against a Data Lineage Item more than once.</param>
-        Public Sub New(ByRef arModel As FBM.Model,
+        Public Sub New(ByRef arDataLineageItem As DataLineage.DataLineageItem,
+                       ByRef arModel As FBM.Model,
                        ByVal asDataLineageItemName As String,
                        ByVal asPropertyType As String,
                        ByVal asProperty As String,
                        ByVal aiLineageSetNumber As Integer)
             Try
+                Me.DataLineageItem = arDataLineageItem
                 Me.Model = arModel
                 Me.Name = asDataLineageItemName
                 Me.PropertyType = asPropertyType
@@ -48,7 +52,7 @@ Namespace DataLineage
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -56,7 +60,20 @@ Namespace DataLineage
             Return Me.Name = other.Name And Me.PropertyType = other.PropertyType And Me.Property = other.Property And Me.LineageSetNumber = other.LineageSetNumber
         End Function
 
+        Public Sub Delete()
 
+            Try
+                Call tableDataLineageItemProperty.DeleteDataLineageItemProperty(Me)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
         Public Sub Save(Optional ByVal abIgnoreErrors As Boolean = False)
 
             Try
@@ -77,6 +94,8 @@ Namespace DataLineage
                     Call tableDataLineageItemProperty.DeleteDataLineageItemProperty(Me)
                 Else
 OkayToProceed:
+                    Call tableDataLineageItemProperty.ExistsDataLineageItemPropertySet(Me.DataLineageItem, Me)
+
                     If tableDataLineageItemProperty.ExistsDataLineageItemProperty(Me) Then
                         Call tableDataLineageItemProperty.updateDataLineageItemProperty(Me)
                     Else
@@ -94,7 +113,7 @@ OkayToProceed:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

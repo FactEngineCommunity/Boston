@@ -1,5 +1,56 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head>
+<html>
+<style>
+/* CSS */
+.button-13 {
+  background-color: #fff;
+  border: 1px solid #d5d9d9;
+  border-radius: 8px;
+  box-shadow: rgba(213, 217, 217, .5) 0 2px 5px 0;
+  box-sizing: border-box;
+  color: #4BACC6;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Amazon Ember",sans-serif;
+  font-size: 13px;
+  line-height: 29px;
+  padding: 0 10px 0 11px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  width: 100px;
+  /* Adjust the padding to leave space for the image on the left */
+}
+
+.button-13:hover {
+  background-color: #f7fafa;
+}
+
+.button-13:focus {
+  border-color: #008296;
+  box-shadow: rgba(213, 217, 217, .5) 0 2px 5px 0;
+  outline: 0;
+}
+
+.no-underline-a {
+    text-decoration: none;
+}
+
+</style>
+
+<script>
+    function navigateTo(url) {
+        if (window.external) {
+            window.external.NavigateTo(url);
+        }
+    }
+</script>
+
+<head>
   
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
   <title>ORM Studio Startup</title>
@@ -21,35 +72,44 @@
 <div style="text-align: left;"><br>
 <br>
 <br>
+<p style="margin-left: 20px;">
+        <span style="font-family: Arial;">
+		            <a class="no-underline-a objectType" href="function:AddNewModel">
+                		<button class="button-13" style="width:200px; display: flex; align-items: center;" role="button";><img style="width: 16px; height: 16px; padding-right: 5px;" alt="" src="images/Model16x16.png">Add new Model to Boston</button>
+		            </a>
+		        </span>
+</p>
 <table style="text-align: left; width: 662px; height: 108px;" border="0" cellpadding="2" cellspacing="2">
   <tbody>
-    <tr>
-      <td style="vertical-align: top; width: 125px;"><small></span><img style="width: 16px; height: 16px;" alt="" src="images/Model16x16.png"></small></td>
-      <td style="vertical-align: top; width: 517px;"><small><span style="font-family: Arial;"> <a class="objectType" href="function:AddNewModel">Add new Model to Boston</a></small></td>
-    </tr>
     <tr>
       <td style="vertical-align: top; width: 125px;">&nbsp;</td>
       <td style="vertical-align: top; width: 517px;">&nbsp;</td>
     </tr>
     <tr>
-      <td style="vertical-align: top; width: 125px;"><small><span style="font-family: Arial;">Getting Started</span>: </small></td>
-      <td style="vertical-align: top; width: 517px;"><small><a href="./FactEngineTraining.html" target="_top"><span style="font-family: Arial;">Training @ FactEngine</span></a> </small></td>
-    </tr>
-    <tr>
       <td style="vertical-align: top; width: 125px;"><small><span style="font-family: Arial;">Resources</span>: </small></td>
-      <td style="vertical-align: top; width: 517px;"><small><a href="./ORMResources.html" target="_top"><span style="font-family: Arial;">ORM Resources</span></a> </small></td>
+      <td style="vertical-align: top; width: 517px;"><small><a href="./ORMResources.html" target="_top" style="color: #4BACC6;"><span style="font-family: Arial;">ORM Resources</span></a> </small></td>
     </tr>
     <tr>
       <td style="vertical-align: top; width: 125px;"><small><span style="font-family: Arial;">FactEngine</span>:<br>
       </small></td>
-      <td style="vertical-align: top; width: 517px;"><small><a style="font-family: Arial;" href="http://www.factengine.ai" target="_blank">https://www.factengine.ai</a><br>
-      </small></td>
+      <td style="vertical-align: top; width: 517px;"><small>
+        <a href="function:NavigateTo:https://www.factengine.ai" 
+           style="color: #4BACC6; font-family: Arial;" 
+	   onclick="navigateTo('https://www.factengine.ai'); return false;"
+           target="_blank">https://www.factengine.ai</a>
+</small><br>
+</td>
     </tr>
     <tr>
       <td style="vertical-align: top; width: 125px;"><small><span style="font-family: Arial;">Boston on YouTube</span>:</small><br>
       </td>
-      <td style="vertical-align: top; width: 517px;"><small><span style="font-family: Arial;"> <a href="https://www.youtube.com/channel/UCHybHukPEsivzh-JMe-oJXA/videos" target="_blank">[Click Here]</a>&nbsp;&nbsp;&nbsp;&nbsp;   Instructional videos on how to use Boston</span><small><br>
-      </small></small></td>
+      <td style="vertical-align: top; width: 517px;" font-family: Arial;><small>
+        <a href="function:NavigateTo:https://www.youtube.com/@factengine2481/videos" 
+           style="color: #4BACC6; font-family: Arial;" 
+	   onclick="navigateTo('https://www.youtube.com/@factengine2481/videos'); return false;"
+           target="_blank">[Click Here]</a>
+	&nbsp;&nbsp;&nbsp;&nbsp;Instructional videos on how to use Boston</small><br>
+      </td>
     </tr>
   </tbody>
 </table>

@@ -258,7 +258,7 @@ Public Class frmCRUDAddAttribute
             Me.zbAttributeIsMandatory = Me.CheckBoxIsMandatory.Checked
             Me.zbAttributeIsPartOfPrimaryKey = Me.CheckBoxIsPrimaryIdentifier.Checked
 
-            If IsSomething(Me.zrReferencesModelObject) Then
+            If Me.zrReferencesModelObject IsNot Nothing Then
                 '---------------------------------------------------------------------------------------------
                 'The Entity references another Entity.
                 '  The associated FactType (i.e. the FBM.FactType associated with the Attribute)
@@ -298,7 +298,7 @@ Public Class frmCRUDAddAttribute
         ''Check to see whether a ValueType already exists in the Model with the same name as the ValueType
         ''  that will be associated with the Attribute
         ''---------------------------------------------------------------------------------------------------
-        'If IsSomething(Me.zrReferencesModelObject) Then
+        'If Me.zrReferencesModelObject IsNot Nothing Then
 
         '    Dim lrValueType As New FBM.ValueType
         '    lrValueType.Id = Me.zarAttribute(0).Name
@@ -318,7 +318,7 @@ Public Class frmCRUDAddAttribute
 
     Private Sub RadioButtonManyToOne_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RadioButtonManyToOne.CheckedChanged
 
-        If IsSomething(Me.zrModelObject) Then
+        If Me.zrModelObject IsNot Nothing Then
             Call Me.UpdateVerbalisationReading()
             Call Me.zrFactType.CreateManyToOneInternalUniquenessConstraint(Me.zrModelObject)
         End If
@@ -350,7 +350,7 @@ Public Class frmCRUDAddAttribute
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -388,7 +388,7 @@ Public Class frmCRUDAddAttribute
     Private Sub ComboBoxAttribute_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs)
 
         'Me.zrValueType(Me.BindingSourceAttribute.IndexOf(Me.BindingSourceAttribute.Current)).Name = Me.ComboBoxAttribute.Text
-        'Me.zrFactType(Me.BindingSourceAttribute.IndexOf(Me.BindingSourceAttribute.Current)).Name = Viev.strings.RemoveWhiteSpace(Me.zrModelObject.Name & Me.ComboBoxAttribute.Text)
+        'Me.zrFactType(Me.BindingSourceAttribute.IndexOf(Me.BindingSourceAttribute.Current)).Name = FEStrings.ProperSpace(Me.zrModelObject.Name & Me.ComboBoxAttribute.Text)
         Call Me.PopulateTermList()
 
     End Sub
@@ -401,7 +401,7 @@ Public Class frmCRUDAddAttribute
 
     Private Sub frm_orm_reading_editor_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
 
-        If IsSomething(frmMain) Then
+        If frmMain IsNot Nothing Then
             frmMain.zfrm_orm_reading_editor = Nothing
         End If
 
@@ -787,7 +787,7 @@ Public Class frmCRUDAddAttribute
         Else
             Me.ComboBoxReferences.Visible = False
             Me.ComboBoxReferences.SelectedIndex = -1
-            Me.LabelValueTypeDescription.Visible = True            
+            Me.LabelValueTypeDescription.Visible = True
             Me.GroupBoxRelationshipType.Enabled = False
 
             Me.zarAttribute.Clear()
@@ -1107,7 +1107,7 @@ Public Class frmCRUDAddAttribute
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -1132,7 +1132,7 @@ Public Class frmCRUDAddAttribute
         'Don't allow the User to set the OriginMandatory to False
         ' if the OriginContributesToPrimaryKey is True
         '----------------------------------------------------------
-        If Not Me.CheckBoxRelationOriginMandatory.Checked And _
+        If Not Me.CheckBoxRelationOriginMandatory.Checked And
                Me.CheckBoxRelationContributesToPrimaryKey.Checked Then
             Me.CheckBoxRelationOriginMandatory.Checked = True
             Exit Sub
@@ -1165,7 +1165,7 @@ Public Class frmCRUDAddAttribute
         If Me.CheckBoxRelationOriginMany.Checked Then
             Me.zrRelation.OriginMultiplicity = pcenumCMMLMultiplicity.Many
         Else
-            Me.zrRelation.OriginMultiplicity = pcenumCMMLMultiplicity.One            
+            Me.zrRelation.OriginMultiplicity = pcenumCMMLMultiplicity.One
         End If
 
         Call Me.SetPictureboxRelation()
@@ -1222,7 +1222,7 @@ Public Class frmCRUDAddAttribute
 
         Dim lsMessage As String = ""
 
-        If Me.CheckBoxRelationOriginMandatory.Checked = True And _
+        If Me.CheckBoxRelationOriginMandatory.Checked = True And
            Me.CheckBoxIsMandatory.Checked = False Then
 
             lsMessage = "If the relation between Entity, '" & Me.zrEntity.Name & "', and Entity, '" & Me.ComboBoxReferences.Text & "'"
@@ -1262,8 +1262,8 @@ Public Class frmCRUDAddAttribute
 
         lrAttribute = Me.BindingSourceAttribute.Current
 
-        If IsSomething(Me.BindingSourceAttribute.Current) Then
-            If IsSomething(lrAttribute.ReferencesAttribute) Then
+        If Me.BindingSourceAttribute.Current IsNot Nothing Then
+            If lrAttribute.ReferencesAttribute IsNot Nothing Then
                 ComboBoxKeyAttributes.SelectedIndex = ComboBoxKeyAttributes.FindString(lrAttribute.ReferencesAttribute.Name)
             End If
         Else
@@ -1271,7 +1271,7 @@ Public Class frmCRUDAddAttribute
             'Refreshing BindingSource
             '--------------------------
         End If
-        
+
 
     End Sub
 
@@ -1298,7 +1298,7 @@ Public Class frmCRUDAddAttribute
                 '----------------------------------------------------------------------------------
                 CheckRelationValidity = False
 
-                lsMessage = "If a Relation contributes to the PrimaryKey, then the Relation must be Mandatory."                
+                lsMessage = "If a Relation contributes to the PrimaryKey, then the Relation must be Mandatory."
                 MsgBox(lsMessage)
         End Select
 
@@ -1344,7 +1344,7 @@ Public Class frmCRUDAddAttribute
     '        '  NB Do this first, because we need lrFactInstanceRelation for when 
     '        '  mapping the relationship between an Attribute and its associated Relation.
     '        '----------------------------------------------------------------------------
-    '        If IsSomething(lrAddAttributeForm.zrReferencesModelObject) Then
+    '        If lrAddAttributeForm.zrReferencesModelObject IsNot Nothing Then
 
     '            Dim lrLink As ERD.Link
 
@@ -1522,7 +1522,7 @@ Public Class frmCRUDAddAttribute
     '            Dim lrFactInstance As FBM.FactInstance
 
     '            Dim lsIndexName As String = ""
-    '            lsIndexName = Viev.Strings.RemoveWhiteSpace(lrEntity.Id & "PK")
+    '            lsIndexName = FEStrings.ProperSpace(lrEntity.Id & "PK")
 
     '            If lrERAttribute.PartOfPrimaryKey Then
 
@@ -1558,7 +1558,7 @@ Public Class frmCRUDAddAttribute
     '            End If
     '            '==========================================================
 
-    '            If IsSomething(lrAddAttributeForm.zrReferencesModelObject) Then
+    '            If lrAddAttributeForm.zrReferencesModelObject IsNot Nothing Then
     '                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreAttributeIsPartOfRelation.ToString
     '                lsSQLQuery &= " (Attribute, Relation)"
     '                lsSQLQuery &= " ON PAGE '" & Me.zrPage.Name & "'"

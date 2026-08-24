@@ -37,10 +37,10 @@ Namespace TableSpaceGlossary
                         lrDictionaryEntry = New FBM.DictionaryEntry
                         lrDictionaryEntry.Model = arModel
                         lrDictionaryEntry.Concept = New FBM.Concept(lRecordset("Term").Value)
-                        lrDictionaryEntry.Realisations.Add(lrDictionaryEntry.Concept)
+                        lrDictionaryEntry.Realisations.Add(lrDictionaryEntry.ConceptType)
                         lrDictionaryEntry.Symbol = lrDictionaryEntry.Concept.Symbol
-                        lrDictionaryEntry.ShortDescription = Trim(VievLibrary.NullVal(lRecordset("ShortDescription").Value, ""))
-                        lrDictionaryEntry.LongDescription = Trim(VievLibrary.NullVal(lRecordset("LongDescription").Value, ""))
+                        lrDictionaryEntry.ShortDescription = Trim(NullVal(lRecordset("ShortDescription").Value, ""))
+                        lrDictionaryEntry.LongDescription = Trim(NullVal(lRecordset("LongDescription").Value, ""))
                         lrDictionaryEntry.isGeneralConcept = True
 
                         lrDictionaryEntry = arModel.AddModelDictionaryEntry(lrDictionaryEntry)
@@ -57,7 +57,7 @@ Namespace TableSpaceGlossary
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try

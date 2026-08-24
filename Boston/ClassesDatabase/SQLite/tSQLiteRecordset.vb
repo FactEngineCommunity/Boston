@@ -22,11 +22,24 @@ Namespace SQLite
 
         Public Overrides ReadOnly Property EOF As Boolean
             Get
-                If Me.SQLiteDataReader.HasRows Then
-                    Return Me._EOF
-                Else
+                Try
+                    If Me.SQLiteDataReader Is Nothing Then
+                        prApplication.ThrowMessage("SQLite.Recordset: SQLiteDataReader Is Nothing", pcenumErrorType.Critical)
+                    End If
+
+                    'CodeSafe
+                    If Me.SQLiteDataReader Is Nothing Then Return True
+
+                    If Me.SQLiteDataReader.HasRows Then
+                        Return Me._EOF
+                    Else
+                        Return True
+                    End If
+
+                Catch ex As Exception
                     Return True
-                End If
+                End Try
+
             End Get
         End Property
 
@@ -112,7 +125,7 @@ Namespace SQLite
         End Property
 
         Public Overrides Sub Close()
-            'Me.SQLiteDataReader.Close()
+            If Me.SQLiteDataReader IsNot Nothing Then Me.SQLiteDataReader.Close()
         End Sub
 
 
@@ -170,23 +183,59 @@ Namespace SQLite
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Function
 
         Public Overrides Function Open(ByVal asQuery As String) As Boolean
 
-            Try
-                Dim sqlite_cmd As SQLiteCommand
+            Dim lsMessage As String
 
-                sqlite_cmd = Me.ActiveConnection.Connection.CreateCommand()
+            Try
+                Dim lrSQLiteConnection = Database.CreateConnection(Me.ActiveConnection.DatabaseConnectionString)
+
+                Try
+                    ' Set the journal mode to WAL
+                    Using setWALCmd = lrSQLiteConnection.CreateCommand()
+                        setWALCmd.CommandText = "PRAGMA journal_mode=WAL;"
+                        setWALCmd.ExecuteNonQuery()
+                    End Using
+
+                    lrSQLiteConnection.EnableExtensions(True)
+                    lrSQLiteConnection.LoadExtension("SQLite.Interop.dll", "sqlite3_fts5_init") ' "sqlite3_json_init")
+                Catch
+                    'Tried
+                End Try
+
+                Dim sqlite_cmd = lrSQLiteConnection.CreateCommand()
                 sqlite_cmd.CommandText = asQuery
 
-                Me.SQLiteDataReader = sqlite_cmd.ExecuteReader()
+                Me.SQLiteDataReader = sqlite_cmd.ExecuteReader(CommandBehavior.CloseConnection)
+
+            Catch ex As SQLiteException
+                ' Check if the exception is due to a database lock
+                If ex.ErrorCode = SQLiteErrorCode.Busy OrElse ex.Message.ToLower().Contains("database is locked") Then
+                    ' Handle the database lock scenario
+                    ' You might want to log this error, wait and retry, or take other appropriate action
+                    Return False ' Or any other indication of a lock
+                ElseIf ex.ErrorCode = SQLiteErrorCode.NotADb Then
+#Region "Not a database"
+                    lsMessage = "SQLite RecordsetProxy: Open Method:"
+                    lsMessage.AppendLine("SQLiteException: 26: Connection is not a database.")
+                    lsMessage.AppendLine("Database Connection String: " & Me.ActiveConnection.DatabaseConnectionString)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
+#End Region
+                Else
+                    ' Handle other SQLite exceptions
+                End If
+
+                If pbLogStartup Then
+                    lsMessage = "SQLite RecordsetProxy: Open Method:"
+                    lsMessage.AppendLine("SQLiteException: " & ex.ErrorCode.ToString)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
+                End If
 
             Catch ex As Exception
-                Dim lsMessage As String
-
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -199,7 +248,7 @@ Namespace SQLite
                     lsMessage.AppendLine("Error returning ActiveConnection.Connection")
                 End Try
 
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -222,7 +271,7 @@ Namespace SQLite
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function

@@ -110,10 +110,13 @@ Public Class ODBCDatabaseReverseEngineer
             Me.TempModel.connectToDatabase()
 
             'Load DatabaseTypes into memory.
-            Call Me.Model.DatabaseConnection.getDatabaseTypes()
+            Call Me.Model.DatabaseConnection.getDatabaseDataTypes()
             Call Me.SetProgressBarValue(5, "Loaded Data Types.")
 
             'Call Me.GetDataTypes()
+
+            '==========================================================================================================================
+            'Reverse Engineering to Temporary Tables
 
             Call Me.getTables()
             Call Me.SetProgressBarValue(10, "Loaded Tables.")
@@ -134,10 +137,16 @@ Public Class ODBCDatabaseReverseEngineer
             Call Me.TempModel.RDS.orderTablesByRelations()
             Call Me.SetProgressBarValue(45)
 
+            '==========================================================================================================================
+            'Actual Reverse Engineering (from Temporary Tables created)
             '------------------------------------------------------------------------------
             'Create EntityTypes for each Table with a PrimaryKey with one Column.
             Call Me.createTablesForSingleColumnPKTables()
-            Call Me.SetProgressBarValue(60, "Created Entit Types/Tables for Single Primary Key Column Tables.")
+            Call Me.SetProgressBarValue(60, "Created Entity Types/Tables for Single Primary Key Column Tables.")
+
+            'Create EntityTypes for each Table with a PrimaryKey with one Column.
+            Call Me.createTablesForTablesWithNoPrimaryKey()
+            Call Me.SetProgressBarValue(60, "Created Entity Types/Tables for Tables with no Primary Key.")
 
             'Create EntityTypes for those Tables that are not subtypes of other tables and have no Columns
             If My.Settings.ReverseEngineeringCreateEntityTypesForTablesWithNoColumns Then
@@ -150,7 +159,8 @@ Public Class ODBCDatabaseReverseEngineer
 
             Call Me.SetProgressBarValue(70, "Creating other Value Types. ")
 
-            For Each lrTable In Me.TempModel.RDS.Table
+CreateObjectifiedFactTypes:
+            For Each lrTable In Me.TempModel.RDS.Table.FindAll(Function(x) Not x.hasNoPrimaryKey).ToArray
 
                 'Create ValueTypes (that haven't already been created by virtue of being the ReferenceModeValueType of Simple Reference Scheme EntityTypes.
                 Call Me.AppendProgress(".")
@@ -161,7 +171,15 @@ Public Class ODBCDatabaseReverseEngineer
                 Call Me.AppendProgress(".")
                 If Me.Model.GetModelObjectByName(lrTable.Name) Is Nothing Then
                     'The Table has no ModelElement, so create it.
-                    If lrTable.getPrimaryKeyColumns.Count = 1 And lrTable.PrimarySupertype = "Entity" Then
+                    Dim lbPKValueTypeReferencesIsZero As Boolean = True
+                    For Each lrColumn In lrTable.getPrimaryKeyColumns
+                        Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrColumn.Name)
+                        If lrModelElement IsNot Nothing AndAlso lrModelElement.GetType = GetType(FBM.ValueType) Then
+                            lbPKValueTypeReferencesIsZero = False
+                            Exit For
+                        End If
+                    Next
+                    If lbPKValueTypeReferencesIsZero And lrTable.PrimarySupertype = "Entity" Then
                         'Is an EntityType, and should already be a ModelElement in the Model.
                         Call Me.ReportError($"Error: Creating Objectified Fact Types: {lrTable.Name} should already be a Model Element/Entity Type in the Model because it has a Single Column Primary Key.")
                     Else
@@ -177,10 +195,27 @@ Public Class ODBCDatabaseReverseEngineer
                                 Dim lrDestinationTable As RDS.Table = Me.Model.RDS.getTableByName(lrRelation.DestinationTable.Name)
 
                                 If lrDestinationTable Is Nothing Then
-                                    Throw New Exception($"Creating Objectified Fact Types. For: {lrTable.Name}. Destination Table does not exist: " & lrRelation.DestinationTable.Name)
+
+                                    lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
+
+                                    If lrModelElement Is Nothing Then
+
+                                        '20240122-try this trick.
+                                        Me.TempModel.RDS.Table.Remove(lrTable)
+                                        Me.TempModel.RDS.Table.Add(lrTable)
+                                        GoTo CreateObjectifiedFactTypes
+                                    Else
+                                        Select Case lrModelElement.GetType
+                                            Case Is = GetType(FBM.ValueType)
+                                            Case Is = GetType(FBM.EntityType)
+                                            Case Is = GetType(FBM.FactType)
+                                        End Select
+                                    End If
+                                    'Throw New Exception($"Creating Objectified Fact Types. For: {lrTable.Name}. Destination Table does not exist: " & lrRelation.DestinationTable.Name)
+                                Else
+                                    lrModelElement = lrDestinationTable.FBMModelElement
                                 End If
 
-                                lrModelElement = lrDestinationTable.FBMModelElement
                                 If lrModelElement Is Nothing Then
                                     lrModelElement = Me.Model.GetModelObjectByName(lrColumn.Name)
                                 End If
@@ -191,7 +226,7 @@ Public Class ODBCDatabaseReverseEngineer
                             If lrModelElement.isReferenceModeValueType Then
                                 lrModelElement = Me.Model.getEntityTypeByReferenceModeValueType(lrModelElement)
                             End If
-                            larModelObject.Add(lrModelElement)
+                            larModelObject.AddUnique(lrModelElement)
                         Next
 
                         'FactTypes joining FactTypes only have one Role. See TimetableBookings FT in University model.
@@ -353,14 +388,45 @@ Public Class ODBCDatabaseReverseEngineer
 
             '-----------------------------------------------------------------------------
             'Create FactTypes that are from a ModelElement straight to a ValueType.
-            Dim lasNonReferenceModeValueTypeNames = From ValueType In Me.Model.ValueType
-                                                    Where Not ValueType.isReferenceModeValueType
-                                                    Select LCase(ValueType.Id)
+            Dim lasNonReferenceModeValueTypeNames = (From ValueType In Me.Model.ValueType
+                                                     Where Not ValueType.isReferenceModeValueType
+                                                     Select LCase(ValueType.Id)).ToList
+
+            'Create the ValueTypes that are missing
+            Dim larMissingValueTypeColumns = (From TempTable In Me.TempModel.RDS.Table
+                                              From TempColumn In TempTable.Column
+                                              Where Not lasNonReferenceModeValueTypeNames.Contains(LCase(TempColumn.Name))
+                                              Select TempColumn).ToList
+            'Where Not TempColumn.isPartOfPrimaryKey
+
+            'Add Missing Value Types to the Model.
+            Dim lrValueType As FBM.ValueType
+            For Each lrNewValueTypeColumn In larMissingValueTypeColumns.ToArray
+
+                'CodeSafe: Just check if ValueType exists
+                If Me.Model.ValueType.Find(Function(x) LCase(x.Id) = LCase(lrNewValueTypeColumn.Name.Trim)) IsNot Nothing Then
+                    Continue For
+                End If
+
+                'Create the ValueType
+                lrValueType = New FBM.ValueType(Me.Model, pcenumLanguage.ORMModel, lrNewValueTypeColumn.Name.Trim, True)
+                Try
+                    lrValueType.DataType = Me.Model.DatabaseConnection.getBostonDataTypeByDatabaseDataType(lrNewValueTypeColumn.DataType.DataType)
+                Catch ex As Exception
+                    lrValueType.DataType = pcenumORMDataType.TextVariableLength
+                End Try
+
+                'Add the ValueType to the Model
+                Me.Model.AddValueType(lrValueType,,,, True)
+                lrValueType.SetDBName(lrNewValueTypeColumn.DatabaseName)
+            Next
+
+            lasNonReferenceModeValueTypeNames.AddRange(larMissingValueTypeColumns.Select(Function(x) LCase(x.Name)))
 
             Call Me.SetProgressBarValue(90, "Creating Fact Types straight to Value Types.")
-            For Each lrTable In Me.TempModel.RDS.Table
+            For Each lrTempTable In Me.TempModel.RDS.Table
 
-                Dim larValueTypeColumns = From Column In lrTable.Column
+                Dim larValueTypeColumns = From Column In lrTempTable.Column
                                           Where lasNonReferenceModeValueTypeNames.Contains(LCase(Column.Name))
                                           Where Not Column.isPartOfPrimaryKey
                                           Select Column
@@ -370,7 +436,7 @@ Public Class ODBCDatabaseReverseEngineer
                     Dim lrModelElement1 As FBM.ModelObject = Nothing
                     Dim lrModelElement2 As FBM.ModelObject = Nothing
 
-                    Dim lrModelTable As RDS.Table = Me.Model.RDS.getTableByName(lrTable.Name)
+                    Dim lrModelTable As RDS.Table = Me.Model.RDS.getTableByName(lrTempTable.Name)
                     If lrModelTable IsNot Nothing Then
                         lrModelElement1 = lrModelTable.FBMModelElement
 
@@ -532,7 +598,7 @@ NextValueTypeColumn:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -917,7 +983,7 @@ Skip: 'Because is not a ValueType
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -940,8 +1006,24 @@ Skip: 'Because is not a ValueType
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
+
+    End Sub
+
+    Private Sub createTablesForTablesWithNoPrimaryKey()
+
+        For Each lrTable In Me.TempModel.RDS.Table
+
+            If lrTable.hasNoPrimaryKey And lrTable.PrimarySupertype = "Entity" Then
+
+                Dim lrEntityType As FBM.EntityType
+                lrEntityType = New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lrTable.Name, lrTable.Name)
+                Me.Model.AddEntityType(lrEntityType, True)
+                lrEntityType.SetDBName(lrTable.DatabaseName)
+
+            End If
+        Next
 
     End Sub
 
@@ -1114,7 +1196,7 @@ Skip: 'Because is not a ValueType
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1129,15 +1211,15 @@ Skip: 'Because is not a ValueType
             'Tables
             For Each lrTable In Me.TempModel.RDS.Table
                 lrTable.DatabaseName = lrTable.Name
-                lrTable.Name = Viev.Strings.MakeCapCamelCase(lrTable.Name)
+                lrTable.Name = FEStrings.MakeCapCamelCase(lrTable.Name)
 
                 'Columns 
                 For Each lrColumn In lrTable.Column
                     lrColumn.DatabaseName = lrColumn.Name
-                    lrColumn.Name = Viev.Strings.MakeCapCamelCase(lrColumn.Name)
+                    lrColumn.Name = FEStrings.MakeCapCamelCase(lrColumn.Name)
                 Next
 
-                lrTable.PrimarySupertype = Viev.Strings.MakeCapCamelCase(lrTable.PrimarySupertype)
+                lrTable.PrimarySupertype = FEStrings.MakeCapCamelCase(lrTable.PrimarySupertype)
             Next
 
 

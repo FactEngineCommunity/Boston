@@ -69,7 +69,7 @@ Namespace XMLModel1
                     lrXMLEntityType.ReferenceModeValueTypeId = lrEntityType.ReferenceModeValueType.Id
                 End If
 
-                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationship As FBM.SubtypeRelationship
                 Dim lrXMLSubtypeRelationship As XMLModel1.SubtypeRelationship
 
                 For Each lrSubtypeRelationship In lrEntityType.SubtypeRelationship
@@ -571,7 +571,7 @@ Namespace XMLModel1
                 Next
 
                 If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
-                    prApplication.ThrowErrorMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
+                    prApplication.ThrowMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
                 Else
                     lrFactType = lrRoleConstraint.Role(0).FactType
                     lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
@@ -888,7 +888,7 @@ Namespace XMLModel1
                 lsMessage2 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage2 &= vbCrLf & vbCrLf & ex.Message
                 lsMessage2 &= vbCrLf & vbCrLf & "Loading Facts for FactType: '" & arFactType.Id & "'"
-                prApplication.ThrowErrorMessage(lsMessage2, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage2, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1075,7 +1075,7 @@ Namespace XMLModel1
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

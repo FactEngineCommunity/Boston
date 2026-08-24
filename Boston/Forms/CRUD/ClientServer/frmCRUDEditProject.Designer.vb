@@ -32,6 +32,12 @@ Partial Class frmCRUDEditProject
         Me.LabelHelpTipsUser = New System.Windows.Forms.Label()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.LabelPromptLeastRestrictivePermissions = New System.Windows.Forms.Label()
+        Me.CheckBoxLeastRestrictiveCreate = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxLeastRestrictiveAlter = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxLeastRestrictiveRead = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxLeastRestrictivenoPermission = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxLeastRestrictiveFullPermissions = New System.Windows.Forms.CheckBox()
         Me.FlexibleListBoxIncludedUser = New FlexibleListBox()
         Me.PanelInviteUser = New System.Windows.Forms.Panel()
         Me.TextBoxUserName = New System.Windows.Forms.TextBox()
@@ -74,17 +80,17 @@ Partial Class frmCRUDEditProject
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.ListBoxIncludedNamespaces = New System.Windows.Forms.ListBox()
         Me.LabelPromptIncludedNamespaces = New System.Windows.Forms.Label()
+        Me.SharedModels = New System.Windows.Forms.TabPage()
+        Me.GroupBoxProjects = New System.Windows.Forms.GroupBox()
+        Me.LabelPromptProjectsForGroup = New System.Windows.Forms.Label()
+        Me.ListBoxModels = New System.Windows.Forms.ListBox()
         Me.TextBoxProjectName = New System.Windows.Forms.TextBox()
         Me.LabelPromptGroupName = New System.Windows.Forms.Label()
         Me.ButtonOkay = New System.Windows.Forms.Button()
         Me.ButtonCancel = New System.Windows.Forms.Button()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxLeastRestrictiveCreate = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxLeastRestrictiveAlter = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxLeastRestrictiveRead = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxLeastRestrictivenoPermission = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxLeastRestrictiveFullPermissions = New System.Windows.Forms.CheckBox()
-        Me.LabelPromptLeastRestrictivePermissions = New System.Windows.Forms.Label()
+        Me.TabPageRequirements = New System.Windows.Forms.TabPage()
+        Me.ButtonShowProjectRequirements = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.TabControl2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
@@ -98,7 +104,10 @@ Partial Class frmCRUDEditProject
         Me.PanelInviteGroup.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.TabPage7.SuspendLayout()
+        Me.SharedModels.SuspendLayout()
+        Me.GroupBoxProjects.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPageRequirements.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox1
@@ -137,6 +146,8 @@ Partial Class frmCRUDEditProject
         Me.TabControl2.Controls.Add(Me.TabPage3)
         Me.TabControl2.Controls.Add(Me.TabPage4)
         Me.TabControl2.Controls.Add(Me.TabPage7)
+        Me.TabControl2.Controls.Add(Me.SharedModels)
+        Me.TabControl2.Controls.Add(Me.TabPageRequirements)
         Me.TabControl2.Location = New System.Drawing.Point(9, 81)
         Me.TabControl2.Name = "TabControl2"
         Me.TabControl2.SelectedIndex = 0
@@ -195,6 +206,65 @@ Partial Class frmCRUDEditProject
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Included Users"
         Me.TabPage1.UseVisualStyleBackColor = True
+        '
+        'LabelPromptLeastRestrictivePermissions
+        '
+        Me.LabelPromptLeastRestrictivePermissions.AutoSize = True
+        Me.LabelPromptLeastRestrictivePermissions.Location = New System.Drawing.Point(12, 432)
+        Me.LabelPromptLeastRestrictivePermissions.Name = "LabelPromptLeastRestrictivePermissions"
+        Me.LabelPromptLeastRestrictivePermissions.Size = New System.Drawing.Size(273, 13)
+        Me.LabelPromptLeastRestrictivePermissions.TabIndex = 13
+        Me.LabelPromptLeastRestrictivePermissions.Text = "Least Restrictive Permissions (Between User and Group)"
+        '
+        'CheckBoxLeastRestrictiveCreate
+        '
+        Me.CheckBoxLeastRestrictiveCreate.AutoSize = True
+        Me.CheckBoxLeastRestrictiveCreate.Location = New System.Drawing.Point(96, 452)
+        Me.CheckBoxLeastRestrictiveCreate.Name = "CheckBoxLeastRestrictiveCreate"
+        Me.CheckBoxLeastRestrictiveCreate.Size = New System.Drawing.Size(57, 17)
+        Me.CheckBoxLeastRestrictiveCreate.TabIndex = 12
+        Me.CheckBoxLeastRestrictiveCreate.Text = "Create"
+        Me.CheckBoxLeastRestrictiveCreate.UseVisualStyleBackColor = True
+        '
+        'CheckBoxLeastRestrictiveAlter
+        '
+        Me.CheckBoxLeastRestrictiveAlter.AutoSize = True
+        Me.CheckBoxLeastRestrictiveAlter.Location = New System.Drawing.Point(212, 452)
+        Me.CheckBoxLeastRestrictiveAlter.Name = "CheckBoxLeastRestrictiveAlter"
+        Me.CheckBoxLeastRestrictiveAlter.Size = New System.Drawing.Size(47, 17)
+        Me.CheckBoxLeastRestrictiveAlter.TabIndex = 11
+        Me.CheckBoxLeastRestrictiveAlter.Text = "Alter"
+        Me.CheckBoxLeastRestrictiveAlter.UseVisualStyleBackColor = True
+        '
+        'CheckBoxLeastRestrictiveRead
+        '
+        Me.CheckBoxLeastRestrictiveRead.AutoSize = True
+        Me.CheckBoxLeastRestrictiveRead.Location = New System.Drawing.Point(159, 452)
+        Me.CheckBoxLeastRestrictiveRead.Name = "CheckBoxLeastRestrictiveRead"
+        Me.CheckBoxLeastRestrictiveRead.Size = New System.Drawing.Size(52, 17)
+        Me.CheckBoxLeastRestrictiveRead.TabIndex = 10
+        Me.CheckBoxLeastRestrictiveRead.Text = "Read"
+        Me.CheckBoxLeastRestrictiveRead.UseVisualStyleBackColor = True
+        '
+        'CheckBoxLeastRestrictivenoPermission
+        '
+        Me.CheckBoxLeastRestrictivenoPermission.AutoSize = True
+        Me.CheckBoxLeastRestrictivenoPermission.Location = New System.Drawing.Point(15, 475)
+        Me.CheckBoxLeastRestrictivenoPermission.Name = "CheckBoxLeastRestrictivenoPermission"
+        Me.CheckBoxLeastRestrictivenoPermission.Size = New System.Drawing.Size(93, 17)
+        Me.CheckBoxLeastRestrictivenoPermission.TabIndex = 9
+        Me.CheckBoxLeastRestrictivenoPermission.Text = "No Permission"
+        Me.CheckBoxLeastRestrictivenoPermission.UseVisualStyleBackColor = True
+        '
+        'CheckBoxLeastRestrictiveFullPermissions
+        '
+        Me.CheckBoxLeastRestrictiveFullPermissions.AutoSize = True
+        Me.CheckBoxLeastRestrictiveFullPermissions.Location = New System.Drawing.Point(15, 452)
+        Me.CheckBoxLeastRestrictiveFullPermissions.Name = "CheckBoxLeastRestrictiveFullPermissions"
+        Me.CheckBoxLeastRestrictiveFullPermissions.Size = New System.Drawing.Size(75, 17)
+        Me.CheckBoxLeastRestrictiveFullPermissions.TabIndex = 8
+        Me.CheckBoxLeastRestrictiveFullPermissions.Text = "Full Rights"
+        Me.CheckBoxLeastRestrictiveFullPermissions.UseVisualStyleBackColor = True
         '
         'FlexibleListBoxIncludedUser
         '
@@ -279,7 +349,7 @@ Partial Class frmCRUDEditProject
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(629, 428)
+        Me.TabPage2.Size = New System.Drawing.Size(629, 511)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "User Permissions"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -639,6 +709,50 @@ Partial Class frmCRUDEditProject
         Me.LabelPromptIncludedNamespaces.TabIndex = 4
         Me.LabelPromptIncludedNamespaces.Text = "Included Namespace/s:"
         '
+        'SharedModels
+        '
+        Me.SharedModels.Controls.Add(Me.GroupBoxProjects)
+        Me.SharedModels.Location = New System.Drawing.Point(4, 22)
+        Me.SharedModels.Name = "SharedModels"
+        Me.SharedModels.Size = New System.Drawing.Size(649, 596)
+        Me.SharedModels.TabIndex = 3
+        Me.SharedModels.Text = "Shared Models"
+        Me.SharedModels.UseVisualStyleBackColor = True
+        '
+        'GroupBoxProjects
+        '
+        Me.GroupBoxProjects.Controls.Add(Me.LabelPromptProjectsForGroup)
+        Me.GroupBoxProjects.Controls.Add(Me.ListBoxModels)
+        Me.GroupBoxProjects.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GroupBoxProjects.Location = New System.Drawing.Point(0, 0)
+        Me.GroupBoxProjects.Name = "GroupBoxProjects"
+        Me.GroupBoxProjects.Size = New System.Drawing.Size(649, 596)
+        Me.GroupBoxProjects.TabIndex = 1
+        Me.GroupBoxProjects.TabStop = False
+        '
+        'LabelPromptProjectsForGroup
+        '
+        Me.LabelPromptProjectsForGroup.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.LabelPromptProjectsForGroup.AutoSize = True
+        Me.LabelPromptProjectsForGroup.Location = New System.Drawing.Point(10, 16)
+        Me.LabelPromptProjectsForGroup.Name = "LabelPromptProjectsForGroup"
+        Me.LabelPromptProjectsForGroup.Size = New System.Drawing.Size(156, 13)
+        Me.LabelPromptProjectsForGroup.TabIndex = 1
+        Me.LabelPromptProjectsForGroup.Text = "Models shared with this Project:"
+        '
+        'ListBoxModels
+        '
+        Me.ListBoxModels.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ListBoxModels.FormattingEnabled = True
+        Me.ListBoxModels.Location = New System.Drawing.Point(6, 38)
+        Me.ListBoxModels.Name = "ListBoxModels"
+        Me.ListBoxModels.Size = New System.Drawing.Size(637, 550)
+        Me.ListBoxModels.TabIndex = 0
+        '
         'TextBoxProjectName
         '
         Me.TextBoxProjectName.Location = New System.Drawing.Point(86, 18)
@@ -677,64 +791,24 @@ Partial Class frmCRUDEditProject
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxLeastRestrictiveCreate
+        'TabPageRequirements
         '
-        Me.CheckBoxLeastRestrictiveCreate.AutoSize = True
-        Me.CheckBoxLeastRestrictiveCreate.Location = New System.Drawing.Point(96, 452)
-        Me.CheckBoxLeastRestrictiveCreate.Name = "CheckBoxLeastRestrictiveCreate"
-        Me.CheckBoxLeastRestrictiveCreate.Size = New System.Drawing.Size(57, 17)
-        Me.CheckBoxLeastRestrictiveCreate.TabIndex = 12
-        Me.CheckBoxLeastRestrictiveCreate.Text = "Create"
-        Me.CheckBoxLeastRestrictiveCreate.UseVisualStyleBackColor = True
+        Me.TabPageRequirements.Controls.Add(Me.ButtonShowProjectRequirements)
+        Me.TabPageRequirements.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageRequirements.Name = "TabPageRequirements"
+        Me.TabPageRequirements.Size = New System.Drawing.Size(649, 596)
+        Me.TabPageRequirements.TabIndex = 4
+        Me.TabPageRequirements.Text = "Requirements"
+        Me.TabPageRequirements.UseVisualStyleBackColor = True
         '
-        'CheckBoxLeastRestrictiveAlter
+        'ButtonShowProjectRequirements
         '
-        Me.CheckBoxLeastRestrictiveAlter.AutoSize = True
-        Me.CheckBoxLeastRestrictiveAlter.Location = New System.Drawing.Point(212, 452)
-        Me.CheckBoxLeastRestrictiveAlter.Name = "CheckBoxLeastRestrictiveAlter"
-        Me.CheckBoxLeastRestrictiveAlter.Size = New System.Drawing.Size(47, 17)
-        Me.CheckBoxLeastRestrictiveAlter.TabIndex = 11
-        Me.CheckBoxLeastRestrictiveAlter.Text = "Alter"
-        Me.CheckBoxLeastRestrictiveAlter.UseVisualStyleBackColor = True
-        '
-        'CheckBoxLeastRestrictiveRead
-        '
-        Me.CheckBoxLeastRestrictiveRead.AutoSize = True
-        Me.CheckBoxLeastRestrictiveRead.Location = New System.Drawing.Point(159, 452)
-        Me.CheckBoxLeastRestrictiveRead.Name = "CheckBoxLeastRestrictiveRead"
-        Me.CheckBoxLeastRestrictiveRead.Size = New System.Drawing.Size(52, 17)
-        Me.CheckBoxLeastRestrictiveRead.TabIndex = 10
-        Me.CheckBoxLeastRestrictiveRead.Text = "Read"
-        Me.CheckBoxLeastRestrictiveRead.UseVisualStyleBackColor = True
-        '
-        'CheckBoxLeastRestrictivenoPermission
-        '
-        Me.CheckBoxLeastRestrictivenoPermission.AutoSize = True
-        Me.CheckBoxLeastRestrictivenoPermission.Location = New System.Drawing.Point(15, 475)
-        Me.CheckBoxLeastRestrictivenoPermission.Name = "CheckBoxLeastRestrictivenoPermission"
-        Me.CheckBoxLeastRestrictivenoPermission.Size = New System.Drawing.Size(93, 17)
-        Me.CheckBoxLeastRestrictivenoPermission.TabIndex = 9
-        Me.CheckBoxLeastRestrictivenoPermission.Text = "No Permission"
-        Me.CheckBoxLeastRestrictivenoPermission.UseVisualStyleBackColor = True
-        '
-        'CheckBoxLeastRestrictiveFullPermissions
-        '
-        Me.CheckBoxLeastRestrictiveFullPermissions.AutoSize = True
-        Me.CheckBoxLeastRestrictiveFullPermissions.Location = New System.Drawing.Point(15, 452)
-        Me.CheckBoxLeastRestrictiveFullPermissions.Name = "CheckBoxLeastRestrictiveFullPermissions"
-        Me.CheckBoxLeastRestrictiveFullPermissions.Size = New System.Drawing.Size(75, 17)
-        Me.CheckBoxLeastRestrictiveFullPermissions.TabIndex = 8
-        Me.CheckBoxLeastRestrictiveFullPermissions.Text = "Full Rights"
-        Me.CheckBoxLeastRestrictiveFullPermissions.UseVisualStyleBackColor = True
-        '
-        'LabelPromptLeastRestrictivePermissions
-        '
-        Me.LabelPromptLeastRestrictivePermissions.AutoSize = True
-        Me.LabelPromptLeastRestrictivePermissions.Location = New System.Drawing.Point(12, 432)
-        Me.LabelPromptLeastRestrictivePermissions.Name = "LabelPromptLeastRestrictivePermissions"
-        Me.LabelPromptLeastRestrictivePermissions.Size = New System.Drawing.Size(273, 13)
-        Me.LabelPromptLeastRestrictivePermissions.TabIndex = 13
-        Me.LabelPromptLeastRestrictivePermissions.Text = "Least Restrictive Permissions (Between User and Group)"
+        Me.ButtonShowProjectRequirements.Location = New System.Drawing.Point(23, 21)
+        Me.ButtonShowProjectRequirements.Name = "ButtonShowProjectRequirements"
+        Me.ButtonShowProjectRequirements.Size = New System.Drawing.Size(154, 23)
+        Me.ButtonShowProjectRequirements.TabIndex = 0
+        Me.ButtonShowProjectRequirements.Text = "Show Project &Requirements"
+        Me.ButtonShowProjectRequirements.UseVisualStyleBackColor = True
         '
         'frmCRUDEditProject
         '
@@ -768,7 +842,11 @@ Partial Class frmCRUDEditProject
         Me.TabPage6.PerformLayout()
         Me.TabPage7.ResumeLayout(False)
         Me.TabPage7.PerformLayout()
+        Me.SharedModels.ResumeLayout(False)
+        Me.GroupBoxProjects.ResumeLayout(False)
+        Me.GroupBoxProjects.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPageRequirements.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -833,4 +911,10 @@ Partial Class frmCRUDEditProject
     Friend WithEvents CheckBoxLeastRestrictiveRead As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxLeastRestrictivenoPermission As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxLeastRestrictiveFullPermissions As System.Windows.Forms.CheckBox
+    Friend WithEvents SharedModels As TabPage
+    Friend WithEvents GroupBoxProjects As GroupBox
+    Friend WithEvents LabelPromptProjectsForGroup As Label
+    Friend WithEvents ListBoxModels As ListBox
+    Friend WithEvents TabPageRequirements As TabPage
+    Friend WithEvents ButtonShowProjectRequirements As Button
 End Class

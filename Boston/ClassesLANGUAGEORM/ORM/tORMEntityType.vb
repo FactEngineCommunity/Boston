@@ -4,6 +4,7 @@ Imports System.Collections.Specialized
 Imports System.Xml.Serialization
 Imports System.Reflection
 Imports Newtonsoft.Json
+Imports System.Linq.Expressions
 
 Namespace FBM
     <Serializable()> _
@@ -100,7 +101,7 @@ Namespace FBM
 
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End Try
             End Set
         End Property
@@ -115,10 +116,6 @@ Namespace FBM
             End Set
         End Property
 
-
-        <XmlIgnore()>
-        Public WithEvents ReferenceModeValueType As FBM.ValueType = Nothing
-
         <XmlIgnore()>
         <JsonIgnore()>
         Public _PreferredIdentifierRCId As String = Nothing
@@ -132,6 +129,7 @@ Namespace FBM
             End Set
         End Property
 
+
         <XmlElement()>
         <JsonIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -143,7 +141,7 @@ Namespace FBM
             End Get
             Set(ByVal value As FBM.RoleConstraint)
                 Me._ReferenceModeRoleConstraint = value
-                If IsSomething(Me._ReferenceModeRoleConstraint) Then
+                If Me._ReferenceModeRoleConstraint IsNot Nothing Then
                     Me.PreferredIdentifierRCId = Me._ReferenceModeRoleConstraint.Id
                 Else
                     Me.PreferredIdentifierRCId = ""
@@ -232,7 +230,6 @@ Namespace FBM
         <JsonIgnore()>
         Public last_modified_user_id As String 'The Id of the Richmond User who last created/modified the EntityType.
 
-
         <XmlAttribute()>
         <CategoryAttribute("Entity Type"),
         DefaultValueAttribute(False),
@@ -304,12 +301,14 @@ Namespace FBM
         <NonSerialized()>
         Public Event IsDerivedChanged(ByVal abIsDerived As Boolean)
         <NonSerialized()>
+        Public Event MakeVisible() 'Used for EntityTypeInstances
+        <NonSerialized()>
         Public Event ModelErrorAdded(ByRef arModelError As ModelError) Implements iValidationErrorHandler.ModelErrorAdded
         'Public Event NameChanged(ByVal asNewName As String)
         <NonSerialized()>
-        Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean)
+        Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.SubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean)
         <NonSerialized()>
-        Public Event SubtypeConstraintRemoved(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship)
+        Public Event SubtypeConstraintRemoved(ByRef arSubtypeConstraint As FBM.SubtypeRelationship)
         <NonSerialized()>
         Public Event ReferenceModeChanged(ByVal asNewReferenceMode As String, ByVal abSimpleAssignment As Boolean, ByVal abBroadcastInterfaceEvent As Boolean)
         <NonSerialized()>
@@ -323,7 +322,7 @@ Namespace FBM
         <NonSerialized()>
         Public Event ReferenceModeRoleConstraintChanged(ByRef arNewReferenceModeRoleConstraint As FBM.RoleConstraint)
         <NonSerialized()>
-        Public Event IsObjectifyingEntityTypeChanged(ByVal abNewIsObjectifyingEntityType As Boolean)
+        Public Event IsObjectifyingEntityTypeChanged(ByVal abNewIsObjectifyingEntityType As Boolean, ByVal abKeepVisible As Boolean)
         <NonSerialized()>
         Public Event IsIndependentChanged(ByVal abNewIsIndependent As Boolean) Implements iFBMIndependence.IsIndependentChanged
         <NonSerialized()>
@@ -359,13 +358,13 @@ Namespace FBM
 
             Me.Model = arModel
 
-            If IsSomething(as_entity_type_name) Then
+            If as_entity_type_name IsNot Nothing Then
                 Me.Name = as_entity_type_name
             Else
                 Me.Name = "New Entity Type"
             End If
 
-            If IsSomething(arValueType) Then
+            If arValueType IsNot Nothing Then
                 Me.ReferenceModeValueType = arValueType
             End If
 
@@ -390,7 +389,7 @@ Namespace FBM
 
             Me.Concept = New FBM.Concept(Me.Id)
 
-            If IsSomething(arValueType) Then
+            If arValueType IsNot Nothing Then
                 Me.ReferenceModeValueType = arValueType
             End If
 
@@ -450,7 +449,7 @@ Namespace FBM
                 Return aoA.SubtypeRelationship.Count - aoB.SubtypeRelationship.Count
 
             Catch ex As Exception
-                prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -505,18 +504,18 @@ Namespace FBM
                     End If
 
                     For Each lrParentEntityType In .parentModelObjectList
-                        lrEntityType.parentModelObjectList.Add(lrParentEntityType.Clone(arModel))
+                        lrEntityType.parentModelObjectList.Add(lrParentEntityType.Clone(arModel, abAddToModel, abIsMDAModelElement))
                     Next
 
-                    If IsSomething(.ReferenceModeValueType) Then
+                    If .ReferenceModeValueType IsNot Nothing Then
                         lrEntityType.ReferenceModeValueType = .ReferenceModeValueType.Clone(arModel, abAddToModel)
                     End If
 
-                    If IsSomething(.ReferenceModeFactType) Then
+                    If .ReferenceModeFactType IsNot Nothing Then
                         lrEntityType.ReferenceModeFactType = .ReferenceModeFactType.Clone(arModel, abAddToModel)
                     End If
 
-                    If IsSomething(.ReferenceModeRoleConstraint) Then
+                    If .ReferenceModeRoleConstraint IsNot Nothing Then
                         lrEntityType.ReferenceModeRoleConstraint = .ReferenceModeRoleConstraint.Clone(arModel, abAddToModel)
                     End If
 
@@ -544,7 +543,7 @@ Namespace FBM
 
             Me.Instance.AddUnique(asDataInstance)
 
-            If IsSomething(Me.parentModelObjectList) Then
+            If Me.parentModelObjectList IsNot Nothing Then
                 Dim lrEntityType As FBM.EntityType
                 For Each lrEntityType In Me.parentModelObjectList
                     lrEntityType.AddDataInstance(asDataInstance)
@@ -591,7 +590,7 @@ Namespace FBM
 
                     lrFact = lrFactType.Fact.Find(AddressOf lrFactPredicate.EqualsByRoleIdData)
 
-                    If IsSomething(lrFact) Then
+                    If lrFact IsNot Nothing Then
                         lrReturnFactData = lrFact.GetFactDataByRoleId(lrRoleConstraintRole.Role.Id)
                         lasReturnString.Add(lrReturnFactData.Data)
                     Else
@@ -691,7 +690,7 @@ Namespace FBM
                                 lsColumnName = lrFactTypeReading.PredicatePart(1).PreBoundText.Replace("-", "") & lsColumnName
                             End If
 
-                            lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                            lsColumnName = FEStrings.MakeCapCamelCase(FEStrings.ProperSpace(lsColumnName))
                             lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)
 
                             aarColumn.Add(New RDS.Column(arTable, lsColumnName, arResponsibleRole, lrActiveRole))
@@ -713,7 +712,7 @@ Namespace FBM
                                             lrActiveRole = lrTopmostSupertypeEntityType.ReferenceModeFactType.RoleGroup(1) 'lrRoleConstraintRole.Role
 
                                             lsColumnName = lrTopmostSupertypeEntityType.ReferenceModeValueType.Id
-                                            lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                                            lsColumnName = FEStrings.MakeCapCamelCase(FEStrings.ProperSpace(lsColumnName))
                                             lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)
                                         Else 'Is am ObjectifiedFactType
                                             Throw New NotImplementedException("Called EntityType.getCompoundReferenceSchemeColumns for an EntityType that has a Topmost Supertype that is an Objectified Fact Type. This is not implemented.")
@@ -728,7 +727,7 @@ Namespace FBM
                                     lrActiveRole = lrEntityType.ReferenceModeFactType.RoleGroup(1) 'lrRoleConstraintRole.Role
 
                                     lsColumnName = lrEntityType.ReferenceModeValueType.Id
-                                    lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                                    lsColumnName = FEStrings.MakeCapCamelCase(FEStrings.ProperSpace(lsColumnName))
                                     lsColumnName = arTable.createUniqueColumnName(lsColumnName, Nothing, 0)
 
                                 End If
@@ -757,7 +756,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -798,21 +797,48 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return Nothing
             End Try
 
         End Function
 
-        Public Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False) As String
+        Public Overrides Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False, Optional ByVal abUseEntityGrouping As Boolean = False) As String
 
             Try
                 Dim lsReturnString As String
 
-                lsReturnString = Me.Id & " IS AN ENTITY TYPE" & vbCrLf
+                lsReturnString = Me.Id & " IS AN ENTITY TYPE"
 
                 If Me.HasSimpleReferenceScheme Then
-                    lsReturnString &= Me.Id & " IS IDENTIFIED BY ITS " & Me.ReferenceMode.TrimStart(".")
+                    lsReturnString.AppendLine(Me.Id & " IS IDENTIFIED BY ITS " & If(Me.GetTopmostSupertype.ReferenceMode.StartsWith("."), Me.GetTopmostSupertype.ReferenceMode.TrimStart("."c), Me.GetTopmostSupertype.ReferenceMode))
+                End If
+
+                Dim lrTable As RDS.Table = Me.getCorrespondingRDSTable(False)
+
+                If lrTable IsNot Nothing AndAlso abUseEntityGrouping AndAlso lrTable.Column.Count > 0 Then
+                    lsReturnString.AppendLine(" AND (")
+
+                    Dim larColumn = lrTable.Column.
+                                                Where(Function(x) x.ActiveRole.JoinsValueType IsNot Nothing).
+                                                GroupBy(Function(x) x.FactType).
+                                                Select(Function(g) g.First()).
+                                                ToList()
+
+                    For Each lrColumn In larColumn
+
+                        Dim lsWRITTENASClause = $" {lrColumn.ActiveRole.JoinsValueType.GetWRITTENASClause}"
+
+                        Dim lbWriteWRITTENASClause = lrColumn.Role.TypeOfJoin = pcenumRoleJoinType.ValueType Or
+                                                     ((pcenumRoleJoinType.EntityType = lrColumn.Role.TypeOfJoin AndAlso
+                                                     lrColumn.Role.JoinsEntityType.HasSimpleReferenceScheme) Or
+                                                     lrColumn.FactType.RoleGroup.FindAll(Function(x) TypeOf x.JoinedORMObject Is FBM.ValueType).Count > 0)
+
+                        lsReturnString.AppendLine(vbTab & lrColumn.FactType.GenerateFEKLLine(True, True) & If(lbWriteWRITTENASClause, lsWRITTENASClause, ""))
+
+                    Next
+
+                    lsReturnString.AppendLine(" )" & vbCrLf)
                 End If
 
                 If Not abDontAddNewLine Then
@@ -827,7 +853,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return ""
             End Try
@@ -857,7 +883,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -900,7 +926,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -984,7 +1010,7 @@ Namespace FBM
         '            lrEntityTypeInstance.IsObjectifyingEntityType = .IsObjectifyingEntityType
 
         '            If lrEntityTypeInstance.IsObjectifyingEntityType Then
-        '                If IsSomething(.ObjectifiedFactType) Then
+        '                If .ObjectifiedFactType IsNot Nothing Then
         '                    lrEntityTypeInstance.ObjectifiedFactType = New FBM.FactTypeInstance
         '                    Dim lrFactTypeInstance As FBM.FactTypeInstance
         '                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = .ObjectifiedFactType.Id)
@@ -998,14 +1024,14 @@ Namespace FBM
         '                End If
         '            End If
 
-        '            If IsSomething(.ReferenceModeValueType) Then
+        '            If .ReferenceModeValueType IsNot Nothing Then
         '                lrEntityTypeInstance.ReferenceModeValueType = .ReferenceModeValueType.CloneInstance(arPage, abAddToPage)
         '            End If
-        '            If IsSomething(.ReferenceModeFactType) Then
+        '            If .ReferenceModeFactType IsNot Nothing Then
         '                lrEntityTypeInstance.ReferenceModeFactType = .ReferenceModeFactType.CloneInstance(arPage, abAddToPage)
         '            End If
 
-        '            If IsSomething(.ReferenceModeRoleConstraint) Then
+        '            If .ReferenceModeRoleConstraint IsNot Nothing Then
         '                lrEntityTypeInstance.ReferenceModeRoleConstraint = arPage.RoleConstraintInstance.Find(Function(x) x.Id = .ReferenceModeRoleConstraint.Id)
         '            End If
 
@@ -1034,7 +1060,7 @@ Namespace FBM
         '        Dim lsMessage As String
         '        lsMessage = "Error: tORMEntityType.CloneInstance:"
         '        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        '        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         '    End Try
 
         '    Return lrEntityTypeInstance
@@ -1076,7 +1102,7 @@ Namespace FBM
                     lrEntityTypeInstance.IsObjectifyingEntityType = .IsObjectifyingEntityType
 
                     If lrEntityTypeInstance.IsObjectifyingEntityType Then
-                        If IsSomething(.ObjectifiedFactType) Then
+                        If .ObjectifiedFactType IsNot Nothing Then
                             lrEntityTypeInstance.ObjectifiedFactType = New FBM.FactTypeInstance
                             Dim lrFactTypeInstance As FBM.FactTypeInstance
                             lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = .ObjectifiedFactType.Id)
@@ -1088,15 +1114,15 @@ Namespace FBM
                         arPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance)
                     End If
 
-                    If IsSomething(.ReferenceModeValueType) Then
+                    If .ReferenceModeValueType IsNot Nothing Then
                         lrEntityTypeInstance.ReferenceModeValueType = .ReferenceModeValueType.CloneInstance(arPage, abAddToPage)
                     End If
 
-                    If IsSomething(.ReferenceModeFactType) Then
+                    If .ReferenceModeFactType IsNot Nothing Then
                         lrEntityTypeInstance.ReferenceModeFactType = .ReferenceModeFactType.CloneInstance(arPage, abAddToPage)
                     End If
 
-                    If IsSomething(.ReferenceModeRoleConstraint) Then
+                    If .ReferenceModeRoleConstraint IsNot Nothing Then
                         lrEntityTypeInstance.ReferenceModeRoleConstraint = arPage.RoleConstraintInstance.Find(Function(x) x.Id = .ReferenceModeRoleConstraint.Id)
                     End If
 
@@ -1126,7 +1152,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tORMEntityType.CloneInstance:"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
             Return lrEntityTypeInstance
@@ -1187,7 +1213,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Me
             End Try
@@ -1336,10 +1362,189 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
+
+        ''' <summary>
+        ''' Converts an EntityType to a FactType
+        ''' </summary>
+        Public Sub ConvertToFCOIMFactType()
+
+            Try
+                If Not Me.HasPrimaryReferenceScheme Then
+                    MsgBox("This Entity Type cannot be converted to a Fact Type. Create a Primary Reference Scheme for the Entity Type.")
+                    Exit Sub
+                End If
+
+                Dim lbHasSimpleReferenceScheme As Boolean = Me.HasSimpleReferenceScheme
+
+                If lbHasSimpleReferenceScheme Then
+
+                    'Get the Role in the ReferenceModeFactType joined to the EntityType
+                    Dim lrEntityTypeRole = Me.ReferenceModeFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = Me.Id)
+                    Dim lrValueTypeRole = Me.ReferenceModeFactType.GetOtherRoleOfBinaryFactType(lrEntityTypeRole.Id)
+
+                    Call lrValueTypeRole.InternalUniquenessConstraint(0).RemoveFromModel(True, False)
+                    lrValueTypeRole.SequenceNr = 1
+
+                    Me.TriggerExpandReferenceScheme()
+
+                    Me.ReferenceModeFactType.IsPreferredReferenceMode = False
+
+                    Dim lrFactType As FBM.FactType = Me.ReferenceModeFactType
+
+                    Dim larModelElement As New List(Of FBM.ModelObject) From {Me, Me.ReferenceModeValueType}
+                    Dim lrFactTypeReading = Me.ReferenceModeFactType.getFactTypeReadingByModelElementOrder(larModelElement)
+                    Call Me.ReferenceModeFactType.RemoveFactTypeReading(lrFactTypeReading, True)
+
+                    Me.ReferenceModeValueType = Nothing
+                    Me.ReferenceModeFactType = Nothing
+                    Call Me.ReferenceModeRoleConstraint.RemoveFromModel(True, False)
+                    Me.ReferenceModeRoleConstraint = Nothing
+                    Me.ReferenceMode = ""
+
+                    'Remove the Role from the ReferenceModeFactType
+                    Call lrFactType.RemoveRole(lrEntityTypeRole, False, False, False, True)
+
+                    lrFactType.FactTypeReading(0).PredicatePart(0).SetPredicateText("is identifier", True)
+
+                    lrFactType.setName(Me.Id, True, True)
+
+                    lrFactType.Objectify(True, False, Me)
+                    lrFactType.SetShowFactTypeName(True, Nothing)
+                    lrFactType.makeDirty()
+
+                    Me.SetIsObjectifyingEntityType(True, True, True)
+                    Me.SetReferenceMode("", True, Nothing, True,, True, True)
+                    Me.ObjectifiedFactType = lrFactType
+
+                    Me.TriggerMakeVisible()
+                Else
+                    Dim larModelElement As New List(Of FBM.ModelObject)
+
+                    For Each lrRole In Me.ReferenceModeRoleConstraint.Role
+                        larModelElement.Add(lrRole.JoinedORMObject)
+                    Next
+
+                    Dim lrFactType = Me.Model.CreateFactType(Me.Id, larModelElement, False, True, False, Nothing, True, Nothing, False)
+
+                    Call lrFactType.CreateInternalUniquenessConstraint(lrFactType.RoleGroup, True, True, True, False, Nothing, True, True)
+
+                    Call Me.TriggerChangingToFactType(lrFactType)
+
+
+                    Dim larLinkFactType As New List(Of FBM.FactType)
+
+                    For Each lrPRSRoleConstraintRole In Me.ReferenceModeRoleConstraint.Role
+                        Dim lrOtherRole = lrPRSRoleConstraintRole.FactType.GetOtherRoleOfBinaryFactType(lrPRSRoleConstraintRole.Id)
+                        Call lrOtherRole.ReassignJoinedModelObject(lrFactType, True, Nothing, True)
+                        lrPRSRoleConstraintRole.FactType.SetIsLinkFactType(True)
+                        larLinkFactType.AddUnique(lrPRSRoleConstraintRole.FactType)
+                        lrPRSRoleConstraintRole.FactType.makeDirty()
+                    Next
+
+                    For Each lrRole In lrFactType.RoleGroup
+                        larLinkFactType = larLinkFactType.ToList
+
+                        Dim lrLinkFactType = (From LinkFactType In larLinkFactType
+                                              From LFTRole In LinkFactType.RoleGroup
+                                              Where LinkFactType.LinkFactTypeRole Is Nothing
+                                              Where LFTRole.JoinedORMObject.Id <> lrFactType.Id
+                                              Select New With {Key .FactType = LinkFactType, Key .Role = LFTRole}).First
+
+
+                        lrLinkFactType.FactType.SetLinkFactTypeRole(lrRole)
+                        lrLinkFactType.FactType.makeDirty()
+                    Next
+
+                    '===================================================
+                    'RDS
+                    Dim larProcessedColumn As New List(Of RDS.Column)
+                    For Each lrRole In lrFactType.RoleGroup.ToArray
+
+                        Dim lrLinkFactType = (From FactType In larLinkFactType
+                                              Where FactType.LinkFactTypeRole.Id = lrRole.Id
+                                              Select FactType).First
+
+                        Dim lrLFKRole = (From Role In lrLinkFactType.RoleGroup
+                                         Where Role.JoinedORMObject.Id <> lrFactType.Id
+                                         Select Role).First
+
+                        Dim lrModelElement = lrLFKRole.JoinedORMObject
+
+                        Dim larColumn = From Column In lrFactType.getCorrespondingRDSTable.Column
+                                        Where Column.Role.FactType.Id = lrLinkFactType.Id
+                                        Where Not larProcessedColumn.Contains(Column)
+                                        Select Column
+
+                        Dim lrColumn = larColumn.First
+                        lrColumn.setRole(lrRole)
+
+                        If lrRole.JoinedORMObject.GetType = GetType(FBM.ValueType) Then
+                            lrColumn.setActiveRole(lrRole)
+                        End If
+
+                        lrColumn.FactType = lrFactType
+                        '20220523-vm-was but wrong.
+                        'lrColumn.setActiveRole(lrRole)
+                        larProcessedColumn.Add(lrColumn)
+                    Next
+
+                    Dim larRole = From FactType In Me.Model.FactType
+                                  From Role In FactType.RoleGroup
+                                  Where Role.JoinedORMObject IsNot Nothing
+                                  Where Role.JoinedORMObject.Id = Me.Id
+                                  Where Role.TypeOfJoin = pcenumRoleJoinType.EntityType
+                                  Select Role
+
+                    For Each lrRole In larRole
+                        Call lrRole.ReassignJoinedModelObject(lrFactType, True, Nothing, True)
+                    Next
+
+                    Call Me.ReferenceModeRoleConstraint.RemoveFromModel(True, True, True, True, False)
+
+#Region "FactTypeReading"
+                    Dim lsSentence As String = ""
+                    For Each lrRole In lrFactType.RoleGroup
+                        lsSentence &= lrRole.JoinedORMObject.Id
+                        If Not lrRole Is lrFactType.RoleGroup(lrFactType.RoleGroup.Count - 1) Then
+                            lsSentence &= " has "
+                        End If
+                    Next
+
+                    Dim lrSentence As New Language.Sentence(lsSentence)
+                    For Each lrRole In lrFactType.RoleGroup
+                        If Not lrRole Is lrFactType.RoleGroup(lrFactType.RoleGroup.Count - 1) Then
+                            lsSentence &= " has "
+                            lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                        Else
+                            lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                        End If
+
+                    Next
+
+                    Dim lrFactTypeReading As New FBM.FactTypeReading(lrFactType, lrFactType.RoleGroup, lrSentence)
+                    Call lrFactType.AddFactTypeReading(lrFactTypeReading, True, True)
+#End Region
+
+                    Call Me.TriggerChangedToFactType(lrFactType)
+                End If
+
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
 
         ''' <summary>
         ''' Creates a ReferenceMode where there is none. Sets up ReferenceModeFactType, ReferenceModeValueType, ReferenceModeRoleConstraint, PreferredIdentifierRCId.
@@ -1369,9 +1574,9 @@ Namespace FBM
                 ''CodeSafe: Throw an error if any of the following are already set for the EntityType: 
                 ''  ReferenceModeFactType, ReferenceModeValueType, ReferenceModeRoleConstraint, PreferredIdentifierRCId.
                 ''--------------------------------------------------------------------------------------------------------
-                'If IsSomething(Me.ReferenceModeFactType) Or _
-                '   IsSomething(Me.ReferenceModeValueType) Or _
-                '   IsSomething(Me.ReferenceModeRoleConstraint) Or _
+                'If Me.ReferenceModeFactType IsNot Nothing Or _
+                '   Me.ReferenceModeValueType IsNot Nothing Or _
+                '   Me.ReferenceModeRoleConstraint IsNot Nothing Or _
                 '   Trim(PreferredIdentifierRCId) <> "" Then
 
                 '    lsMessage = "Tried to setup a ReferenceMode for EntityType where EntityType already has one of the following:"
@@ -1383,7 +1588,7 @@ Namespace FBM
                 '-------------------------------------------------------------------------------------------------
                 'Code Safe: Throw an error if the ReferenceModeValueType or ReferenceModeFactType already exist.
                 '-------------------------------------------------------------------------------------------------
-                If IsSomething(Me.ReferenceModeValueType) Or IsSomething(Me.ReferenceModeFactType) Then
+                If Me.ReferenceModeValueType IsNot Nothing Or Me.ReferenceModeFactType IsNot Nothing Then
                     lsMessage = "Tried to create a ReferenceMode for an EntityType, where ReferenceMode already exists."
                     lsMessage &= vbCrLf & "EntityType.Id : '" & Me.Id & "'"
                     Throw New Exception(lsMessage)
@@ -1547,7 +1752,7 @@ Namespace FBM
                         Call lrColumn.setName(lrColumn.Role.GetAttributeName)
                     Else
                         lsColumnName = Me.ReferenceModeValueType.Id
-                        lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                        lsColumnName = FEStrings.MakeCapCamelCase(FEStrings.ProperSpace(lsColumnName))
                         Call lrColumn.setName(lsColumnName)
                     End If
                 Next
@@ -1555,6 +1760,7 @@ Namespace FBM
                 'Reassign the ActiveRole of respective Columns
                 Dim larColumn = From Table In Me.Model.RDS.Table
                                 From Column In Table.Column
+                                Where Column.ActiveRole IsNot Nothing
                                 Where Column.ActiveRole.JoinedORMObject Is Me
                                 Where Not Column.Table.FBMModelElement Is Me
                                 Select Column
@@ -1673,7 +1879,7 @@ Namespace FBM
 
                 lsMessage = "Error:  " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -1692,10 +1898,10 @@ Namespace FBM
                                                             Optional ByVal asSubtypeRoleId As String = Nothing,
                                                             Optional ByVal asSupertypeRoleId As String = Nothing,
                                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                            Optional ByVal arUsingFactType As FBM.FactType = Nothing) As FBM.tSubtypeRelationship
+                                                            Optional ByVal arUsingFactType As FBM.FactType = Nothing) As FBM.SubtypeRelationship
 
             Try
-                Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationship As New FBM.SubtypeRelationship
 
                 lrSubtypeRelationship.Model = Me.Model
                 lrSubtypeRelationship.ModelElement = Me
@@ -1717,10 +1923,10 @@ Namespace FBM
 
                     larModelObject.Add(Me)
                     If arParentModelElement.IsObjectifyingEntityType Then
-                        lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.ObjectifiedFactType.Id)
+                        lsFactTypeName = FEStrings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.ObjectifiedFactType.Id)
                         larModelObject.Add(arParentModelElement.ObjectifiedFactType)
                     Else
-                        lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.Name)
+                        lsFactTypeName = FEStrings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.Name)
                         larModelObject.Add(arParentModelElement)
                     End If
 
@@ -1806,7 +2012,8 @@ Namespace FBM
                     'Supertype needs to get Columns from this subtype
                 End If 'Not Absorbed
 
-                Call Me.Model.MakeDirty()
+                Call Me.makeDirty()
+                Call Me.Model.MakeDirty(abCheckForErrors:=False)
 
                 Return lrSubtypeRelationship
 
@@ -1816,7 +2023,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1946,7 +2153,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return pcenumORMDataType.DataTypeNotSet
             End Try
@@ -1976,7 +2183,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return 0
             End Try
@@ -2068,7 +2275,7 @@ FailsafeContinue:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of FBM.Role)
             End Try
@@ -2133,7 +2340,7 @@ FailsafeContinue:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return "Error generating CQL for Entity Type: " & Me.Id
             End Try
@@ -2152,7 +2359,7 @@ FailsafeContinue:
 
             lsSignature = Me.Id
 
-            If IsSomething(Me.ReferenceModeValueType) Then
+            If Me.ReferenceModeValueType IsNot Nothing Then
                 lsSignature &= Me.ReferenceModeValueType.Id & Me.ReferenceModeValueType.DataType.ToString
                 lsSignature &= Me.PreferredIdentifierRCId
             End If
@@ -2187,7 +2394,7 @@ FailsafeContinue:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of FBM.ModelObject)
             End Try
@@ -2212,15 +2419,33 @@ FailsafeContinue:
                 End If
 
                 If (lrModelElement.ReferenceMode = "") And (lrModelElement.ReferenceModeRoleConstraint Is Nothing) Then
-                    HasCompoundReferenceMode = False
-                ElseIf lrModelElement.ReferenceModeRoleConstraint IsNot Nothing Then
-                    If lrModelElement.ReferenceModeRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                        '-----------------------------------------------------------------------------------------------
-                        'Must be an EntityType without a Compound Reference Mode.
-                        '  Only EntityTypes with a ReferenceModeRoleConstraint that is an ExternalUniquenessConstraint
-                        '  are those EntityTypes that have a CompoundReferenceMode.
-                        '-----------------------------------------------------------------------------------------------
+
+                    If lrModelElement.IsObjectifyingEntityType Then
+                        HasCompoundReferenceMode = True
+                    Else
                         HasCompoundReferenceMode = False
+                    End If
+                ElseIf lrModelElement.ReferenceModeRoleConstraint IsNot Nothing Then
+
+                    If lrModelElement.ReferenceModeRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+
+                        If lrModelElement.ReferenceModeRoleConstraint.Role.Count = 1 Then
+
+                            If lrModelElement.ReferenceModeRoleConstraint.Role(0).JoinsFactType IsNot Nothing AndAlso lrModelElement.ReferenceModeRoleConstraint.Role(0).JoinsFactType.IsObjectified Then
+                                Return True
+                            Else
+                                Return False
+                            End If
+
+                        Else
+                            '-----------------------------------------------------------------------------------------------
+                            'Must be an EntityType without a Compound Reference Mode.
+                            '  Only EntityTypes with a ReferenceModeRoleConstraint that is an ExternalUniquenessConstraint
+                            '  are those EntityTypes that have a CompoundReferenceMode.
+                            '-----------------------------------------------------------------------------------------------
+                            HasCompoundReferenceMode = False
+                        End If
+
                     Else
                         '-----------------------------------------------------------------------------------------
                         'Must be an EntityType with a ReferenceMode and where that ReferenceMode is defined by a 
@@ -2236,7 +2461,7 @@ FailsafeContinue:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -2257,7 +2482,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -2333,7 +2558,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True, arException:=ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True, arException:=ex)
 
                 Return False
             End Try
@@ -2358,7 +2583,7 @@ FailsafeContinue:
 
                 Me.Instance(Me.Instance.IndexOf(asOldValue)) = asNewValue
 
-                If IsSomething(Me.parentModelObjectList) Then
+                If Me.parentModelObjectList IsNot Nothing Then
                     Dim lrEntityType As FBM.EntityType
                     For Each lrEntityType In Me.parentModelObjectList
                         lrEntityType.ModifyDataInstance(asOldValue, asNewValue)
@@ -2430,7 +2655,7 @@ FailsafeContinue:
                                                   Optional ByVal abIsPartOfSimpleReferenceScheme As Boolean = False) As Boolean
 
             Dim lrEntityType As FBM.EntityType
-            Dim lrSubtype As FBM.tSubtypeRelationship
+            Dim lrSubtype As FBM.SubtypeRelationship
 
             Try
                 If abForceRemoval Then
@@ -2466,7 +2691,7 @@ FailsafeContinue:
 
                 If abDoDatabaseProcessing Then
                     For Each lrEntityType In Me.parentModelObjectList
-                        lrSubtype = New FBM.tSubtypeRelationship
+                        lrSubtype = New FBM.SubtypeRelationship
                         lrSubtype.ModelElement = Me
                         lrSubtype.parentModelElement.Id = lrEntityType.Id
                         lrSubtype.Model = Me.Model
@@ -2479,12 +2704,12 @@ FailsafeContinue:
 
                 Dim lrFactType As FBM.FactType
                 lrFactType = Me.ReferenceModeFactType
-                If IsSomething(Me.ReferenceModeFactType) Then
+                If Me.ReferenceModeFactType IsNot Nothing Then
                     Call lrFactType.RemoveFromModel(True, False, abDoDatabaseProcessing)
                 End If
 
 
-                If IsSomething(lrValueType) Then
+                If lrValueType IsNot Nothing Then
                     Call lrValueType.RemoveFromModel(False, False, abDoDatabaseProcessing)
                 End If
 
@@ -2502,6 +2727,9 @@ FailsafeContinue:
 
                 Me.Model.RemoveEntityType(Me, abDoDatabaseProcessing)
 
+                Call Me.DeleteConceptClassifications()
+                Call Me.DeleteModelElementFlags()
+
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)
                 MyBase.TriggerRemovedFromModel()
 
@@ -2513,7 +2741,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -2616,12 +2844,12 @@ FailsafeContinue:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Public Overrides Sub RemoveSubtypeRelationship(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+        Public Overrides Sub RemoveSubtypeRelationship(ByRef arSubtypeRelationship As FBM.SubtypeRelationship)
 
             Me.parentModelObjectList.Remove(arSubtypeRelationship.parentModelElement)
             arSubtypeRelationship.parentModelElement.childModelObjectList.Remove(Me)
@@ -2697,7 +2925,7 @@ FailsafeContinue:
                 '    lsMessage = "Tried to save an EntityType with no corresponding DictionaryEntry."
                 '    lsMessage &= vbCrLf & vbCrLf & "Creating a DictionaryEntry for the EntityType"
 
-                '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
+                '    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
 
                 '    lrDictionaryEntry = New FBM.DictionaryEntry(Me.Model, Me.Id, pcenumConceptType.EntityType, Me.ShortDescription, Me.LongDescription)
                 '    lrDictionaryEntry.isDirty = True
@@ -2750,7 +2978,7 @@ FailsafeContinue:
                 '--------------------------------------------------------------
                 'Save any SubtypeRelationships associated with the EntityType
                 '-----------------------------------------
-                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationship As FBM.SubtypeRelationship
                 For Each lrSubtypeRelationship In Me.SubtypeRelationship
                     Call lrSubtypeRelationship.Save(abRapidSave)
                 Next
@@ -2760,7 +2988,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2781,7 +3009,8 @@ FailsafeContinue:
                                                    Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False) As FBM.ValueType
 
             Try
-                If IsSomething(Me.ReferenceModeValueType) Or IsSomething(Me.ReferenceModeFactType) Then
+                If Me.ReferenceModeValueType IsNot Nothing Or Me.ReferenceModeFactType IsNot Nothing Then
+#Region "Existing ReferenceMode exists"
                     '-----------------------------------------------------------------------------------------------------------------
                     ' The EntityType already has a ReferenceMode, so change the ReferenceMode values of the respective Model Objects
                     '  to the new ReferenceMode
@@ -2814,6 +3043,7 @@ FailsafeContinue:
                     Else
                         lrValueType.SetName(Me.MakeReferenceModeName, abBroadcastInterfaceEvent)
                     End If
+#End Region
                 ElseIf abSimpleAssignment Then
                     '------------------------------------------------------------------------------------------------------------------------
                     'Simply setting the ReferenceMode of the EntityType and which needs to be set for all corresponding EntityTypeInstances
@@ -2859,7 +3089,7 @@ FailsafeContinue:
                     Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateEntityType, Me, Nothing)
                 End If
 
-                Me.SetHideReferenceMode(My.Settings.HideAllReferenceModesOnReferenceModeSet)
+                Me.SetHideReferenceMode(My.Settings.HideAllReferenceModesOnReferenceModeSet Or Me.Model.HideReferenceModesByDefault)
 
                 'So much happens/changes, so save.
                 If Not abSuppressModelSave Then
@@ -2876,7 +3106,7 @@ FailsafeContinue:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2949,7 +3179,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
             Return lsReferenceModeName
@@ -2997,7 +3227,7 @@ FailsafeContinue:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3034,7 +3264,7 @@ FailsafeContinue:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3066,7 +3296,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3101,7 +3331,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3115,7 +3345,7 @@ FailsafeContinue:
                 If Me.ReferenceModeValueType IsNot Nothing Then
                     Call Me.ReferenceModeValueType.SetDataType(aiORMDataType, aiDataTypeLength, aiDataTypePrecision, abBroadcastInterfaceEvent)
                 Else
-                    prApplication.ThrowErrorMessage("The Entity Type, " & Me.Id & ", does not have a Reference Mode Value Type to set its data type.", pcenumErrorType.Warning,, False,, True)
+                    prApplication.ThrowMessage("The Entity Type, " & Me.Id & ", does not have a Reference Mode Value Type to set its data type.", pcenumErrorType.Warning,, False,, True)
                 End If
             Catch ex As Exception
                 Dim lsMessage As String
@@ -3123,7 +3353,7 @@ FailsafeContinue:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3149,7 +3379,8 @@ FailsafeContinue:
         ''' <remarks>Preconditions: The uniqueness of the new EntityType.Name amoungst EntityTypes, ValueTypes, FactTypes and RoleConstraints has already been verified.</remarks>
         Public Overrides Function SetName(ByVal asNewName As String,
                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
+                                          Optional ByVal abSuppressModelSave As Boolean = False,
+                                          Optional ByVal abSetDBNameAsNewName As Boolean = False) As Boolean
             '-----------------------------------------------------------------------------------------------------------------
             'The following explains the logic and philosophy of Boston.
             '  A EntityType.Id/Name represents the same thing accross all Models in Richmond, otherwise the Richmond 
@@ -3200,6 +3431,21 @@ FailsafeContinue:
                     '  in the database as well
                     '-------------------------------------------------------
                     Call TableSubtypeRelationship.ModifyKey(Me, asNewName)
+
+                    '------------------------
+                    'Concept Classification
+#Region "Concept Classification"
+                    Dim lrDataStore As New DataStore.Store
+                    Dim lsModelId As String = Me.Model.ModelId
+                    Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.ModelId = lsModelId And p.Concept = Me.Id
+
+                    Dim larConceptClassificationType = lrDataStore.Get(Of KnowledgeGraph.ConceptClassificationValue)(whereClause)
+
+                    For Each lrConceptClassificationType In larConceptClassificationType
+                        lrConceptClassificationType.Concept = asNewName
+                        lrDataStore.Update(Of KnowledgeGraph.ConceptClassificationValue)(lrConceptClassificationType, whereClause)
+                    Next
+#End Region
 
                     If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                         Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateEntityType, Me, Nothing)
@@ -3277,13 +3523,13 @@ FailsafeContinue:
                 Return True
 
             Catch iex As tInformationException
-                prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
+                prApplication.ThrowMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
                 Return False
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: tEntityType.SetName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -3329,18 +3575,25 @@ FailsafeContinue:
                             Throw New Exception("The reference mode role constraint for Entity Type, " & Me.Id & ", refererenced an Entity Type rather than a Value Type. As a precaution the Reference Mode for the Entity Type was removed.")
                         End If
 
-                        Me.ReferenceModeValueType = Me.ReferenceModeRoleConstraint.Role(0).JoinedORMObject
-                        Me.ReferenceModeFactType = New FBM.FactType
+                        If Me.ReferenceModeRoleConstraint.Role(0).JoinsValueType IsNot Nothing Then 'Because may join an Objectified Fact Type.
 
-                        '--------------------------------------------------------------------------------------------------------
-                        'CodeSafe: If the ReferenceMode = "" (i.e. isnot set), then set it to at least something.
-                        '  The used can update the ReferenceMode on screen, but at least the objects are set for the EntityType
-                        '--------------------------------------------------------------------------------------------------------
-                        If Trim(Me.ReferenceMode) = "" Then
-                            Me.ReferenceMode = Me.ReferenceModeRoleConstraint.Role(0).JoinedORMObject.Id
+                            Me.ReferenceModeValueType = Me.ReferenceModeRoleConstraint.Role(0).JoinedORMObject
+
+                            '--------------------------------------------------------------------------------------------------------
+                            'CodeSafe: If the ReferenceMode = "" (i.e. isnot set), then set it to at least something.
+                            '  The used can update the ReferenceMode on screen, but at least the objects are set for the EntityType
+                            '--------------------------------------------------------------------------------------------------------
+                            If Trim(Me.ReferenceMode) = "" Then
+                                Me.ReferenceMode = Me.ReferenceModeRoleConstraint.Role(0).JoinedORMObject.Id
+                            End If
+
+                            Me.ReferenceModeFactType = Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType
+                        Else
+                            'Because may join an Objectified Fact Type.
+                            Me._ReferenceModeFactType = Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType
                         End If
 
-                        Me.ReferenceModeFactType = Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType
+
 
                         '------------------------------------------------------------------------
                         'CodeSafe: Set the IsPreferredReferenceMode member of the FactType to True
@@ -3357,7 +3610,7 @@ SkipSettingReferenceModeObjects:
                 lsMessage &= vbCrLf & vbCrLf & "Model.Id: " & Me.Model.ModelId
                 lsMessage &= vbCrLf & "EntityType.Id: " & Me.Id
                 lsMessage &= vbCrLf & "PreferredIdentifierRCId: " & Me.PreferredIdentifierRCId
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3390,7 +3643,7 @@ SkipSettingReferenceModeObjects:
                     'CodeSafe: Do double checking to make sure the EntityType is primed for receipt of a RoleConstraint defining the 
                     '  CompoundReferenceScheme for the EntityType.
                     '-----------------------------------------------------------------------------------------------------------------
-                    If IsSomething(Me.ReferenceModeFactType) Or IsSomething(Me.ReferenceModeValueType) Then
+                    If Me.ReferenceModeFactType IsNot Nothing Or Me.ReferenceModeValueType IsNot Nothing Then
                         lsMessage = "EntityType has no ReferenceMode (does not have a SimpleReferenceScheme) but either of the following are set for the EntityType:"
                         lsMessage &= vbCrLf & "ReferenceModeFactType and/or ReferenceModeValueType"
                         lsMessage &= vbCrLf & "EntityType.Id: " & Me.Id
@@ -3409,7 +3662,7 @@ SkipSettingReferenceModeObjects:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,,,,,,, ex)
 
                 Return False
             End Try
@@ -3428,10 +3681,10 @@ SkipSettingReferenceModeObjects:
         ''' </summary>
         ''' <param name="abIsObjectifyingEntityType"></param>
         ''' <remarks></remarks>
-        Public Sub SetIsObjectifyingEntityType(ByVal abIsObjectifyingEntityType As Boolean, Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
+        Public Sub SetIsObjectifyingEntityType(ByVal abIsObjectifyingEntityType As Boolean, Optional ByVal abBroadcastInterfaceEvent As Boolean = True, Optional ByVal abKeepVisible As Boolean = False)
             Me.IsObjectifyingEntityType = abIsObjectifyingEntityType
 
-            RaiseEvent IsObjectifyingEntityTypeChanged(abIsObjectifyingEntityType)
+            RaiseEvent IsObjectifyingEntityTypeChanged(abIsObjectifyingEntityType, abKeepVisible)
 
             If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                 Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateEntityType, Me, Nothing)
@@ -3492,7 +3745,7 @@ SkipSettingReferenceModeObjects:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3610,12 +3863,16 @@ SkipSettingReferenceModeObjects:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
         Private Sub TriggerExpandReferenceScheme()
             RaiseEvent ExpandReferenceScheme()
+        End Sub
+
+        Private Sub TriggerMakeVisible()
+            RaiseEvent MakeVisible()
         End Sub
 
         Private Sub TriggerChangingToFactType(ByRef arFactType As FBM.FactType)

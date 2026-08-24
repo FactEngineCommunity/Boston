@@ -55,41 +55,61 @@ Public Class DlgFind
     End Sub
 
     Private Sub btnFind_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnFind.Click
-        If TextboxFindWhat.TextLength > 0 Then
-            Dim findOption As RichTextBoxFinds = RichTextBoxFinds.None
-            If chkMatchCase.Checked Then findOption = RichTextBoxFinds.MatchCase
-            If chkWholeWord.Checked Then findOption = (findOption Or RichTextBoxFinds.WholeWord)
-            If optUp.Checked Then findOption = (findOption Or RichTextBoxFinds.Reverse)
-            Call Me.FindText(TextboxFindWhat.Text, findOption)
-        End If
+
+        Try
+            If TextboxFindWhat.TextLength > 0 Then
+                Dim findOption As RichTextBoxFinds = RichTextBoxFinds.None
+                If chkMatchCase.Checked Then findOption = RichTextBoxFinds.MatchCase
+                If chkWholeWord.Checked Then findOption = (findOption Or RichTextBoxFinds.WholeWord)
+                If optUp.Checked Then findOption = (findOption Or RichTextBoxFinds.Reverse)
+                Call Me.FindText(TextboxFindWhat.Text, findOption)
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+        End Try
     End Sub
 
     Private Sub FindText(ByVal findWhat As String, ByVal findOption As RichTextBoxFinds)
 
-        If findWhat.Equals(foundWord) Then findIndex = foundIndex
-
-        Me.mRichTextBox.MoveCursorAndScrollToIndex(findIndex)
-
-        If findOption = RichTextBoxFinds.Reverse Then
-            findIndex = Me.mRichTextBox.Find(findWhat, 0, findIndex, findOption)
-        Else
-            findIndex = Me.mRichTextBox.Find(findWhat, findIndex, findOption)
-        End If
-        If findIndex > 0 Then
-            foundWord = findWhat
+        Try
+            If findWhat.Equals(foundWord) Then findIndex = foundIndex
 
             Me.mRichTextBox.MoveCursorAndScrollToIndex(findIndex)
 
-            Me.mRichTextBox.ResetHighlighting
-            Me.mRichTextBox.HighlightText(findIndex, findWhat.Length)
-
             If findOption = RichTextBoxFinds.Reverse Then
-                foundIndex = findIndex
+                findIndex = Me.mRichTextBox.Find(findWhat, 0, findIndex, findOption)
             Else
-                foundIndex = findIndex + findWhat.Length
+                findIndex = Me.mRichTextBox.Find(findWhat, findIndex, findOption)
             End If
+            If findIndex > 0 Then
+                foundWord = findWhat
 
-        End If
+                Me.mRichTextBox.MoveCursorAndScrollToIndex(findIndex)
+
+                Me.mRichTextBox.ResetHighlighting
+                Me.mRichTextBox.HighlightText(findIndex, findWhat.Length)
+
+                If findOption = RichTextBoxFinds.Reverse Then
+                    foundIndex = findIndex
+                Else
+                    foundIndex = findIndex + findWhat.Length
+                End If
+
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+        End Try
+
     End Sub
 
     Private Sub ButtonReplace_Click(sender As Object, e As EventArgs) Handles ButtonReplace.Click
@@ -114,7 +134,7 @@ Public Class DlgFind
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -136,7 +156,7 @@ Public Class DlgFind
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -152,7 +172,7 @@ Public Class DlgFind
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 End Class

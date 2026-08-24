@@ -49,7 +49,7 @@ Namespace Validation
                             lrFactType._ModelError.AddUnique(lrModelError)
                             lrFactData.Fact.AddModelError(lrModelError)
                             lrFactData.AddModelError(lrModelError)
-                            Me.Model.AddModelError(lrModelError)
+                            Me.Model.AddModelError(lrModelError, False)
 
                         Next
 
@@ -62,7 +62,7 @@ Namespace Validation
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.Linq.Expressions
+Imports System.Reflection
 
 Namespace TableValueTypeValueConstraint
 
@@ -25,7 +26,7 @@ Namespace TableValueTypeValueConstraint
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueTypeValueConstraint.AddValueTypeValueConstraint"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -79,7 +80,7 @@ Namespace TableValueTypeValueConstraint
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueTypeValueConstraint.ExistsValueTypeValueConstraint"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -117,7 +118,7 @@ Namespace TableValueTypeValueConstraint
                         '  NB Needs to be CaseInsensitive because MSAccess/Jet is not case sensitive.
                         '  This is because otherwise HORSE would override Horse on save back to database. This can be problematic for DBName where Horse is otherwise an Entity with a DBName and HORSE may just be a Value.
                         '--------------------------------------------
-                        lrDictionaryEntry = arValueType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, True, False, False, False, True, True)
+                        lrDictionaryEntry = arValueType.Model.AddModelDictionaryEntry(lrDictionaryEntry, True, False, False, False, False, True, True)
 
                         lREcordset.MoveNext()
                     End While
@@ -129,7 +130,7 @@ Namespace TableValueTypeValueConstraint
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueTypeValueConstraint.GetValueConstraintsByValueType"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -155,7 +156,7 @@ Namespace TableValueTypeValueConstraint
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueTypeValueConstraint.ModifyKey"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -191,7 +192,7 @@ Namespace TableValueTypeValueConstraint
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 

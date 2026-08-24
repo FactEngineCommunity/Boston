@@ -27,7 +27,7 @@ Namespace TableORMFactTypeReadingRole
                 Dim lsMessage As String
                 lsMessage = "Error: TableFactTypeReading.AddFactTypeReadingRole"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -49,7 +49,7 @@ Namespace TableORMFactTypeReadingRole
                 Dim lsMessage As String
                 lsMessage = "Error: TableFactTypeReading.DeleteFactTypeReadingRole"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -84,7 +84,7 @@ Namespace TableORMFactTypeReadingRole
                 Dim lsMessage As String
                 lsMessage = "Error: TableFactTypeReading.UpdateFactTypeReadingRole"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

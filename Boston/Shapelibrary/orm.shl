@@ -65,6 +65,43 @@
     </outline>
     <decorations />
   </shape>
+  <shape id="Ternary Fact Type" fill-mode="Winding" display-name="Ternary Fact Type">
+    <outline>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="30" />
+        <point x="100" y="30" />
+      </line>  
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="30" />
+        <point x="100" y="74" />
+      </line>    
+      <line dash-style="Custom" width="-1">
+        <point x="100" y="74" />
+        <point x="0" y="74" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="74" />
+        <point x="0" y="30" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="0" y="30" />
+        <point x="32" y="30" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="32" y="30" />
+        <point x="32" y="74" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="32" y="74" />
+        <point x="66" y="74" />
+      </line>
+      <line dash-style="Custom" width="-1">
+        <point x="66" y="74" />
+        <point x="66" y="30" />
+      </line>
+    </outline>
+  <decorations />
+  </shape>
   <shape id="Subtype Connector" fill-mode="Winding" display-name="Subtype Connector">
     <outline>
       <round-rectangle x="0" y="0" w="95" h="70" r="5" color="#FFFFFFFF" dash-style="Custom" width="-1" />
@@ -125,6 +162,13 @@
     </outline>
     <decorations />
     <image x="10" y="10" width="74" height="74" src="value_comparison_greater_equal.png" />
+  </shape>
+  <shape id="Value Comparison Constraint" fill-mode="Winding">
+    <outline>
+      <arc x="8" y="9" arc-width="74" arc-height="74" start="-185.8696" sweep="365.8696" color="#FFFFFFFF" dash-style="Custom" width="-1" />
+    </outline>
+    <decorations />
+    <image x="12" y="14" width="72" height="72" src="value_comparison.png" />
   </shape>
   <shape id="Model Note" fill-mode="Winding" display-name="Model Note">
     <outline>

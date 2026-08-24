@@ -28,6 +28,8 @@ Public Class frmSplash
             Me.LabelSoftwareCategory.Text = "Enterprise"
         ElseIf prSoftwareCategory = pcenumSoftwareCategory.Student Then
             Me.LabelSoftwareCategory.Text = "Student"
+        ElseIf prSoftwareCategory = pcenumSoftwareCategory.Boston4SQLite Then
+            Me.LabelSoftwareCategory.Text = "Boston-4-SQLite"
         End If
 
         ls_message = "Boston version: v" & psApplicationApplicationVersionNr
@@ -38,6 +40,9 @@ Public Class frmSplash
         End If
 
         ls_message &= "Required Boston database version: v" & psApplicationDatabaseVersionNr
+
+        LabelSoftwareCategory.ForeColor = Color.FromArgb(255, 65, 162, 188)
+        label_splash.ForeColor = Color.FromArgb(255, 65, 162, 188)
 
         label_splash.Text = ls_message
 

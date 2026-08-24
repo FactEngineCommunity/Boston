@@ -9,8 +9,8 @@ EOF           -> @"^$";
 [Color(76, 153, 0)]	MODELELEMENTNAME -> @"(([A-Z0-9]+[_a-zA-Z\-0-9#\.\""+*?$@!%]*[ |_]*)+[_|\s]?)+";// @"(([A-Z][a-z]+)+[\s]?)+"; //([A-Z][a-z]*)+"; @"[a-zA-Z0-9,\-\s_\.\""+#*?$@!%]*";
 [Color(153, 0, 153)]	PREDICATEPART	-> @"(?!([a-z]+\-))(?!([a-z\s]+$))([a-z'#,*?$@!%]+[^\-])"; //(?>[a-z|\s]+ )(?<!$)"; //(?>[a-z]+)([^\-])(?<!$)
 PREDICATESPACE -> @"[\s]+";
-[Color(153, 76, 0)] PREBOUNDREADINGTEXT -> @"[a-z]+\-";
-[Color(153, 76, 0)] POSTBOUNDREADINGTEXT -> @"\-[a-z]+";
+[Color(153, 76, 0)] PREBOUNDREADINGTEXT -> @"[a-z\s\-]+\-";
+[Color(153, 76, 0)] POSTBOUNDREADINGTEXT -> @"\-[a-z\-]+";
 [Color(153, 0, 153)]	SUBSCRIPT -> @"\([0-9]+\)";
 [Color(153, 0, 153)]	UNARYPREDICATEPART	-> @"((?>[a-z])+[\s]*)+$"; //(?>[a-zA-Z|\s]+)";
 

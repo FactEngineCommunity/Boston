@@ -10,9 +10,10 @@ Namespace FEKL
         Public Property DocumentLocation As String
         Public Property DocumentLocationJson As String
         Public Property ObjectType As String
+        Public Property ActualText As String
         Public Property FEKLStatement As String
         Public Property PageNumber As Integer
-        Public Property LineNumber As Integer
+        Public Property LineNumber As Integer = 1
         Public Property SectionId As String
         Public Property SectionName As String
         Public Property RequirementId As String
@@ -39,6 +40,7 @@ Namespace FEKL
             clonedObj.DocumentLocation = Me.DocumentLocation
             clonedObj.DocumentLocationJson = Me.DocumentLocationJson
             clonedObj.ObjectType = Me.ObjectType
+            clonedObj.ActualText = Me.ActualText
             clonedObj.FEKLStatement = Me.FEKLStatement
             clonedObj.PageNumber = Me.PageNumber
             clonedObj.LineNumber = Me.LineNumber

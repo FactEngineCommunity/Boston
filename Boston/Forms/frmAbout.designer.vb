@@ -38,7 +38,7 @@ Partial Class frmAbout
         '
         Me.button_close.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.button_close.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.button_close.Location = New System.Drawing.Point(275, 187)
+        Me.button_close.Location = New System.Drawing.Point(282, 197)
         Me.button_close.Name = "button_close"
         Me.button_close.Size = New System.Drawing.Size(80, 23)
         Me.button_close.TabIndex = 0
@@ -47,7 +47,8 @@ Partial Class frmAbout
         '
         'labelprompt_rosters
         '
-        Me.labelprompt_rosters.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.labelprompt_rosters.Font = New System.Drawing.Font("Arial", 26.25!, System.Drawing.FontStyle.Bold)
+        Me.labelprompt_rosters.ForeColor = System.Drawing.Color.Black
         Me.labelprompt_rosters.Location = New System.Drawing.Point(12, 9)
         Me.labelprompt_rosters.Name = "labelprompt_rosters"
         Me.labelprompt_rosters.Size = New System.Drawing.Size(275, 42)
@@ -58,17 +59,18 @@ Partial Class frmAbout
         '
         Me.label_versioning.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.label_versioning.ForeColor = System.Drawing.Color.Gray
-        Me.label_versioning.Location = New System.Drawing.Point(16, 51)
+        Me.label_versioning.Location = New System.Drawing.Point(16, 66)
         Me.label_versioning.Name = "label_versioning"
-        Me.label_versioning.Size = New System.Drawing.Size(257, 33)
+        Me.label_versioning.Size = New System.Drawing.Size(257, 45)
         Me.label_versioning.TabIndex = 5
         Me.label_versioning.Text = "label_versioning"
         '
         'label_details
         '
-        Me.label_details.Location = New System.Drawing.Point(12, 93)
+        Me.label_details.ForeColor = System.Drawing.Color.SteelBlue
+        Me.label_details.Location = New System.Drawing.Point(12, 125)
         Me.label_details.Name = "label_details"
-        Me.label_details.Size = New System.Drawing.Size(343, 53)
+        Me.label_details.Size = New System.Drawing.Size(343, 52)
         Me.label_details.TabIndex = 6
         Me.label_details.Text = "label_details"
         '
@@ -78,7 +80,7 @@ Partial Class frmAbout
         Me.LabelPromptLicenses.Cursor = System.Windows.Forms.Cursors.Hand
         Me.LabelPromptLicenses.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LabelPromptLicenses.ForeColor = System.Drawing.Color.Blue
-        Me.LabelPromptLicenses.Location = New System.Drawing.Point(12, 165)
+        Me.LabelPromptLicenses.Location = New System.Drawing.Point(12, 193)
         Me.LabelPromptLicenses.Name = "LabelPromptLicenses"
         Me.LabelPromptLicenses.Size = New System.Drawing.Size(49, 13)
         Me.LabelPromptLicenses.TabIndex = 9
@@ -90,7 +92,7 @@ Partial Class frmAbout
         Me.Label1.Cursor = System.Windows.Forms.Cursors.Hand
         Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label1.ForeColor = System.Drawing.Color.Blue
-        Me.Label1.Location = New System.Drawing.Point(12, 178)
+        Me.Label1.Location = New System.Drawing.Point(12, 206)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(114, 13)
         Me.Label1.TabIndex = 10
@@ -99,7 +101,8 @@ Partial Class frmAbout
         'LabelCategory
         '
         Me.LabelCategory.AutoSize = True
-        Me.LabelCategory.Location = New System.Drawing.Point(143, 33)
+        Me.LabelCategory.ForeColor = System.Drawing.Color.DimGray
+        Me.LabelCategory.Location = New System.Drawing.Point(143, 30)
         Me.LabelCategory.Name = "LabelCategory"
         Me.LabelCategory.Size = New System.Drawing.Size(75, 13)
         Me.LabelCategory.TabIndex = 11
@@ -108,9 +111,9 @@ Partial Class frmAbout
         'PictureBox2
         '
         Me.PictureBox2.Image = CType(resources.GetObject("PictureBox2.Image"), System.Drawing.Image)
-        Me.PictureBox2.Location = New System.Drawing.Point(237, 16)
+        Me.PictureBox2.Location = New System.Drawing.Point(237, 9)
         Me.PictureBox2.Name = "PictureBox2"
-        Me.PictureBox2.Size = New System.Drawing.Size(118, 35)
+        Me.PictureBox2.Size = New System.Drawing.Size(118, 39)
         Me.PictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
         Me.PictureBox2.TabIndex = 8
         Me.PictureBox2.TabStop = False
@@ -120,7 +123,7 @@ Partial Class frmAbout
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(365, 219)
+        Me.ClientSize = New System.Drawing.Size(378, 239)
         Me.ControlBox = False
         Me.Controls.Add(Me.LabelCategory)
         Me.Controls.Add(Me.Label1)

@@ -1,6 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Reflection
 Imports System.Xml.Serialization
+Imports Newtonsoft.Json
 Imports Boston.FBM
 
 Namespace RDS
@@ -10,20 +11,43 @@ Namespace RDS
         Implements IEquatable(Of RDS.Relation)
         Implements IDisposable
 
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Public Model As RDS.Model
 
         <XmlAttribute()>
         Public Id As String = System.Guid.NewGuid.ToString
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <NonSerialized()>
         Public OriginTable As RDS.Table
 
+        <XmlArray("Origin Columns")>
+        <XmlArrayItem("Column")>
         Public OriginColumns As New List(Of RDS.Column)
+
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Public ReverseOriginColumns As New List(Of RDS.Column) 'For 1:1 Binary Relations
 
-        <XmlAttribute()>
+
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Public OriginMultiplicity As pcenumCMMLMultiplicity
+
+        <XmlAttribute>
+        Public Property RelationOriginMultiplicity As String
+            Get
+                Return Me.OriginMultiplicity.ToString
+            End Get
+            Set(value As String)
+                Throw New NotImplementedException("Not implemented. See Relation.OriginMultiplicity")
+            End Set
+        End Property
 
         <XmlAttribute()>
         Public RelationOriginIsMandatory As Boolean = False
@@ -31,19 +55,59 @@ Namespace RDS
         <XmlAttribute()>
         Public OriginPredicate As String = ""
 
-        <XmlAttribute()>
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Public ContributesToPrimaryKey As Boolean = False
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <NonSerialized()>
-        Public WithEvents DestinationTable As RDS.Table
+        Private WithEvents _DestinationTable As RDS.Table
+        <XmlIgnore>
+        <JsonIgnore()>
+        Public Property DestinationTable As RDS.Table
+            Get
+                Return Me._DestinationTable
+            End Get
+            Set(value As RDS.Table)
+                Me._DestinationTable = value
+            End Set
+        End Property
 
-        <XmlElement()>
+        <XmlAttribute>
+        Public Property DestinationTableName As String
+            Get
+                Return Me.DestinationTable.Name
+            End Get
+            Set(value As String)
+                Throw New NotImplementedException("Not implemented. See Relation.DestinationTable")
+            End Set
+        End Property
+
+        <XmlArray("Destination Columns")>
+        <XmlArrayItem("Column")>
         Public DestinationColumns As New List(Of RDS.Column)
+
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Public ReverseDestinationColumns As New List(Of RDS.Column) 'For 1:1 Binary Relations
 
-        <XmlAttribute()>
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Public DestinationMultiplicity As pcenumCMMLMultiplicity
+
+        <XmlAttribute>
+        Public Property RelationDestinationMultiplicity As String
+            Get
+                Return Me.DestinationMultiplicity.ToString
+            End Get
+            Set(value As String)
+                Throw New NotImplementedException("Not implemented. See Relation.DestinationMultiplicity")
+            End Set
+        End Property
 
         <XmlAttribute()>
         Public RelationDestinationIsMandatory As Boolean = False
@@ -52,17 +116,40 @@ Namespace RDS
         Public DestinationPredicate As String = ""
 
         <XmlAttribute()>
-        Public EnforceReferentialIntegrity As Boolean = False
+        Public EnforcesOnCascadeUpdate As Boolean = False
 
         <XmlAttribute()>
+        Public EnforcesOnCascadeDelete As Boolean = False
+
+        <XmlAttribute()>
+        Public EnforcesReferentialIntegrity As Boolean = False
+
+        <XmlIgnore>
+        <JsonIgnore()>
         Public CascadingDelete As Boolean = False
 
-        <XmlAttribute()>
+        <XmlIgnore>
+        <JsonIgnore()>
         Public CascadingUpdate As Boolean = False
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <NonSerialized()>
-        Public WithEvents ResponsibleFactType As FBM.FactType
+        Private WithEvents _ResponsibleFactType As FBM.FactType
+        <XmlIgnore>
+        <JsonIgnore()>
+        Public Property ResponsibleFactType As FBM.FactType
+            Get
+                Return Me._ResponsibleFactType
+            End Get
+            Set(value As FBM.FactType)
+                Me._ResponsibleFactType = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Private disposedValue As Boolean
 
         ''' <summary>
@@ -70,6 +157,7 @@ Namespace RDS
         ''' </summary>
         ''' <returns></returns>
         <XmlIgnore()>
+        <JsonIgnore()>
         Public ReadOnly Property UltimateFactType As FBM.FactType
             Get
                 Dim lrFactType As FBM.FactType = Nothing
@@ -87,12 +175,27 @@ Namespace RDS
             End Get
         End Property
 
+        <NonSerialized()>
         Public Event DestinationMandatoryChanged(ByVal abDestinationIsMandatory As Boolean)
+        <NonSerialized()>
         Public Event DestinationMultiplicityChanged(ByVal aiDestinationMultiplicity As pcenumCMMLMultiplicity)
+        <NonSerialized()>
+        Public Event EnforcesOnCascadeUpdateChanged(ByVal abNewEnforcesOnCascadeUpdate As Boolean)
+        <NonSerialized()>
+        Public Event EnforcesOnCascadeDeleteChanged(ByVal abNewEnforcesOnCascadeDelete As Boolean)
+        <NonSerialized()>
+        Public Event EnforcesReferentialIntegrityChanged(ByVal abNewEnforcesReferentialIntegrity As Boolean)
+        <NonSerialized()>
+        Public Event GraphLabelAdded(ByVal asNewGraphLabel As String)
+        <NonSerialized()>
         Public Event ResponsibleFactTypeChanged(ByRef arNewResponsibleFactType As FBM.FactType)
+        <NonSerialized()>
         Public Event ResponsibleFactTypeFactTypeReadingModified()
+        <NonSerialized()>
         Public Event DestinationPredicateChanged(ByVal asPredicate As String)
+        <NonSerialized()>
         Public Event DestinationTableChanged(ByRef arTable As RDS.Table)
+        <NonSerialized()>
         Public Event OriginMandatoryChanged(ByVal abOriginIsMandatory As Boolean)
         Public Event OriginMultiplicityChanged(ByVal aiOriginMultiplicity As pcenumCMMLMultiplicity)
         Public Event OriginPredicateChanged(ByVal asPredicate As String)
@@ -145,7 +248,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -163,7 +266,9 @@ Namespace RDS
                 lrRelation.DestinationMultiplicity = .DestinationMultiplicity
                 lrRelation.DestinationPredicate = .DestinationPredicate
                 lrRelation.DestinationTable = .DestinationTable
-                lrRelation.EnforceReferentialIntegrity = .EnforceReferentialIntegrity
+                lrRelation.EnforcesOnCascadeUpdate = .EnforcesOnCascadeUpdate
+                lrRelation.EnforcesOnCascadeDelete = .EnforcesOnCascadeDelete
+                lrRelation.EnforcesReferentialIntegrity = .EnforcesReferentialIntegrity
                 lrRelation.Model = .Model
                 If arOriginTable IsNot Nothing Then
                     lrRelation.OriginColumns = New List(Of RDS.Column)
@@ -287,10 +392,38 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
+
+        Public Function GetGraphPredicate() As String
+
+            Try
+                If Me.ResponsibleFactType.GraphLabel.Count > 0 Then
+                    Return Me.ResponsibleFactType.PropertyGraphLabel
+                Else
+                    If Me.ResponsibleFactType.IsManyTo1BinaryFactType Then
+                        If Me.ResponsibleFactType.getOutgoingFactTypeReadingPredicates.Count = 0 Then
+                            Return "<Error. Add Graph Label>"
+                        Else
+                            Return Me.ResponsibleFactType.getOutgoingFactTypeReadingPredicates(0)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+
+                Return "<Error>"
+            End Try
+
+        End Function
 
         Public Function is1To1BinaryRelation() As Boolean
 
@@ -317,7 +450,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -356,7 +489,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -377,10 +510,73 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
+
+        Public Sub SetEnforcesOnCascadeUpdate(ByVal abEnforcesOnCascadeUpdate As Boolean)
+
+            Try
+                Me.EnforcesOnCascadeUpdate = abEnforcesOnCascadeUpdate
+
+                Call Me.Model.Model.setCMMLCoreRelationEnforcesOnCascadeUpdate(Me, abEnforcesOnCascadeUpdate)
+
+                RaiseEvent EnforcesOnCascadeUpdateChanged(abEnforcesOnCascadeUpdate)
+
+                Call Me.Model.Model.MakeDirty(, False,)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub SetEnforcesOnCascadeDelete(ByVal abEnforcesOnCascadeDelete As Boolean)
+
+            Try
+                Me.EnforcesOnCascadeDelete = abEnforcesOnCascadeDelete
+
+                Call Me.Model.Model.setCMMLCoreRelationEnforcesOnCascadeDelete(Me, abEnforcesOnCascadeDelete)
+
+                RaiseEvent EnforcesOnCascadeDeleteChanged(abEnforcesOnCascadeDelete)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub SetEnforcesReferentialIntegrity(ByVal abEnforcesReferentialIntegrity As Boolean)
+
+            Try
+                Me.EnforcesReferentialIntegrity = abEnforcesReferentialIntegrity
+
+                Call Me.Model.Model.setCMMLCoreRelationEnforcesReferentialIntegrity(Me, abEnforcesReferentialIntegrity)
+
+                RaiseEvent EnforcesReferentialIntegrityChanged(abEnforcesReferentialIntegrity)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
 
         Public Sub setOriginMandatory(ByVal abOriginIsMandatory As Boolean)
 
@@ -394,7 +590,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -435,7 +631,34 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub SetResponsibleFactType(arFactType As FBM.FactType)
+
+            Try
+                Me.ResponsibleFactType = arFactType
+
+                Dim lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString & " WHERE Relation = '" & Me.Id & "'"
+                Dim lrRecordset As ORMQL.Recordset = Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                If lrRecordset.EOF Then
+                    Call Me.Model.Model.addCMMLRelationIsForFactType(Me, arFactType)
+                Else
+                    lsSQLQuery = $"UPDATE {pcenumCMMLRelations.CoreRelationIsForFactType.ToString}"
+                    lsSQLQuery.AppendLine($" SET FactType = '{arFactType.Id}' WHERE Relation = '{Me.Id}'")
+                    Me.Model.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -464,12 +687,12 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub ResponsibleFactType_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles ResponsibleFactType.RemovedFromModel
+        Private Sub ResponsibleFactType_RemovedFromModel(abBroadcastInterfaceEvent As Boolean) Handles _ResponsibleFactType.RemovedFromModel
 
             Try
                 'CodeSafe
@@ -495,12 +718,12 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub DestinationTable_IndexRemoved(ByRef arIndex As Index) Handles DestinationTable.IndexRemoved
+        Private Sub DestinationTable_IndexRemoved(ByRef arIndex As Index) Handles _DestinationTable.IndexRemoved
 
             Try
                 If arIndex.IsPrimaryKey Then
@@ -520,7 +743,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -537,7 +760,7 @@ Namespace RDS
 
                 Dim liOrdinalPosition As Integer = aiOrdinalPosition
                 If aiOrdinalPosition = -1 Then
-                    liOrdinalPosition = Me.OriginColumns.Count + 1
+                    liOrdinalPosition = Me.DestinationColumns.Count + 1
                 End If
 
                 'CMML
@@ -549,7 +772,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -559,6 +782,7 @@ Namespace RDS
             Try
                 'CodeSafe
                 If Me.OriginColumns.Contains(arColumn) Then Exit Sub
+                If arColumn Is Nothing Then Exit Sub
 
                 Me.OriginColumns.Add(arColumn)
 
@@ -576,7 +800,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -595,8 +819,107 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
+        End Sub
+
+        Public Sub ReplaceOriginColumnsTable()
+
+            Try
+                Dim lsOriginalColumnName As String = "Error-Contact FactEngine"
+                Dim lrColumn As RDS.Column = Nothing
+
+                For Each lrDestinationColumn In Me.DestinationTable.getPrimaryKeyColumns
+
+                    Dim larOriginColumn = From Column In Me.OriginColumns
+                                          Where Column.ActiveRole.JoinedORMObject.Id = lrDestinationColumn.ActiveRole.JoinedORMObject.Id
+                                          Select Column
+
+                    If larOriginColumn.Count = 0 Then
+                        'Need to create a new Origin Column or replace one, perhaps.
+                        For Each lrColumn In Me.OriginColumns.ToArray
+                            Call Me.RemoveOriginColumn(lrColumn)
+                        Next
+
+                        larOriginColumn = From Column In Me.OriginTable.Column
+                                          Where Column.ActiveRole.JoinedORMObject.Id = lrDestinationColumn.ActiveRole.JoinedORMObject.Id
+                                          Select Column
+
+                        If larOriginColumn.Count > 0 Then
+                            Call Me.AddOriginColumn(larOriginColumn.First)
+                        End If
+
+                    Else
+                        larOriginColumn.First.setTable(Me.OriginTable, True)
+
+                        'Check the Role (ResponsibleRole)
+                        lrColumn = larOriginColumn.First
+
+                        If Me.ResponsibleFactType.IsCandidatePGSRelationshipNode Then
+                        Else
+                            If lrColumn.Role.JoinedORMObject.Id <> Me.OriginTable.FBMModelElement.Id Then
+
+                                Select Case Me.ResponsibleFactType.Arity
+                                    Case Is = 2
+                                        Dim lrRole = Me.ResponsibleFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = Me.OriginTable.FBMModelElement.Id)
+
+                                        If lrRole IsNot Nothing Then
+                                            Call lrColumn.setRole(lrRole)
+                                        End If
+                                End Select
+                            End If
+                        End If
+
+                    End If
+                Next
+
+#Region "Example Code: From RDSRelation Builder: FBM.Model.generateRelationForManyTo1BinaryFactType "
+                'Select Case Me.DestinationTable.FBMModelElement.ConceptType
+                '    Case Is = pcenumConceptType.EntityType
+                '        For Each lrColumn In Me.DestinationColumns
+                '            If arRole.FactType.IsLinkFactType Then
+                '                lrColumn = Me.OriginTable.Column.Find(Function(x) x.Role.Id = lrRole.FactType.LinkFactTypeRole.Id _
+                '                                                                  And x.ActiveRole.Id = lrColumn.ActiveRole.Id)
+                '                lsOriginalColumnName = lrColumn.ActiveRole.JoinedORMObject.DBName
+                '                larOriginColumn.Add(lrColumn)
+                '            Else
+                '                If lrOriginTable.Column.Find(Function(x) x.Role.Id = lrRole.Id _
+                '                                             And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
+                '                    '=====================================================
+                '                    'The Column doesn't exist in the Table yet.
+                '                    lsOriginalColumnName = lrColumn.ActiveRole.JoinedORMObject.Id
+                '                    lsColumnName = Me.OriginTable.createUniqueColumnName(lsOriginalColumnName)
+                '                    Dim lrNewColumn = New RDS.Column(Me.OriginTable, lsColumnName, lrRole, lrColumn.ActiveRole, lrRole.Mandatory)
+                '                    Me.OriginTable.addColumn(lrNewColumn)
+                '                End If
+                '                lrColumn = Me.OriginTable.Column.Find(Function(x) x.Role.Id = lrRole.Id _
+                '                                                                 And x.ActiveRole.Id = lrColumn.ActiveRole.Id)
+                '                lsOriginalColumnName = lrColumn.ActiveRole.JoinedORMObject.DBName
+                '                larOriginColumn.Add(lrColumn)
+
+                '            End If
+                '        Next
+                '    Case Is = pcenumConceptType.FactType
+                'For Each lrColumn In Me.DestinationTable.Column
+                '    lrColumn = Me.OriginTable.Column.Find(Function(x) x.ActiveRole.Id = lrColumn.ActiveRole.Id _
+                '                                                             And Not x.Role.FactType.IsPreferredReferenceMode _
+                '                                                             And x.Relation.Count = 0
+                '                                                             )
+                '    lsOriginalColumnName = lrColumn.ActiveRole.JoinedORMObject.DBName
+                '    larOriginColumn.Add(lrColumn)
+                'Next
+                'End Select
+#End Region
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
         End Sub
 
         Public Sub RemoveOriginColumn(ByRef arColumn As RDS.Column)
@@ -613,11 +936,11 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
-        Public Sub DestinationTable_IndexModified(ByRef arIndex As Index) Handles DestinationTable.IndexModified
+        Public Sub DestinationTable_IndexModified(ByRef arIndex As Index) Handles _DestinationTable.IndexModified
 
             Try
                 'CodeSafe
@@ -634,6 +957,9 @@ Namespace RDS
 
                 lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
 
+                'CodeSafe
+                If lrPrimaryKeyIndex IsNot Nothing AndAlso lrPrimaryKeyIndex.IndexQualifier <> arIndex.IndexQualifier Then Exit Sub
+
                 lrOriginalColumn = Me.OriginColumns(0)
                 lrActualTable = lrOriginalColumn.Table
 
@@ -643,6 +969,7 @@ Namespace RDS
                 Dim larOriginTableColumnsToRemove As New List(Of RDS.Column)
 
                 Dim larColumn = From Column In Me.OriginColumns
+                                Where Column.ActiveRole IsNot Nothing
                                 Where Column.ActiveRole.JoinedORMObject.Id = lrIndex.Table.Name And Column.ActiveRole.JoinsEntityType IsNot Nothing
                                 Select Column
 
@@ -710,7 +1037,7 @@ Namespace RDS
                     'lrNewColumn.Name = lrNewColumn.Table.createUniqueColumnName(lrNewColumn.Name, lrNewColumn, 0)
                     lrNewColumn.Relation.AddUnique(Me)
 
-                    If Not Me.OriginTable.Column.Contains(lrNewColumn) Then
+                    If Not Me.OriginTable.Column.Contains(lrNewColumn) And lrNewColumn.isPartOfPrimaryKey Then
                         Me.OriginTable.addColumn(lrNewColumn)
                     Else
                         lrNewColumn = Me.OriginTable.Column.Find(AddressOf lrNewColumn.Equals)
@@ -730,130 +1057,18 @@ Namespace RDS
                     Call lrPrimaryKeyIndex.Table.triggerIndexModified(lrPrimaryKeyIndex)
                 End If
 
-                'Else
-
-                'If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
-                '                        'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
-                '#Region "EntityType original join, where EntityType did not have a ReferenceScheme"
-                '                        lrOriginalColumn = Me.OriginColumns(0)
-                '                        lrActualTable = lrOriginalColumn.Table
-
-                '                        Call Me.RemoveOriginColumn(lrOriginalColumn) 'Because the Column needs to be one that points to the Role of the PreferredIdentifier of the ReferenceScheme of the EntityType
-
-                '                        For Each lrDestinationColumn In Me.DestinationColumns.ToArray
-                '                            Call Me.RemoveDestinationColumn(lrDestinationColumn)
-                '                        Next
-
-                '                        For Each lrColumn In arIndex.Column
-                '                            Dim lrNewColumn As New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
-                '                            Call Me.OriginTable.addColumn(lrNewColumn)
-                '                            lrNewColumn.Relation.Add(Me)
-                '                            Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count + 1)
-                '                            Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count + 1)
-                '                        Next
-
-                '                        Call Me.OriginTable.removeColumn(lrOriginalColumn)
-                '#End Region
-                '                    Else
-                '                        lrOriginalColumn = Me.OriginColumns(0)
-                '                        lrActualTable = lrOriginalColumn.Table
-
-                '                        For Each lrDestinationColumn In Me.DestinationColumns.ToArray
-                '                            Call Me.RemoveDestinationColumn(lrDestinationColumn)
-                '                        Next
-
-                '                        For Each lrOriginColumn In Me.OriginColumns.ToList
-                '                            Call Me.RemoveOriginColumn(lrOriginColumn)
-                '                        Next
-
-                '                        Dim lrNewColumn As RDS.Column
-                '                        For Each lrColumn In arIndex.Column
-                '                            lrNewColumn = lrColumn.Clone(lrActualTable, Me,, True) '20220823-VM-Was New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
-                '                            Call Me.OriginTable.addColumn(lrNewColumn,,,)
-                '                            lrNewColumn.Relation.Add(Me)
-                '                            Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count + 1)
-                '                            Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count + 1)
-                '                        Next
-
-                '                        '20220807-VM-Testing out something (the above)
-                '#Region "Commented out"
-                '                        'ElseIf Me.OriginColumns.Count <> Me.DestinationColumns.Count Then
-                '                        '    If Me.OriginColumns.Count > 0 Then
-                '                        '        'Should get this far
-
-                '                        '        lrOriginalColumn = Me.OriginColumns(0)
-                '                        '        lrActualTable = lrOriginalColumn.Table
-
-                '                        '        'CodeSafe
-                '                        '        'Let the Supertype take care of all this.
-                '                        '        If lrActualTable.Name <> Me.OriginTable.Name Then Exit Sub
-
-                '                        '        If Me.OriginColumns.Count = 1 And Me.OriginColumns(0).ActiveRole.JoinsEntityType IsNot Nothing Then
-                '                        '            'Column joins, via its ActiveRole, an EntityType rather than the ReferenceScheme ValueTypes of that EntityType.
-
-                '                        '            Call Me.RemoveOriginColumn(lrOriginalColumn)
-
-                '                        '            For Each lrColumn In arIndex.Column
-                '                        '                Dim lrNewColumn As New RDS.Column(lrActualTable, lrColumn.Name, lrOriginalColumn.Role, lrColumn.ActiveRole)
-                '                        '                Call Me.OriginTable.addColumn(lrNewColumn)
-                '                        '                lrNewColumn.Relation.Add(Me)
-                '                        '                Call Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
-                '                        '                Call Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count)
-                '                        '            Next
-                '                        '            Call Me.OriginTable.removeColumn(lrOriginalColumn)
-                '                        '        End If
-
-                '                        '        Dim lbColumnsArePartOfPrimaryKey As Boolean = False
-                '                        '        Dim lrIndex As RDS.Index = arIndex
-                '                        '        If Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinsEntityType IsNot Nothing).Count > 0 Then
-                '                        '            Dim lrPrimaryKeyIndex As RDS.Index = Nothing
-                '                        '            lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
-                '                        '            For Each lrColumn In Me.OriginColumns.FindAll(Function(x) x.ActiveRole.JoinsEntityType IsNot Nothing).ToArray
-                '                        '                If lrColumn.isPartOfPrimaryKey Then lbColumnsArePartOfPrimaryKey = True
-                '                        '                Me.OriginColumns.Remove(lrColumn)
-                '                        '                Me.OriginTable.removeColumn(lrColumn)
-                '                        '                If lrPrimaryKeyIndex IsNot Nothing Then
-                '                        '                    lrPrimaryKeyIndex.removeColumn(lrColumn)
-                '                        '                End If
-                '                        '            Next
-
-                '                        '            '20220226-VM-Found this commented out. If not missed after a while, delete.
-                '                        '            'Was possibly replaced by Me.DestinationTable.IndexColumnAdded method functionality. Either way, was found like this Feb 2022.
-                '                        '            'If lbColumnsArePartOfPrimaryKey Then
-                '                        '            '    lrPrimaryKeyIndex = Me.OriginTable.Index.Find(Function(x) x.IsPrimaryKey)
-                '                        '            'End If
-
-                '                        '            'For Each lrColumn In arIndex.Column
-
-                '                        '            '    Dim lrNewColumn = lrColumn.Clone(Me.OriginTable, Me)
-                '                        '            '    lrNewColumn.Relation.AddUnique(Me)
-
-                '                        '            '    If Me.OriginTable.addColumn(lrNewColumn) Then
-                '                        '            '        Me.AddOriginColumn(lrNewColumn, Me.OriginColumns.Count)
-                '                        '            '        Me.AddDestinationColumn(lrColumn, Me.DestinationColumns.Count)
-
-                '                        '            '        If lbColumnsArePartOfPrimaryKey And lrPrimaryKeyIndex IsNot Nothing Then
-                '                        '            '            lrPrimaryKeyIndex.addColumn(lrNewColumn)
-                '                        '            '        End If
-                '                        '            '    End If
-                '                        '            'Next
-                '                        '        End If
-                '#End Region
-                '                    End If
-                '                End If
-
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub DestinationTable_IndexAdded(ByRef arIndex As Index) Handles DestinationTable.IndexAdded
+        Private Sub DestinationTable_IndexAdded(ByRef arIndex As Index) Handles _DestinationTable.IndexAdded
 
             Try
                 If arIndex.IsPrimaryKey Then
@@ -922,7 +1137,7 @@ Namespace RDS
 
         End Sub
 
-        Private Sub DestinationTable_IndexColumnAdded(ByRef arIndex As Index, ByRef arColumn As Column) Handles DestinationTable.IndexColumnAdded
+        Private Sub DestinationTable_IndexColumnAdded(ByRef arIndex As Index, ByRef arColumn As Column) Handles _DestinationTable.IndexColumnAdded
 
             Try
                 If arIndex.IsPrimaryKey Then
@@ -962,12 +1177,12 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub ResponsibleFactType_FactTypeReadingModified(ByRef arFactTypeReading As FactTypeReading) Handles ResponsibleFactType.FactTypeReadingModified
+        Private Sub ResponsibleFactType_FactTypeReadingModified(ByRef arFactTypeReading As FactTypeReading) Handles _ResponsibleFactType.FactTypeReadingModified
 
             Call Me.setDestinationPredicate(arFactTypeReading.PredicatePart(0).PredicatePartText)
 
@@ -1004,7 +1219,7 @@ Namespace RDS
         ''' Not often used. Comes into effect when Entity Type is subtype of FactType.
         ''' </summary>
         ''' <param name="arColumn"></param>
-        Private Sub DestinationTable_ColumnAdded(ByRef arColumn As Column) Handles DestinationTable.ColumnAdded
+        Private Sub DestinationTable_ColumnAdded(ByRef arColumn As Column) Handles _DestinationTable.ColumnAdded
 
             Try
                 If Not arColumn.isPartOfPrimaryKey Then Exit Sub
@@ -1071,22 +1286,23 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub DestinationTable_ColumnRemoved(arColumn As Column) Handles DestinationTable.ColumnRemoved
+        Private Sub DestinationTable_ColumnRemoved(ByRef arColumn As Column) Handles _DestinationTable.ColumnRemoved
 
             Try
                 'CodeSafe
-                If Me.DestinationColumns.FindAll(Function(x) x.Id = arColumn.Id).Count > 0 Then
+                Dim lrColumn = arColumn
+                If Me.DestinationColumns.FindAll(Function(x) x.Id = lrColumn.Id).Count > 0 Then
                     Call Me.RemoveDestinationColumn(arColumn)
                     If Me.ResponsibleFactType.IsManyTo1BinaryFactType Then
                         Dim lrRole = Me.ResponsibleFactType.RoleGroup.Find(Function(x) x.InternalUniquenessConstraint.Count > 0)
                         Dim larOriginTableColumn = From Column In Me.OriginTable.Column
                                                    Where Column.Role.Id = lrRole.Id
-                                                   Where Column.ActiveRole.Id = arColumn.ActiveRole.Id
+                                                   Where Column.ActiveRole.Id = lrColumn.ActiveRole.Id
                                                    Select Column
 
                         For Each lrColumn In larOriginTableColumn.ToList
@@ -1101,9 +1317,13 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
+        End Sub
+
+        Private Sub _ResponsibleFactType_GraphLabelAdded(asNewGraphLabel As String) Handles _ResponsibleFactType.GraphLabelAdded
+            RaiseEvent GraphLabelAdded(asNewGraphLabel)
         End Sub
 
     End Class

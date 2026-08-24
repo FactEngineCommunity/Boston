@@ -5,7 +5,9 @@
             None
             Equals
             LessThan
+            LessThanOrEquals
             GreaterThan
+            GreaterThanOrEquals
         End Enum
 
         Public Enum pcenumFEQLComparitor
@@ -21,6 +23,7 @@
             [Date]
             Month
             Year
+            Hour
             Time
             ToLower
             ToUpper
@@ -28,6 +31,11 @@
             Average
             Max
             Min
+            Between
+            [Next]
+            [This]
+            Today
+            Tomorrow
         End Enum
 
         Public Enum pcenumFEQLOrderByDirection

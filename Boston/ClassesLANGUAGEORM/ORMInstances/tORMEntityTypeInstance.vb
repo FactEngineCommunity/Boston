@@ -3,6 +3,7 @@ Imports System.ComponentModel
 Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Linq
+Imports System.Linq.Expressions
 Imports Newtonsoft.Json
 
 Namespace FBM
@@ -30,15 +31,16 @@ Namespace FBM
                 Me.Concept = value.Concept
             End Set
         End Property
-        Public Overloads Property Instances As Viev.Strings.StringCollection
+
+        Public Overloads Property Instances As FEStrings.StringCollection
             Get
                 If Me.EntityType Is Nothing Then
-                    Return New Viev.Strings.StringCollection
+                    Return New FEStrings.StringCollection
                 Else
                     Return Me.EntityType.Instances
                 End If
             End Get
-            Set(value As Viev.Strings.StringCollection)
+            Set(value As FEStrings.StringCollection)
                 If Me.EntityType IsNot Nothing Then
                     Me.EntityType.Instances = value
                 End If
@@ -77,6 +79,51 @@ Namespace FBM
             End Get
             Set(value As Integer)
                 Me._InstanceNumber = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        Public Shadows _Synonyms As New FEStrings.StringCollection
+
+        <XmlIgnore()>
+        <CategoryAttribute("Entity Type"),
+        Browsable(True),
+        [ReadOnly](False),
+        DescriptionAttribute("The list of Synonyms to the name of this Entity Type."),
+        Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Property Synonyms() As FEStrings.StringCollection  'NB This is what is edited in the PropertyGrid
+            Get
+                If Me.Model IsNot Nothing Then
+                    Dim lasSynonym = (From Synonym In Me.Model.Synonyms
+                                      Where Synonym.BaseTerm = Me.Id
+                                      Select Synonym.Synonym).ToArray
+
+                    Me._Synonyms.Clear()
+                    Me._Synonyms.AddRange(lasSynonym)
+                End If
+
+                Return Me._Synonyms
+
+            End Get
+            Set(ByVal Value As FEStrings.StringCollection)
+
+                Me._Synonyms = Value
+
+                ' Find synonyms that are in the model but not in the new value
+                Dim synonymsToRemove = (From synonym In Me.Model.Synonyms
+                                        Where synonym.BaseTerm = Me.Id AndAlso Not Value.Contains(synonym.Synonym)).ToList()
+
+                ' Remove synonyms that are no longer present in the new value
+                For Each synonymToRemove In synonymsToRemove
+                    Me.Model.Synonyms.Remove(synonymToRemove)
+                Next
+
+                ' Add new synonyms that are not in the model
+                For Each synonymToAdd In Value
+                    If Not Me.Model.Synonyms.Any(Function(s) s.BaseTerm = Me.Id AndAlso s.Synonym = synonymToAdd) Then
+                        Me.Model.Synonyms.Add(New FBM.Synonym(Me.ModelLevelElement, synonymToAdd))
+                    End If
+                Next
             End Set
         End Property
 
@@ -142,8 +189,15 @@ Namespace FBM
         <XmlIgnore()> _
         Public Shadows ReferenceModeValueType As FBM.ValueTypeInstance = Nothing
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public Shadows ReferenceModeRoleConstraint As FBM.RoleConstraintInstance = Nothing
+
+        Public ReadOnly Property ReferenceModeIsHidden As Boolean
+            Get
+                If Me.ReferenceModeShape Is Nothing Then Return True
+                Return Me.ReferenceModeShape.Visible
+            End Get
+        End Property
 
         <XmlIgnore()>
         Private _ObjectifiedFactType As FBM.FactTypeInstance
@@ -151,7 +205,7 @@ Namespace FBM
         Public Shadows Property ObjectifiedFactType As FBM.FactTypeInstance
             Get
                 Try
-                    If Me._ObjectifiedFactType Is Nothing Then
+                    If Me.Page IsNot Nothing AndAlso Me._ObjectifiedFactType Is Nothing Then
                         Return Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.EntityType.ObjectifiedFactType.Id)
                     Else
                         Return Me._ObjectifiedFactType
@@ -233,6 +287,10 @@ Namespace FBM
         Public Shadows Property HideReferenceMode As Boolean
             Get
                 If Me.Flag.Find(Function(x) x.Flag = pcenumConceptInstanceFlag.EntityTypeHideReferenceMode) IsNot Nothing Then
+                    'CodeSafe
+                    If Not Me._HideReferenceMode Then
+                        Return False
+                    End If
                     Return True
                 Else
                     Return False
@@ -271,7 +329,7 @@ Namespace FBM
                         Dim lrTopmostEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
                         Return lrTopmostEntityType.ReferenceModeValueType.DataType
                     Catch ex As Exception
-                        prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical)
+                        prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical)
                     End Try
                 Else
                     Return pcenumORMDataType.DataTypeNotSet
@@ -447,6 +505,24 @@ Namespace FBM
             End Set
         End Property
 
+        Public Property Width As Integer Implements iPageObject.Width
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Height As Integer Implements iPageObject.Height
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public Flag As New List(Of FBM.ConceptInstanceFlag)
 
         <NonSerialized(),
@@ -482,7 +558,7 @@ Namespace FBM
                 Me.Id = System.Guid.NewGuid.ToString
             End If
 
-            If IsSomething(as_entity_type_name) Then
+            If as_entity_type_name IsNot Nothing Then
                 Me.Name = as_entity_type_name
             Else
                 Me.Name = "New Entity Type"
@@ -637,7 +713,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tEntityTypeInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrEntityTypeInstance
             End Try
@@ -693,7 +769,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -708,6 +784,11 @@ Namespace FBM
         End Sub
 
         Public Sub NodeSelected() Implements FBM.iPageObject.NodeSelected
+
+            'CodeSafe - Make Sure
+            If Not Me.Shape.Selected Then
+                Me.Shape.Selected = True
+            End If
 
             Call Me.SetAppropriateColour()
 
@@ -798,7 +879,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -807,27 +888,27 @@ Namespace FBM
 
             Me.Instance.AddUnique(asDataInstance)
 
-            If IsSomething(Me.SubtypeRelationship) Then
+            If Me.SubtypeRelationship IsNot Nothing Then
                 Dim lrSubtypeInstance As FBM.SubtypeRelationshipInstance
                 For Each lrSubtypeInstance In Me.SubtypeRelationship
-                    lrSubtypeInstance.parentModelElement.AddDataInstance(asDataInstance)
+                    lrSubtypeInstance.ParentModelElement.AddDataInstance(asDataInstance)
                 Next
             End If
 
         End Sub
 
-        Public Overridable Overloads Sub AddSubtypeRelationship(ByVal arParentEntityTypeInstance As FBM.EntityTypeInstance)
+        Public Overridable Overloads Sub AddSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject)
 
-            Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
+            Dim lrSubtypeConstraint As New FBM.SubtypeRelationship
 
             Try
-                If Not arParentEntityTypeInstance.HasPrimaryReferenceScheme Then
+                If Not arParentModelElement.HasPrimaryReferenceScheme Then
                     Dim lsMessage As String
-                    lsMessage = "The selected Supertype, " & arParentEntityTypeInstance.Id & ", does not have a Primary Reference Scheme."
+                    lsMessage = "The selected Supertype, " & arParentModelElement.Id & ", does not have a Primary Reference Scheme."
                     lsMessage &= vbCrLf & vbCrLf & "What you are asking Boston to do is create related Tables/Nodes that have no Primary Key."
                     lsMessage.AppendString(" While Boston can handle this, it makes no sense.")
-                    If arParentEntityTypeInstance.EntityType.getCorrespondingRDSTable.Column.Count = 0 Then
-                        lsMessage &= vbCrLf & vbCrLf & "Also, the related Table/Node for the Supertype model element, " & arParentEntityTypeInstance.Id & ", has no Columns/Attributes/Properties at all."
+                    If CType(arParentModelElement, Object).ModelLevelElement.getCorrespondingRDSTable.Column.Count = 0 Then
+                        lsMessage &= vbCrLf & vbCrLf & "Also, the related Table/Node for the Supertype model element, " & arParentModelElement.Id & ", has no Columns/Attributes/Properties at all."
                         If Not Me.EntityType.IsAbsorbed Then
                             lsMessage.AppendString(" Because the model element, " & Me.Id & ", is not absorbed this means that no Columns/Attributes/Properties will be pulled down to the related Table/Node for this model element.")
                         End If
@@ -845,7 +926,7 @@ Namespace FBM
                 'Create a Model level SubtypeConstraint
                 '----------------------------------------
                 With New WaitCursor
-                    lrSubtypeConstraint = Me.EntityType.CreateSubtypeRelationship(arParentEntityTypeInstance.EntityType)
+                    lrSubtypeConstraint = Me.EntityType.CreateSubtypeRelationship(CType(arParentModelElement, Object).ModelLevelElement)
                     Me.Model.Save(False)
 
                 End With
@@ -856,7 +937,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -889,7 +970,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1007,7 +1088,7 @@ Namespace FBM
 
                     liGreaterWidth = Viev.Greater(Me.Name.Length, Me.ReferenceMode.Length)
 
-                    If IsSomething(Me.ReferenceModeValueType) Then
+                    If Me.ReferenceModeValueType IsNot Nothing Then
                         lsReferenceMode = "(" & Me.ReferenceMode & ")"
                     End If
 
@@ -1037,7 +1118,7 @@ Namespace FBM
                     loDroppedReferenceModeNode.AttachTo(Me.Shape, AttachToNode.TopCenter)
                     loDroppedReferenceModeNode.Locked = True
 
-                    If IsSomething(Me.ReferenceModeValueType) Then
+                    If Me.ReferenceModeValueType IsNot Nothing Then
 
                         If Me.ReferenceModeValueType.ValueConstraint.Count > 0 Then
 
@@ -1115,7 +1196,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1140,63 +1221,82 @@ Namespace FBM
                     lsETNameText &= "!"
                 End If
 
-                If IsSomething(Me.ReferenceModeValueType) Then
+                If Me.EntityType.ReferenceModeValueType IsNot Nothing Then
                     lsReferenceMode = "(" & Me.ReferenceMode & ")"
                 End If
 
-                '---------------------------------------------------------------------------------------------------------------
-                'Set the size of the EnityTypeInstance.Shape based on whether a ReferenceMode exists for the EntityType or not
-                '---------------------------------------------------------------------------------------------------------------
-                liGreaterWidth = Greater(Me.Name.Length, lsReferenceMode.Length)
-                If Me.Name.Length = liGreaterWidth Then
-                    liGreaterWidth = Me.EntityTypeNameShape.Bounds.Width + 4
-                    loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.Name) + "MMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                Else
-                    liGreaterWidth = Me.ReferenceModeShape.Bounds.Width + 4
-                    loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                End If
-                loEntityNameWidth = Me.Page.Diagram.MeasureString(Trim(lsETNameText) + ".", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
-                loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M",
-                                                                         Me.Page.Diagram.Font,
-                                                                         1000,
-                                                                         System.Drawing.StringFormat.GenericDefault)
+                If Me.EntityTypeNameShape IsNot Nothing Then
+                    Me.EntityTypeNameShape.Text = lsETNameText
 
-                If Me.HasSimpleReferenceScheme And Me.EntityType.IsSubtype And Me.EntityType.ReferenceModeValueType IsNot Nothing Then
-                    Dim lrSupertypeEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
-                    If Me.EntityType.ReferenceModeValueType IsNot lrSupertypeEntityType.ReferenceModeValueType Then
-                        lbIsVariedReferenceSchemeSubtype = True
+                    If Me.Visible Then
+                        Me.EntityTypeNameShape.Visible = True
+                        If Me.ObjectifyingEntityTypeIndicatorShape IsNot Nothing Then
+                            Me.ObjectifyingEntityTypeIndicatorShape.Visible = True
+                        End If
                     End If
-                End If
 
-                If Me.IsObjectifyingEntityType And Me.Visible Then
-                    loEntityWidth = New SizeF(loEntityWidth.Width + 8, loEntityWidth.Height)
-                End If
+                    '---------------------------------------------------------------------------------------------------------------
+                    'Set the size of the EnityTypeInstance.Shape based on whether a ReferenceMode exists for the EntityType or not
+                    '---------------------------------------------------------------------------------------------------------------
+                    liGreaterWidth = Greater(Me.Name.Length, lsReferenceMode.Length)
+                    If Me.Name.Length = liGreaterWidth Then
+                        liGreaterWidth = Me.EntityTypeNameShape.Bounds.Width + 4
+                        loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.Name) + "MMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    Else
+                        liGreaterWidth = Me.ReferenceModeShape.Bounds.Width + 4
+                        loEntityWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "MMMI", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    End If
+                    loEntityNameWidth = Me.Page.Diagram.MeasureString(Trim(lsETNameText) + ".", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                    loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M",
+                                                                             Me.Page.Diagram.Font,
+                                                                             1000,
+                                                                             System.Drawing.StringFormat.GenericDefault)
 
-                If Not Me.HideReferenceMode And ((Me.HasSimpleReferenceScheme And Not Me.EntityType.IsSubtype) Or lbIsVariedReferenceSchemeSubtype) Then
-                    loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
-                    Me.Shape.SetRect(loRectangle, False)
-                    loRectangle = New Rectangle(Me.X + 2, Me.ReferenceModeShape.Bounds.Y, loReferenceModeWidth.Width, loReferenceModeWidth.Height + 1)
-                    Me.ReferenceModeShape.SetRect(loRectangle, False)
-                    Me.ReferenceModeShape.Visible = True
-                    Me.ReferenceModeShape.Text = "(" & Me.ReferenceMode & ")"
-                    Me.ReferenceModeShape.Move(Me.X + (Me.Shape.Bounds.Width / 2) - (Me.ReferenceModeShape.Bounds.Width / 2),
-                                                   Me.Y + 6)
-                Else
-                    loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 8)
-                    Me.Shape.SetRect(loRectangle, False)
-                    Me.ReferenceModeShape.Visible = False
-                End If
+                    If Me.HasSimpleReferenceScheme And Me.EntityType.IsSubtype And Me.EntityType.ReferenceModeValueType IsNot Nothing Then
+                        Dim lrSupertypeEntityType As FBM.EntityType = Me.EntityType.GetTopmostSupertype
+                        If Me.EntityType.ReferenceModeValueType IsNot lrSupertypeEntityType.ReferenceModeValueType Then
+                            lbIsVariedReferenceSchemeSubtype = True
+                        End If
+                    End If
 
-                '------------------------------------------------
-                'Set the rectangle for the EntityTypeNameShape.
-                '------------------------------------------------
-                If Me.IsObjectifyingEntityType And Me.Visible Then
-                    loRectangle = New Rectangle(Me.X + Me.ObjectifyingEntityTypeIndicatorShape.Bounds.Width + 1, Me.Y + 1, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
-                Else
-                    loRectangle = New Rectangle(Me.X + 2, Me.Y + 1, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
-                End If
+                    If Me.IsObjectifyingEntityType And Me.Visible Then
+                        loEntityWidth = New SizeF(loEntityWidth.Width + 8, loEntityWidth.Height)
+                    End If
 
-                Me.EntityTypeNameShape.SetRect(loRectangle, False)
+                    If Not Me.HideReferenceMode And ((Me.HasSimpleReferenceScheme And Not Me.EntityType.IsSubtype) Or lbIsVariedReferenceSchemeSubtype) Then
+                        loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
+                        Me.Shape.SetRect(loRectangle, False)
+                        loRectangle = New Rectangle(Me.X + 2, Me.ReferenceModeShape.Bounds.Y, loReferenceModeWidth.Width, loReferenceModeWidth.Height + 1)
+                        Me.ReferenceModeShape.SetRect(loRectangle, False)
+                        Me.ReferenceModeShape.Visible = True
+                        Me.ReferenceModeShape.Text = "(" & Me.ReferenceMode & ")"
+                        Me.ReferenceModeShape.Move(Me.X + (Me.Shape.Bounds.Width / 2) - (Me.ReferenceModeShape.Bounds.Width / 2),
+                                                       Me.Y + 6)
+                    Else
+                        loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 8)
+                        Me.Shape.SetRect(loRectangle, False)
+                        Me.ReferenceModeShape.Visible = False
+                    End If
+
+                    '------------------------------------------------
+                    'Set the rectangle for the EntityTypeNameShape.
+                    '------------------------------------------------
+                    If Me.IsObjectifyingEntityType And Me.Visible Then
+                        loRectangle = New Rectangle(Me.X + Me.ObjectifyingEntityTypeIndicatorShape.Bounds.Width + 1, Me.Y + 1, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
+                    Else
+                        If Me.Name.Length > lsReferenceMode.Length Then
+                            loRectangle = New Rectangle(Me.X + 2, Me.Y + 1, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
+                        Else
+                            loRectangle = New Rectangle(Me.X + (Me.Shape.Bounds.Width / 2) - (Me.Page.Diagram.MeasureString(Me.Name.Trim, Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault).Width / 2), Me.Y + 1, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
+                        End If
+                    End If
+
+                    Me.EntityTypeNameShape.SetRect(loRectangle, False)
+                    Me.EntityTypeNameShape.ZTop()
+
+                    Me.Page.Diagram.Invalidate()
+
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -1204,7 +1304,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1251,7 +1351,7 @@ Namespace FBM
                 '---------------------------------------------------------------------------------------------------------------
                 'Set the size of the EnityTypeInstance.Shape based on whether a ReferenceMode exists for the EntityType or not
                 '---------------------------------------------------------------------------------------------------------------                                    
-                If IsSomething(Me.EntityType.ReferenceModeValueType) Then
+                If Me.EntityType.ReferenceModeValueType IsNot Nothing Then
                     loRectangle = New Rectangle(Me.X, Me.Y, Me.EntityTypeNameShape.Bounds.Width + 4, 12)
                     Me.Shape.SetRect(loRectangle, False)
                 Else
@@ -1267,10 +1367,11 @@ Namespace FBM
                     If lrFactTypeInstance.Shape Is Nothing Then GoTo MoveOn
 
                     lrFactTypeInstance.Shape.Visible = False
+                    lrFactTypeInstance._Visible = False
                     lrFactTypeInstance.FactTable.TableShape.Visible = False
                     lrFactTypeInstance.FactTypeNameShape.Visible = False
                     If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
-                        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                        If lrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing Then
                             lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
                         End If
                     End If
@@ -1297,7 +1398,9 @@ Namespace FBM
                     Next
                     For Each lrRoleConstraintInstance In lrFactTypeInstance.InternalUniquenessConstraint
                         For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                            lrRoleConstraintRoleInstance.Shape.Visible = False
+                            If lrRoleConstraintRoleInstance.Shape IsNot Nothing Then
+                                lrRoleConstraintRoleInstance.Shape.Visible = False
+                            End If
                         Next
                     Next
                 Next
@@ -1317,7 +1420,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1333,7 +1436,7 @@ MoveOn:
                                           And FactTypeInstance.isPreferredReferenceMode = True
                                           Select FactTypeInstance Distinct
 
-                Me.ReferenceModeShape.Visible = False
+                Me.ReferenceModeShape.Visible = False 'Also used to determine if the ReferenceScheme (FT and VT) is being displayed. See ReferenceModeIsHidden Property.
 
                 loRectangle = New Rectangle(Me.X, Me.Y, Me.EntityTypeNameShape.Bounds.Width + 4, 8)
                 Me.Shape.SetRect(loRectangle, False)
@@ -1360,7 +1463,7 @@ MoveOn:
                 '----------------------------------------------------------------------------------------
 
                 If lrFactTypeInstance.IsObjectified Then
-                    lrFactTypeInstance.Shape.Visible = True
+                    lrFactTypeInstance.Visible = True
                 End If
                 lrFactTypeInstance.X = Me.X + (2 * Me.Shape.Bounds.Width) - (lrFactTypeInstance.Shape.Bounds.Width / 2)
                 lrFactTypeInstance.Y = Me.Y - Me.Shape.Bounds.Height
@@ -1386,7 +1489,7 @@ MoveOn:
                 lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, False)
 
                 If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
-                    If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                    If lrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing Then
                         lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
                     End If
                 End If
@@ -1455,7 +1558,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1487,7 +1590,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1515,7 +1618,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RoleInstance)
 
@@ -1683,7 +1786,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1705,7 +1808,7 @@ MoveOn:
         '        Call TableConceptInstance.ModifyKey(Me, asNewName)
 
         '        Me.Id = asNewName
-        '        If IsSomething(Me.Page) Then
+        '        If Me.Page IsNot Nothing Then
         '            Me.Page.MakeDirty()
         '        End If
         '    End If
@@ -1726,7 +1829,7 @@ MoveOn:
                     End If
                     Me.ReferenceModeRoleConstraint = Me.Page.RoleConstraintInstance.Find(Function(x) x.Id = Me.EntityType.ReferenceModeRoleConstraint.Id)
 
-                    If IsSomething(Me.ReferenceModeRoleConstraint) And Me.HasSimpleReferenceScheme Then
+                    If Me.ReferenceModeRoleConstraint IsNot Nothing And Me.HasSimpleReferenceScheme Then
                         Me.ReferenceModeFactType = New FBM.FactTypeInstance
                         Me.ReferenceModeFactType = Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType
                     End If
@@ -1741,12 +1844,12 @@ MoveOn:
                 lsMessage &= vbCrLf & "Page.Name: " & Me.Page.Name
                 lsMessage &= vbCrLf & "PreferredIdentifierRCId: " & Me.PreferredIdentifierRCId
                 Try
-                    If IsSomething(Me.ReferenceModeRoleConstraint) Then
+                    If Me.ReferenceModeRoleConstraint IsNot Nothing Then
                         lsMessage &= vbCrLf & "FactType.Id: " & Me.ReferenceModeRoleConstraint.RoleConstraintRole(0).Role.FactType.Id
                     End If
                 Catch
                 End Try
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1771,6 +1874,7 @@ MoveOn:
 
                 If Me.HasSimpleReferenceScheme And Me.EntityType.ReferenceModeFactType IsNot Nothing Then
                     liFactTypeInstanceCount = Aggregate FactType In Me.Page.FactTypeInstance
+                                                  Where Not FactType.IsSubtypeRelationshipFactType
                                                    From Role In FactType.RoleGroup
                                                   Where Role.JoinedORMObject IsNot Nothing
                                                   Where Role.JoinedORMObject.Id = Me.Id
@@ -1861,11 +1965,11 @@ MoveOn:
                 If appEx.Data("ErrorType") = 100 Then
                     'See above (in the code for this method) for the ErrorType=100
                     lsMessage = appEx.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
                 Else
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & appEx.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, appEx.StackTrace)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, appEx.StackTrace)
                 End If
 
             Catch ex As Exception
@@ -1873,7 +1977,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1917,7 +2021,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1961,7 +2065,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1980,9 +2084,10 @@ MoveOn:
                 '------------------
                 'Update the Model
                 '------------------
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "DataType"
+#Region "DataType"
                             Select Case Me._DataType
                                 Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
                                           pcenumORMDataType.NumericDecimal,
@@ -2005,6 +2110,7 @@ MoveOn:
                                 Me.EntityType._ModelError.RemoveAll(Function(x) x.ErrorId = pcenumModelErrors.DataTypeNotSpecifiedError)
                                 Me.EntityType.ReferenceModeValueType.SetDataType(Me._DataType)
                             End If
+#End Region
                         Case Is = "DataTypeLength"
                             If Me.EntityType.HasSimpleReferenceScheme Then
                                 Me.EntityType.ReferenceModeValueType.SetDataTypeLength(Me._DataTypeLength)
@@ -2019,6 +2125,7 @@ MoveOn:
                             Call Me.EntityType.SetDerivationText(Me.DerivationText, True)
 
                         Case Is = "IsActor"
+#Region "IsActor"
                             If Me._isActor Then
                                 Call Me.EntityType.setIsActor(True)
                             Else
@@ -2037,7 +2144,7 @@ MoveOn:
                                     End If
                                 End If
                             End If
-
+#End Region
                         Case Is = "IsDatabaseReservedWord"
                             Call Me.EntityType.setIsDatabaseReservedWord(Me.IsDatabaseReservedWord)
                         Case Is = "IsDerived"
@@ -2057,6 +2164,7 @@ MoveOn:
                             Call Me.EnableSaveButton()
                         Case Is = "IsAbsorbed"
 
+                            '20250904-VM-Remove after 6 months if not missed.
                             'If Me.IsAbsorbed Then
                             '    For Each lrModelObject In Me.EntityType.HasSubtype
                             '        If Not lrModelObject.IsAbsorbed Then
@@ -2081,14 +2189,14 @@ MoveOn:
                             Me.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(Me.Id)).LongDescription = Me.LongDescription
                             Call Me.EnableSaveButton()
                         Case Is = "ExpandReferenceMode" 'The name of the Property on the EntityType class related to this EntityTypeInstance
-
+#Region "Expand ReferenceMode"
                             Dim larFactTypeInstance = From FactTypeInstance In Me.Page.FactTypeInstance
                                                       From Role In FactTypeInstance.FactType.RoleGroup
                                                       Where Role.JoinedORMObject.Id = Me.Id _
                                                       And FactTypeInstance.isPreferredReferenceMode = True
                                                       Select FactTypeInstance Distinct
 
-                            If IsSomething(larFactTypeInstance) Then
+                            If larFactTypeInstance IsNot Nothing Then
                                 If Me.ExpandReferenceMode Then
                                     Call Me.ExpandTheReferenceScheme()
                                 Else
@@ -2131,7 +2239,9 @@ MoveOn:
                                 'Call Me.Page.DropFactTypeAtPoint(lrValueType, lo_pt)
 
                             End If
+#End Region
                         Case Is = "ReferenceMode" 'The name of the Property on the EntityType class related to this EntityTypeInstance                            
+#Region "ReferenceMode"
                             If Me.EntityType.GetTopmostNonAbsorbedSupertype Is Me.EntityType Then
                                 With New WaitCursor
                                     Call Me.EntityType.SetReferenceMode(Trim(Me.ReferenceMode))
@@ -2147,9 +2257,11 @@ MoveOn:
                             Else
                                 'Call Me.SetPropertyAttributes(Me, "DataType", True)
                             End If
+#End Region
                         Case Is = "HideReferenceMode"
                             Call Me.EntityType.SetHideReferenceMode(Me.HideReferenceMode)
                         Case Is = "Name"
+#Region "Name"
                             If Me.EntityType.Name = Me.Name Then
                                 '------------------------------------------------------------
                                 'Nothing to do. Name of the EntityType has not been changed.
@@ -2190,9 +2302,28 @@ MoveOn:
                                     End If
                                 End If
                             End If
+#End Region
+                        Case Is = "Value"
+                            With New WaitCursor
+                                Select Case asSelectedGridItemLabel
+                                    Case Is = "Synonyms"
+                                        'CodeSafe
+                                        If aoChangedPropertyItem.OldValue = aoChangedPropertyItem.ChangedItem.Value Then GoTo RefreshShapeSkipValue
+
+                                        Call Me.Page.Model.ModifySynonyms(Me.ModelLevelElement, aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                                        Me._Synonyms.Remove(aoChangedPropertyItem.OldValue)
+                                        Me._Synonyms.Add(aoChangedPropertyItem.ChangedItem.Value)
+                                    Case Is = "GraphLabel"
+                                        'GraphLabel processing.
+                                        Call Me.ModelLevelElement.ModifyOrAddGraphLabel(aoChangedPropertyItem.OldValue, aoChangedPropertyItem.ChangedItem.Value.ToString)
+                                    Case Else
+                                        'No other collections at this stage.
+                                End Select
+                            End With
+RefreshShapeSkipValue:
                     End Select
 
-                    If IsSomething(Me.Page.Form) Then
+                    If Me.Page.Form IsNot Nothing Then
                         Call Me.EnableSaveButton()
                         Me.Page.Diagram.Invalidate()
                     End If
@@ -2205,19 +2336,36 @@ MoveOn:
 
                 End If
 
+                '-------------------------------------------------------------------------------------------------------------------------------
+                'Removing an item using the UITypeEditor does not trigger a return of aoChangedPropertyItem (As PropertyValueChangedEventArgs).
+                '  So we must check each time (back here) whether there is an item to remove from the Synonyms list for the [ModelElement]Instance.
+                Dim lrDataStore As New DataStore.Store
+                For Each lsSynonym In Me.EntityType.Model.Synonyms.FindAll(Function(x) x.BaseTerm = Me.Id).Select(Function(y) y.Synonym).ToArray
+                    If lsSynonym IsNot Nothing Then
+                        If Not Me._Synonyms.Contains(lsSynonym) Then
+                            Call Me.Model.Synonyms.RemoveAll(Function(x) x.BaseTermModelElement.Id = Me.Id And x.Synonym = lsSynonym)
+                            Dim lsModelId = Me.Model.ModelId
+                            Dim lsLocalSynonym = lsSynonym
+                            Dim whereClause As Expression(Of Func(Of FBM.Synonym, Boolean)) = Function(t) t.ModelId = lsModelId And t.BaseTerm = Me.Id And t.Synonym = lsLocalSynonym
+                            lrDataStore.Delete(Of FBM.Synonym)(whereClause)
+
+                        End If
+                    End If
+                Next
+
                 '=============================
                 'Do Shape display processing
                 '=============================
                 Dim liGreaterWidth As Integer = 0
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
 
                     Call Me.SetShapeSizesAndPositions()
 
                     '20230602-VM-Remove after 6 months'------------------
                     ''Diagram is set.
                     ''------------------
-                    'If IsSomething(Me.EntityTypeNameShape) Then
+                    'If Me.EntityTypeNameShape IsNot Nothing Then
                     '    '-------------------------------------------------------------------------------
                     '    'ShapeNode does not exist for an EntityTypeInstance when cloning an EntityType
                     '    '-------------------------------------------------------------------------------
@@ -2255,7 +2403,7 @@ MoveOn:
                     '        loReferenceModeWidth = Me.Page.Diagram.MeasureString(Trim(Me.ReferenceMode) + "M", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                     '    End If
 
-                    '    If IsSomething(Me.EntityType.ReferenceModeValueType) And Not Me.ExpandReferenceMode Then
+                    '    If Me.EntityType.ReferenceModeValueType IsNot Nothing And Not Me.ExpandReferenceMode Then
                     '        loRectangle = New Rectangle(Me.X, Me.Y, loEntityWidth.Width, 12)
                     '        Me.Shape.SetRect(loRectangle, False)
                     '        loRectangle = New Rectangle(Me.X + 2, Me.EntityTypeNameShape.Bounds.Y, loEntityNameWidth.Width, Me.EntityTypeNameShape.Bounds.Height)
@@ -2281,7 +2429,7 @@ MoveOn:
                 '---------------------------------------------------------------
                 'Some properties of the EntityType/Instance may now be hidden.
                 '---------------------------------------------------------------
-                If IsSomething(Me.Page.Form) Then
+                If Me.Page.Form IsNot Nothing Then
                     'Call Me.Page.Form.ResetPropertiesGridToolbox(Me)
                 End If
 
@@ -2290,7 +2438,7 @@ MoveOn:
                 lsMessage &= vbCrLf & vbCrLf & "EntityTypeName: " & Me.Name
                 lsMessage &= vbCrLf & ", PageId:" & Me.Page.PageId
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2318,7 +2466,7 @@ MoveOn:
                     '-------------------------------------------------------------------------------------------------------------
                     'User has elected to give the EntityType(Instance) a ReferenceMode or has changed the existing ReferenceMode
                     '-------------------------------------------------------------------------------------------------------------
-                    If IsSomething(Me.ReferenceModeValueType) Then
+                    If Me.ReferenceModeValueType IsNot Nothing Then
                         '--------------------------------------------------------------------------------------
                         'All good, the EntityType(Instance) already has a ReferenceMode
                         '--------------------------------------------------------------------------------------
@@ -2394,7 +2542,7 @@ MoveOn:
                             '------------------------------------------------------------------------------------------
                             '20170322-If all seems fine without this code commented out (just below)...remove it.
                             'Call Me.ReferenceModeValueType.SetName(Me.MakeReferenceModeName)
-                            If IsSomething(Me.Shape) Then
+                            If Me.Shape IsNot Nothing Then
                                 Me.ReferenceModeValueType.DisplayAndAssociate()
                                 If Me.ReferenceModeValueType.Shape IsNot Nothing Then
                                     Me.ReferenceModeValueType.Shape.Visible = False
@@ -2418,7 +2566,7 @@ MoveOn:
                             End If
                         Else
                             Me.ReferenceModeFactType = Me.EntityType.ReferenceModeFactType.CloneInstance(Me.Page, True)
-                            If IsSomething(Me.Shape) Then
+                            If Me.Shape IsNot Nothing Then
                                 Me.ReferenceModeFactType.DisplayAndAssociate()
                                 If Me.ReferenceModeFactType.Shape IsNot Nothing Then
                                     Me.ReferenceModeFactType.Shape.Visible = False
@@ -2459,7 +2607,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2488,14 +2636,26 @@ MoveOn:
 
         Private Sub _EntityType_NameChanged() Handles _EntityType.NameChanged
 
-            Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.EntityType.Id, pcenumConceptType.EntityType)
-            Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
+            Try
+                Dim lrConceptInstance As New FBM.ConceptInstance(Me.Model, Me.Page, Me.EntityType.Id, pcenumConceptType.EntityType)
+                Call TableConceptInstance.UpdateConceptInstanceByModelPageConceptTypeRoleId(lrConceptInstance, Me.Id)
 
-            Me.Name = Me.EntityType.Id
-            Me.Id = Me.EntityType.Id
-            Me.Symbol = Me.EntityType.Id
+                Me.Name = Me.EntityType.Id
+                Me.Id = Me.EntityType.Id
+                Me.Symbol = Me.EntityType.Id
 
-            Me.Page.MakeDirty()
+                Call Me.RefreshShape()
+
+                Me.Page.MakeDirty()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 
@@ -2514,7 +2674,7 @@ MoveOn:
                 'Do ReferenceMode processing
                 '-----------------------------
                 Me.ReferenceMode = Me.EntityType.ReferenceMode
-                If (Trim(Me.ReferenceMode) = "") And IsSomething(Me.ReferenceModeFactType) Then
+                If (Trim(Me.ReferenceMode) = "") And Me.ReferenceModeFactType IsNot Nothing Then
                     '--------------------------------------------------------
                     'Is an EntityType already with a SimpleReferenceScheme.
                     '--------------------------------------------------------
@@ -2552,7 +2712,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2560,7 +2720,7 @@ MoveOn:
         Private Sub _EntityType_ReferenceModeRoleConstraintChanged(ByRef arNewReferenceModeRoleConstraint As RoleConstraint) Handles _EntityType.ReferenceModeRoleConstraintChanged
 
             Try
-                If IsSomething(arNewReferenceModeRoleConstraint) Then
+                If arNewReferenceModeRoleConstraint IsNot Nothing Then
                     Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
                     lrRoleConstraintInstance.Id = arNewReferenceModeRoleConstraint.Id
                     If Me.Page.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
@@ -2599,7 +2759,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2647,15 +2807,15 @@ MoveOn:
                     '-----------------------------
                     Me.ExpandReferenceMode = True
 
-                    If IsSomething(Me.ReferenceModeValueType) Then
-                        If IsSomething(Me.ReferenceModeValueType.Shape) Then
+                    If Me.ReferenceModeValueType IsNot Nothing Then
+                        If Me.ReferenceModeValueType.Shape IsNot Nothing Then
                             Me.ReferenceModeValueType.Shape.Visible = True
                             Call Me.getBlankCellCloseBy(Me.ReferenceModeValueType.X, Me.ReferenceModeValueType.Y)
                         End If
                         Me.ReferenceModeValueType = Nothing
                     End If
 
-                    If IsSomething(Me.ReferenceModeFactType) Then
+                    If Me.ReferenceModeFactType IsNot Nothing Then
                         Me.ReferenceModeFactType.isPreferredReferenceMode = False
                         Me.ReferenceModeFactType.Visible = True
 
@@ -2663,7 +2823,7 @@ MoveOn:
                         Me.ReferenceModeFactType = Nothing
                     End If
 
-                    If IsSomething(Me.ReferenceModeRoleConstraint) Then
+                    If Me.ReferenceModeRoleConstraint IsNot Nothing Then
                         Me.ReferenceModeRoleConstraint.IsPreferredIdentifier = False
                         Me.ReferenceModeRoleConstraint.RefreshShape()
                         Me.ReferenceModeRoleConstraint = Nothing
@@ -2681,12 +2841,12 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub _EntityType_SubtypeConstraintAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean) Handles _EntityType.SubtypeRelationshipAdded
+        Private Sub _EntityType_SubtypeConstraintAdded(ByRef arSubtypeRelationship As FBM.SubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean) Handles _EntityType.SubtypeRelationshipAdded
 
             Try
                 '-----------------------------------------------------------------------------------------------------------
@@ -2725,12 +2885,12 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub _EntityType_SubtypeConstraintRemoved(ByRef arSubtypeConstraint As FBM.tSubtypeRelationship) Handles _EntityType.SubtypeConstraintRemoved
+        Private Sub _EntityType_SubtypeConstraintRemoved(ByRef arSubtypeConstraint As FBM.SubtypeRelationship) Handles _EntityType.SubtypeConstraintRemoved
 
             Try
                 Dim lrSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
@@ -2738,7 +2898,7 @@ MoveOn:
                 lrSubtypeConstraintInstance = arSubtypeConstraint.CloneInstance(Me.Page, False)
                 lrSubtypeConstraintInstance = Me.SubtypeRelationship.Find(AddressOf lrSubtypeConstraintInstance.Equals)
 
-                If IsSomething(lrSubtypeConstraintInstance) Then
+                If lrSubtypeConstraintInstance IsNot Nothing Then
                     Call lrSubtypeConstraintInstance.RemoveFromPage()
                     Me.SubtypeRelationship.Remove(lrSubtypeConstraintInstance)
                     If Me.Page.Form IsNot Nothing Then
@@ -2752,7 +2912,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2784,7 +2944,7 @@ MoveOn:
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "EntityTypeName: " & Me.Name
                 lsMessage &= vbCrLf & ", PageId:" & Me.Page.PageId
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -2796,10 +2956,12 @@ MoveOn:
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
 
             Try
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     If Me.Shape.Selected Then
+                        Me.Shape.Pen.Width = 0.7
                         Me.Shape.Pen.Color = Color.Blue
                     Else
+                        Me.Shape.Pen.Width = 0.5
                         If Me.EntityType.HasModelError Then
                             Me.Shape.Pen.Color = Color.Red
                         ElseIf Me.EntityType.HasSimpleReferenceScheme Then
@@ -2825,7 +2987,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2890,7 +3052,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2941,7 +3103,7 @@ MoveOn:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3052,7 +3214,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -3105,7 +3267,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3122,7 +3284,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3169,7 +3331,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -3199,7 +3361,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3215,7 +3377,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3226,13 +3388,36 @@ MoveOn:
         '''   See EntityType.ConvertToFactType, lrFactType.Objectify for instance.
         ''' </summary>
         ''' <param name="abNewIsObjectifyingEntityType"></param>
-        Private Sub _EntityType_IsObjectifyingEntityTypeChanged(abNewIsObjectifyingEntityType As Boolean) Handles _EntityType.IsObjectifyingEntityTypeChanged
+        Private Sub _EntityType_IsObjectifyingEntityTypeChanged(abNewIsObjectifyingEntityType As Boolean, ByVal abKeepVisible As Boolean) Handles _EntityType.IsObjectifyingEntityTypeChanged
 
             Try
+                Me.IsObjectifyingEntityType = abNewIsObjectifyingEntityType
+
+#Region "ObjectifyingEntityType"
+                If Me.EntityType.IsObjectifyingEntityType And Me.Visible Then
+                    Dim loDroppedOETINode As ShapeNode = Nothing
+                    loDroppedOETINode = Me.Page.Diagram.Factory.CreateShapeNode(Me.X + 1, Me.Y + 1, 7, 3)
+                    loDroppedOETINode.HandlesStyle = HandlesStyle.InvisibleMove
+                    loDroppedOETINode.AllowOutgoingLinks = False
+                    loDroppedOETINode.AllowIncomingLinks = True
+                    loDroppedOETINode.Pen = New MindFusion.Drawing.Pen(Color.White, 0.0002)
+                    loDroppedOETINode.Visible = True
+                    loDroppedOETINode.Tag = Nothing
+                    loDroppedOETINode.Image = My.Resources.ORMShapes.ObjectifyingEntityTypeIndicator
+                    Dim loRectangle = New Rectangle(Me.X + 1, Me.Y + 2, 7, 3)
+                    loDroppedOETINode.SetRect(loRectangle, False)
+                    loDroppedOETINode.AttachTo(Me.Shape, AttachToNode.TopLeft)
+                    loDroppedOETINode.Move(loRectangle.X, loRectangle.Y)
+                    loDroppedOETINode.Locked = True
+                    Me.Page.Diagram.Nodes.Add(loDroppedOETINode)
+                    Me.ObjectifyingEntityTypeIndicatorShape = loDroppedOETINode
+                End If
+#End Region
+
                 'Double check is on the Page.
                 If Me.Page.EntityTypeInstance.Contains(Me) Then
                     'Is on the Page.
-                    If Me.Shape IsNot Nothing Then
+                    If Me.Shape IsNot Nothing And Not abKeepVisible Then
                         Me.Shape.Visible = False
                         Try
                             Me.EntityTypeNameShape.Visible = False
@@ -3250,7 +3435,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3266,7 +3451,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3301,13 +3486,18 @@ MoveOn:
                                     Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
                                 End If
                                 Try
+                                    lrSubtypeRelationshipInstance.Link.Origin = Me.Shape
                                     lrSubtypeRelationshipInstance.Link.Destination = larClosestModelElementInstance.First.Shape
+                                    If Not Me.Page.Diagram.Links.Contains(lrSubtypeRelationshipInstance.Link) Then
+                                        Me.Page.Diagram.Links.Add(lrSubtypeRelationshipInstance.Link)
+                                    End If
                                 Catch ex As Exception
                                     Me.Page.Diagram.Links.Add(lrSubtypeRelationshipInstance.Link)
                                 End Try
 
                             End If
                             Me.Page.Diagram.Invalidate()
+                            Me.Page.DiagramView.Refresh()
                         End If
                     End If
                 Next
@@ -3319,7 +3509,7 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -3354,11 +3544,144 @@ MoveOn:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
+        Private Sub _EntityType_MakeVisible() Handles _EntityType.MakeVisible
+
+            Try
+                Me.Shape.Visible = True
+                Me.Visible = True
+
+                Try
+                    If Me.Page IsNot Nothing AndAlso Me.Page.Diagram IsNot Nothing Then
+                        Me.Page.Diagram.Invalidate()
+                    End If
+                Catch ex As Exception
+                    Dim lsMessage As String
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                    lsMessage &= vbCrLf & vbCrLf & ex.Message
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                End Try
+
+                Call Me.RefreshShape()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub CreateDerivationTextShape()
+
+            Try
+                Dim loEntityTypeDerivationTextShape As ShapeNode
+                Dim lsDerivationText As String = ""
+
+
+                lsDerivationText = "* " & Me.DerivationText
+
+                Dim StringSize As New SizeF
+
+                StringSize = Me.Page.Diagram.MeasureString(Trim(lsDerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                StringSize.Height += 2
+
+                If StringSize.Width > 70 Then
+                    StringSize = New SizeF(70, (StringSize.Height + 2) * lsDerivationText.Length / 100)
+                End If
+
+                loEntityTypeDerivationTextShape = Me.Page.Diagram.Factory.CreateShapeNode(Me.X, Me.Y + Me.Shape.Bounds.Height + 5, StringSize.Width, StringSize.Height)
+                loEntityTypeDerivationTextShape.Shape = MindFusion.Diagramming.Shapes.Rectangle
+                loEntityTypeDerivationTextShape.HandlesStyle = HandlesStyle.MoveOnly
+                loEntityTypeDerivationTextShape.EnableStyledText = True
+                loEntityTypeDerivationTextShape.Locked = False
+                loEntityTypeDerivationTextShape.TextFormat.Alignment = StringAlignment.Near
+                loEntityTypeDerivationTextShape.Text = lsDerivationText
+                Call loEntityTypeDerivationTextShape.ResizeToFitText(FitSize.KeepWidth)
+                loEntityTypeDerivationTextShape.TextColor = Color.Black
+                loEntityTypeDerivationTextShape.Transparent = True
+                loEntityTypeDerivationTextShape.AllowIncomingLinks = False
+                loEntityTypeDerivationTextShape.AllowOutgoingLinks = False
+                loEntityTypeDerivationTextShape.ZTop()
+
+                If Me.EntityTypeDerivationText Is Nothing Then
+                    Me.EntityTypeDerivationText = New FBM.EntityTypeDerivationText(Me.Model, Me.Page, Me)
+                    Me.EntityTypeDerivationText.InstanceNumber = Me.InstanceNumber
+                End If
+
+                Me.EntityTypeDerivationText.Shape = loEntityTypeDerivationTextShape
+                loEntityTypeDerivationTextShape.Tag = Me.EntityTypeDerivationText
+
+                If Me.EntityTypeDerivationText.X = 0 Then Me.EntityTypeDerivationText.X = Me.X
+                If Me.EntityTypeDerivationText.Y = 0 Then Me.EntityTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
+
+                Me.EntityTypeDerivationText.Shape.Move(Me.EntityTypeDerivationText.X,
+                                                     Me.EntityTypeDerivationText.Y)
+
+                Me.Page.Diagram.Nodes.Add(Me.EntityTypeDerivationText.Shape)
+
+                Me.EntityTypeDerivationText.Shape.Visible = Me.IsDerived
+                Call Me.EntityTypeDerivationText.Shape.ZBottom()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub _EntityType_DerivationTextChanged(asDerivationText As String) Handles _EntityType.DerivationTextChanged
+
+            Try
+                'CodeSafe
+                If Me.Shape Is Nothing Then Exit Sub
+
+                Me.DerivationText = asDerivationText
+
+                If Me.EntityTypeDerivationText Is Nothing Then
+
+                    Me.EntityTypeDerivationText = New FBM.EntityTypeDerivationText(Me.Model, Me.Page, Me)
+                    Me.EntityTypeDerivationText.X = Me.X
+                    Me.EntityTypeDerivationText.Y = Me.Y + Me.Shape.Bounds.Height + 5
+
+                    If Me.Shape IsNot Nothing And Me.Page.Diagram IsNot Nothing Then
+                        Call Me.EntityTypeDerivationText.displayAndAssociate()
+                    End If
+                Else
+                    If Me.EntityTypeDerivationText.Shape Is Nothing Then
+                        Call Me.CreateDerivationTextShape()
+                    Else
+                        Dim lsDerivationText = "* " & Me.DerivationText
+                        Me.EntityTypeDerivationText.Shape.Text = lsDerivationText
+                    End If
+
+                End If
+
+                Call Me.EntityTypeDerivationText.SetSize
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
     End Class
 
 End Namespace

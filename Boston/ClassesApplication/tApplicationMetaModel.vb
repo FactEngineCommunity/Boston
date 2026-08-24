@@ -34,7 +34,7 @@ Partial Public Class tApplication
             Dim lsMessage As String
             lsMessage = "Error: TableModelDictionary.DoesModelObjectExistInAntotherModel"
             lsMessage &= vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return larModel
         End Try
@@ -74,7 +74,7 @@ Partial Public Class tApplication
             Dim lsMessage As String
             lsMessage = "Error: TableModelDictionary.DoesModelObjectExistInAntotherModel"
             lsMessage &= vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return larModel
         End Try

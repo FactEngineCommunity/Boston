@@ -4,6 +4,11 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Schema
 Imports System.IO
 Imports Newtonsoft.Json.Linq
+Imports VDS.RDF
+Imports VDS.RDF.Parsing
+Imports VDS.RDF.Query
+Imports VDS.RDF.Query.Patterns
+Imports System.Text.RegularExpressions
 
 Public Class frmFEKLUploader
 
@@ -31,7 +36,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -62,7 +67,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -83,7 +88,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -113,7 +118,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -131,7 +136,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -141,6 +146,23 @@ Public Class frmFEKLUploader
         Try
             Dim lsFEKLStatement As String
             Dim lrDuplexServiceClientError As DuplexServiceClient.DuplexServiceClientError = Nothing
+
+            'CodeSafe
+            If prApplication.Brain.Model Is Nothing Then
+                If Me.mrModel IsNot Nothing Then
+                    prApplication.Brain.Model = Me.mrModel
+                    prApplication.WorkingModel = Me.mrModel
+                ElseIf prApplication.WorkingModel Is Nothing Then
+                    Throw New Exception("The Brain has no Working Model")
+                Else
+                    '20250902-VM-Consider asking the user to confirm the Working Model.
+                    'prApplication.Brain.Model = prApplication.WorkingModel
+                    If Me.mrModel IsNot Nothing Then
+                        prApplication.Brain.Model = Me.mrModel
+                        prApplication.WorkingModel = Me.mrModel
+                    End If
+                End If
+            End If
 
             'Housekeeping
             Me.LabelErrorType.Text = "N/A"
@@ -222,6 +244,8 @@ Public Class frmFEKLUploader
                             End Try
                         End If
 
+                        '==============================================================
+                        'Process the FEKL Statement
                         lrDuplexServiceClientError = prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lsFEKLStatement, lrFEKLLineageObject)
 
                         Dim lbIgnoreDuplicates As Boolean = True
@@ -305,7 +329,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -319,7 +343,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -344,7 +368,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -362,7 +386,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -393,7 +417,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -419,7 +443,7 @@ Public Class frmFEKLUploader
                     Dim jsonData As JObject = JObject.Parse(jsonContent)
 
                     ' Validate JSON against schema
-                    Dim validationResults As IList(Of ValidationError)
+                    Dim validationResults As IList(Of ValidationError) = Nothing
                     Dim isValid As Boolean = jsonData.IsValid(schema, validationResults)
 
                     If isValid Then
@@ -472,7 +496,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -507,7 +531,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -534,7 +558,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -568,7 +592,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -608,7 +632,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -671,6 +695,9 @@ Public Class frmFEKLUploader
                 If lrDuplexServiceClientError.ErrorType = [Interface].publicConstants.pcenumErrorType.None Then
                     'No Error
                     lrFEKLObject.ErrorType = [Interface].publicConstants.pcenumErrorType.None
+                ElseIf lrDuplexServiceClientError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists And
+                        Not Me.CheckBoxFlagDuplicates.Checked Then
+                    lrFEKLObject.ErrorType = [Interface].publicConstants.pcenumErrorType.None
                 Else
                     'Error in FEKL or Execution of FEKL                    
                     'Report the Error
@@ -725,7 +752,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -735,6 +762,11 @@ Public Class frmFEKLUploader
         Dim lsMessage As String
 
         Try
+            'Make sure the WorkingPage is nothing, so that a bunch of model elements don't get dumped onto the Page.
+            If prApplication.Brain IsNot Nothing Then
+                prApplication.Brain.Page = Nothing
+            End If
+            prApplication.WorkingPage = Nothing
 
             Dim lbHasProcessedFEKLStatements = Me.mrFEKL4JSON.FEKLStatement.FindAll(Function(x) x.Processed).Count > 0
 
@@ -776,23 +808,23 @@ Public Class frmFEKLUploader
 
                 Else
                     Call Me.LoadFEKLStatementsIntoModelJSON()
-                    End If
-
-                ElseIf Me.ButtonStopContinueProcessing.Tag = "Processing" Then
-                    'Pause Processing, but show Green Continue Processing button
-                    Me.ButtonStopContinueProcessing.BackColor = Color.DarkSeaGreen
-                    Me.ButtonStopContinueProcessing.Text = "Continue Processing"
-                    Me.ButtonStopContinueProcessing.Tag = "Paused"
-
-                    Me.mbProcessingPaused = True
                 End If
 
-                Me.ButtonStopContinueProcessing.Refresh()
-                Me.ButtonStopContinueProcessing.Invalidate()
-                Me.DataGridViewFEKLStatements.Refresh()
-                Me.DataGridViewFEKLStatements.Invalidate()
+            ElseIf Me.ButtonStopContinueProcessing.Tag = "Processing" Then
+                'Pause Processing, but show Green Continue Processing button
+                Me.ButtonStopContinueProcessing.BackColor = Color.DarkSeaGreen
+                Me.ButtonStopContinueProcessing.Text = "Continue Processing"
+                Me.ButtonStopContinueProcessing.Tag = "Paused"
 
-                Me.Invalidate()
+                Me.mbProcessingPaused = True
+            End If
+
+            Me.ButtonStopContinueProcessing.Refresh()
+            Me.ButtonStopContinueProcessing.Invalidate()
+            Me.DataGridViewFEKLStatements.Refresh()
+            Me.DataGridViewFEKLStatements.Invalidate()
+
+            Me.Invalidate()
 
         Catch ex As Exception
 
@@ -801,7 +833,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -816,7 +848,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -826,6 +858,12 @@ Public Class frmFEKLUploader
         Dim lsMessage As String
 
         Try
+            'Make sure the WorkingPage is nothing, so that a bunch of model elements don't get dumped onto the Page.
+            If prApplication.Brain IsNot Nothing Then
+                prApplication.Brain.Page = Nothing
+            End If
+            prApplication.WorkingPage = Nothing
+
             Dim lbHasProcessedFEKLStatements = Me.miFEKLStraightProcessedUpToLine > 0
 
             Dim larContinuePromptStatus = {"Paused", "NotYetStarted"}
@@ -888,7 +926,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -903,7 +941,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -912,14 +950,23 @@ Public Class frmFEKLUploader
 
         Try
             Me.RichTextBoxFEKLDocument.ResetHighlighting
+
+            Dim lsFEKLText = Me.RichTextBoxFEKLDocument.Text
+            Dim liInd = 0
+
             Me.zrTextHighlighter = New FEKL.TextHighlighter(
                                    Me.RichTextBoxFEKLDocument,
                                    Me.zrScanner,
                                    Me.zrParser)
 
-            Me.zrTextHighlighter.Tree = Me.zrParser.Parse(Me.RichTextBoxFEKLDocument.Text)
+            Me.zrTextHighlighter.Tree = Me.zrParser.Parse(lsFEKLText)
+
+            Me.RichTextBoxFEKLDocument.SelectionStart = Me.RichTextBoxFEKLDocument.Text.Length
 
             Call Me.zrTextHighlighter.HighlightText()
+            Call Me.zrTextHighlighter.HighlightTextInternal()
+
+            If liInd = 1 Then Exit Sub
 
             Me.TextMarker.Clear()
             Me.LabelErrorType.Text = [Interface].pcenumErrorType.None.ToString
@@ -930,10 +977,30 @@ Public Class frmFEKLUploader
                 Me.TextMarker.AddWord(Me.zrTextHighlighter.Tree.Errors(0).Position, Me.zrTextHighlighter.Tree.Errors(0).Length, Color.Red)
                 Me.RichTextBoxFEKLDocument.SelectionStart = Me.zrTextHighlighter.Tree.Errors(0).Position
                 Me.RichTextBoxFEKLDocument.Invalidate()
-                Me.RichTextBoxFEKLDocument.Refresh()
-                Me.RichTextBoxFEKLDocument.Invalidate()
-                Me.RichTextBoxFEKLDocument.Update()
-                Me.RichTextBoxFEKLDocument.ScrollToCaret()
+                'Me.RichTextBoxFEKLDocument.Refresh()
+                'Me.RichTextBoxFEKLDocument.Invalidate()
+                'Me.RichTextBoxFEKLDocument.Update()
+                'Me.RichTextBoxFEKLDocument.ScrollToCaret()
+
+#Region "Highlight the errored line."
+                ' Get the line index of the caret
+                Dim currentLine As Integer = Me.RichTextBoxFEKLDocument.GetLineFromCharIndex(Me.RichTextBoxFEKLDocument.SelectionStart)
+
+                ' Get the start and end positions of the line
+                Dim start As Integer = Me.RichTextBoxFEKLDocument.GetFirstCharIndexFromLine(currentLine)
+                Dim [end] As Integer = Me.RichTextBoxFEKLDocument.GetFirstCharIndexFromLine(currentLine + 1)
+                If [end] = -1 Then
+                    [end] = Me.RichTextBoxFEKLDocument.TextLength
+                End If
+
+                ' Select the line
+                Me.RichTextBoxFEKLDocument.Select(start, [end] - start)
+
+                ' Change the background color of the selected line
+                Me.RichTextBoxFEKLDocument.SelectionBackColor = Color.Yellow
+#End Region
+                ' Deselect the text
+                Me.RichTextBoxFEKLDocument.SelectionLength = 0
 
                 Me.LabelErrorType.Text = [Interface].pcenumErrorType.SyntaxError.ToString
                 Me.LabelErrorMessage.Text = Me.zrTextHighlighter.Tree.Errors(0).Message
@@ -948,7 +1015,7 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -958,6 +1025,7 @@ Public Class frmFEKLUploader
         Try
             'CodeSafe
             If Me.zrTextHighlighter Is Nothing Then Exit Sub
+            If Me.zrTextHighlighter.threadAutoHighlight Is Nothing Then Exit Sub
 
             Me.zrTextHighlighter.threadAutoHighlight.Join(10)
             If Me.zrTextHighlighter.threadAutoHighlight.IsAlive Then
@@ -975,7 +1043,315 @@ Public Class frmFEKLUploader
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub RDFOWLttlTurtleFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RDFOWLttlTurtleFileToolStripMenuItem.Click
+
+        Call Me.ImportGenesysRDFOWLTurtleTTLFile()
+
+    End Sub
+
+    Private Sub ImportGenesysRDFOWLTurtleTTLFile()
+
+        Dim lsMessage As String
+        Try
+            Dim openFileDialog As New OpenFileDialog()
+
+
+            ' Set the file filter to only show .ttl files
+            openFileDialog.Filter = "RDF Turtle Files (*.ttl)|*.ttl"
+
+            If openFileDialog.ShowDialog() = DialogResult.OK Then
+                Dim filePath As String = openFileDialog.FileName
+
+                ' Create a new RDF graph
+                Dim graph As New Graph()
+
+                ' Use the Turtle parser to load the file into the graph
+                Try
+                    Dim parser As New TurtleParser()
+                    parser.Load(graph, filePath)
+
+                    Dim outputLines As New List(Of String)
+                    Dim lsRelation As String = ""
+                    Dim larObjectTypeName As New List(Of String)
+                    Dim larFactTypeName As New List(Of String)
+
+                    ' Display or process the natural language triples with labels
+                    For Each triple In graph.Triples
+
+                        ' Get the subject, predicate, and object nodes
+                        Dim lrSubject As INode = triple.Subject
+                        Dim lrPredicate As INode = triple.Predicate
+                        Dim lrObject As INode = triple.Object
+
+                        ' Extract labels using the rdfs:label property
+                        '================Subject=================
+                        Dim lsSubjectLabel As String = GetRDFLabel(graph, lrSubject)
+                        If Uri.IsWellFormedUriString(lsSubjectLabel, UriKind.Absolute) Then
+                            lsSubjectLabel = New Uri(lsSubjectLabel).Segments.Last()
+                        End If
+                        '================Predicate===============
+                        Dim lsPredicate As String = GetRDFLabel(graph, lrPredicate)
+                        ' Get the local name of the predicate without the full URI
+                        lsPredicate = New Uri(lsPredicate).Segments.Last()
+                        '================Object==================
+                        Dim lsObjectLabel As String = GetRDFLabel(graph, lrObject)
+                        If Uri.IsWellFormedUriString(lsObjectLabel, UriKind.Absolute) Then
+                            lsObjectLabel = New Uri(lsObjectLabel).Segments.Last()
+                        End If
+
+                        Dim lsSubjectLabelPascalCase = lsSubjectLabel.ToPascalCaseWithSpaces
+                        Dim lsObjectLabelPascalCase = lsObjectLabel.ToPascalCaseWithSpaces
+
+                        '===========Clean=============================
+                        lsSubjectLabelPascalCase = CleanModelelementName(lsSubjectLabelPascalCase)
+                        lsObjectLabelPascalCase = CleanModelelementName(lsObjectLabelPascalCase)
+                        lsPredicate = CleanModelelementName(lsPredicate)
+
+                        If lsSubjectLabel.StartsWith("SAMPLE") Then GoTo SkipTriple
+
+                        Select Case lsPredicate
+                            Case Is = "rdf schema", "isProxy"
+                                GoTo SkipTriple
+                            Case Is = "identifier", "22-rdf-syntax-ns"
+                                GoTo SkipTriple 'For now
+                            Case Is = "hasSource", "hasTarget"
+                                GoTo SkipTriple 'For now
+                            Case Is = "hasGenesysValue", "hasGenesysValueType"
+                                GoTo SkipTriple 'For now
+                            Case Is = "description"
+                                'Process 'GoTo SkipTriple 'For now
+                        End Select
+
+                        Dim pattern As String = "(.*?)(\s>\s)(.*?)\s>\s(.*)"
+                        Dim match As Match = Regex.Match(lsSubjectLabel, pattern)
+
+                        Select Case lsPredicate
+                            Case Is = "description"
+                                Dim lsDescription = triple.Object.ToString.Replace("""", """""").Replace(vbCrLf, "").Replace(vbLf, "")
+                                Dim lsDescriptionFEKL As String = lsSubjectLabel.ToPascalCaseWithSpaces & " HAS LONG DESCRIPTION """ & lsDescription & """"
+                                outputLines.AddUnique(lsDescriptionFEKL)
+                            Case Else
+                                'hasPart, <other> section. I.e. Triples that have hasPart as the predicate, or some <other> predicate.
+                                If match.Success Then
+                                    'FactTypeReading
+                                    lsSubjectLabelPascalCase = match.Groups(1).Value.Trim().ToPascalCaseWithSpaces
+                                    lsPredicate = match.Groups(3).Value.Trim()
+                                    lsObjectLabelPascalCase = match.Groups(4).Value.Trim().ToPascalCaseWithSpaces
+
+                                    If Not larObjectTypeName.Contains(lsSubjectLabelPascalCase) Then
+                                        lsRelation = $"{lsSubjectLabelPascalCase} IS AN ENTITY TYPE"
+                                        outputLines.AddUnique(lsRelation)
+                                        larObjectTypeName.AddUnique(lsSubjectLabelPascalCase)
+                                    End If
+
+                                    Dim lsFactTypeName = $"{lsSubjectLabelPascalCase}{lsPredicate.ToPascalCase}{lsObjectLabelPascalCase}".RemoveWhitespace
+                                    Dim lsFactTypeReading = $"{lsSubjectLabelPascalCase} {lsPredicate} {lsObjectLabelPascalCase}"
+                                    lsFactTypeName.RemoveDoubleWhiteSpace.RemoveWhitespace
+
+                                    If Not larFactTypeName.Contains(lsFactTypeName) Then
+                                        outputLines.AddUnique(lsFactTypeReading)
+                                    End If
+                                Else
+                                    If Not larObjectTypeName.Contains(lsSubjectLabelPascalCase) Then
+                                        lsRelation = $"{lsSubjectLabelPascalCase} IS AN ENTITY TYPE"
+                                        outputLines.AddUnique(lsRelation)
+                                        larObjectTypeName.AddUnique(lsSubjectLabelPascalCase)
+                                    Else
+                                        lsRelation = $"{lsSubjectLabelPascalCase} IS AN ENTITY TYPE"
+                                        If Not outputLines.Contains(lsRelation) Then
+                                            outputLines.AddUnique(lsRelation)
+                                        End If
+                                    End If
+
+                                    If Not larObjectTypeName.Contains(lsObjectLabelPascalCase) Then
+                                        lsRelation = $"{lsObjectLabelPascalCase} IS A CONCEPT"
+                                        outputLines.AddUnique(lsRelation)
+                                        larObjectTypeName.AddUnique(lsObjectLabelPascalCase)
+                                    End If
+
+                                    Dim lsFactTypeName As String = $"{lsSubjectLabelPascalCase}Has{lsObjectLabelPascalCase}".RemoveWhitespace
+
+                                    If Not larFactTypeName.Contains(lsFactTypeName) Then
+                                        'Create the Fact Type Reading
+                                        Dim lsFactTypeReading = $"{lsSubjectLabelPascalCase} has AT MOST ONE {lsObjectLabelPascalCase}"
+                                        outputLines.AddUnique(lsFactTypeReading)
+                                    End If
+                                End If
+                        End Select
+SkipTriple:
+                    Next
+
+                    ' Save the output lines to a text file
+                    Dim saveFileDialog As New SaveFileDialog()
+                    saveFileDialog.Filter = "Text Files (*.txt)|*.txt"
+                    If saveFileDialog.ShowDialog() = DialogResult.OK Then
+                        Dim outputFilePath As String = saveFileDialog.FileName
+                        System.IO.File.WriteAllLines(outputFilePath, outputLines)
+                    End If
+
+                    Dim textWithNewlines As String = String.Join(Environment.NewLine, outputLines)
+                    Clipboard.SetText(textWithNewlines)
+
+                    lsMessage = "RDF file imported successfully."
+                    lsMessage.AppendDoubleLineBreak("Copied to Clipboard.")
+
+                    Boston.ShowFlashCard(lsMessage, Color.DarkSeaGreen, 2500, 10)
+
+                Catch ex As Exception
+                    Throw New Exception(ex.Message)
+                End Try
+            End If
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Function GetRDFLabel(graph As IGraph, node As INode) As String
+        'Dim labelPredicateUri As Uri = New Uri("http://www.w3.org/2000/01/rdf-schema#label")
+        'Dim labelPredicate As INode = graph.CreateUriNode(labelPredicateUri)
+        'Dim labelTriple As Triple = graph.GetTriplesWithSubjectPredicate(node, labelPredicate).FirstOrDefault()
+
+        'If labelTriple IsNot Nothing Then
+        '    Return labelTriple.Object.ToString()
+        'Else
+        '    Return node.ToString()
+        'End If
+        Dim rdfs As String = "http://www.w3.org/2000/01/rdf-schema#"
+        Dim labelPredicate As INode = graph.CreateUriNode(New Uri(rdfs & "label"))
+        Dim labelTriple As Triple = graph.GetTriplesWithSubjectPredicate(node, labelPredicate).FirstOrDefault()
+
+        If labelTriple IsNot Nothing Then
+            Return labelTriple.Object.ToString()
+        Else
+            Return node.ToString()
+        End If
+    End Function
+
+    Private Function CleanModelelementName(ByVal asModelElementName As String) As String
+
+        Try
+            Dim lsReturnString As String = asModelElementName
+
+            lsReturnString = lsReturnString.Replace(".", "")
+            lsReturnString = lsReturnString.Replace(" - ", " ")
+            lsReturnString = lsReturnString.Replace("-", " ")
+            lsReturnString = lsReturnString.Replace("&", "And")
+            lsReturnString = lsReturnString.Replace("/", " ")
+            lsReturnString = lsReturnString.Replace(",", "")
+            lsReturnString = lsReturnString.Replace("_", " ")
+            lsReturnString = lsReturnString.Replace("(", "")
+            lsReturnString = lsReturnString.Replace(")", "")
+            lsReturnString = lsReturnString.Replace(":", "")
+
+            Return lsReturnString.Trim.RemoveDoubleWhiteSpace
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
+
+    End Function
+
+    Private Sub CloseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CloseToolStripMenuItem.Click
+
+        Try
+            Me.Hide()
+            Me.Close()
+            Me.Dispose()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub GenerateModelsFEKLToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GenerateModelsFEKLToolStripMenuItem.Click
+
+        Try
+
+#Region "Dynamic Form"
+            ' Create form definition JSON
+            Dim formDefinition As String = "
+                    {
+                        'UseEntityGrouping': {
+                            'type': 'checkbox',
+                            'label': 'Use Entity Grouping',
+                            'default': false
+                        },
+                        'GenerateFacts': {
+                            'type': 'checkbox',
+                            'label': 'Generate Facts',
+                            'default': false
+                        }
+                    }"
+
+            ' Create and show the form
+            Dim form As New frmDynamicForm()
+            form.FormFields = formDefinition
+
+            Dim lbUseEntityGrouping As Boolean = False
+            Dim lbGenerateFacts As Boolean = False
+
+            If form.ShowDialog() = DialogResult.OK Then
+                ' Get the results as JSON
+                Dim loResults As JObject = JObject.Parse(form.FormData)
+
+
+                lbUseEntityGrouping = CBool(loResults("UseEntityGrouping"))
+                lbGenerateFacts = CBool(loResults("GenerateFacts"))
+
+            End If
+#End Region
+
+#Region "Setup Generic Selection Form"
+            Dim lfrmGenericSelect As New frmGenericSelect()
+            lfrmGenericSelect.zoGenericSelection.Type = pcenumGenericSelectionType.SelectFromList
+            lfrmGenericSelect.zoGenericSelection.FormTitle = "Select Model Element to generate CLIF for"
+            lfrmGenericSelect.zoGenericSelection.ComboBoxStyle = pcenumComboBoxStyle.DropdownList
+
+            Dim larModelElement = (From ModelElement In Me.mrModel.getModelObjects(False).FindAll(Function(x) Not x.IsMDAModelElement)
+                                   Where {GetType(FBM.EntityType), GetType(FBM.FactType)}.Contains(ModelElement.GetType)
+                                   Select ModelElement).ToList.OrderByDescending(Function(x) x.Name)
+
+
+            For Each lrModelElement In larModelElement
+                lfrmGenericSelect.zoGenericSelection.TupleList.Add(New tComboboxItem(Nothing, lrModelElement.Name, lrModelElement))
+            Next
+
+            lfrmGenericSelect.zoGenericSelection.TupleList.Add(New tComboboxItem(Nothing, "All", Nothing))
+#End Region
+
+            If lfrmGenericSelect.ShowDialog = DialogResult.OK Then
+                Me.RichTextBoxFEKLDocument.Text = Me.mrModel.GenerateFEKL(lbUseEntityGrouping, lbGenerateFacts, lfrmGenericSelect.zoGenericSelection.SelectedTag)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

@@ -1,4 +1,6 @@
-﻿Namespace PluginInterface.Sources
+﻿Imports Boston.FBM
+
+Namespace PluginInterface.Sources
 
     Friend Class NullConnection
         Implements IConnection
@@ -15,16 +17,6 @@
             End Get
             Set(ByVal value As String)
                 Me.mName = value
-            End Set
-        End Property
-
-        Public _BostonModel As FBM.Model
-        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
-            Get
-                Return Me._BostonModel
-            End Get
-            Set(value As FBM.Model)
-                Me._BostonModel = value
             End Set
         End Property
 
@@ -95,6 +87,15 @@
             Get
                 Return New List(Of String)
             End Get
+        End Property
+
+        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As FBM.Model)
+                Throw New NotImplementedException()
+            End Set
         End Property
 
         Public Function TestQuery(ByVal Query As String) As DataTable Implements IConnection.TestQuery

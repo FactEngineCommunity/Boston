@@ -3,6 +3,7 @@
 Namespace FBM
 
     Interface iPageObject
+
         Sub MouseDown()
         Sub MouseMove()
         Sub MouseUp()
@@ -28,6 +29,9 @@ Namespace FBM
         Property Visible As Boolean
         Property X As Integer
         Property Y As Integer
+        Property Width As Integer
+        Property Height As Integer
+
     End Interface
 
     Interface iPageModelObject

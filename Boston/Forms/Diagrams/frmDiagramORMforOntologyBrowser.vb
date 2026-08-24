@@ -97,7 +97,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -241,7 +241,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -267,7 +267,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -347,12 +347,12 @@ Public Class frmDiagramORMForOntologyBrowser
             lrFactDataInstance = _table(_col, _row).Tag
 
             lsDebugMessage = "Changing FactDataInstance at Row:" & _row & ", Col:" & _col & " in FactTable"
-            If IsSomething(lrFactDataInstance.FactType) Then
+            If lrFactDataInstance.FactType IsNot Nothing Then
                 lsDebugMessage &= vbCrLf & "FactType.Id: " & lrFactDataInstance.FactType.Id
             Else
                 lsDebugMessage &= vbCrLf & "FactType.Id: Nothing"
             End If
-            If IsSomething(lrFactDataInstance.Fact) Then
+            If lrFactDataInstance.Fact IsNot Nothing Then
                 lsDebugMessage &= vbCrLf & "Fact.Symbol: " & lrFactDataInstance.Fact.Symbol
                 lsDebugMessage &= vbCrLf & lrFactDataInstance.Fact.EnumerateAsBracketedFact
             Else
@@ -360,21 +360,21 @@ Public Class frmDiagramORMForOntologyBrowser
             End If
             lsDebugMessage &= vbCrLf & "Role.Id :" & lrFactDataInstance.Role.Id
             lsDebugMessage &= vbCrLf & vbCrLf
-            If IsSomething(lrFactDataInstance.FactData.FactType) Then
+            If lrFactDataInstance.FactData.FactType IsNot Nothing Then
                 lsDebugMessage &= vbCrLf & "FactData.FactType.Id: " & lrFactDataInstance.FactData.FactType.Id
             Else
                 lsDebugMessage &= vbCrLf & "FactData.FactType.Id: Nothing"
             End If
-            If IsSomething(lrFactDataInstance.FactData.Fact) Then
+            If lrFactDataInstance.FactData.Fact IsNot Nothing Then
                 lsDebugMessage &= vbCrLf & "FactData.Fact.Symbol: " & lrFactDataInstance.FactData.Fact.Symbol
                 lsDebugMessage &= vbCrLf & lrFactDataInstance.FactData.Fact.EnumerateAsBracketedFact
             Else
                 lsDebugMessage &= vbCrLf & "FactData.Fact.Symbol: Nothing"
             End If
             lsDebugMessage &= vbCrLf & "FactData.Role.Id :" & lrFactDataInstance.FactData.Role.Id
-            Call prApplication.ThrowErrorMessage(lsDebugMessage, pcenumErrorType.Information)
+            Call prApplication.ThrowMessage(lsDebugMessage, pcenumErrorType.Information)
 
-            Call prApplication.ThrowErrorMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
+            Call prApplication.ThrowMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
 
             '---------------------------------------------
             'Update the FactData of the FactDataInstance
@@ -383,7 +383,7 @@ Public Class frmDiagramORMForOntologyBrowser
             lrFactDataInstance.FactData.Data = Me.ComboBoxFact.Items(Me.ComboBoxFact.SelectedIndex).ItemData
             lrFactDataInstance.Data = lrFactDataInstance.FactData.Data
 
-            Call prApplication.ThrowErrorMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
+            Call prApplication.ThrowMessage("...." & lrFactDataInstance.Fact.Symbol, pcenumErrorType.Information)
 
             lrFactDataInstance.Cell.Text = Me.ComboBoxFact.SelectedItem.Tag.EnumerateAsBracketedFact()
         End If
@@ -431,7 +431,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -516,7 +516,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -531,9 +531,12 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim loPoint As New PointF(0, 0)
         Dim lrFactType As FBM.FactType
 
-        Dim larFactType = (From Role In Me.zrPage.Model.Role
+        Dim loFactTypeComparer As New FBM.FactTypeComparer()
+        Dim larFactType = (From Role In Me.zrPage.Model.Role.Select(Function(x) x).Distinct
                            Where Role.JoinedORMObject.Id = aoModelObject.Id
-                           Select Role.FactType).Distinct.ToList
+                           Where Not Role.FactType.isReferenceModeFactType
+                           Group By Role.FactType Into Group
+                           Select FactType).Distinct(loFactTypeComparer).ToList
 
         loPoint.X = CInt(Math.Floor((300 - 10 + 1) * Rnd())) + 10
         loPoint.Y = CInt(Math.Floor((300 - 10 + 1) * Rnd())) + 10
@@ -546,7 +549,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
         Dim lrFactTypeInstance As FBM.FactTypeInstance
         Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
-        Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+        Dim lrSubtypeRelationship As FBM.SubtypeRelationship
 
         For Each lrFactType In larFactType
 
@@ -554,7 +557,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 Me.zrPage.DropEntityTypeAtPoint(lrFactType.ObjectifyingEntityType, loPoint)
             End If
 
-            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False)
+            lrFactTypeInstance = Me.zrPage.DropFactTypeAtPoint(lrFactType, loPoint, False,,,,,,,, True)
 
             If lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
 
@@ -609,8 +612,8 @@ Public Class frmDiagramORMForOntologyBrowser
 
     Private Sub frm_ORMModel_page_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.GotFocus
 
-        If IsSomething(Me.zoTreeNode) Then
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+        If Me.zoTreeNode IsNot Nothing Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
             End If
         End If
@@ -634,7 +637,7 @@ Public Class frmDiagramORMForOntologyBrowser
             '20180620-Remove if all okay. Commented out because Boston.PageDataExistsInClipboad caused some sort of unsolveable threading issue
             '  when the form is loading and when this form is the second/third/etc frmDiagramORM form loaded for a Model.
             'If Boston.PageDataExistsInClipboard(lrPage) Then
-            '    If IsSomething(Me.zrPage) Then
+            '    If Me.zrPage IsNot Nothing Then
             '        If lrPage.CopiedPageId <> Me.zrPage.PageId Then
             '            prApplication.MainForm.PasteToolStripMenuItem.Enabled = True
             '        Else
@@ -645,8 +648,8 @@ Public Class frmDiagramORMForOntologyBrowser
             '    prApplication.MainForm.PasteToolStripMenuItem.Enabled = False
             'End If
 
-            If IsSomething(Me.zoTreeNode) Then
-                If IsSomething(frmMain.zfrmModelExplorer) Then
+            If Me.zoTreeNode IsNot Nothing Then
+                If frmMain.zfrmModelExplorer IsNot Nothing Then
                     frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
                 End If
             End If
@@ -657,7 +660,7 @@ Public Class frmDiagramORMForOntologyBrowser
             prApplication.MainForm.ToolStripComboBox_zoom.SelectedIndex =
                    prApplication.MainForm.ToolStripComboBox_zoom.FindStringExact(CInt(Me.DiagramView.ZoomFactor).ToString & "%")
 
-            If IsSomething(Me.zrPage) Then
+            If Me.zrPage IsNot Nothing Then
                 If prApplication.WorkingModel Is Nothing Then
                     prApplication.WorkingModel = Me.zrPage.Model
                 End If
@@ -665,12 +668,12 @@ Public Class frmDiagramORMForOntologyBrowser
                 Dim lrModelDictionaryForm As frmToolboxModelDictionary
                 lrModelDictionaryForm = prApplication.GetToolboxForm(frmToolboxModelDictionary.Name)
 
-                If IsSomething(lrModelDictionaryForm) Then
+                If lrModelDictionaryForm IsNot Nothing Then
                     Call lrModelDictionaryForm.LoadToolboxModelDictionary(Me.zrPage.Language)
                 End If
             End If
 
-            If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
+            If frmMain.zfrm_KL_theorem_writer IsNot Nothing Then
                 frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
             End If
 
@@ -691,7 +694,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -702,7 +705,7 @@ Public Class frmDiagramORMForOntologyBrowser
         '-------------------------------------------
         'Process the page associated with the form.
         '-------------------------------------------
-        If IsSomething(Me.zrPage) Then
+        If Me.zrPage IsNot Nothing Then
             If Me.zrPage.IsDirty And Not Me.zrPage.UserRejectedSave And (Not GetType(FBM.DiagramSpyPage) Is Me.zrPage.GetType) Then
 
                 Dim lsMessage As String = ""
@@ -916,7 +919,7 @@ Public Class frmDiagramORMForOntologyBrowser
                         '-------------------------------------------------------------------------------------
                         Dim lrEntityTypeInstance As New FBM.EntityTypeInstance(lrModel, pcenumLanguage.ORMModel, lrEntityType.Name, True)
 
-                        If IsSomething(Me.zrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)) Then
+                        If Me.zrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals) IsNot Nothing Then
                             MsgBox("This Page already contains the Entity Type, '" & lrEntityType.Name & "'.")
                         Else
                             '------------------------------------------------------------------------------------
@@ -964,7 +967,7 @@ Public Class frmDiagramORMForOntologyBrowser
                         '--------------------------------------------------------------------------------
                         Dim lrValueTypeInstance As New FBM.ValueTypeInstance(Me.zrPage.Model, Me.zrPage, pcenumLanguage.ORMModel, lrValueType.Name, True)
 
-                        If IsSomething(Me.zrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)) Then
+                        If Me.zrPage.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals) IsNot Nothing Then
                             MsgBox("This Page already contains the Value Type, '" & lrValueType.Name & "'.")
                         Else
                             '------------------------------------------------------------------------------------
@@ -1025,7 +1028,7 @@ Public Class frmDiagramORMForOntologyBrowser
                         '--------------------------------------------------------------------------------
                         Dim lrFactTypeInstance As New FBM.FactTypeInstance(lrModel, Me.zrPage, pcenumLanguage.ORMModel, lrFactType.Name, True)
 
-                        If IsSomething(Me.zrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)) Then
+                        If Me.zrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals) IsNot Nothing Then
                             If lrFactTypeInstance.Shape Is Nothing Then
                                 lrFactType = Me.zrPage.Model.GetModelObjectByName(lrFactTypeInstance.Id)
                                 '===================================================================================
@@ -1470,7 +1473,7 @@ Public Class frmDiagramORMForOntologyBrowser
             'Create the corresponding FactType and add it to the model.
             '  Name is set within the RoleInstance form by the ObjectTypes that the User selects to join the RoleInstance to.
             '------------------------------------------------------------------------------------------------------------------
-            If IsSomething(aoDropTargetNode) Then
+            If aoDropTargetNode IsNot Nothing Then
                 lrFactType = aoDropTargetNode.Tag.FactType
                 lrFactType = Me.zrPage.Model.FactType.Find(Function(x) x.Id = lrFactType.Id)
 
@@ -1518,7 +1521,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lrRoleInstanceForm.zrBaseFactType = lrFactType
             lrRoleInstanceForm.zrRole = lrRole
-            If IsSomething(aoDropTargetNode) Then
+            If aoDropTargetNode IsNot Nothing Then
                 lrRoleInstanceForm.zbExtendingExistingFactType = True
             End If
             If lrRoleInstanceForm.showdialog(lrRole, Me.zrPage) = Windows.Forms.DialogResult.OK Then
@@ -1534,7 +1537,7 @@ Public Class frmDiagramORMForOntologyBrowser
                         'The FactType.Name already exists within the database
                         '  so create a new FactType.Name
                         '-----------------------------------------------------------
-                        lrFactType.setName(Me.zrPage.Model.CreateUniqueFactTypeName(Viev.Strings.RemoveWhiteSpace(lrFactType.Name), 0))
+                        lrFactType.setName(Me.zrPage.Model.CreateUniqueFactTypeName(FEStrings.ProperSpace(lrFactType.Name), 0))
                     End If
 
                     '----------------------------------------------
@@ -1625,7 +1628,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Dim lsMessage As String
             lsMessage = "Error: frmDiagramORM.DropRoleAtPoint"
             lsMessage &= vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -1652,7 +1655,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 '--------------------------------------------------
                 prApplication.WorkingPage = Me.zrPage
 
-                If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+                If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                     '----------------------------
                     'Mouse is over an ShapeNode
                     '----------------------------
@@ -1719,7 +1722,7 @@ Public Class frmDiagramORMForOntologyBrowser
                                 Me.LabelHelp.Text = "Drop the Frequency Constraint on a Role."
                                 e.Effect = DragDropEffects.Copy
                             Case Is = "Role"
-                                If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+                                If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                                     '-------------------------------------------
                                     'Change the color of any object that the
                                     '  item is dragged over. Visual aid.
@@ -1775,7 +1778,7 @@ Public Class frmDiagramORMForOntologyBrowser
             End If
 
 
-            'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            'If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             '    '-------------------------------------------
             '    'Change the color of any object that the
             '    '  item is dragged over. Visual aid.
@@ -1803,7 +1806,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1992,7 +1995,7 @@ Public Class frmDiagramORMForOntologyBrowser
             '----------------
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 If lrFactTable.FactTypeInstance.Fact.Count > 0 Then
                     lrFactDataInstance = lrFactTable.TableShape.Item(0, lrFactTable.SelectedRow - 1).Tag
@@ -2019,7 +2022,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Dim lsMessage As String
             lsMessage = "Error: frmDiagramORM.Diagram.CellClicked"
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2060,7 +2063,7 @@ Public Class frmDiagramORMForOntologyBrowser
         '--------------------
         Dim lrFactDataInstance As New FBM.FactDataInstance
         lrFactDataInstance = e.Cell.Tag
-        If IsSomething(lrFactDataInstance) Then
+        If lrFactDataInstance IsNot Nothing Then
             lrFactDataInstance.ChangeData(e.NewText)
         Else
             '----------------------------------------------------------
@@ -2117,7 +2120,7 @@ Public Class frmDiagramORMForOntologyBrowser
             lrModelObject = Me.zrPage.SelectedObject(0)
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Select Case lrModelObject.ConceptType
                     Case Is = pcenumConceptType.EntityType
@@ -2136,6 +2139,8 @@ Public Class frmDiagramORMForOntologyBrowser
                                 Call lrToolboxForm.VerbaliseRoleConstraintEqualityConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.ExclusionConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintExclusionConstraint(lrRoleConstraintInstance.RoleConstraint)
+                            Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                Call lrToolboxForm.VerbaliseRoleConstraintExternalFrequencyConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InclusiveORConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintInclusiveORConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
@@ -2246,7 +2251,7 @@ Public Class frmDiagramORMForOntologyBrowser
                             Exit For
                         End If
                     Next
-                    If IsSomething(lrLinkToRemove) Then
+                    If lrLinkToRemove IsNot Nothing Then
                         Me.Diagram.Links.Remove(lrLinkToRemove)
                     End If
                     lrModelNoteInstance.JoinedObjectType = New FBM.ModelObject
@@ -2285,7 +2290,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 Me.Diagram.Links.Remove(a)
             End If
 
-            If IsSomething(lrTargetModelObject) Then
+            If lrTargetModelObject IsNot Nothing Then
                 Select Case lrModelObject.ConceptType
                     Case Is = pcenumConceptType.ModelNote
                         e.Link.Pen.DashPattern = New Single() {2, 1, 2, 1}
@@ -2470,7 +2475,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.Diagram.Links.Remove(e.Link)
         End Try
@@ -2517,7 +2522,7 @@ Public Class frmDiagramORMForOntologyBrowser
                     End Select
                     Dim loNode As DiagramNode
                     loNode = Me.Diagram.GetNodeAt(e.MousePosition)
-                    If IsSomething(loNode) Then
+                    If loNode IsNot Nothing Then
                         If loNode.Tag.ConceptType = pcenumConceptType.Role Then
                             Me.DiagramView.DrawLinkCursor = Cursors.Hand
                             loNode.AllowIncomingLinks = True
@@ -2537,7 +2542,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.Diagram.Links.Remove(e.Link)
             e.Cancel = True
@@ -2623,7 +2628,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2641,7 +2646,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2654,7 +2659,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim loNode As Object 'Because may be ShapeNode or TableNode
         Dim lrModelObject As FBM.ModelObject
 
-        If IsSomething(Diagram.GetNodeAt(e.MousePosition)) Then
+        If Diagram.GetNodeAt(e.MousePosition) IsNot Nothing Then
             loNode = Diagram.GetNodeAt(e.MousePosition, True, False)
             lrModelObject = loNode.tag
             Select Case lrModelObject.ConceptType
@@ -2918,7 +2923,7 @@ Public Class frmDiagramORMForOntologyBrowser
         'Try this...if one node is deselected, then deselect all nodes
         'Me.zrPage.SelectedObject.Clear() 'Didn't seem to work
 
-        If IsSomething(e.Node) Then
+        If e.Node IsNot Nothing Then
             Select Case e.Node.Tag.ConceptType
                 Case Is = pcenumConceptType.EntityType
                     If Not (Control.ModifierKeys = Keys.Control) Then
@@ -2952,7 +2957,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Call Boston.ShowFlashCard("Remember to make changes to the Model from Pages opened in the Model Explorer", Color.LightGray, 2500, 10)
         Exit Sub
 
-        If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             loNode = Diagram.GetNodeAt(lo_point, True, False)
             lrModelObject = loNode.tag
             Select Case lrModelObject.ConceptType
@@ -3079,7 +3084,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3118,7 +3123,7 @@ Public Class frmDiagramORMForOntologyBrowser
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
-            If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                 '20200820-VM-Moved to DiagramView.Click, so that the user needs to click on the ModelElement they want to use in the subtype.
                 'If Me.zrPage.SelectedObject.Count = 2 Then
 
@@ -3241,7 +3246,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                 Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
                     If Me.Diagram.Selection.Items.Count = 1 Then
                         lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
                         Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag.Shape.Selected = True
@@ -3415,7 +3420,7 @@ Public Class frmDiagramORMForOntologyBrowser
                                 Call lrTable.addColumn(lrColumn)
                             Catch ex As Exception
                                 'Warning only. Because could be modifying the Core model, in which case there is no Table for larModelObject(0).
-                                prApplication.ThrowErrorMessage("Error trying to create a Column for a unary Fact Type, for Model Element:" & larModelObject(0).Id, pcenumErrorType.Warning, Nothing, False, False, True)
+                                prApplication.ThrowMessage("Error trying to create a Column for a unary Fact Type, for Model Element:" & larModelObject(0).Id, pcenumErrorType.Warning, Nothing, False, False, True)
                             End Try
 
                         End If
@@ -3562,7 +3567,7 @@ Public Class frmDiagramORMForOntologyBrowser
                     Dim lrDiagramOverviewForm As frmToolboxOverview
                     lrDiagramOverviewForm = prApplication.GetToolboxForm(frmToolboxOverview.Name)
 
-                    If IsSomething(lrDiagramOverviewForm) Then
+                    If lrDiagramOverviewForm IsNot Nothing Then
                         lrDiagramOverviewForm.SetDocument(Me.DiagramView)
                     End If
                 End If
@@ -3711,8 +3716,8 @@ Public Class frmDiagramORMForOntologyBrowser
     Public Function CreateValueType(Optional ByVal as_value_type_name As String = Nothing,
                                     Optional ByVal ab_use_value_type_name_as_id As Boolean = False,
                                     Optional ByVal aiDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet,
-                                    Optional ByVal aiLength As Integer = Nothing,
-                                    Optional ByVal aiPrecision As Integer = Nothing) As FBM.ValueTypeInstance
+                                    Optional ByVal aiLength As Integer = 0,
+                                    Optional ByVal aiPrecision As Integer = 0) As FBM.ValueTypeInstance
 
         Dim lo_ValueTypeInstance As FBM.ValueTypeInstance
         Dim ls_value_type_name As String = ""
@@ -3725,12 +3730,9 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrValueType As FBM.ValueType
         lrValueType = Me.zrPage.Model.CreateValueType(as_value_type_name)
         lrValueType.DataType = aiDataType
-        If IsSomething(aiLength) Then
-            lrValueType.DataTypeLength = aiLength
-        End If
-        If IsSomething(aiPrecision) Then
-            lrValueType.DataTypePrecision = aiPrecision
-        End If
+        lrValueType.DataTypeLength = aiLength
+        lrValueType.DataTypePrecision = aiPrecision
+
         lo_ValueTypeInstance = Me.zrPage.DropValueTypeAtPoint(lrValueType, lo_point)
         '=================================================================
 
@@ -3832,7 +3834,7 @@ Public Class frmDiagramORMForOntologyBrowser
                     Me.zrPage.SelectedObject.Clear()
                     Me.Diagram.Selection.Clear()
                     Me.DiagramView.ContextMenuStrip = ContextMenuStrip_Diagram
-                ElseIf IsSomething(loSelectedNode) Then
+                ElseIf loSelectedNode IsNot Nothing Then
                     '------------------------------------------------------------------------------------
                     'Special handling for FactTypes.
                     '  FactTypeInstances are not added to zrPage.SelectedObject in Diagram.NodeSelected
@@ -3853,7 +3855,7 @@ Public Class frmDiagramORMForOntologyBrowser
             '--------------------------------------------------
             prApplication.WorkingPage = Me.zrPage
 
-            If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                 '----------------------------
                 'Mouse is over an ShapeNode
                 '----------------------------
@@ -4055,12 +4057,12 @@ Public Class frmDiagramORMForOntologyBrowser
                                 Dim lrRoleInstance As FBM.RoleInstance
                                 lrRoleInstance = loNode.Tag
 
-                                If IsSomething(lrRoleInstance.Link) Then
+                                If lrRoleInstance.Link IsNot Nothing Then
                                     lrRoleInstance.Link.Pen.Color = Color.LightGray
                                 End If
                                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
                                 For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-                                    If IsSomething(lrEntityTypeInstance.Shape) Then
+                                    If lrEntityTypeInstance.Shape IsNot Nothing Then
                                         lrEntityTypeInstance.Shape.AllowIncomingLinks = True
                                     End If
                                 Next
@@ -4100,7 +4102,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
 
-                If IsSomething(lrPropertyGridForm) And IsSomething(loNode) Then
+                If lrPropertyGridForm IsNot Nothing And loNode IsNot Nothing Then
                     Dim lrModelObject As FBM.ModelObject
                     lrModelObject = loNode.Tag
                     lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
@@ -4300,7 +4302,7 @@ Public Class frmDiagramORMForOntologyBrowser
 #End Region
                 Me.Diagram.Invalidate()
 
-            ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 1, True)) Then
+            ElseIf Diagram.GetLinkAt(lo_point, 1, True) IsNot Nothing Then
                 '----------------------------
                 'Mouse is over a Link
                 '----------------------------
@@ -4309,7 +4311,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-                If IsSomething(lrPropertyGridForm) And IsSomething(loLink) Then
+                If lrPropertyGridForm IsNot Nothing And loLink IsNot Nothing Then
 
                     Dim lrModelObject As FBM.ModelObject
                     lrModelObject = loLink.Tag
@@ -4362,7 +4364,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 Dim lrPropertyGridForm As frmToolboxProperties
 
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
 
                     Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
                     Dim myHiddenAttribute As Attribute = New System.ComponentModel.DisplayNameAttribute("Language")
@@ -4398,7 +4400,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 '-------------------------------------------------------
                 Dim lrToolboxForm As frmToolboxORMVerbalisation
                 lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                If IsSomething(lrToolboxForm) Then
+                If lrToolboxForm IsNot Nothing Then
                     Call lrToolboxForm.VerbalisePage(Me.zrPage)
                 End If
 
@@ -4412,7 +4414,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -4454,7 +4456,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 If prApplication.RightToolboxForms.FindAll(Function(x) x.Name = frmToolboxModelDictionary.Name).Count >= 1 Then
                     child = prApplication.RightToolboxForms.Find(Function(x) x.Name = frmToolboxModelDictionary.Name)
                     child.zrORMModel = prApplication.WorkingModel
-                    If IsSomething(prApplication.WorkingPage) _
+                    If prApplication.WorkingPage IsNot Nothing _
                     And child.zrLoadedModel IsNot prApplication.WorkingModel Then
                         Call child.LoadToolboxModelDictionary(prApplication.WorkingPage.Language)
                     End If
@@ -4493,7 +4495,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Dim lrRoleInstance As FBM.RoleInstance
             Dim lrOtherRoleInstance As FBM.RoleInstance
 
-            If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                 '----------------------------------------------
                 'Mouse is over a ShapeNode
                 '----------------------------------------------
@@ -4548,7 +4550,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4587,7 +4589,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Exit Sub
         End If
 
-        If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             '----------------------------------------------
             'Mouse is over a ShapeNode
             '----------------------------------------------
@@ -4649,7 +4651,7 @@ Public Class frmDiagramORMForOntologyBrowser
         '-----------------------------------------        
         frmMain.ToolStripButton_Save.Enabled = True
 
-        If IsSomething(e.Node.Tag) Then
+        If e.Node.Tag IsNot Nothing Then
 
             Dim lrUserAction As New tUserAction(e.Node.Tag, pcenumUserAction.MoveModelObject, Me.zrPage)
             lrUserAction.PreActionModelObject = New tUndoRedoObject(e.Node.Tag.X, e.Node.Tag.Y)
@@ -4879,7 +4881,7 @@ Public Class frmDiagramORMForOntologyBrowser
 #Region "ORM Verbalisation"
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Select Case e.Node.Tag.ConceptType
                     Case Is = pcenumConceptType.EntityType
@@ -4909,6 +4911,8 @@ Public Class frmDiagramORMForOntologyBrowser
                                 Call lrToolboxForm.VerbaliseRoleConstraintEqualityConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.ExclusionConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintExclusionConstraint(lrRoleConstraintInstance.RoleConstraint)
+                            Case Is = pcenumRoleConstraintType.ExternalFrequencyConstraint
+                                Call lrToolboxForm.VerbaliseRoleConstraintExternalFrequencyConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InclusiveORConstraint
                                 Call lrToolboxForm.VerbaliseRoleConstraintInclusiveORConstraint(lrRoleConstraintInstance.RoleConstraint)
                             Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
@@ -4939,7 +4943,7 @@ Public Class frmDiagramORMForOntologyBrowser
                             Dim lrPropertyGridForm As frmToolboxProperties
                             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                             If lrPropertyGridForm IsNot Nothing Then
-                                If IsSomething(lrPropertyGridForm) Then
+                                If lrPropertyGridForm IsNot Nothing Then
                                     lrPropertyGridForm.BringToFront()
                                 End If
                             End If
@@ -4953,7 +4957,7 @@ Public Class frmDiagramORMForOntologyBrowser
                             Dim lrPropertyGridForm As frmToolboxProperties
                             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                             If lrPropertyGridForm IsNot Nothing Then
-                                If IsSomething(lrPropertyGridForm) Then
+                                If lrPropertyGridForm IsNot Nothing Then
                                     lrPropertyGridForm.BringToFront()
                                 End If
                             End If
@@ -5007,7 +5011,7 @@ Public Class frmDiagramORMForOntologyBrowser
                             '20210801-VM-Removed below so can verbalise an IUC.
                             If lrRoleConstraintInstance.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                                 lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                                If IsSomething(lrToolboxForm) Then
+                                If lrToolboxForm IsNot Nothing Then
                                     'Special VerbalisationProcess
                                     Call lrToolboxForm.VerbaliseRoleConstraintInternalUniquenessConstraint(lrRoleConstraintInstance.RoleConstraint)
                                 End If
@@ -5109,7 +5113,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -5137,9 +5141,8 @@ Public Class frmDiagramORMForOntologyBrowser
         '------------------------------------------------------------------------
 
         Try
-            'Me.SetVisibleCore(False)
 
-            prApplication.ThrowErrorMessage("Entered frmDiagramORM.DisplayORMModelPage", pcenumErrorType.Information)
+            prApplication.ThrowMessage("Entered frmDiagramORM.DisplayORMModelPage", pcenumErrorType.Information)
 
             Dim loDroppedNode As ShapeNode = Nothing
             Dim lrValueTypeInstance As FBM.ValueTypeInstance
@@ -5151,6 +5154,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Me.zrPage = arPage
             Me.Tag = arPage
             Me.TabText = arPage.Name
+            Me.zrPage.Diagram = Me.Diagram
 
             '===========================
             'Set the Zoom factor
@@ -5174,7 +5178,7 @@ Public Class frmDiagramORMForOntologyBrowser
             '   with the corresponding 'object' within the ORMModelPage object
             '------------------------------------------------------------------------
 
-            prApplication.ThrowErrorMessage("frmDiagramORM.DisplayORMModelPage, about to load the Instances.", pcenumErrorType.Information)
+            prApplication.ThrowMessage("frmDiagramORM.DisplayORMModelPage, about to load the Instances.", pcenumErrorType.Information)
 
             '----------------------------------------------
             'Display the EntityTypes within the ORMDiagram
@@ -5213,13 +5217,17 @@ Public Class frmDiagramORMForOntologyBrowser
             '-----------------------------------
             'Display any Subtype Relationships
             '-----------------------------------        
-            For Each lrEntityTypeInstance In arPage.EntityTypeInstance
+            For Each lrEntityTypeInstance In arPage.EntityTypeInstance.FindAll(Function(x) x.SubtypeRelationship.Count > 0)
                 For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
+                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And x.Visible)
+                    If lrFactTypeInstance Is Nothing Then Continue For
                     Call lrSubtypeRelationship.DisplayAndAssociate()
                 Next
             Next
             For Each lrValueTypeInstance In arPage.ValueTypeInstance
                 For Each lrSubtypeRelationship In lrValueTypeInstance.SubtypeRelationship
+                    lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationship.FactType.Id And x.Visible)
+                    If lrFactTypeInstance Is Nothing Then Continue For
                     Call lrSubtypeRelationship.DisplayAndAssociate()
                 Next
             Next
@@ -5234,15 +5242,18 @@ Public Class frmDiagramORMForOntologyBrowser
             '-----------------------------
             'Display the RoleConstraints
             '-----------------------------
+#Region "Role Constraints"
             'CodeSafe
             Call Me.zrPage.RemoveRoleConstraintInstancesNoLongerInModel()
 
             Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
+            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) x.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint)
                 '-------------------------
                 'Load the RoleConstraint
                 '-------------------------
                 Call lrRoleConstraintInstance.DisplayAndAssociate()
+
+                '20220715-VM-Remove if not missed. Found already commented out on this date.
                 'Select Case lrRoleConstraintInstance.RoleConstraintType
                 '    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                 '        '20211122-VM-Delete if all is well. All variants use RoleConstraintInstance.DisplayAndAssociate.
@@ -5258,8 +5269,16 @@ Public Class frmDiagramORMForOntologyBrowser
                 '        'Case Else
                 '        Call lrRoleConstraintInstance.DisplayAndAssociate()
                 'End Select
-
             Next
+
+            Dim larInternalUniquenessConstraint = From FactTypeInstance In Me.zrPage.FactTypeInstance
+                                                  From InternalUniquenessConstraint In FactTypeInstance.InternalUniquenessConstraint
+                                                  Select InternalUniquenessConstraint
+
+            For Each lrInternalUniquenessConstraint In larInternalUniquenessConstraint
+                Call lrInternalUniquenessConstraint.DisplayAndAssociate()
+            Next
+#End Region
 
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Visible = True)
                 Call lrFactTypeInstance.AdjustBorderHeight()
@@ -5276,6 +5295,19 @@ Public Class frmDiagramORMForOntologyBrowser
                 Call lrModelNoteInstance.DisplayAndAssociate()
             Next
 
+            'Reassess Role Links (join to nearest ModelElementInstance), including for SubtypeRelationships, which are a FactType
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                Call lrFactTypeInstance.SortRoleGroup()
+            Next
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
+                Call lrEntityTypeInstance.ResetSubtypeRelationshipLinks()
+            Next
+
+            'Reasses Role Links for ExternalUniquenessConstraints
+            For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) Not x.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint)
+                Call lrRoleConstraintInstance.LinkToClosestModelElements()
+            Next
+
             'CodeSaf-User Experience
             Call Me.zrPage.RepellOverlappingFactTypeInstances()
 
@@ -5290,10 +5322,39 @@ Public Class frmDiagramORMForOntologyBrowser
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
                 lrPropertyGridForm.PropertyGrid.SelectedObject = arPage
             End If
+
+            'Quality Checking
+            Try
+                Dim larVisibleReferenceModeFactTypeInstance = (From FactTypeInstance In Me.zrPage.FactTypeInstance
+                                                               Where FactTypeInstance.isReferenceModeFactType
+                                                               Where FactTypeInstance.Visible AndAlso FactTypeInstance.Shape.Visible
+                                                               From EntityTypeInstance In Me.zrPage.EntityTypeInstance
+                                                               Where EntityTypeInstance.ReferenceModeFactType.Id = FactTypeInstance.Id
+                                                               Where EntityTypeInstance.ReferenceModeIsHidden = False
+                                                               Select FactTypeInstance).ToList
+
+                Dim larHiddenFactTypeInstanceRolesShowing = (From FactTypeInstance In Me.zrPage.FactTypeInstance
+                                                             Where FactTypeInstance.isReferenceModeFactType
+                                                             Where Not FactTypeInstance.Visible
+                                                             From Role In FactTypeInstance.RoleGroup
+                                                             Where Role.Shape IsNot Nothing
+                                                             Where Role.Shape.Visible
+                                                             Select FactTypeInstance
+                                                             ).ToList
+
+                larVisibleReferenceModeFactTypeInstance.AddRange(larHiddenFactTypeInstanceRolesShowing)
+
+                For Each lrFactTypeInstance In larVisibleReferenceModeFactTypeInstance
+                    Call lrFactTypeInstance.Hide()
+                Next
+            Catch ex As Exception
+
+            End Try
+
 
             '--------------------------------------------------------------------------
             'Because ShapeItems are 'selected' during this process, calling the below
@@ -5309,14 +5370,198 @@ Public Class frmDiagramORMForOntologyBrowser
             arPage.SelectedObject.Clear()
             Me.PerformCleanup()
 
-            prApplication.ThrowErrorMessage("frmDiagramORM.DisplayORMModelPage setting the toolbox.", pcenumErrorType.Information)
+            prApplication.ThrowMessage("frmDiagramORM.DisplayORMModelPage setting the toolbox.", pcenumErrorType.Information)
             Call Me.SetToolbox()
 
             'Me.Diagram.ResizeToFitItems(1 )
             Me.Diagram.Invalidate()
             Me.zrPage.FormLoaded = True
 
-            prApplication.ThrowErrorMessage("frmDiagramORM.DisplayORMModelPage, finished loading the Page", pcenumErrorType.Information)
+            prApplication.ThrowMessage("frmDiagramORM.DisplayORMModelPage, finished loading the Page", pcenumErrorType.Information)
+
+
+#Region "Old Code - Commented out, because was not loading Instances as per new Multi-Instance per page regime."
+            ''Me.SetVisibleCore(False)
+
+            'prApplication.ThrowMessage("Entered frmDiagramORM.DisplayORMModelPage", pcenumErrorType.Information)
+
+            'Dim loDroppedNode As ShapeNode = Nothing
+            'Dim lrValueTypeInstance As FBM.ValueTypeInstance
+
+            'Me.Diagram.AutoResize = True
+            ''-------------------------------------------------------
+            ''Set the Caption/Title of the Page to the PageName
+            ''-------------------------------------------------------
+            'Me.zrPage = arPage
+            'Me.Tag = arPage
+            'Me.TabText = arPage.Name
+
+            ''===========================
+            ''Set the Zoom factor
+            'Me.DiagramView.ZoomFactor = My.Settings.DefaultPageZoomFactor
+
+            ''-----------------------------------------------------------------------------------------------------------
+            ''If the Virtual Analyst toolbox is loaded, set the Brain's Page (of the toolbox) to the Page of this form.
+            ''-----------------------------------------------------------------------------------------------------------
+            'If prApplication.ToolboxForms.FindAll(Function(x) x.Name = frmToolboxBrainBox.Name).Count > 0 Then
+            '    prApplication.Brain.Page = Me.zrPage
+            '    prApplication.Brain.Model = Me.zrPage.Model
+            'End If
+
+            ''-----------------------------------------------------
+            ''Override default in Settings for an individual Page
+            ''-----------------------------------------------------
+            'Me.ViewFactTablesToolStripMenuItem.Checked = Me.zrPage.ShowFacts
+
+            ''------------------------------------------------------------------------
+            ''Display the ORMDiagram and logically associating  each Shape object
+            ''   with the corresponding 'object' within the ORMModelPage object
+            ''------------------------------------------------------------------------
+
+            'prApplication.ThrowMessage("frmDiagramORM.DisplayORMModelPage, about to load the Instances.", pcenumErrorType.Information)
+
+            ''----------------------------------------------
+            ''Display the EntityTypes within the ORMDiagram
+            ''----------------------------------------------
+            'Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+            'For Each lrEntityTypeInstance In arPage.EntityTypeInstance
+            '    'lrEntityTypeInstance.ExpandReferenceMode = False
+            '    Call lrEntityTypeInstance.DisplayAndAssociate()
+            'Next
+
+            'Me.HelpProvider.SetHelpKeyword(Me.DiagramView, "Entity")
+            'Me.HelpProvider.SetHelpNavigator(Me.DiagramView, HelpNavigator.KeywordIndex)
+
+            ''----------------------------------------------
+            ''Display the ValueTypes within the ORMDiagram
+            ''----------------------------------------------
+            'For Each lrValueTypeInstance In arPage.ValueTypeInstance
+            '    '--------------------------------------------------------------------
+            '    'Create a Shape for the EntityTypeInstance on the DiagramView object
+            '    '--------------------------------------------------------------------            
+            '    lrValueTypeInstance.DisplayAndAssociate()
+            'Next
+
+            ''-----------------------
+            ''Display the FactTypes
+            ''-----------------------
+            'Dim lrFactTypeInstance As FBM.FactTypeInstance
+            'For Each lrFactTypeInstance In arPage.FactTypeInstance
+            '    '----------------------------------------------
+            '    '  Create the new ShapeNode for the FactType.
+            '    '----------------------------------------------            
+            '    Call lrFactTypeInstance.DisplayAndAssociate(Me.ViewFactTablesToolStripMenuItem.Checked,
+            '                                                My.Settings.ShowFactTypeNamesOnORMModelLoad)
+            'Next
+
+            ''-----------------------------------
+            ''Display any Subtype Relationships
+            ''-----------------------------------        
+            'For Each lrEntityTypeInstance In arPage.EntityTypeInstance
+            '    For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
+            '        Call lrSubtypeRelationship.DisplayAndAssociate()
+            '    Next
+            'Next
+            'For Each lrValueTypeInstance In arPage.ValueTypeInstance
+            '    For Each lrSubtypeRelationship In lrValueTypeInstance.SubtypeRelationship
+            '        Call lrSubtypeRelationship.DisplayAndAssociate()
+            '    Next
+            'Next
+
+            ''--------------------------------
+            ''ExpandedReferenceScheme
+            ''--------------------------------
+            'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.ExpandReferenceMode)
+            '    Call lrEntityTypeInstance.ExpandTheReferenceScheme()
+            'Next
+
+            ''-----------------------------
+            ''Display the RoleConstraints
+            ''-----------------------------
+            ''CodeSafe
+            'Call Me.zrPage.RemoveRoleConstraintInstancesNoLongerInModel()
+
+            'Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+            'For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
+            '    '-------------------------
+            '    'Load the RoleConstraint
+            '    '-------------------------
+            '    Call lrRoleConstraintInstance.DisplayAndAssociate()
+            '    'Select Case lrRoleConstraintInstance.RoleConstraintType
+            '    '    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+            '    '        '20211122-VM-Delete if all is well. All variants use RoleConstraintInstance.DisplayAndAssociate.
+            '    '        '    'Dim lrUniquenessConstraintInstance As New tUniquenessConstraint
+            '    '        '    'lrUniquenessConstraintInstance = lrRoleConstraintInstance.CloneUniquenessConstraintInstance(lrRoleConstraintInstance.Page)
+            '    '        '    'lrUniquenessConstraintInstance.DisplayAndAssociate()
+            '    '        '    Call lrRoleConstraintInstance.DisplayAndAssociate()
+            '    '        'Case Is = pcenumRoleConstraintType.FrequencyConstraint
+            '    '        '    'Dim lrFrequencyConstraintInstance As New FBM.tFrequencyConstraint
+            '    '        '    'lrFrequencyConstraintInstance = lrRoleConstraintInstance.CloneFrequencyConstraintInstance(lrRoleConstraintInstance.Page)
+            '    '        '    'lrFrequencyConstraintInstance.DisplayAndAssociate()
+            '    '        '    Call lrRoleConstraintInstance.DisplayAndAssociate()
+            '    '        'Case Else
+            '    '        Call lrRoleConstraintInstance.DisplayAndAssociate()
+            '    'End Select
+
+            'Next
+
+            'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.Visible = True)
+            '    Call lrFactTypeInstance.AdjustBorderHeight()
+            'Next
+
+            ''------------------------
+            ''Display the ModelNotes
+            ''------------------------
+            'Dim lrModelNoteInstance As FBM.ModelNoteInstance
+            'For Each lrModelNoteInstance In Me.zrPage.ModelNoteInstance
+            '    '-------------------------
+            '    'Load the RoleConstraint
+            '    '-------------------------
+            '    Call lrModelNoteInstance.DisplayAndAssociate()
+            'Next
+
+            ''CodeSaf-User Experience
+            'Call Me.zrPage.RepellOverlappingFactTypeInstances()
+
+            ''-------------------------------------------------------------------
+            ''Load any State Transitions that relate to EntityTypes on the Page
+            ''-------------------------------------------------------------------
+            'Call Me.loadStateTransitions()
+
+            ''------------------------------------------------------------------
+            ''Set the PropertiesGrid.SeletedObject to the ORMModel.Page itself
+            ''------------------------------------------------------------------
+            'Dim lrPropertyGridForm As frmToolboxProperties
+            'lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
+
+            'If lrPropertyGridForm IsNot Nothing Then
+            '    lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
+            '    lrPropertyGridForm.PropertyGrid.SelectedObject = arPage
+            'End If
+
+            ''--------------------------------------------------------------------------
+            ''Because ShapeItems are 'selected' during this process, calling the below
+            ''  resets all the default colours for when no items are selected
+            ''--------------------------------------------------------------------------
+            'Call Me.ResetNodeAndLinkColors()
+
+
+            ''----------------------------------
+            ''Clear the selected items (if any)
+            ''----------------------------------
+            'Diagram.Selection.Clear()
+            'arPage.SelectedObject.Clear()
+            'Me.PerformCleanup()
+
+            'prApplication.ThrowMessage("frmDiagramORM.DisplayORMModelPage setting the toolbox.", pcenumErrorType.Information)
+            'Call Me.SetToolbox()
+
+            ''Me.Diagram.ResizeToFitItems(1 )
+            'Me.Diagram.Invalidate()
+            'Me.zrPage.FormLoaded = True
+
+            'prApplication.ThrowMessage("frmDiagramORM.DisplayORMModelPage, finished loading the Page", pcenumErrorType.Information)
+#End Region
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -5324,7 +5569,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5409,7 +5654,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5448,7 +5693,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             Dim lrPropertyGridForm As frmToolboxProperties
 
-            If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+            If prApplication.GetToolboxForm(frmToolboxProperties.Name) IsNot Nothing Then
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
                 Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
@@ -5462,7 +5707,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -5476,7 +5721,7 @@ Public Class frmDiagramORMForOntologyBrowser
         lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
         Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
         lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-        If IsSomething(lrPropertyGridForm) Then
+        If lrPropertyGridForm IsNot Nothing Then
             If Me.Diagram.Selection.Items.Count > 0 Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
             Else
@@ -5657,7 +5902,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -5776,7 +6021,7 @@ Public Class frmDiagramORMForOntologyBrowser
                     Dim lrORMReadingEditor As frmToolboxORMReadingEditor
                     lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                    If IsSomething(lrORMReadingEditor) Then
+                    If lrORMReadingEditor IsNot Nothing Then
 
                         '-------------------------------------------------------------------------
                         'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
@@ -5797,7 +6042,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -5965,7 +6210,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrORMReadingEditor As frmToolboxORMReadingEditor
         lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-        If IsSomething(lrORMReadingEditor) Then
+        If lrORMReadingEditor IsNot Nothing Then
             Select Case Me.zrPage.SelectedObject.Count
                 Case Is = 0
                     lrORMReadingEditor.zrFactTypeInstance = New FBM.FactTypeInstance
@@ -5995,7 +6240,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
         lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
 
-        If IsSomething(lrModelElementDescriptionsEditor) Then
+        If lrModelElementDescriptionsEditor IsNot Nothing Then
             Select Case Me.zrPage.SelectedObject.Count
                 Case Is = 0
                     Call lrModelElementDescriptionsEditor.setDescriptions(Nothing)
@@ -6020,7 +6265,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 '----------------------------------
                 'A MultiSelection has taken place
                 '----------------------------------
-                If IsSomething(Me.zrPage) Then
+                If Me.zrPage IsNot Nothing Then
                     '---------------------------------------------------------------
                     'WorkingPage exists. Sometimes, if the user 'closes' the form
                     '  the SelectionChanged gets triggered, but the WorkingPage
@@ -6169,8 +6414,12 @@ Public Class frmDiagramORMForOntologyBrowser
                     Throw New NotSupportedException("Can only sort FactTypes for EntityTypes and ValueTypes")
             End Select
 
+            Dim larLink As New List(Of DiagramLink)
+            For Each lrLink In arModelObject.Shape.IncomingLinks
+                larLink.Add(lrLink)
+            Next
 
-            For Each lo_link In arModelObject.shape.IncomingLinks
+            For Each lo_link In larLink '20230910-Was arModelObject.shape.IncomingLinks
                 If lo_link.Origin.Tag.ConceptType = pcenumConceptType.Role Then
                     '-------------------------------------------------
                     'Sort the RoleGroup of the FactType instance
@@ -6193,14 +6442,14 @@ Public Class frmDiagramORMForOntologyBrowser
 
                     'lrFactTypeReading = lrFactTypeInstance.FactType.FindSuitableFactTypeReadingByRoles(larRole)
 
-                    'If IsSomething(lrFactTypeReading) Then
+                    'If lrFactTypeReading IsNot Nothing Then
                     '    lrFactTypeReadingInstance = lrFactTypeReading.CloneInstance(lo_link.Origin.Tag.factType.Page)
                     '    lrFactTypeReadingInstance.shape = lo_link.Origin.Tag.factType.FactTypeReadingShape.shape
                     '    lo_link.Origin.Tag.FactType.FactTypeReadingShape = lrFactTypeReadingInstance
                     '    lo_link.Origin.Tag.FactType.FactTypeReadingShape.RefreshShape()
                     'Else
-                    '    If IsSomething(lrFactTypeInstance.FactTypeReadingShape) Then
-                    '        If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) Then
+                    '    If lrFactTypeInstance.FactTypeReadingShape IsNot Nothing Then
+                    '        If lrFactTypeInstance.FactTypeReadingShape.shape IsNot Nothing Then
                     '            lrFactTypeInstance.FactTypeReadingShape.shape.Text = ""
                     '        End If
                     '    End If
@@ -6214,7 +6463,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -6250,7 +6499,7 @@ Public Class frmDiagramORMForOntologyBrowser
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
 
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
 
@@ -6290,7 +6539,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6323,7 +6572,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6338,7 +6587,7 @@ Public Class frmDiagramORMForOntologyBrowser
             '------------------------------------------------------------------------------------
             For liInd = 1 To Diagram.Nodes.Count
                 If Diagram.Nodes(liInd - 1).Selected Then
-                    If IsSomething(Diagram.Nodes(liInd - 1).Tag) Then
+                    If Diagram.Nodes(liInd - 1).Tag IsNot Nothing Then
                         Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
                             Case Is = pcenumConceptType.EntityType
                                 Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
@@ -6369,7 +6618,7 @@ Public Class frmDiagramORMForOntologyBrowser
                     End If
 
                 Else 'Non-Selected Nodes.
-                    If IsSomething(Diagram.Nodes(liInd - 1).Tag) Then
+                    If Diagram.Nodes(liInd - 1).Tag IsNot Nothing Then
                         Select Case Diagram.Nodes(liInd - 1).Tag.ConceptType
                             Case Is = pcenumConceptType.EntityType
                                 Dim lrEntityTypeInstance As FBM.EntityTypeInstance
@@ -6469,7 +6718,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Next
 
             For liInd = 1 To Diagram.Links.Count
-                If IsSomething(Diagram.Links(liInd - 1).Tag) Then
+                If Diagram.Links(liInd - 1).Tag IsNot Nothing Then
                     Select Case Diagram.Links(liInd - 1).Tag.ConceptType
                         Case Is = pcenumConceptType.RoleConstraint
                             Select Case Diagram.Links(liInd - 1).Tag.RoleConstraintType
@@ -6505,7 +6754,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6514,11 +6763,11 @@ Public Class frmDiagramORMForOntologyBrowser
 
         Try
 
-            If IsSomething(arObject) Then
+            If arObject IsNot Nothing Then
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
                     Dim lrModelObject As FBM.ModelObject
                     lrModelObject = arObject
                     lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
@@ -6561,7 +6810,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -6591,20 +6840,33 @@ Public Class frmDiagramORMForOntologyBrowser
 
     Private Sub ORMDiagramView_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles DiagramView.MouseWheel
 
-        Select Case e.Delta
-            Case Is = 0
+        Try
+
+            Select Case e.Delta
+                Case Is = 0
                 'Do Nothing
-            Case Is < 0
-                If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
-                    frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
-                End If
-            Case Is > 0
-                If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count Then
-                    If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count - 1 Then
-                        frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
+                Case Is < 0
+                    If frmMain.ToolStripComboBox_zoom.SelectedIndex > 0 Then
+                        frmMain.ToolStripComboBox_zoom.SelectedIndex -= 1
                     End If
-                End If
-        End Select
+                Case Is > 0
+                    If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count Then
+                        If frmMain.ToolStripComboBox_zoom.SelectedIndex < frmMain.ToolStripComboBox_zoom.Items.Count - 1 Then
+                            frmMain.ToolStripComboBox_zoom.SelectedIndex += 1
+                        End If
+                    End If
+            End Select
+
+            Me.zrPage.DiagramView.ZoomFactor = frmMain.ToolStripComboBox_zoom.SelectedItem.ItemData
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -6618,9 +6880,9 @@ Public Class frmDiagramORMForOntologyBrowser
 
         Select Case e.KeyValue
             Case Is = (e.Control And Keys.C)
-                Call frmMain.CopySelectedObjectsToClipboard()
+                Call frmMain.CopySelectedObjectsToClipboard(Me.zrPage)
             Case Is = (e.Control And Keys.V)
-                Call frmMain.PasteToCurrentPageFromClipboard()
+                Boston.ShowFlashCard("You cannot amend Models in the Ontology Browser. Please use a Model/Page selected from the Model Explorer.", Color.LightGray, 2500, 10)
             Case Is = (e.Alt And Keys.X)
                 If Me.zrPage.AreAllSelectedObjectsRoles Then
                     lo_point = Me.zrPage.GetMidOfSelectedObjects
@@ -6648,14 +6910,12 @@ Public Class frmDiagramORMForOntologyBrowser
 
     End Sub
 
-    Public Sub AutoLayout()
+    Public Sub AutoLayoutSimple()
 
         Dim liHighestOutgoingLinkCount As Integer = 0
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
         Dim lrFactTypeInstance As FBM.FactTypeInstance
         Dim lrCentralEntityTypeInstance As New FBM.EntityTypeInstance
-        'Dim lrLink As MindFusion.Diagramming.DiagramLink
-        'Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
 
         Try
 
@@ -6663,21 +6923,145 @@ Public Class frmDiagramORMForOntologyBrowser
                 Exit Sub
             End If
 
-            'Every EntityType at least 10,10 from the corner of the screen
-            'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-            '    lrEntityTypeInstance.HasBeenMoved = False
-            '    If IsSomething(lrEntityTypeInstance.shape) Then
-            '        lrEntityTypeInstance.shape.Move(Viev.Greater(10, lrEntityTypeInstance.shape.Bounds.X), _
-            '                                        Viev.Greater(10, lrEntityTypeInstance.shape.Bounds.Y))
-            '    End If
-            'Next
+            '-----------------------------
+            'Find the central EntityType
+            '-----------------------------
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
 
-            'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-            '    lrFactTypeInstance.HasBeenMoved = False
-            '    If IsSomething(lrFactTypeInstance.Shape) Then
-            '        lrFactTypeInstance.Shape.Move(Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.X), Viev.Greater(10, lrFactTypeInstance.Shape.Bounds.Y))
-            '    End If
-            'Next
+                Dim liTotalLinkCount = lrEntityTypeInstance.Shape.IncomingLinks.Count + lrEntityTypeInstance.Shape.OutgoingLinks.Count
+
+                If liTotalLinkCount >= liHighestOutgoingLinkCount Then
+                    liHighestOutgoingLinkCount = liTotalLinkCount
+                    lrCentralEntityTypeInstance = lrEntityTypeInstance
+                    lrCentralEntityTypeInstance.HasBeenMoved = False
+                End If
+
+            Next
+
+            '---------------------------------------------------------------
+            'Put the EntityTypes with SubTypes towards the top of the page
+            '---------------------------------------------------------------
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.HasSubTypes = True And Not x.IsObjectifyingEntityType)
+
+                If lrCentralEntityTypeInstance IsNot Nothing AndAlso lrEntityTypeInstance.Id = lrCentralEntityTypeInstance.Id Then
+                    GoTo SkipEntityType
+                End If
+
+                lrEntityTypeInstance.Shape.Move(200, 85)
+                lrEntityTypeInstance.HasBeenMoved = True
+                Call lrEntityTypeInstance.AutoLayout(False, False)
+
+                Dim lrSubtypeEntityTypeInstance As FBM.EntityTypeInstance
+                Dim liInd As Integer = 30
+                Dim larSubTypes As New List(Of FBM.EntityTypeInstance)
+
+                larSubTypes = lrEntityTypeInstance.GetSubTypes
+                larSubTypes.Sort(AddressOf FBM.EntityTypeInstance.CompareTotalLinks)
+                For Each lrSubtypeEntityTypeInstance In larSubTypes
+                    lrSubtypeEntityTypeInstance.Shape.Move(liInd, 120)
+                    Call lrSubtypeEntityTypeInstance.AutoLayout(True, False)
+                    If lrCentralEntityTypeInstance IsNot Nothing AndAlso lrEntityTypeInstance.Id <> lrCentralEntityTypeInstance.Id Then
+                        lrSubtypeEntityTypeInstance.HasBeenMoved = True
+                    End If
+                    liInd += 50
+                Next
+SkipEntityType:
+            Next
+
+            Dim liX As Integer = Math.Max(Viev.Lesser(150, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 3), 150)
+            Dim liY As Integer = Math.Max(Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 3), 100)
+
+            Dim liDegrees As Integer = 320
+
+            If lrCentralEntityTypeInstance IsNot Nothing AndAlso lrCentralEntityTypeInstance.Shape IsNot Nothing Then
+                If lrCentralEntityTypeInstance.HasBeenMoved Then
+                    '--------------------
+                    'Moved as a SubType
+                    '--------------------
+                Else
+                    lrCentralEntityTypeInstance.Shape.Move(liX, liY)
+                    lrCentralEntityTypeInstance.HasBeenMoved = True
+                End If
+
+                If lrCentralEntityTypeInstance.HasSubTypes Then
+                    liDegrees = 270
+                End If
+            End If
+
+            For Each lrFactTypeInstance In Me.zrPage.GetModelElementsJoinedFactTypes(lrCentralEntityTypeInstance)
+
+                Dim lrRoleInstance As FBM.RoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrCentralEntityTypeInstance.Id)
+
+                liX = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 40)
+                liY = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 40)
+                If lrFactTypeInstance.Shape IsNot Nothing Then
+                    lrFactTypeInstance.Shape.Move(liX, liY)
+                End If
+
+                lrFactTypeInstance.HasBeenMoved = True
+
+                If lrFactTypeInstance.IsBinaryFactType And Not lrFactTypeInstance.FactType.IsSubtypeRelationshipFactType Then
+                    Dim lrObject As Object
+                    lrObject = lrFactTypeInstance.GetOtherRoleOfBinaryFactType(lrRoleInstance.Id).JoinedORMObject
+                    liX = Viev.Greater(40, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 65)
+                    liY = Viev.Greater(40, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 65)
+                    If Not lrObject.HasBeenMoved Then
+                        lrObject.Shape.Move(liX, liY)
+                    End If
+                    lrObject.HasBeenMoved = True
+
+                    If (lrObject.ConceptType = pcenumConceptType.EntityType) Then
+
+                        Dim lrChildEntityTypeInstance As FBM.EntityTypeInstance
+                        lrChildEntityTypeInstance = lrObject
+
+                        Call lrChildEntityTypeInstance.AutoLayout(False, False)
+
+                    End If
+
+                End If
+
+                liDegrees += 21
+
+            Next
+
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                lrFactTypeInstance.SortRoleGroup()
+                lrFactTypeInstance.HasBeenMoved = False
+            Next
+
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                Call lrFactTypeInstance.BringStrandedJoinedObjectsCloser()
+                Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
+                Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(5, False)
+                lrFactTypeInstance.AdjustBorderHeight()
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+
+    End Sub
+
+
+    Public Sub AutoLayout()
+
+        Dim liHighestOutgoingLinkCount As Integer = 0
+        Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+        Dim lrFactTypeInstance As FBM.FactTypeInstance
+        Dim lrCentralEntityTypeInstance As New FBM.EntityTypeInstance
+
+        Try
+
+            If Me.zrPage.EntityTypeInstance.Count = 0 Then
+                Exit Sub
+            End If
 
             '---------------------------------------------------------------
             'Put the EntityTypes with SubTypes towards the top of the page
@@ -6715,33 +7099,29 @@ Public Class frmDiagramORMForOntologyBrowser
 
             Next
 
-            Dim liX As Integer = Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 3)
-            Dim liY As Integer = Viev.Lesser(100, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 3)
+            Dim liX As Integer = Viev.Lesser(150, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).X / 3)
+            Dim liY As Integer = Viev.Lesser(150, DiagramView.ClientToDoc(New Point(Me.Width, Me.Height)).Y / 3)
 
-            If lrCentralEntityTypeInstance.HasBeenMoved Then
-                '--------------------
-                'Moved as a SubType
-                '--------------------
-            Else
-                lrCentralEntityTypeInstance.Shape.Move(liX, liY)
-                lrCentralEntityTypeInstance.HasBeenMoved = True
+            Dim liDegrees As Integer = 320
+
+            If lrCentralEntityTypeInstance IsNot Nothing AndAlso lrCentralEntityTypeInstance.Shape IsNot Nothing Then
+                If lrCentralEntityTypeInstance.HasBeenMoved Then
+                    '--------------------
+                    'Moved as a SubType
+                    '--------------------
+                Else
+                    lrCentralEntityTypeInstance.Shape.Move(liX, liY)
+                    lrCentralEntityTypeInstance.HasBeenMoved = True
+                End If
+
+                If lrCentralEntityTypeInstance.HasSubTypes Then
+                    liDegrees = 270
+                End If
             End If
-
-            Dim liDegrees As Integer
-            If lrCentralEntityTypeInstance.HasSubTypes Then
-                liDegrees = 270
-            Else
-                liDegrees = 320
-            End If
-
-            'For Each lrLink In lrCentralEntityTypeInstance.Shape.IncomingLinks
-            'If lrLink.Tag.ConceptType = pcenumConceptType.Role Then
 
             For Each lrFactTypeInstance In Me.zrPage.GetModelElementsJoinedFactTypes(lrCentralEntityTypeInstance)
 
                 Dim lrRoleInstance As FBM.RoleInstance = lrFactTypeInstance.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lrCentralEntityTypeInstance.Id)
-                'lrRoleInstance = lrLink.Tag
-                'lrFactTypeInstance = lrRoleInstance.FactType
 
                 liX = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.X + Math.Cos(liDegrees * (Math.PI / 180)) * 40)
                 liY = Viev.Greater(10, lrCentralEntityTypeInstance.Shape.Bounds.Y + Math.Sin(liDegrees * (Math.PI / 180)) * 40)
@@ -6772,18 +7152,9 @@ Public Class frmDiagramORMForOntologyBrowser
 
                 End If
 
-
                 liDegrees += 21
 
             Next
-
-            'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
-            '    If lrEntityTypeInstance.HasBeenMoved Then
-            '    Else
-            '        lrEntityTypeInstance.Shape.Move(50, 50)
-            '        Call lrEntityTypeInstance.AutoLayout(False, False)
-            '    End If
-            'Next
 
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 lrFactTypeInstance.SortRoleGroup()
@@ -6794,80 +7165,10 @@ Public Class frmDiagramORMForOntologyBrowser
                 Call lrFactTypeInstance.BringStrandedJoinedObjectsCloser()
             Next
 
-            'Dim lrValueTypeInstance As FBM.ValueTypeInstance
-            'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.IsObjectified)
-            '    For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-            '        Select Case lrRoleInstance.JoinedORMObject.ConceptType
-            '            Case Is = pcenumConceptType.ValueType
-            '                lrValueTypeInstance = lrRoleInstance.JoinedORMObject
-            '                lrValueTypeInstance.X = lrRoleInstance.X
-            '                lrValueTypeInstance.Y = lrRoleInstance.Y + (20 * (lrValueTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
-            '                lrValueTypeInstance.RepellNeighbouringPageObjects(15)
-            '            Case Is = pcenumConceptType.EntityType
-            '                lrEntityTypeInstance = lrRoleInstance.JoinedORMObject
-            '                lrEntityTypeInstance.X = lrRoleInstance.X
-            '                lrEntityTypeInstance.Y = lrRoleInstance.Y + (20 * (lrEntityTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
-            '                lrEntityTypeInstance.RepellNeighbouringPageObjects(15)
-            '            Case Is = pcenumConceptType.FactType
-            '                lrFactTypeInstance = lrRoleInstance.JoinedORMObject
-            '                lrFactTypeInstance.X = lrRoleInstance.X
-            '                lrFactTypeInstance.Y = lrRoleInstance.Y + (20 * (lrFactTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
-            '                Call lrFactTypeInstance.RepellNeighbouringPageObjects(15)
-            '        End Select
-            '    Next
-            'Next
-
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
                 lrEntityTypeInstance.RepellNeighbouringPageObjects(1)
             Next
 
-            'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-            '    Call lrEntityTypeInstance.SetAdjoinedFactTypesBetweenModelElements()
-            'Next
-
-            'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance.FindAll(Function(x) x.IsObjectified)
-            '    For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-
-            '        Select Case lrRoleInstance.JoinedORMObject.ConceptType
-            '            Case Is = pcenumConceptType.ValueType
-            '                lrValueTypeInstance = lrRoleInstance.JoinedORMObject
-            '                lrValueTypeInstance.X = lrRoleInstance.X
-            '                lrValueTypeInstance.Y = lrRoleInstance.Y + (20 * (lrValueTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
-            '                lrValueTypeInstance.RepellNeighbouringPageObjects(25)
-            '            Case Is = pcenumConceptType.EntityType
-            '                lrEntityTypeInstance = lrRoleInstance.JoinedORMObject
-            '                lrEntityTypeInstance.X = lrRoleInstance.X
-            '                lrEntityTypeInstance.Y = lrRoleInstance.Y + (20 * (lrEntityTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
-            '                lrEntityTypeInstance.RepellNeighbouringPageObjects(25)
-            '            Case Is = pcenumConceptType.FactType
-            '                lrFactTypeInstance = lrRoleInstance.JoinedORMObject
-            '                lrFactTypeInstance.X = lrRoleInstance.X
-            '                lrFactTypeInstance.Y = lrRoleInstance.Y + (20 * (lrFactTypeInstance.Y.CompareTo(lrRoleInstance.Y)))
-            '                Call lrFactTypeInstance.RepellNeighbouringPageObjects(50)
-            '        End Select
-            '    Next
-            'Next
-
-            'For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance.FindAll(Function(x) x.RoleConstraintType <> pcenumRoleConstraintType.InternalUniquenessConstraint)
-
-            '    Dim larRoleInstance As New List(Of FBM.RoleInstance)
-            '    Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-            '    Dim lrPointF As PointF
-
-            '    For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-            '        larRoleInstance.Add(lrRoleConstraintRoleInstance.Role)
-            '    Next
-            '    lrPointF = Me.zrPage.GetMidOfRoleInstances(larRoleInstance)
-            '    lrRoleConstraintInstance.Shape.Move(lrPointF.X, lrPointF.Y)
-            'Next
-
-            'For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
-            '    lrEntityTypeInstance.HasBeenMoved = False
-            'Next
-
-            'For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-            '    Call lrFactTypeInstance.RepellNeighbouringPageObjects(1)
-            'Next
 
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 Call lrFactTypeInstance.SetSuitableFactTypeReading()
@@ -6896,8 +7197,12 @@ Public Class frmDiagramORMForOntologyBrowser
 
             Call Me.ResetNodeAndLinkColors()
 
-            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing)
+            For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance.FindAll(Function(x) x.Shape IsNot Nothing AndAlso lrCentralEntityTypeInstance IsNot Nothing AndAlso Not x Is lrCentralEntityTypeInstance)
                 lrEntityTypeInstance.Shape.Move(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
+            Next
+
+            For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
+                Call lrFactTypeInstance.AdjustBorderHeight(True)
             Next
 
 
@@ -6911,7 +7216,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6930,7 +7235,7 @@ Public Class frmDiagramORMForOntologyBrowser
             prApplication.AddUndoAction(lrUserAction)
         Next
 
-        Call Me.AutoLayout()
+        Call Me.AutoLayoutSimple()
 
     End Sub
 
@@ -7110,7 +7415,7 @@ Public Class frmDiagramORMForOntologyBrowser
         prApplication.WorkingModel = Me.zrPage.Model
         prApplication.WorkingPage = Me.zrPage
 
-        Call frmMain.loadToolboxORMVerbalisationForm(Me.zrPage.Model, Me.DockPanel.ActivePane)
+        Call frmMain.loadToolboxORMVerbalisationForm(Nothing, Nothing)
 
     End Sub
 
@@ -7162,7 +7467,7 @@ Public Class frmDiagramORMForOntologyBrowser
         ''-------------------------------------------------------
         'lo_point = Diagram.PixelToUnit(e.Location)
 
-        'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        'If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
         '----------------------------------------------
         'Mouse is over a ShapeNode
         '----------------------------------------------
@@ -7236,7 +7541,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
 
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
 
                 Call Directory.SetCurrentDirectory(Boston.MyPath)
                 loShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.ORMShapeLibrary)
@@ -7286,7 +7591,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -7423,7 +7728,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
         Me.HiddenDiagram.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
 
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
@@ -7435,6 +7740,7 @@ Public Class frmDiagramORMForOntologyBrowser
             '------------------------------------------------------------------
             Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
             lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
 
             Dim larEntityTypeInstance = From EntityTypeInstance In lrPage.EntityTypeInstance
                                         Where EntityTypeInstance.Id = lrEntityTypeInstance.Id
@@ -7507,7 +7813,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
         Me.HiddenDiagram.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
             lrEnterpriseView = item.Tag
             prApplication.WorkingPage = lrEnterpriseView.Tag
@@ -7515,12 +7821,14 @@ Public Class frmDiagramORMForOntologyBrowser
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Actor/EntityType being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
-            lr_page = lrEnterpriseView.Tag
-            Dim lrValueTypeInstanceList = From ValueTypeInstance In lr_page.ValueTypeInstance
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
+
+            Dim lrValueTypeInstanceList = From ValueTypeInstance In lrPage.ValueTypeInstance
                                           Where ValueTypeInstance.Id = lrValueTypeInstance.Id
-                                          Select New FBM.ValueTypeInstance(lr_page.Model,
-                                                                    lr_page,
+                                          Select New FBM.ValueTypeInstance(lrPage.Model,
+                                                                    lrPage,
                                                                     pcenumLanguage.ORMModel,
                                                                     lrValueTypeInstance.Name,
                                                                     True,
@@ -7574,7 +7882,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
             Me.HiddenDiagram.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
                 lrEnterpriseView = item.Tag 'Set when the ContextMenu.Opening event is triggered.            
                 Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
@@ -7585,6 +7893,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 '------------------------------------------------------------------
                 Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
                 lrPage = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
 
                 Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
                 If lrPage.DiagramView IsNot Nothing Then
@@ -7699,7 +8008,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -7732,7 +8041,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
         Me.HiddenDiagram.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
             lrEnterpriseView = item.Tag
             prApplication.WorkingPage = lrEnterpriseView.Tag
@@ -7740,12 +8049,14 @@ Public Class frmDiagramORMForOntologyBrowser
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Actor/EntityType being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lrEnterpriseView.Tag.Model)
-            lr_page = lrEnterpriseView.Tag
-            Dim lrFactTypeInstanceList = From FactTypeInstance In lr_page.FactTypeInstance
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
+
+            Dim lrFactTypeInstanceList = From FactTypeInstance In lrPage.FactTypeInstance
                                          Where FactTypeInstance.Id = lrFactTypeInstance.Id
-                                         Select New FBM.FactTypeInstance(lr_page.Model,
-                                                                    lr_page,
+                                         Select New FBM.FactTypeInstance(lrPage.Model,
+                                                                    lrPage,
                                                                     pcenumLanguage.ORMModel,
                                                                     lrFactTypeInstance.Name,
                                                                     True,
@@ -7799,7 +8110,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
             Me.HiddenDiagram.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
                 lrEnterpriseView = item.Tag 'Set when the ContextMenu.Opening event is triggered.            
                 Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
@@ -7807,8 +8118,9 @@ Public Class frmDiagramORMForOntologyBrowser
 
                 Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
                 lrPage = lrEnterpriseView.Tag
-                Dim lrNode As PGS.Node
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
 
+                Dim lrNode As PGS.Node
                 '-------------------------------------------------------------------------------------
                 'Populate the MorphVector with each relevant ModelObjectInstance on the current Page
                 '  that is also on the destination Page.
@@ -7870,11 +8182,11 @@ Public Class frmDiagramORMForOntologyBrowser
                     Exit For
                 Next
 
-                If lrFactDataInstance.shape IsNot Nothing Then
+                If lrFactDataInstance.Shape IsNot Nothing Then
                     Me.MorphVector(0).EndSize = New Rectangle(lrFactDataInstance.X,
                                                               lrFactDataInstance.Y,
-                                                              lrFactDataInstance.shape.Bounds.Width,
-                                                              lrFactDataInstance.shape.Bounds.Height)
+                                                              lrFactDataInstance.Shape.Bounds.Width,
+                                                              lrFactDataInstance.Shape.Bounds.Height)
                 Else
                     Me.MorphVector(0).EndSize = New Rectangle(0, 0, 20, 10)
                 End If
@@ -7947,7 +8259,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.HiddenDiagramView.SendToBack()
             Me.CircularProgressBar.SendToBack()
@@ -7982,7 +8294,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Me.HiddenDiagram.Nodes.Add(Me.MorphVector(0).Shape)
             Me.HiddenDiagram.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
                 lrEnterpriseView = item.Tag 'Set when the ContextMenu.Opening event is triggered.            
                 Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
@@ -7993,6 +8305,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 '------------------------------------------------------------------
                 Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
                 lrPage = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
 
                 Me.MorphVector(0).InitialZoomFactor = Me.DiagramView.ZoomFactor
                 If lrPage.DiagramView IsNot Nothing Then
@@ -8034,7 +8347,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8101,7 +8414,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -8115,6 +8428,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrValueType As New FBM.ValueType
         Dim lrValueTypeInstance As New FBM.ValueTypeInstance
         Dim lo_menu_option As ToolStripItem
+        Dim lsMessage As String
 
         Try
             If Me.zrPage.SelectedObject.Count = 0 Then
@@ -8164,7 +8478,8 @@ Public Class frmDiagramORMForOntologyBrowser
             'Load the ORMDiagrams that relate to the ValueType
             '  as selectable menuOptions
             '--------------------------------------------------------        
-            larPage_list = prApplication.CMML.get_orm_diagram_pages_for_value_type(lrValueType)
+#Region "ORM Diagram Pages"
+            larPage_list = prApplication.CMML.getORMDiagramPagesForValueType(lrValueType)
 
             For Each lr_page In larPage_list
                 '----------------------------------------------------------
@@ -8181,7 +8496,7 @@ Public Class frmDiagramORMForOntologyBrowser
                                                            Nothing,
                                                            lr_page.PageId)
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -8191,12 +8506,14 @@ Public Class frmDiagramORMForOntologyBrowser
                     AddHandler lo_menu_option.Click, AddressOf Me.MorphToORMDiagramValueType
                 End If
             Next
+#End Region
 
             '--------------------------------------------------------
-            'Load the ORMDiagrams that relate to the ValueType
+            'Load the State Transition Diagrams that relate to the ValueType
             '  as selectable menuOptions
             '--------------------------------------------------------        
-            larPage_list = prApplication.CMML.getSTDDiagramPagesForValueType(lrValueType)
+#Region "State Transition Diagrams"
+            larPage_list = prApplication.CMML.getStateTransitionDiagramPagesForValueType(lrValueType)
 
             For Each lr_page In larPage_list
                 '----------------------------------------------------------
@@ -8213,24 +8530,24 @@ Public Class frmDiagramORMForOntologyBrowser
                                                            Nothing,
                                                            lr_page.PageId)
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
                     'lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lr_page.Name)
                     lo_menu_option = Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Add(lr_page.Name)
                     lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                    AddHandler lo_menu_option.Click, AddressOf Me.MorphToSTDiagram
+                    AddHandler lo_menu_option.Click, AddressOf Me.morphToSTDiagram
                 End If
             Next
+#End Region
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8249,7 +8566,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -8261,167 +8578,188 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrFactType As New FBM.FactType
         Dim lrFactTypeInstance As New FBM.FactTypeInstance
         Dim lo_menu_option As ToolStripItem
+        Dim lsMessage As String = Nothing
+
+        Try
+            Me.ContextMenuStrip_FactType.ImageScalingSize = New Drawing.Size(16, 16)
 
 
-        Me.ContextMenuStrip_FactType.ImageScalingSize = New Drawing.Size(16, 16)
+            If Me.zrPage.SelectedObject.Count = 0 Then
+                Exit Sub
+            End If
 
+            Dim lrModelObject As FBM.ModelObject = Me.zrPage.SelectedObject(0)
 
-        If Me.zrPage.SelectedObject.Count = 0 Then
-            Exit Sub
-        End If
+            Select Case lrModelObject.ConceptType
+                Case Is = pcenumConceptType.Role
+                    Dim lrRoleInstance As FBM.RoleInstance
+                    lrRoleInstance = Me.zrPage.SelectedObject(0)
+                    lrFactTypeInstance = lrRoleInstance.FactType
+                Case Is = pcenumConceptType.FactType
+                    lrFactTypeInstance = Me.zrPage.SelectedObject(0)
+            End Select
 
-        Dim lrModelObject As FBM.ModelObject = Me.zrPage.SelectedObject(0)
+            lrFactType = lrFactTypeInstance.FactType
+            lr_model = lrFactType.Model
 
-        Select Case lrModelObject.ConceptType
-            Case Is = pcenumConceptType.Role
-                Dim lrRoleInstance As FBM.RoleInstance
-                lrRoleInstance = Me.zrPage.SelectedObject(0)
-                lrFactTypeInstance = lrRoleInstance.FactType
-            Case Is = pcenumConceptType.FactType
-                lrFactTypeInstance = Me.zrPage.SelectedObject(0)
-        End Select
+            '----------------------------------------------------------------------------------------------
+            'If the FactType is a LinkFactType then the user can't remove the FactType from the Model,
+            '  except by chaning the FactType to being one that is not Objectified.
+            '----------------------------------------------------------------------------------------------
+            'Me.ToolStripMenuItemFactTypeRemoveFromPageModel.Enabled = Not lrFactType.IsLinkFactType
 
-        lrFactType = lrFactTypeInstance.FactType
-        lr_model = lrFactType.Model
+            '--------------------------------------------------------------------
+            'ModelErrors - Add menu items for the ModelErrors for the FactType
+            '--------------------------------------------------------------------
+            Me.ToolStripMenuItemFactTypeModelErrors.DropDownItems.Clear()
+            Dim lrModelError As FBM.ModelError
+            If lrFactType.ModelError.Count > 0 Then
+                Me.ToolStripMenuItemFactTypeModelErrors.Image = My.Resources.MenuImages.RainCloudRed16x16
+                For Each lrModelError In lrFactType.ModelError
+                    lo_menu_option = Me.ToolStripMenuItemFactTypeModelErrors.DropDownItems.Add(lrModelError.Description)
+                    lo_menu_option.Image = My.Resources.MenuImages.RainCloudRed16x16
+                Next
+            Else
+                Me.ToolStripMenuItemFactTypeModelErrors.Image = My.Resources.MenuImages.Cloud216x16
+                lo_menu_option = Me.ToolStripMenuItemFactTypeModelErrors.DropDownItems.Add("There are no Model Errors for this Fact Type.")
+                lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
+            End If
 
-        '----------------------------------------------------------------------------------------------
-        'If the FactType is a LinkFactType then the user can't remove the FactType from the Model,
-        '  except by chaning the FactType to being one that is not Objectified.
-        '----------------------------------------------------------------------------------------------
-        'Me.ToolStripMenuItemFactTypeRemoveFromPageModel.Enabled = Not lrFactType.IsLinkFactType
+            ToolStripMenuItemViewFactTable.Checked = lrFactTypeInstance.FactTable.TableShape.Visible
 
-        '--------------------------------------------------------------------
-        'ModelErrors - Add menu items for the ModelErrors for the FactType
-        '--------------------------------------------------------------------
-        Me.ToolStripMenuItemFactTypeModelErrors.DropDownItems.Clear()
-        Dim lrModelError As FBM.ModelError
-        If lrFactType.ModelError.Count > 0 Then
-            Me.ToolStripMenuItemFactTypeModelErrors.Image = My.Resources.MenuImages.RainCloudRed16x16
-            For Each lrModelError In lrFactType.ModelError
-                lo_menu_option = Me.ToolStripMenuItemFactTypeModelErrors.DropDownItems.Add(lrModelError.Description)
-                lo_menu_option.Image = My.Resources.MenuImages.RainCloudRed16x16
+            '---------------------------------------------------------------------------------------------
+            'Set the initial MorphVector for the selected FactType. Morphing the FactType to another 
+            '  shape, and to/into another diagram starts at the MorphVector.
+            '---------------------------------------------------------------------------------------------
+            Me.MorphVector.Clear()
+            Me.MorphVector.Add(New tMorphVector(lrFactTypeInstance.X, lrFactTypeInstance.Y, 0, 0, 40))
+
+            '--------------------------------------------------------------
+            'Clear the list of diagrams that may relate to the FactType
+            '--------------------------------------------------------------
+            Me.ORMFromFactTypeToolStripMenuItem.DropDownItems.Clear()
+            Me.ERDiagramFromFactTypeToolStripMenuItem.DropDownItems.Clear()
+            Me.PGSDiagramToolStripMenuItem.DropDownItems.Clear()
+
+            '==================================================================================
+            'All Pages must be loaded for Morphing.
+            If Not Me.zrPage.Model.AllPagesLoaded Then
+                lsMessage = "You'll need to bring the other Pages into memory to do morphing."
+                lsMessage.AppendDoubleLineBreak("Would you like the unloaded Pages now?")
+                lsMessage.AppendDoubleLineBreak("You can still open Pages for editing from the Model Explorer.")
+                If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                    Call Me.zrPage.Model.LoadUnloadedPagesFromConceptInstances()
+                Else
+                    Exit Sub
+                End If
+            End If
+
+            '--------------------------------------------------------
+            'Load the ORMDiagrams that relate to the FactType
+            '  as selectable menuOptions
+            '--------------------------------------------------------        
+            larPage_list = prApplication.CMML.getORMDiagramPagesForFactType(lrFactType)
+
+            For Each lr_page In larPage_list
+                '----------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is now added for those hidden Pages.
+                '----------------------------------------------------------
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lr_page.PageId)
+
+                If lrEnterpriseView IsNot Nothing Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    lo_menu_option = Me.ORMFromFactTypeToolStripMenuItem.DropDownItems.Add(lr_page.Name)
+                    lo_menu_option.Tag = lrEnterpriseView
+                    AddHandler lo_menu_option.Click, AddressOf Me.MorphToORMDiagramFactType
+                End If
             Next
-        Else
-            Me.ToolStripMenuItemFactTypeModelErrors.Image = My.Resources.MenuImages.Cloud216x16
-            lo_menu_option = Me.ToolStripMenuItemFactTypeModelErrors.DropDownItems.Add("There are no Model Errors for this Fact Type.")
-            lo_menu_option.Image = My.Resources.MenuImages.Cloud216x16
-        End If
 
-        ToolStripMenuItemViewFactTable.Checked = lrFactTypeInstance.FactTable.TableShape.Visible
+            '--------------------------------------------------------
+            'Load the ER Diagrams that relate to the FactType
+            '  as selectable menuOptions
+            '--------------------------------------------------------        
+            larPage_list = prApplication.CMML.getERDiagramPagesForModelElementName(lrFactType.Model, lrFactType.Id)
 
-        '---------------------------------------------------------------------------------------------
-        'Set the initial MorphVector for the selected FactType. Morphing the FactType to another 
-        '  shape, and to/into another diagram starts at the MorphVector.
-        '---------------------------------------------------------------------------------------------
-        Me.MorphVector.Clear()
-        Me.MorphVector.Add(New tMorphVector(lrFactTypeInstance.X, lrFactTypeInstance.Y, 0, 0, 40))
+            For Each lr_page In larPage_list
+                '----------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
+                '  is now added for those hidden Pages.
+                '----------------------------------------------------------
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-        '--------------------------------------------------------------
-        'Clear the list of diagrams that may relate to the FactType
-        '--------------------------------------------------------------
-        Me.ORMFromFactTypeToolStripMenuItem.DropDownItems.Clear()
-        Me.ERDiagramFromFactTypeToolStripMenuItem.DropDownItems.Clear()
-        Me.PGSDiagramToolStripMenuItem.DropDownItems.Clear()
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lr_page.PageId)
 
-        '--------------------------------------------------------
-        'Load the ORMDiagrams that relate to the FactType
-        '  as selectable menuOptions
-        '--------------------------------------------------------        
-        larPage_list = prApplication.CMML.get_orm_diagram_pages_for_FactType(lrFactType)
-
-        For Each lr_page In larPage_list
-            '----------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-            '  is now added for those hidden Pages.
-            '----------------------------------------------------------
-            Dim lrEnterpriseView As tEnterpriseEnterpriseView
-
-            lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lr_page.PageId)
-
-            If IsSomething(lrEnterpriseView) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                lo_menu_option = Me.ORMFromFactTypeToolStripMenuItem.DropDownItems.Add(lr_page.Name)
-                lo_menu_option.Tag = lrEnterpriseView
-                AddHandler lo_menu_option.Click, AddressOf Me.MorphToORMDiagramFactType
+                If lrEnterpriseView IsNot Nothing Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    lo_menu_option = Me.ERDiagramFromFactTypeToolStripMenuItem.DropDownItems.Add(lr_page.Name)
+                    lo_menu_option.Tag = lrEnterpriseView
+                    AddHandler lo_menu_option.Click, AddressOf Me.morphToERDiagram
+                End If
+            Next
+            If larPage_list.Count = 0 Then
+                '----------------------------------------------------------------------------------
+                'Provide and option for the User to create a PGS Page for the current Page.
+                lsMessage = "Create an Entity Relationship Diagram for this current Page. No ERD Page currently exists for the model element you have selected."
+                lo_menu_option = Me.ERDiagramFromFactTypeToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ERD16x16)
+                lo_menu_option.Tag = True
+                AddHandler lo_menu_option.Click, AddressOf Me.createEntityRelationshipDiagramPageForCurrentPage
             End If
-        Next
+            '==================================================================================================
 
-        '--------------------------------------------------------
-        'Load the ER Diagrams that relate to the FactType
-        '  as selectable menuOptions
-        '--------------------------------------------------------        
-        larPage_list = prApplication.CMML.getERDiagramPagesForModelElementName(lrFactType.Model, lrFactType.Id)
+            '==================================================================================================
+            'Load the Property Graph Schema Diagrams that relate to the EntityType, as selectable menuOptions
+            '--------------------------------------------------------        
+            larPage_list = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrFactType.Model, lrFactType.Id)
 
-        For Each lr_page In larPage_list
-            '----------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, they will not be in the TreeView and so a menuOption
-            '  is now added for those hidden Pages.
-            '----------------------------------------------------------
-            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            For Each lrPage In larPage_list
+                '----------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, 
+                '  they will not be in the TreeView and so a menuOption
+                '  is now added for those hidden Pages.
+                '----------------------------------------------------------
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-            lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lr_page.PageId)
+                lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId) ' AddressOf lrEnterpriseView.Equals)
 
-            If IsSomething(lrEnterpriseView) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                lo_menu_option = Me.ERDiagramFromFactTypeToolStripMenuItem.DropDownItems.Add(lr_page.Name)
-                lo_menu_option.Tag = lrEnterpriseView
-                AddHandler lo_menu_option.Click, AddressOf Me.morphToERDiagram
+                If lrEnterpriseView IsNot Nothing Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    lo_menu_option = Me.PGSDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
+                    lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler lo_menu_option.Click, AddressOf Me.morphToPGSDiagram
+                End If
+
+                Me.ERDiagramToolStripMenu.Enabled = True
+            Next
+
+            If larPage_list.Count = 0 Then
+                '----------------------------------------------------------------------------------
+                'Provide and option for the User to create a PGS Page for the current Page.
+                lsMessage = "Create an Property Graph Schema for this current Page. No PGS Page currently exists for the model element you have selected."
+                lo_menu_option = Me.PGSDiagramToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ERD16x16)
+                lo_menu_option.Tag = True
+                AddHandler lo_menu_option.Click, AddressOf Me.createPropertyGraphSchemaPageFromCurrentPage
             End If
-        Next
-        If larPage_list.Count = 0 Then
-            '----------------------------------------------------------------------------------
-            'Provide and option for the User to create a PGS Page for the current Page.
-            Dim lsMessage As String = "Create an Entity Relationship Diagram for this current Page. No ERD Page currently exists for the model element you have selected."
-            lo_menu_option = Me.ERDiagramFromFactTypeToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ERD16x16)
-            lo_menu_option.Tag = True
-            AddHandler lo_menu_option.Click, AddressOf Me.createEntityRelationshipDiagramPageForCurrentPage
-        End If
-        '==================================================================================================
+            '======================================================================================
 
-        '==================================================================================================
-        'Load the Property Graph Schema Diagrams that relate to the EntityType, as selectable menuOptions
-        '--------------------------------------------------------        
-        larPage_list = prApplication.CMML.getPGSDiagramPagesForModelElementName(lrFactType.Model, lrFactType.Id)
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        For Each lrPage In larPage_list
-            '----------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, 
-            '  they will not be in the TreeView and so a menuOption
-            '  is now added for those hidden Pages.
-            '----------------------------------------------------------
-            Dim lrEnterpriseView As tEnterpriseEnterpriseView
-
-            lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId) ' AddressOf lrEnterpriseView.Equals)
-
-            If IsSomething(lrEnterpriseView) Then
-                '---------------------------------------------------
-                'Add the Page(Name) to the MenuOption.DropDownItems
-                '---------------------------------------------------
-                lo_menu_option = Me.PGSDiagramToolStripMenuItem.DropDownItems.Add(lrPage.Name, My.Resources.MenuImages.PGS16x16)
-                lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
-                AddHandler lo_menu_option.Click, AddressOf Me.morphToPGSDiagram
-            End If
-
-            Me.ERDiagramToolStripMenu.Enabled = True
-        Next
-
-        If larPage_list.Count = 0 Then
-            '----------------------------------------------------------------------------------
-            'Provide and option for the User to create a PGS Page for the current Page.
-            Dim lsMessage As String = "Create an Property Graph Schema for this current Page. No PGS Page currently exists for the model element you have selected."
-            lo_menu_option = Me.PGSDiagramToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ERD16x16)
-            lo_menu_option.Tag = True
-            AddHandler lo_menu_option.Click, AddressOf Me.createPropertyGraphSchemaPageFromCurrentPage
-        End If
-        '======================================================================================
-
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -8444,7 +8782,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8474,7 +8812,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8492,8 +8830,8 @@ Public Class frmDiagramORMForOntologyBrowser
 
     Private Sub Diagram_ValidateAnchorPoint(ByVal sender As Object, ByVal e As MindFusion.Diagramming.LinkValidationEventArgs) Handles Diagram.ValidateAnchorPoint
 
-        If IsSomething(e.Link) Then
-            If IsSomething(e.Link.Tag) Then
+        If e.Link IsNot Nothing Then
+            If e.Link.Tag IsNot Nothing Then
                 Select Case e.Link.Tag.ConceptType
                     Case Is = pcenumConceptType.Role
                         If e.ChangingOrigin Then
@@ -8536,7 +8874,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
         Dim lrPropertyGridForm As frmToolboxProperties
 
-        If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+        If prApplication.GetToolboxForm(frmToolboxProperties.Name) IsNot Nothing Then
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
             If Me.Diagram.Selection.Items.Count > 0 Then
@@ -8558,7 +8896,7 @@ Public Class frmDiagramORMForOntologyBrowser
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = Me.zrPage.SelectedObject(0)
             End If
 
@@ -8566,7 +8904,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Dim lsMessage As String
             lsMessage = "Error: frmDiagramORM.ToolStripMenuItem10_Click"
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8581,7 +8919,7 @@ Public Class frmDiagramORMForOntologyBrowser
         If ToolStripMenuItemSubtypeRelationships.Checked Then
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
                 For Each lrSubtypeInstance In lrEntityTypeInstance.SubtypeRelationship
-                    If IsSomething(lrSubtypeInstance.Link) Then
+                    If lrSubtypeInstance.Link IsNot Nothing Then
                         lrSubtypeInstance.Link.Visible = True
                     End If
                 Next
@@ -8589,7 +8927,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Else
             For Each lrEntityTypeInstance In Me.zrPage.EntityTypeInstance
                 For Each lrSubtypeInstance In lrEntityTypeInstance.SubtypeRelationship
-                    If IsSomething(lrSubtypeInstance.Link) Then
+                    If lrSubtypeInstance.Link IsNot Nothing Then
                         lrSubtypeInstance.Link.Visible = False
                     End If
                 Next
@@ -8607,24 +8945,24 @@ Public Class frmDiagramORMForOntologyBrowser
 
         If ToolStripMenuItemRoleConstraints.Checked Then
             For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
-                If IsSomething(lrRoleConstraintInstance.Shape) Then
+                If lrRoleConstraintInstance.Shape IsNot Nothing Then
                     lrRoleConstraintInstance.Shape.Visible = True
                 End If
 
                 For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                    If IsSomething(lrRoleConstraintRoleInstance.Link) Then
+                    If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
                         lrRoleConstraintRoleInstance.Link.Visible = True
                     End If
                 Next
             Next
         Else
             For Each lrRoleConstraintInstance In Me.zrPage.RoleConstraintInstance
-                If IsSomething(lrRoleConstraintInstance.Shape) Then
+                If lrRoleConstraintInstance.Shape IsNot Nothing Then
                     lrRoleConstraintInstance.Shape.Visible = False
                 End If
 
                 For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                    If IsSomething(lrRoleConstraintRoleInstance.Link) Then
+                    If lrRoleConstraintRoleInstance.Link IsNot Nothing Then
                         lrRoleConstraintRoleInstance.Link.Visible = False
                     End If
                 Next
@@ -8643,7 +8981,7 @@ Public Class frmDiagramORMForOntologyBrowser
         If ToolStripMenuItemRoleNames.Checked Then
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                    If IsSomething(lrRoleInstance.RoleName.Shape) Then
+                    If lrRoleInstance.RoleName.Shape IsNot Nothing Then
                         lrRoleInstance.RoleName.Shape.Visible = True
                     End If
                 Next
@@ -8651,7 +8989,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Else
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
                 For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                    If IsSomething(lrRoleInstance.RoleName.Shape) Then
+                    If lrRoleInstance.RoleName.Shape IsNot Nothing Then
                         lrRoleInstance.RoleName.Shape.Visible = False
                     End If
                 Next
@@ -8669,13 +9007,13 @@ Public Class frmDiagramORMForOntologyBrowser
 
         If ToolStripMenuItemFactTypeReadings.Checked Then
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) And Not lrFactTypeInstance.isPreferredReferenceMode Then
+                If lrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing And Not lrFactTypeInstance.isPreferredReferenceMode Then
                     lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = True
                 End If
             Next
         Else
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                If lrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing Then
                     lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
                 End If
             Next
@@ -8690,13 +9028,13 @@ Public Class frmDiagramORMForOntologyBrowser
 
         If ToolStripMenuItemFactTypeNames.Checked Then
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeNameShape.Shape) And lrFactTypeInstance.ShowFactTypeName Then
+                If lrFactTypeInstance.FactTypeNameShape.Shape IsNot Nothing And lrFactTypeInstance.ShowFactTypeName Then
                     lrFactTypeInstance.FactTypeNameShape.Visible = True
                 End If
             Next
         Else
             For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
-                If IsSomething(lrFactTypeInstance.FactTypeNameShape.Shape) Then
+                If lrFactTypeInstance.FactTypeNameShape.Shape IsNot Nothing Then
                     lrFactTypeInstance.FactTypeNameShape.Visible = False
                 End If
             Next
@@ -8742,7 +9080,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -8760,7 +9098,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8805,7 +9143,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8828,7 +9166,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8847,7 +9185,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 Dim lrModelDictionaryForm As frmToolboxModelDictionary
                 lrModelDictionaryForm = prApplication.GetToolboxForm(frmToolboxModelDictionary.Name)
 
-                If IsSomething(lrModelDictionaryForm) Then
+                If lrModelDictionaryForm IsNot Nothing Then
                     Call lrModelDictionaryForm.LoadToolboxModelDictionary(Me.zrPage.Language, True)
                 End If
             End If
@@ -8860,7 +9198,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8980,7 +9318,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -8995,7 +9333,7 @@ Public Class frmDiagramORMForOntologyBrowser
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 If Me.Diagram.Selection.Items.Count > 0 Then
                     lrPropertyGridForm.PropertyGrid.SelectedObject = Me.Diagram.Selection.Items(Me.Diagram.Selection.Items.Count - 1).Tag
                 Else
@@ -9009,7 +9347,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -9046,7 +9384,7 @@ Public Class frmDiagramORMForOntologyBrowser
             frmMain.Cursor = Cursors.Default
 
             Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
-            If IsSomething(lrPage) Then
+            If lrPage IsNot Nothing Then
                 lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
 
                 MsgBox("Added the new Property Graph Schema Page, '" & lrPage.Name & "', to the Model.")
@@ -9066,7 +9404,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -9079,6 +9417,7 @@ Public Class frmDiagramORMForOntologyBrowser
         Dim lrModel As FBM.Model
         Dim lrEntityType As New FBM.EntityType
         Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+        Dim lsMessage As String
 
         Try
             Me.ContextMenuStrip_EntityType.ImageScalingSize = New Drawing.Size(16, 16)
@@ -9157,6 +9496,19 @@ Public Class frmDiagramORMForOntologyBrowser
             '-----------------------------------------------------------------------------
             Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Clear()
 
+            '==================================================================================
+            'All Pages must be loaded for Morphing.
+            If Not Me.zrPage.Model.AllPagesLoaded Then
+                lsMessage = "You'll need to bring the other Pages into memory to do morphing."
+                lsMessage.AppendDoubleLineBreak("Would you like the unloaded Pages now?")
+                lsMessage.AppendDoubleLineBreak("You can still open Pages for editing from the Model Explorer.")
+                If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                    Call Me.zrPage.Model.LoadUnloadedPagesFromConceptInstances()
+                Else
+                    Exit Sub
+                End If
+            End If
+
             '--------------------------------------------------------
             'Load the ORMDiagrams that relate to the EntityType
             '  as selectable menuOptions
@@ -9180,7 +9532,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
                 lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
 
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -9193,7 +9545,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             '----------------------------------------------------------------------------------
             'Provide and option for the User to create a PGS Page for the current Page.
-            Dim lsMessage As String = "Add an &ORM Diagram for the selected Entity Type."
+            lsMessage = "Add an &ORM Diagram for the selected Entity Type."
             lo_menu_option = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lsMessage, My.Resources.MenuImages.ORM16x16)
             lo_menu_option.Tag = lrEntityTypeInstance.EntityType
             AddHandler lo_menu_option.Click, AddressOf Me.createORMDiagramPageForEntityType
@@ -9221,7 +9573,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
                 lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId) ' AddressOf lrEnterpriseView.Equals)
 
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -9259,7 +9611,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
                 lrEnterpriseView = prPageNodes.Find(Function(x) x.PageId = lrPage.PageId) ' AddressOf lrEnterpriseView.Equals)
 
-                If IsSomething(lrEnterpriseView) Then
+                If lrEnterpriseView IsNot Nothing Then
                     '---------------------------------------------------
                     'Add the Page(Name) to the MenuOption.DropDownItems
                     '---------------------------------------------------
@@ -9282,14 +9634,11 @@ Public Class frmDiagramORMForOntologyBrowser
 
             '======================================================================================
 
-
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -9339,7 +9688,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -9391,7 +9740,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End With
 
@@ -9426,7 +9775,7 @@ Public Class frmDiagramORMForOntologyBrowser
                 Me.zrPage.Model.AllowCheckForErrors = True
 
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView = Nothing
-                If IsSomething(lrPage) Then
+                If lrPage IsNot Nothing Then
                     lrEnterpriseView = frmMain.zfrmModelExplorer.AddExistingPageToModel(lrPage, lrPage.Model, lrPage.Model.TreeNode, True)
 
                     MsgBox("Added the new Entity Relationship Diagram Page, '" & lrPage.Name & "' to the Model.")
@@ -9446,7 +9795,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End With
@@ -9460,15 +9809,15 @@ Public Class frmDiagramORMForOntologyBrowser
 
         For Each lrFactTypeInstance In Me.zrPage.FactTypeInstance
             For Each lrRoleInstance In lrFactTypeInstance.RoleGroup
-                If IsSomething(lrRoleInstance.RoleName.Shape) Then
+                If lrRoleInstance.RoleName.Shape IsNot Nothing Then
                     lrRoleInstance.RoleName.Shape.Visible = False
                 End If
 
-                If IsSomething(lrFactTypeInstance.FactTypeReadingShape.shape) Then
-                    lrFactTypeInstance.FactTypeReadingShape.shape.Visible = False
+                If lrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing Then
+                    lrFactTypeInstance.FactTypeReadingShape.Shape.Visible = False
                 End If
 
-                If IsSomething(lrFactTypeInstance.FactTypeNameShape.Shape) Then
+                If lrFactTypeInstance.FactTypeNameShape.Shape IsNot Nothing Then
                     lrFactTypeInstance.FactTypeNameShape.Visible = False
                 End If
             Next
@@ -9566,7 +9915,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -9592,7 +9941,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9613,7 +9962,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -9714,7 +10063,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9745,7 +10094,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9773,7 +10122,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9822,7 +10171,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9844,7 +10193,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -9875,7 +10224,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9905,7 +10254,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -9937,7 +10286,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9970,7 +10319,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -9990,7 +10339,7 @@ Public Class frmDiagramORMForOntologyBrowser
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
                 lrPropertyGridForm.PropertyGrid.SelectedObject = lrRoleConstraintRoleInstance.RoleConstraint
                 lrPropertyGridForm.Show()
             End If
@@ -10001,7 +10350,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10031,7 +10380,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -10058,7 +10407,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -10122,40 +10471,11 @@ Public Class frmDiagramORMForOntologyBrowser
 
         loForm = frmMain.DockPanel.ActiveDocument
 
-        If frmMain.PageDataExistsInClipboard(lrPage) Then
-            '------------------------------------
-            'Page data exists in the clipboard.
-            '------------------------------------
-            If loForm.Name = frmMain.zrORMModel_view.Name Then
-                '------------------------------------------------------------------------
-                'Current form is an ORM Diagram form, so can at least paste to the Page
-                '  if it isn't the same page the data was copied from
-                '------------------------------------------------------------------------
-                Dim loORMDiagramForm As frmDiagramORM
-                loORMDiagramForm = loForm
-                If IsSomething(loORMDiagramForm.zrPage) Then
-                    If lrPage.CopiedPageId <> loORMDiagramForm.zrPage.PageId Then
-                        Me.ToolStripMenuItemPaste.Enabled = True
-                    Else
-                        Me.ToolStripMenuItemPaste.Enabled = False
-                    End If
-                End If
-            End If
-        Else
-            Me.ToolStripMenuItemPaste.Enabled = False
-        End If
-
-    End Sub
-
-    Private Sub ToolStripMenuItemPaste_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemPaste.Click
-        Call frmMain.PasteToCurrentPageFromClipboard()
-
-        Me.ToolStripMenuItemPaste.Enabled = False
     End Sub
 
     Private Sub CopyToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCopy.Click
 
-        Call frmMain.CopySelectedObjectsToClipboard()
+        Call frmMain.CopySelectedObjectsToClipboard(Me.zrPage)
 
     End Sub
 
@@ -10214,7 +10534,7 @@ Public Class frmDiagramORMForOntologyBrowser
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
 
                 Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                 Dim loMiscFilterAttribute2 As Attribute = New System.ComponentModel.CategoryAttribute("Instances")
@@ -10232,7 +10552,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -10266,7 +10586,7 @@ Public Class frmDiagramORMForOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -10275,14 +10595,14 @@ Public Class frmDiagramORMForOntologyBrowser
     Private Sub ToolStripMenuItemCopyMultiple_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCopyMultiple.Click
 
         Try
-            Call frmMain.CopySelectedObjectsToClipboard()
+            Call frmMain.CopySelectedObjectsToClipboard(Me.zrPage)
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

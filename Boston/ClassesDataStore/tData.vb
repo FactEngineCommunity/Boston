@@ -6,6 +6,8 @@
         ''' </summary>
         ''' <returns></returns>
         Public Property ID As String = System.Guid.NewGuid.ToString
+
+        Public Property ModelId As String 'ModelId of the Model (if any) that the data belongs to.
         Public Property Data As String 'JSON or Text
         Public Property DataClass As String 'E.g "Person" or a class in Boston
         Public Property EntryDate As DateTime 'Date of Entry.

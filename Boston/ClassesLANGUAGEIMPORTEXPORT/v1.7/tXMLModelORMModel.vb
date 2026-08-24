@@ -19,6 +19,8 @@ Namespace XMLModel
         Public FactTypes As New List(Of XMLModel.FactType)
         Public RoleConstraints As New List(Of XMLModel.RoleConstraint)
         Public ModelNotes As New List(Of XMLModel.ModelNote)
+        Public Functions As New List(Of XMLModel.Function)
+        Public Synonyms As New List(Of XMLModel.Synonym)
 
         ''' <summary>
         ''' Parameterless Constructor
@@ -60,7 +62,7 @@ Namespace XMLModel
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try

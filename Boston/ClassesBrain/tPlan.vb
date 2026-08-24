@@ -39,6 +39,12 @@ Namespace Brain
 
         End Sub
 
+        Public Sub RemoveStep(ByVal arStep As Brain.Step)
+
+            Me.Step.Remove(arStep)
+
+        End Sub
+
 
         Public Function GetIndexFirstUnresolvedStep() As Integer
 
@@ -72,7 +78,7 @@ Namespace Brain
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return pcenumActionType.None
             End Try
@@ -102,7 +108,7 @@ Namespace Brain
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

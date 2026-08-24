@@ -23,15 +23,35 @@ Partial Class frmToolboxJupyterForBoston
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.Panel = New System.Windows.Forms.Panel()
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.Panel.SuspendLayout()
+        Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'Panel
         '
+        Me.Panel.Controls.Add(Me.MenuStrip1)
         Me.Panel.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel.Location = New System.Drawing.Point(0, 0)
         Me.Panel.Name = "Panel"
         Me.Panel.Size = New System.Drawing.Size(800, 450)
         Me.Panel.TabIndex = 0
+        '
+        'MenuStrip1
+        '
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CloseToolStripMenuItem})
+        Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
+        Me.MenuStrip1.Name = "MenuStrip1"
+        Me.MenuStrip1.Size = New System.Drawing.Size(800, 24)
+        Me.MenuStrip1.TabIndex = 0
+        Me.MenuStrip1.Text = "MenuStrip1"
+        '
+        'CloseToolStripMenuItem
+        '
+        Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(48, 20)
+        Me.CloseToolStripMenuItem.Text = "&Close"
         '
         'frmToolboxJupyterForBoston
         '
@@ -39,11 +59,18 @@ Partial Class frmToolboxJupyterForBoston
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
         Me.Controls.Add(Me.Panel)
+        Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmToolboxJupyterForBoston"
-        Me.Text = "frmJupyterForBoston"
+        Me.Text = "Jupyter Notebook"
+        Me.Panel.ResumeLayout(False)
+        Me.Panel.PerformLayout()
+        Me.MenuStrip1.ResumeLayout(False)
+        Me.MenuStrip1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
 
     Friend WithEvents Panel As Panel
+    Friend WithEvents MenuStrip1 As MenuStrip
+    Friend WithEvents CloseToolStripMenuItem As ToolStripMenuItem
 End Class

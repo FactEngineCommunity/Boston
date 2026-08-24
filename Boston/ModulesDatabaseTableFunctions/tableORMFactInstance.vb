@@ -67,6 +67,7 @@ Module tableORMFactInstance
 
                     lrFactInstance.X = lRecordset("FCIX").Value
                     lrFactInstance.Y = lRecordset("FCIY").Value
+                    lrFactInstance.isDirty = False
                     Dim lrFactDataInstance As FBM.FactDataInstance
 
                     '-----------------------------------
@@ -145,7 +146,7 @@ Module tableORMFactInstance
                                     lsMessage &= "Page: " & arFactTypeInstance.Page.Name
                                     lsMessage.AppendLine("Fact Type: " & arFactTypeInstance.Id)
                                     lsMessage.AppendLine("Fact :" & lsFactId)
-                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,, True)
+                                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,, True)
 #End Region
                                 End Try
                             Else
@@ -169,7 +170,7 @@ Module tableORMFactInstance
                                     lsMessage = "Error: GetFactsForFactTypeInstance:"
                                     lsMessage &= vbCrLf & vbCrLf & ex.Message
                                     lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id & vbCrLf & ", FactId:" & lsFactId
-                                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                                 End Try
                             End If
                         End If
@@ -211,7 +212,7 @@ Module tableORMFactInstance
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             lsMessage &= vbCrLf & vbCrLf & "PageId: " & arFactTypeInstance.Page.PageId & vbCrLf & ", FactTypeId: " & arFactTypeInstance.Id
 
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,, True,, True)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,, True,, True)
 
             lRecordset.Close()
         End Try

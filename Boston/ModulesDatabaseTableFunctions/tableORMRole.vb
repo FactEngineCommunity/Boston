@@ -20,17 +20,17 @@ Namespace TableRole
                 lsSQLQuery &= " ," & arRole.part_of_key
                 lsSQLQuery &= " ," & arRole.FactType.Arity
                 lsSQLQuery &= " ," & arRole.SequenceNr
-                'If IsSomething(arRole.JoinsEntityType) Then
+                'If arRole.JoinsEntityType IsNot Nothing Then
                 '    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsEntityType.Id, ""), "'", "`") & "'"
                 'Else
                 '    lsSQLQuery &= "       ,''"
                 'End If
-                'If IsSomething(arRole.JoinsValueType) Then
+                'If arRole.JoinsValueType IsNot Nothing Then
                 '    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsValueType.Id, ""), "'", "`") & "'"
                 'Else
                 '    lsSQLQuery &= "       ,''"
                 'End If
-                'If IsSomething(arRole.JoinsFactType) Then
+                'If arRole.JoinsFactType IsNot Nothing Then
                 '    lsSQLQuery &= "       ,'" & Replace(Viev.NullVal(arRole.JoinsFactType.Id, ""), "'", "`") & "'"
                 'Else
                 '    lsSQLQuery &= "       ,''"
@@ -41,7 +41,7 @@ Namespace TableRole
                 lsSQLQuery &= " ,'" & arRole.JoinedORMObject.Id & "'"
                 lsSQLQuery &= ")"
 
-                Call pdbConnection.Execute(lsSQLQuery)
+                pdbConnection.Execute(lsSQLQuery)
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -49,7 +49,7 @@ Namespace TableRole
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -72,7 +72,7 @@ Namespace TableRole
                 lsMessage &= vbCrLf & "ModelId: " & arRole.Model.ModelId
                 lsMessage &= vbCrLf & "RoleId: " & arRole.Id
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -188,7 +188,7 @@ Namespace TableRole
                                         lsMessage.AppendDoubleLineBreak("Could not find linked Fact Type for Role on Fact Type, " & arFactType.Id & ".")
                                         lsMessage.AppendDoubleLineBreak("Click [Yes] if you would like Boston to try and remove this Fact Type from the Model.")
                                         Dim liMessageResponse As MsgBoxResult
-                                        liMessageResponse = prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, , False, False, True, MessageBoxButtons.YesNo)
+                                        liMessageResponse = prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, , False, False, True, MessageBoxButtons.YesNo)
 
                                         If liMessageResponse = MsgBoxResult.Yes Then
                                             If arFactType.CanSafelyRemoveFromModel() Then
@@ -276,7 +276,7 @@ SkipJoiningRole:
                 lsMessage1 &= vbCrLf & vbCrLf & "Loading Roles for "
                 lsMessage1 &= vbCrLf & "  FactTypeId: '" & arFactType.Id & "' for"
                 lsMessage1 &= vbCrLf & "  ModelId: '" & arFactType.Model.ModelId & "'"
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 GetRolesForModelFactType = New List(Of FBM.Role)
             End Try
@@ -297,17 +297,17 @@ SkipJoiningRole:
 
                 lsSQLQuery &= "       ,JoinsModelElementId = '" & arRole.JoinedORMObject.Id & "'"
 
-                'If IsSomething(arRole.JoinsEntityType) Then
+                'If arRole.JoinsEntityType IsNot Nothing Then
                 '    lsSQLQuery &= "       ,JoinsEntityTypeId = '" & Viev.NullVal(arRole.JoinsEntityType.Id, "") & "'"
                 'Else
                 '    lsSQLQuery &= "       ,JoinsEntityTypeId = ''"
                 'End If
-                'If IsSomething(arRole.JoinsValueType) Then
+                'If arRole.JoinsValueType IsNot Nothing Then
                 '    lsSQLQuery &= "       ,JoinsValueTypeId = '" & Viev.NullVal(arRole.JoinsValueType.Id, "") & "'"
                 'Else
                 '    lsSQLQuery &= "       ,JoinsValueTypeId = ''"
                 'End If
-                'If IsSomething(arRole.JoinsFactType) Then
+                'If arRole.JoinsFactType IsNot Nothing Then
                 '    lsSQLQuery &= "       ,JoinsNestedFactTypeId = '" & Viev.NullVal(arRole.JoinsFactType.Id, "") & "'"
                 'Else
                 '    lsSQLQuery &= "       ,JoinsNestedFactTypeId = ''"
@@ -326,7 +326,7 @@ SkipJoiningRole:
                 lsMessage = "Error: TableFactType.UpdateRole"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "SQL: " & lsSQLQuery
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

@@ -32,7 +32,7 @@ Namespace SourcePlugins.Boston
             '
             'picLogo
             '
-            Me.picLogo.Image = Global.Boston.My.Resources.MenuImagesMain.ORMStudio32x322
+            Me.picLogo.Image = Global.Boston.My.Resources.MenuImages.ORMStudio32x322
             Me.picLogo.Location = New System.Drawing.Point(0, 0)
             Me.picLogo.Name = "picLogo"
             Me.picLogo.Size = New System.Drawing.Size(32, 32)

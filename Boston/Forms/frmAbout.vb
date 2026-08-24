@@ -13,8 +13,8 @@ Public Class frmAbout
         Dim ls_message As String = ""
 
         ls_message = "Boston version: v" & prApplication.ApplicationVersionNr & " (Assembly: " & psAssemblyFileVersionNumber & ")"
-        ls_message &= vbCrLf
-        ls_message &= "Boston database version: v" & prApplication.DatabaseVersionNr
+        ls_message.AppendLine($"Boston database version: v{prApplication.DatabaseVersionNr}")
+        ls_message.AppendLine("Core version required: v" & My.Settings.CoreVersionNumber & " : Actual: v" & prApplication.CMML.Core.CoreVersionNumber)
 
         label_versioning.Text = ls_message
 
@@ -34,7 +34,7 @@ Public Class frmAbout
         Me.LabelCategory.Text = prApplication.SoftwareCategory.ToString
 
         ls_message = "Written by FactEngine and Victor Morgante."
-        ls_message &= vbCrLf & "Copyright 2017-2021. All rights reserved."
+        ls_message &= vbCrLf & "Copyright 2017-" & System.DateTime.Now.Year.ToString("YYYY") & ". All rights reserved."
 
         label_details.Text = ls_message
 
@@ -59,7 +59,7 @@ Public Class frmAbout
             lsMessage = "Error: You might not have a default email application setup in Windows."
             lsMessage &= vbCrLf & vbCrLf
             lsMessage &= "Email support@factengine.ai for support on Boston"
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 

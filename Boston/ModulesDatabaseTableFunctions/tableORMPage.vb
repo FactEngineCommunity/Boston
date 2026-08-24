@@ -29,7 +29,7 @@ Namespace TablePage
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -50,7 +50,7 @@ Namespace TablePage
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -97,7 +97,7 @@ Namespace TablePage
         End Function
 
 
-        Public Function GetPageCountByModel(ByVal as_ModelId As String, Optional ByVal abIncludeCorePages As Boolean = False)
+        Public Function GetPageCountByModel(ByVal as_ModelId As String, Optional ByVal abIncludeCorePages As Boolean = False) As Integer
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New RecordsetProxy
@@ -119,7 +119,15 @@ Namespace TablePage
 
         End Function
 
-
+        ''' <summary>
+        ''' Page.Loaded = False if not abLoadPage
+        ''' </summary>
+        ''' <param name="ar_model">The Model for the Pages</param>
+        ''' <param name="abLoadPage">TRUE if load the Page objects for the Page.</param>
+        ''' <param name="abUseThreading">TRUE if use threading. NB Threading is no longer used.</param>
+        ''' <param name="aoBackgroundWorker">A BackGroundWorker to show progress if needed.</param>
+        ''' <param name="abThreadAfter30pages">TRUE if only use threading after 30 Pages have been loaded. NB Threading no longer used.</param>
+        ''' <returns></returns>
         Public Function GetPagesByModel(ByRef ar_model As FBM.Model,
                                         Optional ByVal abLoadPage As Boolean = False,
                                         Optional ByVal abUseThreading As Boolean = False,
@@ -221,7 +229,7 @@ Namespace TablePage
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -263,7 +271,7 @@ Namespace TablePage
                 Dim lsMessage As String
                 lsMessage = "Error: TablePage.UpdatePage"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

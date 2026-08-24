@@ -13,12 +13,12 @@ Public Class frmCRUDEditProject
 
         Try
             Dim larRole As New List(Of ClientServer.Role)
-            larRole = tableClientServerProjectUserRole.GetRolesForUserOnProject(prApplication.User, _
+            larRole = tableClientServerProjectUserRole.GetRolesForUserOnProject(prApplication.User,
                                                                                 Me.zrProject,
                                                                                 True)
 
 
-            Dim larFunction = From Role In larRole _
+            Dim larFunction = From Role In larRole
                               From [Function] In Role.Function
                               Select [Function]
 
@@ -32,50 +32,8 @@ Public Class frmCRUDEditProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
-
-    End Sub
-
-    Private Sub ButtonOkay_Click(sender As Object, e As EventArgs) Handles ButtonOkay.Click
-
-        If Me.checkFields() Then
-            Call Me.getFields(Me.zrProject)
-            Call tableClientServerProject.UpdateProject(Me.zrProject)
-
-            Me.Hide()
-            Me.Close()
-            Me.Dispose()
-        End If
-
-    End Sub
-
-    Private Function checkFields() As Boolean
-
-        checkFields = True
-
-        If Trim(Me.TextBoxProjectName.Text) = "" Then
-            checkFields = False
-        ElseIf prApplication.User Is Nothing Then
-            '----------------------------------------------------------------
-            'Need the User to populate arProject.CreatedByUser
-            checkFields = False
-        End If
-
-    End Function
-
-    Private Sub getFields(ByRef arProject As ClientServer.Project)
-
-        arProject.Name = Trim(Me.TextBoxProjectName.Text)
-        arProject.CreatedByUserId = prApplication.User.Id
-
-    End Sub
-
-    Private Sub ButtonCancel_Click(sender As Object, e As EventArgs) Handles ButtonCancel.Click
-
-        Me.Hide()
-        Me.Close()
-        Me.Dispose()
 
     End Sub
 
@@ -122,14 +80,80 @@ Public Class frmCRUDEditProject
             'Hide/Disable Functionality Depending on the User's Role/Functions/Permissions
             Call Me.hideDisableFunctionalityDependingOnTheUsersRoleFunctionsPermission()
 
+            Call Me.loadModelsSharedWithThisProject()
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
+    End Sub
+
+
+    Private Sub ButtonOkay_Click(sender As Object, e As EventArgs) Handles ButtonOkay.Click
+
+        If Me.checkFields() Then
+            Call Me.getFields(Me.zrProject)
+            Call tableClientServerProject.UpdateProject(Me.zrProject)
+
+            Me.Hide()
+            Me.Close()
+            Me.Dispose()
+        End If
+
+    End Sub
+
+    Private Function checkFields() As Boolean
+
+        checkFields = True
+
+        If Trim(Me.TextBoxProjectName.Text) = "" Then
+            checkFields = False
+        ElseIf prApplication.User Is Nothing Then
+            '----------------------------------------------------------------
+            'Need the User to populate arProject.CreatedByUser
+            checkFields = False
+        End If
+
+    End Function
+
+    Private Sub getFields(ByRef arProject As ClientServer.Project)
+
+        arProject.Name = Trim(Me.TextBoxProjectName.Text)
+        arProject.CreatedByUserId = prApplication.User.Id
+
+    End Sub
+
+    Private Sub ButtonCancel_Click(sender As Object, e As EventArgs) Handles ButtonCancel.Click
+
+        Me.Hide()
+        Me.Close()
+        Me.Dispose()
+
+    End Sub
+
+    Private Sub loadModelsSharedWithThisProject()
+
+        Try
+            Dim larModel As List(Of FBM.Model) = tableClientServerProjectModelShare.getModelsForProject(Me.zrProject)
+
+            For Each lrModel In larModel
+                Dim lrComboboxItem As New tComboboxItem(lrModel.ModelId, lrModel.Name, lrModel)
+                Call Me.ListBoxModels.Items.Add(lrComboboxItem)
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
     End Sub
 
     Private Sub hideDisableFunctionalityDependingOnTheUsersRoleFunctionsPermission()
@@ -316,7 +340,7 @@ Public Class frmCRUDEditProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -429,7 +453,7 @@ Public Class frmCRUDEditProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -524,19 +548,19 @@ Public Class frmCRUDEditProject
         lREcordset.ActiveConnection = pdbConnection
         lREcordset.CursorType = pcOpenStatic
 
-        lsSQLQuery = "SELECT Username & ' ' & LastName AS Name, *"
+        lsSQLQuery = "SELECT FirstName " & pdbConnection.StingConcatenationSymbol & "' '" & pdbConnection.StingConcatenationSymbol & " LastName AS Name,*"
         lsSQLQuery &= " FROM ClientServerUser"
         lsSQLQuery &= " WHERE Id IN (SELECT UserId FROM ClientServerProjectUser WHERE ProjectId = '" & arProject.Id & "')"
 
         lREcordset.Open(lsSQLQuery)
 
-        Dim lasFields() As String = Viev.Strings.RemoveWhiteSpace("Name, Username").Split(",")
+        Dim lasFields() As String = FEStrings.ProperSpace("Name, Username").Split(",")
 
         '=================================================================================================================
         Dim dtLoading As New DataTable("UsStates")
 
         For Each lsField In lasFields
-            dtLoading.Columns.Add(lsField, System.Type.GetType("System.String"))
+            dtLoading.Columns.Add(lsField.Trim, System.Type.GetType("System.String"))
         Next
 
         While Not lREcordset.EOF
@@ -544,7 +568,7 @@ Public Class frmCRUDEditProject
             dr = dtLoading.NewRow
 
             For Each lsField In lasFields
-                dr(lsField) = lREcordset(lsField).Value
+                dr(lsField.Trim) = lREcordset(lsField.Trim).Value
             Next
 
             dtLoading.Rows.Add(dr)
@@ -846,7 +870,7 @@ Public Class frmCRUDEditProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -896,7 +920,7 @@ Public Class frmCRUDEditProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -926,7 +950,7 @@ Public Class frmCRUDEditProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -989,7 +1013,7 @@ Public Class frmCRUDEditProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1034,7 +1058,7 @@ Public Class frmCRUDEditProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1071,7 +1095,7 @@ Public Class frmCRUDEditProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1141,7 +1165,7 @@ Public Class frmCRUDEditProject
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1279,7 +1303,7 @@ Public Class frmCRUDEditProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1510,7 +1534,7 @@ Public Class frmCRUDEditProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1638,7 +1662,7 @@ Public Class frmCRUDEditProject
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -1688,6 +1712,22 @@ Public Class frmCRUDEditProject
             lrComboboxItem = New tComboboxItem(lrUser.Id, lrUser.FullName, lrUser)
             Me.ListBoxGroupUsers.Items.Add(lrComboboxItem)
         Next
+
+    End Sub
+
+    Private Sub ButtonShowProjectRequirements_Click(sender As Object, e As EventArgs) Handles ButtonShowProjectRequirements.Click
+
+        Try
+            Call prApplication.MainForm.LoadProjectRequirementsLister(Me.zrProject)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
 
     End Sub
 

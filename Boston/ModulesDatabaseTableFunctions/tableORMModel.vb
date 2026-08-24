@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.Linq.Expressions
+Imports System.Reflection
 
 Namespace TableModel
 
@@ -50,7 +51,7 @@ Namespace TableModel
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -152,7 +153,7 @@ Namespace TableModel
                     arModel.EnterpriseId = arModel.EnterpriseId
                     arModel.SubjectAreaId = Viev.NullVal(lREcordset("SubjectAreaId").Value, "")
                     arModel.ProjectId = Viev.NullVal(lREcordset("ProjectId").Value, "")
-                    arModel.ProjectPhaseId = lREcordset("ProjectPhaseId").Value
+                    arModel.ProjectPhaseId = Viev.NullVal(lREcordset("ProjectPhaseId").Value, 0)
                     arModel.SolutionId = Viev.NullVal(lREcordset("SolutionId").Value, "")
 
                     arModel.IsConceptualModel = True 'Default
@@ -184,6 +185,8 @@ Namespace TableModel
                     Throw New System.Exception(lsMessage)
                 End If
 
+                lREcordset.Close()
+
                 Return True
 
             Catch ex As Exception
@@ -192,7 +195,7 @@ Namespace TableModel
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -236,7 +239,7 @@ Namespace TableModel
                     lrModel.EnterpriseId = lrModel.EnterpriseId
                     lrModel.SubjectAreaId = Viev.NullVal(lREcordset("SubjectAreaId").Value, "")
                     lrModel.ProjectId = Viev.NullVal(lREcordset("ProjectId").Value, "")
-                    lrModel.ProjectPhaseId = lREcordset("ProjectPhaseId").Value
+                    lrModel.ProjectPhaseId = Viev.NullVal(lREcordset("ProjectPhaseId").Value, 0)
                     lrModel.SolutionId = Viev.NullVal(lREcordset("SolutionId").Value, "")
 
                     lrModel.IsConceptualModel = True 'Default
@@ -264,7 +267,7 @@ Namespace TableModel
                     lrModel.DatabaseRole = Trim(NullVal(lREcordset("Role").Value, ""))
                     lrModel.Port = Trim(NullVal(lREcordset("Port").Value, ""))
 
-                    GetModels.Add(lrModel)
+                    GetModels.AddUnique(lrModel)
                     lREcordset.MoveNext()
                 End While
 
@@ -276,10 +279,90 @@ Namespace TableModel
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
+
+        ''' <summary>
+        ''' Only one Project for a Model at this stage, unless it is shared with a Project. Easier to just get a list of one.
+        ''' </summary>
+        ''' <param name="arModel"></param>
+        ''' <returns></returns>
+        Public Function getProjectsForModel(ByRef arModel As FBM.Model) As List(Of ClientServer.Project)
+
+            Dim lsMessage As String
+            Dim lsSQLQuery As String = ""
+            Dim lREcordset As New RecordsetProxy
+
+            Dim lrProject As ClientServer.Project
+            Dim larProject As New List(Of ClientServer.Project)
+
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic
+
+            Try
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM MetaModelModel"
+                lsSQLQuery &= " WHERE ModelId = '" & arModel.ModelId & "'"
+
+                lREcordset.Open(lsSQLQuery)
+
+                If Not lREcordset.EOF Then
+                    While Not lREcordset.EOF
+                        lrProject = New ClientServer.Project
+                        lrProject.Id = lREcordset("ProjectId").Value
+
+                        lrProject = tableClientServerProject.getProjectDetailsById(lrProject.Id, lrProject, True)
+
+                        If lrProject IsNot Nothing Then
+                            larProject.Add(lrProject)
+                        End If
+                        lREcordset.MoveNext()
+                    End While
+                End If
+
+                lREcordset.Close()
+
+                Return larProject
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return larProject
+            End Try
+
+        End Function
+
+        Public Sub ModifyKey(ByRef arModelElement As FBM.ModelObject, ByVal asNewKey As String)
+
+            Try
+                Dim lrDataStore As New DataStore.Store
+                Dim lsModelId = arModelElement.Model.ModelId
+                Dim lsBaseTerm = arModelElement.Id
+                Dim lrModelElement = arModelElement
+                Dim lrWhereClause As Expression(Of Func(Of FBM.Synonym, Boolean)) = Function(p) p.ModelId = lsModelId And p.BaseTerm = lsBaseTerm
+                For Each lrSynonym In arModelElement.Model.Synonyms.FindAll(Function(x) x.BaseTerm = lrModelElement.Id).ToArray
+                    Dim lrTempModelElement = New FBM.ModelObject(asNewKey)
+                    lrTempModelElement.Model = arModelElement.Model
+                    lrSynonym.BaseTermModelElement = lrTempModelElement
+                    Call lrDataStore.Update(Of FBM.Synonym)(lrSynonym, lrWhereClause)
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
 
         Public Sub update_model(ByVal ar_model As FBM.Model)
 
@@ -332,7 +415,7 @@ Namespace TableModel
                 Dim lsMessage As String
                 lsMessage = "Error: tableORMMOdel.UpdateModel"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

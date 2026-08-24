@@ -1,7 +1,8 @@
-﻿Imports System.Xml.Serialization
-Imports System.Reflection
-Imports System.Threading.Tasks
+﻿Imports System.Reflection
 Imports System.Runtime.CompilerServices
+Imports System.Threading.Tasks
+Imports System.Xml.Serialization
+Imports Boston.FBMMetaModel
 
 Namespace XMLModel
 
@@ -18,10 +19,14 @@ Namespace XMLModel
         Public ORMDiagram As New List(Of XMLModel.Page)
 
         ' Build a dictionaries for faster search
-        Dim ValueTypeDictionary As Dictionary(Of String, FBM.ValueType)
-        Dim EntityTypeDictionary As Dictionary(Of String, FBM.EntityType)
-        Dim FactTypeDictionary As Dictionary(Of String, FBM.FactType)
-        Dim RoleConstraintDictionary As Dictionary(Of String, FBM.RoleConstraint)
+        <XmlIgnore>
+        Public ValueTypeDictionary As Dictionary(Of String, FBM.ValueType)
+        <XmlIgnore>
+        Public EntityTypeDictionary As Dictionary(Of String, FBM.EntityType)
+        <XmlIgnore>
+        Public FactTypeDictionary As Dictionary(Of String, FBM.FactType)
+        <XmlIgnore>
+        Public RoleConstraintDictionary As Dictionary(Of String, FBM.RoleConstraint)
 
         Private Function FactTypeIsReferenceModeFactType(ByVal asXMLFactTypeId As String) As Boolean
 
@@ -47,7 +52,7 @@ Namespace XMLModel
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -63,7 +68,7 @@ Namespace XMLModel
         Public Function MapFromFBMModel(ByVal arFBMModel As FBM.Model, Optional ByVal abExcludedMDAModelElements As Boolean = False) As Boolean
 
             Try
-                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationship As FBM.SubtypeRelationship
                 Dim lrXMLSubtypeRelationship As XMLModel.SubtypeRelationship
 
                 Me.ORMModel = New XMLModel.ORMModel
@@ -89,6 +94,7 @@ Namespace XMLModel
                     lrXMLValueType.LongDescription = lrValueType.LongDescription
                     lrXMLValueType.ShortDescription = lrValueType.ShortDescription
                     lrXMLValueType.IsIndependent = lrValueType.IsIndependent
+                    lrXMLValueType.ObjectifyingFactTypeId = lrValueType.ObjectifyingFactTypeId
                     lrXMLValueType.GUID = lrValueType.GUID
                     lrXMLValueType.IsMDAModelElement = lrValueType.IsMDAModelElement
                     lrXMLValueType.DBName = lrValueType.DBName
@@ -142,14 +148,16 @@ SkipModelLevelValueType:
                     lrXMLEntityType.ShortDescription = lrEntityType.ShortDescription
                     lrXMLEntityType.IsMDAModelElement = lrEntityType.IsMDAModelElement
                     lrXMLEntityType.DBName = lrEntityType.DBName
+                    lrXMLEntityType.ModelElementFlags = lrEntityType.ModelElementFlag
+                    lrXMLEntityType.GraphLabel = lrEntityType.GraphLabel.Select(Function(x) x.Label).ToList
 
                     If lrXMLEntityType.IsMDAModelElement And abExcludedMDAModelElements Then GoTo SkipModelLevelEntityType
 
-                    If IsSomething(lrEntityType.ReferenceModeRoleConstraint) Then
+                    If lrEntityType.ReferenceModeRoleConstraint IsNot Nothing Then
                         lrXMLEntityType.ReferenceSchemeRoleConstraintId = lrEntityType.ReferenceModeRoleConstraint.Id
                     End If
 
-                    If IsSomething(lrEntityType.ReferenceModeValueType) Then
+                    If lrEntityType.ReferenceModeValueType IsNot Nothing Then
                         lrXMLEntityType.ReferenceModeValueTypeId = lrEntityType.ReferenceModeValueType.Id
                     End If
 
@@ -163,7 +171,7 @@ SkipModelLevelValueType:
 
                             lrXMLEntityType.SubtypeRelationships.Add(lrXMLSubtypeRelationship)
                         Catch ex As Exception
-                            prApplication.ThrowErrorMessage("Error exporting Subtype Relationship for Entity Type: " & lrXMLEntityType.Id, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.OK, False, Nothing)
+                            prApplication.ThrowMessage("Error exporting Subtype Relationship for Entity Type: " & lrXMLEntityType.Id, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.OK, False, Nothing)
                             Throw New Exception("Error exporting Model to FBM format.")
                         End Try
                     Next
@@ -190,7 +198,7 @@ SkipModelLevelEntityType:
                     lrXMLFactType.IsObjectified = lrFactType.IsObjectified
                     lrXMLFactType.IsPreferredReferenceSchemeFT = lrFactType.IsPreferredReferenceMode
                     lrXMLFactType.IsSubtypeRelationshipFactType = lrFactType.IsSubtypeRelationshipFactType
-                    If IsSomething(lrFactType.ObjectifyingEntityType) Then
+                    If lrFactType.ObjectifyingEntityType IsNot Nothing Then
                         lrXMLFactType.ObjectifyingEntityTypeId = lrFactType.ObjectifyingEntityType.Id
                     End If
                     lrXMLFactType.IsDerived = lrFactType.IsDerived
@@ -206,8 +214,326 @@ SkipModelLevelEntityType:
                     lrXMLFactType.IsSubtypeStateControlling = lrFactType.IsSubtypeStateControlling
                     lrXMLFactType.StoreFactCoordinates = lrFactType.StoreFactCoordinates
                     lrXMLFactType.DBName = lrFactType.DBName
+                    lrXMLFactType.ModelElementFlags = lrFactType.ModelElementFlag
+#Region "Property Graph Schema specific"
+                    lrXMLFactType.GraphLabel = lrFactType.GraphLabel.Select(Function(x) x.Label).ToList
+                    lrXMLFactType.Source = lrFactType.Source
+                    lrXMLFactType.Target = lrFactType.Target
+#End Region
 
                     If lrXMLFactType.IsMDAModelElement And abExcludedMDAModelElements Then GoTo SkipModelLevelFactType
+
+#Region "Derivation Rule"
+
+                    '--------------------------------------------
+                    ' FactType.DerivationRule  -> XMLModel.DerivationRule
+                    '--------------------------------------------
+                    If lrFactType.DerivationRule IsNot Nothing Then
+
+                        Dim lrDerivationRule As FBM.DerivationRule = lrFactType.DerivationRule
+                        Dim lrXMLDerivationRule As New XMLModel.DerivationRule
+
+                        '--------------------------------------------
+                        ' DerivationRule.FactTypeDerivationPath
+                        '--------------------------------------------
+                        If lrDerivationRule.FactTypeDerivationPath IsNot Nothing Then
+
+                            Dim lrDerivationPath As FBM.FactTypeDerivationPath = lrDerivationRule.FactTypeDerivationPath
+                            Dim lrXMLDerivationPath As New XMLModel.FactTypeDerivationPath
+
+                            lrXMLDerivationPath.Id = lrDerivationPath.Id
+                            lrXMLDerivationPath.Name = lrDerivationPath.Name
+
+                            '--------------------------------------------
+                            ' PathComponents.RolePath
+                            '--------------------------------------------
+                            If lrDerivationPath.PathComponents IsNot Nothing AndAlso lrDerivationPath.PathComponents.RolePaths.Count > 0 Then
+
+                                Dim lrXMLPathComponents As New XMLModel.PathComponents
+
+                                For Each lrRolePath As FBM.RolePath In lrDerivationPath.PathComponents.RolePaths
+
+                                    'Dim lrRolePath As FBM.RolePath = lrDerivationPath.PathComponents.RolePath 'REmoved because we are now storing multiple RolePaths
+
+                                    Dim lrXMLRolePath As New XMLModel.RolePath
+
+                                    lrXMLRolePath.Id = lrRolePath.Id
+                                    lrXMLRolePath.SplitCombinationOperator = lrRolePath.SplitCombinationOperator
+
+                                    'RootObjectType is XmlIgnore in XMLModel.RolePath, and we still copy it for runtime usage.
+                                    If lrRolePath.RootObjectType IsNot Nothing Then
+                                        lrXMLRolePath.RootObjectType = New XMLModel.RootObjectType
+                                        lrXMLRolePath.RootObjectType.Id = lrRolePath.RootObjectType.id
+                                        lrXMLRolePath.RootObjectType.ModelElementId = lrRolePath.RootObjectType.BostonModelElement.Id
+                                        lrXMLRolePath.RootObjectType.IsNegated = lrRolePath.RootObjectType.IsNegated
+                                    End If
+
+                                    '--------------------------------------------
+                                    ' RolePath.PathedRoles
+                                    '--------------------------------------------
+                                    If lrRolePath.PathedRole IsNot Nothing Then
+                                        For Each lrPathedRole As FBM.PathedRole In lrRolePath.PathedRole
+                                            Dim lrXMLPathedRole As New XMLModel.PathedRole
+                                            lrXMLPathedRole.id = lrPathedRole.id
+                                            lrXMLPathedRole.Ref = lrPathedRole.Ref
+                                            lrXMLPathedRole.IsNegated = lrPathedRole.IsNegated
+                                            lrXMLPathedRole.Purpose = lrPathedRole.Purpose
+
+                                            lrXMLPathedRole.ValueRestriction = ConvertPathedRoleValueRestrictionToXmlModel(lrPathedRole.ValueRestriction)
+
+                                            lrXMLRolePath.PathedRole.Add(lrXMLPathedRole)
+                                        Next
+                                    End If
+
+                                    '--------------------------------------------
+                                    ' RolePath.SubPaths
+                                    '--------------------------------------------
+                                    If lrRolePath.SubPath IsNot Nothing Then
+                                        For Each lrSubPath As FBM.RoleSubPath In lrRolePath.SubPath
+
+                                            Dim lrXMLSubPath As XMLModel.RoleSubPath = ConvertRoleSubPathToXmlModel(lrSubPath)
+
+                                            If lrXMLSubPath IsNot Nothing Then
+                                                lrXMLRolePath.SubPath.Add(lrXMLSubPath)
+                                            End If
+
+                                        Next
+                                    End If
+
+                                    '--------------------------------------------
+                                    ' RolePath.ObjectUnifiers
+                                    '--------------------------------------------
+                                    If lrRolePath.ObjectUnifier IsNot Nothing Then
+                                        For Each lrObjectUnifier As FBM.ObjectUnifier In lrRolePath.ObjectUnifier
+
+                                            Dim lrXMLObjectUnifier As New XMLModel.ObjectUnifier
+                                            lrXMLObjectUnifier.id = lrObjectUnifier.id
+
+                                            '-----------------------------------------
+                                            ' PathedRole refs
+                                            '-----------------------------------------
+                                            If lrObjectUnifier.PathedRoles IsNot Nothing Then
+                                                For Each lrPathedRoleRef As FBM.PathedRoleReference In lrObjectUnifier.PathedRoles
+                                                    Dim lrXMLPathedRoleRef As New XMLModel.PathedRoleReference
+                                                    lrXMLPathedRoleRef.Ref = lrPathedRoleRef.Ref
+                                                    lrXMLObjectUnifier.PathedRoles.Add(lrXMLPathedRoleRef)
+                                                Next
+                                            End If
+
+                                            '-----------------------------------------
+                                            ' PathRoot refs
+                                            '-----------------------------------------
+                                            If lrObjectUnifier.PathRoots IsNot Nothing Then
+                                                For Each lrPathRootRef As FBM.PathRootReference In lrObjectUnifier.PathRoots
+                                                    Dim lrXMLPathRootRef As New XMLModel.PathRootReference
+                                                    lrXMLPathRootRef.Ref = lrPathRootRef.Ref
+                                                    lrXMLObjectUnifier.PathRoots.Add(lrXMLPathRootRef)
+                                                Next
+                                            End If
+
+                                            lrXMLRolePath.ObjectUnifier.Add(lrXMLObjectUnifier)
+
+                                        Next
+                                    End If
+
+
+                                    '--------------------------------------------
+                                    ' RolePath.CalculatedValues  (typed)
+                                    '--------------------------------------------
+                                    If lrRolePath.CalculatedValues IsNot Nothing Then
+
+                                        For Each lrCalculatedValue As FBM.CalculatedValue In lrRolePath.CalculatedValues
+
+                                            Dim lrXMLCalculatedValue As New XMLModel.CalculatedValue
+                                            lrXMLCalculatedValue.Id = lrCalculatedValue.Id
+
+                                            'Function ref
+                                            If lrCalculatedValue.Function IsNot Nothing Then
+                                                lrXMLCalculatedValue.Function = New XMLModel.FunctionRef
+                                                lrXMLCalculatedValue.Function.Ref = lrCalculatedValue.Function.Ref
+                                            End If
+
+                                            'AggregationContext
+                                            If lrCalculatedValue.AggregationContext IsNot Nothing Then
+
+                                                Dim lrXMLAggregationContext As New XMLModel.AggregationContext
+
+                                                If lrCalculatedValue.AggregationContext.PathRoot IsNot Nothing Then
+                                                    lrXMLAggregationContext.PathRoot = New XMLModel.PathRootReference
+                                                    lrXMLAggregationContext.PathRoot.Ref = lrCalculatedValue.AggregationContext.PathRoot.Ref
+                                                End If
+
+                                                lrXMLCalculatedValue.AggregationContext = lrXMLAggregationContext
+
+                                            End If
+
+                                            'Inputs
+                                            If lrCalculatedValue.Inputs IsNot Nothing AndAlso lrCalculatedValue.Inputs.Input IsNot Nothing Then
+
+                                                lrXMLCalculatedValue.Inputs = New XMLModel.Inputs
+
+                                                For Each lrInput As FBM.Input In lrCalculatedValue.Inputs.Input
+
+                                                    Dim lrXMLInput As New XMLModel.Input
+                                                    lrXMLInput.Id = lrInput.Id
+
+                                                    If lrInput.Parameter IsNot Nothing Then
+                                                        lrXMLInput.Parameter = New XMLModel.ParameterRef
+                                                        lrXMLInput.Parameter.Ref = lrInput.Parameter.Ref
+                                                    End If
+
+                                                    If lrInput.Source IsNot Nothing Then
+                                                        lrXMLInput.Source = New XMLModel.Source
+
+                                                        If lrInput.Source.Item IsNot Nothing Then
+
+                                                            If TypeOf lrInput.Source.Item Is FBM.PathRootReference Then
+
+                                                                Dim lrInRef As FBM.PathRootReference = CType(lrInput.Source.Item, FBM.PathRootReference)
+
+                                                                Dim lrOutRef As New XMLModel.PathRootReference
+                                                                lrOutRef.Ref = lrInRef.Ref
+                                                                lrXMLInput.Source.Item = lrOutRef
+
+                                                            ElseIf TypeOf lrInput.Source.Item Is FBM.PathedRoleRef Then
+                                                                Dim lrInRef As FBM.PathedRoleRef = CType(lrInput.Source.Item, FBM.PathedRoleRef)
+                                                                Dim lrOutRef As New XMLModel.PathedRoleRef
+                                                                lrOutRef.Ref = lrInRef.Ref
+                                                                lrXMLInput.Source.Item = lrOutRef
+
+                                                            ElseIf TypeOf lrInput.Source.Item Is FBM.CalculatedValueRef Then
+                                                                Dim lrInRef As FBM.CalculatedValueRef = CType(lrInput.Source.Item, FBM.CalculatedValueRef)
+                                                                Dim lrOutRef As New XMLModel.CalculatedValueRef
+                                                                lrOutRef.Ref = lrInRef.Ref
+                                                                lrXMLInput.Source.Item = lrOutRef
+
+                                                            ElseIf TypeOf lrInput.Source.Item Is FBM.Constant Then
+                                                                Dim lrInConst As FBM.Constant = CType(lrInput.Source.Item, FBM.Constant)
+                                                                Dim lrOutConst As New XMLModel.Constant
+                                                                lrOutConst.Id = lrInConst.Id
+                                                                lrOutConst.Value = lrInConst.Value
+                                                                lrXMLInput.Source.Item = lrOutConst
+
+                                                            End If
+                                                        End If
+                                                    End If
+
+                                                    lrXMLCalculatedValue.Inputs.Input.Add(lrXMLInput)
+
+                                                Next 'Input
+                                            End If 'Inputs
+
+                                            lrXMLRolePath.CalculatedValues.Add(lrXMLCalculatedValue)
+
+                                        Next 'CalculatedValue
+                                    End If
+
+                                    '--------------------------------------------
+                                    ' RolePath.Conditions  (typed)
+                                    '--------------------------------------------
+                                    If lrRolePath.Conditions IsNot Nothing Then
+
+                                        Dim lrXMLConditions As New XMLModel.Conditions
+
+                                        If lrRolePath.Conditions.Items IsNot Nothing Then
+                                            For Each lrNode As FBM.ConditionNode In lrRolePath.Conditions.Items
+                                                Dim lrXMLNode As XMLModel.ConditionNode = ConvertConditionNodeToXmlModel(lrNode)
+                                                If lrXMLNode IsNot Nothing Then
+                                                    lrXMLConditions.Items.Add(lrXMLNode)
+                                                End If
+                                            Next
+                                        End If
+
+                                        lrXMLRolePath.Conditions = lrXMLConditions
+
+                                    End If
+
+
+                                    lrXMLPathComponents.RolePath.Add(lrXMLRolePath)
+
+                                Next
+
+                                lrXMLDerivationPath.PathComponents = lrXMLPathComponents
+                            End If
+
+                            '--------------------------------------------
+                            ' DerivationProjections  (NORMA-structured)
+                            '--------------------------------------------
+                            If lrDerivationPath.Projection IsNot Nothing Then
+
+                                For Each lrProjection As FBM.DerivationProjection In lrDerivationPath.Projection
+
+                                    Dim lrXMLProjection As New XMLModel.DerivationProjection
+
+                                    lrXMLProjection.Id = lrProjection.Id
+                                    lrXMLProjection.Ref = lrProjection.Ref
+
+                                    '-----------------------------------------
+                                    ' RoleProjection (0..n)
+                                    '-----------------------------------------
+                                    If lrProjection.RoleProjection IsNot Nothing Then
+
+                                        For Each lrRoleProjection As FBM.RoleProjection In lrProjection.RoleProjection
+
+                                            Dim lrXMLRoleProjection As New XMLModel.RoleProjection
+
+                                            lrXMLRoleProjection.Id = lrRoleProjection.Id
+                                            lrXMLRoleProjection.Ref = lrRoleProjection.Ref
+
+                                            '-----------------------------------------
+                                            ' DerivationSource
+                                            '-----------------------------------------
+                                            If lrRoleProjection.DerivationSource IsNot Nothing Then
+
+                                                Dim lrXMLDerivationSource As New XMLModel.DerivationSource
+
+                                                ' PathRoot
+                                                If lrRoleProjection.DerivationSource.PathRoot IsNot Nothing Then
+                                                    lrXMLDerivationSource.PathRoot = New XMLModel.PathRootReference With {
+                                                                        .Ref = lrRoleProjection.DerivationSource.PathRoot.Ref
+                                                                    }
+                                                End If
+
+                                                ' CalculatedValue
+                                                If lrRoleProjection.DerivationSource.CalculatedValue IsNot Nothing Then
+                                                    lrXMLDerivationSource.CalculatedValue = New XMLModel.CalculatedValueReference With {
+                                                                        .Ref = lrRoleProjection.DerivationSource.CalculatedValue.Ref
+                                                                    }
+                                                End If
+
+                                                ' PathedRole
+                                                If lrRoleProjection.DerivationSource.PathedRole IsNot Nothing Then
+                                                    lrXMLDerivationSource.PathedRole = New XMLModel.PathedRoleReference With {
+                                                                        .Ref = lrRoleProjection.DerivationSource.PathedRole.Ref
+                                                                    }
+                                                End If
+
+                                                lrXMLRoleProjection.DerivationSource = lrXMLDerivationSource
+
+                                            End If
+
+                                            lrXMLProjection.RoleProjection.Add(lrXMLRoleProjection)
+
+                                        Next 'RoleProjection
+
+                                    End If
+
+                                    lrXMLDerivationPath.Projection.Add(lrXMLProjection)
+
+                                Next 'DerivationProjection
+
+                            End If
+
+                            lrXMLDerivationRule.FactTypeDerivationPath = lrXMLDerivationPath
+
+                        End If
+
+                        'Attach to FactType
+                        lrXMLFactType.DerivationRule = lrXMLDerivationRule
+
+                    End If
+
+#End Region
 
                     '---------------
                     'Map the Roles
@@ -223,7 +549,7 @@ SkipModelLevelEntityType:
                         lrXMLRole.SequenceNr = lrRole.SequenceNr
                         lrXMLRole.Mandatory = lrRole.Mandatory
 
-                        If IsSomething(lrRole.JoinedORMObject) Then
+                        If lrRole.JoinedORMObject IsNot Nothing Then
                             lrXMLRole.JoinedObjectTypeId = lrRole.JoinedORMObject.Id
                         End If
 
@@ -235,6 +561,7 @@ SkipModelLevelEntityType:
                     '---------------
                     'Map the Facts
                     '---------------
+#Region "Facts"
                     Dim lrFact As FBM.Fact
                     Dim lrXMLFact As XMLModel.Fact
                     Dim lrFactData As FBM.FactData
@@ -260,6 +587,7 @@ SkipModelLevelEntityType:
 
                         lrXMLFactType.Facts.Add(lrXMLFact)
                     Next
+#End Region
 
                     '----------------------
                     'Map FactTypeReadings
@@ -406,6 +734,49 @@ SkipModelLevelRoleConstraint:
                 Next
 #End Region
 
+                '==========================
+                'Map Functions (per nORMa)
+                '==========================
+#Region "Functions"
+                Dim lrFunction As FBM.Function
+                Dim lrXMLFunction As XMLModel.Function
+
+                For Each lrFunction In arFBMModel.Function
+
+                    lrXMLFunction = New XMLModel.Function
+
+                    lrXMLFunction.Id = lrFunction.id
+                    lrXMLFunction.Name = lrFunction.Name
+                    lrXMLFunction.OperatorSymbol = lrFunction.OperatorSymbol
+                    lrXMLFunction.IsBoolean = lrFunction.IsBoolean
+
+                    For Each lrParameter In lrFunction.Parameters
+
+                        Dim lrXMLParameter = New XMLModel.Parameter
+
+                        lrXMLParameter.Id = lrParameter.id
+                        lrXMLParameter.Name = lrParameter.Name
+                        lrXMLParameter.BagInput = lrParameter.BagInput
+
+                        lrXMLFunction.Parameters.Add(lrXMLParameter)
+
+                    Next
+
+                    Me.ORMModel.Functions.Add(lrXMLFunction)
+                Next
+
+#End Region
+                '================
+                'Map Synonymns
+                '================
+#Region "Synonyms"
+                For Each lrSynonym In arFBMModel.Synonyms
+
+                    Me.ORMModel.Synonyms.Add(New XMLModel.Synonym(lrSynonym.BaseTermModelElement.Id, lrSynonym.Synonym))
+
+                Next
+#End Region
+
                 '================================
                 'Map the Pages
                 '================================
@@ -416,6 +787,10 @@ SkipModelLevelRoleConstraint:
                 For Each lrPage In arFBMModel.Page
 
                     If lrPage.Language <> pcenumLanguage.ORMModel And abExcludedMDAModelElements Then Continue For
+
+                    If lrPage.GetAllPageObjects.Count > 0 Then
+                        lrPage.Loaded = True
+                    End If
 
                     lrExportPage = Me.MapToXMLPage(lrPage)
 
@@ -431,7 +806,7 @@ SkipModelLevelRoleConstraint:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -470,6 +845,17 @@ SkipModelLevelRoleConstraint:
                 ' the MetaModel of a Use Case Diagram in First-Order Logic.
                 '-----------------------------------------------------------------------
 
+                '=============================================================================
+                'Overarching
+                '  In this strategy, if a User has never opened a Page, then all of the CocneptInstances are within its ConceptInstance list.
+                '  I.e. There is no need to laboriously step through ValueTypeInstances, EntityTypeInstance etc.
+                '  Just copy the ConceptInstance list over to the Export page and you are done.
+                If arPage.Loaded = False And arPage.ConceptInstance.Count > 0 And lrPage.GetAllPageObjects.Count = 0 Then
+                    lrExportPage.ConceptInstance = arPage.ConceptInstance
+                    Return lrExportPage
+                End If
+
+
                 '------------------------------------------
                 'Establish ConceptInstances for the Page.
                 '------------------------------------------
@@ -488,6 +874,7 @@ SkipModelLevelRoleConstraint:
                 'Establish the set of EntityTypeInstances that are on the Page
                 '  as ConceptInstances.
                 '--------------------------------------------------------------
+#Region "EntityTypeInstances"
                 For Each lrEntityTypeInstance In lrPage.EntityTypeInstance
 
                     lrConceptInstance = lrEntityTypeInstance.CloneConceptInstance
@@ -496,11 +883,13 @@ SkipModelLevelRoleConstraint:
                     '-------------------------------------
                     lrExportPage.ConceptInstance.Add(lrConceptInstance)
                 Next
+#End Region
 
                 '--------------------------------------------------------------
                 'Establish the set of ValueTypeInstances that are on the Page
                 '  as ConceptInstances.
                 '--------------------------------------------------------------
+#Region "ValueTypeInstances"
                 For Each lrValueTypeInstance In lrPage.ValueTypeInstance
                     lrConceptInstance = lrValueTypeInstance.CloneConceptInstance
                     '-------------------------------------
@@ -508,13 +897,20 @@ SkipModelLevelRoleConstraint:
                     '-------------------------------------
                     lrExportPage.ConceptInstance.Add(lrConceptInstance)
                 Next
+#End Region
 
                 '--------------------------------------------------------------
                 'Establish the set of FactTypeInstances that are on the Page
                 '  as ConceptInstances.
                 '--------------------------------------------------------------
+#Region "FactTypeInstances"
+                'NB Facts are below RoleConstraintInstances, below
                 For Each lrFactTypeInstance In lrPage.FactTypeInstance
+
                     lrConceptInstance = lrFactTypeInstance.CloneConceptInstance
+
+                    lrConceptInstance.Visible = lrFactTypeInstance._Visible Or lrFactTypeInstance.IsObjectified Or (lrFactTypeInstance.Shape IsNot Nothing AndAlso lrFactTypeInstance.Shape.Visible)
+
                     '-------------------------------------
                     'Add the ConceptInstance to the Page
                     '-------------------------------------
@@ -528,6 +924,8 @@ SkipModelLevelRoleConstraint:
                                                                      lrFactTypeInstance.Page,
                                                                      lrFactTypeInstance.Id,
                                                                      pcenumConceptType.DerivationText)
+
+
                         lrConceptInstance.X = lrFactTypeInstance.FactTypeDerivationText.X
                         lrConceptInstance.Y = lrFactTypeInstance.FactTypeDerivationText.Y
 
@@ -573,11 +971,13 @@ SkipModelLevelRoleConstraint:
                         lrExportPage.ConceptInstance.Add(lrConceptInstance)
                     End If
                 Next
+#End Region
 
                 '--------------------------------------------------------------
                 'Establish the set of RoleConstraintInstances that are on the Page
                 '  as ConceptInstances.
                 '--------------------------------------------------------------
+#Region "RoleConstraintInstances"
                 For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
 
                     lrConceptInstance = lrRoleConstraintInstance.CloneConceptInstance
@@ -586,23 +986,30 @@ SkipModelLevelRoleConstraint:
                     '-------------------------------------
                     lrExportPage.ConceptInstance.Add(lrConceptInstance)
                 Next
+#End Region
 
                 '--------------------------------------------------------------
                 'Establish the set of FactInstances that are on the Page
                 '  as ConceptInstances.
                 '--------------------------------------------------------------
+#Region "FactInstances"
                 Dim larFactInstance = From FactTypeInstance In lrPage.FactTypeInstance
                                       From FactInstance In FactTypeInstance.Fact
                                       Select FactInstance
 
                 For Each lrFactInstance In larFactInstance
+
                     lrConceptInstance = lrFactInstance.CloneConceptInstance
+                    lrConceptInstance.X = lrFactInstance.X
+                    lrConceptInstance.Y = lrFactInstance.Y
                     '-------------------------------------
                     'Add the ConceptInstance to the Page
                     '-------------------------------------
                     lrExportPage.ConceptInstance.Add(lrConceptInstance)
                 Next
+#End Region
 
+#Region "FactDataInstances"
                 '--------------------------------------------------------------
                 'Establish the set of ValueInstances that are on the Page
                 '  as ConceptInstances.
@@ -618,6 +1025,7 @@ SkipModelLevelRoleConstraint:
                     '-------------------------------------
                     lrExportPage.ConceptInstance.Add(lrConceptInstance)
                 Next
+#End Region
 
                 '--------------------------------------------------------------
                 'Establish the set of RoleNameInstances that are on the Page
@@ -647,6 +1055,7 @@ SkipModelLevelRoleConstraint:
                 '-----------------------------------------------
                 'Model Notes
                 '-----------------------------------------------
+#Region "Model Notes"
                 For Each lrModelNoteInstance In lrPage.ModelNoteInstance
                     lrConceptInstance = lrModelNoteInstance.CloneConceptInstance
                     '-------------------------------------
@@ -654,6 +1063,7 @@ SkipModelLevelRoleConstraint:
                     '-------------------------------------
                     lrExportPage.ConceptInstance.Add(lrConceptInstance)
                 Next
+#End Region
 
                 Return lrExportPage
 
@@ -676,8 +1086,9 @@ SkipModelLevelRoleConstraint:
                                       Optional ByVal abSkipAlreadyLoadedModelElements As Boolean = False) As FBM.Model
 
             Try
-
+                Dim larFactType As List(Of FBM.FactType)
                 Dim lsMessage As String = ""
+
                 Dim lrModel As New FBM.Model
                 If arModel IsNot Nothing Then
                     lrModel = arModel
@@ -719,6 +1130,7 @@ SkipModelLevelRoleConstraint:
                     lrValueType.DataTypePrecision = lrXMLValueType.DataTypePrecision
                     lrValueType.DataTypeLength = lrXMLValueType.DataTypeLength
                     lrValueType.IsIndependent = lrXMLValueType.IsIndependent
+                    lrValueType.ObjectifyingFactTypeId = lrXMLValueType.ObjectifyingFactTypeId
                     lrValueType.IsMDAModelElement = lrXMLValueType.IsMDAModelElement
                     lrValueType.DBName = lrXMLValueType.DBName
                     lrValueType.ShortDescription = lrXMLValueType.ShortDescription
@@ -733,7 +1145,7 @@ SkipModelLevelRoleConstraint:
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
                     Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrValueType.Id, pcenumConceptType.ValueType, lrValueType.ShortDescription, lrValueType.LongDescription, True, True, lrValueType.DBName)
-                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, ,,, True,, True)
+                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , False,, True,, True)
 
 
                     lrValueType.Concept = lrDictionaryEntry.Concept
@@ -780,6 +1192,8 @@ SkipValueType:
                     lrEntityType.DBName = lrXMLEntityType.DBName
                     lrEntityType.ShortDescription = lrXMLEntityType.ShortDescription
                     lrEntityType.LongDescription = lrXMLEntityType.LongDescription
+                    lrEntityType.ModelElementFlag = lrXMLEntityType.ModelElementFlags
+                    lrEntityType.GraphLabel = lrXMLEntityType.GraphLabel.Select(Function(x) New RDS.GraphLabel With {.Model = lrModel, .ModelElement = lrEntityType, .ModelElementId = lrEntityType.Id, .ModelId = lrModel.ModelId, .Label = x}).ToList
 
                     If lrXMLEntityType.ReferenceModeValueTypeId = "" Then
                         lrEntityType.ReferenceModeValueType = Nothing
@@ -799,7 +1213,7 @@ SkipValueType:
                     'Link to the Concept within the ModelDictionary
                     '------------------------------------------------
                     Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrEntityType.Name, pcenumConceptType.EntityType, lrEntityType.ShortDescription, lrEntityType.LongDescription, True, True, lrEntityType.DBName)
-                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , True,, True,, True)
+                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , False,, True,, True)
 
                     lrEntityType.Concept = lrDictionaryEntry.Concept
 
@@ -813,10 +1227,10 @@ SkipEntityType:
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(64)
 #End Region
 
-
                 '==============================
                 'Map the FactTypes
                 '==============================
+#Region "FactTypes"
                 Dim lrXMLFactType As XMLModel.FactType
                 Dim lrFactType As FBM.FactType
 
@@ -835,21 +1249,26 @@ SkipEntityType:
 SkipFactType:
                 Next
 
+                'All Fact Types now exist, so deferred derivation roots can be resolved.
+                Call Me.ResolveDerivationRolePathRoots(lrModel)
+
                 ' Build a dictionary for faster search
                 Me.FactTypeDictionary = lrModel.FactType.ToDictionary(Function(x) x.Id)
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(66)
+#End Region
 
                 '===============================================================================================
                 'Populate Roles that are (still) joined to Nothing
                 '===================================================
+#Region "Role Cleanup"
                 Dim latType = {GetType(FBM.ValueType),
                                GetType(FBM.EntityType),
                                GetType(FBM.FactType)}
 
                 Dim larRole = From Role In lrModel.Role
                               Where Role.JoinedORMObject Is Nothing _
-                              Or Not latType.Contains(Role.JoinedORMObject.GetType)
+                              OrElse Not latType.Contains(Role.JoinedORMObject.GetType)
                               Select Role
 
                 For Each lrRole In larRole
@@ -862,18 +1281,20 @@ SkipFactType:
                     lrRole.JoinedORMObject = New FBM.ModelObject
                     lrRole.JoinedORMObject.Id = lrXMLRole(0).JoinedObjectTypeId
 
-                    If IsSomething(lrModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
+                    If lrModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals) IsNot Nothing Then
                         lrRole.JoinedORMObject = lrModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    ElseIf IsSomething(lrModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
+                    ElseIf lrModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals) IsNot Nothing Then
                         lrRole.JoinedORMObject = lrModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                     Else
                         lrRole.JoinedORMObject = lrModel.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                     End If
                 Next
 
+#End Region
                 '==============================
                 'Subtype Relationships
                 '==============================
+#Region "Subtype Relationships"
                 Dim larSubtypeRelationshipFactTypes = From FactType In Me.ORMModel.FactTypes
                                                       Where FactType.IsSubtypeRelationshipFactType
                                                       Select FactType
@@ -881,224 +1302,282 @@ SkipFactType:
                 Dim lrModelElement As FBM.ModelObject
                 For Each lrXMLFactType In larSubtypeRelationshipFactTypes
 
-                    If abSkipAlreadyLoadedModelElements Then
-                        'Really only ever called when using the UnifiedOntologyBrowser
-                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
-                        If lrModel.FactType.Find(Function(x) x.Id = lrXMLFactType.Id) IsNot Nothing Then GoTo SkipSubtypeRelationship
-                    End If
+                    Try
 
-                    lrFactType = New FBM.FactType(lrXMLFactType.Id, True)
-                    lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
+                        If abSkipAlreadyLoadedModelElements Then
+                            'Really only ever called when using the UnifiedOntologyBrowser
+                            '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                            If lrModel.FactType.Find(Function(x) x.Id = lrXMLFactType.Id) IsNot Nothing Then GoTo SkipSubtypeRelationship
+                        End If
 
-                    Dim lrParentModelElement As FBM.ModelObject
-                    lrModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(0).JoinedORMObject.Id)
-                    lrParentModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(1).JoinedORMObject.Id)
+                        lrFactType = New FBM.FactType(lrXMLFactType.Id, True)
+                        lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
 
-                    If lrParentModelElement Is Nothing Then
-                        lrModel.AddModelError(New FBM.ModelError(pcenumModelErrors.ModelLoadingError, "Model Element Not Found, " & lrFactType.RoleGroup(1).JoinedORMObject.Id & "."))
-                        GoTo SkipSubtypeRelationship
-                    End If
+                        Dim lrParentModelElement As FBM.ModelObject
+                        lrModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(0).JoinedORMObject.Id)
+                        lrParentModelElement = lrModel.GetModelObjectByName(lrFactType.RoleGroup(1).JoinedORMObject.Id)
 
-                    If lrParentModelElement.GetType = GetType(FBM.FactType) Then
-                        lrParentModelElement = CType(lrParentModelElement, FBM.FactType).ObjectifyingEntityType
-                    End If
-                    lrModelElement.parentModelObjectList.Add(lrParentModelElement)
-                    lrParentModelElement.childModelObjectList.Add(lrModelElement)
+                        If lrParentModelElement Is Nothing Then
+                            lrModel.AddModelError(New FBM.ModelError(pcenumModelErrors.ModelLoadingError, "Model Element Not Found, " & lrFactType.RoleGroup(1).JoinedORMObject.Id & "."))
+                            GoTo SkipSubtypeRelationship
+                        End If
 
-                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
+                        If lrParentModelElement.GetType = GetType(FBM.FactType) Then
+                            lrParentModelElement = CType(lrParentModelElement, FBM.FactType).ObjectifyingEntityType
 
-                    Select Case lrModelElement.GetType
-                        Case Is = GetType(FBM.EntityType)
-                            Dim larSubtypeRelationship = From EntityType In Me.ORMModel.EntityTypes
-                                                         From SubtypeRelationship In EntityType.SubtypeRelationships
-                                                         Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
-                                                         Select SubtypeRelationship
-                            Try
-                                lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
-                            Catch ex As Exception
-                                'CodeSafe
-                                'Not a biggie at this stage.
-                            End Try
+                            If lrParentModelElement Is Nothing Then
+                                lsMessage = "Consider removing the Subtype Relationship: " & lrFactType.Id
+                                lsMessage.AppendDoubleLineBreak("There is no Supertype, " & lrFactType.RoleGroup(1).JoinedORMObject.Id & ", in the model.")
+                                Throw New Exception(lsMessage)
+                            End If
+                        End If
+                        lrModelElement.parentModelObjectList.Add(lrParentModelElement)
+                        lrParentModelElement.childModelObjectList.Add(lrModelElement)
 
-                        Case Is = GetType(FBM.ValueType)
-                            Dim larSubtypeRelationship = From ValueType In Me.ORMModel.ValueTypes
-                                                         From SubtypeRelationship In ValueType.SubtypeRelationships
-                                                         Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
-                                                         Select SubtypeRelationship
-                            Try
-                                lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
-                            Catch ex As Exception
-                                'CodeSafe
-                                'Not a biggie at this stage.
-                            End Try
+                        Dim lrSubtypeConstraint As New FBM.SubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
 
-                    End Select
+                        Select Case lrModelElement.GetType
+                            Case Is = GetType(FBM.EntityType)
+                                Dim larSubtypeRelationship = From EntityType In Me.ORMModel.EntityTypes
+                                                             From SubtypeRelationship In EntityType.SubtypeRelationships
+                                                             Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
+                                                             Select SubtypeRelationship
+                                Try
+                                    lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                                Catch ex As Exception
+                                    'CodeSafe
+                                    'Not a biggie at this stage.
+                                End Try
 
-                    lrModelElement.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
+                            Case Is = GetType(FBM.ValueType)
+                                Dim larSubtypeRelationship = From ValueType In Me.ORMModel.ValueTypes
+                                                             From SubtypeRelationship In ValueType.SubtypeRelationships
+                                                             Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
+                                                             Select SubtypeRelationship
+                                Try
+                                    lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                                Catch ex As Exception
+                                    'CodeSafe
+                                    'Not a biggie at this stage.
+                                End Try
+
+                            Case Is = GetType(FBM.FactType)
+                                Dim larSubtypeRelationship = From FactType In Me.ORMModel.FactTypes
+                                                             From SubtypeRelationship In FactType.SubtypeRelationships
+                                                             Where SubtypeRelationship.SubtypingFactTypeId = lrFactType.Id
+                                                             Select SubtypeRelationship
+                                Try
+                                    lrSubtypeConstraint.IsPrimarySubtypeRelationship = larSubtypeRelationship.First.IsPrimarySubtypeRelationship
+                                Catch ex As Exception
+                                    'CodeSafe
+                                    'Not a biggie at this stage.
+                                End Try
+
+                        End Select
+
+                        lrModelElement.SubtypeRelationship.AddUnique(lrSubtypeConstraint)
+
+                    Catch ex As Exception
+                        Dim lsMessage1 As String
+                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                        lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                        lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                        prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Warning, , False,,,, True)
+                    End Try
 SkipSubtypeRelationship:
                 Next
 
+#End Region
 
                 '==============================
                 'Map the RoleConstraints
                 '==============================
+#Region "Role Constraints"
                 Dim lrXMLRoleConstraint As XMLModel.RoleConstraint
                 Dim lrRoleConstraint As FBM.RoleConstraint
 
                 For Each lrXMLRoleConstraint In Me.ORMModel.RoleConstraints
 
-                    If abSkipAlreadyLoadedModelElements Then
-                        'Really only ever called when using the UnifiedOntologyBrowser
-                        '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
-                        If lrModel.RoleConstraint.Find(Function(x) x.Id = lrXMLRoleConstraint.Id) IsNot Nothing Then GoTo SkipRoleConstraint
-                    End If
+                    Try
+                        If abSkipAlreadyLoadedModelElements Then
+                            'Really only ever called when using the UnifiedOntologyBrowser
+                            '  and when need to load the rest of a Model when part of the Model has already been loaded inside the UnifiedOntologyBrowser.
+                            If lrModel.RoleConstraint.Find(Function(x) x.Id = lrXMLRoleConstraint.Id) IsNot Nothing Then GoTo SkipRoleConstraint
+                        End If
 
-                    lrRoleConstraint = New FBM.RoleConstraint
-                    lrRoleConstraint.Id = lrXMLRoleConstraint.Id
-                    lrRoleConstraint.GUID = lrXMLRoleConstraint.GUID
-                    lrRoleConstraint.Model = lrModel
-                    lrRoleConstraint.Name = lrXMLRoleConstraint.Name
-                    'lrRoleConstraint.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
-                    'lrRoleConstraint.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
-                    lrRoleConstraint.ConceptType = pcenumConceptType.RoleConstraint
-                    lrRoleConstraint.RoleConstraintType = CType([Enum].Parse(GetType(pcenumRoleConstraintType), lrXMLRoleConstraint.RoleConstraintType), pcenumRoleConstraintType)
-                    lrRoleConstraint.RingConstraintType = CType([Enum].Parse(GetType(pcenumRingConstraintType), lrXMLRoleConstraint.RingConstraintType), pcenumRingConstraintType)
-                    'lrRoleConstraint.LevelNr = <See right down the bottom of this method>
-                    lrRoleConstraint.IsPreferredIdentifier = lrXMLRoleConstraint.IsPreferredUniqueness
-                    lrRoleConstraint.IsDeontic = lrXMLRoleConstraint.IsDeontic
-                    lrRoleConstraint.Cardinality = lrXMLRoleConstraint.Cardinality
-                    lrRoleConstraint.MaximumFrequencyCount = lrXMLRoleConstraint.MaximumFrequencyCount
-                    lrRoleConstraint.MinimumFrequencyCount = lrXMLRoleConstraint.MinimumFrequencyCount
-                    Select Case lrXMLRoleConstraint.CardinalityRangeType
-                        Case Is = pcenumCardinalityRangeType.LessThanOrEqual.ToString
-                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
-                        Case Is = pcenumCardinalityRangeType.Equal.ToString
-                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Equal
-                        Case Is = pcenumCardinalityRangeType.GreaterThanOrEqual.ToString
-                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
-                        Case Is = pcenumCardinalityRangeType.Between.ToString
-                            lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Between
-                    End Select
-                    lrRoleConstraint.IsMDAModelElement = lrXMLRoleConstraint.IsMDAModelElement
-                    lrRoleConstraint.ShortDescription = lrXMLRoleConstraint.ShortDescription
-                    lrRoleConstraint.LongDescription = lrXMLRoleConstraint.LongDescription
-
-                    '------------------------------------------------
-                    'Link to the Concept within the ModelDictionary
-                    '------------------------------------------------
-                    Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrRoleConstraint.Id, pcenumConceptType.RoleConstraint, lrRoleConstraint.ShortDescription, lrRoleConstraint.LongDescription, True, True)
-                    lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , False,, True,, True)
-
-                    If lrDictionaryEntry Is Nothing Then
-                        lsMessage = "Cannot find DictionaryEntry in the ModelDictionary for RoleConstraint:"
-                        lsMessage &= vbCrLf & "Model.Id: " & lrModel.ModelId
-                        lsMessage &= vbCrLf & "RoleConstraint.Id: " & lrRoleConstraint.Id
-                        Throw New Exception(lsMessage)
-                    End If
-
-                    lrRoleConstraint.Concept = lrDictionaryEntry.Concept
-
-                    '----------------------------------------------------------
-                    'Get the RoleConstraintRole list for the RoleConstraint.
-                    '  NB the SequenceNr of a RoleConstraintRole is 'not' the same as a SequenceNr on a Role.
-                    '  SequenceNr on a RoleConstraintRole is many things, but
-                    '  relates particularly to DataIn, DataOut integrity matching.
-                    '----------------------------------------------------------
-                    Dim lrXMLRoleConstraintRole As XMLModel.RoleConstraintRole
-                    Dim lrRoleConstraintRole As FBM.RoleConstraintRole
-                    Dim lrRole As New FBM.Role
-
-                    For Each lrXMLRoleConstraintRole In lrXMLRoleConstraint.RoleConstraintRoles
-                        Try
-                            lrRoleConstraintRole = New FBM.RoleConstraintRole
-                            lrRoleConstraintRole.Model = lrModel
-                            lrRoleConstraintRole.RoleConstraint = lrRoleConstraint
-                            lrRoleConstraintRole.SequenceNr = lrXMLRoleConstraintRole.SequenceNr
-                            lrRoleConstraintRole.IsEntry = lrXMLRoleConstraintRole.IsEntry
-                            lrRoleConstraintRole.IsExit = lrXMLRoleConstraintRole.IsExit
-
-
-                            lrRole.Id = lrXMLRoleConstraintRole.RoleId
-
-                            lrRoleConstraintRole.Role = lrModel.Role.Find(AddressOf lrRole.Equals)
-
-                            '-------------------------------------------------------------------
-                            'lrRoleConstraintRole.RoleConstraintArgument is set further below.
-                            '-------------------------------------------------------------------
-                            lrRoleConstraintRole.ArgumentSequenceNr = lrXMLRoleConstraintRole.ArgumentSequenceNr
-
-                            lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
-                            lrRoleConstraint.Role.Add(lrRoleConstraintRole.Role)
-                            lrRoleConstraintRole.Role.RoleConstraintRole.Add(lrRoleConstraintRole)
-                        Catch ex As Exception
-                            prApplication.ThrowErrorMessage("Error loading RoleConsraintRole for RoleConstraint," & lrXMLRoleConstraint.Id, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, False, ex)
-                        End Try
-SkipRoleConstraintRole:
-                    Next
-
-                    If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
-                        prApplication.ThrowErrorMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
-                    Else
-                        lrFactType = lrRoleConstraint.Role(0).FactType
-                        lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
-
-                        Select Case lrRoleConstraint.RoleConstraintType
-                            Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                                Call lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+                        lrRoleConstraint = New FBM.RoleConstraint
+                        lrRoleConstraint.Id = lrXMLRoleConstraint.Id
+                        lrRoleConstraint.GUID = lrXMLRoleConstraint.GUID
+                        lrRoleConstraint.Model = lrModel
+                        lrRoleConstraint.Name = lrXMLRoleConstraint.Name
+                        'lrRoleConstraint.ShortDescription = Trim(Viev.NullVal(lREcordset("ShortDescription").Value, ""))
+                        'lrRoleConstraint.LongDescription = Trim(Viev.NullVal(lREcordset("LongDescription").Value, ""))
+                        lrRoleConstraint.ConceptType = pcenumConceptType.RoleConstraint
+                        lrRoleConstraint.RoleConstraintType = CType([Enum].Parse(GetType(pcenumRoleConstraintType), lrXMLRoleConstraint.RoleConstraintType), pcenumRoleConstraintType)
+                        lrRoleConstraint.RingConstraintType = CType([Enum].Parse(GetType(pcenumRingConstraintType), lrXMLRoleConstraint.RingConstraintType), pcenumRingConstraintType)
+                        'lrRoleConstraint.LevelNr = <See right down the bottom of this method>
+                        lrRoleConstraint.IsPreferredIdentifier = lrXMLRoleConstraint.IsPreferredUniqueness
+                        lrRoleConstraint.IsDeontic = lrXMLRoleConstraint.IsDeontic
+                        lrRoleConstraint.Cardinality = lrXMLRoleConstraint.Cardinality
+                        lrRoleConstraint.MaximumFrequencyCount = lrXMLRoleConstraint.MaximumFrequencyCount
+                        lrRoleConstraint.MinimumFrequencyCount = lrXMLRoleConstraint.MinimumFrequencyCount
+                        Select Case lrXMLRoleConstraint.CardinalityRangeType
+                            Case Is = pcenumCardinalityRangeType.LessThanOrEqual.ToString
+                                lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.LessThanOrEqual
+                            Case Is = pcenumCardinalityRangeType.Equal.ToString
+                                lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Equal
+                            Case Is = pcenumCardinalityRangeType.GreaterThanOrEqual.ToString
+                                lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.GreaterThanOrEqual
+                            Case Is = pcenumCardinalityRangeType.Between.ToString
+                                lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Between
                         End Select
-                    End If
+                        lrRoleConstraint.IsMDAModelElement = lrXMLRoleConstraint.IsMDAModelElement
+                        lrRoleConstraint.ShortDescription = lrXMLRoleConstraint.ShortDescription
+                        lrRoleConstraint.LongDescription = lrXMLRoleConstraint.LongDescription
 
-                    Dim lrRoleConstraintArgument As FBM.RoleConstraintArgument
-                    Dim lrXMLRoleConstraintArgument As XMLModel.RoleConstraintArgument
-                    Dim lrJoinPath As FBM.JoinPath
-                    Dim lrXMLRoleReference As XMLModel.RoleReference
+                        '------------------------------------------------
+                        'Link to the Concept within the ModelDictionary
+                        '------------------------------------------------
+                        Dim lrDictionaryEntry As New FBM.DictionaryEntry(lrModel, lrRoleConstraint.Id, pcenumConceptType.RoleConstraint, lrRoleConstraint.ShortDescription, lrRoleConstraint.LongDescription, True, True)
+                        lrDictionaryEntry = lrModel.AddModelDictionaryEntry(lrDictionaryEntry, , False,, True,, True)
 
-                    For Each lrXMLRoleConstraintArgument In lrXMLRoleConstraint.Argument
-                        lrRoleConstraintArgument = New FBM.RoleConstraintArgument(lrRoleConstraint,
-                                                                                  lrXMLRoleConstraintArgument.SequenceNr,
-                                                                                  lrXMLRoleConstraintArgument.Id)
-                        lrRoleConstraintArgument.isDirty = True
+                        If lrDictionaryEntry Is Nothing Then
+                            lsMessage = "Cannot find DictionaryEntry in the ModelDictionary for RoleConstraint:"
+                            lsMessage &= vbCrLf & "Model.Id: " & lrModel.ModelId
+                            lsMessage &= vbCrLf & "RoleConstraint.Id: " & lrRoleConstraint.Id
+                            Throw New Exception(lsMessage)
+                        End If
 
-                        lrJoinPath = New FBM.JoinPath(lrRoleConstraintArgument)
-                        lrJoinPath.JoinPathError = lrXMLRoleConstraintArgument.JoinPath.JoinPathError
+                        lrRoleConstraint.Concept = lrDictionaryEntry.Concept
 
-                        For Each lrXMLRoleReference In lrXMLRoleConstraintArgument.Role
-                            lrRole = New FBM.Role
-                            lrRole.Id = lrXMLRoleReference.RoleId
-                            lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint)
-                            lrRoleConstraintRole = lrRoleConstraint.RoleConstraintRole.Find(AddressOf lrRoleConstraintRole.EqualsByRole)
-                            lrRoleConstraintArgument.RoleConstraintRole.Add(lrRoleConstraintRole)
-                            lrRoleConstraintRole.RoleConstraintArgument = lrRoleConstraintArgument
+                        '----------------------------------------------------------
+                        'Get the RoleConstraintRole list for the RoleConstraint.
+                        '  NB the SequenceNr of a RoleConstraintRole is 'not' the same as a SequenceNr on a Role.
+                        '  SequenceNr on a RoleConstraintRole is many things, but
+                        '  relates particularly to DataIn, DataOut integrity matching.
+                        '----------------------------------------------------------
+                        Dim lrXMLRoleConstraintRole As XMLModel.RoleConstraintRole
+                        Dim lrRoleConstraintRole As FBM.RoleConstraintRole
+                        Dim lrRole As New FBM.Role
+
+                        For Each lrXMLRoleConstraintRole In lrXMLRoleConstraint.RoleConstraintRoles
+                            Try
+                                lrRoleConstraintRole = New FBM.RoleConstraintRole
+                                lrRoleConstraintRole.Model = lrModel
+                                lrRoleConstraintRole.RoleConstraint = lrRoleConstraint
+                                lrRoleConstraintRole.SequenceNr = lrXMLRoleConstraintRole.SequenceNr
+                                lrRoleConstraintRole.IsEntry = lrXMLRoleConstraintRole.IsEntry
+                                lrRoleConstraintRole.IsExit = lrXMLRoleConstraintRole.IsExit
+                                lrRoleConstraintRole.ArgumentSequenceNr = lrXMLRoleConstraintRole.ArgumentSequenceNr
+
+                                lrRole.Id = lrXMLRoleConstraintRole.RoleId
+
+                                lrRoleConstraintRole.Role = lrModel.Role.Find(AddressOf lrRole.Equals)
+
+                                'CodeSafe
+                                If lrRoleConstraintRole.Role Is Nothing Then
+                                    'Not a good situation, but must deal with it
+                                    lsMessage = "Note: Role Link unidentifiable in Role Constraint: " & lrRoleConstraint.Id
+                                    lsMessage.AppendDoubleLineBreak("Removing the Role Link from the Model.")
+                                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, , False,,,, True,,)
+                                    Continue For
+                                Else
+                                    '-------------------------------------------------------------------
+                                    'lrRoleConstraintRole.RoleConstraintArgument is set further below.
+                                    '-------------------------------------------------------------------
+                                    lrRoleConstraint.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                    lrRoleConstraint.Role.Add(lrRoleConstraintRole.Role)
+                                    lrRoleConstraintRole.Role.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                End If
+
+                            Catch ex As Exception
+                                prApplication.ThrowMessage("Error loading RoleConsraintRole for RoleConstraint," & lrXMLRoleConstraint.Id, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, True, ex)
+                            End Try
+SkipRoleConstraintRole:
                         Next
 
-                        For Each lrXMLRoleReference In lrXMLRoleConstraintArgument.JoinPath.RolePath
-                            lrRole = New FBM.Role
-                            lrRole.Id = lrXMLRoleReference.RoleId
-                            lrRole = lrModel.Role.Find(AddressOf lrRole.Equals)
-                            lrJoinPath.RolePath.Add(lrRole)
+                        If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
+                            prApplication.ThrowMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
+                        Else
+                            Try
+                                Select Case lrRoleConstraint.RoleConstraintType
+                                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+
+                                        larFactType = (From Role In lrRoleConstraint.Role
+                                                       Where Role IsNot Nothing
+                                                       Select Role.FactType).ToList
+
+                                        If larFactType.Count = 0 Then
+                                            Throw New Exception("Error: No Role exists for Role Constraint: " & lrRoleConstraint.Id)
+                                        Else
+                                            lrFactType = larFactType.First
+                                            Call lrFactType.AddInternalUniquenessConstraint(lrRoleConstraint)
+                                        End If
+
+                                End Select
+                            Catch ex As Exception
+                                lsMessage = "Error finding FactType for a Role of Role Constraint: " & lrRoleConstraint.Id
+                                lsMessage.AppendDoubleLineBreak(ex.Message)
+                                Throw New Exception(lsMessage)
+                            End Try
+                        End If
+
+                        Dim lrRoleConstraintArgument As FBM.RoleConstraintArgument
+                        Dim lrXMLRoleConstraintArgument As XMLModel.RoleConstraintArgument
+                        Dim lrJoinPath As FBM.JoinPath
+                        Dim lrXMLRoleReference As XMLModel.RoleReference
+
+                        For Each lrXMLRoleConstraintArgument In lrXMLRoleConstraint.Argument
+                            lrRoleConstraintArgument = New FBM.RoleConstraintArgument(lrRoleConstraint,
+                                                                                      lrXMLRoleConstraintArgument.SequenceNr,
+                                                                                      lrXMLRoleConstraintArgument.Id)
+                            lrRoleConstraintArgument.isDirty = True
+
+                            lrJoinPath = New FBM.JoinPath(lrRoleConstraintArgument)
+                            lrJoinPath.JoinPathError = lrXMLRoleConstraintArgument.JoinPath.JoinPathError
+
+                            For Each lrXMLRoleReference In lrXMLRoleConstraintArgument.Role
+                                lrRole = New FBM.Role
+                                lrRole.Id = lrXMLRoleReference.RoleId
+                                lrRoleConstraintRole = New FBM.RoleConstraintRole(lrRole, lrRoleConstraint)
+                                lrRoleConstraintRole = lrRoleConstraint.RoleConstraintRole.Find(AddressOf lrRoleConstraintRole.EqualsByRole)
+                                lrRoleConstraintArgument.RoleConstraintRole.Add(lrRoleConstraintRole)
+                                lrRoleConstraintRole.RoleConstraintArgument = lrRoleConstraintArgument
+                            Next
+
+                            For Each lrXMLRoleReference In lrXMLRoleConstraintArgument.JoinPath.RolePath
+                                lrRole = New FBM.Role
+                                lrRole.Id = lrXMLRoleReference.RoleId
+                                lrRole = lrModel.Role.Find(AddressOf lrRole.Equals)
+                                lrJoinPath.RolePath.Add(lrRole)
+                            Next
+                            lrRoleConstraintArgument.JoinPath = lrJoinPath
+                            Call lrRoleConstraintArgument.JoinPath.ConstructFactTypePath()
+                            lrRoleConstraint.Argument.Add(lrRoleConstraintArgument)
                         Next
-                        lrRoleConstraintArgument.JoinPath = lrJoinPath
-                        Call lrRoleConstraintArgument.JoinPath.ConstructFactTypePath()
-                        lrRoleConstraint.Argument.Add(lrRoleConstraintArgument)
-                    Next
 
-                    If (lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint) And (lrRoleConstraint.Role.Count > 0) Then
-                        lrRoleConstraint.LevelNr = lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.Count
-                    End If
+                        If (lrRoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint) And (lrRoleConstraint.Role.Count > 0) Then
+                            lrRoleConstraint.LevelNr = lrRoleConstraint.Role(0).FactType.InternalUniquenessConstraint.Count
+                        End If
 
-                    'CodeSafe-RoleConstraint must have Roles
-                    If lrRoleConstraint.Role.Count > 0 Then
-                        lrModel.RoleConstraint.AddUnique(lrRoleConstraint)
-                    End If
+                        'CodeSafe-RoleConstraint must have Roles
+                        If lrRoleConstraint.Role.Count > 0 Then
+                            lrModel.RoleConstraint.AddUnique(lrRoleConstraint)
+                        End If
 
-                    For Each lsValueTypeConstraintValue In lrXMLRoleConstraint.ValueConstraint
-                        lrRoleConstraint.ValueConstraint.Add(lsValueTypeConstraintValue)
-                    Next
+                        For Each lsValueTypeConstraintValue In lrXMLRoleConstraint.ValueConstraint
+                            lrRoleConstraint.ValueConstraint.Add(lsValueTypeConstraintValue)
+                        Next
 SkipRoleConstraint:
-                Next
+                    Catch ex As Exception
+                        prApplication.ThrowMessage("Error loading Role Constraint: " & lrXMLRoleConstraint.Id, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, True, ex)
+                    End Try
+            Next 'RoleConstraint
 
                 ' Build a dictionary for faster search
                 Me.RoleConstraintDictionary = lrModel.RoleConstraint.ToDictionary(Function(x) x.Id)
+#End Region
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(68)
 
@@ -1117,6 +1596,7 @@ SkipEntityTypeSetReferenceSchemeObjects:
                 '==============================
                 'Map the ModelNotes
                 '==============================
+#Region "Model Notes"
                 Dim lrXMLModelNote As XMLModel.ModelNote
                 Dim lrModelNote As FBM.ModelNote
 
@@ -1148,19 +1628,98 @@ SkipEntityTypeSetReferenceSchemeObjects:
                     lrModel.AddModelNote(lrModelNote, False)
 SkipModelNote:
                 Next
+#End Region
+
+                '==========================
+                'Map Functions (per nORMa)
+                '==========================
+#Region "Functions"
+                Dim lrFunction As FBM.Function
+                Dim lrXMLFunction As XMLModel.Function
+
+                For Each lrXMLFunction In Me.ORMModel.Functions
+
+                    lrFunction = New FBM.Function
+
+                    lrFunction.id = lrXMLFunction.Id
+                    lrFunction.Name = lrXMLFunction.Name
+                    lrFunction.OperatorSymbol = lrXMLFunction.OperatorSymbol
+                    lrFunction.IsBoolean = lrXMLFunction.IsBoolean
+
+                    For Each lrXMLParameter In lrXMLFunction.Parameters
+
+                        Dim lrParameter = New FBM.Parameter
+
+                        lrParameter.id = lrXMLParameter.Id
+                        lrParameter.Name = lrXMLParameter.Name
+                        lrParameter.BagInput = lrXMLParameter.BagInput
+
+                        lrFunction.Parameters.Add(lrParameter)
+
+                    Next
+
+                    lrModel.Function.Add(lrFunction)
+                Next
+
+#End Region
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70)
 
+                '======================
+                'Map the Synonyms
+                '======================
+#Region "Synonymns"
+                For Each lrXMLSynonym In Me.ORMModel.Synonyms
+
+                    lrModelElement = arModel.GetModelObjectByName(lrXMLSynonym.ModelElementId, True)
+                    If lrModelElement IsNot Nothing Then
+                        Dim lrSynonym As New FBM.Synonym(lrModelElement, lrXMLSynonym.Synonym)
+                        arModel.Synonyms.Add(lrSynonym)
+                    End If
+
+                Next
+#End Region
+
                 '----------------------------------------------------------------------------------------------
                 'Reference any FactType.LinkFactTypeRole values that are NOTHING
-                Dim larFactType = From [FactType] In lrModel.FactType
-                                  Where FactType.LinkFactTypeRole Is Nothing _
-                                  And FactType.IsLinkFactType = True
-                                  Select FactType
+                larFactType = (From [FactType] In lrModel.FactType
+                               Where FactType.LinkFactTypeRole Is Nothing _
+                               And FactType.IsLinkFactType = True
+                               Select FactType).ToList
 
                 For Each lrFactType In larFactType
                     MsgBox("Error: FactType: '" & lrFactType.Name & "' has no LinkFactTypeRole.")
                 Next
+
+#Region "Extra Mappings"
+
+#Region "Objectifying Fact Types for IsIdendependent Value Types"
+                Dim larObjectifyingFactType = From [FactType] In lrModel.FactType
+                                              From ValueType In lrModel.ValueType.FindAll(Function(x) x.IsIndependent)
+                                              Where ValueType.ObjectifyingFactTypeId IsNot Nothing
+                                              Where ValueType.ObjectifyingFactTypeId = FactType.Id
+                                              Select FactType
+
+                For Each lrFactType In larObjectifyingFactType
+                    lrFactType.IsObjectifyingFactType = True
+                Next
+#End Region
+
+#Region "Derivation Text"
+
+                Dim larDerivedFactType = From FactType In lrModel.FactType
+                                         Where FactType.IsDerived
+                                         Where FactType.DerivationText.Trim = ""
+                                         Select FactType
+
+                For Each lrDerivedFactType In larDerivedFactType
+
+                    lrDerivedFactType.DerivationText = BostonDerivationRenderer.RenderDerivationEnglish(lrModel, lrDerivedFactType)
+
+                Next
+#End Region
+
+#End Region
 
                 '=====================
                 'Map the Pages
@@ -1178,7 +1737,7 @@ SkipModelNote:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1221,12 +1780,12 @@ SkipModelNote:
                     For Each lrXMLPage In Me.ORMDiagram
                         lrPage = lrModel.Page.Find(Function(x) x.PageId = lrXMLPage.Id)
                         If lrPage Is Nothing Then
-                            lrPage = Me.MapToFBMPage(lrXMLPage, lrModel)
+                            lrPage = Me.MapToFBMPage(lrXMLPage, lrModel,,,, True)
                         Else
-                            Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker, False)
+                            Call Me.MapToFBMPage(lrXMLPage, lrModel, lrPage, loBackgroundWorker, False, True)
                         End If
 
-                        lrPage.Loaded = True
+                        lrPage.Loaded = False
                         lrPage.IsDirty = True
                         lrModel.Page.AddUnique(lrPage)
                     Next 'XMLModel.Page
@@ -1238,17 +1797,18 @@ SkipModelNote:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
         <MethodImplAttribute(MethodImplOptions.Synchronized)>
-        Private Function MapToFBMPage(ByRef arXMLPage As XMLModel.Page,
+        Public Function MapToFBMPage(ByRef arXMLPage As XMLModel.Page,
                                       ByRef arModel As FBM.Model,
                                       Optional ByRef arPage As FBM.Page = Nothing,
                                       Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing,
-                                      Optional ByVal abCalledAsThread As Boolean = False) As FBM.Page
+                                      Optional ByVal abCalledAsThread As Boolean = False,
+                                      Optional abCopyConceptInstancesOnly As Boolean = False) As FBM.Page
 
             Dim lsMessage As String
 
@@ -1276,6 +1836,12 @@ SkipModelNote:
                 'Make sure Language is captured.
                 lrPage.Language = arXMLPage.Language
 
+                If abCopyConceptInstancesOnly Then
+                    lrPage.ConceptInstance = arXMLPage.ConceptInstance
+                    lrPage.Loaded = False
+                    Return lrPage
+                End If
+
                 '=============================
                 'Map the ValueTypeInstances
                 '=============================
@@ -1289,23 +1855,31 @@ SkipModelNote:
                         lrValueTypeInstance.Model = arModel
                         lrValueTypeInstance.Page = lrPage
                         lrValueTypeInstance.Id = lrConceptInstance.Symbol
-                        ' Perform the search using the dictionary                                
-                        Me.ValueTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrValueType) '20230602-CM-Was .ValueType = arModel.ValueType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        ' Perform the search using the dictionary
+                        Try
+                            Me.ValueTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrValueType) '20230602-CM-Was .ValueType = arModel.ValueType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        Catch
+                            lrValueType = lrPage.Model.ValueType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                            If lrValueType Is Nothing Then
+                                Throw New Exception("Could not find Value Type, " & lrConceptInstance.Symbol & ", in the Model.")
+                            End If
+                        End Try
                         lrValueTypeInstance.ValueType = lrValueType
-                        lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
-                        lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
-                        lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
-                        lrValueTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
+                            lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
+                            lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
+                            lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
+                            lrValueTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
                         lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
+                        lrValueTypeInstance.IsIndependent = lrValueTypeInstance.ValueType.IsIndependent
 
                         lrValueTypeInstance.Name = lrConceptInstance.Symbol
-                        lrValueTypeInstance.DBName = lrValueType.DBName
-                        lrValueTypeInstance.X = lrConceptInstance.X
-                        lrValueTypeInstance.Y = lrConceptInstance.Y
+                            lrValueTypeInstance.DBName = lrValueType.DBName
+                            lrValueTypeInstance.X = lrConceptInstance.X
+                            lrValueTypeInstance.Y = lrConceptInstance.Y
 
-                        lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                    Catch ex As Exception
-                        Call Me.ReportModelLoadingError(arModel, ex.Message)
+                            lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                        Catch ex As Exception
+                            Call Me.ReportModelLoadingError(arModel, ex.Message)
                         GoTo SkipValueTypeInstance
                     End Try
 SkipValueTypeInstance:
@@ -1324,8 +1898,15 @@ SkipValueTypeInstance:
                     lrEntityTypeInstance.Model = arModel
                     lrEntityTypeInstance.Page = lrPage
                     lrEntityTypeInstance.Id = lrConceptInstance.Symbol
-                    ' Perform the search using the dictionary                                
-                    Me.EntityTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrEntityType) '20230602-CM-Was lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.Id)
+                    ' Perform the search using the dictionary                                                    
+                    Try
+                        Me.EntityTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrEntityType) '20230602-CM-Was lrEntityType = arModel.EntityType.Find(Function(x) x.Id = lrEntityTypeInstance.Id)
+                    Catch
+                        lrEntityType = lrPage.Model.EntityType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        If lrEntityType Is Nothing Then
+                            Throw New Exception("Could not find Entity Type, " & lrConceptInstance.Symbol & ", in the Model.")
+                        End If
+                    End Try
                     If lrEntityType Is Nothing Then GoTo SkipEntityTypeInstance
                     lrEntityTypeInstance.EntityType = lrEntityType
                     lrEntityTypeInstance._Name = lrEntityTypeInstance.Id
@@ -1364,14 +1945,21 @@ SkipEntityTypeInstance:
                 Dim lrFactType As FBM.FactType = Nothing
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType)
-                    ' Perform the search using the dictionary        
-                    Me.FactTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrFactType) '20230602-CM-Was lrFactType = arModel.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                    ' Perform the search using the dictionary                            
+                    Try
+                        Me.FactTypeDictionary.TryGetValue(lrConceptInstance.Symbol, lrFactType) '20230602-CM-Was lrFactType = arModel.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                    Catch
+                        lrFactType = lrPage.Model.FactType.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        If lrFactType Is Nothing Then
+                            Throw New Exception("Could not find Fact Type, " & lrConceptInstance.Symbol & ", in the Model.")
+                        End If
+                    End Try
                     If lrFactType Is Nothing Then GoTo SkipFactTypeInstance
                     lrFactTypeInstance = lrFactType.CloneInstance(lrPage, True,, lrConceptInstance.InstanceNumber)
                     lrFactTypeInstance.X = lrConceptInstance.X
                     lrFactTypeInstance.Y = lrConceptInstance.Y
                     lrFactTypeInstance.DBName = lrFactType.DBName
-                    lrFactTypeInstance.Visible = lrConceptInstance.Visible
+                    lrFactTypeInstance._Visible = lrConceptInstance.Visible
 
                     If lrFactType.IsDerived Then
                         lrDerivationTextConceptInstance = arXMLPage.ConceptInstance.Find(Function(x) x.ConceptType = pcenumConceptType.DerivationText And x.Symbol = lrFactType.Id)
@@ -1483,17 +2071,17 @@ SkipFactTypeInstance:
                 'Map the SubtypeRelationships.
                 '=================================================================================
 #Region "SubtypeRelationships"
-                Dim larSubtypeRelationshipFactTypes = From FactType In lrPage.FactTypeInstance
-                                                      Where FactType.IsSubtypeRelationshipFactType
-                                                      Select FactType
+                Dim larSubtypeRelationshipFactTypes = (From FactType In lrPage.FactTypeInstance
+                                                       Where FactType.IsSubtypeRelationshipFactType
+                                                       Select FactType).Distinct
 
                 Dim lrModelElementInstance As FBM.ModelObject
                 Dim lrParentModelElementInstance As FBM.ModelObject
-                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationship As FBM.SubtypeRelationship
                 Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
                 For Each lrFactTypeInstance In larSubtypeRelationshipFactTypes.ToArray
                     Try
-                        For Each lrModelElementInstance In lrPage.GetAllPageObjects(False, False, lrFactTypeInstance.RoleGroup(0).JoinedORMObject)
+                        For Each lrModelElementInstance In lrPage.GetAllPageObjects(False, False, lrFactTypeInstance.RoleGroup(0).JoinedORMObject, True)
                             lrParentModelElementInstance = lrPage.getModelElement(lrFactTypeInstance.RoleGroup(1).JoinedORMObject)
 
                             If lrParentModelElementInstance IsNot Nothing Then
@@ -1506,13 +2094,20 @@ SkipFactTypeInstance:
                                 Select Case lrModelElementInstance.ConceptType
                                     Case Is = pcenumConceptType.EntityType
                                         lrSubtypeRelationship = CType(lrModelElementInstance, FBM.EntityTypeInstance).EntityType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                                        If lrSubtypeRelationship Is Nothing And CType(lrModelElementInstance, FBM.EntityTypeInstance).EntityType.IsObjectifyingEntityType Then
+                                            lrFactType = lrPage.Model.FactType.Find(Function(X) X.Id = lrModelElementInstance.Id)
+
+                                            lrSubtypeRelationship = lrFactType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                                        End If
                                     Case Is = pcenumConceptType.ValueType
                                         lrSubtypeRelationship = CType(lrModelElementInstance, FBM.ValueTypeInstance).ValueType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
+                                    Case Is = pcenumConceptType.FactType
+                                        lrSubtypeRelationship = CType(lrModelElementInstance, FBM.FactTypeInstance).FactType.SubtypeRelationship.Find(Function(x) x.ModelElement.Id = lrModelElementInstance.Id And x.parentModelElement.Id = lrParentModelElementInstance.Id)
                                 End Select
 
                                 lrSubtypeRelationshipInstance = lrSubtypeRelationship.CloneInstance(lrPage, True)
                                 lrSubtypeRelationshipInstance.ModelElement = lrModelElementInstance
-                                lrSubtypeRelationshipInstance.parentModelElement = lrParentModelElementInstance
+                                lrSubtypeRelationshipInstance.ParentModelElement = lrParentModelElementInstance
                                 lrSubtypeRelationshipInstance.Visible = lrSubtypeRelationshipInstance.FactType.Visible
 
                                 Select Case lrModelElementInstance.ConceptType
@@ -1520,6 +2115,8 @@ SkipFactTypeInstance:
                                         CType(lrModelElementInstance, FBM.EntityTypeInstance).SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
                                     Case Is = pcenumConceptType.ValueType
                                         CType(lrModelElementInstance, FBM.ValueTypeInstance).SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                                    Case Is = pcenumConceptType.FactType
+                                        CType(lrModelElementInstance, FBM.FactTypeInstance).SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
                                 End Select
                             End If
                         Next
@@ -1534,7 +2131,7 @@ SkipFactTypeInstance:
                                                            Nothing)
                             arModel._ModelError.Add(lrModelError)
                         Else
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                         End If
 
                     End Try
@@ -1558,19 +2155,32 @@ SkipFactTypeInstance:
                 '=================================
                 'Map the RoleConstraintInstances
                 '=================================
+#Region "Role Constraints"
                 Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
                 Dim lrRoleConstraint As FBM.RoleConstraint = Nothing
 
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
 
-                    If IsSomething(lrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrConceptInstance.Symbol)) Then
+                    If lrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrConceptInstance.Symbol) IsNot Nothing Then
                         '-------------------------------------------------------------------
                         'The RoleConstraintInstance has already been added to the Page.
                         '  FactType.CloneInstance adds RoleConstraintInstances to the Page
                         '-------------------------------------------------------------------
                     Else
                         ' Perform the search using the dictionary                                
-                        Me.RoleConstraintDictionary.TryGetValue(lrConceptInstance.Symbol, lrRoleConstraint) '20230602-CM-Was lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        Try
+                            Me.RoleConstraintDictionary.TryGetValue(lrConceptInstance.Symbol, lrRoleConstraint) '20230602-CM-Was lrRoleConstraint = arModel.RoleConstraint.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        Catch
+                            lrRoleConstraint = lrPage.Model.RoleConstraint.Find(Function(x) x.Id = lrConceptInstance.Symbol)
+                        End Try
+
+                        'CodeSafe
+                        If lrRoleConstraint Is Nothing Then
+                            lsMessage = "Could not find Role Constraint, " & lrConceptInstance.Symbol & ", in the Model. Page: " & lrPage.Name
+                            lsMessage.AppendLine("Removing from Page.")
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,,,,,, True,,)
+                            Continue For
+                        End If
 
                         Try
                             lrRoleConstraintInstance = Nothing
@@ -1612,16 +2222,18 @@ SkipFactTypeInstance:
                                                            Nothing)
                                 arModel._ModelError.Add(lrModelError)
                             Else
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                             End If
                         End Try
 
                     End If
                 Next
+#End Region
 
                 '============================
                 'Map the ModelNoteInstances
                 '============================
+#Region "Mode Notes"
                 Dim lrModelNoteInstance As FBM.ModelNoteInstance
                 Dim lrModelNote As FBM.ModelNote
                 For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.ModelNote)
@@ -1631,6 +2243,9 @@ SkipFactTypeInstance:
                         lrModelNoteInstance = lrModelNote.CloneInstance(lrPage, True)
                         lrModelNoteInstance.X = lrConceptInstance.X
                         lrModelNoteInstance.Y = lrConceptInstance.Y
+                        lrModelNoteInstance.Width = lrConceptInstance.Width
+                        lrModelNoteInstance.Height = lrConceptInstance.Height
+
                     Catch ex As Exception
                         lsMessage = "Error loading Model Note with Id: " & lrConceptInstance.Symbol
                         lsMessage.AppendDoubleLineBreak("Page: " & arXMLPage.Name)
@@ -1641,11 +2256,12 @@ SkipFactTypeInstance:
                                                            Nothing)
                             arModel._ModelError.Add(lrModelError)
                         Else
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                         End If
                     End Try
 
                 Next
+#End Region
 
                 If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(70 + CInt(9 * (arModel.Page.FindAll(Function(x) x.Loaded = True).Count / arModel.Page.Count)))
 
@@ -1669,7 +2285,7 @@ FinishedPage:
                                                            Nothing)
                     arModel._ModelError.Add(lrModelError)
                 Else
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
                 Return Nothing
 
@@ -2078,7 +2694,7 @@ SkipEntityType:
                 '                    lrModelElement.parentModelObjectList.Add(lrParentModelElement)
                 '                    lrParentModelElement.childModelObjectList.Add(lrModelElement)
 
-                '                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
+                '                    Dim lrSubtypeConstraint As New FBM.SubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
 
                 '                    Select Case lrModelElement.GetType
                 '                        Case Is = GetType(FBM.EntityType)
@@ -2543,7 +3159,7 @@ SkipEntityType:
                                 arNORMADocument.ORMModel.Constraints.Items.Add(lrNORMARoleConstraint)
 
                             Catch ex As Exception
-                                prApplication.ThrowErrorMessage("Error loading Internal Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True)
+                                prApplication.ThrowMessage("Error loading Internal Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True)
                             End Try
 
 #End Region 'Enternal Uniqueness Constraint
@@ -2629,7 +3245,7 @@ SkipEntityType:
                                 arNORMADocument.ORMModel.Constraints.Items.Add(lrNORMARoleConstraint)
 
                             Catch ex As Exception
-                                prApplication.ThrowErrorMessage("Error exporting External Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True)
+                                prApplication.ThrowMessage("Error exporting External Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True)
                             End Try
 #End Region 'External Uniqueness Constraint
                         Case Is = pcenumRoleConstraintType.RoleValueConstraint.ToString
@@ -2735,7 +3351,7 @@ SkipEntityType:
                     '                    Next
 
                     '                    If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
-                    '                        prApplication.ThrowErrorMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
+                    '                        prApplication.ThrowMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
                     '                    Else
                     '                        lrFactType = lrRoleConstraint.Role(0).FactType
                     '                        lrFactType = lrNORMAModel.FactType.Find(AddressOf lrFactType.Equals)
@@ -2862,7 +3478,7 @@ SkipRoleConstraint:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -3218,7 +3834,7 @@ SkipRoleConstraint:
         '                '                    lrModelElement.parentModelObjectList.Add(lrParentModelElement)
         '                '                    lrParentModelElement.childModelObjectList.Add(lrModelElement)
 
-        '                '                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
+        '                '                    Dim lrSubtypeConstraint As New FBM.SubtypeRelationship(lrModelElement, lrParentModelElement, lrFactType)
 
         '                '                    Select Case lrModelElement.GetType
         '                '                        Case Is = GetType(FBM.EntityType)
@@ -3510,7 +4126,7 @@ SkipRoleConstraint:
         '                                arNORMADocument.ORMModel.Constraints.Items.Add(lrNORMARoleConstraint)
 
         '                            Catch ex As Exception
-        '                                prApplication.ThrowErrorMessage("Error loading Internal Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True,,, ex)
+        '                                prApplication.ThrowMessage("Error loading Internal Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True,,, ex)
         '                            End Try
 
         '#End Region 'Enternal Uniqueness Constraint
@@ -3596,7 +4212,7 @@ SkipRoleConstraint:
         '                                arNORMADocument.ORMModel.Constraints.Items.Add(lrNORMARoleConstraint)
 
         '                            Catch ex As Exception
-        '                                prApplication.ThrowErrorMessage("Error loading External Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True,,, ex)
+        '                                prApplication.ThrowMessage("Error loading External Uniqueness Constraint: " & lrFBMRoleConstraint.Id, pcenumErrorType.Warning,, False,, True,,, ex)
         '                            End Try
         '#End Region 'External Uniqueness Constraint
         '                        Case Else
@@ -3662,7 +4278,7 @@ SkipRoleConstraint:
         '                    '                    Next
 
         '                    '                    If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
-        '                    '                        prApplication.ThrowErrorMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
+        '                    '                        prApplication.ThrowMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
         '                    '                    Else
         '                    '                        lrFactType = lrRoleConstraint.Role(0).FactType
         '                    '                        lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
@@ -3793,7 +4409,7 @@ SkipRoleConstraint:
 
         '                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
         '                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-        '                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        '                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         '                Return Nothing
         '            End Try
@@ -3801,6 +4417,405 @@ SkipRoleConstraint:
         '        End Function
 
 
+
+#End Region
+
+#Region "NORMA Derivations"
+
+        Private Function ConvertPathedRoleValueRestrictionToXmlModel(
+    ByVal arRestriction As FBM.PathedRoleValueRestriction) _
+    As XMLModel.PathedRoleValueRestriction
+
+            If arRestriction Is Nothing OrElse
+       arRestriction.PathedRoleConditionValueConstraint Is Nothing Then
+                Return Nothing
+            End If
+
+            Dim lrXMLRestriction As New XMLModel.PathedRoleValueRestriction
+            Dim lrConstraint As FBM.PathedRoleConditionValueConstraint =
+        arRestriction.PathedRoleConditionValueConstraint
+            Dim lrXMLConstraint As New XMLModel.PathedRoleConditionValueConstraint
+
+            lrXMLConstraint.id = lrConstraint.id
+
+            If lrConstraint.ValueRange IsNot Nothing Then
+                For Each lrRange As FBM.PathedRoleValueRange In
+            lrConstraint.ValueRange
+
+                    Dim lrXMLRange As New XMLModel.PathedRoleValueRange
+
+                    lrXMLRange.id = lrRange.id
+                    lrXMLRange.MinValue = lrRange.MinValue
+                    lrXMLRange.InvariantMinValue = lrRange.InvariantMinValue
+                    lrXMLRange.MaxValue = lrRange.MaxValue
+                    lrXMLRange.InvariantMaxValue = lrRange.InvariantMaxValue
+                    lrXMLRange.MinInclusion = lrRange.MinInclusion
+                    lrXMLRange.MaxInclusion = lrRange.MaxInclusion
+
+                    lrXMLConstraint.ValueRange.Add(lrXMLRange)
+                Next
+            End If
+
+            lrXMLRestriction.PathedRoleConditionValueConstraint =
+        lrXMLConstraint
+
+            Return lrXMLRestriction
+
+        End Function
+
+        Private Function ConvertPathedRoleValueRestrictionFromXmlModel(
+    ByVal arRestriction As XMLModel.PathedRoleValueRestriction) _
+    As FBM.PathedRoleValueRestriction
+
+            If arRestriction Is Nothing OrElse
+       arRestriction.PathedRoleConditionValueConstraint Is Nothing Then
+                Return Nothing
+            End If
+
+            Dim lrRestriction As New FBM.PathedRoleValueRestriction
+            Dim lrXMLConstraint As XMLModel.PathedRoleConditionValueConstraint =
+        arRestriction.PathedRoleConditionValueConstraint
+            Dim lrConstraint As New FBM.PathedRoleConditionValueConstraint
+
+            lrConstraint.id = lrXMLConstraint.id
+
+            If lrXMLConstraint.ValueRange IsNot Nothing Then
+                For Each lrXMLRange As XMLModel.PathedRoleValueRange In
+            lrXMLConstraint.ValueRange
+
+                    Dim lrRange As New FBM.PathedRoleValueRange
+
+                    lrRange.id = lrXMLRange.id
+                    lrRange.MinValue = lrXMLRange.MinValue
+                    lrRange.InvariantMinValue = lrXMLRange.InvariantMinValue
+                    lrRange.MaxValue = lrXMLRange.MaxValue
+                    lrRange.InvariantMaxValue = lrXMLRange.InvariantMaxValue
+                    lrRange.MinInclusion = lrXMLRange.MinInclusion
+                    lrRange.MaxInclusion = lrXMLRange.MaxInclusion
+
+                    lrConstraint.ValueRange.Add(lrRange)
+                Next
+            End If
+
+            lrRestriction.PathedRoleConditionValueConstraint = lrConstraint
+
+            Return lrRestriction
+
+        End Function
+
+        Private Function ConvertRoleSubPathToXmlModel(ByVal arSubPath As FBM.RoleSubPath) As XMLModel.RoleSubPath
+
+            If arSubPath Is Nothing Then Return Nothing
+
+            Dim lrXMLSubPath As New XMLModel.RoleSubPath
+
+            lrXMLSubPath.Id = arSubPath.Id
+            lrXMLSubPath.SplitCombinationOperator = arSubPath.SplitCombinationOperator
+
+            If arSubPath.RootObjectType IsNot Nothing Then
+                lrXMLSubPath.RootObjectType = New XMLModel.RootObjectType
+
+                lrXMLSubPath.RootObjectType.Id = arSubPath.RootObjectType.id
+
+                If arSubPath.RootObjectType.BostonModelElement IsNot Nothing Then
+                    lrXMLSubPath.RootObjectType.ModelElementId = arSubPath.RootObjectType.BostonModelElement.Id
+                Else
+                    lrXMLSubPath.RootObjectType.ModelElementId = arSubPath.RootObjectType.ref
+                End If
+
+                lrXMLSubPath.RootObjectType.IsNegated = arSubPath.RootObjectType.IsNegated
+            End If
+
+            If arSubPath.PathedRole IsNot Nothing Then
+                For Each lrPathedRole As FBM.PathedRole In arSubPath.PathedRole
+
+                    Dim lrXMLPathedRole As New XMLModel.PathedRole
+
+                    lrXMLPathedRole.id = lrPathedRole.id
+                    lrXMLPathedRole.Ref = lrPathedRole.Ref
+                    lrXMLPathedRole.IsNegated = lrPathedRole.IsNegated
+                    lrXMLPathedRole.Purpose = lrPathedRole.Purpose
+
+                    lrXMLPathedRole.ValueRestriction = ConvertPathedRoleValueRestrictionToXmlModel(lrPathedRole.ValueRestriction)
+
+                    lrXMLSubPath.PathedRole.Add(lrXMLPathedRole)
+                Next
+            End If
+
+            If arSubPath.SubPath IsNot Nothing Then
+                For Each lrChildSubPath As FBM.RoleSubPath In arSubPath.SubPath
+
+                    Dim lrXMLChild As XMLModel.RoleSubPath = ConvertRoleSubPathToXmlModel(lrChildSubPath)
+
+                    If lrXMLChild IsNot Nothing Then
+                        lrXMLSubPath.SubPath.Add(lrXMLChild)
+                    End If
+                Next
+            End If
+
+            Return lrXMLSubPath
+
+        End Function
+
+        Private Function ConvertRoleSubPathFromXmlModel(ByVal arXMLSubPath As XMLModel.RoleSubPath,
+                                                        ByVal arModel As FBM.Model) As FBM.RoleSubPath
+
+            If arXMLSubPath Is Nothing Then Return Nothing
+
+            Dim lrSubPath As New FBM.RoleSubPath
+
+            lrSubPath.Id = arXMLSubPath.Id
+            lrSubPath.SplitCombinationOperator = arXMLSubPath.SplitCombinationOperator
+
+            If arXMLSubPath.RootObjectType IsNot Nothing Then
+
+                Dim lrRoot As New FBM.RootObjectType
+
+                lrRoot.id = arXMLSubPath.RootObjectType.Id
+                lrRoot.ref = arXMLSubPath.RootObjectType.ModelElementId
+                lrRoot.IsNegated = arXMLSubPath.RootObjectType.IsNegated
+
+                'BostonModelElement is resolved after every Fact Type has loaded.
+                lrSubPath.RootObjectType = lrRoot
+
+            End If
+
+            If arXMLSubPath.PathedRole IsNot Nothing Then
+                For Each lrXMLPathedRole As XMLModel.PathedRole In arXMLSubPath.PathedRole
+
+                    Dim lrPathedRole As New FBM.PathedRole
+
+                    lrPathedRole.id = lrXMLPathedRole.id
+                    lrPathedRole.Ref = lrXMLPathedRole.Ref
+                    lrPathedRole.IsNegated = lrXMLPathedRole.IsNegated
+                    lrPathedRole.Purpose = lrXMLPathedRole.Purpose
+
+                    lrPathedRole.ValueRestriction = ConvertPathedRoleValueRestrictionFromXmlModel(lrXMLPathedRole.ValueRestriction)
+
+                    lrSubPath.PathedRole.Add(lrPathedRole)
+                Next
+            End If
+
+            If arXMLSubPath.SubPath IsNot Nothing Then
+                For Each lrXMLChild As XMLModel.RoleSubPath In arXMLSubPath.SubPath
+
+                    Dim lrChild As FBM.RoleSubPath = ConvertRoleSubPathFromXmlModel(
+                                                                lrXMLChild,
+                                                                arModel)
+
+                    If lrChild IsNot Nothing Then
+                        lrSubPath.SubPath.Add(lrChild)
+                    End If
+                Next
+            End If
+
+            Return lrSubPath
+
+        End Function
+
+        Private Function ConvertConditionNodeToXmlModel(ByVal arNode As FBM.ConditionNode) As XMLModel.ConditionNode
+
+            If arNode Is Nothing Then Return Nothing
+
+            If TypeOf arNode Is FBM.ConditionAnd Then
+                Dim lrIn As FBM.ConditionAnd = CType(arNode, FBM.ConditionAnd)
+                Dim lrOut As New XMLModel.ConditionAnd
+                For Each lrChild As FBM.ConditionNode In lrIn.Items
+                    Dim lrChildOut As XMLModel.ConditionNode = ConvertConditionNodeToXmlModel(lrChild)
+                    If lrChildOut IsNot Nothing Then lrOut.Items.Add(lrChildOut)
+                Next
+                Return lrOut
+
+            ElseIf TypeOf arNode Is FBM.ConditionOr Then
+                Dim lrIn As FBM.ConditionOr = CType(arNode, FBM.ConditionOr)
+                Dim lrOut As New XMLModel.ConditionOr
+                For Each lrChild As FBM.ConditionNode In lrIn.Items
+                    Dim lrChildOut As XMLModel.ConditionNode = ConvertConditionNodeToXmlModel(lrChild)
+                    If lrChildOut IsNot Nothing Then lrOut.Items.Add(lrChildOut)
+                Next
+                Return lrOut
+
+            ElseIf TypeOf arNode Is FBM.ConditionNot Then
+                Dim lrIn As FBM.ConditionNot = CType(arNode, FBM.ConditionNot)
+                Dim lrOut As New XMLModel.ConditionNot
+                lrOut.Item = ConvertConditionNodeToXmlModel(lrIn.Item)
+                Return lrOut
+
+            ElseIf TypeOf arNode Is FBM.ConditionEquals Then
+                Return ConvertBinaryComparisonToXmlModel(Of XMLModel.ConditionEquals)(CType(arNode, FBM.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is FBM.ConditionNotEquals Then
+                Return ConvertBinaryComparisonToXmlModel(Of XMLModel.ConditionNotEquals)(CType(arNode, FBM.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is FBM.ConditionGreaterThan Then
+                Return ConvertBinaryComparisonToXmlModel(Of XMLModel.ConditionGreaterThan)(CType(arNode, FBM.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is FBM.ConditionGreaterThanOrEqual Then
+                Return ConvertBinaryComparisonToXmlModel(Of XMLModel.ConditionGreaterThanOrEqual)(CType(arNode, FBM.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is FBM.ConditionLessThan Then
+                Return ConvertBinaryComparisonToXmlModel(Of XMLModel.ConditionLessThan)(CType(arNode, FBM.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is FBM.ConditionLessThanOrEqual Then
+                Return ConvertBinaryComparisonToXmlModel(Of XMLModel.ConditionLessThanOrEqual)(CType(arNode, FBM.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is FBM.CalculatedCondition Then
+                Dim lrIn As FBM.CalculatedCondition = CType(arNode, FBM.CalculatedCondition)
+                Dim lrOut As New XMLModel.CalculatedCondition
+                lrOut.Ref = lrIn.Ref
+                Return lrOut
+
+            End If
+
+            Return Nothing
+
+        End Function
+
+
+        Private Function ConvertBinaryComparisonToXmlModel(Of T As {XMLModel.ConditionBinaryComparison, New})(
+    ByVal arIn As FBM.ConditionBinaryComparison) As T
+
+            Dim lrOut As New T
+
+            If arIn.Left IsNot Nothing Then lrOut.Left = ConvertConditionValueContainerToXmlModel(arIn.Left)
+            If arIn.Right IsNot Nothing Then lrOut.Right = ConvertConditionValueContainerToXmlModel(arIn.Right)
+
+            Return lrOut
+
+        End Function
+
+
+        Private Function ConvertConditionValueContainerToXmlModel(ByVal arIn As FBM.ConditionValueContainer) As XMLModel.ConditionValueContainer
+
+            Dim lrOut As New XMLModel.ConditionValueContainer
+            If arIn Is Nothing OrElse arIn.Item Is Nothing Then Return lrOut
+
+            If TypeOf arIn.Item Is FBM.PathedRoleRef Then
+                Dim lrInRef As FBM.PathedRoleRef = CType(arIn.Item, FBM.PathedRoleRef)
+                Dim lrOutRef As New XMLModel.PathedRoleRef
+                lrOutRef.Ref = lrInRef.Ref
+                lrOut.Item = lrOutRef
+
+            ElseIf TypeOf arIn.Item Is FBM.CalculatedValueRef Then
+                Dim lrInRef As FBM.CalculatedValueRef = CType(arIn.Item, FBM.CalculatedValueRef)
+                Dim lrOutRef As New XMLModel.CalculatedValueRef
+                lrOutRef.Ref = lrInRef.Ref
+                lrOut.Item = lrOutRef
+
+            ElseIf TypeOf arIn.Item Is FBM.Constant Then
+                Dim lrInConst As FBM.Constant = CType(arIn.Item, FBM.Constant)
+                Dim lrOutConst As New XMLModel.Constant
+                lrOutConst.Id = lrInConst.Id
+                lrOutConst.Value = lrInConst.Value
+                lrOut.Item = lrOutConst
+            End If
+
+            Return lrOut
+
+        End Function
+
+        Private Function ConvertConditionNodeFromXmlModel(ByVal arNode As XMLModel.ConditionNode) As FBM.ConditionNode
+
+            If arNode Is Nothing Then Return Nothing
+
+            If TypeOf arNode Is XMLModel.ConditionAnd Then
+                Dim lrIn As XMLModel.ConditionAnd = CType(arNode, XMLModel.ConditionAnd)
+                Dim lrOut As New FBM.ConditionAnd
+                For Each lrChild As XMLModel.ConditionNode In lrIn.Items
+                    Dim lrChildOut As FBM.ConditionNode = ConvertConditionNodeFromXmlModel(lrChild)
+                    If lrChildOut IsNot Nothing Then lrOut.Items.Add(lrChildOut)
+                Next
+                Return lrOut
+
+            ElseIf TypeOf arNode Is XMLModel.ConditionOr Then
+                Dim lrIn As XMLModel.ConditionOr = CType(arNode, XMLModel.ConditionOr)
+                Dim lrOut As New FBM.ConditionOr
+                For Each lrChild As XMLModel.ConditionNode In lrIn.Items
+                    Dim lrChildOut As FBM.ConditionNode = ConvertConditionNodeFromXmlModel(lrChild)
+                    If lrChildOut IsNot Nothing Then lrOut.Items.Add(lrChildOut)
+                Next
+                Return lrOut
+
+            ElseIf TypeOf arNode Is XMLModel.ConditionNot Then
+                Dim lrIn As XMLModel.ConditionNot = CType(arNode, XMLModel.ConditionNot)
+                Dim lrOut As New FBM.ConditionNot
+                lrOut.Item = ConvertConditionNodeFromXmlModel(lrIn.Item)
+                Return lrOut
+
+            ElseIf TypeOf arNode Is XMLModel.ConditionEquals Then
+                Return ConvertBinaryComparisonFromXmlModel(Of FBM.ConditionEquals)(CType(arNode, XMLModel.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is XMLModel.ConditionNotEquals Then
+                Return ConvertBinaryComparisonFromXmlModel(Of FBM.ConditionNotEquals)(CType(arNode, XMLModel.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is XMLModel.ConditionGreaterThan Then
+                Return ConvertBinaryComparisonFromXmlModel(Of FBM.ConditionGreaterThan)(CType(arNode, XMLModel.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is XMLModel.ConditionGreaterThanOrEqual Then
+                Return ConvertBinaryComparisonFromXmlModel(Of FBM.ConditionGreaterThanOrEqual)(CType(arNode, XMLModel.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is XMLModel.ConditionLessThan Then
+                Return ConvertBinaryComparisonFromXmlModel(Of FBM.ConditionLessThan)(CType(arNode, XMLModel.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is XMLModel.ConditionLessThanOrEqual Then
+                Return ConvertBinaryComparisonFromXmlModel(Of FBM.ConditionLessThanOrEqual)(CType(arNode, XMLModel.ConditionBinaryComparison))
+
+            ElseIf TypeOf arNode Is XMLModel.CalculatedCondition Then
+
+                Dim lrIn As XMLModel.CalculatedCondition = CType(arNode, XMLModel.CalculatedCondition)
+
+                Dim lrOut As New FBM.CalculatedCondition
+                lrOut.Ref = lrIn.Ref
+                Return lrOut
+
+            End If
+
+            Return Nothing
+
+        End Function
+
+
+        Private Function ConvertBinaryComparisonFromXmlModel(Of T As {FBM.ConditionBinaryComparison, New})(
+    ByVal arIn As XMLModel.ConditionBinaryComparison) As T
+
+            Dim lrOut As New T
+
+            If arIn.Left IsNot Nothing Then lrOut.Left = ConvertValueContainerFromXmlModel(arIn.Left)
+            If arIn.Right IsNot Nothing Then lrOut.Right = ConvertValueContainerFromXmlModel(arIn.Right)
+
+            Return lrOut
+
+        End Function
+
+
+        Private Function ConvertValueContainerFromXmlModel(ByVal arIn As XMLModel.ConditionValueContainer) As FBM.ConditionValueContainer
+
+            Dim lrOut As New FBM.ConditionValueContainer
+            If arIn Is Nothing OrElse arIn.Item Is Nothing Then Return lrOut
+
+            If TypeOf arIn.Item Is XMLModel.PathedRoleRef Then
+                Dim lrInRef As XMLModel.PathedRoleRef = CType(arIn.Item, XMLModel.PathedRoleRef)
+                Dim lrOutRef As New FBM.PathedRoleRef
+                lrOutRef.Ref = lrInRef.Ref
+                lrOut.Item = lrOutRef
+
+            ElseIf TypeOf arIn.Item Is XMLModel.CalculatedValueRef Then
+                Dim lrInRef As XMLModel.CalculatedValueRef = CType(arIn.Item, XMLModel.CalculatedValueRef)
+                Dim lrOutRef As New FBM.CalculatedValueRef
+                lrOutRef.Ref = lrInRef.Ref
+                lrOut.Item = lrOutRef
+
+            ElseIf TypeOf arIn.Item Is XMLModel.Constant Then
+                Dim lrInConst As XMLModel.Constant = CType(arIn.Item, XMLModel.Constant)
+                Dim lrOutConst As New FBM.Constant
+                lrOutConst.Id = lrInConst.Id
+                lrOutConst.Value = lrInConst.Value
+                lrOut.Item = lrOutConst
+            End If
+
+            Return lrOut
+
+        End Function
 
 #End Region
 
@@ -4167,7 +5182,7 @@ SkipRoleConstraint:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4221,7 +5236,7 @@ SkipRoleConstraint:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4497,7 +5512,7 @@ SkipFactTypeInstance:
 
                 '                Dim lrModelElementInstance As FBM.ModelObject
                 '                Dim lrParentModelElementInstance As FBM.ModelObject
-                '                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                '                Dim lrSubtypeRelationship As FBM.SubtypeRelationship
                 '                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance
                 '                For Each lrFactTypeInstance In larSubtypeRelationshipFactTypes.ToArray
                 '                    Try
@@ -4538,7 +5553,7 @@ SkipFactTypeInstance:
                 '                                                           Nothing)
                 '                            arModel.ModelError.Add(lrModelError)
                 '                        Else
-                '                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                '                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                 '                        End If
 
                 '                    End Try
@@ -4608,7 +5623,7 @@ SkipRoleConstraintInstance:
                 '                Dim lrRoleConstraint As FBM.RoleConstraint
                 '                For Each lrConceptInstance In arXMLPage.ConceptInstance.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint)
 
-                '                    If IsSomething(lrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrConceptInstance.Symbol)) Then
+                '                    If lrPage.RoleConstraintInstance.Find(Function(x) x.Id = lrConceptInstance.Symbol) IsNot Nothing Then
                 '                        '-------------------------------------------------------------------
                 '                        'The RoleConstraintInstance has already been added to the Page.
                 '                        '  FactType.CloneInstance adds RoleConstraintInstances to the Page
@@ -4640,7 +5655,7 @@ SkipRoleConstraintInstance:
                 '                                                           Nothing)
                 '                                arModel.ModelError.Add(lrModelError)
                 '                            Else
-                '                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                '                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                 '                            End If
                 '                        End Try
 
@@ -4669,7 +5684,7 @@ SkipRoleConstraintInstance:
                 '                                                           Nothing)
                 '                            arModel.ModelError.Add(lrModelError)
                 '                        Else
-                '                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
+                '                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True)
                 '                        End If
                 '                    End Try
 
@@ -4689,7 +5704,7 @@ SkipRoleConstraintInstance:
                 If abCalledAsThread Then
                     '20220721-VM-Add code here for throwing error messages in a thread.
                 Else
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
 
                 Return Nothing
@@ -4713,7 +5728,7 @@ SkipRoleConstraintInstance:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4771,7 +5786,7 @@ SkipRoleConstraintInstance:
                                                                     , True
                                                                     )
 
-                        lrConcept = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry).Concept
+                        lrConcept = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry,, False).Concept
                         lrFactData = New FBM.FactData(lrRole, lrConcept, lrFact, True)
 
                         '-----------------------------
@@ -4790,7 +5805,7 @@ SkipRoleConstraintInstance:
                     'If the FactType of the Fact is Objectified, add the Fact.Id as an instance of the ObjectifyingEntityType
                     '----------------------------------------------------------------------------------------------------------
                     If arFactType.IsObjectified Then
-                        If IsSomething(arFactType.ObjectifyingEntityType) Then
+                        If arFactType.ObjectifyingEntityType IsNot Nothing Then
                             'arFactType.ObjectifyingEntityType.Instance.Add(lrFact.Id)
                         End If
                     End If
@@ -4805,10 +5820,83 @@ SkipRoleConstraintInstance:
                 lsMessage2 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage2 &= vbCrLf & vbCrLf & ex.Message
                 lsMessage2 &= vbCrLf & vbCrLf & "Loading Facts for FactType: '" & arFactType.Id & "'"
-                prApplication.ThrowErrorMessage(lsMessage2, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage2, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
+
+#Region "NORMA Derivation Resolvers"
+
+        Private Sub ResolveRootObjectType(ByVal arRoot As FBM.RootObjectType,
+                                            ByVal arModel As FBM.Model)
+
+            If arRoot Is Nothing OrElse arRoot.BostonModelElement IsNot Nothing Then
+                Exit Sub
+            End If
+
+            Dim lsObjectTypeId As String = If(arRoot.ref, "").Trim
+            If lsObjectTypeId = "" Then Exit Sub
+
+            Dim lrObjectType As FBM.ModelObject = Nothing
+
+            lrObjectType = arModel.EntityType.Find(Function(x) x.Id = lsObjectTypeId)
+
+            If lrObjectType Is Nothing Then
+                lrObjectType = arModel.ValueType.Find(Function(x) x.Id = lsObjectTypeId)
+            End If
+
+            If lrObjectType Is Nothing Then
+                lrObjectType = arModel.FactType.Find(Function(x) x.Id = lsObjectTypeId)
+            End If
+
+            arRoot.BostonModelElement = lrObjectType
+
+        End Sub
+
+        Private Sub ResolveRoleSubPathRoots(ByVal arSubPath As FBM.RoleSubPath,
+                                            ByVal arModel As FBM.Model)
+
+            If arSubPath Is Nothing Then Exit Sub
+
+            ResolveRootObjectType(arSubPath.RootObjectType,
+                                 arModel)
+
+            If arSubPath.SubPath IsNot Nothing Then
+                For Each lrChild As FBM.RoleSubPath In arSubPath.SubPath
+                    ResolveRoleSubPathRoots(lrChild, arModel)
+                Next
+            End If
+
+        End Sub
+
+        Private Sub ResolveDerivationRolePathRoots(ByVal arModel As FBM.Model)
+
+            For Each lrFactType As FBM.FactType In arModel.FactType
+
+                If lrFactType.DerivationRule Is Nothing OrElse
+                               lrFactType.DerivationRule.FactTypeDerivationPath Is Nothing OrElse
+                               lrFactType.DerivationRule.FactTypeDerivationPath.PathComponents Is Nothing Then
+                    Continue For
+                End If
+
+                For Each lrRolePath As FBM.RolePath In lrFactType.DerivationRule.FactTypeDerivationPath.PathComponents.RolePaths
+
+                    ResolveRootObjectType(lrRolePath.RootObjectType,
+                                          arModel)
+
+                    If lrRolePath.SubPath IsNot Nothing Then
+                        For Each lrSubPath As FBM.RoleSubPath In lrRolePath.SubPath
+                            ResolveRoleSubPathRoots(lrSubPath, arModel)
+                        Next
+                    End If
+
+                Next
+
+            Next
+
+        End Sub
+
+#End Region
 
 
         ''' <summary>
@@ -4826,6 +5914,7 @@ SkipRoleConstraintInstance:
                 Dim lrXMLRole As XMLModel.Role
                 Dim lrRole As FBM.Role
                 Dim lrXMLFactType As XMLModel.FactType
+                Dim lrFactType = arFactType
 
                 If arXMlFactType Is Nothing Then
                     lrXMLFactType = Me.ORMModel.FactTypes.Find(Function(x) x.Id = lsFactTypeId)
@@ -4862,6 +5951,8 @@ SkipRoleConstraintInstance:
                 arFactType.ShortDescription = lrXMLFactType.ShortDescription
                 arFactType.LongDescription = lrXMLFactType.LongDescription
                 arFactType.DBName = lrXMLFactType.DBName
+                arFactType.ModelElementFlag = lrXMLFactType.ModelElementFlags
+                arFactType.GraphLabel = lrXMLFactType.GraphLabel.Select(Function(x) New RDS.GraphLabel With {.Model = lrFactType.Model, .ModelElement = lrFactType, .ModelElementId = lrFactType.Id, .ModelId = lrFactType.Model.ModelId, .Label = x}).ToList
 
                 If lrXMLFactType.ObjectifyingEntityTypeId = "" Then
                     arFactType.ObjectifyingEntityType = Nothing
@@ -4872,11 +5963,11 @@ SkipRoleConstraintInstance:
                     If arFactType.ObjectifyingEntityType IsNot Nothing Then
                         arFactType.ObjectifyingEntityType.IsObjectifyingEntityType = True
                         '20220530-VM-Commented out. Remove if not needed.
-                        'arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
+                        'arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType                        
                         arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
                     End If
 
-                    If IsSomething(arFactType.ObjectifyingEntityType) Then
+                    If arFactType.ObjectifyingEntityType IsNot Nothing Then
                         '---------------------------------------------
                         'Okay, have found the ObjectifyingEntityType
                         '---------------------------------------------
@@ -4889,10 +5980,340 @@ SkipRoleConstraintInstance:
                     End If
                 End If
 
+#Region "Derivation Rule"
+
+                '------------------------------------------------------------
+                ' XMLModel.FactType.DerivationRule  -> FBM.FactType.DerivationRule
+                '------------------------------------------------------------
+                If lrXMLFactType.DerivationRule IsNot Nothing Then
+
+                    Dim lrXMLDerivationRule As XMLModel.DerivationRule = lrXMLFactType.DerivationRule
+                    Dim lrDerivationRule As New FBM.DerivationRule
+
+                    '------------------------------------------------------------
+                    ' FactTypeDerivationPath
+                    '------------------------------------------------------------
+                    If lrXMLDerivationRule.FactTypeDerivationPath IsNot Nothing Then
+
+                        Dim lrXMLDerivationPath As XMLModel.FactTypeDerivationPath = lrXMLDerivationRule.FactTypeDerivationPath
+                        Dim lrDerivationPath As New FBM.FactTypeDerivationPath
+
+                        lrDerivationPath.Id = lrXMLDerivationPath.Id
+                        lrDerivationPath.Name = lrXMLDerivationPath.Name
+
+                        '------------------------------------------------------------
+                        ' PathComponents.RolePath
+                        '------------------------------------------------------------
+                        If lrXMLDerivationPath.PathComponents IsNot Nothing AndAlso lrXMLDerivationPath.PathComponents.RolePath.Count > 0 Then
+
+                            'Dim lrXMLRolePath As XMLModel.RolePath = lrXMLDerivationPath.PathComponents.RolePath 'Now multiple (below)
+                            Dim lrPathComponents As New FBM.PathComponents
+
+                            For Each lrXMLRolePath As XMLModel.RolePath In lrXMLDerivationPath.PathComponents.RolePath
+                                Dim lrRolePath As New FBM.RolePath
+
+                                lrRolePath.Id = lrXMLRolePath.Id
+                                lrRolePath.SplitCombinationOperator = lrXMLRolePath.SplitCombinationOperator
+
+                                'RootObjectType might be XmlIgnore in XML; set if available, otherwise leave Nothing.
+                                'If your XMLModel.RolePath has RootObjectTypeId, this will pick it up.
+                                If lrXMLRolePath.RootObjectType IsNot Nothing Then
+
+                                    lrRolePath.RootObjectType = New FBM.RootObjectType
+                                    lrRolePath.RootObjectType.id = lrXMLRolePath.RootObjectType.Id
+                                    lrRolePath.RootObjectType.ref = lrXMLRolePath.RootObjectType.ModelElementId
+                                    lrRolePath.RootObjectType.IsNegated = lrXMLRolePath.RootObjectType.IsNegated
+
+                                    'BostonModelElement is resolved after every Fact Type has loaded.
+
+                                End If
+
+                                '------------------------------------------------------------
+                                ' RolePath.PathedRoles
+                                '------------------------------------------------------------
+                                If lrXMLRolePath.PathedRole IsNot Nothing Then
+                                    For Each lrXMLPathedRole As XMLModel.PathedRole In lrXMLRolePath.PathedRole
+                                        Dim lrPathedRole As New FBM.PathedRole
+                                        lrPathedRole.id = lrXMLPathedRole.id
+                                        lrPathedRole.Ref = lrXMLPathedRole.Ref
+                                        lrPathedRole.IsNegated = lrXMLPathedRole.IsNegated
+                                        lrPathedRole.Purpose = lrXMLPathedRole.Purpose
+
+                                        lrPathedRole.ValueRestriction = ConvertPathedRoleValueRestrictionFromXmlModel(lrXMLPathedRole.ValueRestriction)
+
+                                        lrRolePath.PathedRole.Add(lrPathedRole)
+                                    Next
+                                End If
+
+                                '------------------------------------------------------------
+                                ' RolePath.SubPaths
+                                '------------------------------------------------------------
+                                If lrXMLRolePath.SubPath IsNot Nothing Then
+
+                                    For Each lrXMLSubPath As XMLModel.RoleSubPath In lrXMLRolePath.SubPath
+
+                                        Dim lrSubPath As FBM.RoleSubPath = ConvertRoleSubPathFromXmlModel(lrXMLSubPath,
+                                                                                                          arFactType.Model)
+
+                                        If lrSubPath IsNot Nothing Then
+                                            lrRolePath.SubPath.Add(lrSubPath)
+                                        End If
+
+                                    Next
+
+                                End If
+
+                                '------------------------------------------------------------
+                                ' RolePath.ObjectUnifiers
+                                '------------------------------------------------------------
+                                If lrXMLRolePath.ObjectUnifier IsNot Nothing Then
+
+                                    For Each lrXMLObjectUnifier As XMLModel.ObjectUnifier In lrXMLRolePath.ObjectUnifier
+
+                                        Dim lrObjectUnifier As New FBM.ObjectUnifier
+                                        lrObjectUnifier.id = lrXMLObjectUnifier.id
+
+                                        '-----------------------------------------
+                                        ' PathedRole refs
+                                        '-----------------------------------------
+                                        If lrXMLObjectUnifier.PathedRoles IsNot Nothing Then
+                                            For Each lrXMLPathedRoleRef As XMLModel.PathedRoleReference In lrXMLObjectUnifier.PathedRoles
+
+                                                Dim lrPathedRoleRef As New FBM.PathedRoleReference
+                                                lrPathedRoleRef.Ref = lrXMLPathedRoleRef.Ref
+                                                lrObjectUnifier.PathedRoles.Add(lrPathedRoleRef)
+
+                                            Next
+                                        End If
+
+                                        '-----------------------------------------
+                                        ' PathRoot refs
+                                        '-----------------------------------------
+                                        If lrXMLObjectUnifier.PathRoots IsNot Nothing Then
+                                            For Each lrXMLPathRootRef As XMLModel.PathRootReference In lrXMLObjectUnifier.PathRoots
+
+                                                Dim lrPathRootRef As New FBM.PathRootReference
+                                                lrPathRootRef.Ref = lrXMLPathRootRef.Ref
+                                                lrObjectUnifier.PathRoots.Add(lrPathRootRef)
+
+                                            Next
+                                        End If
+
+                                        lrRolePath.ObjectUnifier.Add(lrObjectUnifier)
+
+                                    Next
+
+                                End If
+
+                                '------------------------------------------------------------
+                                ' RolePath.CalculatedValues (typed)
+                                '------------------------------------------------------------
+                                If lrXMLRolePath.CalculatedValues IsNot Nothing Then
+
+                                    For Each lrXMLCalculatedValue As XMLModel.CalculatedValue In lrXMLRolePath.CalculatedValues
+
+                                        Dim lrCalculatedValue As New FBM.CalculatedValue
+                                        lrCalculatedValue.Id = lrXMLCalculatedValue.Id
+
+                                        'Function ref
+                                        If lrXMLCalculatedValue.Function IsNot Nothing Then
+                                            lrCalculatedValue.Function = New FBM.FunctionRef
+                                            lrCalculatedValue.Function.Ref = lrXMLCalculatedValue.Function.Ref
+                                        End If
+
+                                        'AggregationContext
+                                        If lrXMLCalculatedValue.AggregationContext IsNot Nothing Then
+
+                                            Dim lrAggregationContext As New FBM.AggregationContext
+
+                                            If lrXMLCalculatedValue.AggregationContext.PathRoot IsNot Nothing Then
+                                                lrAggregationContext.PathRoot = New FBM.PathRootReference With {
+                                                    .Ref = lrXMLCalculatedValue.AggregationContext.PathRoot.Ref
+                                                }
+                                            End If
+
+                                            lrCalculatedValue.AggregationContext = lrAggregationContext
+
+                                        End If
+
+                                        'Inputs
+                                        If lrXMLCalculatedValue.Inputs IsNot Nothing AndAlso lrXMLCalculatedValue.Inputs.Input IsNot Nothing Then
+                                            lrCalculatedValue.Inputs = New FBM.Inputs
+
+                                            For Each lrXMLInput As XMLModel.Input In lrXMLCalculatedValue.Inputs.Input
+
+                                                Dim lrInput As New FBM.Input
+                                                lrInput.Id = lrXMLInput.Id
+
+                                                If lrXMLInput.Parameter IsNot Nothing Then
+                                                    lrInput.Parameter = New FBM.ParameterRef
+                                                    lrInput.Parameter.Ref = lrXMLInput.Parameter.Ref
+                                                End If
+
+                                                If lrXMLInput.Source IsNot Nothing Then
+                                                    lrInput.Source = New FBM.Source
+
+                                                    If lrXMLInput.Source.Item IsNot Nothing Then
+
+                                                        If TypeOf lrXMLInput.Source.Item Is XMLModel.PathRootReference Then
+
+                                                            Dim lrInRef As XMLModel.PathRootReference = CType(lrXMLInput.Source.Item, XMLModel.PathRootReference)
+
+                                                            Dim lrOutRef As New FBM.PathRootReference
+                                                            lrOutRef.Ref = lrInRef.Ref
+                                                            lrInput.Source.Item = lrOutRef
+
+                                                        ElseIf TypeOf lrXMLInput.Source.Item Is XMLModel.PathedRoleRef Then
+                                                            Dim lrInRef As XMLModel.PathedRoleRef = CType(lrXMLInput.Source.Item, XMLModel.PathedRoleRef)
+                                                            Dim lrOutRef As New FBM.PathedRoleRef
+                                                            lrOutRef.Ref = lrInRef.Ref
+                                                            lrInput.Source.Item = lrOutRef
+
+                                                        ElseIf TypeOf lrXMLInput.Source.Item Is XMLModel.CalculatedValueRef Then
+                                                            Dim lrInRef As XMLModel.CalculatedValueRef = CType(lrXMLInput.Source.Item, XMLModel.CalculatedValueRef)
+                                                            Dim lrOutRef As New FBM.CalculatedValueRef
+                                                            lrOutRef.Ref = lrInRef.Ref
+                                                            lrInput.Source.Item = lrOutRef
+
+                                                        ElseIf TypeOf lrXMLInput.Source.Item Is XMLModel.Constant Then
+                                                            Dim lrInConst As XMLModel.Constant = CType(lrXMLInput.Source.Item, XMLModel.Constant)
+                                                            Dim lrOutConst As New FBM.Constant
+                                                            lrOutConst.Id = lrInConst.Id
+                                                            lrOutConst.Value = lrInConst.Value
+                                                            lrInput.Source.Item = lrOutConst
+
+                                                        End If
+                                                    End If
+                                                End If
+
+                                                lrCalculatedValue.Inputs.Input.Add(lrInput)
+
+                                            Next 'Input
+                                        End If 'Inputs
+
+                                        lrRolePath.CalculatedValues.Add(lrCalculatedValue)
+
+                                    Next 'CalculatedValue
+
+                                End If
+
+                                '------------------------------------------------------------
+                                ' RolePath.Conditions (typed)
+                                '------------------------------------------------------------
+                                If lrXMLRolePath.Conditions IsNot Nothing Then
+
+                                    Dim lrConditions As New FBM.Conditions
+
+                                    If lrXMLRolePath.Conditions.Items IsNot Nothing Then
+                                        For Each lrXMLNode As XMLModel.ConditionNode In lrXMLRolePath.Conditions.Items
+                                            Dim lrNode As FBM.ConditionNode = ConvertConditionNodeFromXmlModel(lrXMLNode)
+                                            If lrNode IsNot Nothing Then
+                                                lrConditions.Items.Add(lrNode)
+                                            End If
+                                        Next
+                                    End If
+
+                                    lrRolePath.Conditions = lrConditions
+
+                                End If
+
+                                lrPathComponents.RolePaths.Add(lrRolePath)
+                            Next
+
+                            lrDerivationPath.PathComponents = lrPathComponents
+
+                        End If
+
+                        '------------------------------------------------------------
+                        ' DerivationProjections
+                        '------------------------------------------------------------
+#Region "Derivation Projection/s"
+                        If lrXMLDerivationPath.Projection IsNot Nothing Then
+
+                            For Each lrXMLProjection As XMLModel.DerivationProjection In lrXMLDerivationPath.Projection
+
+                                Dim lrProjection As New FBM.DerivationProjection
+
+                                lrProjection.Id = lrXMLProjection.Id
+                                lrProjection.Ref = lrXMLProjection.Ref
+
+                                '-----------------------------------------
+                                ' RoleProjection (0..n)
+                                '-----------------------------------------
+                                If lrXMLProjection.RoleProjection IsNot Nothing Then
+
+                                    For Each lrXMLRoleProjection As XMLModel.RoleProjection In lrXMLProjection.RoleProjection
+
+                                        Dim lrRoleProjection As New FBM.RoleProjection
+
+                                        lrRoleProjection.Id = lrXMLRoleProjection.Id
+                                        lrRoleProjection.Ref = lrXMLRoleProjection.Ref
+
+                                        '-----------------------------------------
+                                        ' DerivationSource
+                                        '-----------------------------------------
+                                        If lrXMLRoleProjection.DerivationSource IsNot Nothing Then
+
+                                            Dim lrDerivationSource As New FBM.DerivationSource
+
+                                            ' PathRoot
+                                            If lrXMLRoleProjection.DerivationSource.PathRoot IsNot Nothing Then
+                                                lrDerivationSource.PathRoot = New FBM.PathRootReference With {
+                                                                .Ref = lrXMLRoleProjection.DerivationSource.PathRoot.Ref
+                                                            }
+                                            End If
+
+                                            ' CalculatedValue
+                                            If lrXMLRoleProjection.DerivationSource.CalculatedValue IsNot Nothing Then
+                                                lrDerivationSource.CalculatedValue = New FBM.CalculatedValueReference With {
+                                                                .Ref = lrXMLRoleProjection.DerivationSource.CalculatedValue.Ref
+                                                            }
+                                            End If
+
+                                            ' PathedRole
+                                            If lrXMLRoleProjection.DerivationSource.PathedRole IsNot Nothing Then
+                                                lrDerivationSource.PathedRole = New FBM.PathedRoleReference With {
+                                                                .Ref = lrXMLRoleProjection.DerivationSource.PathedRole.Ref
+                                                            }
+                                            End If
+
+                                            lrRoleProjection.DerivationSource = lrDerivationSource
+
+                                        End If
+
+                                        lrProjection.RoleProjection.Add(lrRoleProjection)
+
+                                    Next 'RoleProjection
+
+                                End If
+
+                                lrDerivationPath.Projection.Add(lrProjection)
+
+                            Next 'DerivationProjection
+
+                        End If
+#End Region
+
+                        lrDerivationRule.FactTypeDerivationPath = lrDerivationPath
+
+                    End If
+
+                    arFactType.DerivationRule = lrDerivationRule
+                    arFactType.IsDerived = True
+                    'DerivationText can only really be calculated once all FactTypes have been loaded for the Model, because they may be needed by the derivation.
+                    'arFactType.DerivationText = BostonDerivationRenderer.RenderDerivationEnglish(arFactType.Model, arFactType)
+
+                Else
+                    arFactType.DerivationRule = Nothing
+                End If
+
+#End Region
+
                 '-----------------------------------------------------
                 'Get the Roles within the RoleGroup for the FactType
                 '-----------------------------------------------------                
                 Dim lrModelElement As FBM.ModelObject
+                Dim lrDictionaryEntry As FBM.DictionaryEntry
                 For Each lrXMLRole In lrXMLFactType.RoleGroup
 
                     lrRole = New FBM.Role
@@ -4918,10 +6339,11 @@ SkipRoleConstraintInstance:
                         GoTo FoundModelElement
                     End If
 KeepLooking:
-                    If IsSomething(arFactType.Model.ValueType.Find(Function(x) x.Id = lrXMLRole.JoinedObjectTypeId), lrModelElement) Then
+                    Dim lrModelElementFound = arFactType.Model.ValueType.Find(Function(x) x.Id = lrXMLRole.JoinedObjectTypeId)
+                    If If(lrModelElementFound IsNot Nothing, lrModelElementFound, lrModelElement) IsNot Nothing Then
                         lrRole.JoinedORMObject = lrModelElement
                     Else
-                        lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
+                        lrRole.JoinedORMObject = arFactType.Model.FactType.Find(Function(x) x.Id = lrXMLRole.JoinedObjectTypeId)
                         If lrRole.JoinedORMObject Is Nothing Then
                             lrRole.JoinedORMObject = New FBM.FactType(lrRole.Model, lrXMLRole.JoinedObjectTypeId, True)
                             Me.GetFactTypeDetails(lrRole.JoinsFactType)
@@ -4929,7 +6351,7 @@ KeepLooking:
                             If lrRole.JoinedORMObject Is Nothing Then
                                 'Something has gone wrong. Create a DummyEntityType
                                 lrRole.JoinedORMObject = New FBM.EntityType(lrRole.Model, pcenumLanguage.ORMModel, lrXMLRole.JoinedObjectTypeId, lrXMLRole.JoinedObjectTypeId)
-                                prApplication.ThrowErrorMessage("There was a problem finding the Object Type, " & lrXMLRole.JoinedObjectTypeId & ", so a dummy Entity Type has been created in its place.", pcenumErrorType.Warning, Nothing, False, False, True)
+                                prApplication.ThrowMessage("There was a problem finding the Object Type, " & lrXMLRole.JoinedObjectTypeId & ", so a dummy Entity Type has been created in its place.", pcenumErrorType.Warning, Nothing, False, False, True)
                                 lrRole.Model.AddEntityType(lrRole.JoinedORMObject,, False, Nothing, True, True)
                             End If
                         End If
@@ -4940,8 +6362,19 @@ FoundModelElement:
                     '--------------------------------------------------
                     arFactType.Model.Role.Add(lrRole)
 
+                    'RoleNames in ModelDictionary if not "", so can save to database without ForeignKey constraint fail on ModelDictionary.
+                    If lrRole.Name.Trim <> "" Then
+                        lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model, lrRole.Name, pcenumConceptType.Value,,, True, True,)
+                        lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False,, True,, True)
+                    End If
+
                     arFactType.RoleGroup.Add(lrRole)
                 Next
+
+#Region "Property Graph Schema specific"
+                arFactType.Source = lrXMLFactType.Source
+                arFactType.Target = lrXMLFactType.Target
+#End Region
 
                 '-------------------------------------------
                 'Get the FactTypeReadings for the FactType
@@ -4956,16 +6389,16 @@ FoundModelElement:
                 '------------------------------------------------
                 'Link to the Concept within the ModelDictionary
                 '------------------------------------------------
-                Dim lrDictionaryEntry As New FBM.DictionaryEntry(arFactType.Model,
-                                                                 arFactType.Id,
-                                                                 pcenumConceptType.FactType,
-                                                                 arFactType.ShortDescription,
-                                                                 arFactType.LongDescription,
-                                                                 True,
-                                                                 True,
-                                                                 arFactType.DBName)
+                lrDictionaryEntry = New FBM.DictionaryEntry(arFactType.Model,
+                                                            arFactType.Id,
+                                                            pcenumConceptType.FactType,
+                                                            arFactType.ShortDescription,
+                                                            arFactType.LongDescription,
+                                                            True,
+                                                            True,
+                                                            arFactType.DBName)
 
-                lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, ,,, False,, True) '20220117-VM-Was this. DBName wasn't working.
+                lrDictionaryEntry = arFactType.Model.AddModelDictionaryEntry(lrDictionaryEntry, , False,, False,, True) '20220117-VM-Was this. DBName wasn't working.
 
                 arFactType.Concept = lrDictionaryEntry.Concept
 
@@ -4976,7 +6409,7 @@ FoundModelElement:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -5031,7 +6464,7 @@ FoundModelElement:
                         lrFactTypeReading.PredicatePart.Add(lrPredicatePart)
                     Next
 
-                    If Not IsSomething(lrFactTypeReading.PredicatePart) Then
+                    If Not lrFactTypeReading.PredicatePart IsNot Nothing Then
                         lsMessage = "Error: TableFactTypeReading.GetFactTypeReadingsForFactType: "
                         lsMessage &= vbCrLf & "No PredicateParts found for:"
                         lsMessage &= vbCrLf & "FactType.Id: '" & arFactType.Id & "'"
@@ -5048,7 +6481,7 @@ FoundModelElement:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -5160,7 +6593,7 @@ FoundModelElement:
         '                                    Add(New NORMA.Model.ObjectifiedType.ObjectifiedTypeRole() With {.Ref = lrNORMARole.Id})
         '                        End Select
         '                    Else
-        '                        prApplication.ThrowErrorMessage("Trouble finding Joined ORM Object, " & lrFBMRole.JoinedObjectTypeId & ", for Fact Type: " & arFBMFactType.Id, pcenumErrorType.Warning,, False,, True)
+        '                        prApplication.ThrowMessage("Trouble finding Joined ORM Object, " & lrFBMRole.JoinedObjectTypeId & ", for Fact Type: " & arFBMFactType.Id, pcenumErrorType.Warning,, False,, True)
         '                    End If
 
         '                    If IsNothing(arNORMAFactType.FactRoles) Then
@@ -5328,7 +6761,7 @@ FoundModelElement:
 
         '                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
         '                lsMessage &= vbCrLf & vbCrLf & ex.Message
-        '                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        '                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         '            End Try
         '        End Sub
 
@@ -5546,7 +6979,7 @@ FoundModelElement:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try

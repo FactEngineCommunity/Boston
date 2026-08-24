@@ -50,7 +50,7 @@ Public Class tUserAction
 
     Public Sub New(ByRef arModelObject As FBM.ModelObject, ByVal aiUserAction As pcenumUserAction, ByRef arPage As FBM.Page, Optional ByVal asTransactionId As String = Nothing)
 
-        If IsSomething(asTransactionId) Then
+        If asTransactionId IsNot Nothing Then
             Me.TransactionId = asTransactionId
         Else
             Me.TransactionId = System.Guid.NewGuid.ToString

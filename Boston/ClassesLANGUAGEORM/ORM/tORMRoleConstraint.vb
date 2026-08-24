@@ -266,21 +266,21 @@ Namespace FBM
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
-        Public _ValueConstraintList As New Viev.Strings.StringCollection
+        Public _ValueConstraintList As New FEStrings.StringCollection
         '<XmlIgnore()> _
         <CategoryAttribute("Value Constraint"),
          Browsable(True),
          [ReadOnly](False),
          DescriptionAttribute("The List of Values that Objects of this Value Type may take."),
          Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
-        Public Property ValueConstraint() As Viev.Strings.StringCollection 'StringCollection 
+        Public Property ValueConstraint() As FEStrings.StringCollection 'StringCollection 
             '   DefaultValueAttribute(""), _
             '   BindableAttribute(True), _
             '   DesignOnly(False), _
             Get
                 Return Me._ValueConstraintList
             End Get
-            Set(ByVal Value As Viev.Strings.StringCollection)
+            Set(ByVal Value As FEStrings.StringCollection)
                 Me._ValueConstraintList = Value
                 '----------------------------------------------------
                 'Update the set of Concepts/Symbols/Values
@@ -341,7 +341,7 @@ Namespace FBM
         <NonSerialized()>
         Public Event IsPreferredIdentifierChanged(ByVal abNewIsPreferredIdentifier As Boolean)
         <NonSerialized()>
-        Public Event RoleConstraintRoleAdded(ByRef arRoleConstraintRole As FBM.RoleConstraintRole, ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+        Public Event RoleConstraintRoleAdded(ByRef arRoleConstraintRole As FBM.RoleConstraintRole, ByRef arSubtypeRelationship As FBM.SubtypeRelationship)
         <NonSerialized()>
         Public Event RoleConstraintRoleRemoved(ByVal arRoleConstraintRole As FBM.RoleConstraintRole)
         <NonSerialized()>
@@ -376,7 +376,7 @@ Namespace FBM
         Public Sub New(ByRef arModel As FBM.Model,
                        ByVal asRoleConstraintName As String,
                        ByVal abUseNameAsId As Boolean,
-                       Optional ByVal aiRoleConstraintType As pcenumRoleConstraintType = Nothing,
+                       Optional ByVal aiRoleConstraintType As pcenumRoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint,
                        Optional ByRef aarRole As List(Of FBM.Role) = Nothing,
                        Optional ByVal abMakeDirty As Boolean = False)
 
@@ -393,19 +393,17 @@ Namespace FBM
             End If
             Me.isDirty = abMakeDirty
 
-            If IsSomething(aiRoleConstraintType) Then
-                Me.RoleConstraintType = aiRoleConstraintType
-            End If
+            Me.RoleConstraintType = aiRoleConstraintType
 
             '-----------------------------------------------------------
             'Create the RoleConstraintRole group for the RoleConstraint
             '-----------------------------------------------------------
-            If IsSomething(aarRole) Then
+            If aarRole IsNot Nothing Then
                 '------------------------------------------------------------
                 'Establish the link between each role and the RoleConstraint
                 '------------------------------------------------------------            
                 For Each lrRole In aarRole
-                    If IsSomething(lrRole) Then
+                    If lrRole IsNot Nothing Then
                         liCounter += 1
                         Me.Role.Add(lrRole)
 
@@ -442,8 +440,8 @@ Namespace FBM
         Sub New(ByRef arModel As FBM.Model,
                 ByVal aiRoleConstraintType As pcenumRoleConstraintType,
                 Optional ByRef aarRole As List(Of FBM.Role) = Nothing,
-                Optional ByVal abAddToModel As Boolean = Nothing,
-                Optional ByVal aiLevelNr As Integer = Nothing,
+                Optional ByVal abAddToModel As Boolean = False,
+                Optional ByVal aiLevelNr As Integer = 1,
                 Optional ByVal abMakeDirty As Boolean = False,
                 Optional ByVal abIdEqualsName As Boolean = False)
 
@@ -467,9 +465,7 @@ Namespace FBM
                 Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
                     Me.ConceptType = pcenumConceptType.RoleConstraint
                     Me.Name = "InternalUniquenessConstraint" & arModel.RoleConstraint.Count + 1
-                    If IsSomething(aiLevelNr) Then
-                        Me.LevelNr = aiLevelNr
-                    End If
+                    Me.LevelNr = aiLevelNr
                 Case Else
                     Me.ConceptType = pcenumConceptType.RoleConstraint
             End Select
@@ -477,7 +473,7 @@ Namespace FBM
             '-----------------------------------------------------------
             'Create the RoleConstraintRole group for the RoleConstraint
             '-----------------------------------------------------------
-            If IsSomething(aarRole) Then
+            If aarRole IsNot Nothing Then
                 '-------------------------------------------------------------------
                 'Throw an exception if this constructor has been called for any
                 '  other than a UniquenessConstraint, because just Role information
@@ -521,11 +517,9 @@ Namespace FBM
 
             '-----------------------------------------------
             'Add the RoleConstraint to the underlying Model
-            '-----------------------------------------------
-            If IsSomething(abAddToModel) Then
-                If abAddToModel Then
-                    Me.Model.AddRoleConstraint(Me)
-                End If
+            '-----------------------------------------------            
+            If abAddToModel Then
+                Me.Model.AddRoleConstraint(Me)
             End If
 
         End Sub
@@ -545,7 +539,7 @@ Namespace FBM
                 ByRef aarRole As List(Of FBM.Role),
                 ByVal aiCardinality As Integer,
                 ByVal aiCardinalityRangeType As pcenumCardinalityRangeType,
-                Optional ByVal abAddToModel As Boolean = Nothing,
+                Optional ByVal abAddToModel As Boolean = False,
                 Optional ByVal abMakeDirty As Boolean = False)
 
             Me.New()
@@ -583,10 +577,8 @@ Namespace FBM
             '-----------------------------------------------
             'Add the RoleConstraint to the underlying Model
             '-----------------------------------------------
-            If IsSomething(abAddToModel) Then
-                If abAddToModel Then
-                    Me.Model.AddRoleConstraint(Me)
-                End If
+            If abAddToModel Then
+                Me.Model.AddRoleConstraint(Me)
             End If
 
         End Sub
@@ -659,7 +651,7 @@ Namespace FBM
         End Sub
 
         Public Sub AddRoleConstraintRole(ByRef arRoleConstraintRole As FBM.RoleConstraintRole,
-                                         Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing)
+                                         Optional arSubtypeRelationship As FBM.SubtypeRelationship = Nothing)
 
             Try
                 arRoleConstraintRole.isDirty = True
@@ -769,7 +761,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -789,7 +781,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -849,7 +841,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -996,11 +988,16 @@ Namespace FBM
                         Else
                             Select Case lrRole.TypeOfJoin
                                 Case Is = pcenumRoleJoinType.ValueType 'ValueType                    
-                                    Return False
+                                    '20240520-VM-Was False...but FCO-IM allows Objectified UnaryFactTypes linked to a Value Type as a valid ObjectType, which it is.
+                                    If Me.RoleConstraintRole.Count = 1 AndAlso Me.RoleConstraintRole(0).Role.FactType.Arity = 1 AndAlso Me.RoleConstraintRole(0).Role.FactType.IsObjectified Then
+                                        Return True
+                                    Else
+                                        Return False
+                                    End If
                                 Case Is = pcenumRoleJoinType.EntityType
                                     If lrRole.FactType.Is1To1BinaryFactType Then
                                         'Rule 4
-                                        If IsSomething(lrRole.JoinsEntityType.ReferenceModeFactType) Then
+                                        If lrRole.JoinsEntityType.ReferenceModeFactType IsNot Nothing Then
                                             If lrRole.FactType.Id = lrRole.JoinsEntityType.ReferenceModeFactType.Id Then
                                                 '---------------------------------------------------
                                                 'Is Role on ReferenceModeFactType
@@ -1164,7 +1161,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1191,7 +1188,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -1251,7 +1248,7 @@ ReturnString:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return ""
             End Try
@@ -1276,7 +1273,7 @@ ReturnString:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1337,7 +1334,7 @@ ReturnString:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of FBM.ModelObject)
             End Try
@@ -1395,7 +1392,7 @@ ReturnString:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1442,7 +1439,7 @@ ReturnString:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return "Error generating CQL for Entity Type: " & Me.Id
             End Try
@@ -1477,14 +1474,14 @@ ReturnString:
         End Function
 
 
-        Function ExistsRoleConstraintRoleForModelObject(ByVal aoModelObject As FBM.ModelObject, Optional ByVal abIsExit As Boolean = Nothing) As Boolean
+        Function ExistsRoleConstraintRoleForModelObject(ByVal aoModelObject As FBM.ModelObject, Optional ByVal abIsExit As Boolean = False) As Boolean
 
             Dim lrRoleConstraintRole As FBM.RoleConstraintRole
 
 
             For Each lrRoleConstraintRole In Me.RoleConstraintRole
                 If lrRoleConstraintRole.Role.JoinedORMObject Is aoModelObject Then
-                    If IsSomething(abIsExit) Then
+                    If abIsExit Then
                         If lrRoleConstraintRole.IsExit Then
                             Return True
                         Else
@@ -1578,7 +1575,7 @@ ReturnString:
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tRoleConstraint.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrRoleConstraint
             End Try
@@ -1662,7 +1659,7 @@ ReturnString:
                             lrRoleConstraintInstance.RoleConstraintRole.Add(lrRoleConstraintRoleInstance)
                         Catch ex As Exception
                             lsMessage = "Error creating RoleConstraintRoleInstance for RoleConstraint, " & Me.Id
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, False, ex)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, False, ex)
                         End Try
                     Next
 
@@ -1680,7 +1677,7 @@ ReturnString:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1864,7 +1861,7 @@ ReturnString:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrRoleConstraintInstance
             End Try
@@ -1938,7 +1935,7 @@ ReturnString:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1979,7 +1976,7 @@ ReturnString:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2046,7 +2043,7 @@ ReturnString:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2075,7 +2072,7 @@ ReturnString:
                     'VM-20180401-Not sure what this does.
                     'Dim lrConcept As New FBM.Concept(aoChangedPropertyItem.OldValue)
                     'lrConcept = Me.ValueType._ValueConstraint.Find(AddressOf lrConcept.Equals)
-                    'If IsSomething(lrConcept) Then
+                    'If lrConcept IsNot Nothing Then
                     '    lrConcept.Symbol = aoChangedPropertyItem.ChangedItem.Value.ToString
                     'End If
 
@@ -2109,7 +2106,7 @@ ReturnString:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2204,7 +2201,7 @@ ReturnString:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2242,7 +2239,7 @@ ReturnString:
                         lsMessage = "Error: Cannot remove a Role Constraint which identifies the Simple Reference Scheme of an Entity Type"
                         lsMessage.AppendDoubleLineBreak("Would you like to force the Role Constraint to be removed from the Model?")
 
-                        If prApplication.ThrowErrorMessage(lsMessage,
+                        If prApplication.ThrowMessage(lsMessage,
                                                            pcenumErrorType.Critical,
                                                            Nothing,
                                                            False, ,, MessageBoxButtons.YesNo) = DialogResult.Yes Then
@@ -2299,9 +2296,27 @@ RemoveAnyway:
                 Next
 
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)
+                MyBase.TriggerRemovedFromModel()
+
                 If abRemoveIndex Then RaiseEvent RemoveIndex(abDoDatabaseProcessing)
 
                 Me.Model.RemoveRoleConstraint(Me, abCheckForErrors, abDoDatabaseProcessing,, abRemoveIndex, abIsPartOfSimpleReferenceScheme)
+
+                '===========Remove Link/Implied Fact Types if required.
+                If Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
+
+                    If Me.Role(0).FactType.RoleGroup.Any(Function(x) x.HasInternalUniquenessConstraint) = False Then
+                        'Fact Type has no more InternalUniquenessConstraints
+
+                        Dim larLinkFactType = Me.Role(0).FactType.getLinkFactTypes
+
+                        For Each lrFactType In larLinkFactType.ToArray
+                            Call lrFactType.RemoveFromModel()
+                        Next
+
+                    End If
+
+                End If
 
                 Me.Model.MakeDirty(False, False)
 
@@ -2316,7 +2331,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -2355,7 +2370,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2392,7 +2407,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2481,14 +2496,15 @@ RemoveAnyway:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
         Public Overrides Function SetName(ByVal asNewName As String,
                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
+                                          Optional ByVal abSuppressModelSave As Boolean = False,
+                                          Optional ByVal abSetDBNameAsNewName As Boolean = False) As Boolean
 
             '-----------------------------------------------------------------------------------------------------------
             'The following explains the logic and philosophy of Boston.
@@ -2555,13 +2571,13 @@ RemoveAnyway:
                 Return True
 
             Catch iex As tInformationException
-                prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
+                prApplication.ThrowMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
                 Return False
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: tRoleConstraint.SetName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -2734,13 +2750,26 @@ RemoveAnyway:
                 '    and now we are making a second IUC preferred, then neeed to set the existing preferred IUC to isPreferred = False.
                 If Me.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
                     If Me.Role(0).FactType.Is1To1BinaryFactType Then
+
+                        Dim lrModelObject As FBM.ModelObject = Me.Role(0).FactType.GetOtherRoleOfBinaryFactType(Me.Role(0).Id).JoinedORMObject
+
                         If Me.Role(0).FactType.IsPreferredReferenceMode Then
-                            Dim lrModelObject As FBM.ModelObject = Me.Role(0).FactType.GetOtherRoleOfBinaryFactType(Me.Role(0).Id).JoinedORMObject
+
                             Select Case lrModelObject.GetType
                                 Case = GetType(FBM.EntityType)
                                     If arExistingPreferedReferenceSchemeRoleConstraint IsNot Nothing Then
                                         Call arExistingPreferedReferenceSchemeRoleConstraint.SetIsPreferredIdentifier(False)
                                     End If
+
+                                    If abIsPreferredIdentifier And lrModelObject.ReferenceMode.Trim = "" AndAlso Me.Role(0).JoinsFactType IsNot Nothing AndAlso Me.Role(0).JoinsFactType.IsObjectified Then
+                                        'CodeSafe
+                                        Me.Role(0).FactType.IsPreferredReferenceMode = True
+                                        Select Case lrModelObject.GetType
+                                            Case Is = GetType(FBM.EntityType)
+                                                CType(lrModelObject, FBM.EntityType).ReferenceModeRoleConstraint = Me
+                                        End Select
+                                    End If
+
                                 Case Else
                                     Throw New NotImplementedException("Only Entity Types catered for at this stage. Contact support.")
                             End Select
@@ -2871,7 +2900,7 @@ RemoveAnyway:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -2897,7 +2926,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

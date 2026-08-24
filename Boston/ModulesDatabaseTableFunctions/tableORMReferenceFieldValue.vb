@@ -1,4 +1,3 @@
-Imports DynamicClassLibrary.Factory
 Imports System.Reflection
 Imports System.Dynamic
 
@@ -28,7 +27,7 @@ Namespace TableReferenceFieldValue
                 lsMessage = "Error: TableReferenceFieldValue.AddReferenceFieldValue"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 If Not abIgnoreError Then
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 End If
             End Try
 
@@ -47,7 +46,7 @@ Namespace TableReferenceFieldValue
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -70,8 +69,8 @@ Namespace TableReferenceFieldValue
             Try
 
                 Dim lsSQLQuery As String = ""
-                Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(arReferenceTableId, loTransformation,, aarExpandoObject)
+                'Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(arReferenceTableId,, aarExpandoObject) ', loTransformation
 
                 If larTransformationTuples.Count > 0 Then
                     lsSQLQuery = "DELETE FROM ReferenceFieldValue"
@@ -87,7 +86,7 @@ Namespace TableReferenceFieldValue
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -108,7 +107,7 @@ Namespace TableReferenceFieldValue
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -152,13 +151,23 @@ Namespace TableReferenceFieldValue
             Dim lsSQLQuery As String
             '20230513-VM-Was - Dim lREcordset As New RecordsetProxy 'Changed when moved to SQLite database
             Dim lRecordset As New RecordsetProxy()
+            Dim lsMessage As String = ""
 
             Try
 
                 lRecordset.ActiveConnection = pdbConnection
                 lRecordset.CursorType = pcOpenStatic
 
-                If pbLogStartup Then prApplication.ThrowErrorMessage("lRecordset.ActiveConnection IsNot Nothing: " & (lRecordset.ActiveConnection IsNot Nothing).ToString, pcenumErrorType.Warning)
+                If pbLogStartup Then
+                    lsMessage = "In GetReferenceFieldValue:"
+                    lsMessage.AppendLine("lRecordset.ActiveConnection IsNot Nothing: " & (lRecordset.ActiveConnection IsNot Nothing).ToString)
+                    Try
+                        lsMessage.AppendLine("ActiveConnection: " & pdbConnection.ToString)
+                    Catch ex As Exception
+                        'We tried
+                    End Try
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
+                End If
 
                 lsSQLQuery = "SELECT Data"
                 lsSQLQuery &= " FROM ReferenceFieldValue"
@@ -180,12 +189,11 @@ Namespace TableReferenceFieldValue
                 lRecordset = Nothing
 
             Catch ex As Exception
-                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -200,14 +208,13 @@ Namespace TableReferenceFieldValue
         ''' <returns></returns>
         ''' <remarks></remarks>
         Function GetReferenceFieldValueTuples(ByVal aiReferenceTableId As Integer,
-                                              ByRef aoWorkingClass As Object,
                                               Optional ByRef arReferenceTable As ReferenceTable = Nothing,
                                               Optional aarExpandoFieldValue As Object() = Nothing) As List(Of Object)
 
+            'ByRef aoWorkingClass As Object, - 20251018-VM-Removed as second parameter. Replace if needed.
+
             Dim liInd As Integer = 0
             Dim loField As New Object
-            Dim loTuple As New tClass
-            Dim loTupleObject As New Object
             Dim laaReferenceFieldList As New List(Of String)
             Dim lsFieldName As String = ""
             Dim lsSQLQuery As String = ""
@@ -215,12 +222,17 @@ Namespace TableReferenceFieldValue
             Dim lsOrderByClause As String = " ORDER BY "
             Dim liFieldCount As Integer
 
+            'Dynamic Object
+            Dim loTuple As Object = New ExpandoObject '20231105-Was New tClass
+            Dim loTupleObject As Object = New ExpandoObject '20231105-Was New tClass New Object
+            Dim loTupleDictionary As IDictionary(Of String, Object) = DirectCast(loTupleObject, IDictionary(Of String, Object))
+
             Try
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = ADODB.CursorTypeEnum.adOpenStatic
 
                 If arReferenceTable IsNot Nothing Then
-                    arReferenceTable.ReferenceTuple.Clear()
+                    arReferenceTable.ReferenceTuples.Clear()
                     arReferenceTable.Name = TableReferenceTable.GetReferenceTableNameById(aiReferenceTableId)
                 End If
 
@@ -250,6 +262,7 @@ Namespace TableReferenceFieldValue
                 End If
 #End Region
 
+#Region "SQL"
                 lsSQLQuery = "SELECT rfv1.row_id AS RowId,"
                 For liInd = 1 To liFieldCount
                     lsSQLQuery &= "rfv" & Trim(CStr(liInd)) & ".data AS " & laaReferenceFieldList(liInd - 1) '"[Data" & "]"
@@ -297,31 +310,42 @@ Namespace TableReferenceFieldValue
                     End If
                 Next
                 lsSQLQuery &= lsOrderByClause
+#End Region
 
                 lREcordset = New RecordsetProxy
                 lREcordset.ActiveConnection = pdbConnection
                 lREcordset.CursorType = ADODB.CursorTypeEnum.adOpenStatic
                 lREcordset.Open(lsSQLQuery)
-
                 '------------------------------------
                 'Setup the DynamicObject
                 '------------------------------------
-                loTuple.add_attribute(New tAttribute("row_id", GetType(String)))
+                '20231105-VM-Now using ExpandoObjects
+                'loTuple.add_attribute(New tAttribute("RowId", GetType(String)))
+
+
+                loTupleDictionary.Add("RowId", Nothing)
+
                 For Each lsFieldName In laaReferenceFieldList
-                    loTuple.add_attribute(New tAttribute(lsFieldName, GetType(String)))
+                    loTupleDictionary.Add(lsFieldName, Nothing)
+                    '20231105-VM-Now using ExpandoObjects
+                    'loTuple.add_attribute(New tAttribute(lsFieldName, GetType(String)))
                 Next
 
                 '---------------------------------------
                 'Return a sample of the Tuple instance
                 '---------------------------------------
-                aoWorkingClass = loTuple.clone
+                'aoWorkingClass = loTupleObject '20231105-VM-Now using ExpandoObjects  Was  loTuple.clone. 20251018-VM-Removed as second argument. Replace if needed.
+                '20251018-VM-Remove after 6 months if not missed.
 
                 Dim lrReferenceTuple As New ReferenceTuple
 
                 If Not lREcordset.EOF Then lREcordset.MoveFirst()
 
                 While Not lREcordset.EOF
-                    loTupleObject = loTuple.clone
+                    loTupleObject = New ExpandoObject() '20231105-VM-Now using ExpandoObjects Was loTuple.clone
+                    loTupleDictionary = DirectCast(loTupleObject, IDictionary(Of String, Object))
+
+                    loTupleDictionary.Add("RowId", Nothing)
 
                     '-------------------
                     'Set the values
@@ -336,23 +360,24 @@ Namespace TableReferenceFieldValue
                                 '  NB This concept is consistent with models such as the
                                 '  ORACLE database, RowId, for unique tuples etc.
                                 '------------------------------------------------------------
-                                loTupleObject.row_id = lREcordset("RowId").Value
-                                lrReferenceTuple.RowId = loTupleObject.row_id
+                                loTupleObject.RowId = lREcordset("RowId").Value
+                                lrReferenceTuple.RowId = loTupleObject.RowId
                             Case Else
 
                                 Dim pro As System.Reflection.PropertyInfo
                                 pro = loTupleObject.GetType.GetProperty(laaReferenceFieldList(liInd - 1))
                                 Try
                                     Dim lsValue = If(lREcordset(loField.Name).Value Is Nothing, " ", lREcordset(loField.Name).Value)
-                                    pro.SetValue(loTupleObject, lsValue, Nothing)
+                                    'pro.SetValue(loTupleObject, lsValue, Nothing)
+                                    '20231105-VM-Now using ExpandoObjects Was loTuple.clone
+                                    loTupleDictionary.Add(loField.Name, lsValue)
                                 Catch ex As Exception
                                     pro.SetValue(loTupleObject, loField.value.ToString, Nothing)
                                 End Try
 
-
                                 If arReferenceTable IsNot Nothing Then
                                     '20230528-VM-loField.Value
-                                    lrReferenceTuple.KeyValuePair.Add(New KeyValuePair(laaReferenceFieldList(liInd - 1), CStr(Viev.NullVal(lREcordset(1).Value, " "))))
+                                    lrReferenceTuple.KeyValuePairs.Add(New KeyValuePair(laaReferenceFieldList(liInd - 1), CStr(Viev.NullVal(lREcordset(1).Value, " "))))
                                 End If
                         End Select
 
@@ -362,7 +387,7 @@ Namespace TableReferenceFieldValue
 
                     If arReferenceTable IsNot Nothing Then
                         arReferenceTable.ReferenceTableId = CStr(aiReferenceTableId)
-                        arReferenceTable.ReferenceTuple.Add(lrReferenceTuple)
+                        arReferenceTable.ReferenceTuples.Add(lrReferenceTuple)
                     End If
 
                     lREcordset.MoveNext()
@@ -380,7 +405,7 @@ Namespace TableReferenceFieldValue
                 lsMessage.AppendDoubleLineBreak("ReferenceTableId:" & aiReferenceTableId)
                 lsMessage.AppendLine("ReferenceFieldCount:" & liFieldCount)
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of Object)
             End Try

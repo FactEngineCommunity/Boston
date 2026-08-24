@@ -23,7 +23,7 @@ Namespace TableFactType
                 lsSQLQuery &= " ," & arFactType.IsObjectified
                 lsSQLQuery &= " ," & arFactType.IsCoreFactType
                 lsSQLQuery &= " ," & arFactType.IsPreferredReferenceMode
-                If IsSomething(arFactType.ObjectifyingEntityType) Then
+                If arFactType.ObjectifyingEntityType IsNot Nothing Then
                     lsSQLQuery &= " ,'" & Trim(arFactType.ObjectifyingEntityType.Id) & "'"
                 Else
                     lsSQLQuery &= " ,''"
@@ -55,7 +55,7 @@ Namespace TableFactType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -79,7 +79,7 @@ Namespace TableFactType
                 Dim lsMessage As String
                 lsMessage = "Error: TableFactType.DeleteFactType"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -102,7 +102,7 @@ Namespace TableFactType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -134,7 +134,7 @@ Namespace TableFactType
                 Dim lsMessage As String
                 lsMessage = "Error: TableFactType.ExistsFactType"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -172,7 +172,7 @@ Namespace TableFactType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -211,7 +211,7 @@ Namespace TableFactType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -269,8 +269,7 @@ Namespace TableFactType
                         If arFactType.LinkFactTypeRole Is Nothing Then
                             arFactType.IsLinkFactType = False
                         ElseIf Not arFactType.LinkFactTypeRole.FactType.IsObjectified Then
-                            '20220808-VM-Keep here for further testing.
-                            'Debugger.Break()
+                            prApplication.ThrowMessage("Link Fact Type's Role's Fact Type is not Objectified. Link Fact Type: " & arFactType.LinkFactTypeRole.FactType.Id, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True, abSuppressLogging:=False)
                         End If
                     End If
                     arFactType.GUID = lREcordset("GUID").Value
@@ -278,6 +277,12 @@ Namespace TableFactType
                     arFactType.IsSubtypeStateControlling = CBool(lREcordset("IsSubtypeStateControlling").Value)
                     arFactType.StoreFactCoordinates = CBool(lREcordset("StoreFactCoordinates").Value)
                     arFactType.isDirty = False
+
+                    'Concept Classification
+                    arFactType.GetConceptClassifications()
+
+                    'ModelElementFlags
+                    arFactType.GetModelElementFlags()
 
                     '---------------------------------------------------------------------------------
                     'Dynamically load related ModelElements (ValueTypes,EntityTypes) if required.
@@ -333,7 +338,7 @@ Namespace TableFactType
                             arFactType.Model.IsDirty = True
                             arFactType.ObjectifyingEntityType = lrEntityType
                             arFactType.isDirty = True
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True,, True)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True,, True)
                         End If
                     End If
 
@@ -361,7 +366,7 @@ Namespace TableFactType
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage.AppendDoubleLineBreak("Click [Yes] if you would like Boston to try and remove this Fact Type from the Model.")
                 Dim liMessageResponse As MsgBoxResult
-                liMessageResponse = prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, False, False, True, MessageBoxButtons.YesNo)
+                liMessageResponse = prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, False, False, True, MessageBoxButtons.YesNo)
 
                 If liMessageResponse = MsgBoxResult.Yes Then
                     If arFactType.CanSafelyRemoveFromModel() Then
@@ -416,7 +421,7 @@ FinishAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return ""
             End Try
@@ -514,7 +519,7 @@ MoveNext:
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "Loading FactTypes for Model: '" & arModel.ModelId & "'"
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return GetFactTypesByModel
             End Try
@@ -609,7 +614,7 @@ SkipFactType:
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "Loading FactTypes for Model: '" & arModel.ModelId & "'"
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return larFactType
             End Try
@@ -671,7 +676,7 @@ SkipRoleConstraint:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return larRoleConstraint
             End Try
@@ -725,13 +730,17 @@ SkipRoleConstraint:
                 pdbConnection.Execute(lsSQLQuery)
                 pdbConnection.CommitTrans()
 
+                Call tableDataLineageItemProperty.ModifyKeyDataLineageItemProperty(arFactType.Model,
+                                                                                   arFactType.Id & " - Fact Type",
+                                                                                   asNewKey & " - Fact Type")
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -748,7 +757,7 @@ SkipRoleConstraint:
                 lsSQLQuery &= "       , IsObjectified = " & arFactType.IsObjectified
                 lsSQLQuery &= "       , IsCoreFactType = " & arFactType.IsCoreFactType
                 lsSQLQuery &= "       , IsPreferredReferenceMode = " & arFactType.IsPreferredReferenceMode
-                If IsSomething(arFactType.ObjectifyingEntityType) Then
+                If arFactType.ObjectifyingEntityType IsNot Nothing Then
                     lsSQLQuery &= "       , ObjectifyingEntityTypeId = '" & Trim(arFactType.ObjectifyingEntityType.Id) & "'"
                 Else
                     lsSQLQuery &= "       , ObjectifyingEntityTypeId = ''"
@@ -784,7 +793,7 @@ SkipRoleConstraint:
                 lsMessage = "Error: TableFactType.UpdateFactType"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "SQL: " & lsSQLQuery
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

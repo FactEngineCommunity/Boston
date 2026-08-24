@@ -15,7 +15,7 @@ Public Class tStringCollectionEditor
     Public Shared Event MyItemChanged As myFormItemChangedHandler
 
     Public Sub New()
-        MyBase.new(GetType(Viev.Strings.StringCollection))
+        MyBase.New(GetType(FEStrings.StringCollection))
     End Sub
 
     Protected Overrides Function CreateInstance(ByVal itemType As System.Type) As Object                
@@ -34,7 +34,7 @@ Public Class tStringCollectionEditor
         '----------------------
         tlpLayout = lrCollectionForm.Controls(0)
 
-        If IsSomething(tlpLayout) Then
+        If tlpLayout IsNot Nothing Then
             'Get a reference to the inner PropertyGrid and hook 
             '  an event handler to it.
             If TypeOf tlpLayout.Controls(5) Is PropertyGrid Then

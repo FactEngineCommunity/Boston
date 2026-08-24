@@ -26,7 +26,7 @@ Public Module tableClientServerProjectModelShare
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -46,10 +46,11 @@ Public Module tableClientServerProjectModelShare
         Try
             lsSQLQuery = " SELECT *"
             lsSQLQuery &= "  FROM ClientServerProjectModelShare"
-            lsSQLQuery &= " WHERE ProjectId IN (SELECT ProjectId"
+            lsSQLQuery &= " WHERE ProjectId = '" & arProject.Id & "'"
+            lsSQLQuery &= "   AND ProjectId IN (SELECT ProjectId"
             lsSQLQuery &= "                       FROM ClientServerProjectUser"
             lsSQLQuery &= "                      WHERE UserId = '" & arUser.Id & "'"
-            lsSQLQuery &= ")"
+            lsSQLQuery &= "                    )"
 
             lREcordset.Open(lsSQLQuery)
 
@@ -59,7 +60,7 @@ Public Module tableClientServerProjectModelShare
                     lrModel.ModelId = lREcordset("ModelId").Value
 
                     If TableModel.GetModelDetails(lrModel) Then
-                        larModel.Add(lrModel)
+                        larModel.AddUnique(lrModel)
                     End If
 
                     lREcordset.MoveNext()
@@ -75,7 +76,7 @@ Public Module tableClientServerProjectModelShare
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return larModel
         End Try
@@ -124,12 +125,63 @@ Public Module tableClientServerProjectModelShare
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return larModel
         End Try
 
     End Function
+
+    Public Function getProjectsForModel(ByRef arModel As FBM.Model) As List(Of ClientServer.Project)
+
+        Dim lsMessage As String
+        Dim lsSQLQuery As String = ""
+        Dim lREcordset As New RecordsetProxy
+
+        Dim lrProject As ClientServer.Project
+        Dim larProject As New List(Of ClientServer.Project)
+
+        lREcordset.ActiveConnection = pdbConnection
+        lREcordset.CursorType = pcOpenStatic
+
+        Try
+            lsSQLQuery = " SELECT *"
+            lsSQLQuery &= "  FROM ClientServerProjectModelShare"
+            lsSQLQuery &= " WHERE ModelId = '" & arModel.ModelId & "'"
+
+            lREcordset.Open(lsSQLQuery)
+
+            If Not lREcordset.EOF Then
+                While Not lREcordset.EOF
+                    lrProject = New ClientServer.Project
+                    lrProject.Id = lREcordset("ProjectId").Value
+
+                    lrProject = tableClientServerProject.getProjectDetailsById(lrProject.Id, lrProject)
+
+                    If lrProject IsNot Nothing Then
+                        larProject.Add(lrProject)
+                    End If
+                    lREcordset.MoveNext()
+                End While
+            End If
+
+            lREcordset.Close()
+
+            Return larProject
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return larProject
+        End Try
+
+    End Function
+
+
 
 
     Public Sub removeModelFromProject(ByRef arProject As ClientServer.Project, ByRef arModel As FBM.Model)
@@ -150,7 +202,7 @@ Public Module tableClientServerProjectModelShare
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

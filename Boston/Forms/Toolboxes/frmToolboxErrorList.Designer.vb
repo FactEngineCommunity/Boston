@@ -37,11 +37,15 @@ Partial Class frmToolboxErrorList
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemShowInDiagram = New System.Windows.Forms.ToolStripMenuItem()
         Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemApplyFix = New System.Windows.Forms.ToolStripMenuItem()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.ContextMenuStripShowCoreModelErrors = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ToolStripMenuItemShowCoreModelErrors = New System.Windows.Forms.ToolStripMenuItem()
         Me.LabelPromptModelName = New System.Windows.Forms.Label()
         Me.LabelModelName = New System.Windows.Forms.Label()
+        Me.CheckBoxShowDatabaseMappingErrors = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxShowRelationalModelErrors = New System.Windows.Forms.CheckBox()
+        Me.ShowInDiagramSpyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.DataGrid_ErrorList, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStripHelp.SuspendLayout()
         Me.ContextMenuStripShowCoreModelErrors.SuspendLayout()
@@ -61,15 +65,15 @@ Partial Class frmToolboxErrorList
         Me.DataGrid_ErrorList.Location = New System.Drawing.Point(0, 26)
         Me.DataGrid_ErrorList.Name = "DataGrid_ErrorList"
         Me.DataGrid_ErrorList.RowHeadersWidth = 62
-        Me.DataGrid_ErrorList.Size = New System.Drawing.Size(755, 190)
+        Me.DataGrid_ErrorList.Size = New System.Drawing.Size(722, 190)
         Me.DataGrid_ErrorList.TabIndex = 1
         '
         'ContextMenuStripHelp
         '
         Me.ContextMenuStripHelp.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ContextMenuStripHelp.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.HelpToolStripMenuItem, Me.ToolStripMenuItemShowInDiagram, Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem})
+        Me.ContextMenuStripHelp.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.HelpToolStripMenuItem, Me.ToolStripMenuItemShowInDiagram, Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem, Me.ShowInDiagramSpyToolStripMenuItem, Me.ToolStripMenuItemApplyFix})
         Me.ContextMenuStripHelp.Name = "ContextMenuStripHelp"
-        Me.ContextMenuStripHelp.Size = New System.Drawing.Size(334, 70)
+        Me.ContextMenuStripHelp.Size = New System.Drawing.Size(334, 136)
         '
         'HelpToolStripMenuItem
         '
@@ -88,6 +92,13 @@ Partial Class frmToolboxErrorList
         Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem.Name = "ShowTheModelElementInTheModelDictionaryToolStripMenuItem"
         Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem.Size = New System.Drawing.Size(333, 22)
         Me.ShowTheModelElementInTheModelDictionaryToolStripMenuItem.Text = "Show the model element in the &Model Dictionary"
+        '
+        'ToolStripMenuItemApplyFix
+        '
+        Me.ToolStripMenuItemApplyFix.Enabled = False
+        Me.ToolStripMenuItemApplyFix.Name = "ToolStripMenuItemApplyFix"
+        Me.ToolStripMenuItemApplyFix.Size = New System.Drawing.Size(333, 22)
+        Me.ToolStripMenuItemApplyFix.Text = "Apply &Fix"
         '
         'ButtonRefresh
         '
@@ -128,11 +139,41 @@ Partial Class frmToolboxErrorList
         Me.LabelModelName.TabIndex = 4
         Me.LabelModelName.Text = "LabelModelName"
         '
+        'CheckBoxShowDatabaseMappingErrors
+        '
+        Me.CheckBoxShowDatabaseMappingErrors.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.CheckBoxShowDatabaseMappingErrors.AutoSize = True
+        Me.CheckBoxShowDatabaseMappingErrors.Location = New System.Drawing.Point(537, 5)
+        Me.CheckBoxShowDatabaseMappingErrors.Name = "CheckBoxShowDatabaseMappingErrors"
+        Me.CheckBoxShowDatabaseMappingErrors.Size = New System.Drawing.Size(172, 17)
+        Me.CheckBoxShowDatabaseMappingErrors.TabIndex = 5
+        Me.CheckBoxShowDatabaseMappingErrors.Text = "Show database mapping errors"
+        Me.CheckBoxShowDatabaseMappingErrors.UseVisualStyleBackColor = True
+        '
+        'CheckBoxShowRelationalModelErrors
+        '
+        Me.CheckBoxShowRelationalModelErrors.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.CheckBoxShowRelationalModelErrors.AutoSize = True
+        Me.CheckBoxShowRelationalModelErrors.Location = New System.Drawing.Point(366, 5)
+        Me.CheckBoxShowRelationalModelErrors.Name = "CheckBoxShowRelationalModelErrors"
+        Me.CheckBoxShowRelationalModelErrors.Size = New System.Drawing.Size(165, 17)
+        Me.CheckBoxShowRelationalModelErrors.TabIndex = 6
+        Me.CheckBoxShowRelationalModelErrors.Text = "Show Relational Model Errors"
+        Me.CheckBoxShowRelationalModelErrors.UseVisualStyleBackColor = True
+        '
+        'ShowInDiagramSpyToolStripMenuItem
+        '
+        Me.ShowInDiagramSpyToolStripMenuItem.Name = "ShowInDiagramSpyToolStripMenuItem"
+        Me.ShowInDiagramSpyToolStripMenuItem.Size = New System.Drawing.Size(333, 22)
+        Me.ShowInDiagramSpyToolStripMenuItem.Text = "Show in &Diagram Spy"
+        '
         'frmToolboxErrorList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(754, 217)
+        Me.ClientSize = New System.Drawing.Size(721, 217)
+        Me.Controls.Add(Me.CheckBoxShowRelationalModelErrors)
+        Me.Controls.Add(Me.CheckBoxShowDatabaseMappingErrors)
         Me.Controls.Add(Me.LabelModelName)
         Me.Controls.Add(Me.LabelPromptModelName)
         Me.Controls.Add(Me.ButtonRefresh)
@@ -158,4 +199,8 @@ Partial Class frmToolboxErrorList
     Friend WithEvents ShowTheModelElementInTheModelDictionaryToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents LabelPromptModelName As Label
     Friend WithEvents LabelModelName As Label
+    Friend WithEvents CheckBoxShowDatabaseMappingErrors As CheckBox
+    Friend WithEvents CheckBoxShowRelationalModelErrors As CheckBox
+    Friend WithEvents ToolStripMenuItemApplyFix As ToolStripMenuItem
+    Friend WithEvents ShowInDiagramSpyToolStripMenuItem As ToolStripMenuItem
 End Class

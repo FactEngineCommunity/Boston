@@ -119,7 +119,7 @@ Namespace DFD
 
             Me.shape = loDroppedNode
 
-            If IsSomething(aoContainerNode) Then
+            If aoContainerNode IsNot Nothing Then
                 aoContainerNode.Add(loDroppedNode)
             End If
 
@@ -149,7 +149,7 @@ Namespace DFD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -161,12 +161,12 @@ Namespace DFD
             '---------------------------------------------------------------------
             Try
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.shape) Then
-                        If Me.shape.Text <> "" Then
+                    If Me.Shape IsNot Nothing Then
+                        If Me.Shape.Text <> "" Then
                             '---------------------------------------------------------------------------------
                             'Is the type of EntityTypeInstance that 
                             '  shows the EntityTypeName within the
@@ -174,7 +174,7 @@ Namespace DFD
                             '  ShapeNode attached to it (e.g. An Actor EntityTypeInstance has two ShapeNodes, 
                             ' 1 for the stickfigure, the other for the name of the Actor.
                             '---------------------------------------------------------------------------------
-                            Me.shape.Text = Trim(Me.FactData.Data)
+                            Me.Shape.Text = Trim(Me.FactData.Data)
                             Call Me.EnableSaveButton()
                             Me.Page.Diagram.Invalidate()
                         End If

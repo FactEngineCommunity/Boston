@@ -48,6 +48,10 @@ Partial Class frmCRUDEditGroup
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.ListBoxAvailableOntologies = New System.Windows.Forms.ListBox()
         Me.ListBox2 = New System.Windows.Forms.ListBox()
+        Me.Projects = New System.Windows.Forms.TabPage()
+        Me.GroupBoxProjects = New System.Windows.Forms.GroupBox()
+        Me.LabelPromptProjectsForGroup = New System.Windows.Forms.Label()
+        Me.ListBoxProjects = New System.Windows.Forms.ListBox()
         Me.LabelCreatedByUser = New System.Windows.Forms.Label()
         Me.LabelPromptCreatedByUser = New System.Windows.Forms.Label()
         Me.TextBoxGroupName = New System.Windows.Forms.TextBox()
@@ -61,6 +65,8 @@ Partial Class frmCRUDEditGroup
         Me.TabPageOntologies.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.Panel1.SuspendLayout()
+        Me.Projects.SuspendLayout()
+        Me.GroupBoxProjects.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -99,6 +105,7 @@ Partial Class frmCRUDEditGroup
         '
         Me.TabControl1.Controls.Add(Me.TabPageUsers)
         Me.TabControl1.Controls.Add(Me.TabPageOntologies)
+        Me.TabControl1.Controls.Add(Me.Projects)
         Me.TabControl1.Location = New System.Drawing.Point(9, 83)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
@@ -314,6 +321,50 @@ Partial Class frmCRUDEditGroup
         Me.ListBox2.Sorted = True
         Me.ListBox2.TabIndex = 8
         '
+        'Projects
+        '
+        Me.Projects.Controls.Add(Me.GroupBoxProjects)
+        Me.Projects.Location = New System.Drawing.Point(4, 22)
+        Me.Projects.Name = "Projects"
+        Me.Projects.Size = New System.Drawing.Size(572, 465)
+        Me.Projects.TabIndex = 2
+        Me.Projects.Text = "Projects"
+        Me.Projects.UseVisualStyleBackColor = True
+        '
+        'GroupBoxProjects
+        '
+        Me.GroupBoxProjects.Controls.Add(Me.LabelPromptProjectsForGroup)
+        Me.GroupBoxProjects.Controls.Add(Me.ListBoxProjects)
+        Me.GroupBoxProjects.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.GroupBoxProjects.Location = New System.Drawing.Point(0, 0)
+        Me.GroupBoxProjects.Name = "GroupBoxProjects"
+        Me.GroupBoxProjects.Size = New System.Drawing.Size(572, 465)
+        Me.GroupBoxProjects.TabIndex = 0
+        Me.GroupBoxProjects.TabStop = False
+        '
+        'LabelPromptProjectsForGroup
+        '
+        Me.LabelPromptProjectsForGroup.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.LabelPromptProjectsForGroup.AutoSize = True
+        Me.LabelPromptProjectsForGroup.Location = New System.Drawing.Point(10, 16)
+        Me.LabelPromptProjectsForGroup.Name = "LabelPromptProjectsForGroup"
+        Me.LabelPromptProjectsForGroup.Size = New System.Drawing.Size(153, 13)
+        Me.LabelPromptProjectsForGroup.TabIndex = 1
+        Me.LabelPromptProjectsForGroup.Text = "Projects included in this Group:"
+        '
+        'ListBoxProjects
+        '
+        Me.ListBoxProjects.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ListBoxProjects.FormattingEnabled = True
+        Me.ListBoxProjects.Location = New System.Drawing.Point(6, 38)
+        Me.ListBoxProjects.Name = "ListBoxProjects"
+        Me.ListBoxProjects.Size = New System.Drawing.Size(560, 420)
+        Me.ListBoxProjects.TabIndex = 0
+        '
         'LabelCreatedByUser
         '
         Me.LabelCreatedByUser.AutoSize = True
@@ -356,7 +407,7 @@ Partial Class frmCRUDEditGroup
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(761, 604)
+        Me.ClientSize = New System.Drawing.Size(704, 597)
         Me.Controls.Add(Me.ButtonCancel)
         Me.Controls.Add(Me.ButtonOkay)
         Me.Controls.Add(Me.GroupBox1)
@@ -375,6 +426,9 @@ Partial Class frmCRUDEditGroup
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.Panel1.ResumeLayout(False)
+        Me.Projects.ResumeLayout(False)
+        Me.GroupBoxProjects.ResumeLayout(False)
+        Me.GroupBoxProjects.PerformLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
@@ -409,4 +463,8 @@ Partial Class frmCRUDEditGroup
     Friend WithEvents Panel1 As Panel
     Friend WithEvents ListBoxAvailableOntologies As ListBox
     Friend WithEvents ListBox2 As ListBox
+    Friend WithEvents Projects As TabPage
+    Friend WithEvents GroupBoxProjects As GroupBox
+    Friend WithEvents LabelPromptProjectsForGroup As Label
+    Friend WithEvents ListBoxProjects As ListBox
 End Class

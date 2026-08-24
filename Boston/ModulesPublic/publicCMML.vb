@@ -20,6 +20,7 @@ Public Enum pcenumCMMLRelations
         'BPMN
         '---------------------------------------------
         CoreBPMNCollaborationHasCoreBPMNCollaborationName
+        CoreBPMNCollaborationContainsCoreElement
         CoreProcessIsOfCoreBPMNGatewayType
         CoreProcessIsOfCoreBPMNProcessType
         CoreProcessIsOfCoreBPMNActivityType
@@ -60,12 +61,14 @@ Public Enum pcenumCMMLRelations
         '------------------------------------------
         CoreActorToProcessParticipationRelation  ' 200(ActorSymbol,ProcessSymbol)
         CoreProcessToProcessParticipationRelation
+        'CoreProcessHasProcessName - 'See CoreElementHasElementName
         CoreProcessHasProcessText
 
         '-----------------------------------------------------
         'ERDs (EntityRelationshipDiagrams)
         '-----------------------------------------------------
         CorePropertyHasOrdinalPosition
+        CorePropertyHasOrdinalPositionForEntity
         CoreAttributeIsPartOfRelation
         CoreAttributeIsPartOfRelationDestination
         CoreAttributeIsPartOfRelationDestinationHasOrdinalPosition
@@ -94,6 +97,14 @@ Public Enum pcenumCMMLRelations
         CorePropertyIsForRole
         CorePropertyHasActiveRole
         CoreRelationIsForFactType
+        CoreRelationEnforcesOnCascadeUpdate
+        CoreRelationEnforcesOnCascadeDelete
+        CoreRelationEnforcesReferentialIntegrity
+
+        '------------------------------------------------------------------------------------------------
+        'Generic Diagram, where the Mindfusion SaveToString/XML is used and that stored in the relation
+        '------------------------------------------------------------------------------------------------
+        CoreDiagramHasDiagramXML  '{Diagram, XML}
 
         '---------------------------------------
         'Binary Relations - UML Class Diagrams 
@@ -126,6 +137,7 @@ Public Enum pcenumCMMLRelations
         CoreMultiplicityHasLowerBound
         CoreMultiplicityHasUpperBound
         CoreMultiplicityIsUnbounded
+        CorePropertyHasDBName
         CorePropertyHasType
         CorePropertyHasMultiplicity
         CorePropertyHasPropertyName
@@ -134,8 +146,9 @@ Public Enum pcenumCMMLRelations
     End Enum
 
     Enum pcenumCMMLIndexDirection
-        ASC
-        DESC
+        Unknown = 0
+        ASC = 1
+        DESC = 2
     End Enum
 
     <Serializable()> _
@@ -170,10 +183,14 @@ Public Enum pcenumCMMLRelations
         CoreEntityRelationshipDiagram
         CoreEventTraceDiagram
         CoreFlowchart
+        CoreGenericDiagram
+        CoreProperty
         CorePropertyGraphSchema
+        CoreRelationship
         CoreStateTransitionDiagram
         CoreUMLSuperstructure
         CoreUMLUseCaseDiagram
+        CoreDiagram
     End Enum
 
     <Serializable()> _

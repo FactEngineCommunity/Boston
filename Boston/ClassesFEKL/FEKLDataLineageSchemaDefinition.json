@@ -31,6 +31,10 @@
             "type": "string",
             "description": "The Fact Engine Knowledge Language statement"
           },
+          "TextSegment": {
+            "type": "string",
+            "description": "The actual coreference or text segment."
+          },
           "PageNumber": {
             "type": "integer",
             "description": "The page number of the FEKL in the PDF document"

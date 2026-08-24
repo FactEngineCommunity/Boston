@@ -30,7 +30,7 @@ Namespace FBM
                 If lrRecordset.EOF Then
                     lsMessage = "The Actor, '" & arActor.Name & "', does not seem to exist at the Model level."
 
-                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
+                    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
                     Exit Sub
                 Else
                     lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
@@ -50,7 +50,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -77,7 +77,7 @@ Namespace FBM
                 If lrRecordset.EOF Then
                     lsMessage = "The Actor, '" & arCMMLActor.Name & "', does not seem to exist at the Model level."
 
-                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
+                    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
                     Return Nothing
                 Else
                     lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
@@ -114,7 +114,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -144,7 +144,7 @@ Namespace FBM
                 If lrRecordset.EOF Then
                     lsMessage = "The Process, '" & arCMMLProcess.Text & "', does not seem to exist at the Model level."
 
-                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
+                    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
                     Return Nothing
                 Else
                     lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
@@ -185,7 +185,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -223,7 +223,7 @@ Namespace FBM
                 If lrRecordset.EOF Then
                     lsMessage = "The Process, '" & arProcess.Text & "', does not seem to exist at the Model level."
 
-                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
+                    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
                     Return Nothing
                 Else
 
@@ -252,7 +252,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try

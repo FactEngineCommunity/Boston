@@ -34,7 +34,7 @@ Namespace Validation
                                                                   lrRoleConstraint)
 
                                 lrRoleConstraint._ModelError.Add(lrModelError)
-                                Me.Model.AddModelError(lrModelError)
+                                Me.Model.AddModelError(lrModelError, False)
                             End If
 
                         Case Else
@@ -50,7 +50,7 @@ Namespace Validation
                                                                   lrRoleConstraint)
 
                                 lrRoleConstraint._ModelError.Add(lrModelError)
-                                Me.Model.AddModelError(lrModelError)
+                                Me.Model.AddModelError(lrModelError, False)
 
                             End If
                     End Select
@@ -62,7 +62,7 @@ Namespace Validation
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

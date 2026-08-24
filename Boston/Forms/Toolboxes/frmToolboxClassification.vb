@@ -25,8 +25,8 @@ Public Class frmToolboxConceptClassification
 
     Private Sub frmToolboxClassification_Load(sender As Object, e As EventArgs) Handles Me.Load
 
-        Dim loSetting As Object = New System.Dynamic.ExpandoObject 'Dummy
-        Me.marContextClassification = TableReferenceFieldValue.GetReferenceFieldValueTuples(pcenumReferenceTable.ConceptClassification, loSetting, Me.mrConceptClassificationReferenceTable)
+        'Dim loSetting As Object = New System.Dynamic.ExpandoObject 'Dummy
+        Me.marContextClassification = TableReferenceFieldValue.GetReferenceFieldValueTuples(pcenumReferenceTable.ConceptClassification, Me.mrConceptClassificationReferenceTable) ', loSetting
 
     End Sub
 
@@ -39,6 +39,14 @@ Public Class frmToolboxConceptClassification
                 Me.DataGridView.DataSource = Nothing
                 Me.LabelModelElementName.Text = "<Nothing Selected>"
             Else
+                'Double Check Database
+                Dim lrDataStore As New DataStore.Store
+                Dim lsModelId = Me.mrModelElement.Model.ModelId.ToString
+                Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) =
+                    Function(p) p.ModelId = lsModelId And p.Concept = Me.mrModelElement.Id
+
+                Me.mrModelElement.ClassificationValue = lrDataStore.Get(Of KnowledgeGraph.ConceptClassificationValue)(whereClause)
+
                 Me.mrBindingList = New BindingList(Of KnowledgeGraph.ConceptClassificationValue)(Me.mrModelElement.ClassificationValue)
                 Me.DataGridView.DataSource = Me.mrBindingList
                 Me.DataGridView.Columns(0).Visible = False
@@ -63,7 +71,7 @@ Public Class frmToolboxConceptClassification
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -85,7 +93,7 @@ Public Class frmToolboxConceptClassification
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -133,7 +141,7 @@ Public Class frmToolboxConceptClassification
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -179,7 +187,7 @@ Public Class frmToolboxConceptClassification
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -199,7 +207,7 @@ Public Class frmToolboxConceptClassification
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -279,7 +287,7 @@ LoadCombo:
                     Exit Sub
                 Else
                     If lsOldConceptClassificationType <> "" Then
-                        DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = lsOldConceptClassificationType
+                        DataGridView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = lsUpdatedClassificationType
                         Exit Sub
                     End If
                 End If
@@ -328,8 +336,9 @@ LoadCombo:
 
                 ' Perform the upsert operation with whereClause based on the old ClassificationType and ClassificationValue
                 Dim lrDataStore As New DataStore.Store
+                Dim lsModelId = Me.mrModelElement.Model.ModelId.ToString
                 Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) =
-                    Function(p) p.ModelId = Me.mrModelElement.Model.ModelId And p.Concept = lrConceptClassification.Concept And p.ClassificationType = lrConceptClassification.ClassificationType
+                    Function(p) p.ModelId = lsModelId And p.Concept = lrConceptClassification.Concept And p.ClassificationType = lrConceptClassification.ClassificationType
 
                 If lrConceptClassification.Concept <> "" _
                     And lrConceptClassification.ClassificationType <> "" _
@@ -359,7 +368,7 @@ LoadCombo:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -367,7 +376,7 @@ LoadCombo:
     Private Sub DataGridView_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles DataGridView.DataError
 
         Try
-            Call prApplication.ThrowErrorMessage("Check field values", pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True, abSuppressLogging:=True)
+            Call prApplication.ThrowMessage("Check field values", pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True, abSuppressLogging:=True)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -375,7 +384,7 @@ LoadCombo:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -401,7 +410,7 @@ LoadCombo:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -416,7 +425,7 @@ LoadCombo:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

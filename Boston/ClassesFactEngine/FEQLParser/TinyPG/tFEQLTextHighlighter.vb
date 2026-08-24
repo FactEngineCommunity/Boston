@@ -119,7 +119,89 @@ Namespace FEQL
         Public Event SwitchContext As ContextSwitchEventHandler
         Public Event KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
 
-        Private threadAutoHighlight As Thread
+        Public threadAutoHighlight As Thread
+
+        Public ReadOnly Property CanUndo() As Boolean
+            Get
+                Return UndoIndex > 0
+            End Get
+        End Property
+
+        Public ReadOnly Property CanRedo() As Boolean
+            Get
+                Return UndoIndex < UndoList.Count
+            End Get
+        End Property
+
+        Public Sub New(ByVal textbox As RichTextBox, ByVal scanner As Scanner, ByVal parser As Parser, Optional ByVal abStartAutoHighlighter As Boolean = False)
+            Me.Textbox = textbox
+            Me.Scanner = scanner
+            Me.Parser = parser
+
+            ClearUndo()
+
+            AddHandler textbox.TextChanged, AddressOf Textbox_TextChanged
+            AddHandler textbox.KeyDown, AddressOf textbox_KeyDown
+            AddHandler textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
+            AddHandler textbox.Disposed, AddressOf Textbox_Disposed
+
+            Tree = New ParseTree()
+            currentContext = Tree
+
+            '20231124-VM-Most parsers in Boston don't need autohighlighting. Safer not to have it on.
+            If abStartAutoHighlighter Then
+                threadAutoHighlight = New Thread(AddressOf AutoHighlightStart)
+                threadAutoHighlight.Start()
+            End If
+        End Sub
+
+        Sub textbox_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
+
+            '=============================
+            If e.KeyCode = Keys.Space And Textbox.SelectionStart >= Textbox.Text.Trim.Length Then
+                'DoAction(Textbox.Rtf, Textbox.SelectionStart)
+                HighlightText()
+            End If
+            '=============================
+
+            'Undo/Redo
+            'CTRL-Y
+            'If e.KeyValue = 89 AndAlso e.Control Then Redo()
+
+            ' CTRL-Z
+            'If e.KeyValue = 90 AndAlso e.Control Then Undo()
+
+            RaiseEvent KeyDown(sender, e)
+
+        End Sub
+
+        Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
+            If stateLocked <> IntPtr.Zero Then
+                Return
+            End If
+        End Sub
+
+        Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
+            If stateLocked <> IntPtr.Zero Then
+                Return
+            End If
+
+            Dim newContext As ParseNode = GetCurrentContext()
+
+            If currentContext Is Nothing Then
+                currentContext = newContext
+            End If
+            If newContext Is Nothing Then
+                Return
+            End If
+
+            If newContext.Token.Type <> currentContext.Token.Type Then
+                RaiseEvent SwitchContext(Me, New ContextSwitchEventArgs(currentContext, newContext))
+                'SwitchContext.Invoke(Me, New ContextSwitchEventArgs(currentContext, newContext))
+                currentContext = newContext
+            End If
+
+        End Sub
 
 
         Private Sub DoAction(ByVal text As String, ByVal position As Integer)
@@ -154,7 +236,8 @@ Namespace FEQL
             UndoIndex = UndoList.Count
         End Sub
 
-    Public Sub ClearUndo()
+#Region "Undo Redo"
+        Public Sub ClearUndo()
         UndoList = New List(Of UndoItem)()
         UndoIndex = 0
     End Sub
@@ -200,39 +283,9 @@ Namespace FEQL
         Unlock()
     End Sub
 
-    Public ReadOnly Property CanUndo() As Boolean
-        Get
-            Return UndoIndex > 0
-        End Get
-    End Property
+#End Region
 
-    Public ReadOnly Property CanRedo() As Boolean
-        Get
-            Return UndoIndex < UndoList.Count
-        End Get
-    End Property
-
-    Public Sub New(ByVal textbox As RichTextBox, ByVal scanner As Scanner, ByVal parser As Parser)
-        Me.Textbox = textbox
-        Me.Scanner = scanner
-        Me.Parser = parser
-
-        ClearUndo()
-
-        AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
-        AddHandler textbox.KeyDown, AddressOf textbox_KeyDown
-        AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
-        AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
-
-        Tree = New ParseTree()
-        currentContext = Tree
-
-        threadAutoHighlight = New Thread(AddressOf AutoHighlightStart)
-        threadAutoHighlight.Start()
-    End Sub
-
-
-    Public Sub Lock()
+        Public Sub Lock()
         ' Stop redrawing:  
         SendMessage(Textbox.Handle, WM_SETREDRAW, 0, IntPtr.Zero)
         ' Stop sending of events:  
@@ -250,62 +303,12 @@ Namespace FEQL
         Textbox.Invalidate()
     End Sub
 
-    Sub textbox_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
 
-            '=============================
-            If e.KeyCode = Keys.Space Then
-                DoAction(Textbox.Rtf, Textbox.SelectionStart)
-                HighlightText()
-            End If
-            '=============================
-
-            ' undo/redo
-            If e.KeyValue = 89 AndAlso e.Control Then
-            Redo()
-            ' CTRL-Y
-        End If
-        If e.KeyValue = 90 AndAlso e.Control Then
-            Undo()
-            ' CTRL-Z
-        End If
-
-        RaiseEvent KeyDown(sender, e)
-
-    End Sub
-
-    Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
-        If stateLocked <> IntPtr.Zero Then
-            Return
-        End If
-    End Sub
-
-    Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
-        If stateLocked <> IntPtr.Zero Then
-            Return
-        End If
-
-        Dim newContext As ParseNode = GetCurrentContext()
-
-        If currentContext Is Nothing Then
-            currentContext = newContext
-        End If
-        If newContext Is Nothing Then
-            Return
-        End If
-
-        If newContext.Token.Type <> currentContext.Token.Type Then
-            RaiseEvent SwitchContext(Me, New ContextSwitchEventArgs(currentContext, newContext))
-            'SwitchContext.Invoke(Me, New ContextSwitchEventArgs(currentContext, newContext))
-            currentContext = newContext
-        End If
-
-    End Sub
-
-    ''' <summary>
-    ''' this handy function returns the section in which the user is editing currently
-    ''' </summary>
-    ''' <returns></returns>
-    Public Function GetCurrentContext() As ParseNode
+        ''' <summary>
+        ''' this handy function returns the section in which the user is editing currently
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function GetCurrentContext() As ParseNode
         Dim node As ParseNode = FindNode(Tree, Textbox.SelectionStart)
         Return node
     End Function
@@ -339,35 +342,40 @@ Namespace FEQL
 
             SyncLock treelock
                 textChanged = True
-                currentText = Textbox.Text
+                currentText = Trim(Textbox.Text)
             End SyncLock
 
         End Sub
 
-        Private Sub HighlightTextInternal()
-        ' highlight the text (used internally only)
-        Lock()
+        Public Sub HighlightTextInternal()
 
-        Dim hscroll As Integer = HScrollPos
-        Dim vscroll As Integer = VScrollPos
+            'CodeSafe: 20231119-VM
+            If Me.Textbox.SelectionStart < Me.Textbox.Text.Trim.Length Then Exit Sub
+
+            ' highlight the text (used internally only)
+            Lock()
+
+            Dim hscroll As Integer = HScrollPos
+
+            Dim vscroll As Integer = VScrollPos
+
 
             Dim selstart As Integer = Textbox.SelectionStart
 
             HighlighTextCore()
 
+            Textbox.[Select](selstart, 0)
 
-                Textbox.[Select](selstart, 0)
+            HScrollPos = hscroll
+            VScrollPos = vscroll
 
-        HScrollPos = hscroll
-        VScrollPos = vscroll
+            Unlock()
+        End Sub
 
-        Unlock()
-    End Sub
-
-    ''' <summary>
-    ''' this method should be used only by HighlightText or RestoreState methods
-    ''' </summary>
-    Private Sub HighlighTextCore()
+        ''' <summary>
+        ''' this method should be used only by HighlightText or RestoreState methods
+        ''' </summary>
+        Private Sub HighlighTextCore()
             'Tree = Parser.Parse(Textbox.Text);
             Try
                 Dim sb As New StringBuilder()
@@ -376,7 +384,7 @@ Namespace FEQL
                 End If
 
                 If Tree.Nodes.Count = 0 Then
-                    Exit Sub
+                    Return
                 End If
 
                 If Tree.Errors.Count > 0 Then
@@ -432,8 +440,8 @@ Namespace FEQL
     Private textChanged As Boolean
     Private currentText As String
 
-    Private Sub AutoHighlightStart()
-        Dim _tree As ParseTree
+        Public Sub AutoHighlightStart()
+            Dim _tree As ParseTree
             Dim _currenttext As String = ""
             Try
                 While Not isDisposing
@@ -454,6 +462,7 @@ Namespace FEQL
 
                     SyncLock treelock
                         If textChanged Then
+                            Thread.Sleep(200)
                             Continue While
                         Else
                             ' assign new tree
@@ -461,23 +470,33 @@ Namespace FEQL
                         End If
                     End SyncLock
 
+                    'Make sure a successful _tree is at least as long as the text.
+                    '  Otherwise the user may get half way through typing something and a sub_tree may chop off the latter part of the text.
+                    '  This isn't so much an error, as not having got to the last error in the parse.                    
+                    If Tree.MaxDistance < _currenttext.Trim.Length Then
+                        Thread.Sleep(200)
+                        Continue While
+                    End If
+
 
                     If _tree.Errors.Count = 0 Then
                         Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
                     End If
                 End While
+
+
             Catch ex As Exception
 
             End Try
         End Sub
 
 
-    ''' <summary>
-    ''' inserts the RTF codes to highlight text blocks
-    ''' </summary>
-    ''' <param name="node">the node to highlight, will be appended to sb</param>
-    ''' <param name="sb">the final output string</param>
-    Private Sub HightlightNode(ByVal node As ParseNode, ByVal sb As StringBuilder)
+        ''' <summary>
+        ''' inserts the RTF codes to highlight text blocks
+        ''' </summary>
+        ''' <param name="node">the node to highlight, will be appended to sb</param>
+        ''' <param name="sb">the final output string</param>
+        Private Sub HightlightNode(ByVal node As ParseNode, ByVal sb As StringBuilder)
         If node.Nodes.Count = 0 Then
             If (node.Token.Skipped IsNot Nothing) Then
                 For Each skiptoken As Token In node.Token.Skipped
@@ -533,617 +552,677 @@ Namespace FEQL
                     Case TokenType.CONCATENATIONSYMBOL:
                         sb.Append("{{\cf10 ")
                         Exit Select
-                    Case TokenType.DATABASENAME:
+                    Case TokenType.CURLYBRACKETCLOSE:
                         sb.Append("{{\cf11 ")
                         Exit Select
-                    Case TokenType.DATABASETYPE:
+                    Case TokenType.CURLYBRACKETOPEN:
                         sb.Append("{{\cf12 ")
                         Exit Select
-                    Case TokenType.DESCRIPTIONCONTENT:
+                    Case TokenType.DATABASENAME:
                         sb.Append("{{\cf13 ")
                         Exit Select
-                    Case TokenType.EMAILADDRESS:
+                    Case TokenType.DATABASETYPE:
                         sb.Append("{{\cf14 ")
                         Exit Select
-                    Case TokenType.EQUALS:
+                    Case TokenType.DAYOFTHEWEEK:
                         sb.Append("{{\cf15 ")
                         Exit Select
-                    Case TokenType.FILELOCATIONNAME:
+                    Case TokenType.DESCRIPTIONCONTENT:
                         sb.Append("{{\cf16 ")
                         Exit Select
-                    Case TokenType.FOLLOWINGREADINGTEXT:
+                    Case TokenType.DOUBLEQUOTE:
                         sb.Append("{{\cf17 ")
                         Exit Select
-                    Case TokenType.IDENTIFIER:
+                    Case TokenType.EMAILADDRESS:
                         sb.Append("{{\cf18 ")
                         Exit Select
-                    Case TokenType.INCOMPARITOR:
+                    Case TokenType.EQUALS:
                         sb.Append("{{\cf19 ")
                         Exit Select
-                    Case TokenType.INDIVIDUALNAME:
+                    Case TokenType.FILELOCATIONNAME:
                         sb.Append("{{\cf20 ")
                         Exit Select
-                    Case TokenType.LIKECOMPARITOR:
+                    Case TokenType.FOLLOWINGREADINGTEXT:
                         sb.Append("{{\cf21 ")
                         Exit Select
-                    Case TokenType.MATHFUNCTION:
+                    Case TokenType.IDENTIFIER:
                         sb.Append("{{\cf22 ")
                         Exit Select
-                    Case TokenType.MODELELEMENTNAME:
+                    Case TokenType.INCOMPARITOR:
                         sb.Append("{{\cf23 ")
                         Exit Select
-                    Case TokenType.MODELELEMENTSUFFIX:
+                    Case TokenType.INDIVIDUALNAME:
                         sb.Append("{{\cf24 ")
                         Exit Select
-                    Case TokenType.NUMBER:
+                    Case TokenType.LIKECOMPARITOR:
                         sb.Append("{{\cf25 ")
                         Exit Select
-                    Case TokenType.PAGENAME:
+                    Case TokenType.MATHFUNCTION:
                         sb.Append("{{\cf26 ")
                         Exit Select
-                    Case TokenType.OPENPARENTHESIS:
+                    Case TokenType.MODELELEMENTNAME:
                         sb.Append("{{\cf27 ")
                         Exit Select
-                    Case TokenType.OPENSQUAREBRACKET:
+                    Case TokenType.MODELELEMENTSUFFIX:
                         sb.Append("{{\cf28 ")
                         Exit Select
-                    Case TokenType.PERIOD:
+                    Case TokenType.NUMBER:
                         sb.Append("{{\cf29 ")
                         Exit Select
-                    Case TokenType.PREBOUNDREADINGTEXT:
+                    Case TokenType.PAGENAME:
                         sb.Append("{{\cf30 ")
                         Exit Select
-                    Case TokenType.POSTBOUNDREADINGTEXT:
+                    Case TokenType.OPENPARENTHESIS:
                         sb.Append("{{\cf31 ")
                         Exit Select
-                    Case TokenType.PREDICATE:
+                    Case TokenType.OPENSQUAREBRACKET:
                         sb.Append("{{\cf32 ")
                         Exit Select
-                    Case TokenType.QUOTEDSTRING:
+                    Case TokenType.PERIOD:
                         sb.Append("{{\cf33 ")
                         Exit Select
-                    Case TokenType.REFERENCEMODE:
+                    Case TokenType.PREBOUNDREADINGTEXT:
                         sb.Append("{{\cf34 ")
                         Exit Select
-                    Case TokenType.ROLENAME:
+                    Case TokenType.POSTBOUNDREADINGTEXT:
                         sb.Append("{{\cf35 ")
                         Exit Select
-                    Case TokenType.SEMICOLON:
+                    Case TokenType.PREDICATE:
                         sb.Append("{{\cf36 ")
                         Exit Select
-                    Case TokenType.SINGLEQUOTE:
+                    Case TokenType.QUOTEDSTRING:
                         sb.Append("{{\cf37 ")
                         Exit Select
-                    Case TokenType.SPACE:
+                    Case TokenType.REFERENCEMODE:
                         sb.Append("{{\cf38 ")
                         Exit Select
-                    Case TokenType.STAR:
+                    Case TokenType.ROLENAME:
                         sb.Append("{{\cf39 ")
                         Exit Select
-                    Case TokenType.WHICHCLAUSEBROPEN:
+                    Case TokenType.SEMICOLON:
                         sb.Append("{{\cf40 ")
                         Exit Select
-                    Case TokenType.WHICHCLAUSEBRCLOSE:
+                    Case TokenType.SINGLEQUOTE:
                         sb.Append("{{\cf41 ")
                         Exit Select
-                    Case TokenType.VALUE:
+                    Case TokenType.SPACE:
                         sb.Append("{{\cf42 ")
                         Exit Select
-                    Case TokenType.KEYWDA:
+                    Case TokenType.STAR:
                         sb.Append("{{\cf43 ")
                         Exit Select
-                    Case TokenType.KEYWDADD:
+                    Case TokenType.WHICHCLAUSEBROPEN:
                         sb.Append("{{\cf44 ")
                         Exit Select
-                    Case TokenType.KEYWDADDFACT:
+                    Case TokenType.WHICHCLAUSEBRCLOSE:
                         sb.Append("{{\cf45 ")
                         Exit Select
-                    Case TokenType.KEYWDADDFACTTYPE:
+                    Case TokenType.VALUE:
                         sb.Append("{{\cf46 ")
                         Exit Select
-                    Case TokenType.KEYWDADDOBJECTTYPESRELATEDTO:
+                    Case TokenType.VARIABLE:
                         sb.Append("{{\cf47 ")
                         Exit Select
-                    Case TokenType.KEYWDADDOBJECTTYPE:
+                    Case TokenType.KEYWDA:
                         sb.Append("{{\cf48 ")
                         Exit Select
-                    Case TokenType.KEYWDAN:
+                    Case TokenType.KEYWDADD:
                         sb.Append("{{\cf49 ")
                         Exit Select
-                    Case TokenType.KEYWDAND:
+                    Case TokenType.KEYWDADDFACT:
                         sb.Append("{{\cf50 ")
                         Exit Select
-                    Case TokenType.KEYWDANYFACTTYPE:
+                    Case TokenType.KEYWDADDFACTTYPE:
                         sb.Append("{{\cf51 ")
                         Exit Select
-                    Case TokenType.KEYWDASC:
+                    Case TokenType.KEYWDADDOBJECTTYPESRELATEDTO:
                         sb.Append("{{\cf52 ")
                         Exit Select
-                    Case TokenType.KEYWDASSERT:
+                    Case TokenType.KEYWDADDOBJECTTYPE:
                         sb.Append("{{\cf53 ")
                         Exit Select
-                    Case TokenType.KEYWDAS:
+                    Case TokenType.KEYWDAN:
                         sb.Append("{{\cf54 ")
                         Exit Select
-                    Case TokenType.KEYWDATMOSTONE:
+                    Case TokenType.KEYWDAND:
                         sb.Append("{{\cf55 ")
                         Exit Select
-                    Case TokenType.KEYWDAVG:
+                    Case TokenType.KEYWDANYFACTTYPE:
                         sb.Append("{{\cf56 ")
                         Exit Select
-                    Case TokenType.KEYWDBUTNOTBOTH:
+                    Case TokenType.KEYWDASC:
                         sb.Append("{{\cf57 ")
                         Exit Select
-                    Case TokenType.KEYWDCIRCULAR:
+                    Case TokenType.KEYWDASSERT:
                         sb.Append("{{\cf58 ")
                         Exit Select
-                    Case TokenType.KEYWDCOMBINATION:
+                    Case TokenType.KEYWDAS:
                         sb.Append("{{\cf59 ")
                         Exit Select
-                    Case TokenType.KEYWDCOUNT:
+                    Case TokenType.KEYWDATMOSTONE:
                         sb.Append("{{\cf60 ")
                         Exit Select
-                    Case TokenType.KEYWDCOUNTSTAR:
+                    Case TokenType.KEYWDAVG:
                         sb.Append("{{\cf61 ")
                         Exit Select
-                    Case TokenType.KEYWDCREATE:
+                    Case TokenType.KEYWDBETWEEN:
                         sb.Append("{{\cf62 ")
                         Exit Select
-                    Case TokenType.KEYWDCREATECONCEPT:
+                    Case TokenType.KEYWDBUTNOTBOTH:
                         sb.Append("{{\cf63 ")
                         Exit Select
-                    Case TokenType.KEYWDCONNECTTOMODEL:
+                    Case TokenType.KEYWDCIRCULAR:
                         sb.Append("{{\cf64 ")
                         Exit Select
-                    Case TokenType.KEYWDDATABASE:
+                    Case TokenType.KEYWDCOMBINATION:
                         sb.Append("{{\cf65 ")
                         Exit Select
-                    Case TokenType.KEYWDDATE:
+                    Case TokenType.KEYWDCOUNT:
                         sb.Append("{{\cf66 ")
                         Exit Select
-                    Case TokenType.KEYWDDESC:
+                    Case TokenType.KEYWDCOUNTSTAR:
                         sb.Append("{{\cf67 ")
                         Exit Select
-                    Case TokenType.KEYWDCREATEENTITYTYPE:
+                    Case TokenType.KEYWDCREATE:
                         sb.Append("{{\cf68 ")
                         Exit Select
-                    Case TokenType.KEYWDCREATEFACTTYPE:
+                    Case TokenType.KEYWDCREATECONCEPT:
                         sb.Append("{{\cf69 ")
                         Exit Select
-                    Case TokenType.KEYWDCREATEMODEL:
+                    Case TokenType.KEYWDCONNECTTOMODEL:
                         sb.Append("{{\cf70 ")
                         Exit Select
-                    Case TokenType.KEYWDCREATEVALUETYPE:
+                    Case TokenType.KEYWDDATABASE:
                         sb.Append("{{\cf71 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE:
+                    Case TokenType.KEYWDDATE:
                         sb.Append("{{\cf72 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPELOGICALYESNO:
+                    Case TokenType.KEYWDDESC:
                         sb.Append("{{\cf73 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEAUTOCOUNTER:
+                    Case TokenType.KEYWDCREATEENTITYTYPE:
                         sb.Append("{{\cf74 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEDECIMAL:
+                    Case TokenType.KEYWDCREATEFACTTYPE:
                         sb.Append("{{\cf75 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION:
+                    Case TokenType.KEYWDCREATEMODEL:
                         sb.Append("{{\cf76 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION:
+                    Case TokenType.KEYWDCREATEVALUETYPE:
                         sb.Append("{{\cf77 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION:
+                    Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE:
                         sb.Append("{{\cf78 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEMONEY:
+                    Case TokenType.KEYWDDATATYPELOGICALYESNO:
                         sb.Append("{{\cf79 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER:
+                    Case TokenType.KEYWDDATATYPEAUTOCOUNTER:
                         sb.Append("{{\cf80 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESIGNEDINTEGER:
+                    Case TokenType.KEYWDDATATYPEDECIMAL:
                         sb.Append("{{\cf81 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER:
+                    Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION:
                         sb.Append("{{\cf82 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER:
+                    Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION:
                         sb.Append("{{\cf83 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER:
+                    Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION:
                         sb.Append("{{\cf84 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER:
+                    Case TokenType.KEYWDDATATYPEMONEY:
                         sb.Append("{{\cf85 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER:
+                    Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER:
                         sb.Append("{{\cf86 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEOBJECTID:
+                    Case TokenType.KEYWDDATATYPESIGNEDINTEGER:
                         sb.Append("{{\cf87 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEROWID:
+                    Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER:
                         sb.Append("{{\cf88 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH:
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER:
                         sb.Append("{{\cf89 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH:
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER:
                         sb.Append("{{\cf90 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT:
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER:
                         sb.Append("{{\cf91 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATA:
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER:
                         sb.Append("{{\cf92 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH:
+                    Case TokenType.KEYWDDATATYPEOBJECTID:
                         sb.Append("{{\cf93 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP:
+                    Case TokenType.KEYWDDATATYPEROWID:
                         sb.Append("{{\cf94 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEDATE:
+                    Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH:
                         sb.Append("{{\cf95 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEDATETIME:
+                    Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH:
                         sb.Append("{{\cf96 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETIME:
+                    Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT:
                         sb.Append("{{\cf97 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH:
+                    Case TokenType.KEYWDDATATYPERAWDATA:
                         sb.Append("{{\cf98 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH:
+                    Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH:
                         sb.Append("{{\cf99 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH:
+                    Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP:
                         sb.Append("{{\cf100 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETEXTFIXEDLENGTH:
+                    Case TokenType.KEYWDDATATYPEDATE:
                         sb.Append("{{\cf101 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETEXTLARGELENGTH:
+                    Case TokenType.KEYWDDATATYPEDATETIME:
                         sb.Append("{{\cf102 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETEXTVARIABLELENGTH:
+                    Case TokenType.KEYWDDATATYPETIME:
                         sb.Append("{{\cf103 ")
                         Exit Select
-                    Case TokenType.KEYWDDELETE:
+                    Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH:
                         sb.Append("{{\cf104 ")
                         Exit Select
-                    Case TokenType.KEYWDDELETEALL:
+                    Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH:
                         sb.Append("{{\cf105 ")
                         Exit Select
-                    Case TokenType.KEYWDDELETEFACT:
+                    Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH:
                         sb.Append("{{\cf106 ")
                         Exit Select
-                    Case TokenType.KEYWDDESCRIBE:
+                    Case TokenType.KEYWDDATATYPETEXTFIXEDLENGTH:
                         sb.Append("{{\cf107 ")
                         Exit Select
-                    Case TokenType.KEYWDDID:
+                    Case TokenType.KEYWDDATATYPETEXTLARGELENGTH:
                         sb.Append("{{\cf108 ")
                         Exit Select
-                    Case TokenType.KEYWDDISTINCT:
+                    Case TokenType.KEYWDDATATYPETEXTVARIABLELENGTH:
                         sb.Append("{{\cf109 ")
                         Exit Select
-                    Case TokenType.KEYWDDOES:
+                    Case TokenType.KEYWDDELETE:
                         sb.Append("{{\cf110 ")
                         Exit Select
-                    Case TokenType.KEYWDEACH:
+                    Case TokenType.KEYWDDELETEALL:
                         sb.Append("{{\cf111 ")
                         Exit Select
-                    Case TokenType.KEYWDEITHER:
+                    Case TokenType.KEYWDDELETEFACT:
                         sb.Append("{{\cf112 ")
                         Exit Select
-                    Case TokenType.KEYWDENTITY:
+                    Case TokenType.KEYWDDESCRIBE:
                         sb.Append("{{\cf113 ")
                         Exit Select
-                    Case TokenType.KEYWDENTITYTYPE:
+                    Case TokenType.KEYWDDID:
                         sb.Append("{{\cf114 ")
                         Exit Select
-                    Case TokenType.KEYWDENTITYTYPES:
+                    Case TokenType.KEYWDDISTINCT:
                         sb.Append("{{\cf115 ")
                         Exit Select
-                    Case TokenType.KEYWDENUMERATE:
+                    Case TokenType.KEYWDDOES:
                         sb.Append("{{\cf116 ")
                         Exit Select
-                    Case TokenType.KEYWDEXISTS:
+                    Case TokenType.KEYWDEACH:
                         sb.Append("{{\cf117 ")
                         Exit Select
-                    Case TokenType.KEYWDFACT:
+                    Case TokenType.KEYWDEITHER:
                         sb.Append("{{\cf118 ")
                         Exit Select
-                    Case TokenType.KEYWDFACTTYPE:
+                    Case TokenType.KEYWDENTITY:
                         sb.Append("{{\cf119 ")
                         Exit Select
-                    Case TokenType.KEYWDFACTTYPES:
+                    Case TokenType.KEYWDENTITYTYPE:
                         sb.Append("{{\cf120 ")
                         Exit Select
-                    Case TokenType.KEYWDFOR:
+                    Case TokenType.KEYWDENTITYTYPES:
                         sb.Append("{{\cf121 ")
                         Exit Select
-                    Case TokenType.KEYWDFOREACH:
+                    Case TokenType.KEYWDENUMERATE:
                         sb.Append("{{\cf122 ")
                         Exit Select
-                    Case TokenType.KEYWDFROM:
+                    Case TokenType.KEYWDEXISTS:
                         sb.Append("{{\cf123 ")
                         Exit Select
-                    Case TokenType.KEYWDGET:
+                    Case TokenType.KEYWDFACT:
                         sb.Append("{{\cf124 ")
                         Exit Select
-                    Case TokenType.KEYWDGROUPBY:
+                    Case TokenType.KEYWDFACTTYPE:
                         sb.Append("{{\cf125 ")
                         Exit Select
-                    Case TokenType.KEYWDHAVING:
+                    Case TokenType.KEYWDFACTTYPES:
                         sb.Append("{{\cf126 ")
                         Exit Select
-                    Case TokenType.KEYWDIFANDONLYIF:
+                    Case TokenType.KEYWDFOR:
                         sb.Append("{{\cf127 ")
                         Exit Select
-                    Case TokenType.KEYWDIN:
+                    Case TokenType.KEYWDFOREACH:
                         sb.Append("{{\cf128 ")
                         Exit Select
-                    Case TokenType.KEYWDINSERT:
+                    Case TokenType.KEYWDFROM:
                         sb.Append("{{\cf129 ")
                         Exit Select
-                    Case TokenType.KEYWDINTO:
+                    Case TokenType.KEYWDGET:
                         sb.Append("{{\cf130 ")
                         Exit Select
-                    Case TokenType.KEYWDIS:
+                    Case TokenType.KEYWDGROUPBY:
                         sb.Append("{{\cf131 ")
                         Exit Select
-                    Case TokenType.KEYWDISA:
+                    Case TokenType.KEYWDHAVING:
                         sb.Append("{{\cf132 ")
                         Exit Select
-                    Case TokenType.KEYWDISAKINDOF:
+                    Case TokenType.KEYWDHOUR:
                         sb.Append("{{\cf133 ")
                         Exit Select
-                    Case TokenType.KEYWDISAVALUETYPE:
+                    Case TokenType.KEYWDIFANDONLYIF:
                         sb.Append("{{\cf134 ")
                         Exit Select
-                    Case TokenType.KEYWDISIDENTIFIEDBY:
+                    Case TokenType.KEYWDIN:
                         sb.Append("{{\cf135 ")
                         Exit Select
-                    Case TokenType.KEYWDISOBJECTIFIED:
+                    Case TokenType.KEYWDINSERT:
                         sb.Append("{{\cf136 ")
                         Exit Select
-                    Case TokenType.KEYWDISNOT:
+                    Case TokenType.KEYWDINTO:
                         sb.Append("{{\cf137 ")
                         Exit Select
-                    Case TokenType.KEYWDISWHERE:
+                    Case TokenType.KEYWDIS:
                         sb.Append("{{\cf138 ")
                         Exit Select
-                    Case TokenType.KEYWDISWRITTENAS:
+                    Case TokenType.KEYWDISA:
                         sb.Append("{{\cf139 ")
                         Exit Select
-                    Case TokenType.KEYWDITISMANDATORYTHAT:
+                    Case TokenType.KEYWDISAKINDOF:
                         sb.Append("{{\cf140 ")
                         Exit Select
-                    Case TokenType.KEYWDITS:
+                    Case TokenType.KEYWDISAVALUETYPE:
                         sb.Append("{{\cf141 ")
                         Exit Select
-                    Case TokenType.KEYWDJOINING:
+                    Case TokenType.KEYWDISIDENTIFIEDBY:
                         sb.Append("{{\cf142 ")
                         Exit Select
-                    Case TokenType.KEYWDINDEX:
+                    Case TokenType.KEYWDISOBJECTIFIED:
                         sb.Append("{{\cf143 ")
                         Exit Select
-                    Case TokenType.KEYWDLANGUAGE:
+                    Case TokenType.KEYWDISNOT:
                         sb.Append("{{\cf144 ")
                         Exit Select
-                    Case TokenType.KEYWDLANGUAGEDFD:
+                    Case TokenType.KEYWDISWHERE:
                         sb.Append("{{\cf145 ")
                         Exit Select
-                    Case TokenType.KEYWDLANGUAGEERD:
+                    Case TokenType.KEYWDISWRITTENAS:
                         sb.Append("{{\cf146 ")
                         Exit Select
-                    Case TokenType.KEYWDLANGUAGEETD:
+                    Case TokenType.KEYWDITISMANDATORYTHAT:
                         sb.Append("{{\cf147 ")
                         Exit Select
-                    Case TokenType.KEYWDLANGUAGEORM:
+                    Case TokenType.KEYWDITS:
                         sb.Append("{{\cf148 ")
                         Exit Select
-                    Case TokenType.KEYWDLANGUAGESTD:
+                    Case TokenType.KEYWDJOINING:
                         sb.Append("{{\cf149 ")
                         Exit Select
-                    Case TokenType.KEYWDLANGUAGEUCD:
+                    Case TokenType.KEYWDINDEX:
                         sb.Append("{{\cf150 ")
                         Exit Select
-                    Case TokenType.KEYWDLOCATION:
+                    Case TokenType.KEYWDLANGUAGE:
                         sb.Append("{{\cf151 ")
                         Exit Select
-                    Case TokenType.KEYWDLIST:
+                    Case TokenType.KEYWDLANGUAGEDFD:
                         sb.Append("{{\cf152 ")
                         Exit Select
-                    Case TokenType.KEYWDMAX:
+                    Case TokenType.KEYWDLANGUAGEERD:
                         sb.Append("{{\cf153 ")
                         Exit Select
-                    Case TokenType.KEYWDMATCH:
+                    Case TokenType.KEYWDLANGUAGEETD:
                         sb.Append("{{\cf154 ")
                         Exit Select
-                    Case TokenType.KEYWDMIN:
+                    Case TokenType.KEYWDLANGUAGEORM:
                         sb.Append("{{\cf155 ")
                         Exit Select
-                    Case TokenType.KEYWDMODEL:
+                    Case TokenType.KEYWDLANGUAGESTD:
                         sb.Append("{{\cf156 ")
                         Exit Select
-                    Case TokenType.KEYWDMONTH:
+                    Case TokenType.KEYWDLANGUAGEUCD:
                         sb.Append("{{\cf157 ")
                         Exit Select
-                    Case TokenType.KEYWDMODELNOTES:
+                    Case TokenType.KEYWDLIMIT:
                         sb.Append("{{\cf158 ")
                         Exit Select
-                    Case TokenType.KEYWDMODELDICTIONARY:
+                    Case TokenType.KEYWDLOCATION:
                         sb.Append("{{\cf159 ")
                         Exit Select
-                    Case TokenType.KEYWDNO:
+                    Case TokenType.KEYWDLIST:
                         sb.Append("{{\cf160 ")
                         Exit Select
-                    Case TokenType.KEYWDNULL:
+                    Case TokenType.KEYWDMAX:
                         sb.Append("{{\cf161 ")
                         Exit Select
-                    Case TokenType.KEYWDOBJECT:
+                    Case TokenType.KEYWDMATCH:
                         sb.Append("{{\cf162 ")
                         Exit Select
-                    Case TokenType.KEYWDOCCURSATLEASTONETIME:
+                    Case TokenType.KEYWDMIN:
                         sb.Append("{{\cf163 ")
                         Exit Select
-                    Case TokenType.KEYWDOCCURSATLEASTONETIMEINEACHOF:
+                    Case TokenType.KEYWDMODEL:
                         sb.Append("{{\cf164 ")
                         Exit Select
-                    Case TokenType.KEYWDOF:
+                    Case TokenType.KEYWDMONTH:
                         sb.Append("{{\cf165 ")
                         Exit Select
-                    Case TokenType.KEYWDON:
+                    Case TokenType.KEYWDMODELNOTES:
                         sb.Append("{{\cf166 ")
                         Exit Select
-                    Case TokenType.KEYWDONE:
+                    Case TokenType.KEYWDMODELDICTIONARY:
                         sb.Append("{{\cf167 ")
                         Exit Select
-                    Case TokenType.KEYWDONPAGE:
+                    Case TokenType.KEYWDNEXT:
                         sb.Append("{{\cf168 ")
                         Exit Select
-                    Case TokenType.KEYWDOPEN:
+                    Case TokenType.KEYWDNO:
                         sb.Append("{{\cf169 ")
                         Exit Select
-                    Case TokenType.KEYWDOR:
+                    Case TokenType.KEYWDNULL:
                         sb.Append("{{\cf170 ")
                         Exit Select
-                    Case TokenType.KEYWDORDERBY:
+                    Case TokenType.KEYWDOBJECT:
                         sb.Append("{{\cf171 ")
                         Exit Select
-                    Case TokenType.KEYWDPAGE:
+                    Case TokenType.KEYWDOCCURSATLEASTONETIME:
                         sb.Append("{{\cf172 ")
                         Exit Select
-                    Case TokenType.KEYWDPREDICATE:
+                    Case TokenType.KEYWDOCCURSATLEASTONETIMEINEACHOF:
                         sb.Append("{{\cf173 ")
                         Exit Select
-                    Case TokenType.KEYWDRETURN:
+                    Case TokenType.KEYWDOF:
                         sb.Append("{{\cf174 ")
                         Exit Select
-                    Case TokenType.KEYWDROLE:
+                    Case TokenType.KEYWDON:
                         sb.Append("{{\cf175 ")
                         Exit Select
-                    Case TokenType.KEYWDSELECT:
+                    Case TokenType.KEYWDONE:
                         sb.Append("{{\cf176 ")
                         Exit Select
-                    Case TokenType.KEYWDRESTRICTEDTO:
+                    Case TokenType.KEYWDONPAGE:
                         sb.Append("{{\cf177 ")
                         Exit Select
-                    Case TokenType.KEYWDROLECONSTRAINTS:
+                    Case TokenType.KEYWDOPEN:
                         sb.Append("{{\cf178 ")
                         Exit Select
-                    Case TokenType.KEYWDSET:
+                    Case TokenType.KEYWDOR:
                         sb.Append("{{\cf179 ")
                         Exit Select
-                    Case TokenType.KEYWDSHORTESTPATH:
+                    Case TokenType.KEYWDORDERBY:
                         sb.Append("{{\cf180 ")
                         Exit Select
-                    Case TokenType.KEYWDSHOW:
+                    Case TokenType.KEYWDPAGE:
                         sb.Append("{{\cf181 ")
                         Exit Select
-                    Case TokenType.KEYWDSHOWME:
+                    Case TokenType.KEYWDPREDICATE:
                         sb.Append("{{\cf182 ")
                         Exit Select
-                    Case TokenType.KEYWDSTANDALONE:
+                    Case TokenType.KEYWDRETURN:
                         sb.Append("{{\cf183 ")
                         Exit Select
-                    Case TokenType.KEYWDSUM:
+                    Case TokenType.KEYWDROLE:
                         sb.Append("{{\cf184 ")
                         Exit Select
-                    Case TokenType.KEYWDSUPERTYPE:
+                    Case TokenType.KEYWDSELECT:
                         sb.Append("{{\cf185 ")
                         Exit Select
-                    Case TokenType.KEYWDTIME:
+                    Case TokenType.KEYWDRESTRICTEDTO:
                         sb.Append("{{\cf186 ")
                         Exit Select
-                    Case TokenType.KEYWDTHAT:
+                    Case TokenType.KEYWDROLECONSTRAINTS:
                         sb.Append("{{\cf187 ")
                         Exit Select
-                    Case TokenType.KEYWDTHEIR:
+                    Case TokenType.KEYWDSET:
                         sb.Append("{{\cf188 ")
                         Exit Select
-                    Case TokenType.KEYWDTO:
+                    Case TokenType.KEYWDSHORTESTPATH:
                         sb.Append("{{\cf189 ")
                         Exit Select
-                    Case TokenType.KEYWDTODAY:
+                    Case TokenType.KEYWDSHOW:
                         sb.Append("{{\cf190 ")
                         Exit Select
-                    Case TokenType.KEYWDTOLOWER:
+                    Case TokenType.KEYWDSHOWME:
                         sb.Append("{{\cf191 ")
                         Exit Select
-                    Case TokenType.KEYWDTOUPPER:
+                    Case TokenType.KEYWDSTANDALONE:
                         sb.Append("{{\cf192 ")
                         Exit Select
-                    Case TokenType.KEYWDTOPAGE:
+                    Case TokenType.KEYWDSUM:
                         sb.Append("{{\cf193 ")
                         Exit Select
-                    Case TokenType.KEYWDTYPE:
+                    Case TokenType.KEYWDSUPERTYPE:
                         sb.Append("{{\cf194 ")
                         Exit Select
-                    Case TokenType.KEYWDUPDATE:
+                    Case TokenType.KEYWDTABLEINSTANCE:
                         sb.Append("{{\cf195 ")
                         Exit Select
-                    Case TokenType.KEYWDVALUES:
+                    Case TokenType.KEYWDTIME:
                         sb.Append("{{\cf196 ")
                         Exit Select
-                    Case TokenType.KEYWDVALUETYPE:
+                    Case TokenType.KEYWDTHAT:
                         sb.Append("{{\cf197 ")
                         Exit Select
-                    Case TokenType.KEYWDVALUETYPES:
+                    Case TokenType.KEYWDTHEIR:
                         sb.Append("{{\cf198 ")
                         Exit Select
-                    Case TokenType.KEYWDWHEN:
+                    Case TokenType.KEYWDTHIS:
                         sb.Append("{{\cf199 ")
                         Exit Select
-                    Case TokenType.KEYWDWHERE:
+                    Case TokenType.KEYWDTO:
                         sb.Append("{{\cf200 ")
                         Exit Select
-                    Case TokenType.KEYWDWITH:
+                    Case TokenType.KEYWDTODAY:
                         sb.Append("{{\cf201 ")
                         Exit Select
-                    Case TokenType.KEYWDWHAT:
+                    Case TokenType.KEYWDTOMORROW:
                         sb.Append("{{\cf202 ")
                         Exit Select
-                    Case TokenType.KEYWDWHEREALSO:
+                    Case TokenType.KEYWDTOLOWER:
                         sb.Append("{{\cf203 ")
                         Exit Select
-                    Case TokenType.KEYWDWHICH:
+                    Case TokenType.KEYWDTOUPPER:
                         sb.Append("{{\cf204 ")
                         Exit Select
-                    Case TokenType.KEYWDWHO:
+                    Case TokenType.KEYWDTOPAGE:
                         sb.Append("{{\cf205 ")
                         Exit Select
-                    Case TokenType.KEYWDWRITTENAS:
+                    Case TokenType.KEYWDTYPE:
                         sb.Append("{{\cf206 ")
                         Exit Select
-                    Case TokenType.KEYWDYEAR:
+                    Case TokenType.KEYWDUPDATE:
                         sb.Append("{{\cf207 ")
                         Exit Select
-                    Case TokenType.PLUS:
+                    Case TokenType.KEYWDVALUES:
                         sb.Append("{{\cf208 ")
                         Exit Select
-                    Case TokenType.MINUS:
+                    Case TokenType.KEYWDVALUETYPE:
                         sb.Append("{{\cf209 ")
                         Exit Select
-                    Case TokenType.DIVIDE:
+                    Case TokenType.KEYWDVALUETYPES:
                         sb.Append("{{\cf210 ")
                         Exit Select
-                    Case TokenType.TIMES:
+                    Case TokenType.KEYWDWHEN:
                         sb.Append("{{\cf211 ")
                         Exit Select
-                    Case TokenType.EXPRESSIONSYMBOL:
+                    Case TokenType.KEYWDWHERE:
                         sb.Append("{{\cf212 ")
                         Exit Select
-                    Case TokenType.KEYWDLESSTHAN:
+                    Case TokenType.KEYWDWITH:
                         sb.Append("{{\cf213 ")
                         Exit Select
-                    Case TokenType.KEYWDGREATERTHAN:
+                    Case TokenType.KEYWDWHAT:
                         sb.Append("{{\cf214 ")
+                        Exit Select
+                    Case TokenType.KEYWDWHEREALSO:
+                        sb.Append("{{\cf215 ")
+                        Exit Select
+                    Case TokenType.KEYWDWHICH:
+                        sb.Append("{{\cf216 ")
+                        Exit Select
+                    Case TokenType.KEYWDWHO:
+                        sb.Append("{{\cf217 ")
+                        Exit Select
+                    Case TokenType.KEYWDWRITTENAS:
+                        sb.Append("{{\cf218 ")
+                        Exit Select
+                    Case TokenType.KEYWDYEAR:
+                        sb.Append("{{\cf219 ")
+                        Exit Select
+                    Case TokenType.KEYWDPIECHART:
+                        sb.Append("{{\cf220 ")
+                        Exit Select
+                    Case TokenType.KEYWDBARCHART:
+                        sb.Append("{{\cf221 ")
+                        Exit Select
+                    Case TokenType.KEYWDLINECHART:
+                        sb.Append("{{\cf222 ")
+                        Exit Select
+                    Case TokenType.KEYWDAREACHART:
+                        sb.Append("{{\cf223 ")
+                        Exit Select
+                    Case TokenType.KEYWDSCATTERPLOT:
+                        sb.Append("{{\cf224 ")
+                        Exit Select
+                    Case TokenType.PLUS:
+                        sb.Append("{{\cf225 ")
+                        Exit Select
+                    Case TokenType.MINUS:
+                        sb.Append("{{\cf226 ")
+                        Exit Select
+                    Case TokenType.DIVIDE:
+                        sb.Append("{{\cf227 ")
+                        Exit Select
+                    Case TokenType.TIMES:
+                        sb.Append("{{\cf228 ")
+                        Exit Select
+                    Case TokenType.EXPRESSIONSYMBOL:
+                        sb.Append("{{\cf229 ")
+                        Exit Select
+                    Case TokenType.KEYWDLESSTHAN:
+                        sb.Append("{{\cf230 ")
+                        Exit Select
+                    Case TokenType.KEYWDGREATERTHAN:
+                        sb.Append("{{\cf231 ")
+                        Exit Select
+                    Case TokenType.KEYWDLESSTHANEQUALS:
+                        sb.Append("{{\cf232 ")
+                        Exit Select
+                    Case TokenType.KEYWDGREATERTHANEQUALS:
+                        sb.Append("{{\cf233 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATEDIFF:
+                        sb.Append("{{\cf234 ")
                         Exit Select
 
             Case Else
@@ -1154,7 +1233,7 @@ Namespace FEQL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red227\green143\blue247;\red227\green143\blue247;\red94\green213\blue165;\red255\green171\blue26;\red135\green207\blue243;\red135\green207\blue243;\red227\green143\blue247;\red227\green143\blue247;\red153\green0\blue0;\red216\green127\blue178;\red135\green207\blue243;\red227\green143\blue247;\red227\green143\blue247;\red216\green127\blue178;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red216\green127\blue178;\red94\green213\blue165;\red94\green213\blue165;\red216\green127\blue178;\red227\green143\blue247;\red227\green143\blue247;\red227\green143\blue247;\red135\green207\blue243;\red94\green213\blue165;\red94\green213\blue165;\red227\green143\blue247;\red227\green143\blue247;\red76\green153\blue0;\red153\green76\blue0;\red227\green143\blue247;\red216\green127\blue178;\red0\green0\blue255;\red255\green171\blue26;\red94\green213\blue165;\red94\green213\blue165;\red153\green0\blue0;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red115\green217\blue243;\red115\green217\blue243;\red135\green207\blue243;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red135\green207\blue243;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red115\green217\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red135\green207\blue243;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red94\green213\blue165;\red255\green171\blue26;\red255\green171\blue26;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red227\green143\blue247;\red227\green143\blue247;\red94\green213\blue165;\red255\green171\blue26;\red115\green190\blue213;\red115\green190\blue213;\red153\green0\blue0;\red153\green0\blue0;\red227\green143\blue247;\red227\green143\blue247;\red216\green127\blue178;\red153\green0\blue0;\red153\green0\blue0;\red216\green127\blue178;\red115\green190\blue213;\red227\green143\blue247;\red239\green180\blue149;\red216\green127\blue178;\red94\green213\blue165;\red94\green213\blue165;\red94\green213\blue165;\red216\green127\blue178;\red94\green213\blue165;\red94\green213\blue165;\red216\green127\blue178;\red227\green143\blue247;\red227\green143\blue247;\red227\green143\blue247;\red115\green190\blue213;\red154\green200\blue135;\red174\green203\blue145;\red227\green143\blue247;\red227\green143\blue247;\red76\green153\blue0;\red153\green76\blue0;\red227\green143\blue247;\red216\green127\blue178;\red0\green0\blue255;\red255\green171\blue26;\red94\green213\blue165;\red94\green213\blue165;\red153\green0\blue0;\red153\green0\blue0;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red115\green217\blue243;\red115\green217\blue243;\red115\green217\blue243;\red115\green190\blue213;\red115\green217\blue243;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red115\green217\blue243;\red115\green190\blue213;\red105\green170\blue203;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red200\green200\blue200;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red115\green217\blue243;\red115\green190\blue213;\red115\green217\blue243;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red0\green0\blue255;\red115\green190\blue213;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red115\green190\blue213;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red115\green190\blue213;\red0\green0\blue255;\red0\green0\blue255;\red115\green217\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red115\green190\blue213;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green217\blue243;\red115\green190\blue213;\red0\green0\blue255;\red105\green170\blue203;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green217\blue243;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red115\green190\blue213;\red115\green190\blue213;\red115\green217\blue243;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red115\green190\blue213;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red94\green213\blue165;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red255\green171\blue26;\red115\green190\blue213;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)
@@ -1167,13 +1246,21 @@ Namespace FEQL
 
 #Region "IDisposable Members"
 
-    Public Sub Dispose() Implements IDisposable.Dispose
-        isDisposing = True
-        threadAutoHighlight.Join(1000)
-        If threadAutoHighlight.IsAlive Then
-            threadAutoHighlight.Abort()
-        End If
-    End Sub
+        Public Sub Dispose() Implements IDisposable.Dispose
+
+            isDisposing = True
+
+            RemoveHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
+            RemoveHandler Textbox.KeyDown, AddressOf textbox_KeyDown
+            RemoveHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
+
+            If Me.threadAutoHighlight IsNot Nothing Then
+                threadAutoHighlight.Join(1000)
+                If threadAutoHighlight.IsAlive Then
+                    threadAutoHighlight.Abort()
+                End If
+            End If
+        End Sub
 
 #End Region
 

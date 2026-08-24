@@ -1,6 +1,7 @@
 ﻿Imports System.ComponentModel
+Imports System.Dynamic
 Imports System.Reflection
-Imports DynamicClassLibrary.Factory
+Imports DynamicClassLibrary.ClassFactory
 
 Namespace ORMQL
     Public Class RecordsetDataGridList
@@ -8,49 +9,71 @@ Namespace ORMQL
 
         Public mrRecordset As ORMQL.Recordset
         Public mrTable As RDS.Table
-        Private DynamicClass As tClass
+        Private DynamicClass As DynamicBindableObject 'tClass
         Public DynamicObject As Object
 
 
         Public Sub New(ByRef arRecordset As ORMQL.Recordset,
                        ByRef arTable As RDS.Table)
 
-            Me.mrRecordset = arRecordset
-            Me.mrTable = arTable
+            Dim lsMessage As String
 
-            Me.DynamicClass = New tClass
-            Dim larColumn() As RDS.Column
+            Try
 
-            Dim lrTable = arTable
+                Me.mrRecordset = arRecordset
+                Me.mrTable = arTable
 
-            Select Case arTable.Model.Model.TargetDatabaseType
-                Case Is = pcenumDatabaseType.Neo4j,
-                          pcenumDatabaseType.KuzuDB
+                Me.DynamicObject = New DynamicBindableObject 'Me.DynamicClass = New tClass
+                Dim larColumn() As RDS.Column
 
-                    Dim lbIgnoreForeignKeys As Boolean = arTable.Model.Model.HideOtherwiseForeignKeyColumns
+                Dim lrTable = arTable
 
-                    larColumn = arTable.Column.FindAll(Function(x) Not (x.isPartOfPrimaryKey Or (lbIgnoreForeignKeys And x.isForeignKey))).OrderBy(Function(x) x.OrdinalPosition).ToArray
-                Case Else
-                    larColumn = arTable.Column.ToArray
-            End Select
-            For Each lsColumn In larColumn.Select(Function(x) x.Name).ToList  '20230525-VM-Was Me.mrRecordset.Columns....but for concat Columns was not working. FirstName + ' ' + LastName
+                If arTable Is Nothing Then
+                    larColumn = arRecordset.Columns.ToArray
+                Else
+                    Select Case arTable.Model.Model.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.Neo4j,
+                              pcenumDatabaseType.KuzuDB
 
-                Dim lsColumnName As String
-                Try
-                    lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
-                Catch ex As Exception
-                    lsColumnName = Trim(lsColumn)
-                End Try
+                            Dim lbIgnoreForeignKeys As Boolean = arTable.Model.Model.HideOtherwiseForeignKeyColumns
+
+                            larColumn = arTable.Column.FindAll(Function(x) Not (x.isPartOfPrimaryKey Or (lbIgnoreForeignKeys And x.isForeignKey))).OrderBy(Function(x) x.OrdinalPosition).ToArray
+                        Case Else
+                            larColumn = arTable.Column.ToArray
+                    End Select
+                End If
+
+                Dim dynamicObj = CType(Me.DynamicObject, DynamicBindableObject)
+
+                For Each lsColumn In larColumn.Select(Function(x) x.Name).ToList  '20230525-VM-Was Me.mrRecordset.Columns....but for concat Columns was not working. FirstName + ' ' + LastName
+
+                    Dim lsColumnName As String
+                    Try
+                        lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
+                    Catch ex As Exception
+                        lsColumnName = Trim(lsColumn)
+                    End Try
 
 
-                Select Case lsColumnName
-                    Case Is = "Date"
-                        Me.DynamicClass.add_attribute(New tAttribute("[" & lsColumnName & "]", GetType(Date)))
-                    Case Else
-                        Me.DynamicClass.add_attribute(New tAttribute(lsColumnName, GetType(String)))
-                End Select
-            Next
-            Me.DynamicObject = Me.DynamicClass.clone()
+                    Select Case lsColumnName
+                        Case Is = "Date"
+                            dynamicObj.AddAttribute("[" & lsColumnName & "]", GetType(Date)) 'Me.DynamicClass.add_attribute(New tAttribute("[" & lsColumnName & "]", GetType(Date)), False)
+                        Case Else
+                            dynamicObj.AddAttribute(lsColumnName, GetType(String)) 'Me.DynamicClass.add_attribute(New tAttribute(lsColumnName, GetType(String)), False)
+                    End Select
+                Next
+
+                'No need to generate code; we use a dynamic object
+                'Me.DynamicClass.generate_code()
+                'Me.DynamicObject = Me.DynamicClass.clone()
+
+            Catch ex As Exception
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 
@@ -116,30 +139,31 @@ Namespace ORMQL
         Default Public Property Item(index As Integer) As Object Implements IList.Item
             Get
                 Try
-                    Dim liInd As Integer = 0
                     Dim lsDataAsString As String
+                    Dim lsColumnName As String
+                    Dim lsColumn As String
+                    'Dim piInstance As PropertyInfo
+                    Dim liDataType = pcenumORMDataType.TextVariableLength
 
+                    Dim dict = Me.DynamicObject
+
+                    Dim liInd As Integer = 0
                     For Each lrData In Me.mrRecordset.Facts(index).Data
 
                         Try
-                            Dim lsColumn As String = Me.mrRecordset.Columns(liInd) '20230525-Me.mrRecordset.Facts(index).Data(liInd).Role.Name '20230414-VM-Me.mrRecordset.Columns(liInd)
-                            Dim lsColumnName As String
+                            lsColumn = Me.mrRecordset.ColumnNames(liInd) '20230525-Me.mrRecordset.Facts(index).Data(liInd).Role.Name '20230414-VM-Me.mrRecordset.Columns(liInd)
+
                             Try
                                 lsColumnName = lsColumn.Substring(lsColumn.IndexOf(".") + 1)
                             Catch ex As Exception
                                 lsColumnName = lsColumn
                             End Try
 
-                            'Dim lsString = Me.mrRecordset.Columns(liInd)
-                            Dim piInstance As PropertyInfo = Nothing
+                            'piInstance = Nothing
 
-                            piInstance = NullVal(Me.DynamicObject.GetType.GetProperty(lsColumnName), Me.DynamicObject.GetType.GetProperty(Me.mrTable.Column(liInd).Name))
+                            'piInstance = NullVal(Me.DynamicObject.GetType.GetProperty(lsColumnName), Me.DynamicObject.GetType.GetProperty(Me.mrTable.Column(liInd).Name))
 
-                            Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength
-
-                            liDataType = Me.mrTable.Column.Find(Function(x) x.Name = lsColumnName).getMetamodelDataType
-
-                            Select Case liDataType 'Was lsString
+                            Select Case Me.mrTable.Column.FirstOrDefault(Function(x) x.DBName = lsColumnName)?.getMetamodelDataType
                                 Case Is = pcenumORMDataType.TemporalDate,
                                           pcenumORMDataType.TemporalDateAndTime
                                     Try
@@ -154,7 +178,19 @@ Namespace ORMQL
                                     lsDataAsString = lrData.Data
                             End Select
 
-                            piInstance.SetValue(Me.DynamicObject, lsDataAsString)
+                            'piInstance.SetValue(Me.DynamicObject, lsDataAsString)
+                            If dict.ContainsKey(lsColumnName) Then
+                                dict(lsColumnName) = lsDataAsString
+                            Else
+                                dict.Add(lsColumnName, lsDataAsString) ' Add if missing
+                            End If
+
+                            ' ✅ Explicitly trigger PropertyChanged (ensures UI updates)
+                            'Dim dynamicBindable As DynamicBindableObject = TryCast(Me.DynamicObject, DynamicBindableObject)
+                            'If dynamicBindable IsNot Nothing Then
+                            '    dynamicBindable.TriggerPropertyChanged(lsColumnName)
+                            'End If
+
                         Catch ex As Exception
                             'Not a biggie. Column's data won't be set,
                             ' but indicates to the user there is something wrong with the Column; possibly ColumnName mismatch between Model and Database Table/NodeType.
@@ -162,7 +198,9 @@ Namespace ORMQL
 
                         liInd += 1
                     Next
-                    Return Me.DynamicObject.clone
+
+                    Return Me.DynamicObject 'Me.DynamicObject '.clone
+
                 Catch ex As Exception
                     Return Me.DynamicObject
                 End Try

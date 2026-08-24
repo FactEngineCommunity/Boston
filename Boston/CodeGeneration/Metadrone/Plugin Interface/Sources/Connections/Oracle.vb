@@ -1,4 +1,5 @@
-﻿Imports System.Data.OracleClient.OracleConnection
+﻿Imports System.Data.OracleClient
+Imports Boston.FBM
 
 Namespace PluginInterface.Sources
 
@@ -28,16 +29,6 @@ Namespace PluginInterface.Sources
             Me.mName = Name
             Me.ConnStr = ConnectionString
         End Sub
-
-        Public _BostonModel As FBM.Model
-        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
-            Get
-                Return Me._BostonModel
-            End Get
-            Set(value As FBM.Model)
-                Me._BostonModel = value
-            End Set
-        End Property
 
         Friend Function GetQuery(ByVal Query As QueryEnum) As String
             Select Case Query
@@ -131,6 +122,15 @@ Namespace PluginInterface.Sources
             End Get
         End Property
 
+        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As FBM.Model)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public Sub TestConnection() Implements IConnection.TestConnection
             Dim Conn As New OracleClient.OracleConnection(Me.ConnStr)
             Conn.Open()
@@ -160,7 +160,6 @@ Namespace PluginInterface.Sources
         End Function
 
         Public Function GetSchema() As List(Of SchemaRow) Implements IConnection.GetSchema
-
             If Not String.IsNullOrEmpty(Me.ColumnSchemaQuery) Then
                 If Me.ColumnSchemaQuery.IndexOf(Me.TableNamePlaceHolder) = -1 Then
                     Throw New Exception("Required placeholder for table name: '" & Me.TableNamePlaceHolder & "'.")
@@ -284,9 +283,9 @@ Namespace PluginInterface.Sources
             End Using
         End Function
 
-        Public Function GetRoutineColumnSchema(ByVal RoutineName As String,
-                                              ByVal RoutineType As String,
-                                              ByVal IsProcedure As Boolean,
+        Public Function GetRoutineColumnSchema(ByVal RoutineName As String, _
+                                              ByVal RoutineType As String, _
+                                              ByVal IsProcedure As Boolean, _
                                               ByVal ParamList As List(Of String)) As List(Of SchemaRow) Implements IConnection.GetRoutineColumnSchema
             'TODO implement
             Return New List(Of SchemaRow)
@@ -450,10 +449,10 @@ Namespace PluginInterface.Sources
             Return tables
         End Function
 
-        Public Function CreateCopy(ByVal Name As String, ByVal Connectionstring As String,
-                                   ByVal SchemaQuery As String, ByVal TableSchemaQuery As String,
-                                   ByVal ColumnSchemaQuery As String, ByVal TableNamePlaceHolder As String,
-                                   ByVal RoutineSchemaQuery As String, ByVal Transformations As String,
+        Public Function CreateCopy(ByVal Name As String, ByVal Connectionstring As String, _
+                                   ByVal SchemaQuery As String, ByVal TableSchemaQuery As String, _
+                                   ByVal ColumnSchemaQuery As String, ByVal TableNamePlaceHolder As String, _
+                                   ByVal RoutineSchemaQuery As String, ByVal Transformations As String, _
                                    ByVal IgnoreTableNames As List(Of String)) As IConnection Implements IConnection.CreateCopy
             Dim copy As New Oracle(Name, Connectionstring)
             copy.SchemaQuery = SchemaQuery
@@ -500,6 +499,5 @@ Namespace PluginInterface.Sources
         End Sub
 
     End Class
-
 
 End Namespace

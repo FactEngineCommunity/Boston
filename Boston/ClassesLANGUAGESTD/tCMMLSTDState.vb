@@ -160,7 +160,7 @@ Namespace STD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -168,7 +168,7 @@ Namespace STD
         Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing,
                                 Optional ByVal asSelectedGridItemLabel As String = "")
 
-            If IsSomething(aoChangedPropertyItem) Then
+            If aoChangedPropertyItem IsNot Nothing Then
                 Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                     Case Is = "StateName"
                         Call Me.STMState.setName(Me.StateName)
@@ -200,7 +200,7 @@ Namespace STD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -276,7 +276,7 @@ Namespace STD
 
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
 
-            If IsSomething(Me.Shape) Then
+            If Me.Shape IsNot Nothing Then
                 If Me.Shape.Selected Then
                     Me.Shape.Pen.Color = Color.Blue
                 Else
@@ -320,7 +320,7 @@ Namespace STD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -338,7 +338,7 @@ Namespace STD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

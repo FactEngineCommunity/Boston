@@ -98,7 +98,7 @@ Public Class tQuestion
 
             Me.ModelObject = New List(Of FBM.ModelObject)
 
-            If IsSomething(aasSymbol) Then
+            If aasSymbol IsNot Nothing Then
                 For Each lsString In aasSymbol
                     Select Case aiQuestionType
                         Case Is = pcenumQuestionType.CreateValueType
@@ -109,20 +109,24 @@ Public Class tQuestion
                             Dim lrDummyEntityType As New FBM.EntityType(Nothing, pcenumLanguage.ORMModel, lsString, Nothing, True)
                             lrDummyEntityType.Id = lsString
                             Me.ModelObject.Add(lrDummyEntityType)
+                        Case Is = pcenumQuestionType.CreateInternalUniquenessConstraint
+                            Me.ModelObject.Add(aoObjectType)
                     End Select
                 Next
             End If
 
             Me.FocalSymbol = aasSymbol
 
-            If IsSomething(arSentence) Then
+            If arSentence IsNot Nothing Then
                 Me.sentence = arSentence
             End If
 
             Me.Plan = arPlan
             Me.PlanStep = arStep
-            Me.Plan.Step.AddUnique(arStep)
-            If IsSomething(arStep) Then
+            If Me.Plan IsNot Nothing Then
+                Me.Plan.Step.AddUnique(arStep)
+            End If
+            If arStep IsNot Nothing Then
                 arStep.Question = Me
             End If
 
@@ -136,7 +140,7 @@ Public Class tQuestion
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

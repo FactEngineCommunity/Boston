@@ -6,7 +6,10 @@ Imports System.ComponentModel
 Public Class frmUnifiedOntologyBrowser
 
     Public WithEvents zrUnifiedOntology As Ontology.UnifiedOntology
-    Private zrFrmORMDiagramViewer As frmDiagramORMForOntologyBrowser
+    Private mrFrmORMDiagramViewer As frmDiagramORMForOntologyBrowser
+    Private mbORMViewExpanded As Boolean = False
+
+    Private mrSelectedModelElement As FBM.ModelObject
 
     ''' <summary>
     ''' The Model for the information shown in the WebBrowser.
@@ -15,16 +18,51 @@ Public Class frmUnifiedOntologyBrowser
     ''' </summary>
     Private mrWebBrowserModel As FBM.Model
 
+    Private mbShadeDuplicates As Boolean = False
+
+    ' Helper function to convert an Image to base64
+    Private Function ImageToBase64(image As Image) As String
+        Using ms As New System.IO.MemoryStream()
+            image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg)
+            Return Convert.ToBase64String(ms.ToArray())
+        End Using
+    End Function
+
     Private Sub frmGlossary_Load(sender As Object, e As EventArgs) Handles Me.Load
 
         Try
             Me.LabelOntologyName.Text = Me.zrUnifiedOntology.Name
-            Call Me.ShowGlossary(Me.zrUnifiedOntology)
+
+            '=================================================================
+            'Put the Models in the Combobox
+            Dim lrComboboxItem = New tComboboxItem(Nothing, "All", Nothing)
+            Me.ComboBoxModel.Items.Add(lrComboboxItem)
+            For Each lrModel In Me.zrUnifiedOntology.Model
+                lrComboboxItem = New tComboboxItem(lrModel.ModelId, lrModel.Name, lrModel)
+                Me.ComboBoxModel.Items.Add(lrComboboxItem)
+            Next
+            Me.ComboBoxModel.SelectedIndex = 0
+
+            '=================================================================
+            'Show the Glossary
+            Call Me.ShowGlossary(Me.zrUnifiedOntology, Nothing)
 
             Me.ToolStripStatusLabelModel.Visible = True
-            Me.ToolStripStatusLabelModel.Text = "Term Count: " & Me.ListBox1.Items.Count
+            Me.ToolStripStatusLabelModel.Text = "Term Count:  " & Me.ListBox1.Items.Count
 
-            Me.WebBrowser.Navigate(Me.zrUnifiedOntology.ImageFileLocationName)
+            Try
+#Region "Load the Image file"
+                ' Load the image from the file
+                Dim imageFilePath As String = Me.zrUnifiedOntology.ImageFileLocationName
+                Dim image As Image = Image.FromFile(imageFilePath)
+
+                ' Attach the DocumentCompleted event handler to the WebBrowser control
+                Dim htmlImageTag As String = "<html><body style='margin:0;padding:0;'><img src='data:image/jpeg;base64," & ImageToBase64(image) & "' width='" & image.Width & "' height='" & image.Height & "'/></body></html>"
+                Me.WebBrowser.DocumentText = htmlImageTag
+#End Region
+            Catch ex As Exception
+                'We tried
+            End Try
 
             '======================================================================================
             'Load the Sub ORM Diagram Form/Viewer
@@ -33,20 +71,13 @@ Public Class frmUnifiedOntologyBrowser
             formToShow.WindowState = FormWindowState.Maximized
             formToShow.FormBorderStyle = Windows.Forms.FormBorderStyle.None
             formToShow.Visible = True
-            'Dim lrPage As New FBM.Page(zrModel, "GlossaryPage", "GlossaryPage", pcenumLanguage.ORMModel)
-            'formToShow.zrPage = lrPage
-            'lrPage.Form = New Windows.Forms.Form
-            'lrPage.Form = formToShow
-            'lrPage.Diagram = formToShow.Diagram
-            'lrPage.DiagramView = formToShow.DiagramView
-            'Me.SplitContainer2.Panel2.Controls.Add(formToShow)
+            Me.SplitContainer2.Panel2.Controls.Add(formToShow)
 
             formToShow.Show()
             formToShow.Height = Me.SplitContainer2.Panel2.Height
             'formToShow.Anchor = AnchorStyles.Left + AnchorStyles.Right + AnchorStyles.Bottom + AnchorStyles.Top
 
-            'Call formToShow.DisplayORMModelPage(lrPage)
-            zrFrmORMDiagramViewer = formToShow
+            mrFrmORMDiagramViewer = formToShow
             '======================================================================================
 
             prApplication.ActivePages.Add(Me)
@@ -57,13 +88,15 @@ Public Class frmUnifiedOntologyBrowser
             Me.ListBox1.Refresh()
             Me.ListBox1.Invalidate()
 
+            Me.ToolStripDropDownButton2.Image = My.Resources.MenuImages.Expand16x16
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -113,52 +146,134 @@ Public Class frmUnifiedOntologyBrowser
                     g.DrawString(item.ItemData, e.Font, Brushes.Black, blackTextBounds)
                     Dim lsModelName As String = item.Tag.Model.Name
                     g.DrawString(lsModelName.CondenseString(15, 7, 5), e.Font, Brushes.Silver, grayTextBounds)
+
+#Region "Duplicates"
+                    If Me.mbShadeDuplicates Then
+                        Dim duplicates As Boolean = Me.ListBox1.Items.OfType(Of tComboboxItem)().Count(Function(x) item.ItemData = x.ItemData) > 1
+                        If duplicates Then
+                            e.Graphics.FillRectangle(Brushes.LightBlue, itemBounds)
+                        End If
+                        g.DrawString(item.ItemData, e.Font, Brushes.Black, blackTextBounds)
+                        g.DrawString(lsModelName.CondenseString(15, 7, 5), e.Font, Brushes.Silver, grayTextBounds)
+                    End If
+#End Region
                 End If
 
-                e.DrawFocusRectangle()
+                    e.DrawFocusRectangle()
             End If
+
+
 
         Catch ex As Exception
             'We tried.
         End Try
     End Sub
 
-    Private Sub ShowGlossary(ByRef arUnifiedOntology As Ontology.UnifiedOntology)
+    Private Sub ShowGlossary(ByRef arUnifiedOntology As Ontology.UnifiedOntology,
+                             Optional ByRef arModel As FBM.Model = Nothing)
 
+        '------------------------
+        'Clear the list
         Me.ListBox1.Items.Clear()
 
-        Dim larUnifiedOntology As Ontology.UnifiedOntology = arUnifiedOntology
+        Try
 
-        Dim larModelDictionaryEntry = From Model In larUnifiedOntology.Model
-                                      From ModelDictionaryEntry In Model.ModelDictionary
-                                      Where ModelDictionaryEntry.isValueType Or
-                                            ModelDictionaryEntry.isEntityType
-                                      Select ModelDictionaryEntry
-                                      Order By ModelDictionaryEntry.Symbol Ascending
+            'Housekeeping
+            Me.ToolStripDropDownButton2.Image = My.Resources.MenuImages.Collapse16x16 'Because we are effectively resetting the ORM view.
 
-        Dim lrComboBoxItem As tComboboxItem
-        For Each lrModelDictionaryEntry In larModelDictionaryEntry
+            Dim larUnifiedOntology As Ontology.UnifiedOntology = arUnifiedOntology
 
-            Dim lsConceptSymbol As String = lrModelDictionaryEntry.Model.Name.CondenseString(15, 7, 5)
+            '---------------------------------------------------------
+            'Get the ModelDictionary entries from the Model/s
+            Dim larModelDictionaryEntry As List(Of FBM.DictionaryEntry)
 
-            lrComboBoxItem = New tComboboxItem(lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry.Symbol & " - " & lsConceptSymbol, lrModelDictionaryEntry)
+            Dim larFinalModelDictionary As New List(Of FBM.DictionaryEntry)
 
-            Me.ListBox1.Items.Add(lrComboBoxItem)
-        Next
+            If arModel IsNot Nothing Then
+                Dim lrModel = arModel
+                larModelDictionaryEntry = (From ModelDictionaryEntry In lrModel.ModelDictionary
+                                           Where ModelDictionaryEntry.isValueType Or
+                                                 ModelDictionaryEntry.isEntityType Or
+                                                 ModelDictionaryEntry.isGeneralConcept
+                                           Where Not ModelDictionaryEntry.Symbol.StartsWith("Core")
+                                           Select ModelDictionaryEntry
+                                           Order By ModelDictionaryEntry.Symbol Ascending).ToList
 
-        'For Each lrEntityType In arModel.EntityType.FindAll(Function(x) x.IsObjectifyingEntityType = False _
-        '                                                        And x.IsMDAModelElement = False)
-        '    Me.ListBox1.Items.Add(lrEntityType.Name)
-        'Next
+                Dim lrActualModel = prApplication.Models.Find(Function(x) x.ModelId = lrModel.ModelId)
 
-        'For Each lrValueType In arModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
-        '    Me.ListBox1.Items.Add(lrValueType.Name)
-        'Next
+                If lrActualModel IsNot Nothing Then
 
-        'For Each lrFactType In arModel.FactType.FindAll(Function(x) (x.IsObjectified And x.IsMDAModelElement = False) Or x.isRDSTable)
-        '    Me.ListBox1.Items.Add(lrFactType.Name)
-        'Next
-        Me.ListBox1.Refresh()
+                    Dim larActualModelDictionaryEntry = (From ModelDictionaryEntry In lrActualModel.ModelDictionary
+                                                         Where ModelDictionaryEntry.isValueType Or
+                                                              ModelDictionaryEntry.isEntityType Or
+                                                              ModelDictionaryEntry.isGeneralConcept
+                                                         From ModelElement In lrActualModel.getModelObjects
+                                                         Where Not ModelElement.IsMDAModelElement
+                                                         Where ModelDictionaryEntry.Symbol = ModelElement.Id
+                                                         Select ModelDictionaryEntry
+                                                         Order By ModelDictionaryEntry.Symbol Ascending).ToList
+
+                    Dim larUniqueModelDictionaryEntry = larActualModelDictionaryEntry.Except(larModelDictionaryEntry)
+                    larModelDictionaryEntry.AddRange(larUniqueModelDictionaryEntry)
+                End If
+            Else
+
+                For Each lrModel In Me.zrUnifiedOntology.Model
+
+                    larModelDictionaryEntry = (From Model In larUnifiedOntology.Model
+                                               Where Model.ModelId = lrModel.ModelId
+                                               From ModelDictionaryEntry In Model.ModelDictionary
+                                               Where ModelDictionaryEntry.isValueType Or
+                                                     ModelDictionaryEntry.isEntityType Or
+                                                     ModelDictionaryEntry.isGeneralConcept
+                                               Where Not ModelDictionaryEntry.Symbol.StartsWith("Core")
+                                               Select ModelDictionaryEntry
+                                               Order By ModelDictionaryEntry.Symbol Ascending).ToList
+
+                    Dim lrActualModel = prApplication.Models.Find(Function(x) x.ModelId = lrModel.ModelId)
+
+                    If lrActualModel IsNot Nothing Then
+
+                        Dim larActualModelDictionaryEntry = (From ModelDictionaryEntry In lrActualModel.ModelDictionary
+                                                             Where ModelDictionaryEntry.isValueType Or
+                                                              ModelDictionaryEntry.isEntityType Or
+                                                              ModelDictionaryEntry.isGeneralConcept
+                                                             From ModelElement In lrActualModel.getModelObjects
+                                                             Where Not ModelElement.IsMDAModelElement
+                                                             Where ModelDictionaryEntry.Symbol = ModelElement.Id
+                                                             Where Not larModelDictionaryEntry.Contains(ModelDictionaryEntry)
+                                                             Select ModelDictionaryEntry
+                                                             Order By ModelDictionaryEntry.Symbol Ascending).ToList
+
+                        Dim loDictionaryEntryComparer = New FBM.CustomDictionaryEntryComparer
+                        Dim larUniqueModelDictionaryEntry = larActualModelDictionaryEntry.Except(larModelDictionaryEntry, loDictionaryEntryComparer)
+                        larModelDictionaryEntry.AddRange(larUniqueModelDictionaryEntry)
+                    End If
+
+                    larFinalModelDictionary.Addrange(larModelDictionaryEntry)
+                Next
+            End If
+
+            Dim lrComboBoxItem As tComboboxItem
+            For Each lrModelDictionaryEntry In larFinalModelDictionary
+
+                Dim lsConceptSymbol As String = lrModelDictionaryEntry.Model.Name.CondenseString(15, 7, 5)
+
+                lrComboBoxItem = New tComboboxItem(lrModelDictionaryEntry.Symbol, lrModelDictionaryEntry.Symbol & " - " & lsConceptSymbol, lrModelDictionaryEntry)
+
+                Me.ListBox1.Items.Add(lrComboBoxItem)
+            Next
+
+            Me.ListBox1.Refresh()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -173,36 +288,8 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
-
-    End Sub
-
-    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
-
-        ''Dim items = From it In ListBox1.Items.Cast(Of Object)() _
-        ''    Where it.ToString().IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0
-
-        'If Me.ListBox1.Items.Count < 200 Then
-
-        '    Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
-        '                             From DictionaryEntry In Model.ModelDictionary
-        '                             Where (DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
-        '                                   Or Fastenshtein.Levenshtein.Distance(DictionaryEntry.Symbol, TextBox1.Text) < 4)
-        '                             Where DictionaryEntry.isEntityType Or DictionaryEntry.isValueType
-        '                             Select DictionaryEntry
-
-        '    'Dim matchingItemList As List(Of Object) = items.ToList()
-
-        '    ListBox1.BeginUpdate()
-        '    ListBox1.Items.Clear()
-        '    Dim lrComboBoxItem As tComboboxItem
-        '    For Each DictionaryEntry In larDictionaryEntry 'matchingItemList
-        '        lrComboBoxItem = New tComboboxItem(DictionaryEntry.Symbol, DictionaryEntry.Symbol, DictionaryEntry)
-        '        ListBox1.Items.Add(lrComboBoxItem)
-        '    Next
-        '    ListBox1.EndUpdate()
-        'End If
 
     End Sub
 
@@ -211,15 +298,33 @@ Public Class frmUnifiedOntologyBrowser
         Try
 
             With New WaitCursor
-                Dim larDictionaryEntry = From Model In Me.zrUnifiedOntology.Model
-                                         From DictionaryEntry In Model.ModelDictionary
-                                         Where (DictionaryEntry.Symbol.IndexOf(TextBox1.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
-                                               Or Fastenshtein.Levenshtein.Distance(DictionaryEntry.Symbol, TextBox1.Text) < 4 _
-                                               Or Boston.Soundex(DictionaryEntry.Symbol, 4) = Boston.Soundex(TextBox1.Text, 4))
-                                         Where DictionaryEntry.isEntityType Or DictionaryEntry.isValueType
-                                         Select DictionaryEntry
+                Dim larDictionaryEntry = (From Model In Me.zrUnifiedOntology.Model
+                                          From DictionaryEntry In Model.ModelDictionary
+                                          Where (DictionaryEntry.Symbol.IndexOf(SearchTextbox.TextBox.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                                               Or Fastenshtein.Levenshtein.Distance(DictionaryEntry.Symbol, SearchTextbox.TextBox.Text) < 4 _
+                                               Or Boston.Soundex(DictionaryEntry.Symbol, 4) = Boston.Soundex(SearchTextbox.TextBox.Text, 4))
+                                          Where DictionaryEntry.isEntityType Or DictionaryEntry.isValueType Or DictionaryEntry.isGeneralConcept
+                                          Select DictionaryEntry).ToList
 
-                'Dim matchingItemList As List(Of Object) = items.ToList()
+                For Each lrModel In Me.zrUnifiedOntology.Model
+                    Dim lrActualModel = prApplication.Models.Find(Function(x) x.ModelId = lrModel.ModelId)
+
+                    If lrActualModel IsNot Nothing Then
+
+                        Dim larActualModelDictionaryEntry = (From ModelDictionaryEntry In lrActualModel.ModelDictionary
+                                                             Where ModelDictionaryEntry.isValueType Or
+                                                                   ModelDictionaryEntry.isEntityType Or
+                                                                   ModelDictionaryEntry.isGeneralConcept
+                                                             Where (ModelDictionaryEntry.Symbol.IndexOf(SearchTextbox.TextBox.Text, StringComparison.CurrentCultureIgnoreCase) >= 0 _
+                                                                    Or Fastenshtein.Levenshtein.Distance(ModelDictionaryEntry.Symbol, SearchTextbox.TextBox.Text) < 4 _
+                                                                    Or Boston.Soundex(ModelDictionaryEntry.Symbol, 4) = Boston.Soundex(SearchTextbox.TextBox.Text, 4))
+                                                             Select ModelDictionaryEntry
+                                                             Order By ModelDictionaryEntry.Symbol Ascending).ToList
+
+                        Dim larUniqueModelDictionaryEntry = larActualModelDictionaryEntry.Except(lrModel.ModelDictionary)
+                        larDictionaryEntry.AddRange(larUniqueModelDictionaryEntry)
+                    End If
+                Next
 
                 ListBox1.BeginUpdate()
                 ListBox1.Items.Clear()
@@ -238,7 +343,7 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 
@@ -481,6 +586,12 @@ Public Class frmUnifiedOntologyBrowser
                     Dim lrModelElement As FBM.ModelObject = Nothing
 
                     Select Case lrModelDictionaryEntry.GetModelObjectConceptType
+
+                        Case Is = pcenumConceptType.GeneralConcept
+
+                            lrModelElement = New FBM.ModelObject(lrModelDictionaryEntry.Symbol, pcenumConceptType.GeneralConcept)
+                            lrModelElement.Model = lrModelDictionaryEntry.Model
+
                         Case Is = pcenumConceptType.ValueType
                             Dim lrValueType As FBM.ValueType
                             lrValueType = lrModelDictionaryEntry.Model.ValueType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
@@ -533,6 +644,8 @@ Public Class frmUnifiedOntologyBrowser
 
                     If lrModelElement IsNot Nothing Then
 
+                        Me.mrSelectedModelElement = lrModelElement
+
                         Call Me.DescribeModelElement(lrModelElement)
 
                         Call lrModelElement.GetConceptClassifications()
@@ -556,7 +669,7 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -564,41 +677,147 @@ Public Class frmUnifiedOntologyBrowser
     Public Sub DescribeModelElement(ByVal arModelElement As FBM.ModelObject)
 
         Try
-            Select Case arModelElement.Model.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
-                Case Is = pcenumConceptType.EntityType
-                    Dim lrEntityType As FBM.EntityType
-                    lrEntityType = arModelElement.Model.GetModelObjectByName(arModelElement.Id)
-                    Call Me.VerbaliseEntityType(lrEntityType)
+            Me.mrSelectedModelElement = arModelElement
 
-                Case Is = pcenumConceptType.ValueType
-                    Dim lrValueType As FBM.ValueType
-                    lrValueType = arModelElement.Model.GetModelObjectByName(arModelElement.Id)
-                    Call Me.VerbaliseValueType(lrValueType)
+            With New WaitCursor
+                If arModelElement.ConceptType = pcenumConceptType.GeneralConcept Then
 
-                Case Is = pcenumConceptType.FactType
-                    Dim lrFactType As FBM.FactType
-                    lrFactType = arModelElement.Model.GetModelObjectByName(arModelElement.Id)
-                    Call Me.VerbaliseFactType(lrFactType)
-                Case Is = pcenumConceptType.GeneralConcept
-                    Call Me.VerbaliseGeneralConcept(arModelElement.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
-            End Select
+                    Dim lrDictionaryEntry As FBM.DictionaryEntry = arModelElement.Model.ModelDictionary.Find(Function(x) x.Symbol = arModelElement.Id)
+                    Call Me.VerbaliseGeneralConcept(lrDictionaryEntry)
+
+                Else
+                    Select Case arModelElement.Model.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
+                        Case Is = pcenumConceptType.EntityType
+                            Dim lrEntityType As FBM.EntityType
+                            lrEntityType = arModelElement.Model.GetModelObjectByName(arModelElement.Id)
+                            Call Me.VerbaliseEntityType(lrEntityType)
+
+                        Case Is = pcenumConceptType.ValueType
+                            Dim lrValueType As FBM.ValueType
+                            lrValueType = arModelElement.Model.GetModelObjectByName(arModelElement.Id)
+                            Call Me.VerbaliseValueType(lrValueType)
+
+                        Case Is = pcenumConceptType.FactType
+                            Dim lrFactType As FBM.FactType
+                            lrFactType = arModelElement.Model.GetModelObjectByName(arModelElement.Id)
+                            Call Me.VerbaliseFactType(lrFactType)
+                        Case Is = pcenumConceptType.GeneralConcept
+                            Call Me.VerbaliseGeneralConcept(arModelElement.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
+                    End Select
+
+                End If
+            End With
 
             '-----------------------------------------------
             If arModelElement Is Nothing Then
                 '-----------------------------------------------------------------
                 'Clear the ORMDiagramView
-                Me.zrFrmORMDiagramViewer.clear_diagram()
+                Me.mrFrmORMDiagramViewer.clear_diagram()
 
                 '==============================================================
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
                     Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                     lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
                     lrPropertyGridForm.PropertyGrid.SelectedObject = arModelElement.Model.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id))
                 End If
             Else
-                'Call Me.DisplayORMDiagramViewForModelObject(arModelElement)
+                Call Me.DisplayORMDiagramViewForModelObject(arModelElement)
+            End If
+
+            Me.mbORMViewExpanded = False
+            Me.ToolStripDropDownButton2.Image = My.Resources.MenuImages.Expand16x16
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+    End Sub
+
+    Private Sub DisplayORMDiagramViewForModelObject(ByRef arModelElement As FBM.ModelObject)
+
+        Try
+            Me.mrFrmORMDiagramViewer.zrPage = New FBM.Page(arModelElement.Model, Nothing, "Ontology Page", pcenumLanguage.ORMModel)
+            Me.mrFrmORMDiagramViewer.zrPage.DiagramView = Me.mrFrmORMDiagramViewer.DiagramView
+            Me.mrFrmORMDiagramViewer.zrPage.Diagram = Me.mrFrmORMDiagramViewer.Diagram
+            Me.mrFrmORMDiagramViewer.zrPage.Form = Me.mrFrmORMDiagramViewer
+
+            'Clear the ORM Diagram View's Page/Diagram
+            Call Me.mrFrmORMDiagramViewer.zrPage.ClearFast(True)
+
+            '==============================================================
+            Dim loPt As New PointF(50, 50)
+
+            Select Case arModelElement.ConceptType
+                Case Is = pcenumConceptType.ValueType
+                    Dim lrValueType As FBM.ValueType
+                    lrValueType = arModelElement
+                    Call mrFrmORMDiagramViewer.zrPage.DropValueTypeAtPoint(lrValueType, loPt)
+                    Call mrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrValueType)
+                Case Is = pcenumConceptType.EntityType
+                    Dim lrEntityType As FBM.EntityType
+                    lrEntityType = arModelElement
+                    Dim larSuptypeRelationship = From EntityType In arModelElement.Model.EntityType
+                                                 From SubtypeRelationship In EntityType.SubtypeRelationship
+                                                 Where EntityType.Id = lrEntityType.Id
+                                                 Select SubtypeRelationship
+
+                    For Each lrSubtypeRelationship In larSuptypeRelationship
+                        If Not mrFrmORMDiagramViewer.zrPage.ContainsModelElement(lrSubtypeRelationship.parentModelElement) Then
+                            Select Case lrSubtypeRelationship.parentModelElement.ConceptType
+                                Case Is = pcenumConceptType.EntityType
+                                    Call mrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrSubtypeRelationship.parentModelElement, New PointF(30, 30))
+                            End Select
+                        End If
+                    Next
+
+                    Call mrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt)
+                    Call mrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrEntityType)
+                Case Is = pcenumConceptType.FactType
+                    Dim lrFactType As FBM.FactType
+                    lrFactType = arModelElement
+                    Call mrFrmORMDiagramViewer.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False,,,,,,,, True)
+                Case Is = pcenumConceptType.RoleConstraint
+                    Dim lrRoleConstraint As FBM.RoleConstraint
+                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+
+                    lrRoleConstraint = arModelElement
+
+                    Select Case lrRoleConstraint.RoleConstraintType
+                        Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+                            lrRoleConstraintInstance = mrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                        Case Is = pcenumRoleConstraintType.RingConstraint,
+                                  pcenumRoleConstraintType.EqualityConstraint,
+                                  pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                  pcenumRoleConstraintType.ExclusiveORConstraint,
+                                  pcenumRoleConstraintType.ExclusionConstraint,
+                                  pcenumRoleConstraintType.SubsetConstraint
+                            lrRoleConstraintInstance = mrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                        Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                            Call mrFrmORMDiagramViewer.DropFrequencyConstraintAtPoint(lrRoleConstraint, loPt)
+                    End Select
+            End Select
+
+            Dim larSuptypeRelationshipInstance = From EntityTypeInstance In Me.mrFrmORMDiagramViewer.zrPage.EntityTypeInstance
+                                                 From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
+                                                 Select SubtypeRelationshipInstance
+
+
+            For Each lrSubtypeRelationship In larSuptypeRelationshipInstance
+                Call lrSubtypeRelationship.DisplayAndAssociate()
+            Next
+
+            Call mrFrmORMDiagramViewer.AutoLayoutSimple()
+            mrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
+            mrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
+            mrFrmORMDiagramViewer.DiagramView.ZoomToFit()
+            If mrFrmORMDiagramViewer.DiagramView.ZoomFactor > 150 Then
+                mrFrmORMDiagramViewer.DiagramView.ZoomFactor = 150
             End If
 
         Catch ex As Exception
@@ -607,84 +826,8 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
-    End Sub
-
-    Private Sub DisplayORMDiagramViewForModelObject(ByRef arModelElement As FBM.ModelObject)
-
-        'Clear the ORM Diagram View's Page/Diagram
-        Call zrFrmORMDiagramViewer.zrPage.ClearFast(True)
-
-        '==============================================================
-        Dim loPt As New PointF(50, 50)
-
-        Select Case arModelElement.ConceptType
-            Case Is = pcenumConceptType.ValueType
-                Dim lrValueType As FBM.ValueType
-                lrValueType = arModelElement
-                Call zrFrmORMDiagramViewer.zrPage.DropValueTypeAtPoint(lrValueType, loPt)
-                Call zrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrValueType)
-            Case Is = pcenumConceptType.EntityType
-                Dim lrEntityType As FBM.EntityType
-                lrEntityType = arModelElement
-                Dim larSuptypeRelationship = From EntityType In arModelElement.Model.EntityType
-                                             From SubtypeRelationship In EntityType.SubtypeRelationship
-                                             Where EntityType.Id = lrEntityType.Id
-                                             Select SubtypeRelationship
-
-                For Each lrSubtypeRelationship In larSuptypeRelationship
-                    If Not zrFrmORMDiagramViewer.zrPage.ContainsModelElement(lrSubtypeRelationship.parentModelElement) Then
-                        Select Case lrSubtypeRelationship.parentModelElement.ConceptType
-                            Case Is = pcenumConceptType.EntityType
-                                Call zrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrSubtypeRelationship.parentModelElement, New PointF(30, 30))
-                        End Select
-                    End If
-                Next
-
-                Call zrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt)
-                Call zrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrEntityType)
-            Case Is = pcenumConceptType.FactType
-                Dim lrFactType As FBM.FactType
-                lrFactType = arModelElement
-                Call zrFrmORMDiagramViewer.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False)
-            Case Is = pcenumConceptType.RoleConstraint
-                Dim lrRoleConstraint As FBM.RoleConstraint
-                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-
-                lrRoleConstraint = arModelElement
-
-                Select Case lrRoleConstraint.RoleConstraintType
-                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                        lrRoleConstraintInstance = zrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
-                    Case Is = pcenumRoleConstraintType.RingConstraint,
-                              pcenumRoleConstraintType.EqualityConstraint,
-                              pcenumRoleConstraintType.ExternalUniquenessConstraint,
-                              pcenumRoleConstraintType.ExclusiveORConstraint,
-                              pcenumRoleConstraintType.ExclusionConstraint,
-                              pcenumRoleConstraintType.SubsetConstraint
-                        lrRoleConstraintInstance = zrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
-                    Case Is = pcenumRoleConstraintType.FrequencyConstraint
-                        Call zrFrmORMDiagramViewer.DropFrequencyConstraintAtPoint(lrRoleConstraint, loPt)
-                End Select
-        End Select
-
-        Dim larSuptypeRelationshipInstance = From EntityTypeInstance In Me.zrFrmORMDiagramViewer.zrPage.EntityTypeInstance
-                                             From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
-                                             Select SubtypeRelationshipInstance
-
-
-        For Each lrSubtypeRelationship In larSuptypeRelationshipInstance
-            Call lrSubtypeRelationship.DisplayAndAssociate()
-        Next
-
-        Call zrFrmORMDiagramViewer.AutoLayout()
-        zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
-        zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
-        zrFrmORMDiagramViewer.DiagramView.ZoomToFit()
-        If zrFrmORMDiagramViewer.DiagramView.ZoomFactor > 150 Then
-            zrFrmORMDiagramViewer.DiagramView.ZoomFactor = 150
-        End If
 
     End Sub
 
@@ -696,8 +839,8 @@ Public Class frmUnifiedOntologyBrowser
         liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height
 
         Me.SplitContainer2.SplitterDistance = liHeight
-        zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
-        zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
+        mrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
+        mrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         '===================================================================================
 
     End Sub
@@ -707,6 +850,11 @@ Public Class frmUnifiedOntologyBrowser
         Call lrVerbaliser.Reset()
 
         lrVerbaliser.VerbaliseHeading(arDictionaryEntry.Symbol)
+        lrVerbaliser.VerbaliseQuantifier(" is an General Concept.")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.VerbaliseIndent()
+        lrVerbaliser.VerbaliseError("Change this General Concept to an Object Type as soon as possible.")
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.VerbaliseQuantifier("Informally: ")
@@ -722,8 +870,10 @@ Public Class frmUnifiedOntologyBrowser
             lrVerbaliser.VerbaliseQuantifier("(Long Description) ")
             lrVerbaliser.VerbaliseQuantifierLight(arDictionaryEntry.LongDescription)
         End If
-
-
+        If arDictionaryEntry.ShortDescription.Trim = "" And arDictionaryEntry.LongDescription.Trim = "" Then
+            lrVerbaliser.VerbaliseIndent()
+            lrVerbaliser.VerbaliseQuantifierLight("There is no Short or Long Description for this Model Element yet.")
+        End If
 
         Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
@@ -1084,7 +1234,7 @@ Public Class frmUnifiedOntologyBrowser
 
                     lrFactTypeReading = arFactType.FindSuitableFactTypeReadingByRoles(larRole)
 
-                    If IsSomething(lrFactTypeReading) Then
+                    If lrFactTypeReading IsNot Nothing Then
 
                         lrVerbaliser.VerbaliseQuantifier("Each ")
                         lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject)
@@ -1131,7 +1281,7 @@ Public Class frmUnifiedOntologyBrowser
                     lrVerbaliser.VerbaliseQuantifier(" combination ")
 
                     For Each lrRole In arFactType.RoleGroup
-                        If Not IsSomething(lrRoleConstraint.Role.Find(AddressOf lrRole.Equals)) Then
+                        If Not lrRoleConstraint.Role.Find(AddressOf lrRole.Equals) IsNot Nothing Then
                             lrVerbaliser.VerbaliseQuantifier("is unique and relates to exactly one instance of ")
                             lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
                         End If
@@ -1178,14 +1328,14 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
 
     Private Sub frmGlossary_MenuStart(sender As Object, e As EventArgs) Handles Me.MenuStart
 
-        zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
+        mrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
 
     End Sub
 
@@ -1193,129 +1343,141 @@ Public Class frmUnifiedOntologyBrowser
 
         Dim lasURLArgument() As String
         Dim lsModelObjectName As String
+        Dim lrModelElement As FBM.ModelObject
 
-        lasURLArgument = e.Url.ToString.Split(":")
+        Try
 
-        If lasURLArgument(0) = "elementid" Then
+            lasURLArgument = e.Url.ToString.Split(":")
 
-            lsModelObjectName = lasURLArgument(1)
+            If lasURLArgument(0) = "elementid" Then
 
-            Dim lrModelElement As FBM.ModelObject
+                lsModelObjectName = lasURLArgument(1)
 
-            lrModelElement = Me.mrWebBrowserModel.GetModelObjectByName(lsModelObjectName)
+                lrModelElement = Me.mrWebBrowserModel.GetModelObjectByName(lsModelObjectName)
 
-            If lrModelElement Is Nothing Then
+                If lrModelElement Is Nothing Then
 #Region "Get ModelDictionaryEntry from Model"
 
-                Dim lrModelDictionaryEntry As FBM.DictionaryEntry
+                    Dim lrModelDictionaryEntry As FBM.DictionaryEntry
 
-                Try
-                    lrModelDictionaryEntry = (From ModelDictionaryEntry In Me.mrWebBrowserModel.ModelDictionary
-                                              Where ModelDictionaryEntry.Symbol = lsModelObjectName
-                                              Select ModelDictionaryEntry).First
-                Catch ex As Exception
-                    Exit Sub
-                End Try
+                    Try
+                        lrModelDictionaryEntry = (From ModelDictionaryEntry In Me.mrWebBrowserModel.ModelDictionary
+                                                  Where ModelDictionaryEntry.Symbol = lsModelObjectName
+                                                  Select ModelDictionaryEntry).First
+                    Catch ex As Exception
+                        Exit Sub
+                    End Try
 
-                Select Case lrModelDictionaryEntry.GetModelObjectConceptType
-                    Case Is = pcenumConceptType.ValueType
-                        Dim lrValueType As FBM.ValueType
-                        lrValueType = lrModelDictionaryEntry.Model.ValueType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
+                    Select Case lrModelDictionaryEntry.GetModelObjectConceptType
+                        Case Is = pcenumConceptType.ValueType
+                            Dim lrValueType As FBM.ValueType
+                            lrValueType = lrModelDictionaryEntry.Model.ValueType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
 
-                        If lrValueType Is Nothing Then
-                            lrValueType = New FBM.ValueType(lrModelDictionaryEntry.Model,
-                                                                pcenumLanguage.ORMModel,
-                                                                lrModelDictionaryEntry.Symbol,
-                                                                lrModelDictionaryEntry.Symbol)
+                            If lrValueType Is Nothing Then
+                                lrValueType = New FBM.ValueType(lrModelDictionaryEntry.Model,
+                                                                    pcenumLanguage.ORMModel,
+                                                                    lrModelDictionaryEntry.Symbol,
+                                                                    lrModelDictionaryEntry.Symbol)
 
-                            lrValueType.Model.ValueType.Add(TableValueType.GetValueTypeDetails(lrValueType))
-                        End If
+                                lrValueType.Model.ValueType.Add(TableValueType.GetValueTypeDetails(lrValueType))
+                            End If
 
-                        lrModelElement = lrValueType
+                            lrModelElement = lrValueType
 
-                        'Load the related FactTypes.
-                        lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
-                        Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrValueType, True)
+                            'Load the related FactTypes.
+                            lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
+                            Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrValueType, True)
 
-                    Case Is = pcenumConceptType.EntityType
-                        Dim lrEntityType As FBM.EntityType
+                        Case Is = pcenumConceptType.EntityType
+                            Dim lrEntityType As FBM.EntityType
 
-                        lrEntityType = lrModelDictionaryEntry.Model.EntityType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
+                            lrEntityType = lrModelDictionaryEntry.Model.EntityType.Find(Function(x) x.Id = lrModelDictionaryEntry.Symbol)
 
-                        If lrEntityType Is Nothing Then
-                            lrEntityType = New FBM.EntityType(lrModelDictionaryEntry.Model,
-                                                                  pcenumLanguage.ORMModel,
-                                                                  lrModelDictionaryEntry.Symbol,
-                                                                  Nothing,
-                                                                  True)
-                            lrEntityType = TableEntityType.GetEntityTypeDetails(lrEntityType)
-                            lrEntityType.Model.EntityType.AddUnique(lrEntityType)
+                            If lrEntityType Is Nothing Then
+                                lrEntityType = New FBM.EntityType(lrModelDictionaryEntry.Model,
+                                                                      pcenumLanguage.ORMModel,
+                                                                      lrModelDictionaryEntry.Symbol,
+                                                                      Nothing,
+                                                                      True)
+                                lrEntityType = TableEntityType.GetEntityTypeDetails(lrEntityType)
+                                lrEntityType.Model.EntityType.AddUnique(lrEntityType)
 
-                            Call lrEntityType.Model.LoadEntityTypesReferenceSchemeModelElements(lrEntityType)
-                            Call lrEntityType.SetReferenceModeObjects()
-                            Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrEntityType, True)
-                        End If
+                                Call lrEntityType.Model.LoadEntityTypesReferenceSchemeModelElements(lrEntityType)
+                                Call lrEntityType.SetReferenceModeObjects()
+                                Call TableSubtypeRelationship.GetSubtypeRelationshipsForModelElementByModel(lrEntityType, True)
+                            End If
 
 
-                        lrModelElement = lrEntityType
+                            lrModelElement = lrEntityType
 
-                        'Load the related FactTypes.
-                        lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
-                    Case Else
-                        lrModelElement = Nothing
-                End Select
+                            'Load the related FactTypes.
+                            lrModelDictionaryEntry.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
+                        Case Else
+                            lrModelElement = Nothing
+                    End Select
 #End Region
-            Else
-                lrModelElement.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
+                Else
+                    lrModelElement.Model.LoadFactTypesRelatedToModelElement(lrModelElement, True)
+                End If
+
+                'CodeSafe
+                If lrModelElement Is Nothing Then Exit Sub
+
+                Me.mrSelectedModelElement = lrModelElement
+
+                Select Case lrModelElement.ConceptType
+                    Case Is = pcenumConceptType.ValueType
+                        Call Me.VerbaliseValueType(lrModelElement)
+                    Case Is = pcenumConceptType.EntityType
+                        Call Me.VerbaliseEntityType(lrModelElement)
+                    Case Is = pcenumConceptType.FactType
+                        Call Me.VerbaliseFactType(lrModelElement)
+                    Case Is = pcenumConceptType.RoleConstraint
+                        'TBA
+                End Select
+
+                Call Me.DisplayORMDiagramViewForModelObject(lrModelElement)
+
+                SearchTextbox.TextBox.Text = ""
+                'Call Me.LoadGlossaryListbox()
+                If Me.ListBox1.Items.Contains(lrModelElement.Id) Then
+                    Me.ListBox1.SelectedIndex = Me.ListBox1.FindString(lrModelElement.Id)
+                End If
+
+                '------------------------------------------------------------------------------------------
+                'Cancel the Navigation so that the new verbalisation isn't wiped out.
+                '  i.e. Because the Navication (e.URL) isn't to an actual URL, an error WebPage is shown,
+                '  rather than the new Verbalisation. Cancelling the Navigation fixes this.
+                '------------------------------------------------------------------------------------------
+                e.Cancel = True
+
             End If
 
-            'CodeSafe
-            If lrModelElement Is Nothing Then Exit Sub
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            Select Case lrModelElement.ConceptType
-                Case Is = pcenumConceptType.ValueType
-                    Call Me.VerbaliseValueType(lrModelElement)
-                Case Is = pcenumConceptType.EntityType
-                    Call Me.VerbaliseEntityType(lrModelElement)
-                Case Is = pcenumConceptType.FactType
-                    Call Me.VerbaliseFactType(lrModelElement)
-                Case Is = pcenumConceptType.RoleConstraint
-                    'TBA
-            End Select
-
-            'Call Me.DisplayORMDiagramViewForModelObject(lrModelObject)
-
-            Me.TextBox1.Text = ""
-            'Call Me.LoadGlossaryListbox()
-            If Me.ListBox1.Items.Contains(lrModelElement.Id) Then
-                Me.ListBox1.SelectedIndex = Me.ListBox1.FindString(lrModelElement.Id)
-            End If
-
-            '------------------------------------------------------------------------------------------
-            'Cancel the Navigation so that the new verbalisation isn't wiped out.
-            '  i.e. Because the Navication (e.URL) isn't to an actual URL, an error WebPage is shown,
-            '  rather than the new Verbalisation. Cancelling the Navigation fixes this.
-            '------------------------------------------------------------------------------------------
-            e.Cancel = True
-
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
     Private Sub frmGlossary_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
 
-        If IsSomething(zrFrmORMDiagramViewer) Then
-            zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
-            zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
+        If mrFrmORMDiagramViewer IsNot Nothing Then
+            mrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
+            mrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         End If
 
     End Sub
 
     Private Sub SplitContainer2_SplitterMoved(sender As Object, e As SplitterEventArgs) Handles SplitContainer2.SplitterMoved
 
-        If IsSomething(zrFrmORMDiagramViewer) Then
-            zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
-            zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
+        If mrFrmORMDiagramViewer IsNot Nothing Then
+            mrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
+            mrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         End If
 
     End Sub
@@ -1333,7 +1495,7 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1352,18 +1514,26 @@ Public Class frmUnifiedOntologyBrowser
                 Exit Sub
             End If
 
+            Dim lrCopyPage As New FBM.Page(lrModelDictionaryEntry.Model, "CopyPage", "CopyPage", pcenumLanguage.ORMModel)
+
             '--------------------------------------------------------------------------------
-            'Load the ORMDiagrams that relate to the ModelElement as selectable menuOptions
+            'Load the Pages/ORMDiagrams that relate to the ModelElement as selectable menuOptions
             '--------------------------------------------------------------------------------
+#Region "Pages"
             lrModel = lrModelDictionaryEntry.Model
             Select Case lrModelDictionaryEntry.GetModelObjectConceptType
                 Case Is = pcenumConceptType.ValueType
                     Dim lrValueType As New FBM.ValueType(lrModel, pcenumLanguage.ORMModel, lrModelDictionaryEntry.Symbol, True)
 
                     larPage = TableConceptInstance.getPagesContainingDictionaryEntry(lrModelDictionaryEntry)
-                    For Each lrPage In prApplication.CMML.getSTDDiagramPagesForValueType(lrValueType)
+                    For Each lrPage In prApplication.CMML.getStateTransitionDiagramPagesForValueType(lrValueType)
                         larPage.AddUnique(lrPage)
                     Next
+
+                    '-------------------------------------------------------------------
+                    'Add to CopyPage, so can copy to another Model if the user wants
+                    lrCopyPage.SelectedObject.Add(lrValueType.CloneInstance(lrCopyPage, True))
+
                 Case Is = pcenumConceptType.EntityType
                     Dim lrEntityType As New FBM.EntityType(lrModel, pcenumLanguage.ORMModel, lrModelDictionaryEntry.Symbol, Nothing, True)
 
@@ -1371,6 +1541,11 @@ Public Class frmUnifiedOntologyBrowser
                     For Each lrPage In prApplication.CMML.getORMDiagramPagesForEntityType(lrEntityType)
                         larPage.AddUnique(lrPage)
                     Next
+
+                    '-------------------------------------------------------------------
+                    'Add to CopyPage, so can copy to another Model if the user wants
+                    lrCopyPage.SelectedObject.Add(lrEntityType.CloneInstance(lrCopyPage, True, True))
+
                 Case Is = pcenumConceptType.FactType
             End Select
 
@@ -1389,6 +1564,31 @@ Public Class frmUnifiedOntologyBrowser
                 loMenuOption.Tag = lrModel.Page.Find(Function(x) x.PageId = lrPage.PageId)
                 AddHandler loMenuOption.Click, AddressOf Me.OpenORMModelPage
             Next
+#End Region 'Pages
+
+            '----------------------------------------------------------------------------------------
+            'Load the Pages/ORMDiagrams that relate to the ModelElement as selectable menuOptions
+            '--------------------------------------------------------------------------------
+            Me.ToolStripMenuItemCopyToModel.DropDownItems.Clear()
+            Call frmMain.CopySelectedObjectsToClipboard(lrCopyPage)
+
+            '-------------------------------------------------------------------------------------------------
+            'The user can copy the ModelElement to another Model
+            '  Add the list of Models to the two respective menu items. One within the Glossary, and one within the Verbalisation view.
+            For Each lrModel In Me.zrUnifiedOntology.Model.FindAll(Function(x) x.ModelId <> lrModelDictionaryEntry.Model.ModelId)
+                '---------------------------------------------------
+                'Add the Model(Name) to the MenuOption.DropDownItems
+                '---------------------------------------------------
+                loMenuOption = Me.ToolStripMenuItemCopyToModel.DropDownItems.Add(lrModel.Name, My.Resources.MenuImages.ORM16x16)
+                Dim lrCopyToPage As New FBM.Page(lrModel, "CopyToPage", "CopyToPage", pcenumLanguage.ORMModel)
+                loMenuOption.Tag = New With {.Model = lrModel}
+                AddHandler loMenuOption.Click, AddressOf Me.CopyModelElementToModel
+
+                loMenuOption = Me.ToolStripMenuItemCopyModelElementToModel.DropDownItems.Add(lrModel.Name, My.Resources.MenuImages.ORM16x16)
+                lrCopyToPage = New FBM.Page(lrModel, "CopyToPage", "CopyToPage", pcenumLanguage.ORMModel)
+                loMenuOption.Tag = New With {.Model = lrModel}
+                AddHandler loMenuOption.Click, AddressOf Me.CopyModelElementToModel
+            Next
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1396,7 +1596,43 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        End Try
+
+    End Sub
+
+    Private Sub CopyModelElementToModel(ByVal sender As Object, ByVal e As EventArgs)
+
+        Try
+
+            Dim loSenderItem As ToolStripItem = CType(sender, ToolStripItem)
+
+            Dim lrModel As FBM.Model = loSenderItem.Tag.Model 'The prototype of the Model to copy to. Not the actual model in prApplication.Models (as in the Model Explorer)
+
+            Dim lrCopyToModel As FBM.Model = prApplication.Models.Find(Function(x) x.ModelId = lrModel.ModelId)
+            Dim lrCopyToPage As New FBM.Page(lrCopyToModel, "CopyToPage", "CopyToPage", pcenumLanguage.ORMModel)
+
+            If MsgBox("Are you sure you want to copy the selected Model Element to the Model, " & lrModel.Name & "?", MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                If Not lrCopyToModel.Loaded Then
+                    Boston.ShowFlashCard("Loading the Model, " & lrCopyToModel.Name, Color.LightGray)
+                    With New WaitCursor
+                        Call lrCopyToModel.Load(True)
+                    End With
+                End If
+
+                'Page with ModelElement is in Clipboard, per the Opening method of the ContextMenuItem.
+                Call frmMain.PasteToPageFromClipboard(lrCopyToModel, lrCopyToPage)
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1415,8 +1651,9 @@ Public Class frmUnifiedOntologyBrowser
                 lrPage = lrToolStripItem.Tag
                 prApplication.WorkingPage = lrPage
 
-                If Not lrPage.Loaded Then
+                If Not lrPage.Loaded Or lrPage.GetAllPageObjects.Count = 0 Then
                     Call lrPage.Model.loadModelLevelModelElementsForPage(lrPage)
+                    lrPage.Loaded = False
                     Call lrPage.Load(True) 'Load and add to Model
                 End If
 
@@ -1444,7 +1681,7 @@ Public Class frmUnifiedOntologyBrowser
 
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 End Try
             End With
 
@@ -1454,7 +1691,7 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1517,12 +1754,12 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
 
-    Private Sub ButtonSearch_Click(sender As Object, e As EventArgs) Handles ButtonSearch.Click
+    Private Sub SearchTextbox_InitiateSearch(asSearchString As String) Handles SearchTextbox.InitiateSearch
 
         Try
             Call Me.ShowSelectedItem()
@@ -1533,27 +1770,10 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
-        End Try
-
-    End Sub
-
-    Private Sub TextBox1_KeyDown(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyDown
-
-        Try
-            If e.KeyCode = Keys.Enter Then
-                Call Me.ShowSelectedItem()
-            End If
-
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
+
 
     Private Sub frmUnifiedOntologyBrowser_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
 
@@ -1567,7 +1787,291 @@ Public Class frmUnifiedOntologyBrowser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
+
+    Private Sub DataLineageToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DataLineageToolStripMenuItem.Click
+
+        Dim lrModelDictionaryEntry As FBM.DictionaryEntry
+        Dim lrModelElement As FBM.ModelObject
+
+        Try
+            If Me.ListBox1.SelectedIndex >= 0 Then
+                lrModelDictionaryEntry = ListBox1.SelectedItem.Tag
+            Else
+                Exit Sub
+            End If
+
+            Try
+                Dim lrModel As FBM.Model = lrModelDictionaryEntry.Model
+
+                Try
+                    If lrModelDictionaryEntry.isGeneralConcept Then
+                        lrModelElement = New FBM.ModelObject(lrModelDictionaryEntry.Symbol, pcenumConceptType.GeneralConcept)
+                        lrModelElement.Model = lrModel
+                    Else
+                        lrModelElement = lrModel.GetModelObjectByName(lrModelDictionaryEntry.Symbol, True)
+                    End If
+
+                    If lrModelElement Is Nothing Then Throw New Exception("trip")
+                Catch ex As Exception
+                    Throw ex
+                End Try
+
+                If lrModelElement Is Nothing Then Throw New Exception("Couldn't find Model Element for: " & Me.ListBox1.Text)
+            Catch
+                Exit Sub
+            End Try
+
+            Call frmMain.LoadDataLineageForm(lrModelElement)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
+
+        Try
+            Me.ComboBoxModel.SelectedIndex = 0
+            Call Me.ShowGlossary(Me.zrUnifiedOntology)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ComboBoxModel_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxModel.SelectedIndexChanged
+
+        Try
+            Call Me.ShowGlossary(Me.zrUnifiedOntology, Me.ComboBoxModel.SelectedItem.Tag)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CopyToClipboardToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CopyToClipboardToolStripMenuItem.Click
+
+        Try
+            Try
+                Clipboard.Clear()
+                Dim selectionText As String = WebBrowser.Document.Body.InnerText
+                'Clipboard.SetText(selectionText)
+                Clipboard.SetData(DataFormats.Text, CType(selectionText, Object))
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripDropDownButton2_Click(sender As Object, e As EventArgs) Handles ToolStripDropDownButton2.Click
+
+        Me.mbORMViewExpanded = Not Me.mbORMViewExpanded
+
+        Try
+
+            If Me.mbORMViewExpanded Then
+                Me.SplitContainer2.SplitterDistance = Me.SplitContainer2.Height / 4
+                Me.ToolStripDropDownButton2.Image = My.Resources.MenuImages.Collapse16x16
+
+                prApplication.WorkingPage = Me.mrFrmORMDiagramViewer.zrPage
+                frmMain.ToolStripComboBox_zoom.SelectedIndex = 3
+                Me.mrFrmORMDiagramViewer.zrPage.DiagramView.ZoomFactor = frmMain.ToolStripComboBox_zoom.SelectedItem.ItemData
+            Else
+                Dim liHeight As Integer = Me.WebBrowser.Height - 1
+
+                Me.SplitContainer2.SplitterDistance = 0
+
+                liHeight = Me.WebBrowser.Document.Body.ScrollRectangle.Height + 22 'StatusBar Height=22
+
+                Me.SplitContainer2.SplitterDistance = liHeight
+                Me.mrFrmORMDiagramViewer.DiagramView.ZoomFactor = 80
+                Me.ToolStripDropDownButton2.Image = My.Resources.MenuImages.Expand16x16
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub SplitContainer2_Paint(sender As Object, e As PaintEventArgs) Handles SplitContainer2.Paint
+
+        Try
+            Dim s As SplitContainer = TryCast(sender, SplitContainer)
+
+            If s IsNot Nothing Then
+                Dim top As Integer = 5
+                Dim bottom As Integer = s.Height - 5
+                Dim left As Integer = s.SplitterDistance
+                Dim right As Integer = left + s.SplitterWidth - 1
+                e.Graphics.FillRectangle(Brushes.LightGray, s.SplitterRectangle)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub SplitContainer1_Paint(sender As Object, e As PaintEventArgs) Handles SplitContainer1.Paint
+
+        Try
+            Dim s As SplitContainer = TryCast(sender, SplitContainer)
+
+            If s IsNot Nothing Then
+                Dim top As Integer = 5
+                Dim bottom As Integer = s.Height - 5
+                Dim left As Integer = s.SplitterDistance
+                Dim right As Integer = left + s.SplitterWidth - 1
+                e.Graphics.FillRectangle(Brushes.LightGray, s.SplitterRectangle)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ModelElementToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ModelElementToolStripMenuItem.Click
+
+        Try
+            Dim loMenuOption As ToolStripMenuItem
+
+            'CodeSafe
+            If Me.mrSelectedModelElement Is Nothing Then Exit Sub
+
+            Me.ToolStripMenuItemCopyModelElementToModel.DropDownItems.Clear()
+
+            Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.mrSelectedModelElement.Model, Me.mrSelectedModelElement.Id, Me.mrSelectedModelElement.ConceptType)
+
+            Dim lrCopyPage As New FBM.Page(Me.mrSelectedModelElement.Model, System.Guid.NewGuid.ToString, "CopyToPage", pcenumLanguage.ORMModel)
+            lrCopyPage.SelectedObject.Clear()
+            Select Case Me.mrSelectedModelElement.GetType
+                Case Is = GetType(FBM.ValueType)
+                    lrCopyPage.SelectedObject.Add(CType(Me.mrSelectedModelElement, FBM.ValueType).CloneInstance(lrCopyPage, True, True))
+                Case = GetType(FBM.EntityType)
+                    lrCopyPage.SelectedObject.Add(CType(Me.mrSelectedModelElement, FBM.EntityType).CloneInstance(lrCopyPage, True, True, True))
+                Case Is = GetType(FBM.FactType)
+                    lrCopyPage.SelectedObject.Add(CType(Me.mrSelectedModelElement, FBM.FactType).CloneInstance(lrCopyPage, True, True))
+            End Select
+
+            Call frmMain.CopySelectedObjectsToClipboard(lrCopyPage)
+
+            For Each lrModel In Me.zrUnifiedOntology.Model.FindAll(Function(x) x.ModelId <> lrModelDictionaryEntry.Model.ModelId)
+                '---------------------------------------------------
+                'Add the Model(Name) to the MenuOption.DropDownItems
+                '---------------------------------------------------
+                loMenuOption = Me.ToolStripMenuItemCopyModelElementToModel.DropDownItems.Add(lrModel.Name, My.Resources.MenuImages.ORM16x16)
+                Dim lrCopyToPage As New FBM.Page(lrModel, "CopyToPage", "CopyToPage", pcenumLanguage.ORMModel)
+                loMenuOption.Tag = New With {.Model = lrModel}
+                AddHandler loMenuOption.Click, AddressOf Me.CopyModelElementToModel
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub RadioButtonShadeDuplicates_Click(sender As Object, e As EventArgs) Handles RadioButtonShadeDuplicates.Click
+
+        Try
+            Me.RadioButtonShadeDuplicates.Checked = Not Me.RadioButtonShadeDuplicates.Checked
+            Me.RadioButtonShadeDuplicates.AutoCheck = False
+            Me.RadioButtonShadeDuplicates.Refresh()
+            Me.mbShadeDuplicates = Me.RadioButtonShadeDuplicates.Checked
+            Me.ListBox1.Refresh()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub CloseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CloseToolStripMenuItem.Click
+
+        Try
+
+            Me.Hide()
+            Me.Close()
+            Me.Dispose()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub MenuStripModelElement_ItemClicked(sender As Object, e As ToolStripItemClickedEventArgs) Handles MenuStripModelElement.ItemClicked
+
+        Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

@@ -43,7 +43,7 @@ Namespace FBM
                 Me.RoleConstraint.SetName(Me.Name)
             End If
 
-            If IsSomething(aoChangedPropertyItem) Then
+            If aoChangedPropertyItem IsNot Nothing Then
                 Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                     Case Is = "ShortDescription"
                         Me.RoleConstraint.ShortDescription = Me.ShortDescription
@@ -176,7 +176,7 @@ Namespace FBM
 
         Public Overloads Sub SetAppropriateColour()
 
-            If IsSomething(Me.Shape) Then
+            If Me.Shape IsNot Nothing Then
                 If Me.Shape.Selected Then
                     Me.Shape.Pen.Color = Color.Blue
                 Else

@@ -126,7 +126,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -158,7 +158,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -207,7 +207,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -277,7 +277,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -326,7 +326,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -453,7 +453,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -498,7 +498,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -535,7 +535,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return False
             End Try
@@ -668,7 +668,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return lrFactTypeReading
             End Try
@@ -692,9 +692,14 @@ Namespace FBM
                     If lrFactTypeInstance Is Nothing Then
                         lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(x) x.Id = Me.FactType.Id)
                     End If
+
+                    If lrFactTypeInstance Is Nothing Then GoTo ReturnFactTypeInstance
+
+                    lrFactTypeReadingInstance.InstanceNumber = lrFactTypeInstance.InstanceNumber
                     lrFactTypeReadingInstance.FactType = lrFactTypeInstance
                 End With
 
+ReturnFactTypeInstance:
                 Return lrFactTypeReadingInstance
 
             Catch ex As Exception
@@ -703,7 +708,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -778,7 +783,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -826,7 +831,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -909,7 +914,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return "Error"
             End Try
@@ -948,7 +953,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return "Error"
             End Try
@@ -1011,6 +1016,16 @@ Namespace FBM
                         arVerbaliser.VerbaliseModelObject(lrPredicatePart.Role.JoinedORMObject)
                     End If
 
+                    If Me.FactType.IsSubtypeRelationshipFactType Then
+                        arVerbaliser.VerbaliseQuantifierLight(" (as ")
+                        arVerbaliser.VerbaliseQuantifierLight(lrPredicatePart.Role.Name) 'Subtype, Supertype
+                        arVerbaliser.VerbaliseQuantifierLight(" )")
+                    End If
+
+                    If lrPredicatePart.Role.JoinedORMObject.isReferenceModeValueType And Me.FactType.Arity = 2 Then
+                        arVerbaliser.VerbaliseQuantifierLight(" (as unique identifier) ")
+                    End If
+
                     If Me.FactType.IsLinkFactType Then
                         Dim larRole = From Role In Me.FactType.LinkFactTypeRole.FactType.RoleGroup
                                       Where Role.JoinedORMObject.Id = lrPredicatePart.Role.JoinedORMObject.Id
@@ -1065,6 +1080,10 @@ Namespace FBM
                             End If
                         ElseIf Me.FactType.Is1To1BinaryFactType Then '  InternalUniquenessConstraint.Count = 1 Then..
 
+                            If Not Me.FactType.GetRoleById(Me.RoleList(0).Id).Mandatory Then
+                                arVerbaliser.VerbaliseQuantifierLight(" possibly ")
+                            End If
+
                             arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
 
                             If Me.MatchesRoleConstraintRoleOrder(Me.FactType.InternalUniquenessConstraint(0)) Then
@@ -1082,6 +1101,14 @@ Namespace FBM
                             End If
                         Else
                             arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
+
+                            If Me.FactType.IsBinaryFactType And Me.FactType.HasMultiPartRoleConstraint Then
+                                If Me.FactType.GetRoleById(Me.RoleList(0).Id).Mandatory = True Then
+                                    arVerbaliser.VerbaliseQuantifierLight(" at least one ")
+                                Else
+                                    arVerbaliser.VerbaliseQuantifierLight(" any number of ")
+                                End If
+                            End If
                         End If
                     Else
                         arVerbaliser.VerbalisePredicateText(lsPredicatePartText)
@@ -1112,7 +1139,7 @@ Namespace FBM
                 If abThrowErrorToVerbaliser Then
                     arVerbaliser.VerbaliseError(lsMessage)
                 Else
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 End If
 
             End Try
@@ -1202,7 +1229,7 @@ Namespace FBM
                                 If Me.FactType.GetRoleById(Me.RoleList(0).Id).Mandatory = True Then
                                     arWordDocumentVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
 
-                                    arWordDocumentVerbaliser.VerbaliseQuantifierLight(" more than one")
+                                    arWordDocumentVerbaliser.VerbaliseQuantifierLight(" at least one")
                                 Else
                                     arWordDocumentVerbaliser.VerbaliseQuantifierLight(" possibly ")
                                     arWordDocumentVerbaliser.VerbalisePredicateText(lrPredicatePart.PredicatePartText)
@@ -1251,7 +1278,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1377,7 +1404,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return "Error generateing CQL for FactTypeReading: " & Me.Id
             End Try
@@ -1574,7 +1601,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1712,7 +1739,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1851,7 +1878,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1907,7 +1934,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -1937,7 +1964,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -1970,7 +1997,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 

@@ -58,22 +58,22 @@ Namespace PGS
             Me.Fact = arFactInstance
             Me.RDSRelation = arRelation.RDSRelation
 
-            If IsSomething(aoOriginModelElement) Then
+            If aoOriginModelElement IsNot Nothing Then
                 Me.OriginModelElement = aoOriginModelElement
             End If
 
-            If IsSomething(aoDestinationModelElement) Then
+            If aoDestinationModelElement IsNot Nothing Then
                 Me.DestinationModelElement = aoDestinationModelElement
             End If
 
-            If IsSomething(arRelation) Then
+            If arRelation IsNot Nothing Then
                 Me.Relation = arRelation
                 Me.Relation.Link = Me
             End If
 
             Me.SentData.Add(asSentData)
 
-            If IsSomething(aoLink) Then
+            If aoLink IsNot Nothing Then
                 aoLink.Text = asSentData
                 aoLink.Tag = Me
                 Me.Link = aoLink
@@ -95,7 +95,10 @@ Namespace PGS
 
             Try
                 If Me.OriginModelElement.Shape Is Nothing Then Exit Sub
-                If Me.Link IsNot Nothing Then Exit Sub
+                If Me.Link IsNot Nothing Then
+                    Me.Page.Diagram.Links.Remove(Me.Link)
+                    Me.Link = Nothing
+                End If
 
                 If Me.OriginModelElement Is Nothing Or Me.DestinationModelElement Is Nothing Then Exit Sub
 
@@ -128,7 +131,7 @@ Namespace PGS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -142,7 +145,7 @@ Namespace PGS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -154,11 +157,11 @@ Namespace PGS
             '---------------------------------------------------------------------
             Try
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.Link) Then
+                    If Me.Link IsNot Nothing Then
                         'If Me.Link.Text <> "" Then
                         '    Me.Link.Text = Trim(Me.FactData.Data)
                         '    Call Me.EnableSaveButton()
@@ -172,7 +175,7 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -180,7 +183,7 @@ Namespace PGS
 
         Private Sub Fact_Deleted() Handles Fact.Deleted
 
-            If IsSomething(Me.Page.Diagram) Then
+            If Me.Page.Diagram IsNot Nothing Then
                 Me.Page.Diagram.Links.Remove(Me.Link)
                 Me.FactInstance.FactType.Fact.Remove(Me.FactInstance)
             End If
@@ -193,7 +196,7 @@ Namespace PGS
 
         Public Sub LinkDeselected() Implements iLinkObject.LinkDeslected
 
-            If IsSomething(Me.Link) Then
+            If Me.Link IsNot Nothing Then
                 Me.Link.Pen.Color = Color.Black
             End If
 
@@ -207,7 +210,7 @@ Namespace PGS
 
             Try
 
-                If IsSomething(Me.Link) Then
+                If Me.Link IsNot Nothing Then
                     Me.Link.Style = LinkStyle.Bezier
                     Me.Link.Pen.Color = Color.Blue
                 End If
@@ -218,7 +221,7 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -253,6 +256,33 @@ Namespace PGS
                 If Me.RDSRelation IsNot Nothing Then
 
                     'CodeSafe
+                    If Me.Relation.RDSRelation Is Nothing Then
+                        Me.Relation.RDSRelation = Me.RDSRelation
+                    End If
+
+                    'CodeSafe
+                    'Fix model if ResponsibleFactType is missing.
+                    If Me.Relation.RDSRelation.ResponsibleFactType Is Nothing Or Me.Relation.RelationFactType Is Nothing Then
+                        Try
+                            Dim larFactType = From FactType In Me.Model.FactType
+                                              Where FactType.Arity = 2
+                                              Where FactType.IsManyTo1BinaryFactType
+                                              From UCRole In FactType.RoleGroup.FindAll(Function(x) x.HasInternalUniquenessConstraint)
+                                              Where UCRole.JoinedORMObject.Id = Me.Relation.RDSRelation.OriginTable.Name
+                                              Where FactType.GetOtherRoleOfBinaryFactType(UCRole.Id).JoinedORMObject.Id = Me.Relation.RDSRelation.DestinationTable.Name
+                                              Select FactType
+
+                            If larFactType.Count > 0 Then
+                                Me.Relation.RDSRelation.ResponsibleFactType = larFactType.First
+                                Me.Relation.RelationFactType = Me.Relation.RDSRelation.ResponsibleFactType
+                            End If
+                        Catch ex As Exception
+                            'We tried
+                        End Try
+
+                    End If
+
+                    'CodeSafe
                     If Me.RDSRelation.ResponsibleFactType Is Nothing Then
                         Throw New Exception("Missing ResponsibleFactType for PGS Relation.")
                     End If
@@ -266,7 +296,7 @@ Namespace PGS
                         If Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole Is Nothing Then
                             lrFactType = Me.RDSRelation.ResponsibleFactType
                         ElseIf Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.Arity = 2 And
-                            Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.getCorrespondingRDSTable.isPGSRelation Then
+                        Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType.getCorrespondingRDSTable.isPGSRelation Then
                             'Must be binary and a PGS Relation
                             lrFactType = Me.RDSRelation.ResponsibleFactType.LinkFactTypeRole.FactType
                         Else
@@ -291,7 +321,11 @@ Namespace PGS
                             If lrFactType.HasTotalRoleConstraint Then
                                 Me.Link.BaseShape = ArrowHead.PointerArrow
                                 Me.Link.HeadShape = ArrowHead.PointerArrow
-
+                                If String.IsNullOrWhiteSpace(lrFactType.Source) Then
+                                    Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                                Else
+                                    Me.Link.BaseShapeSize = 1.5
+                                End If
                             ElseIf Me.OriginModelElement.Name = lrOriginNode.Name Then
                                 Me.Link.BaseShape = ArrowHead.None
                                 Me.Link.HeadShape = ArrowHead.PointerArrow
@@ -301,19 +335,22 @@ Namespace PGS
                             End If
                         Else
                             If lrFactType.HasTotalRoleConstraint Then
-                                Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                                If Not String.IsNullOrWhiteSpace(lrFactType.Source) Then Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
                             Else
-                                Me.Link.BaseShapeSize = 1.5
+                                    Me.Link.BaseShapeSize = 1.5
                             End If
                             Me.Link.BaseShape = ArrowHead.PointerArrow
                             Me.Link.HeadShape = ArrowHead.PointerArrow
-
                         End If
 
                     ElseIf Me.Relation.IsPGSRelationNode Then
                         If Me.RDSRelation.ResponsibleFactType.HasPartialButMultiRoleConstraint Or Me.RDSRelation.ResponsibleFactType.HasTotalRoleConstraint Then
                             Me.Link.BaseShape = ArrowHead.PointerArrow
-                            Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                            If String.IsNullOrWhiteSpace(Me.RDSRelation.ResponsibleFactType.Source) Then
+                                Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                            Else
+                                Me.Link.BaseShapeSize = 1.5
+                            End If
                             Me.Link.HeadShape = ArrowHead.PointerArrow
                             Me.Link.HeadShapeSize = Me.Link.HeadShapeSize
                         ElseIf Me.RDSRelation.ResponsibleFactType.FactTypeReading.Count > 1 Then
@@ -331,6 +368,13 @@ Namespace PGS
                             End If
                             Me.Link.BaseShape = ArrowHead.None
                         End If
+
+                        If Me.RDSRelation.ResponsibleFactType.HasPartialButMultiRoleConstraint Or Me.RDSRelation.ResponsibleFactType.HasTotalRoleConstraint Then
+                            Me.Link.BaseShape = ArrowHead.PointerArrow
+                            If Not String.IsNullOrWhiteSpace(Me.RDSRelation.ResponsibleFactType.Source) Then Me.Link.BaseShapeSize = Me.Link.HeadShapeSize
+                            Me.Link.HeadShape = ArrowHead.PointerArrow
+                            Me.Link.HeadShapeSize = Me.Link.HeadShapeSize
+                        End If
                     End If
                 End If
 
@@ -340,7 +384,7 @@ Namespace PGS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -397,9 +441,20 @@ Namespace PGS
                         GoTo SetPredicateNoMatterWhat
                     End Try
 
-                    If Me.Model.UseNeo4jStyleEdgeLabels And lrFactType.DBName <> "" Then
-                        Me.Link.Text = lrFactType.DBName
-                        Exit Sub
+                    If Me.Model.UseNeo4jStyleEdgeLabels Then
+
+                        If lrFactType.GraphLabel.Count > 0 Then
+
+                            lsPredicate = lrFactType.PropertyGraphLabel
+                            GoTo AddProperties
+
+                        ElseIf lrFactType.DBName <> "" Then
+
+                            lsPredicate = lrFactType.DBName
+                            GoTo AddProperties
+
+                        End If
+
                     End If
 
                     If lrFactType.FactTypeReading.Count = 0 Then
@@ -433,10 +488,11 @@ Namespace PGS
                         '20200714-VM-Not yet implemented.
                     End If
 
+AddProperties:
                     Dim lrRDSTable As RDS.Table
                     If Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrFactType.Id) Is Nothing Then
                         Try
-                            lrRDSTable = lrFactTypeReading.FactType.getCorrespondingRDSTable(Nothing, True)
+                            lrRDSTable = lrFactType.getCorrespondingRDSTable(Nothing, True) '20240428-Vm-Was lrFactTypeReading.
                         Catch ex As Exception
                             lsPredicate = ""
                             Exit Sub
@@ -452,7 +508,7 @@ Namespace PGS
 
                     Dim larColumn = From Column In lrRDSTable.Column
                                     Where Column.Role.JoinedORMObject IsNot Nothing
-                                    Where Column.isPartOfPrimaryKey Or
+                                    Where Not Column.isPartOfPrimaryKey Or
                                         Column.Role.JoinedORMObject.GetType = GetType(FBM.ValueType)
                                     Select Column
 
@@ -475,7 +531,7 @@ Namespace PGS
 SetPredicateNoMatterWhat:
                     Me.Link.Text = lsPredicate
 
-
+#Region "Old Code-20240429-Remove after 20250601 if not missed"
                     'larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(0)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
                     'larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(1))
 
@@ -522,15 +578,28 @@ SetPredicateNoMatterWhat:
                     '        Me.Link.Text = lsDestinationPredicate & " / " & lsOriginPredicate
                     '    End If
                     'End If
+#End Region
                 Else
 SimplePredicate:
                     '=================================================================
                     'Destination Predicates. CodeSafe - GetIt
                     Dim lrFactType = Me.RDSRelation.ResponsibleFactType
+                    Dim lsPredicate As String = lrFactType.DBName
 
-                    If Me.Model.UseNeo4jStyleEdgeLabels And lrFactType.DBName <> "" Then
-                        Me.Link.Text = lrFactType.DBName
-                        Exit Sub
+                    If Me.Model.UseNeo4jStyleEdgeLabels Then
+
+                        If lrFactType.GraphLabel.Count > 0 Then
+
+                            Me.Link.Text = lrFactType.PropertyGraphLabel
+                            Exit Sub
+
+                        ElseIf lrFactType.DBName <> "" Then
+
+                            Me.Link.Text = lsPredicate
+                            Exit Sub
+
+                        End If
+
                     End If
 
 
@@ -540,8 +609,15 @@ SimplePredicate:
                     Dim larRole As New List(Of FBM.Role)
                     Dim lrFactTypeReading As FBM.FactTypeReading
 
-                    larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(0)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
-                    larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(1))
+                    If lrFactType.IsManyTo1BinaryFactType Then
+
+                        Dim lrRole = lrFactType.RoleGroup.Find(Function(x) x.InternalUniquenessConstraint.Count > 0)
+                        larRole.Add(lrRole)
+                        larRole.Add(lrFactType.GetOtherRoleOfBinaryFactType(lrRole.Id))
+                    Else
+                        larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(0)) 'NB Is opposite to the way you would think, because ER Diagrams read predicates at the opposite end of the Relation
+                        larRole.Add(Me.RDSRelation.ResponsibleFactType.RoleGroup(1))
+                    End If
 
                     lrFactTypeReading = Me.RDSRelation.ResponsibleFactType.FindSuitableFactTypeReadingByRoles(larRole, True)
 
@@ -560,7 +636,7 @@ SimplePredicate:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -588,7 +664,7 @@ SimplePredicate:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -603,7 +679,7 @@ SimplePredicate:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

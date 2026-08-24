@@ -59,8 +59,8 @@ Partial Class frmToolboxORMVerbalisation
         Me.Controls.Add(Me.WebBrowser)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmToolboxORMVerbalisation"
-        Me.TabText = "ORM Verbalisation"
-        Me.Text = "ORM Verbalisation"
+        Me.TabText = "Verbalisation"
+        Me.Text = "Verbalisation"
         Me.ContextMenuStripAddBusinessRequirement.ResumeLayout(False)
         Me.ResumeLayout(False)
 

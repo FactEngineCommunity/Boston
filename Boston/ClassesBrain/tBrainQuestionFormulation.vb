@@ -156,6 +156,10 @@ Partial Public Class tBrain
                         ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
                             lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
                             liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                        ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE IsNot Nothing AndAlso Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER.Count > 0 Then
+                            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.DATATYPE
+                            liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(0))
+                            liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(1))
                         End If
 
                         lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -248,7 +252,7 @@ Partial Public Class tBrain
                                 lrThirdStep)
 
             If abStraightToActionProcessing Then
-                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError) Then
+                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject) Then
                     Return False
                 End If
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
@@ -264,7 +268,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return False
 
@@ -425,6 +429,10 @@ Partial Public Class tBrain
                         ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
                             lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
                             liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                        ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE IsNot Nothing AndAlso Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER.Count > 0 Then
+                            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.DATATYPE
+                            liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(0))
+                            liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(1))
                         End If
 
                         lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -517,7 +525,7 @@ Partial Public Class tBrain
                                     lrThirdStep)
 
             If abStraightToActionProcessing Then
-                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError) Then
+                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject) Then
                     Return False
                 End If
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
@@ -533,7 +541,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return False
 
@@ -596,16 +604,56 @@ Partial Public Class tBrain
 
             Dim liInd As Integer = 1
 
-
             For Each lsModelElementName In Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENTNAME
                 Me.send_data(lsModelElementName)
                 lasModelElementNames.Add(Trim(lsModelElementName))
+
+
+                'Get the PredicatePartWords from the PredicateClause of the statement
+                '----------------------------------------------------------------------
+                Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
+                Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT = ""
+                Me.VAQLProcessor.MODELELEMENTClause.MODELELEMENTNAME = ""
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.MODELELEMENTClause, Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENT(liInd - 1))
+                '=======================================================================================
+
+#Region "Predicate Part"
+                Dim lrPredicatePart As New Language.PredicatePart
+
+                lrPredicatePart.PreboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT)
+                lrPredicatePart.PostboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT)
+                lrPredicatePart.ObjectName = Trim(Me.VAQLProcessor.MODELELEMENTClause.MODELELEMENTNAME)
+
+                lsPredicatePart = ""
+
+                If liInd = 1 Then
+                    Me.VAQLProcessor.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
+                    Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.PREDICATEPARTClause, Me.VAQLProcessor.ATMOSTONEStatement.PREDICATECLAUSE(liInd - 1))
+
+                    For Each lsPredicatePartWord In Me.VAQLProcessor.PREDICATEPARTClause.PREDICATEPART
+                        lsPredicatePart = Trim(lsPredicatePart & " " & lsPredicatePartWord)
+                    Next
+                End If
+
+                lrPredicatePart.PredicatePartText = lsPredicatePart
+                lrPredicatePart.SequenceNr = liInd
+                lrSentence.PredicatePart.Add(lrPredicatePart)
+                '=======================================================================================
+#End Region
+
+                'Check if ModelElement already exists.
+                Dim lrModelElement = Me.Model.GetModelObjectByName(lsModelElementName)
+                If lrModelElement IsNot Nothing Then
+                    lrPlan.RemoveStep(lrFirstStep)
+                    liInd += 1
+                    Continue For
+                End If
 
                 Dim lbIsLikelyValueType As Boolean = False
                 Dim lbIsEntityType As Boolean = False
 
                 If liInd = 1 Then
-
+#Region "First Pass"
                     If Me.Model.ModelElementIsGeneralConceptOnly(Trim(lsModelElementName)) Then
                         If My.Settings.DefaultGeneralConceptToObjectTypeConversion = "Value Type" Then
                             lbIsLikelyValueType = True
@@ -661,8 +709,9 @@ Partial Public Class tBrain
                         End If
                     End If
 #End Region
+#End Region 'First Pass
                 ElseIf liInd = 2 Then
-#Region "ValueType"
+#Region "Second Pass - ValueType"
                     If Me.Model.ModelElementIsGeneralConceptOnly(Trim(lsModelElementName)) Then
                         Select Case My.Settings.DefaultGeneralConceptToObjectTypeConversion
                             Case Is = "Value Type"
@@ -708,6 +757,10 @@ Partial Public Class tBrain
                             ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
                                 lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
                                 liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                            ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE IsNot Nothing AndAlso Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER.Count > 0 Then
+                                lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.DATATYPE
+                                liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(0))
+                                liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(1))
                             End If
 
                             lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -783,28 +836,6 @@ Partial Public Class tBrain
                 Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.MODELELEMENTClause, Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENT(liInd - 1))
 
 
-                Dim lrPredicatePart As New Language.PredicatePart
-
-                lrPredicatePart.PreboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT)
-                lrPredicatePart.PostboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT)
-                lrPredicatePart.ObjectName = Trim(Me.VAQLProcessor.MODELELEMENTClause.MODELELEMENTNAME)
-
-                lsPredicatePart = ""
-
-                If liInd = 1 Then
-                    Me.VAQLProcessor.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
-                    Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.PREDICATEPARTClause, Me.VAQLProcessor.ATMOSTONEStatement.PREDICATECLAUSE(liInd - 1))
-
-                    For Each lsPredicatePartWord In Me.VAQLProcessor.PREDICATEPARTClause.PREDICATEPART
-                        lsPredicatePart = Trim(lsPredicatePart & " " & lsPredicatePartWord)
-                    Next
-                End If
-
-                lrPredicatePart.PredicatePartText = lsPredicatePart
-                lrPredicatePart.SequenceNr = liInd
-                lrSentence.PredicatePart.Add(lrPredicatePart)
-                '=======================================================================================
-
                 liInd += 1
             Next
 
@@ -822,7 +853,7 @@ Partial Public Class tBrain
                                     lrThirdStep)
 
             If abStraightToActionProcessing Then
-                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError) Then
+                If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject) Then
                     Return False
                 End If
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
@@ -838,7 +869,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return False
 
@@ -863,11 +894,11 @@ Partial Public Class tBrain
 
         Dim lrQuestion As tQuestion
 
-        Dim lsQuestionText As String = "" & vbCrLf
+        Dim lsQuestionText As String = "" '& vbCrLf '20240726-VM-Was
 
-        lsQuestionText.AppendString(arFactType.RoleGroup(0).JoinedORMObject.Id & " " & arFactTypeReading.PredicatePart(0).PredicatePartText & " AT MOST ONE " & arFactType.RoleGroup(1).JoinedORMObject.Id & ";")
-        lsQuestionText.AppendLine(arFactType.RoleGroup(0).JoinedORMObject.Id & " " & arFactTypeReading.PredicatePart(0).PredicatePartText & " ONE " & arFactType.RoleGroup(1).JoinedORMObject.Id & "; or")
-        lsQuestionText.AppendLine("The relationship is Many-to-Many?")
+        lsQuestionText.AppendString(arFactType.RoleGroup(0).JoinedORMObject.Id & " " & arFactTypeReading.PredicatePart(0).PredicatePartText & " <Nominate Cardinalty> " & arFactType.RoleGroup(1).JoinedORMObject.Id & "; ")
+        'lsQuestionText.AppendLine(arFactType.RoleGroup(0).JoinedORMObject.Id & " " & arFactTypeReading.PredicatePart(0).PredicatePartText & " ONE " & arFactType.RoleGroup(1).JoinedORMObject.Id & "; or ")
+        'lsQuestionText.AppendLine("The relationship is Many-to-Many?")
 
         lrQuestion = New tQuestion(lsQuestionText,
                                    pcenumQuestionType.CreateInternalUniquenessConstraint,
@@ -893,6 +924,8 @@ Partial Public Class tBrain
                                                          Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
                                                          Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
 
+        Dim lsMessage As String
+
         Try
             Dim lrFactTypeReading As New FBM.FactTypeReading
             Dim lrPredicatePart As Language.PredicatePart
@@ -901,6 +934,12 @@ Partial Public Class tBrain
             Dim lrQuestion As tQuestion
 
             Me.Model = prApplication.WorkingModel
+
+            'CodeSafe
+            If Me.Model Is Nothing Then
+                prApplication.ThrowMessage("No Model selected. Try selecting a Model in the Model Explorer.", pcenumErrorType.Warning, , False,,,, True,, True)
+                Return False
+            End If
 
             Me.VAQLProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT = ""
             Me.VAQLProcessor.FACTTYPEREADINGStatement.MODELELEMENT = New List(Of Object)
@@ -992,22 +1031,83 @@ Partial Public Class tBrain
                         Dim lasSymbol As New List(Of String)
                         lasSymbol.Add(lsModelObjectName)
 
+                        Dim lrValueType As FBM.ValueType = Nothing
+
+#Region "Data Type for Value Type"
+
+                        If Me.VAQLProcessor.ParseNodeContainsTokenType(Me.VAQLParsetree.Nodes(0), VAQL.TokenType.KEYWDWRITTENAS) Then
+                            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME = ""
+                            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE = New Object
+                            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH = New Object
+                            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION = New Object
+                            Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER = ""
+
+                            Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement, Me.VAQLParsetree.Nodes(0))
+
+                            Dim lsValueTypeName As String = ""
+                            Dim lsDataTypeName As String = ""
+                            Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
+
+                            lsValueTypeName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME))
+
+                            Dim liDataTypeLength As Integer = 0
+                            Dim liDataTypePrecision As Integer = 0
+
+                            If Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE.GetType Is GetType(VAQL.ParseNode) Then
+                                lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPE.Nodes(0).Token.Text
+                            ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.GetType Is GetType(VAQL.ParseNode) Then
+                                lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPELENGTH.Nodes(0).Token.Text
+                                liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
+                            ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.GetType Is GetType(VAQL.ParseNode) Then
+                                lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.Nodes(0).Token.Text
+                                liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
+                            End If
+
+                            lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
+                            If lsDataTypeName Is Nothing Then
+                                lsMessage = "That's not a valid Data Type."
+                                If arDSCError IsNot Nothing Then
+                                    arDSCError.Success = False
+                                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                    arDSCError.ErrorString = lsMessage
+                                End If
+                                Me.send_data(lsMessage)
+                                Return False
+                            End If
+
+                            Try
+                                liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
+                            Catch ex As Exception
+                                lsMessage = "That's not a valid Data Type."
+                                If arDSCError IsNot Nothing Then
+                                    arDSCError.Success = False
+                                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                    arDSCError.ErrorString = lsMessage
+                                End If
+                                Me.send_data(lsMessage)
+                                Return False
+                            End Try
+
+                            lrValueType = Me.Model.CreateValueType(lsModelObjectName, False, liDataType, liDataTypeLength, liDataTypePrecision, False)
+                        End If
+#End Region
+
                         lrQuestion = New tQuestion("Would you like me to create an Value Type for '" & lsModelObjectName & "'?",
                                                          pcenumQuestionType.CreateValueType,
                                                          pcenumExpectedResponseType.YesNo,
                                                          lasSymbol,
                                                          Nothing,
-                                                         Nothing,
+                                                         lrValueType,
                                                          lrPlan,
                                                          lrStep)
                     Else
-                        lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType, Nothing)
-                        lrPlan.AddStep(lrStep)
+                                lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType, Nothing)
+                                lrPlan.AddStep(lrStep)
 
-                        Dim lasSymbol As New List(Of String)
-                        lasSymbol.Add(lsModelObjectName)
+                                Dim lasSymbol As New List(Of String)
+                                lasSymbol.Add(lsModelObjectName)
 
-                        lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
                                                          pcenumQuestionType.CreateEntityType,
                                                          pcenumExpectedResponseType.YesNo,
                                                          lasSymbol,
@@ -1015,26 +1115,26 @@ Partial Public Class tBrain
                                                          Nothing,
                                                          lrPlan,
                                                          lrStep)
-                    End If
+                            End If
 
 
-                    If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
-                        Select Case lrQuestion.QuestionType
-                            Case Is = pcenumQuestionType.CreateValueType
-                                Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
-                            Case Is = pcenumQuestionType.CreateEntityType
-                                Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
-                        End Select
+                            If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Then
+                                Select Case lrQuestion.QuestionType
+                                    Case Is = pcenumQuestionType.CreateValueType
+                                        Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
+                                    Case Is = pcenumQuestionType.CreateEntityType
+                                        Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
+                                End Select
 
-                    ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
-                        '------------------------------------------------------------
-                        'Great, already asked the question and am awaiting responce
-                        '------------------------------------------------------------
-                        Me.AddQuestion(lrQuestion)
-                    End If
-                End If
+                            ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
+                                '------------------------------------------------------------
+                                'Great, already asked the question and am awaiting responce
+                                '------------------------------------------------------------
+                                Me.AddQuestion(lrQuestion)
+                            End If
+                        End If
 
-                lrPredicatePart.PreboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT)
+                        lrPredicatePart.PreboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT)
                 lrPredicatePart.PostboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT)
 
                 lrPredicatePart.ObjectName = Me.VAQLProcessor.MODELELEMENTClause.MODELELEMENTNAME
@@ -1080,7 +1180,7 @@ Partial Public Class tBrain
                                             lrStep)
 
             If abStraightToActionProcessing Then
-                Call Me.executeStatementAddFactType(lrQuestion, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError)
+                Call Me.executeStatementAddFactType(lrQuestion, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject)
             ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
                 Me.AddQuestion(lrQuestion)
             End If
@@ -1095,14 +1195,427 @@ Partial Public Class tBrain
             Return True
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return False
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' Get's called twice for a DualBinaryFactTypeReadingStatement. E.g. "Satellite has ONE Orbit Type, Orbit Type is for ONE Satellite"  
+    '''   On the second calling, provides the FactType to add the reciprocal reading.
+    ''' </summary>
+    ''' <param name="arBinaryFactTypeReadingClause"></param>
+    ''' <param name="abBroadcastInterfaceEvent"></param>
+    ''' <param name="abStraightToActionProcessing"></param>
+    ''' <param name="arDSCError"></param>
+    ''' <param name="arFEKLLineageObject"></param>
+    ''' <param name="arFactType"></param>
+    ''' <returns></returns>
+    Private Function FormulateQuestionsBinaryFactTypeStatement(ByRef arBinaryFactTypeReadingClause As VAQL.BINARYFACTTYPEREADINGClause,
+                                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                               Optional ByVal abStraightToActionProcessing As Boolean = False,
+                                                               Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                               Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing,
+                                                               Optional ByRef arFactType As FBM.FactType = Nothing,
+                                                               Optional ByRef aiExpectedResponseType As pcenumExpectedResponseType = pcenumExpectedResponseType.None) As Boolean
+
+
+        Dim lsMessage As String
+
+        Try
+            Me.Model = prApplication.WorkingModel
+
+            Dim lrFactTypeReading As New FBM.FactTypeReading
+            Dim lrLanguagePredicatePart As Language.PredicatePart
+            Dim lrPlan As New Brain.Plan 'The Plan formulated to create the FactType.
+            Dim lrStep As Brain.Step 'For Steps added to the Plan.
+            Dim lrQuestion As tQuestion
+
+            lrFactTypeReading.FrontText = If(arBinaryFactTypeReadingClause.FRONTREADINGTEXT IsNot Nothing, arBinaryFactTypeReadingClause.FRONTREADINGTEXT.Trim, "")
+
+            Dim liInd As Integer = 0
+            Dim lasModelObjectId As New List(Of String)
+
+            Dim lrSentence As Language.Sentence
+            Dim lrWordResolved As Language.WordResolved
+
+            Dim lsOriginalSentence As String = lrFactTypeReading.FrontText
+            lsOriginalSentence &= Trim(" " & arBinaryFactTypeReadingClause.MODELELEMENT(0).PREBOUNDREADINGTEXT)
+            lsOriginalSentence &= Trim(" " & arBinaryFactTypeReadingClause.MODELELEMENT(0).MODELELEMENTNAME)
+            lsOriginalSentence &= Trim(" " & arBinaryFactTypeReadingClause.MODELELEMENT(0).POSTBOUNDREADINGTEXT)
+            For Each lsPredicatePart In arBinaryFactTypeReadingClause.PREDICATECLAUSE.PREDICATEPART
+                lsOriginalSentence &= " " & lsPredicatePart
+            Next
+            lsOriginalSentence &= Trim(" " & arBinaryFactTypeReadingClause.MODELELEMENT(1).PREBOUNDREADINGTEXT)
+            lsOriginalSentence &= Trim(" " & arBinaryFactTypeReadingClause.MODELELEMENT(1).MODELELEMENTNAME)
+            lsOriginalSentence &= Trim(" " & arBinaryFactTypeReadingClause.MODELELEMENT(1).POSTBOUNDREADINGTEXT)
+            lsOriginalSentence = lsOriginalSentence & Trim(" " & arBinaryFactTypeReadingClause.FOLLOWINGREADINGTEXT)
+
+            lrSentence = New Language.Sentence(lsOriginalSentence, lsOriginalSentence)
+
+            lrSentence.FrontText = arBinaryFactTypeReadingClause.FRONTREADINGTEXT
+            lrSentence.FollowingText = arBinaryFactTypeReadingClause.FOLLOWINGREADINGTEXT
+
+            For liInd = 1 To arBinaryFactTypeReadingClause.MODELELEMENT.Count
+#Region "Model Element"
+                lrLanguagePredicatePart = New Language.PredicatePart()
+                lrLanguagePredicatePart.SequenceNr = liInd
+
+                Dim lrVAQLModelElement As VAQL.ModelElementClause = arBinaryFactTypeReadingClause.MODELELEMENT(liInd - 1)
+
+                Dim lsModelObjectName As String = Trim(lrVAQLModelElement.MODELELEMENTNAME)
+
+                lasModelObjectId.Add(lsModelObjectName)
+
+                lrWordResolved = New Language.WordResolved(lsModelObjectName, pcenumWordSense.Noun)
+                lrSentence.WordListResolved.Add(lrWordResolved)
+
+                '------------------------------------------------------------------------------------------------------
+                'Check to see whether the MODELELEMENTNAME is an Object Type that is actually linked by the FactType.
+                '------------------------------------------------------------------------------------------------------
+                Dim lbProceedToCreateObjectTypeQuestion As Boolean = False
+
+                If Me.Model.ExistsModelElement(lsModelObjectName) Then
+                    If Array.IndexOf({pcenumConceptType.ValueType,
+                                      pcenumConceptType.EntityType,
+                                      pcenumConceptType.FactType},
+                                    Me.Model.GetModelObjectByName(lsModelObjectName).ConceptType) >= 0 Then
+                        '-----------------------------------------------------------------------------
+                        'A ObjectType already exists within the Model for the name lsModelObjectName
+                        '-----------------------------------------------------------------------------
+                    Else
+                        lbProceedToCreateObjectTypeQuestion = True
+                    End If
+                Else
+                    lbProceedToCreateObjectTypeQuestion = True
+                End If
+
+                If lbProceedToCreateObjectTypeQuestion Then
+#Region "Check if likely is Value Type"
+                    Dim lbIsLikelyValueType As Boolean = False
+                    Dim items As Array
+                    items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
+                    Dim LikelyVTItems As Array = System.Enum.GetValues(GetType(pcenumLikelyValueTypeEndings))
+                    If Me.Model.ModelElementIsGeneralConceptOnly(lsModelObjectName) Then
+                        If My.Settings.DefaultGeneralConceptToObjectTypeConversion = "Value Type" Then
+                            lbIsLikelyValueType = True
+                        End If
+                    End If
+
+                    If liInd <> 1 And arBinaryFactTypeReadingClause.KEYWDWRITTENAS IsNot Nothing Then
+                        lbIsLikelyValueType = True
+                    Else
+                        For Each item As pcenumReferenceModeEndings In items
+                            If lsModelObjectName.EndsWith(GetEnumDescription(item)) Then
+                                lbIsLikelyValueType = True
+                                GoTo FinishedCheckingLikelies
+                            ElseIf lsModelObjectName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                                lbIsLikelyValueType = True
+                                GoTo FinishedCheckingLikelies
+                            End If
+                        Next
+                        For Each item As pcenumLikelyValueTypeEndings In LikelyVTItems
+                            If lsModelObjectName.EndsWith(GetEnumDescription(item)) Then
+                                lbIsLikelyValueType = True
+                                GoTo FinishedCheckingLikelies
+                            ElseIf lsModelObjectName.EndsWith(GetEnumDescription(item).Trim({"."c})) Then 'See https://msdn.microsoft.com/en-us/library/kxbw3kwc(v=vs.110).aspx
+                                lbIsLikelyValueType = True
+                                GoTo FinishedCheckingLikelies
+                            End If
+                        Next
+FinishedCheckingLikelies:
+                    End If
+
+                    items = System.Enum.GetValues(GetType(pcenumValueTypeCandidates))
+                    For Each item In items
+                        If lsModelObjectName.EndsWith(GetEnumDescription(item)) Then
+                            lbIsLikelyValueType = True
+                            Exit For
+                        End If
+                    Next
+
+
+                    Dim lrValueType As FBM.ValueType = Nothing
+                    Dim lsDataTypeName As String = ""
+                    Dim liDataTypeLength As Integer = 0
+                    Dim liDataTypePrecision As Integer = 0
+                    Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
+
+                    If (liInd <> 1) And arBinaryFactTypeReadingClause.KEYWDWRITTENAS IsNot Nothing Then
+#Region "Has IS WRITTEN AS CLAUSE - I.e. Is a Value Type"
+                        Me.VAQLProcessor.VALUETYPEWRITTENASClause = arBinaryFactTypeReadingClause.VALUETYPEWRITTENASCLAUSE
+
+                        If Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
+                            lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPE.Nodes(0).Token.Text
+                        ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPELENGTH IsNot Nothing Then
+                            lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPELENGTH.Nodes(0).Token.Text
+                            liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                        ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
+                            lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
+                            liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                        ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE IsNot Nothing AndAlso Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER.Count > 0 Then
+                            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.DATATYPE
+                            liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(0))
+                            liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(1))
+                        End If
+
+                        lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
+                        If lsDataTypeName Is Nothing Then
+                            lsMessage = "That's not a valid Data Type."
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
+                            End If
+                            Me.send_data(lsMessage)
+                            Return False
+                        End If
+
+                        Try
+                            liDataType = DirectCast([Enum].Parse(GetType(pcenumORMDataType), lsDataTypeName), pcenumORMDataType)
+                        Catch ex As Exception
+                            lsMessage = "That's not a valid Data Type."
+                            If arDSCError IsNot Nothing Then
+                                arDSCError.Success = False
+                                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                                arDSCError.ErrorString = lsMessage
+                            End If
+                            Me.send_data(lsMessage)
+                            Return False
+                        End Try
+
+                        lrValueType = Me.Model.CreateValueType(lsModelObjectName, False, liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
+
+                        lbIsLikelyValueType = True
+#End Region
+#End Region
+                    End If
+
+                    If lbIsLikelyValueType Then
+#Region "Value Type - Question - Likely"
+                        lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None, Nothing)
+                        lrPlan.AddStep(lrStep)
+
+                        Dim lasSymbol As New List(Of String)
+                        lasSymbol.Add(lsModelObjectName)
+
+                        lrQuestion = New tQuestion("Would you like me to create an Value Type for '" & lsModelObjectName & "'?",
+                                                            pcenumQuestionType.CreateValueType,
+                                                            pcenumExpectedResponseType.YesNo,
+                                                            lasSymbol,
+                                                            Nothing,
+                                                            lrValueType,
+                                                            lrPlan,
+                                                            lrStep)
+#End Region
+                    Else
+#Region "Entity Type - Question"
+                        lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType, Nothing)
+                        lrPlan.AddStep(lrStep)
+
+                        Dim lasSymbol As New List(Of String)
+                        lasSymbol.Add(lsModelObjectName)
+
+                        lrQuestion = New tQuestion("Would you like me to create an Entity Type for '" & lsModelObjectName & "'? (Answer 'No' and I'll ask you if you want a Value Type)",
+                                                            pcenumQuestionType.CreateEntityType,
+                                                            pcenumExpectedResponseType.YesNo,
+                                                            lasSymbol,
+                                                            Nothing,
+                                                            Nothing,
+                                                            lrPlan,
+                                                            lrStep)
+#End Region
+                    End If
+
+
+                    If abStraightToActionProcessing And Not Me.QuestionIsResolved(lrQuestion) Or (liInd <> 1 And arBinaryFactTypeReadingClause.KEYWDWRITTENAS IsNot Nothing) Then
+                        Select Case lrQuestion.QuestionType
+                            Case Is = pcenumQuestionType.CreateValueType
+                                Call Me.ProcessStatementAddValueType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
+                            Case Is = pcenumQuestionType.CreateEntityType
+                                Call Me.ProcessStatementAddEntityType(lrQuestion, abBroadcastInterfaceEvent, arFEKLLineageObject)
+                        End Select
+                    ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
+                        Me.AddQuestion(lrQuestion)
+                    End If
+                End If
+
+                lrLanguagePredicatePart.PreboundText = Trim(lrVAQLModelElement.PREBOUNDREADINGTEXT)
+                lrLanguagePredicatePart.PostboundText = Trim(lrVAQLModelElement.POSTBOUNDREADINGTEXT)
+
+                lrLanguagePredicatePart.ObjectName = lrVAQLModelElement.MODELELEMENTNAME
+
+                Dim lsPredicatePartText As String = ""
+
+#Region "Get Predicate Parts"
+                '--------------------------------------------------------------
+                'FactType is binary in arity. Get Predicate Parts.
+                '--------------------------------------------------------------
+                If liInd < arBinaryFactTypeReadingClause.MODELELEMENT.Count Then
+
+                    For Each lsPredicatePartText In arBinaryFactTypeReadingClause.PREDICATECLAUSE.PREDICATEPART
+                        lrLanguagePredicatePart.PredicatePartText &= lsPredicatePartText
+                    Next
+                End If
+
+                lrLanguagePredicatePart.PredicatePartText = Trim(lrLanguagePredicatePart.PredicatePartText)
+
+                lrSentence.PredicatePart.Add(lrLanguagePredicatePart)
+#End Region
+
+#End Region
+            Next 'ModelElement
+
+            Dim liFrequencyDeterminer As pcenumStepFactTypeAttributes = pcenumStepFactTypeAttributes.None
+            Dim liMandatoryRoleDeterminer As pcenumStepFactTypeAttributes = pcenumStepFactTypeAttributes.None
+            If arBinaryFactTypeReadingClause.INTERNALUNIQUENESSDETERMINER IsNot Nothing Then
+                Select Case arBinaryFactTypeReadingClause.INTERNALUNIQUENESSDETERMINER.GetBinaryFactTypeFrequencyDeterminer
+                    Case Is = pcenumBinaryFactTypeFrequencyDeterminer.One
+                        liFrequencyDeterminer = pcenumStepFactTypeAttributes.ManyToOne
+                        liMandatoryRoleDeterminer = pcenumStepFactTypeAttributes.MandatoryFirstRole
+                    Case Is = pcenumBinaryFactTypeFrequencyDeterminer.AtMostOne
+                        liFrequencyDeterminer = pcenumStepFactTypeAttributes.ManyToOne
+                    Case Is = pcenumBinaryFactTypeFrequencyDeterminer.AtLeastOne
+                        liFrequencyDeterminer = pcenumStepFactTypeAttributes.OneToMany
+                        liMandatoryRoleDeterminer = pcenumStepFactTypeAttributes.MandatorySecondRole
+                    Case Is = pcenumBinaryFactTypeFrequencyDeterminer.AnyNumberOf
+                        liFrequencyDeterminer = pcenumStepFactTypeAttributes.OneToMany
+                End Select
+            End If
+
+            Dim lsEnumeratedFactTypeReading As String
+
+            lsEnumeratedFactTypeReading = Me.CreateEnumeratedFactTypeReadingFromParts(lasModelObjectId, lrSentence) ' Me.VAQLProcessor.PREDICATEPARTClause.PREDICATEPART)
+
+            If arFactType Is Nothing Then
+#Region "Create the Fact Type"
+                lrStep = New Brain.Step(pcenumActionType.CreateFactType,
+                                        True,
+                                        pcenumActionType.None,
+                                        Nothing,
+                                        pcenumStepFactTypeAttributes.BinaryFactType,
+                                        liFrequencyDeterminer,
+                                        liMandatoryRoleDeterminer)
+
+
+                lrPlan.AddStep(lrStep)
+
+                lrQuestion = New tQuestion("Would you like me to create a Fact Type for '" & lsEnumeratedFactTypeReading & "'?",
+                                           pcenumQuestionType.CreateFactTypePredetermined,
+                                           aiExpectedResponseType,
+                                           lasModelObjectId,
+                                           lrSentence,
+                                           Nothing,
+                                           lrPlan,
+                                           lrStep)
+
+                If abStraightToActionProcessing Then
+                    'Create and return the FactType.
+                    If Not Me.executeStatementAddFactTypePredetermined(lrQuestion, abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject, arFactType) Then
+                        Return False
+                    End If
+                ElseIf Not Me.QuestionHasBeenRaised(lrQuestion) Then
+                    Me.AddQuestion(lrQuestion)
+                End If
+#End Region
+            Else
+#Region "Just add the (reciprocal) FactTypeReading and InternalUniquenessConstraint"
+
+                lrFactTypeReading = New FBM.FactTypeReading(arFactType, New List(Of FBM.Role) From {arFactType.RoleGroup(1), arFactType.RoleGroup(0)}, lrSentence)
+                Call arFactType.AddFactTypeReading(lrFactTypeReading, True, abBroadcastInterfaceEvent)
+
+                If aiExpectedResponseType = pcenumExpectedResponseType.ATMOSTONEONEMANYTOMANY Then
+
+                    '------------------------------
+                    'Create a Plan
+                    '------------------------------
+                    lrPlan = New Brain.Plan
+                    Dim lrFirstStep As Brain.Step
+                    lrFirstStep = New Brain.Step(pcenumActionType.CreateInternalUniquenessConstraint, False, pcenumActionType.None, New List(Of FBM.ModelObject))
+                    lrPlan.AddStep(lrFirstStep)
+
+                    lrQuestion = New tQuestion("Select the cardinality regime for the Fact Type: '" & lsEnumeratedFactTypeReading & "'",
+                                       pcenumQuestionType.CreateInternalUniquenessConstraint,
+                                       aiExpectedResponseType,
+                                       New List(Of String) From {arFactType.Id},
+                                       lrSentence,
+                                       arFactType,
+                                       lrPlan,
+                                       lrPlan.Step(0))
+
+                    Me.AddQuestion(lrQuestion)
+                    Me.Timeout.Start()
+
+                Else
+                    'InternalUniquenessConstraint
+                    If liFrequencyDeterminer = pcenumStepFactTypeAttributes.ManyToOne Then
+
+                        arFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {arFactType.RoleGroup(1)}, False, True, True, False, Nothing, abBroadcastInterfaceEvent, False)
+                    End If
+
+                    'MandatoryRoleConstraint
+                    If liMandatoryRoleDeterminer = pcenumStepFactTypeAttributes.MandatoryFirstRole Then
+                        arFactType.RoleGroup(1).SetMandatory(True, abBroadcastInterfaceEvent)
+                    End If
+                End If
+#End Region
+            End If
+
+            Return True
+
+
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Function
+
+    Private Function FormulateQuestionsDualBinaryFactTypeStatement(ByVal asOriginalSentence As String,
+                                                                 Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                                 Optional ByVal abStraightToActionProcessing As Boolean = False,
+                                                                 Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                                 Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
+
+
+        Dim lsMessage As String
+
+        Try
+            Me.Model = prApplication.WorkingModel
+
+            Me.VAQLProcessor.DUALBINARYFACTTYPEREADINGSTMT = New VAQL.DualBinaryFactTypeReadingStatement
+
+            Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.DUALBINARYFACTTYPEREADINGSTMT, Me.VAQLParsetree)
+
+            Dim liExpectedResponseType = pcenumExpectedResponseType.YesNo
+            If Me.VAQLProcessor.DUALBINARYFACTTYPEREADINGSTMT.BINARYFACTTYPEREADING(0).INTERNALUNIQUENESSDETERMINER Is Nothing And
+                    Me.VAQLProcessor.DUALBINARYFACTTYPEREADINGSTMT.BINARYFACTTYPEREADING(1).INTERNALUNIQUENESSDETERMINER Is Nothing Then
+                liExpectedResponseType = pcenumExpectedResponseType.ATMOSTONEONEMANYTOMANY
+            End If
+
+            Dim lrFactType As FBM.FactType = Nothing
+            Dim lrBINARYFACTTYPEREADINGSTMT = Me.VAQLProcessor.DUALBINARYFACTTYPEREADINGSTMT.BINARYFACTTYPEREADING(0)
+            Call Me.FormulateQuestionsBinaryFactTypeStatement(lrBINARYFACTTYPEREADINGSTMT, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject, lrFactType)
+
+            lrBINARYFACTTYPEREADINGSTMT = Me.VAQLProcessor.DUALBINARYFACTTYPEREADINGSTMT.BINARYFACTTYPEREADING(1)
+            Call Me.FormulateQuestionsBinaryFactTypeStatement(lrBINARYFACTTYPEREADINGSTMT, abBroadcastInterfaceEvent, abStraightToActionProcessing, arDSCError, arFEKLLineageObject, lrFactType, liExpectedResponseType)
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -1117,7 +1630,7 @@ Partial Public Class tBrain
 
         Try
             Dim lrFactTypeReading As New FBM.FactTypeReading
-            Dim lrPredicatePart As Language.PredicatePart
+            Dim lrLanguagePredicatePart As Language.PredicatePart
             Dim lrPlan As New Brain.Plan 'The Plan formulated to create the FactType.
             Dim lrStep As Brain.Step 'For Steps added to the Plan.
             Dim lrQuestion As tQuestion
@@ -1151,9 +1664,9 @@ Partial Public Class tBrain
             lrSentence.FollowingText = Me.VAQLProcessor.ATMOSTONEStatement.FOLLOWINGREADINGTEXT
 
             For liInd = 1 To Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENT.Count
-
-                lrPredicatePart = New Language.PredicatePart()
-                lrPredicatePart.SequenceNr = liInd
+#Region "Model Element"
+                lrLanguagePredicatePart = New Language.PredicatePart()
+                lrLanguagePredicatePart.SequenceNr = liInd
 
                 lrModelElementNode = Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENT(liInd - 1)
                 Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT = ""
@@ -1175,8 +1688,8 @@ Partial Public Class tBrain
 
                 If Me.Model.ExistsModelElement(lsModelObjectName) Then
                     If Array.IndexOf({pcenumConceptType.ValueType,
-                                        pcenumConceptType.EntityType,
-                                        pcenumConceptType.FactType},
+                                      pcenumConceptType.EntityType,
+                                      pcenumConceptType.FactType},
                                     Me.Model.GetModelObjectByName(lsModelObjectName).ConceptType) >= 0 Then
                         '-----------------------------------------------------------------------------
                         'A ObjectType already exists within the Model for the name lsModelObjectName
@@ -1189,7 +1702,7 @@ Partial Public Class tBrain
                 End If
 
                 If lbProceedToCreateObjectTypeQuestion Then
-
+#Region "Check if likely is Value Type"
                     Dim lbIsLikelyValueType As Boolean = False
                     Dim items As Array
                     items = System.Enum.GetValues(GetType(pcenumReferenceModeEndings))
@@ -1240,7 +1753,7 @@ FinishedCheckingLikelies:
                     Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
 
                     If (liInd <> 1) And Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENTTYPE(Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENTTYPE.Count - 1).KEYWDWRITTENAS IsNot Nothing Then
-
+#Region "Has IS WRITTEN AS CLAUSE - I.e. Is a Value Type"
                         Me.VAQLProcessor.VALUETYPEWRITTENASClause = Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENTTYPE(Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENTTYPE.Count - 1).VALUETYPEWRITTENASCLAUSE
 
                         If Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPE IsNot Nothing Then
@@ -1251,6 +1764,10 @@ FinishedCheckingLikelies:
                         ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
                             lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
                             liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                        ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE IsNot Nothing AndAlso Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER.Count > 0 Then
+                            lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.DATATYPE
+                            liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(0))
+                            liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(1))
                         End If
 
                         lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -1281,9 +1798,12 @@ FinishedCheckingLikelies:
                         lrValueType = Me.Model.CreateValueType(lsModelObjectName, False, liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
 
                         lbIsLikelyValueType = True
+#End Region
+#End Region
                     End If
 
                     If lbIsLikelyValueType Then
+#Region "Value Type - Question - Likely"
                         lrStep = New Brain.Step(pcenumActionType.CreateValueType, True, pcenumActionType.None, Nothing)
                         lrPlan.AddStep(lrStep)
 
@@ -1298,7 +1818,9 @@ FinishedCheckingLikelies:
                                                             lrValueType,
                                                             lrPlan,
                                                             lrStep)
+#End Region
                     Else
+#Region "Entity Type - Question"
                         lrStep = New Brain.Step(pcenumActionType.CreateEntityType, True, pcenumActionType.CreateValueType, Nothing)
                         lrPlan.AddStep(lrStep)
 
@@ -1313,6 +1835,7 @@ FinishedCheckingLikelies:
                                                             Nothing,
                                                             lrPlan,
                                                             lrStep)
+#End Region
                     End If
 
 
@@ -1328,36 +1851,40 @@ FinishedCheckingLikelies:
                     End If
                 End If
 
-                lrPredicatePart.PreboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT)
-                lrPredicatePart.PostboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT)
+                lrLanguagePredicatePart.PreboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.PREBOUNDREADINGTEXT)
+                lrLanguagePredicatePart.PostboundText = Trim(Me.VAQLProcessor.MODELELEMENTClause.POSTBOUNDREADINGTEXT)
 
-                lrPredicatePart.ObjectName = Me.VAQLProcessor.MODELELEMENTClause.MODELELEMENTNAME
+                lrLanguagePredicatePart.ObjectName = Me.VAQLProcessor.MODELELEMENTClause.MODELELEMENTNAME
 
                 Dim lsPredicatePartText As String = ""
 
+#Region "Get Predicate Parts"
                 If Me.VAQLProcessor.ATMOSTONEStatement.UNARYPREDICATEPART = "" Then
-                    '----------------------------------------
-                    'FactType is binary or greater in arity
-                    '----------------------------------------
+                    '--------------------------------------------------------------
+                    'FactType is binary in arity. Get Predicate Parts.
+                    '--------------------------------------------------------------
                     If liInd < Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENT.Count Then
                         lrPredicateClauseNode = Me.VAQLProcessor.ATMOSTONEStatement.PREDICATECLAUSE(liInd - 1)
                         Me.VAQLProcessor.PREDICATEPARTClause.PREDICATEPART = New List(Of String)
                         Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.PREDICATEPARTClause, lrPredicateClauseNode)
 
                         For Each lsPredicatePartText In Me.VAQLProcessor.PREDICATEPARTClause.PREDICATEPART
-                            lrPredicatePart.PredicatePartText &= lsPredicatePartText
+                            lrLanguagePredicatePart.PredicatePartText &= lsPredicatePartText
                         Next
                     End If
 
-                    lrPredicatePart.PredicatePartText = Trim(lrPredicatePart.PredicatePartText)
+                    lrLanguagePredicatePart.PredicatePartText = Trim(lrLanguagePredicatePart.PredicatePartText)
                 Else
                     '------------------------------
                     'FactType is a unary FactType
                     '------------------------------
-                    lrPredicatePart.PredicatePartText = Trim(Me.VAQLProcessor.ATMOSTONEStatement.UNARYPREDICATEPART)
+                    lrLanguagePredicatePart.PredicatePartText = Trim(Me.VAQLProcessor.ATMOSTONEStatement.UNARYPREDICATEPART)
                 End If
 
-                lrSentence.PredicatePart.Add(lrPredicatePart)
+                lrSentence.PredicatePart.Add(lrLanguagePredicatePart)
+#End Region
+
+#End Region
             Next 'ModelElement
 
             lrStep = New Brain.Step(pcenumActionType.CreateFactType,
@@ -1394,7 +1921,8 @@ FinishedCheckingLikelies:
 
             Return True
 
-            '=====================================
+            '20230904-VM-Old Code. Delete after 20240101=====================================
+#Region "Old Code - Commented out"
             'Me.VAQLProcessor.ATMOSTONEStatement.MODELELEMENTNAME = New List(Of String)
             'Me.VAQLProcessor.ATMOSTONEStatement.PREDICATECLAUSE = New Object
 
@@ -1516,13 +2044,14 @@ FinishedCheckingLikelies:
             'Else
             '    Me.AddQuestion(lrQuestion)
             'End If
+#End Region
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return False
 
@@ -1700,7 +2229,7 @@ FinishedCheckingLikelies:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return False
         End Try
@@ -1789,7 +2318,7 @@ FinishedCheckingLikelies:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return False
         End Try

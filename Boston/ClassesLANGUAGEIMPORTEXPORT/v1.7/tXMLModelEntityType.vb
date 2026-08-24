@@ -53,6 +53,17 @@ Namespace XMLModel
             End Set
         End Property
 
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _GraphLabel As New List(Of String)
+        Public Property GraphLabel() As List(Of String)
+            Get
+                Return Me._GraphLabel
+            End Get
+            Set(ByVal value As List(Of String))
+                Me._GraphLabel = value
+            End Set
+        End Property
+
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _Instance As New List(Of String)
         Public Property Instance() As List(Of String)
@@ -220,13 +231,25 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _ShortDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ShortDescription() As String
             Get
                 Return Me._ShortDescription
             End Get
             Set(ByVal value As String)
                 Me._ShortDescription = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ModelElementFlags As New List(Of FBM.ModelElementFlag)
+        <XmlElement()>
+        Public Property ModelElementFlags() As List(Of FBM.ModelElementFlag)
+            Get
+                Return Me._ModelElementFlags
+            End Get
+            Set(ByVal value As List(Of FBM.ModelElementFlag))
+                Me._ModelElementFlags = value
             End Set
         End Property
 

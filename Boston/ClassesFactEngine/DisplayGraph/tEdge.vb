@@ -1,5 +1,6 @@
 ﻿Namespace FactEngine.DisplayGraph
     Public Class Edge
+        Implements IEquatable(Of FactEngine.DisplayGraph.Edge)
 
         Public QueryEdge As FactEngine.QueryEdge
 
@@ -16,6 +17,11 @@
             Me.TargetNode = arTargetNode
         End Sub
 
+        Public Shadows Function Equals(other As Edge) As Boolean Implements IEquatable(Of Edge).Equals
+
+            Return Me.BaseNode.Name = other.BaseNode.Name And Me.TargetNode.Name = other.TargetNode.Name
+
+        End Function
     End Class
 
 End Namespace

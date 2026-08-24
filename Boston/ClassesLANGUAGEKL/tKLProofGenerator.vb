@@ -44,7 +44,7 @@ Public Class tKLProofGenerator
 
     Sub reserve_free_variable(ByVal as_free_variable As String)
 
-        If IsSomething(Me.FreeVariable.Contains(as_free_variable)) Then
+        If Me.FreeVariable.Contains(as_free_variable) Then
             '---------------------------------------
             'The Free Variable is already reserved
             '---------------------------------------
@@ -56,7 +56,7 @@ Public Class tKLProofGenerator
 
     Sub reserve_function_label(ByVal as_function_label As String)
 
-        If IsSomething(Me.function.Contains(as_function_label)) Then
+        If Me.Function.Contains(as_function_label) Then
             '---------------------------------------
             'The Function Label is already reserved
             '---------------------------------------            

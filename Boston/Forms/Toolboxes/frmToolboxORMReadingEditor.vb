@@ -209,7 +209,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -261,7 +261,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -294,7 +294,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -333,7 +333,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -371,7 +371,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -525,7 +525,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -626,6 +626,8 @@ Public Class frmToolboxORMReadingEditor
                     If lsNewName <> lsOldName And abAskChangeName Then
                         If MsgBox(lsMessage, MsgBoxStyle.DefaultButton2 + MsgBoxStyle.YesNo, "Rename Fact Type?") = DialogResult.Yes Then
 
+                            lsNewName = Me.zrFactTypeInstance.Model.CreateUniqueFactTypeName(lsNewName, 0, True)
+
                             Call Me.zrFactTypeInstance.FactType.setName(lsNewName, True)
 
                             Me.LabelFactTypeName.Text = lsNewName
@@ -670,7 +672,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -696,9 +698,8 @@ Public Class frmToolboxORMReadingEditor
                 lasSortedModelNameObjectList.Add(lsDictionaryItem.Key)
             Next
 
-            Dim lrStringLengthComparerDescending As New Viev.Strings.StringLengthComparerDescending
+            Dim lrStringLengthComparerDescending As New FEStrings.StringLengthComparerDescending
             lasSortedModelNameObjectList.Sort(lrStringLengthComparerDescending)
-
 
             aoRichTextBox.SelectAll()
             aoRichTextBox.SelectionProtected = False
@@ -742,7 +743,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -766,7 +767,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -843,8 +844,8 @@ Public Class frmToolboxORMReadingEditor
 
                     If Me.zrFactTypeInstance.FactTypeReading.Equals(lrFactTypeReadingInstance) Then
 
-                        If IsSomething(Me.zrFactTypeInstance.FactTypeReading) Then
-                            If IsSomething(Me.zrFactTypeInstance.FactTypeReadingShape.Shape) Then
+                        If Me.zrFactTypeInstance.FactTypeReading IsNot Nothing Then
+                            If Me.zrFactTypeInstance.FactTypeReadingShape.Shape IsNot Nothing Then
                                 lrShapeNode = Me.zrFactTypeInstance.FactTypeReadingShape.Shape
                             End If
                         End If
@@ -915,7 +916,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -939,7 +940,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -971,7 +972,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1005,7 +1006,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1015,17 +1016,20 @@ Public Class frmToolboxORMReadingEditor
         'For [Enter] see KeyDown. Calls Me.processFactTypeReading()
 
         Try
-            If e.KeyCode = Keys.Down Or Trim(Me.TextboxReading.Text) <> "NL:" Then
-                Call Me.ProcessAutoComplete(e)
-            End If
-
             If e.KeyCode = Keys.Escape Then
+                'User wants to close the AutoComplete box.
                 Me.AutoComplete.Hide()
+                Exit Sub
             End If
 
             If (e.KeyCode = Keys.Enter) And Me.TextboxReading.Text = "" Then
                 Call Me.AutoComplete.Hide()
+                Exit Sub
             End If
+
+            'If e.KeyCode = Keys.Down Then
+            Call Me.ProcessAutoComplete(e)
+            'End If
 
             e.Handled = True
 
@@ -1035,7 +1039,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1064,7 +1068,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1111,7 +1115,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1125,7 +1129,7 @@ Public Class frmToolboxORMReadingEditor
 
             Dim lo_point As New Point(Me.TextboxReading.GetPositionFromCharIndex(Me.TextboxReading.SelectionStart))
             lo_point.X += Me.TextboxReading.Bounds.X
-            lo_point.Y += Me.TextboxReading.Bounds.Y
+            lo_point.Y += Me.PanelChatBox.Bounds.Y
             lo_point.Y += CInt(Me.TextboxReading.Font.GetHeight()) + 13
             Me.AutoComplete.Location = PointToScreen(lo_point)
 
@@ -1137,7 +1141,7 @@ Public Class frmToolboxORMReadingEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1209,7 +1213,7 @@ ProcessToken:
                 End Select
 
                 lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
-                If IsSomething(lsCurrentTokenType) And (Me.TextboxReading.Text.Length > 0) Then
+                If lsCurrentTokenType IsNot Nothing And (Me.TextboxReading.Text.Length > 0) Then
                     lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
 
                     Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
@@ -1260,7 +1264,7 @@ ProcessToken:
                 '=========================================================================================================================
 
                 lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
-                If IsSomething(lsCurrentTokenType) And (Me.TextboxReading.Text.Length > 0) Then
+                If lsCurrentTokenType IsNot Nothing And (Me.TextboxReading.Text.Length > 0) Then
                     lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
                     Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
                         Case Is = FTR.TokenType.PREDICATEPART,
@@ -1396,7 +1400,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1432,7 +1436,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1452,14 +1456,14 @@ CreateSuggestions:
                         Dim lsModelElementName As String
                         lsModelElementName = Me.TextboxReading.Text.Trim.Split(" ").Last
                     ''lrModelElement = prApplication.WorkingModel.GetModelElementByName(lsModelElementName)
-                    'If IsSomething(lrModelElement) Then
+                    'If lrModelElement IsNot Nothing Then
                     '    Call Me.AddPredicatePartsToEnterpriseAware(prBradfordApplication.Database.MetaDataManager.GetPredicatePartsForModelObject(lrModelElement))
                     'Else
                     '    Dim larCharBeginning() As Char = {"("}
                     '    Dim larCharEnd() As Char = {")"}
                     '    lsModelElementName = lsModelElementName.TrimStart(larCharBeginning).TrimEnd(larCharEnd)
                     '    'lrModelElement = prApplication .WorkingModel.GetModelElementByName(lsModelElementName)
-                    '    If IsSomething(lrModelElement) Then
+                    '    If lrModelElement IsNot Nothing Then
                     '        Call Me.AddPredicatePartsToEnterpriseAware(prBradfordApplication.Database.MetaDataManager.GetPredicatePartsForModelObject(lrModelElement))
                     '    End If
                     'End If
@@ -1488,7 +1492,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1510,7 +1514,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1571,7 +1575,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1629,7 +1633,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1653,7 +1657,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1698,7 +1702,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1722,7 +1726,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1752,7 +1756,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1780,7 +1784,7 @@ CreateSuggestions:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -1793,7 +1797,7 @@ CreateSuggestions:
             Dim lrFactTypeReading As FBM.FactTypeReading
 
             If Me.DataGrid_Readings.SelectedRows.Count = 0 Then
-                prApplication.ThrowErrorMessage("Select a Fact Type Reading in the grid.", pcenumErrorType.Warning,, False,, True,, True)
+                prApplication.ThrowMessage("Select a Fact Type Reading in the grid.", pcenumErrorType.Warning,, False,, True,, True)
                 Exit Sub
             End If
 
@@ -1815,7 +1819,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1847,7 +1851,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1873,7 +1877,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1905,7 +1909,7 @@ CreateSuggestions:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

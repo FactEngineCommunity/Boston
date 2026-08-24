@@ -59,7 +59,7 @@ Partial Class frmToolboxDatabaseSchemaViewer
         Me.GroupboxSchema.Size = New System.Drawing.Size(196, 429)
         Me.GroupboxSchema.TabIndex = 2
         Me.GroupboxSchema.TabStop = False
-        Me.GroupboxSchema.Text = "Schema:"
+        Me.GroupboxSchema.Text = "Actual Database Schema:"
         '
         'TreeViewSchema
         '

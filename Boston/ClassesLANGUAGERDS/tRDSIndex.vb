@@ -1,4 +1,5 @@
 ﻿Imports System.Xml.Serialization
+Imports Newtonsoft.Json
 Imports System.Reflection
 
 Namespace RDS
@@ -7,12 +8,16 @@ Namespace RDS
     Public Class Index
         Implements IEquatable(Of RDS.Index)
 
+        <XmlIgnore>
+        <JsonIgnore()>
+        <NonSerialized>
         Public Model As RDS.Model
 
         <XmlAttribute()> _
         Public Name As String
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <NonSerialized()>
         Public Table As RDS.Table
 
@@ -20,8 +25,19 @@ Namespace RDS
         ''' 20200720-VM-In future will need to modify the Core Model to incorporate this, is derived as of today until new Core is created.
         ''' </summary>
         <XmlIgnore()>
+        <JsonIgnore()>
         <NonSerialized()>
-        Public WithEvents ResponsibleRoleConstraint As FBM.RoleConstraint
+        Private WithEvents _ResponsibleRoleConstraint As FBM.RoleConstraint
+        <XmlIgnore>
+        <JsonIgnore()>
+        Public Property ResponsibleRoleConstraint As FBM.RoleConstraint
+            Get
+                Return Me._ResponsibleRoleConstraint
+            End Get
+            Set(value As FBM.RoleConstraint)
+                Me._ResponsibleRoleConstraint = value
+            End Set
+        End Property
 
         <XmlAttribute()> _
         Public ReadOnly Property TableName As String
@@ -45,8 +61,23 @@ Namespace RDS
         <XmlAttribute()> _
         Public IndexQualifier As String = ""
 
-        <XmlAttribute()> _
-        Public Type As pcenumODBCIndexType
+        <XmlIgnore>
+        Private _IndexType As pcenumODBCIndexType = pcenumODBCIndexType.Unknown
+        <XmlAttribute>
+        Public Property Type As pcenumODBCIndexType 'ODBC
+            Get
+                If Me.IsPrimaryKey Then
+                    Return pcenumODBCIndexType.PrimaryKey
+                ElseIf Me.Unique Then
+                    Return pcenumODBCIndexType.Unique
+                Else
+                    Return pcenumODBCIndexType.Unknown
+                End If
+            End Get
+            Set(value As pcenumODBCIndexType)
+                Me._IndexType = value
+            End Set
+        End Property
 
         <XmlAttribute()> _
         Public AscendingOrDescending As pcenumCMMLIndexDirection 'was pcenumODBCAscendingOrDescending
@@ -54,17 +85,20 @@ Namespace RDS
         <XmlAttribute()> _
         Public Cardinality As Integer = 0
 
-        <XmlAttribute()> _
+        <XmlIgnore>
+        <JsonIgnore()>
         Public Pages As Integer = 0 'Can be DBNull from ODBC
 
-        <XmlAttribute()> _
+        <XmlIgnore>
+        <JsonIgnore()>
         Public FilterCondition As String 'Can be DBNull from ODBC
 
-        <XmlAttribute()> _
+        <XmlAttribute>
         Public IgnoresNulls As Boolean = False
 
-        <NonSerialized()> _
+        <NonSerialized()>
         Public Event ColumnRemoved(ByRef arColumn As RDS.Column)
+        <NonSerialized()>
         Public Event IsPrimaryKeyChanged(ByVal abIsPrimaryKey As Boolean)
 
         ''' <summary>
@@ -82,6 +116,20 @@ Namespace RDS
 
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="arTable">The Table for which the index is created.</param>
+        ''' <param name="asIndexName">Name of the index.</param>
+        ''' <param name="asQualifier">Qualifier, such as 'PK' or 'UC'</param>
+        ''' <param name="aiIndexDirection">Ascending or Descending</param>
+        ''' <param name="abIsPrimaryKey">True if the Index is a Primary Key index.</param>
+        ''' <param name="abRestrainsToUniqueValues">True if the Index restrains to Unique Values.</param>
+        ''' <param name="abIndexIgnoresNulls">True if the Index ignores NULL values.</param>
+        ''' <param name="aarColumn">The list of Columns for the Index.</param>
+        ''' <param name="abAddToTable">True if adding to the Table and the CMML model. See also, abJustAddTheIndex.</param>
+        ''' <param name="abAddIndexToColumns">True if adding the Index to the Column's set of Indexes.</param>
+        ''' <param name="abJustAddTheIndex">Just adds to the Table's Indexes, not CMML model.</param>
         Public Sub New(ByRef arTable As RDS.Table,
                        ByVal asIndexName As String,
                        ByVal asQualifier As String,
@@ -109,7 +157,7 @@ Namespace RDS
                 If abAddIndexToColumns Then
                     lrColumn.addIndex(Me)
 
-                    If Me.IsPrimaryKey Then 'Make sure mandatory
+                    If Me.IsPrimaryKey And Not lrColumn.IsMandatory Then 'Make sure mandatory
                         lrColumn.setMandatory(True)
                     End If
                 End If
@@ -120,7 +168,7 @@ Namespace RDS
                 If abJustAddTheIndex Then
                     arTable.Index.Add(Me)
                 Else
-                    arTable.Index.AddUnique(Me)
+                    arTable.addIndex(Me)
                 End If
 
             End If
@@ -155,7 +203,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrIndex
             End Try
@@ -184,10 +232,15 @@ Namespace RDS
 
         Public Function EqualsByColumns(other As Index) As Boolean
 
+            'CodeSafe
+            other.Column.RemoveAll(Function(x) x Is Nothing)
+
             If Me.Column.Count = other.Column.Count Then
 
                 For Each lrColumn In Me.Column
-                    If other.Column.Find(Function(x) x.Name = lrColumn.Name And x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
+                    If other.Column.Find(Function(x) x.ActiveRole IsNot Nothing And lrColumn.ActiveRole IsNot Nothing AndAlso
+                                         x.Name = lrColumn.Name AndAlso
+                                         x.ActiveRole.Id = lrColumn.ActiveRole.Id) Is Nothing Then
                         Return False
                     End If
                 Next
@@ -239,7 +292,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -324,7 +377,6 @@ KeepChecking1:
 
                     'Otherwise, do the same as the above, but for all RoleConstraints in the FBMModel.
                     Case Is = pcenumConceptType.FactType
-
                         '---------------------------------------------------------------
                         'Try and find the RoleConstraint in the FBM Model
                         Dim loRoleConstraint = From RoleConstraint In Me.Model.Model.RoleConstraint
@@ -359,7 +411,7 @@ Abort:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -381,7 +433,7 @@ Abort:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -401,7 +453,7 @@ Abort:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -439,7 +491,7 @@ Abort:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -457,14 +509,24 @@ Abort:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub ResponsibleRoleConstraint_RemoveIndex(abBroadcastInterfaceEvent As Boolean) Handles ResponsibleRoleConstraint.RemoveIndex
+        Private Sub ResponsibleRoleConstraint_RemoveIndex(abBroadcastInterfaceEvent As Boolean) Handles _ResponsibleRoleConstraint.RemoveIndex
 
-            Call Me.Table.removeIndex(Me)
+            Try
+                Call Me.Table.removeIndex(Me)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 

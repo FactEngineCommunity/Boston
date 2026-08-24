@@ -1,10 +1,25 @@
-﻿Namespace ORMQL
+﻿Imports System.Reflection
+
+Namespace ORMQL
+
     <Serializable()>
     Public Class Recordset
         Implements IEnumerator
 
-        Public Facts As New List(Of FBM.Fact)
-        Public Columns As New List(Of String)
+        Public _Facts As New List(Of FBM.Fact)
+
+        Public Property Facts As List(Of FBM.Fact)
+            Get
+                Return Me._Facts
+            End Get
+            Set(value As List(Of FBM.Fact))
+                Me._Facts = value
+            End Set
+        End Property
+
+
+        Public ColumnNames As New List(Of String)
+        Public Columns As New List(Of RDS.Column)
 
         ''' <summary>
         ''' True if an error was returned when creating the recordset. See ErrorString for error details.
@@ -18,7 +33,25 @@
 
         Public ErrorString As String = Nothing
 
+        ''' <summary>
+        ''' The original FEQL query if one was used. Appended by FactEngine.
+        ''' </summary>
+        Public FEQLQuery As String = Nothing
+
+        ''' <summary>
+        ''' The Actual Query ran against the database.
+        ''' </summary>
         Public Query As String = Nothing
+
+        ''' <summary>
+        ''' Query sent for processing, but that was translated to the Actual Query (Query member), to run Query against the database.
+        ''' </summary>
+        Public IntermediateQuery As String = Nothing
+
+        ''' <summary>
+        ''' If a Natural Language Query is converted to FactEngine Query Language query. Appended by FactEngine.
+        ''' </summary>
+        Public NaturalLanguageQuery As String = Nothing
 
         Public Warning As New List(Of String) 'For if there are any Warnings/Recommendations in a QueryGraph in FactEngine.
 
@@ -114,7 +147,10 @@
                     End If
 
                 Catch ex As Exception
-                    Return Nothing
+                    'Effectively a NullValue. NB If there are no Facts against a FactType, this does not mean the FactType does not exist in the Model.
+                    'It merely means that the effective value for the FactType is nothing. Nothing is "" in Boston.
+                    Dim lrFactData = New FBM.FactData(New FBM.Concept("", False))
+                    Return lrFactData
                 End Try
             End Get
             Set(ByVal value As FBM.FactData)
@@ -161,6 +197,38 @@
             End Select
 
         End Sub
+
+        Public Function generateCSVText() As String
+
+            Dim lsCSVText As String = ""
+            Dim liInd = 0
+
+            Try
+                For Each lrFact In Me.Facts
+
+                    liInd = 0
+                    For Each lrFactData In lrFact.Data
+                        If liInd > 0 Then lsCSVText &= ","
+                        lsCSVText &= lrFactData.Data
+                        liInd += 1
+                    Next
+                    lsCSVText &= vbCrLf
+                Next
+
+                Return lsCSVText
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return ""
+            End Try
+
+        End Function
 
     End Class
 

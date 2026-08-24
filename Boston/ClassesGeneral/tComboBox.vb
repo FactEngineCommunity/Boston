@@ -23,7 +23,12 @@ Public Class tComboboxItem
 
     Public Tag As Object = Nothing
 
-
+    ''' <summary>
+    ''' Constructor
+    ''' </summary>
+    ''' <param name="aiItemdata">The ItemData for the Item. May be an object.</param>
+    ''' <param name="as_text">The Text for the ComboBox Item.</param>
+    ''' <param name="ao_tag_object">The Tag for the ComboBox Item. May be the same as the ItemData.</param>
     Public Sub New(ByVal aiItemdata As Object, ByVal as_text As String, Optional ByRef ao_tag_object As Object = Nothing)
 
         'store these values
@@ -50,6 +55,10 @@ Public Class tComboboxItem
             Return False
         End If
 
+    End Function
+
+    Public Function EqualsByText(ByVal other As tComboboxItem) As Boolean
+        Return Me.Text = other.Text
     End Function
 
     Public Function EqualsAll(ByVal other As tComboboxItem) As Boolean

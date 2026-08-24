@@ -1,5 +1,4 @@
-﻿Imports System.Reflection
-Imports System.Runtime.CompilerServices
+﻿Imports System.Runtime.CompilerServices
 Imports Microsoft.VisualBasic
 Imports System.ComponentModel
 Imports System.Text.RegularExpressions
@@ -9,8 +8,66 @@ Imports System.Runtime.Serialization
 Imports System.Runtime.InteropServices
 Imports System.Globalization
 Imports System.Dynamic
+Imports System.Reflection
 
 Module MyMethodExtensions
+
+    <Extension()>
+    Public Function Between(value As Integer, min As Integer, max As Integer) As Boolean
+        Return value >= min AndAlso value <= max
+    End Function
+
+    <StructLayout(LayoutKind.Sequential)>
+    Private Structure RECT
+        Public Left As Integer
+        Public Top As Integer
+        Public Right As Integer
+        Public Bottom As Integer
+    End Structure
+
+#Region "Richtextbox"
+    ' Constants for Win32 API calls
+    Private Const EM_GETFIRSTVISIBLELINE As Integer = &HCE
+    Private Const EM_LINEINDEX As Integer = &HBB
+    Private Const EM_LINESCROLL As Integer = &HB6
+    Private Const EM_GETRECT As Integer = &HB2
+
+    ' Win32 API declarations
+    Private Declare Function SendMessage Lib "user32.dll" Alias "SendMessageA" (
+        ByVal hWnd As IntPtr, ByVal wMsg As Integer,
+        ByVal wParam As IntPtr, ByVal lParam As IntPtr) As IntPtr
+
+    Private Declare Function GetClientRect Lib "user32.dll" (
+        ByVal hWnd As IntPtr, ByRef lpRect As RECT) As Boolean
+
+
+    ' Extension method to get the first visible character index
+    <Runtime.CompilerServices.Extension()>
+    Public Function GetFirstVisibleCharIndex(ByVal richTextBox As RichTextBox) As Integer
+        Dim rect As RECT
+        GetClientRect(richTextBox.Handle, rect)
+
+        Dim firstVisibleLine As Integer = SendMessage(richTextBox.Handle, EM_GETFIRSTVISIBLELINE, IntPtr.Zero, IntPtr.Zero)
+        Dim firstVisibleCharIndex As Integer = SendMessage(richTextBox.Handle, EM_LINEINDEX, CType(firstVisibleLine, IntPtr), IntPtr.Zero)
+        Dim charWidth As Double = rect.Right / richTextBox.TextLength
+        Dim charOffset As Double = (rect.Left / charWidth)
+        Return CInt(firstVisibleCharIndex + charOffset)
+    End Function
+
+    ' Extension method to get the last visible character index
+    <Runtime.CompilerServices.Extension()>
+    Public Function GetLastVisibleCharIndex(ByVal richTextBox As RichTextBox) As Integer
+        Dim rect As RECT
+        GetClientRect(richTextBox.Handle, rect)
+
+        ' Calculate the number of visible lines based on the control's height and font height
+        Dim visibleLines As Integer = CInt(Math.Ceiling((richTextBox.Height - 2) / (richTextBox.Font.Height + 2)))
+        Dim visibleCharactersPerLine As Integer = CInt(Math.Ceiling((richTextBox.Width - 2) / (richTextBox.Font.Height / 2 + 2)))
+
+        ' Calculate the last visible line index
+        Return richTextBox.GetFirstVisibleCharIndex + (visibleLines * visibleCharactersPerLine)
+
+    End Function
 
     ''' <summary>
     ''' RichTextBox: Move cursor and scroll to index.
@@ -27,6 +84,60 @@ Module MyMethodExtensions
             ' Handle the case where the index is out of bounds.
         End If
     End Sub
+
+#End Region
+
+#Region "Earhart"
+    ''' <summary>
+    ''' This extension will be used to get all the descendants of a tree node
+    ''' </summary>
+    <Extension()>
+    Friend Iterator Function AllDescendants(ByVal c As TreeNodeCollection) As IEnumerable(Of TreeNode)
+        For Each node In c.OfType(Of TreeNode)()
+            Yield node
+
+            For Each child In node.Nodes.AllDescendants()
+                Yield child
+            Next
+        Next
+    End Function
+
+    '''' <summary>
+    '''' This extension will be used to get all nested of a <see cref="Earhart.TreeFolder"/>, Including self
+    '''' </summary>
+    '<Extension()>
+    'Friend Iterator Function All(ByVal arTreeModel As Earhart.TreeFolder) As IEnumerable(Of Earhart.TreeFolder)
+
+    '    Yield arTreeModel
+
+    '    For Each lrTreeModel In arTreeModel.NestedFolders
+    '        For Each child In lrTreeModel.All()
+    '            Yield child
+    '        Next
+    '    Next
+
+    'End Function
+    '''' <summary>
+    '''' This extension will be used to get all the nested of a <see cref="Earhart.TreeFolder"/>
+    '''' </summary>
+    '<Extension()>
+    'Friend Iterator Function AllNested(ByVal arTreeModel As Earhart.TreeFolder) As IEnumerable(Of Earhart.TreeFolder)
+
+    '    For Each lrTreeModel In arTreeModel.NestedFolders
+    '        Yield lrTreeModel
+
+    '        For Each child In lrTreeModel.AllNested()
+    '            Yield child
+    '        Next
+    '    Next
+
+    'End Function
+#End Region
+
+    <Extension()>
+    Public Function GetReversed(Of T)(ByVal list As List(Of T)) As List(Of T)
+        Return list.AsEnumerable().Reverse().ToList()
+    End Function
 
     ''' <summary>
     ''' Append to an array.
@@ -102,6 +213,38 @@ Module MyMethodExtensions
     End Sub
 
     ''' <summary>
+    ''' <see cref="RichTextBox"/> doesn't support the <see cref="vbCrLf"/> characters. <br />
+    ''' This will replace all the line carriage return characters with line feed characters.
+    ''' </summary>
+    ''' <param name="asData">The string data you want check for characters</param>
+    ''' <returns></returns>
+    <Extension()>
+    Friend Function FixLineCharacters(ByRef asData As String) As String
+        Try
+
+            ' replace the characters in the data
+            asData = asData.
+                Replace(vbCr, vbLf).
+                Replace(vbCrLf, vbLf)
+
+            ' return the data
+            Return asData
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            ' return the original data
+            Return asData
+        End Try
+
+    End Function
+
+    ''' <summary>
     ''' RichTextBox: Highlight Text
     ''' </summary>
     ''' <param name="richTextBox"></param>
@@ -148,8 +291,18 @@ Module MyMethodExtensions
     End Function
 
     <Extension()>
+    Public Function ToSnakeCase(ByVal aInput As String) As String
+        If String.IsNullOrWhiteSpace(aInput) Then
+            Return String.Empty
+        End If
+
+        ' Replace spaces with underscores and make lowercase
+        Return aInput.Trim().Replace(" "c, "_"c).ToLowerInvariant()
+    End Function
+
+    <Extension()>
     Function ToPascalCase(ByVal input As String) As String
-        Dim words As String() = input.Split({" "c, "_"c}, StringSplitOptions.None)
+        Dim words As String() = input.Split({" "c}, StringSplitOptions.None) '20250831-Did contain , "_"c
 
         For i As Integer = 0 To words.Length - 1
             words(i) = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(words(i).ToLower())
@@ -170,6 +323,40 @@ Module MyMethodExtensions
             Return input
         End Try
 
+    End Function
+
+    ''' <summary>
+    ''' Used to truncate/concatenate a string.
+    ''' E.g. 'Test Set 1 - Error Conditions', becomes 'TS1EC', for Test Case 'Codes' etc. E.g. 'TS1EC-01'
+    ''' </summary>
+    ''' <param name="aText"></param>
+    ''' <returns></returns>
+    <Extension()>
+    Public Function ToInitialCode(ByVal aText As String) As String
+        If String.IsNullOrWhiteSpace(aText) Then Return String.Empty
+
+        Dim lResult As New Text.StringBuilder
+        ' Match words or numbers
+        For Each lMatch As Match In Regex.Matches(aText, "\w+")
+            Dim lToken As String = lMatch.Value
+            ' If token starts with digit, keep the whole number; else take first letter
+            If Char.IsDigit(lToken(0)) Then
+                lResult.Append(lToken)
+            Else
+                lResult.Append(Char.ToUpper(lToken(0)))
+            End If
+        Next
+
+        Return lResult.ToString()
+    End Function
+
+    <Extension()>
+    Public Function ToPaddedCode(ByVal aNumber As Integer) As String
+        If aNumber < 1000 Then
+            Return aNumber.ToString("D3")   ' pad with zeros up to 3 digits
+        Else
+            Return aNumber.ToString()       ' no padding beyond 999
+        End If
     End Function
 
     ''' <summary>

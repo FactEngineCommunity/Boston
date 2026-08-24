@@ -13,7 +13,7 @@ Namespace TableModelNote
                 lsSQLQuery &= "  VALUES("
                 lsSQLQuery &= "'" & Trim(arModelNote.Id) & "'"
                 lsSQLQuery &= ",'" & Trim(Replace(arModelNote.Text, "'", "`")) & "'"
-                If IsSomething(arModelNote.JoinedObjectType) Then
+                If arModelNote.JoinedObjectType IsNot Nothing Then
                     lsSQLQuery &= ",'" & Trim(arModelNote.JoinedObjectType.Id) & "'"
                 Else
                     lsSQLQuery &= ",''"
@@ -32,7 +32,7 @@ Namespace TableModelNote
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -58,7 +58,7 @@ Namespace TableModelNote
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -94,7 +94,7 @@ Namespace TableModelNote
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -127,7 +127,7 @@ Namespace TableModelNote
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -170,11 +170,11 @@ Namespace TableModelNote
                     Else
                         arModelNote.JoinedObjectType = New FBM.ModelObject
                         arModelNote.JoinedObjectType.Id = Trim(Viev.NullVal(lRecordset("JoinedObjectTypeId").Value, ""))
-                        If IsSomething(arModelNote.Model.EntityType.Find(AddressOf arModelNote.JoinedObjectType.Equals)) Then
+                        If arModelNote.Model.EntityType.Find(AddressOf arModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                             arModelNote.JoinedObjectType = arModelNote.Model.EntityType.Find(AddressOf arModelNote.JoinedObjectType.Equals)
-                        ElseIf IsSomething(arModelNote.Model.ValueType.Find(AddressOf arModelNote.JoinedObjectType.Equals)) Then
+                        ElseIf arModelNote.Model.ValueType.Find(AddressOf arModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                             arModelNote.JoinedObjectType = arModelNote.Model.ValueType.Find(AddressOf arModelNote.JoinedObjectType.Equals)
-                        ElseIf IsSomething(arModelNote.Model.FactType.Find(AddressOf arModelNote.JoinedObjectType.Equals)) Then
+                        ElseIf arModelNote.Model.FactType.Find(AddressOf arModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                             arModelNote.JoinedObjectType = arModelNote.Model.FactType.Find(AddressOf arModelNote.JoinedObjectType.Equals)
                         End If
                     End If
@@ -211,7 +211,7 @@ Namespace TableModelNote
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return arModelNote
             End Try
@@ -265,11 +265,11 @@ Namespace TableModelNote
                         Else
                             lrModelNote.JoinedObjectType = New FBM.ModelObject
                             lrModelNote.JoinedObjectType.Id = Trim(Viev.NullVal(lRecordset("JoinedObjectTypeId").Value, ""))
-                            If IsSomething(arModel.EntityType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
+                            If arModel.EntityType.Find(AddressOf lrModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                                 lrModelNote.JoinedObjectType = arModel.EntityType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
-                            ElseIf IsSomething(arModel.ValueType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
+                            ElseIf arModel.ValueType.Find(AddressOf lrModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                                 lrModelNote.JoinedObjectType = arModel.ValueType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
-                            ElseIf IsSomething(arModel.FactType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
+                            ElseIf arModel.FactType.Find(AddressOf lrModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                                 lrModelNote.JoinedObjectType = arModel.FactType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
                             End If
                         End If
@@ -301,7 +301,7 @@ Namespace TableModelNote
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -313,7 +313,7 @@ Namespace TableModelNote
 
                 lsSQLQuery = "UPDATE MetaModelModelNote"
                 lsSQLQuery &= " SET [Note] = '" & Trim(Replace(arModelNote.Text, "'", "`")) & "'"
-                If IsSomething(arModelNote.JoinedObjectType) Then
+                If arModelNote.JoinedObjectType IsNot Nothing Then
                     lsSQLQuery &= " ,JoinedObjectTypeId = '" & arModelNote.JoinedObjectType.Id & "'"
                 Else
                     lsSQLQuery &= " ,JoinedObjectTypeId = ''"
@@ -332,7 +332,7 @@ Namespace TableModelNote
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

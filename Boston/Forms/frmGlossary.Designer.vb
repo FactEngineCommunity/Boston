@@ -24,7 +24,12 @@ Partial Class frmGlossary
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmGlossary))
+        Dim CheckBoxProperties1 As PresentationControls.CheckBoxProperties = New PresentationControls.CheckBoxProperties()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.MenuStripMain = New System.Windows.Forms.MenuStrip()
+        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemCopyToModel = New System.Windows.Forms.ToolStripMenuItem()
         Me.TextboxSearch = New CustomSearchTextbox()
         Me.ButtonRefresh = New System.Windows.Forms.Button()
         Me.ButtonGenerateHTMLGlossary = New System.Windows.Forms.Button()
@@ -43,7 +48,7 @@ Partial Class frmGlossary
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer()
-        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.StatusStripView = New System.Windows.Forms.StatusStrip()
         Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
         Me.CopyToClipboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripDropDownButton2 = New System.Windows.Forms.ToolStripDropDownButton()
@@ -53,15 +58,17 @@ Partial Class frmGlossary
         Me.LabelModelElement = New System.Windows.Forms.Label()
         Me.ButtonViewLineage = New System.Windows.Forms.Button()
         Me.WebBrowser = New System.Windows.Forms.WebBrowser()
+        Me.CheckBoxComboBoxObjectTypes = New PresentationControls.CheckBoxComboBox()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.MenuStripMain.SuspendLayout()
         Me.ContextMenuStripMain.SuspendLayout()
         CType(Me.SplitContainer2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer2.Panel1.SuspendLayout()
         Me.SplitContainer2.SuspendLayout()
-        Me.StatusStrip1.SuspendLayout()
+        Me.StatusStripView.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -74,6 +81,8 @@ Partial Class frmGlossary
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.CheckBoxComboBoxObjectTypes)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.MenuStripMain)
         Me.SplitContainer1.Panel1.Controls.Add(Me.TextboxSearch)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonRefresh)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonGenerateHTMLGlossary)
@@ -89,11 +98,41 @@ Partial Class frmGlossary
         Me.SplitContainer1.SplitterDistance = 289
         Me.SplitContainer1.TabIndex = 0
         '
+        'MenuStripMain
+        '
+        Me.MenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CloseToolStripMenuItem, Me.EditToolStripMenuItem})
+        Me.MenuStripMain.Location = New System.Drawing.Point(0, 0)
+        Me.MenuStripMain.Name = "MenuStripMain"
+        Me.MenuStripMain.Size = New System.Drawing.Size(289, 24)
+        Me.MenuStripMain.TabIndex = 12
+        Me.MenuStripMain.Text = "MenuStrip1"
+        '
+        'CloseToolStripMenuItem
+        '
+        Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(48, 20)
+        Me.CloseToolStripMenuItem.Text = "&Close"
+        '
+        'EditToolStripMenuItem
+        '
+        Me.EditToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemCopyToModel})
+        Me.EditToolStripMenuItem.Name = "EditToolStripMenuItem"
+        Me.EditToolStripMenuItem.Size = New System.Drawing.Size(39, 20)
+        Me.EditToolStripMenuItem.Text = "&Edit"
+        '
+        'ToolStripMenuItemCopyToModel
+        '
+        Me.ToolStripMenuItemCopyToModel.Image = Global.Boston.My.Resources.Resources.Copy16x16
+        Me.ToolStripMenuItemCopyToModel.Name = "ToolStripMenuItemCopyToModel"
+        Me.ToolStripMenuItemCopyToModel.Size = New System.Drawing.Size(162, 22)
+        Me.ToolStripMenuItemCopyToModel.Text = "&Copy to Model..."
+        '
         'TextboxSearch
         '
         Me.TextboxSearch.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TextboxSearch.Location = New System.Drawing.Point(12, 43)
+        Me.TextboxSearch.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.TextboxSearch.Location = New System.Drawing.Point(12, 54)
         Me.TextboxSearch.Name = "TextboxSearch"
         Me.TextboxSearch.Size = New System.Drawing.Size(195, 26)
         Me.TextboxSearch.TabIndex = 10
@@ -101,7 +140,7 @@ Partial Class frmGlossary
         'ButtonRefresh
         '
         Me.ButtonRefresh.Image = Global.Boston.My.Resources.MenuImages.Refresh_16x16
-        Me.ButtonRefresh.Location = New System.Drawing.Point(213, 43)
+        Me.ButtonRefresh.Location = New System.Drawing.Point(213, 54)
         Me.ButtonRefresh.Name = "ButtonRefresh"
         Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
         Me.ButtonRefresh.TabIndex = 6
@@ -120,7 +159,7 @@ Partial Class frmGlossary
         'CheckBoxShowGeneralConcepts
         '
         Me.CheckBoxShowGeneralConcepts.AutoSize = True
-        Me.CheckBoxShowGeneralConcepts.Location = New System.Drawing.Point(12, 69)
+        Me.CheckBoxShowGeneralConcepts.Location = New System.Drawing.Point(12, 80)
         Me.CheckBoxShowGeneralConcepts.Name = "CheckBoxShowGeneralConcepts"
         Me.CheckBoxShowGeneralConcepts.Size = New System.Drawing.Size(141, 17)
         Me.CheckBoxShowGeneralConcepts.TabIndex = 4
@@ -131,7 +170,7 @@ Partial Class frmGlossary
         '
         Me.LabelModelName.AutoSize = True
         Me.LabelModelName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LabelModelName.Location = New System.Drawing.Point(57, 16)
+        Me.LabelModelName.Location = New System.Drawing.Point(57, 27)
         Me.LabelModelName.Name = "LabelModelName"
         Me.LabelModelName.Size = New System.Drawing.Size(104, 13)
         Me.LabelModelName.TabIndex = 3
@@ -140,7 +179,7 @@ Partial Class frmGlossary
         'LabelPromptModel
         '
         Me.LabelPromptModel.AutoSize = True
-        Me.LabelPromptModel.Location = New System.Drawing.Point(12, 16)
+        Me.LabelPromptModel.Location = New System.Drawing.Point(12, 27)
         Me.LabelPromptModel.Name = "LabelPromptModel"
         Me.LabelPromptModel.Size = New System.Drawing.Size(39, 13)
         Me.LabelPromptModel.TabIndex = 2
@@ -152,10 +191,11 @@ Partial Class frmGlossary
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ListBoxGlossary.ContextMenuStrip = Me.ContextMenuStripMain
+        Me.ListBoxGlossary.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
         Me.ListBoxGlossary.FormattingEnabled = True
-        Me.ListBoxGlossary.Location = New System.Drawing.Point(12, 95)
+        Me.ListBoxGlossary.Location = New System.Drawing.Point(12, 108)
         Me.ListBoxGlossary.Name = "ListBoxGlossary"
-        Me.ListBoxGlossary.Size = New System.Drawing.Size(262, 446)
+        Me.ListBoxGlossary.Size = New System.Drawing.Size(262, 407)
         Me.ListBoxGlossary.Sorted = True
         Me.ListBoxGlossary.TabIndex = 0
         '
@@ -233,7 +273,7 @@ Partial Class frmGlossary
         '
         'SplitContainer2.Panel1
         '
-        Me.SplitContainer2.Panel1.Controls.Add(Me.StatusStrip1)
+        Me.SplitContainer2.Panel1.Controls.Add(Me.StatusStripView)
         Me.SplitContainer2.Panel1.Controls.Add(Me.CheckBoxHideFadedFactTypeNamesVerbalisationView)
         Me.SplitContainer2.Panel1.Controls.Add(Me.TableLayoutPanel1)
         Me.SplitContainer2.Panel1.Controls.Add(Me.WebBrowser)
@@ -241,14 +281,14 @@ Partial Class frmGlossary
         Me.SplitContainer2.SplitterDistance = 367
         Me.SplitContainer2.TabIndex = 0
         '
-        'StatusStrip1
+        'StatusStripView
         '
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripDropDownButton1, Me.ToolStripDropDownButton2})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 345)
-        Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(679, 22)
-        Me.StatusStrip1.TabIndex = 8
-        Me.StatusStrip1.Text = "StatusStrip1"
+        Me.StatusStripView.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripDropDownButton1, Me.ToolStripDropDownButton2})
+        Me.StatusStripView.Location = New System.Drawing.Point(0, 345)
+        Me.StatusStripView.Name = "StatusStripView"
+        Me.StatusStripView.Size = New System.Drawing.Size(679, 22)
+        Me.StatusStripView.TabIndex = 8
+        Me.StatusStripView.Text = "StatusStrip1"
         '
         'ToolStripDropDownButton1
         '
@@ -307,6 +347,7 @@ Partial Class frmGlossary
         '
         'SearchTextbox
         '
+        Me.SearchTextbox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
         Me.SearchTextbox.Location = New System.Drawing.Point(109, 3)
         Me.SearchTextbox.Name = "SearchTextbox"
         Me.SearchTextbox.Size = New System.Drawing.Size(243, 26)
@@ -324,9 +365,10 @@ Partial Class frmGlossary
         '
         'ButtonViewLineage
         '
-        Me.ButtonViewLineage.Location = New System.Drawing.Point(419, 3)
+        Me.ButtonViewLineage.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.ButtonViewLineage.Location = New System.Drawing.Point(439, 6)
         Me.ButtonViewLineage.Name = "ButtonViewLineage"
-        Me.ButtonViewLineage.Size = New System.Drawing.Size(83, 23)
+        Me.ButtonViewLineage.Size = New System.Drawing.Size(79, 23)
         Me.ButtonViewLineage.TabIndex = 11
         Me.ButtonViewLineage.Text = "View &Lineage"
         Me.ButtonViewLineage.UseVisualStyleBackColor = True
@@ -343,12 +385,26 @@ Partial Class frmGlossary
         Me.WebBrowser.Size = New System.Drawing.Size(676, 329)
         Me.WebBrowser.TabIndex = 2
         '
+        'CheckBoxComboBoxObjectTypes
+        '
+        Me.CheckBoxComboBoxObjectTypes.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        CheckBoxProperties1.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.CheckBoxComboBoxObjectTypes.CheckBoxProperties = CheckBoxProperties1
+        Me.CheckBoxComboBoxObjectTypes.DisplayMemberSingleItem = ""
+        Me.CheckBoxComboBoxObjectTypes.FormattingEnabled = True
+        Me.CheckBoxComboBoxObjectTypes.Location = New System.Drawing.Point(12, 521)
+        Me.CheckBoxComboBoxObjectTypes.Name = "CheckBoxComboBoxObjectTypes"
+        Me.CheckBoxComboBoxObjectTypes.Size = New System.Drawing.Size(262, 21)
+        Me.CheckBoxComboBoxObjectTypes.TabIndex = 13
+        '
         'frmGlossary
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(972, 589)
         Me.Controls.Add(Me.SplitContainer1)
+        Me.MainMenuStrip = Me.MenuStripMain
         Me.Name = "frmGlossary"
         Me.TabText = "Glossary"
         Me.Text = "Glossary"
@@ -357,13 +413,15 @@ Partial Class frmGlossary
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
+        Me.MenuStripMain.ResumeLayout(False)
+        Me.MenuStripMain.PerformLayout()
         Me.ContextMenuStripMain.ResumeLayout(False)
         Me.SplitContainer2.Panel1.ResumeLayout(False)
         Me.SplitContainer2.Panel1.PerformLayout()
         CType(Me.SplitContainer2, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer2.ResumeLayout(False)
-        Me.StatusStrip1.ResumeLayout(False)
-        Me.StatusStrip1.PerformLayout()
+        Me.StatusStripView.ResumeLayout(False)
+        Me.StatusStripView.PerformLayout()
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.TableLayoutPanel1.PerformLayout()
         Me.ResumeLayout(False)
@@ -387,7 +445,7 @@ Partial Class frmGlossary
     Friend WithEvents ShowInModelDictionaryToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
-    Friend WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents StatusStripView As StatusStrip
     Friend WithEvents ToolStripDropDownButton1 As ToolStripDropDownButton
     Friend WithEvents CopyToClipboardToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents TextboxSearch As CustomSearchTextbox
@@ -398,4 +456,9 @@ Partial Class frmGlossary
     Friend WithEvents DataLineageToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ButtonViewLineage As Button
     Friend WithEvents ShowInDescriptionEditorToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents MenuStripMain As MenuStrip
+    Friend WithEvents CloseToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents EditToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemCopyToModel As ToolStripMenuItem
+    Friend WithEvents CheckBoxComboBoxObjectTypes As PresentationControls.CheckBoxComboBox
 End Class

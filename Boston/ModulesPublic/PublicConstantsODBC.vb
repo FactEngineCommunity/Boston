@@ -7,6 +7,7 @@
     End Enum
 
     Public Enum pcenumODBCIndexType
+        Unknown = 0
         PrimaryKey = 1
         Unique = 2
     End Enum

@@ -74,7 +74,7 @@ Public Module publicFBMConstants
         End Function
     End Class
 
-    <AttributeUsageAttribute(AttributeTargets.Field)> _
+    <AttributeUsageAttribute(AttributeTargets.Field)>
     Public Class AbsorptionChoiceAttribute
         Inherits Attribute
         ' etc
@@ -106,6 +106,13 @@ Public Module publicFBMConstants
         End Function
     End Class
 
+    ''' <summary>
+    ''' Used for storing Aliases against ModelElements (E.g. The Ossie (Apache Open Semantic Interchange FactTypeName for FactTypes in format {ModelElement}.{LocalFTName})
+    ''' </summary>
+    Public Enum pcenumORMAliasType
+        Ossie 'Open Semantic Interchange
+    End Enum
+
 
     ''' <summary>
     ''' See DataTypeAttribute Class (above) for how to get the name of an Enum member from its corresponding 
@@ -119,6 +126,7 @@ Public Module publicFBMConstants
         <DataType("LogicalTrueFalse")> <Description("Logical: True | False.")> LogicalTrueFalse
         <DataType("LogicalYesNo")> <Description("Logical: Yes | No.")> LogicalYesNo
         <DataType("AutoCounter")> <Description("Numeric: Auto Counter")> NumericAutoCounter
+        <DataType("AutoUUID")> <Description("UUID: A randomly generated UUID")> AutoUUID
         <DataType("Decimal")> <Description("Numeric: Decimal")> NumericDecimal
         <DataType("FloatCustomPrecision")> <Description("Numeric: Float (Custom Precision)")> NumericFloatCustomPrecision
         <DataType("FloatDoublePrecision")> <Description("Numeric: Float (Double Precision)")> NumericFloatDoublePrecision
@@ -138,8 +146,8 @@ Public Module publicFBMConstants
         <DataType("RawDataOLEObject")> <Description("Raw Data: OLE Object")> RawDataOLEObject
         <DataType("RawDataPicture")> <Description("Raw Data: Picture")> RawDataPicture
         <DataType("VariableLength")> <Description("Raw Data: Variable Length")> RawDataVariableLength
-        <DataType("AutoTimestamp")> <Description("Temporal: Auto Timestamp")> TemporalAutoTimestamp
-        <DataType("TemporalDate")> <Description("Temporal: Date")> TemporalDate
+        <DataType("TemporalAutoTimestamp")> <Description("Temporal: Auto Timestamp")> TemporalAutoTimestamp
+        <DataType("TemporalDate")> <AlternateDataType("Date")> <Description("Temporal: Date")> TemporalDate
         <DataType("TemporalDateTime")> <Description("Temporal: Date & Time")> TemporalDateAndTime
         <DataType("Time")> <Description("Temporal: Time")> TemporalTime
         '<DataType("StringFixedLength")> <Description("Text: Fixed Length")> TextFixedLengthLegacy '20230121-VM-Deprecated. See AlternateDatatype instances below.

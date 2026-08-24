@@ -155,11 +155,11 @@ RetryTypeOfJoin:
         [ReadOnly](False),
         DescriptionAttribute("The list of Values that Objects that play this Role may take."),
         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
-        Public Shadows Property ValueConstraint() As Viev.Strings.StringCollection  'NB This is what is edited in the PropertyGrid
+        Public Shadows Property ValueConstraint() As FEStrings.StringCollection  'NB This is what is edited in the PropertyGrid
             Get
                 Return Me._ValueConstraintList
             End Get
-            Set(ByVal Value As Viev.Strings.StringCollection)
+            Set(ByVal Value As FEStrings.StringCollection)
                 Me._ValueConstraintList = Value
             End Set
         End Property
@@ -234,6 +234,24 @@ RetryTypeOfJoin:
             End Set
         End Property
 
+        Private Property iPageObject_Width As Integer Implements iPageObject.Width
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Private Property iPageObject_Height As Integer Implements iPageObject.Height
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public Sub New()
             '-------------------
             'Parameterless New
@@ -246,15 +264,15 @@ RetryTypeOfJoin:
                        Optional ByVal aiX As Object = Nothing,
                        Optional ByVal aiY As Object = Nothing)
 
-            If IsSomething(arModel) Then Me.Role.Model = arModel
+            If arModel IsNot Nothing Then Me.Role.Model = arModel
 
-            If IsSomething(arPage) Then
+            If arPage IsNot Nothing Then
                 Me.Page = arPage
                 Me.RoleName.Page = arPage
             End If
 
-            If IsSomething(aiX) Then Me.X = aiX
-            If IsSomething(aiY) Then Me.Y = aiY
+            If aiX IsNot Nothing Then Me.X = aiX
+            If aiY IsNot Nothing Then Me.Y = aiY
 
             Me.RoleName.RoleInstance = Me
 
@@ -323,6 +341,10 @@ RetryTypeOfJoin:
                     Select Case .TypeOfJoin
                         Case Is = pcenumRoleJoinType.EntityType
                             Dim lrEntityTypeInstance As FBM.EntityTypeInstance = .JoinedORMObject
+                            'CodeSafe 
+                            If lrEntityTypeInstance.EntityType Is Nothing Then
+                                lrEntityTypeInstance.EntityType = Me.Role.JoinedORMObject
+                            End If
                             lrEntityTypeInstance = lrEntityTypeInstance.Clone(arPage, True, lrEntityTypeInstance.EntityType.IsMDAModelElement, True)
                             arPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance)
                             lrRoleInstance.JoinedORMObject = lrEntityTypeInstance 'arPage.EntityTypeInstance.Find(AddressOf .JoinedORMObject.Equals)
@@ -367,7 +389,7 @@ RetryTypeOfJoin:
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tRoleInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrRoleInstance
             End Try
@@ -514,7 +536,7 @@ RetryTypeOfJoin:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return "Error getting Attribute"
             End Try
@@ -588,7 +610,7 @@ RetryTypeOfJoin:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 BelongsToTable = "Mystery"
             End Try
@@ -648,9 +670,15 @@ RetryTypeOfJoin:
                     Exit Sub
                 End If
 
+                'CodeSafe
+                If Me.FactType.Arity = 1 Then
+                    Me.SequenceNr = 1
+                End If
+
                 '-----------------------------------------------------------------------------
                 'Establish the position of the RoleInstance relative to the FactTypeInstance
                 '-----------------------------------------------------------------------------
+#Region "ShapeNode for Role"
                 Me._X = Me.FactType.Shape.Bounds.X + 3
                 Me._Y = Me.FactType.Shape.Bounds.Y + 4 + ((Me.FactType.FactType.GetHighestConstraintLevel - 1) * 1.6)
 
@@ -663,24 +691,24 @@ RetryTypeOfJoin:
                     '---------------------------------------------------------------------------
                     'Attach the Role.ShapeNode to the FactType.ShapeNode ShapeGroup,
                     '  because this Role is effectively the MasterRole of the RoleGroup/FactType
-                    '---------------------------------------------------------------------------                
+                    '---------------------------------------------------------------------------                                    
                     loDroppedNode.AttachTo(Me.FactType.Shape, AttachToNode.MiddleLeft)
                 Else
                     '----------------------------------------------
                     'Drop relative to other Roles in the FactType
                     '----------------------------------------------
-                    loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me._X + (arFactTypeInstance.RoleGroup(0).Shape.Bounds.Width * (Me.SequenceNr - 1)), Me._Y, 6, 4, Shapes.Rectangle)
+                    '20240622-Was arFactTypeInstance.RoleGroup(0).Shape.Bounds.Width for first 5 below
+                    loDroppedNode = Me.Page.Diagram.Factory.CreateShapeNode(Me._X + (6 * (Me.SequenceNr - 1)), Me._Y, 6, 4, Shapes.Rectangle)
 
                     '--------------------------------------------------------------------------------------
                     'Resize the FactType.Shape and reset the position of the RoleGroup within the factType
                     '--------------------------------------------------------------------------------------
-                    Dim lo_rectangle As New Rectangle(Me.FactType.Shape.Bounds.X, Me.FactType.Shape.Bounds.Y, ((Me.FactType.RoleGroup(0).Shape.Bounds.Width * Me.FactType.Arity) + 6), 12 + ((Me.FactType.GetHighestConstraintLevel - 1) * 2))
+                    Dim lo_rectangle As New Rectangle(Me.FactType.Shape.Bounds.X, Me.FactType.Shape.Bounds.Y, ((loDroppedNode.Bounds.Width * Me.FactType.Arity) + 6), 12 + ((Me.FactType.GetHighestConstraintLevel - 1) * 2))
 
                     Me.FactType.Shape.SetRect(lo_rectangle, False)
 
                     loDroppedNode.AttachTo(arFactTypeInstance.Shape, AttachToNode.BottomCenter)
                 End If
-
 
                 loDroppedNode.Tag = New FBM.RoleInstance
                 loDroppedNode.Tag = Me
@@ -688,16 +716,17 @@ RetryTypeOfJoin:
                 loDroppedNode.HandlesStyle = HandlesStyle.InvisibleMove
                 loDroppedNode.AllowOutgoingLinks = True
                 loDroppedNode.ToolTip = "Role"
-                If Me.FactType.isPreferredReferenceMode Then
+                If Me.FactType.isPreferredReferenceMode And Not Me.FactType.Visible Then
                     loDroppedNode.Visible = False
                 Else
                     loDroppedNode.Visible = True
                 End If
                 loDroppedNode.Pen.Width = 0.1
-                If Me.FactType.IsLinkFactType Then
+                If Me.FactType.IsLinkFactType Or Me.FactType.IsImplied Then
                     loDroppedNode.Pen.DashPattern = New Single() {4, 3, 4, 3}
                 End If
 
+#End Region
                 Me.Shape = loDroppedNode
 
                 '----------------------------------------
@@ -710,9 +739,10 @@ RetryTypeOfJoin:
                 '-------------------------------------------------------------
                 'Find the ORMObject to which the Role/RoleInstance attaches
                 '-------------------------------------------------------------
+#Region "Link to JoinedORMObject"
                 Select Case Me.TypeOfJoin
                     Case Is = pcenumRoleJoinType.EntityType
-                        Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.JoinsEntityType.Id And x.Shape IsNot Nothing)
+                        Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = Me.Role.JoinedORMObject.Id And x.Shape IsNot Nothing)
                         If Me.JoinsEntityType Is Nothing Then
                             Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(Function(x) x.Id = Me.Role.JoinedORMObject.Id)
                             If Me.JoinedORMObject Is Nothing Then GoTo PostJoinedORMObject
@@ -740,7 +770,7 @@ PostJoinedORMObject:
                 'Create the link between the Role and the ORMObject that it 
                 '  joins to.
                 '-------------------------------------------------------------
-                If IsSomething(Me.JoinedORMObject) Then
+                If Me.JoinedORMObject IsNot Nothing Then
                     Dim lrJoinedORMObject As Object = Me.JoinedORMObject
                     Dim loNode As MindFusion.Diagramming.ShapeNode = lrJoinedORMObject.shape
 
@@ -750,7 +780,7 @@ PostJoinedORMObject:
                         lo_link.Tag = Me
                         Me.Link = lo_link
                         Me.Shape.OutgoingLinks.Add(lo_link)
-                        If Me.FactType.isPreferredReferenceMode Then
+                        If Me.FactType.isPreferredReferenceMode And Not Me.FactType.Visible Then
                             Me.Link.Visible = False
                         Else
                             Me.Link.Visible = True
@@ -769,13 +799,7 @@ PostJoinedORMObject:
                         Me.Page.Diagram.Links.Add(lo_link)
                     End If
                 End If
-
-                '--------------------------------------------------------------------------------------
-                'Resize the FactType.Shape and reset the position of the RoleGroup within the factType
-                '--------------------------------------------------------------------------------------
-                'Dim lo_rectangle As New Rectangle(Me.FactType.Shape.Bounds.X, Me.FactType.Shape.Bounds.Y, ((Me.FactType.RoleGroup(0).Shape.Bounds.Width * Me.FactType.Arity) + 6), 15)
-
-                'Me.FactType.Shape.SetRect(lo_rectangle, False)
+#End Region
 
                 'Just to be sure.
                 If Me.FactType.RoleGroup.Count > 0 Then
@@ -797,7 +821,7 @@ PostJoinedORMObject:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -842,7 +866,7 @@ PostJoinedORMObject:
                 Case Is = pcenumRoleJoinType.EntityType
                     If Me.HasInternalUniquenessConstraint() And Me.FactType.Is1To1BinaryFactType Then
                         'Rule 4
-                        If IsSomething(Me.JoinsEntityType.ReferenceModeFactType) Then
+                        If Me.JoinsEntityType.ReferenceModeFactType IsNot Nothing Then
                             If Me.FactType.Id = Me.JoinsEntityType.ReferenceModeFactType.Id Then
                                 '---------------------------------------------------
                                 'Is Role on ReferenceModeFactType
@@ -880,7 +904,7 @@ PostJoinedORMObject:
                 Case Is = pcenumRoleJoinType.EntityType
                     If Me.HasInternalUniquenessConstraint() And Me.FactType.Is1To1BinaryFactType Then
                         'Rule 4
-                        If IsSomething(Me.JoinsEntityType.ReferenceModeFactType) Then
+                        If Me.JoinsEntityType.ReferenceModeFactType IsNot Nothing Then
                             If Me.FactType.Id = Me.JoinsEntityType.ReferenceModeFactType.Id Then
                                 '---------------------------------------------------
                                 'Is Role on ReferenceModeFactType
@@ -918,7 +942,7 @@ PostJoinedORMObject:
                 Case Is = pcenumRoleJoinType.EntityType
                     If Me.HasInternalUniquenessConstraint() And Me.FactType.Is1To1BinaryFactType Then
                         'Rule 4
-                        If IsSomething(Me.JoinsEntityType.ReferenceModeFactType) Then
+                        If Me.JoinsEntityType.ReferenceModeFactType IsNot Nothing Then
                             If Me.FactType.Id = Me.JoinsEntityType.ReferenceModeFactType.Id Then
                                 '---------------------------------------------------
                                 'Is Role on ReferenceModeFactType
@@ -1003,7 +1027,7 @@ PostJoinedORMObject:
                     'Sometimes has no outgoing links.
                 End Try
 
-                If IsSomething(Me.RoleName) Then
+                If Me.RoleName IsNot Nothing Then
                     '------------------------------------------------------
                     'RoleName is already displayed for the RoleInstance
                     '------------------------------------------------------
@@ -1057,7 +1081,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1070,7 +1094,7 @@ PostJoinedORMObject:
                 '-----------------------------
                 'Update the underlying model
                 '-----------------------------
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "Name"
                             Call Me.Role.setName(Me.Name, True)
@@ -1102,7 +1126,7 @@ PostJoinedORMObject:
                     End If
                 Next
 
-                If IsSomething(Me.RoleName) Then
+                If Me.RoleName IsNot Nothing Then
                     Me.RoleName.RefreshShape()
                 End If
 
@@ -1122,7 +1146,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1190,7 +1214,7 @@ PostJoinedORMObject:
             '    End If
             'End If
             Me.Shape.AnchorPattern = apat1
-            If IsSomething(Me.Link) Then
+            If Me.Link IsNot Nothing Then
                 '-----------------------------------------------------------------------
                 'Because this method may be called for Roles that do not yet have links
                 '-----------------------------------------------------------------------
@@ -1241,7 +1265,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1258,7 +1282,7 @@ PostJoinedORMObject:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1266,7 +1290,7 @@ PostJoinedORMObject:
 
         'Private Overloads Sub update_from_model() Handles model.ModelUpdated
 
-        '    If IsSomething(Me.JoinedORMObject) Then
+        '    If Me.JoinedORMObject IsNot Nothing Then
         '        Select Case Me.TypeOfJoin
         '            Case pcenumRoleJoinType.EntityType
         '                Dim lrEntityType As Object = Me.JoinedORMObject
@@ -1292,7 +1316,7 @@ PostJoinedORMObject:
 
         '    MsgBox("tRoleInstance: JoinedORMObject.updated: FactType:" & Me.FactType.Name)
 
-        '    If IsSomething(Me.JoinedORMObject) Then
+        '    If Me.JoinedORMObject IsNot Nothing Then
         '        Select Case Me.TypeOfJoin
         '            Case pcenumRoleJoinType.EntityType
         '                Dim lrEntityType As Object = Me.JoinedORMObject
@@ -1326,6 +1350,11 @@ PostJoinedORMObject:
                     Case Is = pcenumConceptType.FactType
                         Me.JoinedORMObject = Me.Page.FactTypeInstance.Find(AddressOf arModelObject.Equals)
 
+                        If Me.JoinedORMObject Is Nothing And CType(arModelObject, FBM.FactType).IsObjectified Then
+                            Dim lrModelElement = arModelObject
+                            Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = lrModelElement.Id And x.Shape IsNot Nothing)
+                        End If
+
                     Case Is = pcenumConceptType.EntityType
                         Dim lrModelElement = arModelObject
                         Me.JoinedORMObject = Me.Page.EntityTypeInstance.Find(Function(x) x.Id = lrModelElement.Id And x.Shape IsNot Nothing)
@@ -1340,7 +1369,7 @@ PostJoinedORMObject:
                                 If Me.Model.GetModelObjectByName(arModelObject.Id).GetType Is GetType(FBM.EntityType) Then
                                     Dim lrEntityType As FBM.EntityType
                                     lrEntityType = Me.Model.GetModelObjectByName(arModelObject.Id)
-                                    If IsSomething(Me.Page.Diagram) Then
+                                    If Me.Page.Diagram IsNot Nothing Then
                                         Dim loPointClient As Point
                                         Dim loPoint As PointF
 
@@ -1389,7 +1418,7 @@ PostJoinedORMObject:
                                 If Me.Model.GetModelObjectByName(arModelObject.Id).GetType Is GetType(FBM.EntityType) Then
                                     Dim lrValueType As FBM.ValueType
                                     lrValueType = Me.Model.GetModelObjectByName(arModelObject.Id)
-                                    If IsSomething(Me.Page.Diagram) Then
+                                    If Me.Page.Diagram IsNot Nothing Then
                                         Dim loPointClient As Point
                                         Dim loPoint As PointF
 
@@ -1422,7 +1451,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1468,7 +1497,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1511,7 +1540,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1564,7 +1593,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1579,7 +1608,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -1594,7 +1623,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1608,7 +1637,7 @@ PostJoinedORMObject:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

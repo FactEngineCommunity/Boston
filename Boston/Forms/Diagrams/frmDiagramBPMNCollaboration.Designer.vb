@@ -78,7 +78,6 @@ Partial Class frmDiagramBPMNCollaboration
         Me.DiagramView.ModificationStart = MindFusion.Diagramming.ModificationStart.SelectedOnly
         Me.DiagramView.Name = "DiagramView"
         Me.DiagramView.RightButtonActions = MindFusion.Diagramming.MouseButtonActions.Cancel
-        Me.DiagramView.ShowScrollbars = False
         Me.DiagramView.Size = New System.Drawing.Size(728, 498)
         Me.DiagramView.TabIndex = 0
         Me.DiagramView.Text = "DiagramView"
@@ -87,7 +86,6 @@ Partial Class frmDiagramBPMNCollaboration
         '
         Me.Diagram.AllowSelfLoops = False
         Me.Diagram.BackBrush = New MindFusion.Drawing.SolidBrush("#FFFFFFFF")
-        Me.Diagram.DynamicLinks = True
         Me.Diagram.EnableLanes = True
         Me.Diagram.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!)
         Me.Diagram.LinkBrush = New MindFusion.Drawing.SolidBrush("#FF000000")

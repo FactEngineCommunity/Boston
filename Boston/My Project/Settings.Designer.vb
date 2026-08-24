@@ -15,7 +15,7 @@ Option Explicit On
 Namespace My
     
     <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0"),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.8.0.0"),  _
      Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
     Partial Friend NotInheritable Class MySettings
         Inherits Global.System.Configuration.ApplicationSettingsBase
@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("1.39")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1.42")>  _
         Public Property DatabaseVersionNumber() As String
             Get
                 Return CType(Me("DatabaseVersionNumber"),String)
@@ -128,8 +128,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\ProgramData\FactEngine\Boston\4."& _ 
-            "0.0.0\database\boston.vdb")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Data Source=D:\00-FactEngine\11-Production\Boston\Databases\boston.db;Version=3;")>  _
         Public Property DatabaseConnectionString() As String
             Get
                 Return CType(Me("DatabaseConnectionString"),String)
@@ -249,7 +248,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("MSJet")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("SQLite")>  _
         Public Property DatabaseType() As String
             Get
                 Return CType(Me("DatabaseType"),String)
@@ -268,17 +267,6 @@ Namespace My
             End Get
             Set
                 Me("ShowFactTablesOnORMModelLoad") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
-        Public Property EnterpriseTreeSearchList() As Global.System.Collections.Specialized.StringCollection
-            Get
-                Return CType(Me("EnterpriseTreeSearchList"),Global.System.Collections.Specialized.StringCollection)
-            End Get
-            Set
-                Me("EnterpriseTreeSearchList") = value
             End Set
         End Property
         
@@ -525,9 +513,9 @@ Namespace My
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("80")>  _
-        Public Property DefaultPageZoomFactor() As Integer
+        Public Property DefaultPageZoomFactor() As String
             Get
-                Return CType(Me("DefaultPageZoomFactor"),Integer)
+                Return CType(Me("DefaultPageZoomFactor"),String)
             End Get
             Set
                 Me("DefaultPageZoomFactor") = value
@@ -573,9 +561,9 @@ Namespace My
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("100")>  _
-        Public Property FactEngineDefaultQueryResultLimit() As Integer
+        Public Property FactEngineDefaultQueryResultLimit() As String
             Get
-                Return CType(Me("FactEngineDefaultQueryResultLimit"),Integer)
+                Return CType(Me("FactEngineDefaultQueryResultLimit"),String)
             End Get
             Set
                 Me("FactEngineDefaultQueryResultLimit") = value
@@ -776,7 +764,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property AutomaticallyDeleteTroublesomeColumns() As Boolean
             Get
                 Return CType(Me("AutomaticallyDeleteTroublesomeColumns"),Boolean)
@@ -1016,7 +1004,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("2.4")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("2.6")>  _
         Public Property CoreVersionNumber() As String
             Get
                 Return CType(Me("CoreVersionNumber"),String)
@@ -1076,7 +1064,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("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")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
         Public Property FactEngineOpenAIAPIKey() As String
             Get
                 Return CType(Me("FactEngineOpenAIAPIKey"),String)
@@ -1088,7 +1076,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property ImportExportColumnNameForFKReferenceEqualsReferencedEntityName() As Boolean
             Get
                 Return CType(Me("ImportExportColumnNameForFKReferenceEqualsReferencedEntityName"),Boolean)
@@ -1149,9 +1137,9 @@ Namespace My
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("500")>  _
-        Public Property LLMChunkSize() As Integer
+        Public Property LLMChunkSize() As String
             Get
-                Return CType(Me("LLMChunkSize"),Integer)
+                Return CType(Me("LLMChunkSize"),String)
             End Get
             Set
                 Me("LLMChunkSize") = value
@@ -1179,6 +1167,305 @@ Namespace My
             End Get
             Set
                 Me("EnableKnowledgeExtraction") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property EnableBPMN() As Boolean
+            Get
+                Return CType(Me("EnableBPMN"),Boolean)
+            End Get
+            Set
+                Me("EnableBPMN") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property PerformGrandfatherFatherSonBackup() As Boolean
+            Get
+                Return CType(Me("PerformGrandfatherFatherSonBackup"),Boolean)
+            End Get
+            Set
+                Me("PerformGrandfatherFatherSonBackup") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property OptOutOfAutomatedErrorReportingAltogether() As Boolean
+            Get
+                Return CType(Me("OptOutOfAutomatedErrorReportingAltogether"),Boolean)
+            End Get
+            Set
+                Me("OptOutOfAutomatedErrorReportingAltogether") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property BrainConfirmActionsWithUser() As Boolean
+            Get
+                Return CType(Me("BrainConfirmActionsWithUser"),Boolean)
+            End Get
+            Set
+                Me("BrainConfirmActionsWithUser") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property SaveNewModelsAsXML() As Boolean
+            Get
+                Return CType(Me("SaveNewModelsAsXML"),Boolean)
+            End Get
+            Set
+                Me("SaveNewModelsAsXML") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property OSMShowOSMMenu() As Boolean
+            Get
+                Return CType(Me("OSMShowOSMMenu"),Boolean)
+            End Get
+            Set
+                Me("OSMShowOSMMenu") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property OSMAssemblyAIAPIKey() As String
+            Get
+                Return CType(Me("OSMAssemblyAIAPIKey"),String)
+            End Get
+            Set
+                Me("OSMAssemblyAIAPIKey") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property MainFormShowSuperUserMenu() As Boolean
+            Get
+                Return CType(Me("MainFormShowSuperUserMenu"),Boolean)
+            End Get
+            Set
+                Me("MainFormShowSuperUserMenu") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property LiteDBFilePath() As String
+            Get
+                Return CType(Me("LiteDBFilePath"),String)
+            End Get
+            Set
+                Me("LiteDBFilePath") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property NLToIndexQueryTrainingFileLocation() As String
+            Get
+                Return CType(Me("NLToIndexQueryTrainingFileLocation"),String)
+            End Get
+            Set
+                Me("NLToIndexQueryTrainingFileLocation") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property LiteDBPassword() As String
+            Get
+                Return CType(Me("LiteDBPassword"),String)
+            End Get
+            Set
+                Me("LiteDBPassword") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property GroqAPIKey() As String
+            Get
+                Return CType(Me("GroqAPIKey"),String)
+            End Get
+            Set
+                Me("GroqAPIKey") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property FactEngineReturnNodePropertyIdentificationColumns() As Boolean
+            Get
+                Return CType(Me("FactEngineReturnNodePropertyIdentificationColumns"),Boolean)
+            End Get
+            Set
+                Me("FactEngineReturnNodePropertyIdentificationColumns") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property EnterpriseShowEnterpriseMenu() As Boolean
+            Get
+                Return CType(Me("EnterpriseShowEnterpriseMenu"),Boolean)
+            End Get
+            Set
+                Me("EnterpriseShowEnterpriseMenu") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property ERDAllowAddEntityTableForm() As Boolean
+            Get
+                Return CType(Me("ERDAllowAddEntityTableForm"),Boolean)
+            End Get
+            Set
+                Me("ERDAllowAddEntityTableForm") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute(".\shapelibrary\structurechart.shl")>  _
+        Public Property StructureChartShapeLibrary() As String
+            Get
+                Return CType(Me("StructureChartShapeLibrary"),String)
+            End Get
+            Set
+                Me("StructureChartShapeLibrary") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property RDSOnXMLLoadIgnoreTroublesomeColumns() As Boolean
+            Get
+                Return CType(Me("RDSOnXMLLoadIgnoreTroublesomeColumns"),Boolean)
+            End Get
+            Set
+                Me("RDSOnXMLLoadIgnoreTroublesomeColumns") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property ERDDatabaseMappingShadingGlobal() As Boolean
+            Get
+                Return CType(Me("ERDDatabaseMappingShadingGlobal"),Boolean)
+            End Get
+            Set
+                Me("ERDDatabaseMappingShadingGlobal") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Blue")>  _
+        Public Property BostonThemeTypeName() As String
+            Get
+                Return CType(Me("BostonThemeTypeName"),String)
+            End Get
+            Set
+                Me("BostonThemeTypeName") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property BostonShowDatabasesForm() As Boolean
+            Get
+                Return CType(Me("BostonShowDatabasesForm"),Boolean)
+            End Get
+            Set
+                Me("BostonShowDatabasesForm") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
+        Public Property EnterpriseTreeSearchList() As Global.System.Collections.Specialized.StringCollection
+            Get
+                Return CType(Me("EnterpriseTreeSearchList"),Global.System.Collections.Specialized.StringCollection)
+            End Get
+            Set
+                Me("EnterpriseTreeSearchList") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("OpenAI")>  _
+        Public Property FactEngineModelCompany() As String
+            Get
+                Return CType(Me("FactEngineModelCompany"),String)
+            End Get
+            Set
+                Me("FactEngineModelCompany") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("gpt-4-1106-preview")>  _
+        Public Property FactEngineModelName() As String
+            Get
+                Return CType(Me("FactEngineModelName"),String)
+            End Get
+            Set
+                Me("FactEngineModelName") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property FlagCMMLIntegrityErrors() As Boolean
+            Get
+                Return CType(Me("FlagCMMLIntegrityErrors"),Boolean)
+            End Get
+            Set
+                Me("FlagCMMLIntegrityErrors") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("en-AU")>  _
+        Public Property CultureInfo() As String
+            Get
+                Return CType(Me("CultureInfo"),String)
+            End Get
+            Set
+                Me("CultureInfo") = value
             End Set
         End Property
     End Class

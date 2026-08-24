@@ -89,7 +89,7 @@ Namespace DataStore
 
     '            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
     '            lsMessage &= vbCrLf & vbCrLf & ex.Message
-    '            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+    '            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
     '            Return ""
     '        End Try
@@ -110,7 +110,7 @@ Namespace DataStore
 
     '            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
     '            lsMessage &= vbCrLf & vbCrLf & ex.Message
-    '            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+    '            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
     '            Return Nothing
     '        End Try
@@ -129,7 +129,7 @@ Namespace DataStore
 
     '            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
     '            lsMessage &= vbCrLf & vbCrLf & ex.Message
-    '            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+    '            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
     '            Return Nothing
     '        End Try
@@ -157,7 +157,7 @@ Namespace DataStore
 
     '            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
     '            lsMessage &= vbCrLf & vbCrLf & ex.Message
-    '            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+    '            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
     '            Return Nothing
     '        End Try

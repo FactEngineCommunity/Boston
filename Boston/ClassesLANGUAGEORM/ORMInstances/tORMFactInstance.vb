@@ -13,7 +13,7 @@ Namespace FBM
         <XmlAttribute()> _
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Fact
 
-        <XmlIgnore()> _
+        <XmlIgnore()>
         Public WithEvents Fact As FBM.Fact 'Pointer to the Fact that this FactInstance relates to. 
 
         <XmlIgnore()>
@@ -91,7 +91,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._Y = value
-                If IsSomething(Me.FactInstance) Then
+                If Me.FactInstance IsNot Nothing Then
                     Me.FactInstance._Y = value
                 End If
             End Set
@@ -232,6 +232,24 @@ Namespace FBM
             End Set
         End Property
 
+        Public Property Width As Integer Implements iPageObject.Width
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Height As Integer Implements iPageObject.Height
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public Overrides Function Clone() As Object
 
             Dim lrFactInstance As New FBM.FactInstance
@@ -258,7 +276,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tFactInstance.Clone"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -293,7 +311,7 @@ Namespace FBM
                 Dim lsMessage As String
                 lsMessage = "Error: tFactInstance.Clone"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -312,7 +330,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -360,7 +378,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrUMLActorProcessRelation
@@ -388,7 +406,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrUCDActorProcessRelation
@@ -420,7 +438,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrUMLProcessProcessRelation
@@ -442,6 +460,8 @@ Namespace FBM
                     lrBPMNProcessProcessRelation.Concept = .Concept
                     lrBPMNProcessProcessRelation.X = .X
                     lrBPMNProcessProcessRelation.Y = .Y
+                    lrBPMNProcessProcessRelation.Process1 = arProcess1
+                    lrBPMNProcessProcessRelation.Process2 = arProcess2
                 End With
 
             Catch ex As Exception
@@ -450,7 +470,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrBPMNProcessProcessRelation
@@ -481,7 +501,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrUCDProcessProcessRelation
@@ -530,7 +550,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -625,7 +645,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return "{}"
             End Try
@@ -653,7 +673,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -749,7 +769,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -796,7 +816,7 @@ Namespace FBM
         End Sub
 
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
-            Throw New NotImplementedException()
+            'N/A Nothing to do here.
         End Sub
 
         Public Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
@@ -821,7 +841,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

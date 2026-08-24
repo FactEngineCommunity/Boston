@@ -4,7 +4,7 @@ Namespace TableSubtypeRelationship
 
     Module Table_SubtypeRelationship
 
-        Sub add_parentEntityType(ByVal arSubtypeRelationship As FBM.tSubtypeRelationship)
+        Sub add_parentEntityType(ByVal arSubtypeRelationship As FBM.SubtypeRelationship)
 
             Dim lsSQLQuery As String = ""
 
@@ -29,12 +29,12 @@ Namespace TableSubtypeRelationship
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
 
-        Public Sub DeleteParentEntityType(ByVal arSubtype As FBM.tSubtypeRelationship)
+        Public Sub DeleteParentEntityType(ByVal arSubtype As FBM.SubtypeRelationship)
 
             Dim lsSQLQuery As String = ""
 
@@ -49,7 +49,7 @@ Namespace TableSubtypeRelationship
 
         End Sub
 
-        Public Function exists_parentEntityType(ByVal arSubtypeRelationship As FBM.tSubtypeRelationship) As Boolean
+        Public Function exists_parentEntityType(ByVal arSubtypeRelationship As FBM.SubtypeRelationship) As Boolean
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New RecordsetProxy
@@ -86,12 +86,12 @@ Namespace TableSubtypeRelationship
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
 
-        Public Function GetSubtypeRelationshipsByModel(ByRef arModel As FBM.Model) As List(Of FBM.tSubtypeRelationship)
+        Public Function GetSubtypeRelationshipsByModel(ByRef arModel As FBM.Model) As List(Of FBM.SubtypeRelationship)
 
             Dim lrEntityType As FBM.EntityType
             Dim lrParentEntityType As FBM.EntityType
@@ -102,7 +102,7 @@ Namespace TableSubtypeRelationship
             '-----------------------------
             'Initialise the return value
             '-----------------------------
-            GetSubtypeRelationshipsByModel = New List(Of FBM.tSubtypeRelationship)
+            GetSubtypeRelationshipsByModel = New List(Of FBM.SubtypeRelationship)
 
             Try
 
@@ -131,7 +131,7 @@ Namespace TableSubtypeRelationship
                     lsId = Trim(lrRecordset("SubtypingFactTypeId").Value)
                     lrFactType = arModel.FactType.Find(Function(x) x.Id = lsId)
 
-                    Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship(lrEntityType, lrParentEntityType, lrFactType)
+                    Dim lrSubtypeRelationship As New FBM.SubtypeRelationship(lrEntityType, lrParentEntityType, lrFactType)
                     lrSubtypeRelationship.isDirty = False
                     lrSubtypeRelationship.IsPrimarySubtypeRelationship = CBool(lrRecordset("IsPrimarySubtypeRelationship").Value)
                     lrEntityType.SubtypeRelationship.Add(lrSubtypeRelationship)
@@ -149,13 +149,13 @@ Namespace TableSubtypeRelationship
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
 
         Public Function GetSubtypeRelationshipsForModelElementByModel(ByRef arSubtypeModelElement As FBM.ModelObject,
-                                                                      ByVal abAddToSubtypeModelElement As Boolean) As List(Of FBM.tSubtypeRelationship)
+                                                                      ByVal abAddToSubtypeModelElement As Boolean) As List(Of FBM.SubtypeRelationship)
 
             Dim lrSupertypeModelElement As FBM.ModelObject
             Dim lsSQLQuery As String
@@ -167,7 +167,7 @@ Namespace TableSubtypeRelationship
             '-----------------------------
             'Initialise the return value
             '-----------------------------
-            GetSubtypeRelationshipsForModelElementByModel = New List(Of FBM.tSubtypeRelationship)
+            GetSubtypeRelationshipsForModelElementByModel = New List(Of FBM.SubtypeRelationship)
 
             Try
                 lrRecordset.ActiveConnection = pdbConnection
@@ -195,7 +195,7 @@ Namespace TableSubtypeRelationship
                         Catch ex As Exception
                             lsMessage = "Problems finding Supertype Model Element details in the Model Dictionary"
                             lsMessage.AppendDoubleLineBreak("Supertype Model Element Id: " & lsId)
-                            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False, False, True)
                             GoTo SkipSubtypeRelationship
                         End Try
 
@@ -212,7 +212,7 @@ Namespace TableSubtypeRelationship
                         lrFactType = TableFactType.GetFactTypeDetailsByModel(lrFactType, True, True)
                     End If
 
-                    Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship(arSubtypeModelElement, lrSupertypeModelElement, lrFactType)
+                    Dim lrSubtypeRelationship As New FBM.SubtypeRelationship(arSubtypeModelElement, lrSupertypeModelElement, lrFactType)
                     lrSubtypeRelationship.isDirty = False
                     lrSubtypeRelationship.IsPrimarySubtypeRelationship = CBool(lrRecordset("IsPrimarySubtypeRelationship").Value)
 
@@ -232,7 +232,7 @@ SkipSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -273,7 +273,7 @@ SkipSubtypeRelationship:
                         lsId = Trim(lrRecordset("ObjectTypeId").Value)
                         lrEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lsId)
 
-                        If IsSomething(lrEntityTypeInstance) Then
+                        If lrEntityTypeInstance IsNot Nothing Then
                             '----------------------------------------------------------------------
                             'The ParentEntityType is at least part of the Page/model under review
                             '  i.e. If currently looking at an ORM model...is within the ORM model
@@ -281,8 +281,8 @@ SkipSubtypeRelationship:
                             lsId = Trim(lrRecordset("SupertypeObjectTypeId").Value)
                             lrParentEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lsId)
 
-                            If IsSomething(lrParentEntityTypeInstance) Then
-                                Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
+                            If lrParentEntityTypeInstance IsNot Nothing Then
+                                Dim lrSubtypeRelationship As New FBM.SubtypeRelationship
                                 lrSubtypeRelationship.ModelElement = lrEntityTypeInstance.EntityType
                                 lrSubtypeRelationship.parentModelElement = lrParentEntityTypeInstance.EntityType
 
@@ -305,7 +305,7 @@ SkipSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of FBM.SubtypeRelationshipInstance)
             End Try
@@ -337,7 +337,7 @@ SkipSubtypeRelationship:
 
         End Sub
 
-        Public Sub update_parentEntityType(ByVal arSubtypeRelationship As FBM.tSubtypeRelationship)
+        Public Sub update_parentEntityType(ByVal arSubtypeRelationship As FBM.SubtypeRelationship)
 
             '--------------------------------------------------------------------------------------------------------
             'Updates to itself at the moment, but is placeholder for the future if more attributes are added to the
@@ -364,7 +364,7 @@ SkipSubtypeRelationship:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

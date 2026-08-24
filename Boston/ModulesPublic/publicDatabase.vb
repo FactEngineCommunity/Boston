@@ -1,9 +1,614 @@
-﻿Imports System.Reflection
-Imports adox
+﻿Imports System.IO
+Imports System.Reflection
+Imports System.Data.OleDb
+Imports System.Configuration
+Imports ADOX
+Imports System.Data.SQLite
+Imports System.IO.Path
+Imports System.Globalization
+Imports System.Data.Common
 
 Namespace Database
 
     Public Module DatabaseModule
+
+        ' Constants for the backup intervals
+        Private Const DaysInWeek As Integer = 7
+        Private Const DaysInMonth As Integer = 30 ' Approximation for a month, adjust as needed
+
+        Public Function OpenDatabase(Optional ByVal asDatabaseLocationFile As String = Nothing,
+                                     Optional abSaveToRegistry As Boolean = True) As Boolean
+
+            Dim lsMessage As String = ""
+            Dim lsConnectionString As String = ""
+            Dim lsDatabaseLocation As String = ""
+            Dim lsDataProvider As String = ""
+            Dim lbUserDatabaseIntervention As Boolean = False 'If True then need to ignore Registry setting for database.
+
+            Try
+                '------------------------------------------------
+                'Define the location of your database
+                'as follows if you want to use a relative folder.
+                '------------------------------------------------
+                lsConnectionString = Trim(My.Settings.DatabaseConnectionString)
+
+                '-------------------------------------------
+                'Sample Database ConnectionStrings
+                '-------------------------------------------
+#Region "Exapmle Database ConnectionStrings"
+                'SQL Server Connection String Sample
+                'DRIVER=SQL Server;UID=s2\vmorgante;PWD=cisco1;Trusted_Connection=;DATABASE=PreviewDialler;WSID=SIS2WKVM;APP=Microsoft Office 2003;SERVER=SIS2DB02;Description=PreviewDialler
+                'lrSQLConnectionStringBuilder used to interogate the connection string.
+                'Dim lrSQLConnectionStringBuilder As New SqlConnectionStringBuilder
+                'lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+                '-----------------------------------
+                'MDB Connection String Sample
+                'Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\Program Files\PreviewDialler\database\PREVIEWDIALLER.mdb
+                '-------------------------------------------
+#End Region
+                '------------------------------------------------
+                'Construct the connection string
+                '------------------------------------------------                 
+                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                Dim lsDatabaseType As String = My.Settings.DatabaseType
+
+#Region "User Intervention on Startup"
+                If My.Computer.Keyboard.AltKeyDown Then
+                    Dim lfrmCRUDBostonConfiguration As New frmCRUDBostonConfiguration
+                    Call lfrmCRUDBostonConfiguration.ShowDialog()
+                    My.Settings.DatabaseConnectionString = lfrmCRUDBostonConfiguration.msConnectionString
+                    My.Settings.DatabaseType = lfrmCRUDBostonConfiguration.msDatabaseType
+                    lfrmCRUDBostonConfiguration.Dispose()
+                    lsConnectionString = My.Settings.DatabaseConnectionString
+                    lsDatabaseType = My.Settings.DatabaseType
+                    prApplication.ThrowMessage("User intervened/set database location:" & lsConnectionString, pcenumErrorType.Information)
+                    lbUserDatabaseIntervention = True 'So an ignore getting Registry database file location.
+                End If
+#End Region
+
+TestDatabase:
+                If lsDatabaseType = pcenumDatabaseType.PostgreSQL.ToString Then
+#Region "Postgres"
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                    pdbConnection = New FactEngine.PostgreSQLConnection(Nothing, lsConnectionString, 10000, False)
+                    pdb_OLEDB_connection = New FactEngine.PostgreSQLConnection(Nothing, lsConnectionString, 10000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
+#End Region
+                ElseIf My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+#Region "SQLite"
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                    pdbConnection = New FactEngine.SQLiteConnection(Nothing, lsConnectionString, 1000, False)
+                    pdb_OLEDB_connection = New FactEngine.SQLiteConnection(Nothing, lsConnectionString, 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
+
+                    If pbLogStartup Then
+                        Call prApplication.ThrowMessage("pdbConnection IsNot Nothing: " & (pdbConnection IsNot Nothing).ToString, pcenumErrorType.Warning)
+                        Call prApplication.ThrowMessage("pdbConnection.Connection IsNot Nothing: " & (pdbConnection.Connection IsNot Nothing).ToString, pcenumErrorType.Warning)
+                    End If
+
+#Region "SHIFT KEY DOWN - User Points to database"
+                    If My.Computer.Keyboard.ShiftKeyDown Then
+UserSelectedDatabaseSQLite:
+                        Using lrOpenFileDialog As New OpenFileDialog
+
+                            lrOpenFileDialog.Filter = "Boston Database (*.db)|*.db; *.db|All Files|*.*"
+
+                            If System.IO.Directory.Exists(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database") Then
+                                lrOpenFileDialog.InitialDirectory = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
+                            End If
+
+                            If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
+
+                                If File.Exists(lrOpenFileDialog.FileName) Then
+                                    lsDatabaseLocation = lrOpenFileDialog.FileName
+                                    'Reaffirm/Set My.Settings.DatabaseConnectionString (for upgrades etc).
+                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                                    My.Settings.Save()
+                                    GoTo CheckExistsDatabaseLocation
+                                Else
+                                    MsgBox("No file exists at the given location/name.")
+                                End If
+                            End If
+
+                        End Using
+
+                    End If
+#End Region
+
+                    lsDatabaseLocation = Boston.returnIfTrue(asDatabaseLocationFile IsNot Nothing, asDatabaseLocationFile, lrSQLConnectionStringBuilder("Data Source"))
+
+                    'Compare with Registry DatabaseConnectionString
+                    Dim lsRegistryDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
+                    If Not lbUserDatabaseIntervention And lsRegistryDatabaseLocation IsNot Nothing Then
+                        If lsDatabaseLocation <> lsRegistryDatabaseLocation Then
+                            lsDatabaseLocation = lsRegistryDatabaseLocation
+                        End If
+                    End If
+
+CheckExistsDatabaseLocationSQLite:
+                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+
+
+                    If Not System.IO.File.Exists(lsDatabaseLocation) Then
+                        '-----------------------------------
+                        'Try and find the database locally
+                        '-----------------------------------
+                        Try
+                            lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
+                            If lsDatabaseLocation IsNot Nothing Then
+                                If System.IO.File.Exists(lsDatabaseLocation) Then
+                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+
+                                    If Not File.Exists(lsDatabaseLocation) Then GoTo StillCannotFindTheDatabase
+
+                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                                    lsConnectionString = My.Settings.DatabaseConnectionString
+                                    GoTo OpenConnection
+                                End If
+                            End If
+                        Catch ex As Exception
+                            'Not a biggie.
+                        End Try
+
+StillCannotFindTheDatabaseSQLite:
+                        If Not My.Settings.SilentPreConfiguration Then
+
+                            lsMessage = "Cannot find the Boston database at the default/configured location:"
+                            lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
+                            lsMessage.AppendDoubleLineBreak("If this is a not a new installation of Boston, contact FactEngine support.")
+                            lsMessage.AppendDoubleLineBreak("Click [Yes] to locate the database yourself or [No] to close Boston.")
+                            lsMessage.AppendDoubleLineBreak("The default name for the Boston database is boston.vdb")
+
+
+                            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                                GoTo UserSelectedDatabaseSQLite
+                            Else
+                                Return False
+                            End If
+
+                        End If
+                    End If
+#End Region
+                ElseIf My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
+#Region "MS Jet"
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
+
+                    pdbConnection = New FactEngine.MSAccessConnection(Nothing, Nothing) ' ADODB.Connection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
+                    pdb_OLEDB_connection = New OleDb.OleDbConnection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
+
+#Region "SHIFT KEY DOWN - User Points to database"
+                    If My.Computer.Keyboard.ShiftKeyDown Then
+UserSelectedDatabase:
+                        Using lrOpenFileDialog As New OpenFileDialog
+
+                            lrOpenFileDialog.Filter = "Boston Database (*.vdb, *.mdb)|*.vdb; *.mdb|All Files|*.*"
+
+                            If System.IO.Directory.Exists(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database") Then
+                                lrOpenFileDialog.InitialDirectory = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
+                            End If
+
+                            If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
+
+                                If File.Exists(lrOpenFileDialog.FileName) Then
+                                    lsDatabaseLocation = lrOpenFileDialog.FileName
+                                    'Reaffirm/Set My.Settings.DatabaseConnectionString (for upgrades etc).
+                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                                    My.Settings.Save()
+                                    GoTo CheckExistsDatabaseLocation
+                                Else
+                                    MsgBox("No file exists at the given location/name.")
+                                End If
+                            End If
+
+                        End Using
+#End Region
+                    End If
+
+                    lsDatabaseLocation = Boston.returnIfTrue(asDatabaseLocationFile IsNot Nothing, asDatabaseLocationFile, lrSQLConnectionStringBuilder("Data Source"))
+                    lsDataProvider = lrSQLConnectionStringBuilder("Provider")
+
+CheckExistsDatabaseLocation:
+                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+
+
+                    If Not System.IO.File.Exists(lsDatabaseLocation) Then
+#Region "Database can't be found"
+                        '-----------------------------------
+                        'Try and find the database locally
+                        '-----------------------------------
+                        Try
+                            lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
+                            If lsDatabaseLocation IsNot Nothing Then
+                                If My.Computer.Keyboard.CtrlKeyDown Then GoTo LastDitch : 
+                                If System.IO.File.Exists(lsDatabaseLocation) Then
+                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+
+                                    If Not File.Exists(lsDatabaseLocation) Then GoTo StillCannotFindTheDatabase
+
+                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                                    lsConnectionString = My.Settings.DatabaseConnectionString
+                                    GoTo OpenConnection
+                                Else
+LastDitch:
+                                    MsgBox("Cannot find the Boston Database. Set the Database Type and Connection String and restart Boston.")
+                                    Dim lfrmCRUDBostonConfiguration As New frmCRUDBostonConfiguration
+                                    Call lfrmCRUDBostonConfiguration.ShowDialog()
+                                    My.Settings.DatabaseConnectionString = lfrmCRUDBostonConfiguration.msConnectionString
+                                    My.Settings.DatabaseType = lfrmCRUDBostonConfiguration.msDatabaseType
+                                    lsConnectionString = My.Settings.DatabaseConnectionString
+                                    lsDatabaseType = My.Settings.DatabaseType
+                                    GoTo TestDatabase
+                                End If
+                            End If
+                        Catch ex As Exception
+                            'Not a biggie.
+                        End Try
+
+StillCannotFindTheDatabase:
+                        If Not My.Settings.SilentPreConfiguration Then
+
+                            lsMessage = "Cannot find the Boston database at the default/configured location:"
+                            lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
+                            lsMessage.AppendDoubleLineBreak("If this is a not a new installation of Boston, contact FactEngine support.")
+                            lsMessage.AppendDoubleLineBreak("Click [Yes] to locate the database yourself or [No] to close Boston.")
+                            lsMessage.AppendDoubleLineBreak("The default name for the Boston database is boston.vdb")
+
+
+                            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                                GoTo UserSelectedDatabase
+                            Else
+                                Return False
+                            End If
+
+                        End If
+
+#Region "Abandoned 20220830"
+                        'If System.IO.File.Exists(lsLocalDatabaseLocation) Then
+                        '    lrSQLConnectionStringBuilder("Data Source") = lsLocalDatabaseLocation
+                        '    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        '    lsMessage = "Saving the following as the Database Connection String for your installation of Boston."
+                        '    lsMessage.AppendDoubleLineBreak(lrSQLConnectionStringBuilder.ConnectionString)
+                        '    lsMessage.AppendDoubleLineBreak("Boston will start but you won't be able to use this database. Contact FactEngine to find out how to connect to the correct database.")
+                        '    lsMessage.AppendDoubleLineBreak("To make changes to the Boston database connection string, go to [Boston]->[Configuration]")
+
+                        '    If Not My.Settings.SilentPreConfiguration Then
+                        '        MsgBox(lsMessage)
+                        '    End If
+
+                        '    My.Settings.Save()
+                        '    lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        'Else
+                        '    lsMessage = "Cannot find the Boston database at:"
+                        '    lsMessage &= vbCrLf & vbCrLf
+                        '    lsMessage &= lsDatabaseLocation
+                        '    lsMessage &= vbCrLf
+                        '    lsMessage &= "or..."
+                        '    lsMessage &= vbCrLf
+                        '    lsMessage &= lsLocalDatabaseLocation
+                        '    lsMessage &= vbCrLf & vbCrLf
+                        '    'lsMessage &= "Adjust the setting, 'database_connection_str', in the 'Boston.exe.config' file and restart Boston."
+                        '    lsMessage &= "Adjust the Database Connection String for your database and restart Boston."
+                        '    MsgBox(lsMessage)
+                        '    frmCRUDBostonConfiguration.ShowDialog()
+                        '    Return False
+                        'End If
+#End Region
+#End Region
+                    End If
+#End Region
+                End If
+
+OpenConnection:
+                Dim regKey As Microsoft.Win32.RegistryKey
+                regKey = My.Computer.Registry.CurrentUser.OpenSubKey("SOFTWARE", True)
+                regKey.CreateSubKey("Boston")
+                regKey.Close()
+                If abSaveToRegistry Then
+                    'Not saved to registry if opening Temp database for Database Upgrade.
+                    regKey = My.Computer.Registry.CurrentUser.OpenSubKey("SOFTWARE\Boston", True)
+                    regKey.SetValue("DatabaseLocation", lsDatabaseLocation)
+                End If
+
+                regKey = My.Computer.Registry.CurrentUser.OpenSubKey("SOFTWARE\Boston", True)
+                Dim loConfiguration As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal)
+                regKey.SetValue("ConfigurationFileLocation", loConfiguration.FilePath)
+
+                'Below Failed...because no permissions.
+                'My.Computer.Registry.SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Boston\Variables", "DatabaseLocation", lsDatabaseLocation)
+
+                '------------------------------------------------
+                'Open the (database) connection
+                '------------------------------------------------
+                lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                If pbLogStartup Then prApplication.ThrowMessage("pdbConnection Opening", pcenumErrorType.Warning)
+
+                If pdbConnection.Open(lsConnectionString) Then
+
+                    If pbLogStartup Then
+                        prApplication.ThrowMessage("pdbConnection Opened: " & lsConnectionString, pcenumErrorType.Warning)
+                    End If
+                Else
+                    Throw New Exception("Failed to Open database. Method: Open.")
+                End If
+
+#Region "OLEDB"
+                Select Case My.Settings.DatabaseType
+                    Case Is = pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.MSJet.ToString
+
+                        'lsDatabaseLocation
+                        lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
+                        lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
+                        lrSQLConnectionStringBuilder("Provider") = "Microsoft.ACE.OLEDB.12.0" ' "Microsoft.Jet.OLEDB.4.0"
+
+                        pdb_OLEDB_connection.ConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        pdb_OLEDB_connection.Open()
+                End Select
+#End Region
+
+                'Database Version Number. Get because user may have intervened and changed database.
+                prApplication.DatabaseVersionNr = TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
+
+                Return True
+
+            Catch lo_ex As Exception
+
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & lo_ex.Message
+                lsMessage.AppendDoubleLineBreak("Error: There was an error opening Boston database: ")
+                lsMessage.AppendDoubleLineBreak(lsConnectionString)
+                lsMessage.AppendDoubleLineBreak("'" & Trim(lo_ex.Message) & "'" & vbCrLf & lo_ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
+                Return False
+            End Try
+
+        End Function
+
+#Region "Grandfather Father Son Regime"
+
+        Public Sub PerformGrandfatherFatherSonBackup()
+
+            Try
+                Dim loSetting As Object = New System.Dynamic.ExpandoObject
+                Dim larExpandoFields() As Object = {}
+
+                larExpandoFields.Add(New With {.FieldName = "GFSBackupType", .Value = "LastGrandfatherBackupDate"})
+                Dim larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(40,, larExpandoFields) ', loSetting
+                Dim grandfatherBackupDate As DateTime = DateTime.ParseExact(larSettingTuples(0).LastBackupDate, "yyyy-MM-dd", CultureInfo.InvariantCulture)
+
+                larExpandoFields = {}
+                larExpandoFields.Add(New With {.FieldName = "GFSBackupType", .Value = "LastFatherBackupDate"})
+                larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(40,, larExpandoFields) ', loSetting
+                Dim fatherBackupDate As DateTime = DateTime.ParseExact(larSettingTuples(0).LastBackupDate, "yyyy-MM-dd", CultureInfo.InvariantCulture)
+
+                larExpandoFields = {}
+                larExpandoFields.Add(New With {.FieldName = "GFSBackupType", .Value = "LastSonBackupDate"})
+                larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(40,, larExpandoFields) ', loSetting
+                Dim sonBackupDate As DateTime = DateTime.ParseExact(larSettingTuples(0).LastBackupDate, "yyyy-MM-dd", CultureInfo.InvariantCulture)
+
+                ' Calculate the backup intervals
+                Dim currentDate As DateTime = DateTime.Now
+                Dim daysSinceGrandfatherBackup As Integer = (currentDate - grandfatherBackupDate).Days
+                Dim daysSinceFatherBackup As Integer = (currentDate - fatherBackupDate).Days
+                Dim daysSinceSonBackup As Integer = (currentDate - sonBackupDate).Days
+
+                ' Perform backups as necessary
+                If daysSinceGrandfatherBackup >= DaysInMonth Then
+                    BackupDatabaseAndXml("Grandfather")
+                    ' Update the last backup date in the database
+                    loSetting = New With {.GFSBackupType = "LastGrandfatherBackupDate", .LastBackupDate = currentDate.ToString("yyyy-MM-dd")}
+                    Dim larKeyFields() As Object = {}
+                    larKeyFields.Add(New With {.FieldId = 1, .FieldName = "GFSBackupType", .Value = "LastGrandfatherBackupDate"})
+                    Call TableReferenceTable.UpSert(40, loSetting, larKeyFields)
+                End If
+                If daysSinceFatherBackup >= DaysInWeek Then
+                    BackupDatabaseAndXml("Father")
+                    ' Update the last backup date in the database
+                    loSetting = New With {.GFSBackupType = "LastFatherBackupDate", .LastBackupDate = currentDate.ToString("yyyy-MM-dd")}
+                    Dim larKeyFields() As Object = {}
+                    larKeyFields.Add(New With {.FieldId = 1, .FieldName = "GFSBackupType", .Value = "LastFatherBackupDate"})
+                    Call TableReferenceTable.UpSert(40, loSetting, larKeyFields)
+                End If
+                If daysSinceSonBackup >= 1 Then
+                    BackupDatabaseAndXml("Son")
+                    'Update the last backup date in the database
+                    loSetting = New With {.GFSBackupType = "LastSonBackupDate", .LastBackupDate = currentDate.ToString("yyyy-MM-dd")}
+                    Dim larKeyFields() As Object = {}
+                    larKeyFields.Add(New With {.FieldId = 1, .FieldName = "GFSBackupType", .Value = "LastSonBackupDate"})
+                    Call TableReferenceTable.UpSert(40, loSetting, larKeyFields)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' Backs up the Database Location and XML Folder under that to a \Grandfather, \Father, or \Son location.
+        ''' </summary>
+        ''' <param name="asBackupType">Grandfather, Father, Son</param>
+        Private Sub BackupDatabaseAndXml(asBackupType As String)
+
+            Try
+                Dim databaseLocation As String = ""
+                Dim backupFolder As String = ""
+                Dim databaseFile As String = ""
+                Dim xmlSourceFolder As String = ""
+                Dim xmlBackupFolder As String = ""
+
+                databaseLocation = GetDatabaseDirectoryPathFromConnectionString(My.Settings.DatabaseConnectionString)
+                backupFolder = System.IO.Path.Combine(databaseLocation, "Backup", asBackupType)
+                'Database File
+                databaseFile = GetDatabaseFileNameFromConnectionString(My.Settings.DatabaseConnectionString)
+
+                'XML folder
+                xmlSourceFolder = Path.Combine(databaseLocation, "XML")
+                xmlBackupFolder = Path.Combine(backupFolder, "XML")
+
+
+                Directory.CreateDirectory(backupFolder)
+                Directory.CreateDirectory(xmlSourceFolder)
+                Directory.CreateDirectory(xmlBackupFolder)
+                File.Copy(Path.Combine(databaseLocation, databaseFile), Path.Combine(backupFolder, Path.GetFileName(databaseFile)), overwrite:=True)
+                CopyDirectory(xmlSourceFolder, xmlBackupFolder)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
+        Private Function GetDatabaseDirectoryPathFromConnectionString(connectionString As String) As String
+            Try
+                Select Case My.Settings.DatabaseType
+                    Case Is = "MSJet"
+                        ' Parse the connection string using DbConnectionStringBuilder.
+                        Dim builder As New DbConnectionStringBuilder With {
+                            .connectionString = connectionString
+                        }
+                        ' Extract the database file path from the connection string.
+                        ' Assumes "Data Source" is the correct key in the connection string.
+                        If builder.ContainsKey("Data Source") Then
+                            Dim databaseFilePath As String = builder("Data Source").ToString()
+                            ' Return the directory path without the database file name.
+                            Return Path.GetDirectoryName(databaseFilePath)
+                        Else
+                            Throw New InvalidOperationException("The connection string does not contain a Data Source key.")
+                        End If
+                    Case Is = "SQLite"
+                        ' Parse the connection string using DbConnectionStringBuilder.
+                        Dim builder As New DbConnectionStringBuilder With {
+                            .ConnectionString = connectionString
+                        }
+                        ' Extract the database file path from the connection string.
+                        ' Assumes "Data Source" is the correct key in the connection string.
+                        If builder.ContainsKey("Data Source") Then
+                            Dim databaseFilePath As String = builder("Data Source").ToString()
+                            ' Return the directory path without the database file name.
+                            Return Path.GetDirectoryName(databaseFilePath)
+                        Else
+                            Throw New InvalidOperationException("The connection string does not contain a Data Source key.")
+                        End If
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodBase.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                ' Replace the following line with your application's error handling
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return "<Error Getting Database Location from Connection String>"
+            End Try
+        End Function
+
+        Private Function GetDatabaseFileNameFromConnectionString(connectionString As String) As String
+            Try
+                Select Case My.Settings.DatabaseType
+                    Case Is = "MSJet"
+                        ' Parse the connection string using DbConnectionStringBuilder.
+                        Dim builder As New System.Data.Common.DbConnectionStringBuilder With {
+                            .ConnectionString = connectionString
+                        }
+                        ' Extract the database file path from the connection string.
+                        ' Assumes "Data Source" is the correct key in the connection string.
+                        If builder.ContainsKey("Data Source") Then
+                            Dim databaseFilePath As String = builder("Data Source").ToString()
+                            ' Return the database file name with extension.
+                            Return Path.GetFileName(databaseFilePath)
+                        Else
+                            Throw New InvalidOperationException("The connection string does not contain a Data Source key.")
+                        End If
+                    Case Is = "SQLite"
+                        ' Parse the connection string using DbConnectionStringBuilder.
+                        Dim builder As New System.Data.Common.DbConnectionStringBuilder With {
+                            .ConnectionString = connectionString
+                        }
+                        ' Extract the database file path from the connection string.
+                        ' Assumes "Data Source" is the correct key in the connection string.
+                        If builder.ContainsKey("Data Source") Then
+                            Dim databaseFilePath As String = builder("Data Source").ToString()
+                            ' Return the database file name with extension.
+                            Return Path.GetFileName(databaseFilePath)
+                        Else
+                            Throw New InvalidOperationException("The connection string does not contain a Data Source key.")
+                        End If
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return "<Error Getting Database Location from Connection String>"
+            End Try
+        End Function
+
+        Private Sub CopyDirectory(sourceDir As String, destDir As String)
+
+            Try
+
+                If Not Directory.Exists(destDir) Then
+                    Directory.CreateDirectory(destDir)
+                End If
+
+                For Each file As String In System.IO.Directory.GetFiles(sourceDir)
+                    System.IO.File.Copy(file, System.IO.Path.Combine(destDir, System.IO.Path.GetFileName(file)), overwrite:=True)
+                Next
+
+                For Each directory As String In System.IO.Directory.GetDirectories(sourceDir)
+                    CopyDirectory(directory, System.IO.Path.Combine(destDir, System.IO.Path.GetFileName(directory)))
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
+
+#End Region
+
+        Public Sub CompactAccessDB(ByVal sFilePath As String, ByVal sNewFilePath As String)
+            Try
+                Dim sCompactError As String = ""
+
+                Dim lsSourceConnectionString, lsNewConnectionString As String
+                lsSourceConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}", sFilePath)
+                lsNewConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};Jet OLEDB:Engine Type=5", sNewFilePath)
+                Dim jro As New JRO.JetEngine 'new instance of the jet engine
+                jro.CompactDatabase(lsSourceConnectionString, lsNewConnectionString)
+
+                System.IO.File.Delete(sFilePath)
+                System.IO.File.Move(sNewFilePath, sFilePath)
+
+            Catch ex As System.Exception
+                Throw New Exception(ex.Message)
+            End Try
+        End Sub
+
 
         Public Sub CompactAndRepairDatabase()
 
@@ -20,12 +625,12 @@ Namespace Database
                 lsCompactedDatabaseLocationName = New System.IO.FileInfo(lsDatabaseLocationName).DirectoryName & "\BostonCompacted.vdb"
 
                 Try
-                    Call Boston.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
+                    Call Database.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
                 Catch ex As Exception
-                    prApplication.ThrowErrorMessage("Failed to compact the database. Check to see if any other application has the database open.", pcenumErrorType.Warning)
+                    prApplication.ThrowMessage("Failed to compact the database. Check to see if any other application has the database open.", pcenumErrorType.Warning)
                 End Try
 
-                Call Boston.OpenDatabase()
+                Call Database.OpenDatabase()
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -33,7 +638,7 @@ Namespace Database
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -41,7 +646,7 @@ Namespace Database
 
             Dim lsReturnString As String = ""
 
-            lsReturnString = asString.Replace("""", "''")
+            lsReturnString = asString.Replace("""", """")
             lsReturnString = asString.Replace("'", "''")
 
 
@@ -88,7 +693,7 @@ Namespace Database
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return False
             End Try
@@ -126,10 +731,12 @@ Namespace Database
         ''' <param name="asToVersionNr">The database VersionNr that the installation datbase will be upgraded to.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function PerformNextRequiredDatabaseUpgrade(ByVal aiUpgradeId As String, ByVal asFromVersionNr As String, ByVal asToVersionNr As String) As Boolean
+        Public Function PerformNextRequiredDatabaseUpgrade(ByVal aiUpgradeId As String,
+                                                           ByVal asFromVersionNr As String,
+                                                           ByVal asToVersionNr As String,
+                                                           ByVal asTempDatabaseLocationFileName As String) As Boolean
 
             Dim lsUpgradeSQL As String
-            Dim lsMessage As String
             Dim lsStallMessage As String = ""
             Dim lsErrorMessage As String
             Dim lrDatabaseUpgradeSQL As DatabaseUpgrade.UpgradeSQL
@@ -182,17 +789,19 @@ Namespace Database
                         lsUpgradeSQL = Trim(Viev.NullVal(lrRecordset("SQLString").Value, ""))
                         lrDatabaseUpgradeSQL.CodeToExecute = Trim(Viev.NullVal(lrRecordset("CodeToExecute").Value, ""))
 
-                        lsMessage = lrRecordset("SequenceNr").Value
-                        lsMessage &= vbCrLf
-                        lsMessage &= lrDatabaseUpgradeSQL.UpgradeType
-                        lsMessage &= vbCrLf
-                        lsMessage &= lrDatabaseUpgradeSQL.TableName
-                        lsMessage &= vbCrLf
-                        lsMessage &= lrDatabaseUpgradeSQL.FieldName
-                        lsMessage &= vbCrLf
-                        lsMessage &= lrDatabaseUpgradeSQL.OrdinalPosition
-                        lsMessage &= vbCrLf
-                        lsMessage &= lsUpgradeSQL
+#Region "Prepare Error Message if required"
+                        lsErrorMessage = lrRecordset("SequenceNr").Value
+                        lsErrorMessage &= vbCrLf
+                        lsErrorMessage &= lrDatabaseUpgradeSQL.UpgradeType
+                        lsErrorMessage &= vbCrLf
+                        lsErrorMessage &= lrDatabaseUpgradeSQL.TableName
+                        lsErrorMessage &= vbCrLf
+                        lsErrorMessage &= lrDatabaseUpgradeSQL.FieldName
+                        lsErrorMessage &= vbCrLf
+                        lsErrorMessage &= lrDatabaseUpgradeSQL.OrdinalPosition
+                        lsErrorMessage &= vbCrLf
+                        lsErrorMessage &= lsUpgradeSQL
+#End Region
 
 
                         Select Case lrDatabaseUpgradeSQL.UpgradeType
@@ -225,7 +834,7 @@ Namespace Database
                             '                        lsMessage1.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
                             '                        lsMessage1 &= vbCrLf & lsCommand
                             '                        lsMessage1 &= vbCrLf & vbCrLf & ex1.Message
-                            '                        prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex1.StackTrace)
+                            '                        prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex1.StackTrace)
 
                             '                        GoTo error_handler
                             '                    End If
@@ -321,31 +930,45 @@ Namespace Database
                                 'Use DBWConsole
 
                                 Try
-                                    SyncLock locker
+                                    Select Case My.Settings.DatabaseType
+                                        Case Is = "MSJet"
+#Region "MSJet"
+                                            SyncLock locker
 
-                                        Threading.Thread.Sleep(3500)
+                                                Threading.Thread.Sleep(3500)
 
-                                        Try
-                                            Boston.WaitForFile(lsSQLFilePath & "\script.sql", IO.FileMode.Open, IO.FileAccess.Write, IO.FileShare.ReadWrite)
-                                            System.IO.File.Delete(lsSQLFilePath & "\script.sql")
-                                        Catch ex As Exception
-                                            'Not a biggie.
-                                        End Try
+                                                Try
+                                                    Boston.WaitForFile(lsSQLFilePath & "\script.sql", IO.FileMode.Open, IO.FileAccess.Write, IO.FileShare.ReadWrite)
+                                                    System.IO.File.Delete(lsSQLFilePath & "\script.sql")
+                                                Catch ex As Exception
+                                                    'Not a biggie.
+                                                End Try
 
-                                        Using streamWriter As New System.IO.StreamWriter(lsSQLFilePath & "\script.sql", False)
+                                                Using streamWriter As New System.IO.StreamWriter(lsSQLFilePath & "\script.sql", False)
 
-                                            streamWriter.WriteLine(lsUpgradeSQL & ";")
-                                            streamWriter.Close()
-                                        End Using
+                                                    streamWriter.WriteLine(lsUpgradeSQL & ";")
+                                                    streamWriter.Close()
+                                                End Using
 
-                                        Dim lsShellCommand As String = Boston.MyPath & "\dbwconsole\DBWConsole.exe " & lsSQLFilePath & "script.sql " & lsSQLFilePath & "boston.mdb /e"
+                                                Dim lsShellCommand As String = Boston.MyPath & "\dbwconsole\DBWConsole.exe " & lsSQLFilePath & "script.sql " & lsSQLFilePath & "boston.mdb /e"
 
-                                        Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
+                                                Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
 
 
-                                        Shell(lsShellCommand, lrDatabaseUpgradeSQL.AllowFail, True, 5000)
+                                                Shell(lsShellCommand, lrDatabaseUpgradeSQL.AllowFail, True, 5000)
 
-                                    End SyncLock
+                                            End SyncLock
+#End Region
+                                        Case Is = "SQLite"
+#Region "SQLite"
+                                            Dim lrUpgradeRecordset As ORMQL.Recordset = pdbConnection.Execute(lsUpgradeSQL.Replace(vbCrLf, ""))
+
+                                            If lrUpgradeRecordset.ErrorReturned Then
+                                                Boston.ShowFlashCard("Error performing upgrade step".AppendDoubleLineBreak(lsErrorMessage), Color.Salmon)
+                                                Return False
+                                            End If
+#End Region
+                                    End Select
 
                                 Catch ex As Exception
 
@@ -377,6 +1000,8 @@ Namespace Database
                 Return True
 
             Catch ex As Exception
+
+                Dim lsMessage As String = ""
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
@@ -398,7 +1023,7 @@ Namespace Database
 
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
 
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 pdbConnection.RollbackTrans()
 
@@ -412,8 +1037,8 @@ error_handler:
             'Call transaction.Rollback()
 
             lsErrorMessage = Err.Number & ", " & Err.Source & ", " & Err.Description
-            lsMessage &= "Error Message: " & lsErrorMessage
-            MsgBox(lsMessage)
+            lsErrorMessage &= "Error Message: " & lsErrorMessage
+            MsgBox(lsErrorMessage)
 
             Return False
 

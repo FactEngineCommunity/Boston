@@ -1,10 +1,11 @@
-﻿Imports DynamicClassLibrary.Factory
-Imports System.Reflection
-Imports System.Runtime.InteropServices
-Imports System.Xml.Serialization
+﻿Imports System.Xml.Serialization
 Imports System.Threading
+Imports System.Threading.Tasks
 Imports AIMLbot
 Imports System.Text.RegularExpressions
+Imports System.Linq.Expressions
+Imports System.Reflection
+Imports System.Net.Http
 
 ''' <summary>
 ''' The Brain follows the principals of Organic / Autonomic Computing.
@@ -23,6 +24,32 @@ Public Class tBrain
     XmlIgnore()>
     Public Page As FBM.Page
 
+    <NonSerialized(),
+    XmlIgnore()>
+    Private _lockObject As New Object()
+
+    <NonSerialized(),
+    XmlIgnore()>
+    Public _CurrentTask As OSM.Task = Nothing
+
+    <XmlIgnore>
+    Public Property CurrentTask As OSM.Task
+        Get
+            SyncLock _lockObject
+                Return _CurrentTask
+            End SyncLock
+        End Get
+        Set(value As OSM.Task)
+            SyncLock _lockObject
+                _CurrentTask = value
+            End SyncLock
+        End Set
+    End Property
+
+    <NonSerialized(),
+    XmlIgnore()>
+    Public WorkingOnTasks As New List(Of OSM.Task)
+
     Public NL2FEKLPrompt As String = Nothing
     Dim mrOpenAIAPI As OpenAI_API.OpenAIAPI
 
@@ -34,6 +61,15 @@ Public Class tBrain
     '-------------------------------------
     'Input
     '-------------------------------------
+    'RealTime Voice Transcription
+    Public AssemblyAIRelTimeTranscriber As AssemblyAIRealtimeClient
+    Public ConversationMode As pcenumOSMConversationMode = pcenumOSMConversationMode.ChatBot
+    Public httpClient As HttpClient
+
+    '-------------------------------------
+    'OSM
+    '-------------------------------------
+    Public OSMTheBox As frmOSMTheBox
 
     ''' <summary>
     ''' AIML Classes/Objects
@@ -48,6 +84,7 @@ Public Class tBrain
     Private InputSymbols As New List(Of String)
 
     Public QuietMode As Boolean = False 'True if TextToSpeech is turned off.
+    Public IsSpeaking As Boolean = False
 
     '-------------------------------------
     'Output
@@ -102,6 +139,15 @@ Public Class tBrain
     Private Directive As New List(Of tDirective)
     Private HistoryPlan As New List(Of Brain.Plan)
 
+    Public ReadOnly Property Plans As List(Of Brain.Plan)
+        Get
+            Dim larPlan = (From Question In Me.Question
+                           Select Question.Plan).Distinct
+
+            Return larPlan.ToList
+        End Get
+    End Property
+
     Private _CurrentQuestion As tQuestion
     Public Property CurrentQuestion() As tQuestion
         Get
@@ -136,6 +182,10 @@ Public Class tBrain
 
     Private ResponseButtons As New List(Of Button)
 
+    Public Event IsOutputtingSpeech()
+    Public Event FinishedOutputtingSpeech()
+    Public Event FormTheBoxClosed()
+
     Public Sub New()
 
         Try
@@ -154,6 +204,8 @@ Public Class tBrain
             Me.CommandList.Add("one")
             Me.CommandList.Add("at most one")
             Me.CommandList.Add("many to many")
+            Me.CommandList.Add("at least one")
+            Me.CommandList.Add("any number of")
             Me.CommandList.Add("what can i say")
             Me.CommandList.Add("speed it up")
             Me.CommandList.Add("slow it down")
@@ -166,10 +218,13 @@ Public Class tBrain
             Me.CommandList.Add("list sentences")
             Me.CommandList.Add("list questions")
             Me.CommandList.Add("list current sentence")
+            Me.CommandList.Add("list available tasks")
             Me.CommandList.Add("list current sentence resolution")
             Me.CommandList.Add("breakdown current sentence")
             Me.CommandList.Add("setmode ormql")
             Me.CommandList.Add("setmode nl")
+            Me.CommandList.Add("setmode osm")
+            Me.CommandList.Add("show osm context")
             Me.CommandList.Add("what is your plan")
             Me.CommandList.Add("drop that plan")
             Me.CommandList.Add("abort your current plan")
@@ -206,7 +261,7 @@ Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -224,7 +279,7 @@ Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -254,12 +309,15 @@ Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
-    Private Sub process_inputbuffer()
+    ''' <summary>
+    ''' The entry point for user input to The Brain.
+    ''' </summary>
+    Private Async Sub process_inputbuffer()
 
         Dim lsString As String = ""
 
@@ -280,6 +338,9 @@ Public Class tBrain
             ElseIf CheckChangeThoughtModeNL(Me.InputBuffer) Then
                 Me.ThoughtMode = pcenumBrainMode.NaturalLanguage
                 Exit Sub
+            ElseIf CheckChangeThoughtModeOSM(Me.InputBuffer) Then
+                Me.ThoughtMode = pcenumBrainMode.OSM
+                Exit Sub
             End If
 
             Select Case Me.ThoughtMode
@@ -287,6 +348,18 @@ Public Class tBrain
                     Call Me.ProcessORMQL()
                 Case Is = pcenumBrainMode.NaturalLanguage
                     Call Me.ProcessNaturalLanguage()
+                Case Is = pcenumBrainMode.OSM
+                    Call Me.ProcessNPUThread()
+                    'Dim timeout = TimeSpan.FromSeconds(20) ' Set your desired timeout duration
+                    'If Await Task.WhenAny(, Task.Delay(timeout)) Is Task.Delay(timeout) Then
+                    '    ' Timeout occurred
+                    '    Me.send_data("OSM Timed out.",,,, True)
+                    'Else
+                    '    'All good. The task completed before the timeout.
+                    'End If
+                Case Else
+                    lsString = "Sorry I didn't understand. Are you in the right mode (NL, OSM, ORMQL)?"
+                    Me.send_data(lsString, False, True)
             End Select
 
         Catch ex As Exception
@@ -295,7 +368,7 @@ Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -313,16 +386,27 @@ Public Class tBrain
     Public Sub send_data(ByVal asData As String,
                          Optional ByVal ab_is_echo As Boolean = False,
                          Optional abSuppressLineLimit As Boolean = False,
-                         Optional aiExpectedResponseType As pcenumExpectedResponseType = pcenumExpectedResponseType.None) ' pcenumExpectedResponseType = pcenumExpectedResponseType.None)
+                         Optional aiExpectedResponseType As pcenumExpectedResponseType = pcenumExpectedResponseType.None,
+                         Optional abSuppressSpeech As Boolean = False,
+                         Optional abIsDebugMessage As Boolean = False,
+                         Optional ByRef aoDebugColor As Color? = Nothing) ' pcenumExpectedResponseType = pcenumExpectedResponseType.None)
 
         Dim lsString As String = ""
 
+        If aoDebugColor Is Nothing Then
+            aoDebugColor = Color.Salmon
+        End If
+
+        'CodeSafe
+        If asData.Trim = "" Then Exit Sub
+
         Try
 
-            If Not ab_is_echo And Not Me.QuietMode Then
+#Region "Speech - Actual artificial voice."
+            If Not abSuppressSpeech And (Not ab_is_echo And Not Me.QuietMode) Then
                 If Me.Page IsNot Nothing Then
                     If Me.Page.Form.GetType Is GetType(frmDiagramORM) Then
-                        If Viev.Strings.CountWords(asData) = 1 Then
+                        If FEStrings.CountWords(asData) = 1 Then
                             Me.Page.Form.Briana.SetTimerInterval(540)
                         Else
                             Me.Page.Form.Briana.SetTimerInterval(80)
@@ -330,10 +414,15 @@ Public Class tBrain
                     End If
                 End If
 
+                RaiseEvent IsOutputtingSpeech()
+                'Threading Speech Output.
                 Me.Thread = New Thread(AddressOf Me.Speak)
                 Me.Thread.IsBackground = True
                 Me.Thread.Start(asData)
+                RaiseEvent FinishedOutputtingSpeech()
+
             End If
+#End Region
 
             If Me.IncludeSenderInOutput And Not (ab_is_echo) Then
                 lsString = "Briana: "
@@ -350,7 +439,7 @@ Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
         If Me.OutputChannel Is Nothing Then GoTo SkipOutputChannel
@@ -359,9 +448,34 @@ Public Class tBrain
         'Me.outputchannel.SelectionLength = lsString.Length
         'Me.outputchannel.SelectionLength = 0
         'Me.outputchannel.text &= vbCrLf
+        Dim liOutputChannelLineLimitDivider = 21
+
         Try
+#Region "Allow for buttons"
+            If abSuppressLineLimit Then
+                Call Me.LimitOutputChannelLines(40)
+            Else
+                Me.OutputChannel.SelectionStart = Me.OutputChannel.TextLength
+                Dim pos As Point = Me.OutputChannel.GetPositionFromCharIndex(Me.OutputChannel.SelectionStart)  'determine the button position            
+                Dim liButtonsTop = pos.Y + Me.OutputChannel.Top + 3
+
+                While (Me.OutputChannel.Height / liOutputChannelLineLimitDivider * (Me.OutputChannel.Font.Height + 4)) + 27 > Me.OutputChannel.Height
+
+                    If (Me.OutputChannel.Height / liOutputChannelLineLimitDivider) > 2 Then
+                        Call Me.LimitOutputChannelLines(Me.OutputChannel.Height / liOutputChannelLineLimitDivider)
+                    Else
+                        Exit While
+                    End If
+                    liOutputChannelLineLimitDivider += 1
+                End While
+                liOutputChannelLineLimitDivider = 21
+            End If
+#End Region
+
             If ab_is_echo Then
                 Me.OutputChannel.SelectionColor = Color.DarkGray
+            ElseIf abIsDebugMessage Then
+                Me.OutputChannel.SelectionColor = aoDebugColor
             Else
                 Me.OutputChannel.SelectionColor = Color.RoyalBlue
             End If
@@ -371,10 +485,6 @@ Public Class tBrain
         Catch ex As Exception
             Boston.WriteToStatusBar("Possible Cross thread concern.")
         End Try
-
-        If Not abSuppressLineLimit Then
-            Call Me.LimitOutputChannelLines()
-        End If
 
         'Buttons
         Try
@@ -419,6 +529,8 @@ Public Class tBrain
 #End Region
                 Case Is = pcenumExpectedResponseType.ATMOSTONEONEMANYTOMANY
 #Region "ATMOSTONEONEMANYTOMANY"
+
+#Region "AT MOST ONE"
                     Dim Button1 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button1.Size = New System.Drawing.Size(95, 27) ' give the button a size
                     Button1.Text = "AT MOST ONE" ' set the button text
@@ -435,7 +547,9 @@ Public Class tBrain
                     Dim pos As Point = Me.OutputChannel.GetPositionFromCharIndex(Me.OutputChannel.SelectionStart)  'determine the button position                    
                     Me.OutputChannel.Controls.Add(Button1) ' get it inside the rich text box
                     Button1.Location = New Point(Me.OutputChannel.Left, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
+#End Region
 
+#Region "ONE"
                     Dim Button2 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button2.Size = New System.Drawing.Size(75, 27) ' give the button a size
                     Button2.Text = "ONE" ' set the button text
@@ -447,7 +561,9 @@ Public Class tBrain
 
                     Me.OutputChannel.Controls.Add(Button2) ' get it inside the rich text box
                     Button2.Location = New Point(Button1.Left + Button1.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
+#End Region
 
+#Region "Many to Many"
                     Dim Button3 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button3.Size = New System.Drawing.Size(125, 27) ' give the button a size
                     Button3.Text = "Many to Many" ' set the button text
@@ -459,23 +575,71 @@ Public Class tBrain
 
                     Me.OutputChannel.Controls.Add(Button3) ' get it inside the rich text box
                     Button3.Location = New Point(Button2.Left + Button2.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
+#End Region
 
+#Region "AT LEAST ONE"
                     Dim Button4 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
                     Button4.Size = New System.Drawing.Size(125, 27) ' give the button a size
-                    Button4.Text = "Abort" ' set the button text
+                    Button4.Text = "AT LEAST ONE" ' set the button text
                     Button4.UseVisualStyleBackColor = True ' make it look windows like
                     Button4.Cursor = Cursors.Hand
-                    Button4.Tag = "Abort"
+                    Button4.Tag = "AT LEAST ONE"
 
                     AddHandler Button4.Click, AddressOf Me.ResponseButton_Click
 
                     Me.OutputChannel.Controls.Add(Button4) ' get it inside the rich text box
                     Button4.Location = New Point(Button3.Left + Button3.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
+#End Region
+
+#Region "ANY NUMBER OF"
+                    Dim Button5 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
+                    Button5.Size = New System.Drawing.Size(125, 27) ' give the button a size
+                    Button5.Text = "ANY NUMBER OF" ' set the button text
+                    Button5.UseVisualStyleBackColor = True ' make it look windows like
+                    Button5.Cursor = Cursors.Hand
+                    Button5.Tag = "ANY NUMBER OF"
+
+                    AddHandler Button5.Click, AddressOf Me.ResponseButton_Click
+
+                    Me.OutputChannel.Controls.Add(Button5) ' get it inside the rich text box
+                    Button5.Location = New Point(Button4.Left + Button4.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
+#End Region
+
+#Region "ONE TO ONE"
+                    Dim Button6 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
+                    Button6.Size = New System.Drawing.Size(75, 27) ' give the button a size
+                    Button6.Text = "ONE TO ONE" ' set the button text
+                    Button6.UseVisualStyleBackColor = True ' make it look windows like
+                    Button6.Cursor = Cursors.Hand
+                    Button6.Tag = "ONE TO ONE"
+
+                    AddHandler Button6.Click, AddressOf Me.ResponseButton_Click
+
+                    Me.OutputChannel.Controls.Add(Button6) ' get it inside the rich text box
+                    Button6.Location = New Point(Button5.Left + Button5.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
+#End Region
+
+#Region "Abort"
+                    Dim Button7 = New RoundedButton(Color.Snow, Color.LightGray) ' Create new instance
+                    Button7.Size = New System.Drawing.Size(125, 27) ' give the button a size
+                    Button7.Text = "Abort" ' set the button text
+                    Button7.UseVisualStyleBackColor = True ' make it look windows like
+                    Button7.Cursor = Cursors.Hand
+                    Button7.Tag = "Abort"
+
+                    AddHandler Button7.Click, AddressOf Me.ResponseButton_Click
+
+                    Me.OutputChannel.Controls.Add(Button7) ' get it inside the rich text box
+                    Button7.Location = New Point(Button6.Left + Button6.Width + 10, pos.Y + Me.OutputChannel.Top + 3) ' set the button position
+#End Region
 
                     Me.ResponseButtons.Add(Button1)
                     Me.ResponseButtons.Add(Button2)
                     Me.ResponseButtons.Add(Button3)
                     Me.ResponseButtons.Add(Button4)
+                    Me.ResponseButtons.Add(Button5)
+                    Me.ResponseButtons.Add(Button6)
+                    Me.ResponseButtons.Add(Button7)
 
                     Dim lrRichTextBox As RichTextBox = Me.OutputChannel
                     lrRichTextBox.AutoScrollOffset = New Point(Button1.Left, Button1.Top + Button1.Height)
@@ -489,7 +653,7 @@ Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
         Try
@@ -502,13 +666,27 @@ SkipOutputChannel:
 
     End Sub
 
-    Private Sub LimitOutputChannelLines()
+    Private Sub LimitOutputChannelLines(Optional ByVal aiNumberOfLines As Integer = 0)
 
         Try
+            Dim numOfLines As Integer = 8
+
+            'Output channel is likely (just) a RichTextBox, can get it's height.
+            Try
+                If aiNumberOfLines > 0 Then
+                    numOfLines = aiNumberOfLines
+                Else
+                    numOfLines = Me.OutputChannel.Height / 18
+                End If
+                numOfLines = If(numOfLines < 2, 2, numOfLines)
+
+            Catch ex As Exception
+                'Defaults to 8. May catch error if not a RichTextBox.
+            End Try
+
             '======================================================================
             '20200725-VM Test to see if can limit the number of lines in the textbox
             Try
-                Dim numOfLines As Integer = 8
                 Dim loTextBox As RichTextBox = Me.OutputChannel
                 Dim lines As List(Of String) = loTextBox.Lines.ToList
                 If (lines.Count > numOfLines) Then ' And Not abSuppressLineLimit Then
@@ -528,15 +706,61 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
 
-    Private Sub Speak(ByVal asTextToSpeak As String)
+    Private Async Sub Speak(ByVal asTextToSpeak As String)
 
         Try
+
+            RaiseEvent IsOutputtingSpeech()
+
+#Region "Eleven Labs"
+            Dim larVoice As List(Of BackCast.Voice) = Boston.GetElevenLabsVoices("5bf9e5dd50a7c5a519ecb8249cd097b3")
+
+            Dim lrUtterance As New BackCast.Utterance()
+
+            Dim lrVoice As BackCast.Voice = larVoice.Find(Function(x) x.name = "Matilda") '"Sarah"(not bad) '"Serena"(older) '"Freya"(young/hyped) '"Dorothy" (is good child story narration) '"Aaron")
+            lrUtterance.Voice = lrVoice
+            lrUtterance.Text = asTextToSpeak.Trim.Replace("""", "'").Replace("[", "").Replace("]", "").Replace(vbCrLf, " ")
+            lrUtterance.Voice.SimilarityBoost = 0.5
+            lrUtterance.Voice.Stability = 0.5
+
+            'Stop taking RealTime Transcription, no matter what.
+            If prApplication.Brain.AssemblyAIRelTimeTranscriber IsNot Nothing Then
+                prApplication.Brain.AssemblyAIRelTimeTranscriber.Dispose()
+                poCancellationTokenSource.Cancel()
+            End If
+
+
+            Call Boston.GetElevenLabsSpeech(lrUtterance.Text, lrUtterance.Voice, lrUtterance, False)
+
+            Select Case prApplication.Brain.ConversationMode
+                Case Is = pcenumOSMConversationMode.RealTimeTranscription
+                    Thread.Sleep(100)
+                    If prApplication.Brain.AssemblyAIRelTimeTranscriber IsNot Nothing Then
+                        prApplication.Brain.AssemblyAIRelTimeTranscriber.Dispose()
+                        prApplication.Brain.AssemblyAIRelTimeTranscriber = Nothing
+                    End If
+                    prApplication.Brain.AssemblyAIRelTimeTranscriber = New AssemblyAIRealtimeClient(prApplication.Brain.InputChannel)
+                    Using prApplication.Brain.AssemblyAIRelTimeTranscriber
+                        Await prApplication.Brain.AssemblyAIRelTimeTranscriber.StartTranscriptionAsync() 'NB us poCancellationTokenSource in PublicVariablesOSM to cancel transcription 
+                    End Using
+
+                Case Is = pcenumOSMConversationMode.ChatBot
+                    'poCancellationTokenSource.Cancel() 'Already cancelled.
+                    If prApplication.Brain.AssemblyAIRelTimeTranscriber IsNot Nothing Then
+                        prApplication.Brain.AssemblyAIRelTimeTranscriber.Dispose()
+                    End If
+            End Select
+
+            Exit Sub
+#End Region
+
+#Region "MS Speeech"
             If Me.Page IsNot Nothing Then
                 If Me.Page.Form.GetType Is GetType(frmDiagramORM) Then
                     Me.Page.Form.Briana.Talk
@@ -550,13 +774,14 @@ SkipOutputChannel:
             Me.SAPI.Speak(asTextToSpeak)
 
             Do
-            Loop Until Me.SAPI.WaitUntilDone(Viev.Strings.CountWords(asTextToSpeak) * 1) '-1&
+            Loop Until Me.SAPI.WaitUntilDone(FEStrings.CountWords(asTextToSpeak) * 1) '-1&
 
             If Me.Page IsNot Nothing Then
                 If Me.Page.Form.GetType Is GetType(frmDiagramORM) Then
                     Me.Page.Form.Briana.StopTalking()
                 End If
             End If
+#End Region
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -565,7 +790,7 @@ SkipOutputChannel:
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & "TextToSpeak: " & asTextToSpeak
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -586,7 +811,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Color.Blue
         End Try
@@ -634,6 +859,22 @@ SkipOutputChannel:
                 Exit Function
             End If
 
+            If Me.InputBuffer = "list available tasks" Then
+
+                Dim lrDataStore As New DataStore.Store
+                Dim larTask As List(Of OSM.Task) = lrDataStore.Get(Of OSM.Task)
+
+                If larTask.Count > 0 Then
+                    Me.send_data("Available Tasks")
+                    Me.send_data("================")
+                End If
+                For Each lrTask In larTask
+                    Call Me.send_data(lrTask.Name)
+                Next
+
+                Return True
+            End If
+
             If Me.InputBuffer = "show facttype names" Then
                 Me.send_data("Okay")
                 Try
@@ -645,7 +886,7 @@ SkipOutputChannel:
                 Exit Function
             End If
 
-            If Me.InputBuffer = "quietmodeoff" Then
+            If {"quietmodeoff", "speak to me"}.Contains(Me.InputBuffer) Then
                 If Me.QuietMode = False Then
                     Me.send_data("I'm already talking to you.")
                     CheckCommand = True
@@ -686,6 +927,15 @@ SkipOutputChannel:
                 End Try
             End If
 
+            If Me.InputBuffer = "show osm context" Then
+                Try
+                    Call prApplication.MainForm.LoadOSMContextSpaceViewer(Me.CurrentTask)
+                    Return True
+                Catch ex As Exception
+
+                End Try
+            End If
+
             If Me.check_cessation_command(Me.InputBuffer) Then
                 '"stop" User has asked the Brain to stop all processing.
                 Me.Timeout.Stop()
@@ -711,6 +961,8 @@ SkipOutputChannel:
                 CheckCommand = True
                 Exit Function
             End If
+
+
 
             '--------------------------------------
             'Check for command: 'list directives'
@@ -778,7 +1030,7 @@ SkipOutputChannel:
             '-------------------------------------------
             If Me.CheckCommandListCurrentSentence(Me.InputBuffer) Then
 
-                If IsSomething(Me.CurrentSentence) Then
+                If Me.CurrentSentence IsNot Nothing Then
                     Me.send_data(Me.CurrentSentence.Sentence)
                 Else
                     Me.send_data("There is no current setence")
@@ -862,13 +1114,13 @@ SkipOutputChannel:
                 Me.send_data("Boston will press for a response to questions:" & Me.PressForAnswer, False, True)
                 Me.send_data("Boston is in thinking mode: " & Me.Timeout.Enabled.ToString, False, True)
                 Me.send_data("Boston is waiting for a response: " & Me.AwaitingQuestionResponse.ToString, False, True)
-                If IsSomething(Me.CurrentSentence) Then
+                If Me.CurrentSentence IsNot Nothing Then
                     Me.send_data("Current Sentence: " & Me.CurrentSentence.Sentence, False, True)
                 End If
-                If IsSomething(Me.CurrentQuestion) Then
+                If Me.CurrentQuestion IsNot Nothing Then
                     Me.send_data("Current Question: " & Me.CurrentQuestion.Question, False, True)
                 End If
-                If IsSomething(Me.CurrentPlan) Then
+                If Me.CurrentPlan IsNot Nothing Then
                     Me.send_data("Current Plan: " & Me.CurrentPlan.GetUltimateGoal.ToString, False, True)
                 End If
                 CheckCommand = True
@@ -876,7 +1128,7 @@ SkipOutputChannel:
 
             If Me.CheckCommandDescribeCurrentPlan(asString) Then
 
-                If IsSomething(Me.CurrentPlan) Then
+                If Me.CurrentPlan IsNot Nothing Then
                     Me.send_data("Plan Status: " & Me.CurrentPlan.Status.ToString)
 
                     Dim lrStep As Brain.Step
@@ -913,7 +1165,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
 
@@ -936,7 +1188,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -958,7 +1210,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -987,7 +1239,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1020,7 +1272,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1042,7 +1294,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1078,7 +1330,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1139,7 +1391,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1174,7 +1426,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1194,7 +1446,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1214,7 +1466,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1233,7 +1485,7 @@ SkipOutputChannel:
                     '  and stop processing the input buffer
                     '---------------------------------------
                     Me.send_data("Hello")
-                    If IsSomething(Me.CurrentSentence) Then
+                    If Me.CurrentSentence IsNot Nothing Then
                         Me.Timeout.Start()
                     End If
 
@@ -1246,7 +1498,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1265,7 +1517,7 @@ SkipOutputChannel:
                     '  and stop processing the input buffer
                     '---------------------------------------
                     Me.send_data("Farewell")
-                    If IsSomething(Me.CurrentSentence) Then
+                    If Me.CurrentSentence IsNot Nothing Then
                         Me.Timeout.Start()
                     End If
 
@@ -1278,7 +1530,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1298,7 +1550,7 @@ SkipOutputChannel:
                     '  and stop processing the input buffer
                     '---------------------------------------
                     Me.send_data("You're welcome")
-                    If IsSomething(Me.CurrentSentence) Then
+                    If Me.CurrentSentence IsNot Nothing Then
                         Me.Timeout.Start()
                     End If
 
@@ -1311,7 +1563,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1347,7 +1599,7 @@ SkipOutputChannel:
 
                     Me.AddQuestion(lrQuestion)
 
-                    If IsSomething(Me.CurrentSentence) Then
+                    If Me.CurrentSentence IsNot Nothing Then
                         Me.Timeout.Start()
                     End If
 
@@ -1359,7 +1611,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -1380,7 +1632,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1401,7 +1653,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1421,7 +1673,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1441,7 +1693,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1462,7 +1714,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1482,7 +1734,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1502,7 +1754,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1523,7 +1775,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1540,7 +1792,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1556,7 +1808,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1576,7 +1828,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1598,7 +1850,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1620,7 +1872,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             Return False
         End Try
     End Function
@@ -1640,7 +1892,27 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            Return False
+        End Try
+    End Function
+
+    Private Function CheckChangeThoughtModeOSM(ByVal asString As String) As Boolean
+
+        CheckChangeThoughtModeOSM = False
+
+        Try
+            Select Case LCase(asString)
+                Case Is = "setmode osm", "set mode observable state machine"
+                    CheckChangeThoughtModeOSM = True
+            End Select
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             Return False
         End Try
     End Function
@@ -1660,7 +1932,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             Return False
         End Try
     End Function
@@ -1683,7 +1955,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1743,7 +2015,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1758,7 +2030,7 @@ SkipOutputChannel:
         Dim lrStep As Brain.Step
 
         Try
-            If IsSomething(Me.CurrentPlan) Then
+            If Me.CurrentPlan IsNot Nothing Then
 
                 Call Me.send_data("Well I'll abort that plan.")
 
@@ -1793,7 +2065,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1816,7 +2088,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1832,14 +2104,14 @@ SkipOutputChannel:
                 Me.Question.Add(arQuestion)
             End If
 
-            Viev.Strings.ProperSpace("hello")
+            FEStrings.ProperSpace("hello")
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1857,7 +2129,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1890,7 +2162,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1922,14 +2194,58 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
+    Private Function HaveUnresolvedQuestion() As Boolean
+
+        Try
+            'First try and resolve all Questions
+            For Each lrQuestion In Me.Question.ToArray
+                Call Me.QuestionIsResolved(lrQuestion)
+            Next
+
+            Return Me.Question.FindAll(Function(x) Not x.IsResolved).Count > 0
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Function
+
+    Private Function UnresolvedPlans() As List(Of Brain.Plan)
+
+        Try
+            Dim larUnresolvedPlan = (From APlan In Me.Plans
+                                     From PlanStep In APlan.Step
+                                     Where Not PlanStep.Question.IsResolved
+                                     Select APlan).Distinct
+
+            Return larUnresolvedPlan.ToList
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Function
+
     Private Function QuestionIsResolved(ByRef arQuestion As tQuestion) As Boolean
 
         Try
+            'CodeSafe
+            If arQuestion Is Nothing Then Return True
 
             QuestionIsResolved = arQuestion.IsResolved
 
@@ -1952,7 +2268,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Function
 
@@ -1967,7 +2283,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2126,7 +2442,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2159,7 +2475,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2180,7 +2496,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -2264,7 +2580,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2289,7 +2605,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -2340,7 +2656,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return ""
         End Try
@@ -2380,7 +2696,7 @@ SkipOutputChannel:
                 Me.FTRProcessor.FACTTYPEREADINGStatement.UNARYPREDICATEPART = ""
                 Me.FTRProcessor.FACTTYPEREADINGStatement.FOLLOWINGREADINGTEXT = ""
                 Call Me.FTRProcessor.GetParseTreeTokensReflection(Me.FTRProcessor.FACTTYPEREADINGStatement, Me.FTRParseTree)
-                arFactTypeReading.FrontText = Trim(NullVal(Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT, ""))
+                arFactTypeReading.FrontText = Trim(Viev.NullVal(Me.FTRProcessor.FACTTYPEREADINGStatement.FRONTREADINGTEXT, ""))
 
                 Dim lrModelElementNode As FTR.ParseNode
                 Dim lrPredicateClauseNode As FTR.ParseNode
@@ -2462,7 +2778,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -2509,7 +2825,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return New Object
         End Try
@@ -2529,7 +2845,7 @@ SkipOutputChannel:
             '---------------------------------------------
             'First double check that a Model is selected
             '---------------------------------------------
-            If IsSomething(Me.Model) Then
+            If Me.Model IsNot Nothing Then
                 '----------
                 'all good
                 '----------
@@ -2569,6 +2885,7 @@ SkipOutputChannel:
                         Dim lrORMQlREcordset As New ORMQL.Recordset
 
                         lrORMQlREcordset.Columns = lrObjectReturn.Columns
+                        lrORMQlREcordset.ColumnNames = lrObjectReturn.ColumnNames
                         lrORMQlREcordset.Facts = lrObjectReturn.Facts
                         lrFactList = lrORMQlREcordset.Facts
 
@@ -2577,11 +2894,16 @@ SkipOutputChannel:
                         Else
                             lrFactList(0).Data.Sort(AddressOf compare_role_SequenceNr)
 
+                            If lrORMQlREcordset.ColumnNames.Count = 0 And lrORMQlREcordset.Columns.Count > 0 Then
+                                lrORMQlREcordset.ColumnNames = lrORMQlREcordset.Columns.Select(Function(x) x.Name).ToList
+                            End If
+
                             Dim lsColumnName As String = ""
-                            For Each lsColumnName In lrORMQlREcordset.Columns
-                                liInd += 1
+                            liInd = 0
+                            For Each lsColumnName In lrORMQlREcordset.ColumnNames
+                                If liInd > 0 Then lsTuple &= ", "
                                 lsTuple &= lsColumnName
-                                If liInd < lrORMQlREcordset.Columns.Count Then lsTuple &= ","
+                                liInd += 1
                             Next
                             Me.send_data(lsTuple)
 
@@ -2592,17 +2914,17 @@ SkipOutputChannel:
                                 lsTuple = ""
 
                                 Dim lsColumName As String
-                                For Each lsColumName In lrORMQlREcordset.Columns
+                                For Each lsColumName In lrORMQlREcordset.ColumnNames
+                                    If liInd > 0 Then lsTuple &= ", "
                                     Select Case lrFact.GetType.ToString
                                         Case Is = GetType(FBM.Fact).ToString
-                                            lsTuple &= lrFact.GetFactDataByRoleName(lrORMQlREcordset.Columns(liInd)).Data
+                                            lsTuple &= lrFact.GetFactDataByRoleName(lrORMQlREcordset.ColumnNames(liInd)).Data
                                         Case Is = GetType(FBM.FactInstance).ToString
                                             Dim lrFactInstance As New FBM.FactInstance
                                             lrFactInstance = lrFact
-                                            lsTuple &= lrFactInstance.GetFactDataInstanceByRoleName(lrORMQlREcordset.Columns(liInd)).Data
+                                            lsTuple &= lrFactInstance.GetFactDataInstanceByRoleName(lrORMQlREcordset.ColumnNames(liInd)).Data
                                     End Select
                                     liInd += 1
-                                    If liInd < lrORMQlREcordset.Columns.Count Then lsTuple &= ","
                                 Next
                                 Me.send_data(lsTuple)
 
@@ -2628,7 +2950,7 @@ SkipOutputChannel:
 
                         'lrFactTypeInstance = lrFact.FactType.CloneInstance(Me.Page)
                         'lrFactTypeInstance = Me.Page.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-                        'If IsSomething(lrFactTypeInstance) Then
+                        'If lrFactTypeInstance IsNot Nothing Then
                         '    Dim lrFactInstance As New FBM.FactInstance
                         '    lrFactInstance = lrFact.CloneInstance(Me.Page)
                         '    lrFactTypeInstance.Fact.Add(lrFactInstance)
@@ -2688,7 +3010,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -2720,12 +3042,21 @@ SkipOutputChannel:
                 Case Is = VAQL.TokenType.ADDOBJECTTYPESRELATEDTOMODELELEMENTTOPAGESTMT
                     'Is StraightToAction
                     Return Me.ProcessADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement(abBroadcastInterfaceEvent, arDSCError)
+                Case Is = VAQL.TokenType.DUALBINARYFACTTYPEREADINGSTMT
+                    Return Me.FormulateQuestionsDualBinaryFactTypeStatement(asOriginalSentence, abBroadcastInterfaceEvent, True, arDSCError, arFEKLLineageObject)
+                Case Is = VAQL.TokenType.CREATENODESTMT
+                    Return Me.ProcessCREATENODEStatement(abBroadcastInterfaceEvent, arDSCError)
                 Case Is = VAQL.TokenType.CREATEPAGESTMT
                     'Is StraightToAction
                     Return Me.ProcessCREATEPAGEStatement(abBroadcastInterfaceEvent, arDSCError)
+                Case Is = VAQL.TokenType.CREATETABLEINSTANCESTMT
+                    Return Me.ProcessCREATETABLEINSTANCEStatement(abBroadcastInterfaceEvent, arDSCError)
                 Case Is = VAQL.TokenType.FACTSTMT
                     'Is StraightToAction
                     Return Me.ProcessFactStatement(abBroadcastInterfaceEvent, arDSCError)
+                Case Is = VAQL.TokenType.ISOBJECTIFIEDCLAUSE
+                    'Is StraightToAction
+                    Return Me.ProcessISOBJECTIFIEDStatement(abBroadcastInterfaceEvent, arDSCError)
                 Case Is = VAQL.TokenType.KEYWDHASLONGDESCRIPTION
                     'Is StraightToAction
                     Return Me.ProcessHasLongDescription(abBroadcastInterfaceEvent, arDSCError, arFEKLLineageObject)
@@ -2773,7 +3104,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -2835,7 +3166,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2871,6 +3202,7 @@ SkipOutputChannel:
                 '-------------------------------------
                 'Ask the next Question in the queue.
                 '-------------------------------------
+AskTheNextQuestionInTheQueue:
                 Me.OutputBuffer = Me.Question(0).Question
                 Me.AwaitingQuestionResponse = True
                 Me.CurrentQuestion = Me.Question(0)
@@ -2879,7 +3211,7 @@ SkipOutputChannel:
                 Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), Me.OutputBuffer, False, False, Me.CurrentQuestion.ExpectedResponseType)
 
                 Exit Sub
-            ElseIf Not IsSomething(Me.CurrentQuestion) And Me.Question.Count > 0 And Me.OutputChannel IsNot Nothing Then
+            ElseIf Not Me.CurrentQuestion IsNot Nothing And Me.Question.Count > 0 And Me.OutputChannel IsNot Nothing Then
                 '-------------------------------------
                 'Ask the next Question in the queue.
                 '-------------------------------------
@@ -2889,6 +3221,33 @@ SkipOutputChannel:
                 Me.CurrentPlan = Me.CurrentQuestion.Plan
                 Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), Me.OutputBuffer, False, False, Me.CurrentQuestion.ExpectedResponseType)
 
+            ElseIf Me.UnresolvedPlans.Count > 1 Then
+                Me.OutputBuffer = "We haven't resolved what we were working on."
+                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+
+                'Get the last (next) Plan in the Question queue.
+#Region "Useful but not as elegant as below"
+                'Dim larPlan = (From Question In Me.Question
+                '               Where Not Question.IsResolved
+                '               Select Question.Plan).Distinct
+
+                'Dim lrPlan = larPlan(1)
+                'lrQuestion = lrPlan.Step.FindAll(Function(x) Not x.Question.IsResolved)(1).Question
+#End Region
+
+                lrQuestion = Me.Question.FindAll(Function(x) Not x.IsResolved And x.Plan Is Me.UnresolvedPlans(1)).First
+
+                Me.OutputBuffer = "...but..., " & lrQuestion.Question
+                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+
+                Dim lrLastPlan = Me.UnresolvedPlans.Last
+                lrLastPlan.Step.Reverse()
+                For Each lrStep In lrLastPlan.Step.FindAll(Function(x) Not x.Question.IsResolved)
+                    Me.Question.Remove(lrStep.Question)
+                    Me.Question.Insert(0, lrStep.Question)
+                Next
+
+                GoTo AskTheNextQuestionInTheQueue
             Else
                 'Me.OutputBuffer = "I don't have any questions at this time"
                 'Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
@@ -2899,7 +3258,7 @@ SkipOutputChannel:
             '    'That's good, the Brain has managed to qualify the Sentence and possibly what the user is talking about
             '    '--------------------------------------------------------------------------------------------------------
             'Else
-            If Not Me.AwaitingQuestionResponse And IsSomething(Me.CurrentSentence) Then
+            If Not Me.AwaitingQuestionResponse And Me.CurrentSentence IsNot Nothing Then
                 If Me.CurrentSentence.POStaggingResolved And Not Me.CurrentSentence.SentenceType.Contains(pcenumSentenceType.Response) Then
                     '------------------------------------------------------------------------------------------
                     'The user wasn't responding to a current question, and the Sentence is likely a Statement
@@ -3016,7 +3375,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3045,7 +3404,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3084,7 +3443,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -3110,7 +3469,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -3134,7 +3493,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Function
 
@@ -3175,7 +3534,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3271,7 +3630,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3313,7 +3672,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3332,7 +3691,7 @@ SkipOutputChannel:
             For Each lrResolvedWord In Me.CurrentSentence.WordListResolved
                 If lrResolvedWord.Sense = pcenumWordSense.Noun Then
 
-                    lrResolvedWord.Word = Viev.Strings.MakeCapCamelCase(lrResolvedWord.Word)
+                    lrResolvedWord.Word = FEStrings.MakeCapCamelCase(lrResolvedWord.Word)
 
                     lasEntityTypeList.Add(Trim(lrResolvedWord.Word))
 
@@ -3403,7 +3762,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3446,7 +3805,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3489,7 +3848,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3545,7 +3904,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -3571,7 +3930,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3581,6 +3940,8 @@ SkipOutputChannel:
         Dim lsMessage As String = ""
 
         Try
+            'CodeSafe
+            If Me.CurrentSentence Is Nothing Then Exit Sub
 
             If Me.ConfirmActions Then
                 Me.OutputBuffer = "Processing Current Sentence"
@@ -3598,15 +3959,15 @@ SkipOutputChannel:
                 'Find an example Model Element in the sentence. I.e. If there is a word in the sentence that is an Entity/Value/ObjectifiedFact Type then return the first one found.
                 Dim lrModelElementWord As String = "Company"
                 For Each lrModelElementWord In Me.CurrentSentence.WordList
-                    If Me.Model.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(lrModelElementWord)) IsNot Nothing Then
-                        Viev.Strings.MakeCapCamelCase(lrModelElementWord)
+                    If Me.Model IsNot Nothing AndAlso Me.Model.GetModelObjectByName(FEStrings.MakeCapCamelCase(lrModelElementWord)) IsNot Nothing Then
+                        FEStrings.MakeCapCamelCase(lrModelElementWord)
                         Exit For
                     End If
                 Next
 
                 If Not Me.CurrentSentence.Sentence.All(Function(c) Char.IsLower(c) Or c = " ") Then
 
-                    lsMessage = "Remember to type a valid command and to use a capital first letter for Entity Types, Value Types and Objectified Fact Types (e.g. '" & Viev.Strings.MakeCapCamelCase(lrModelElementWord) & "')"
+                    lsMessage = "Remember to type a valid command and to use a capital first letter for Entity Types, Value Types and Objectified Fact Types (e.g. '" & FEStrings.MakeCapCamelCase(lrModelElementWord) & "')"
                     '20220529-VM-was. Remove if comment out if not needed.
                     'Me.send_data(lsMessage)
                     Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), lsMessage, False, False, pcenumExpectedResponseType.None)
@@ -3620,7 +3981,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3705,7 +4066,7 @@ SkipOutputChannel:
                 End If
             End If
 
-            If Viev.Strings.checkUpper(Left(Me.InputSymbols(0), 1)) Then
+            If FEStrings.checkUpper(Left(Me.InputSymbols(0), 1)) Then
                 '--------------------------
                 'Creating a new EntityType
                 '--------------------------
@@ -3770,7 +4131,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3798,7 +4159,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3812,8 +4173,13 @@ SkipOutputChannel:
         Dim loTokenType As VAQL.TokenType
 
         Try
-            Call Me.VAQLProcessor.ProcessVAQLStatement(asFEQLStatement, loTokenType, Me.VAQLParsetree)
-            If Me.ProcessVAQLStatement(asFEQLStatement, loTokenType) Then
+            'CodeSafe
+            If Me.VAQLProcessor Is Nothing Then
+                prApplication.Brain.VAQLProcessor = New VAQL.Processor(Me.Model)
+            End If
+
+            Call Me.VAQLProcessor.EvaluateVAQLStatement(asFEQLStatement, loTokenType, Me.VAQLParsetree)
+            If Me.ProcessVAQLStatement(asFEQLStatement, loTokenType,, Not My.Settings.BrainConfirmActionsWithUser) Then
                 '----------------------------------------------------------------------------------------------
                 'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
                 '----------------------------------------------------------------------------------------------
@@ -3829,7 +4195,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3847,7 +4213,7 @@ SkipOutputChannel:
             End If
 
             'Get the TokenType
-            If Me.VAQLProcessor.ProcessVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree) Then
+            If Me.VAQLProcessor.EvaluateVAQLStatement(asFEKLStatement, loTokenType, Me.VAQLParsetree) Then
                 Call Me.ProcessVAQLStatement(asFEKLStatement, loTokenType, False, True, lrDuplexServiceClientError, arFEKLLineageObject)
             Else
                 Dim lsErrorMessage = ""
@@ -3865,9 +4231,219 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return lrDuplexServiceClientError
+        End Try
+
+    End Function
+
+    Private Enum NPUCommand
+        None
+        LoadTask
+        RunTask
+        SetDebugMode
+    End Enum
+
+    Private Async Function ProcessNPUThread() As Task(Of Boolean)
+
+        Dim lsUserInput As String = Nothing
+        Dim lsTaskName As String = Nothing
+        Dim lrWorkingTask As OSM.Task = Nothing
+        Dim lsMessage As String
+
+        Try
+            Me.Timeout.Stop()
+
+            'CodeSafe: Just in case we got here by mistake
+            If Me.CheckCommand(Me.InputBuffer) Then Return True
+
+            If Me.InputBuffer = "" Then
+                Return True
+            Else
+                lsUserInput = Me.InputBuffer
+            End If
+
+#Region "CheckFor/Get OSM Command"
+            Dim liNPUCommand As NPUCommand = NPUCommand.None
+            Dim lsCommandReturnValue As String = Nothing
+            Dim larNPUCommandArray As New List(Of Object)
+
+            larNPUCommandArray.Add(New With {.NPUCommandToken = NPUCommand.LoadTask, .MatchPattern = "^load task (\w+)$", .ReturnValue = ""})
+            larNPUCommandArray.Add(New With {.NPUCommandToken = NPUCommand.LoadTask, .MatchPattern = "^load (\w+)$", .ReturnValue = ""})
+            larNPUCommandArray.Add(New With {.NPUCommandToken = NPUCommand.RunTask, .MatchPattern = "^run task (\w+)$", .ReturnValue = ""})
+            larNPUCommandArray.Add(New With {.NPUCommandToken = NPUCommand.RunTask, .MatchPattern = "^run (\w+)$", .ReturnValue = ""})
+            larNPUCommandArray.Add(New With {.NPUCommandToken = NPUCommand.SetDebugMode, .MatchPattern = "^set debug (\w+)$", .ReturnValue = ""})
+
+            Dim match As Match
+            For Each lrNPUCommand In larNPUCommandArray
+
+                match = Regex.Match(lsUserInput, lrNPUCommand.matchpattern)
+
+                If match.Success Then
+                    liNPUCommand = lrNPUCommand.NPUCommandToken
+                    lsCommandReturnValue = match.Groups(1).Value
+                End If
+            Next
+#End Region
+
+            Select Case liNPUCommand
+                Case Is = NPUCommand.LoadTask
+                    Call Me.LoadOSMTask(lsCommandReturnValue)
+                Case Is = NPUCommand.RunTask
+#Region "Run Task"
+                    If Me.CurrentTask Is Nothing Then
+
+                        Call Me.LoadOSMTask(lsCommandReturnValue)
+                        Dim lsResponse = Await Me.CurrentTask.ProcessUserMessage(Me.CurrentTask.GenerateOSMContext)
+                    Else
+                        If Me.CurrentTask.Name = lsCommandReturnValue Then
+                            lsTaskName = Me.CurrentTask.Name
+                            Dim lsResponse = Await Me.CurrentTask.ProcessUserMessage(Me.CurrentTask.GenerateOSMContext)
+                        Else
+                            Call Me.LoadOSMTask(lsCommandReturnValue)
+                            Dim lsResponse = Await Me.CurrentTask.ProcessUserMessage(Me.CurrentTask.GenerateOSMContext)
+                        End If
+
+                        'Else
+                        'If Me.CurrentTask.IsComplete Then
+                        '    Exit Sub
+                        'ElseIf Me.CurrentTask.HasStarted Then
+                        '    If Me.CurrentTask.GetHighestWorkingOnItLineNumber > 0 Then
+                        '        'Working on it. May beed to be kick started.
+                        '    End If
+                        'Else
+                        '    'Run the task
+                        '    Call Me.CurrentTask.ProcessUserMessage(Me.CurrentTask.GenerateNPUContext)
+                        'End If
+                    End If
+#End Region
+                Case Is = NPUCommand.SetDebugMode
+                    Select Case lsCommandReturnValue
+                        Case Is = "on"
+                            Me.CurrentTask.DebugMode = pcenumDebugMode.Debug
+                            Me.send_data("Turning Debug Mode 'on'")
+                        Case Is = "off"
+                            Me.CurrentTask.DebugMode = pcenumDebugMode.NoLogging
+                        Case Else
+                            send_data("Unknown Debug Mode. Choices are: 'on' and 'off'")
+                            Return False
+                    End Select
+                Case Else
+
+                    Dim lrMainBrain = Me.WorkingOnTasks.Find(Function(x) x.Name = "Percy")
+
+                    If lrMainBrain IsNot Nothing Then
+
+                        lrMainBrain.ConversationFlow.AppendDoubleLineBreak("User: " & Me.InputBuffer)
+                        Dim lsResponse = Await lrMainBrain.ProcessUserMessage(lrMainBrain.GenerateOSMContext)
+
+                        If lsResponse = "Thank you. Processed by Percy." Then
+                            Return True
+                        Else
+                            'Just trips to the curren task.
+                        End If
+
+                    End If
+
+                    If Me.CurrentTask IsNot Nothing Then
+                        Me.CurrentTask.ConversationFlow.AppendDoubleLineBreak("User: " & Me.InputBuffer)
+
+                        If Me.CurrentTask.TaskStatus = pcenumOSMTaskStatus.Closed Then
+                            send_data("Looks like the task, " & Me.CurrentTask.Name & ", is closed. Want to try something else?")
+                            Me.CurrentTask = Nothing
+                            Return True
+                        End If
+
+                        Await Me.CurrentTask.ProcessUserMessage(Me.CurrentTask.GenerateOSMContext)
+
+                        'Dim timeout = TimeSpan.FromSeconds(20) ' Set your desired timeout duration
+                        'If Await Task.WhenAny(Me.CurrentTask.ProcessUserMessage(Me.CurrentTask.GenerateNPUContext), Task.Delay(timeout)) Is Task.Delay(timeout) Then
+                        '    ' Timeout occurred
+                        '    Me.send_data("OSM Timed out.",,,, True)
+                        'Else
+                        '    'All good. The task completed before the timeout.
+                        'End If
+                    End If
+            End Select
+
+            Return True
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
+
+    Public Function LoadOSMTask(ByVal asTaskName As String) As OSM.Task
+
+        Dim lsMessage As String
+
+        Try
+#Region "Load Task Command"
+
+            Dim lrDataStore As New DataStore.Store
+            Dim whereClause As Expression(Of Func(Of OSM.Task, Boolean)) = Function(t) t.Name = asTaskName
+
+            Try
+                Dim lrTask = lrDataStore.Get(Of OSM.Task)(whereClause).First
+
+                If Me.WorkingOnTasks.FindAll(Function(x) x.Name = lrTask.Name).Count = 0 Then
+                    Me.WorkingOnTasks.Add(lrTask)
+                End If
+
+                Me.CurrentTask = lrTask
+                Me.CurrentTask.Brain = Me
+                Call Me.LimitOutputChannelLines(40)
+
+#Region "OpenAIFunctions"
+                Dim lrTaskOpenAIFunctionWHEREClause As Expression(Of Func(Of OSM.TaskOpenAIFunction, Boolean)) = Function(t) t.TaskId = Me.CurrentTask.TaskId
+                Dim larTaskOpenAIFunctions = lrDataStore.Get(Of OSM.TaskOpenAIFunction)(lrTaskOpenAIFunctionWHEREClause)
+
+                Me.CurrentTask.OpenAIFunctions.Clear()
+
+                For Each lrTaskOpenAIFunction In larTaskOpenAIFunctions
+
+                    Dim lrOpenAIFunctionWHEREClause As Expression(Of Func(Of OSM.OpenAIFunction, Boolean)) = Function(t) t.name = lrTaskOpenAIFunction.OpenAIFunctionName
+                    Me.CurrentTask.OpenAIFunctions.Add(lrDataStore.Get(Of OSM.OpenAIFunction)(lrOpenAIFunctionWHEREClause).First)
+
+                Next
+#End Region
+
+#Region "FEQL Queries"
+                Dim whereClauseFEQLQueries As Expression(Of Func(Of OSM.TaskFEQLQuery, Boolean)) = Function(t) t.TaskId = Me.CurrentTask.TaskId
+                Me.CurrentTask.FEQLQuery = lrDataStore.Get(Of OSM.TaskFEQLQuery)(whereClauseFEQLQueries)
+#End Region
+
+                Me.send_data("Task loaded")
+
+                Return lrTask
+
+            Catch ex As Exception
+                lsMessage = "Error or Could no't find Task named: " & asTaskName
+                lsMessage.AppendDoubleLineBreak(ex.Message)
+                Me.send_data(lsMessage)
+
+                Return Nothing
+            End Try
+
+            'lrWorkingTask = Me.WorkingOnTasks.Find(Function(x) x.Name = asTaskName)            
+#End Region
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
         End Try
 
     End Function
@@ -3902,14 +4478,15 @@ SkipOutputChannel:
             '==============================================================================
 
             If Me.IsVAQLStatement("NL: " & Me.InputBuffer) Then
+                Me.Timeout.Stop()
                 Dim loTokenType As VAQL.TokenType
 
                 'Determine if is a valid VAQL Statement.
-                Call Me.VAQLProcessor.ProcessVAQLStatement(Me.InputBuffer, loTokenType, Me.VAQLParsetree)
+                Call Me.VAQLProcessor.EvaluateVAQLStatement(Me.InputBuffer, loTokenType, Me.VAQLParsetree)
 
                 'Process the VAQL Statement based on the primary TokenType returned (above)
                 Dim lrDSCError As New DuplexServiceClient.DuplexServiceClientError
-                If Me.ProcessVAQLStatement(Me.InputBuffer, loTokenType,,, lrDSCError) Then
+                If Me.ProcessVAQLStatement(Me.InputBuffer, loTokenType,, Not My.Settings.BrainConfirmActionsWithUser, lrDSCError) Then
                     '----------------------------------------------------------------------------------------------
                     'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
                     '----------------------------------------------------------------------------------------------
@@ -3949,6 +4526,54 @@ SkipOutputChannel:
                 'Great, the sentence doesn't contain characters like '/*-+@&$#%
                 '----------------------------------------------------------------
             Else
+#Region "GPT4"
+                '=====================================================================================
+                'Farm out to OpenAI via the OpenAI API                
+                Me.NL2FEKLPrompt = Boston.ReadEmbeddedRessourceToString(Assembly.GetExecutingAssembly, "VirtualAnalyst-FEKL-Prompt.txt") ' Path to the GPT Prompt for NL to FEKL
+
+                If Me.NL2FEKLPrompt IsNot Nothing AndAlso Me.mrOpenAIAPI.Auth.ApiKey.Trim <> "" Then
+                    Dim lsPromptExtension = "Try this user input first:"
+                    lsPromptExtension.AppendDoubleLineBreak(Me.InputBuffer)
+                    Dim lsModifiedPrompt As String = Me.NL2FEKLPrompt.AppendDoubleLineBreak(lsPromptExtension)
+                    Dim lrCompletionResult As OpenAI_API.Chat.ChatResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsModifiedPrompt)
+                    Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
+
+                    Dim lines As String() = lsGPT3ReturnString.Split({vbLf}, StringSplitOptions.None)
+
+                    ' Add each line to the result list
+                    For Each line As String In lines
+
+                        If Me.IsVAQLStatement("NL: " & lsGPT3ReturnString) Then
+                            Dim loTokenType As VAQL.TokenType
+
+                            Me.send_data(lsGPT3ReturnString)
+                            Me.send_data("Okay")
+
+                            Me.InputChannel.Text = "NL: " & lsGPT3ReturnString
+
+                            Me.CurrentSentence = Nothing
+                            'Determine if is a valid VAQL Statement.
+                            Call Me.VAQLProcessor.EvaluateVAQLStatement(lsGPT3ReturnString, loTokenType, Me.VAQLParsetree)
+
+                            'Process the VAQL Statement based on the primary TokenType returned (above)
+                            Dim lrDSCError As New DuplexServiceClient.DuplexServiceClientError
+                            If Me.ProcessVAQLStatement(lsGPT3ReturnString, loTokenType,, False, lrDSCError) Then
+                                '----------------------------------------------------------------------------------------------
+                                'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
+                                '----------------------------------------------------------------------------------------------
+                                Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
+                                Exit Sub
+                            Else
+                                Me.send_data("Error processing: " & lsGPT3ReturnString)
+                                Exit Sub
+                            End If
+                        End If
+                    Next
+
+                End If
+                '=====================================================================================
+#End Region
+
                 Dim lsMessage As String = ""
                 lsMessage = "Oops. That's not a valid VAQL statement or a sentence that I can understand."
                 Me.send_data(lsMessage)
@@ -4032,7 +4657,7 @@ SkipOutputChannel:
                 Me.Sentence.Insert(0, Me.CurrentSentence)
             End If
 
-            If IsSomething(Me.CurrentSentence) Then
+            If Me.CurrentSentence IsNot Nothing Then
 
                 '------------------------------------------------------
                 'Questions asked by the user have precedence over the
@@ -4100,13 +4725,15 @@ SkipOutputChannel:
                             Me.send_data(lsGPT3ReturnString)
                             Me.send_data("Okay")
 
+                            Me.InputChannel.Text = lsGPT3ReturnString
+
                             Me.CurrentSentence = Nothing
                             'Determine if is a valid VAQL Statement.
-                            Call Me.VAQLProcessor.ProcessVAQLStatement(lsGPT3ReturnString, loTokenType, Me.VAQLParsetree)
+                            Call Me.VAQLProcessor.EvaluateVAQLStatement(lsGPT3ReturnString, loTokenType, Me.VAQLParsetree)
 
                             'Process the VAQL Statement based on the primary TokenType returned (above)
                             Dim lrDSCError As New DuplexServiceClient.DuplexServiceClientError
-                            If Me.ProcessVAQLStatement(lsGPT3ReturnString, loTokenType,, True, lrDSCError) Then
+                            If Me.ProcessVAQLStatement(lsGPT3ReturnString, loTokenType,, False, lrDSCError) Then
                                 '----------------------------------------------------------------------------------------------
                                 'Start the TimeOut so that the Brain can repeatedly address the Sentence until it is resolved
                                 '----------------------------------------------------------------------------------------------
@@ -4139,7 +4766,7 @@ SkipOutputChannel:
                     Dim lsMessage As String = ""
                     lsMessage = "Sorry, I don't know what you are talking about."
                     Me.send_data(lsMessage)
-                    lsMessage = "Remember to use a capital first letter for Entity Types, Value Types and Objectified Fact Types." '(e.g. '" & Viev.Strings.MakeCapCamelCase(lrModelElementWord) & "')"
+                    lsMessage = "Remember to use a capital first letter for Entity Types, Value Types and Objectified Fact Types." '(e.g. '" & FEStrings.MakeCapCamelCase(lrModelElementWord) & "')"
                     Me.OutputChannel.BeginInvoke(New SendDataDelegateAdvanced(AddressOf Me.send_data), lsMessage, False, False, pcenumExpectedResponseType.None)
                     Me.CurrentSentence.ResolutionType = pcenumSentenceResolutionType.Unresolved
                     Me.Sentence.Add(Me.CurrentSentence)
@@ -4152,7 +4779,7 @@ SkipOutputChannel:
                 '----------------------------------------------------------------------------------------------
                 Me.Timeout.Start() 'Threading jumps to HOUSEKEEPING.OutOfTimeout
 
-                End If
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -4160,7 +4787,7 @@ SkipOutputChannel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4222,6 +4849,26 @@ SkipOutputChannel:
             Me.send_data(lsMessage)
 
         End Try
+    End Sub
+
+    Private Sub tBrain_IsOutputtingSpeech() Handles Me.IsOutputtingSpeech
+        Me.IsSpeaking = True
+    End Sub
+
+    Private Sub tBrain_FinishedOutputtingSpeech() Handles Me.FinishedOutputtingSpeech
+        Me.IsSpeaking = False
+    End Sub
+
+    Public Sub TriggerSpeaking()
+        RaiseEvent IsOutputtingSpeech()
+    End Sub
+
+    Public Sub TriggerFinishedSpeaking()
+        RaiseEvent FinishedOutputtingSpeech()
+    End Sub
+
+    Public Sub TriggerFormTheBoxClosed()
+        RaiseEvent FormTheBoxClosed()
     End Sub
 
 #End Region

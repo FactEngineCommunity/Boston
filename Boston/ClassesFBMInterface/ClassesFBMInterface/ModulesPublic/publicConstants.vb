@@ -179,6 +179,7 @@ Public Module publicConstants
         EqualityConstraint
         ExclusionConstraint
         ExclusiveORConstraint
+        ExternalFrequencyConstraint
         ExternalUniquenessConstraint
         FrequencyConstraint
         InclusiveORConstraint

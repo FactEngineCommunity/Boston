@@ -29,7 +29,7 @@ Partial Class frmAutoComplete
         '
         'ListBox
         '
-        Me.ListBox.BackColor = System.Drawing.Color.GhostWhite
+        Me.ListBox.BackColor = System.Drawing.Color.Linen
         Me.ListBox.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.ListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
         Me.ListBox.FormattingEnabled = True
@@ -51,7 +51,7 @@ Partial Class frmAutoComplete
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.BackColor = System.Drawing.Color.GhostWhite
+        Me.BackColor = System.Drawing.Color.Linen
         Me.ClientSize = New System.Drawing.Size(241, 140)
         Me.ControlBox = False
         Me.Controls.Add(Me.DateTimePicker)

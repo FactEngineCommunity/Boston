@@ -67,7 +67,7 @@ Namespace FEQL
                         lrQueryEdge.TargetNode = lrTargetNode
                         lrQueryEdge.Predicate = Strings.Join(lrASSERTStatement.PREDICATECLAUSE.PREDICATE.ToArray, " ")
 
-                        Call lrQueryEdge.getAndSetFBMFactType(lrBaseNode, lrTargetNode, lrQueryEdge.Predicate)
+                        Call lrQueryEdge.getAndSetFBMFactType(lrBaseNode, lrTargetNode, FactEngine.pcenumWhichClauseType.None, lrQueryEdge.Predicate)
 
                         lsSQLCommand = "UPDATE [" & lrFirstModelElement.Name & "] SET "
 
@@ -210,7 +210,7 @@ Namespace FEQL
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -256,7 +256,7 @@ Namespace FEQL
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return lrRecordset
             End Try
@@ -317,7 +317,7 @@ Namespace FEQL
                     'Get the relevant FBM.FactType
                     Call lrQueryEdge.getAndSetFBMFactType(lrQueryEdge.BaseNode,
                                                           lrQueryEdge.TargetNode,
-                                                          lrQueryEdge.Predicate)
+                                                          lrQueryEdge.Predicate, FactEngine.pcenumWhichClauseType.None)
 
                     Dim lrInsertColumn As RDS.Column
 

@@ -8,14 +8,16 @@ Namespace FBM
         Inherits FBM.PageObject
         Implements FBM.iPageObject
 
-        <XmlIgnore()> _
-        Public FactType As New FBM.FactType
+        <XmlIgnore()>
+        Public WithEvents FactType As New FBM.FactType
 
         <XmlIgnore()>
         Public FactTypeInstance As FBM.FactTypeInstance
 
         Public Shadows Property X As Integer Implements iPageObject.X
         Public Shadows Property Y As Integer Implements iPageObject.Y
+
+        Public [RichTextBox] As RichTextBox = Nothing
 
         ''' <summary>
         ''' Parameterless New
@@ -60,20 +62,26 @@ Namespace FBM
         Public Sub displayAndAssociate()
 
             Dim StringSize As SizeF
-            Dim lsDerivationText As String
+            Dim lsDerivationText As String = ""
             Dim loFactTypeDerivationTextShape As ShapeNode
 
             Try
-                If Me.FactType.IsManyTo1BinaryFactType Then
-                    '-----------------------------------------------------------------------------------------------
-                    'That's good, because needs to be at least that for Derived Fact Type.
-                    Dim lrRole As FBM.Role
-                    lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
-                    lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
-                    lsDerivationText &= vbCrLf & Me.FactType.DerivationText
-                Else
-                    lsDerivationText = "* " & Me.FactType.DerivationText
-                End If
+                Select Case Me.FactType.Model.DerivationSyntaxType
+                    Case Is = pcenumDerivationSyntaxType.FactEngine
+                        If Me.FactType.IsManyTo1BinaryFactType Then
+                            '-----------------------------------------------------------------------------------------------
+                            'That's good, because needs to be at least that for Derived Fact Type.
+                            Dim lrRole As FBM.Role
+                            lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
+                            lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
+                            lsDerivationText &= vbCrLf & Me.FactType.DerivationText
+                        Else
+                            lsDerivationText = "* " & Me.FactType.DerivationText
+                        End If
+                    Case Is = pcenumDerivationSyntaxType.nORMa
+                        lsDerivationText = Me.FactType.DerivationText
+                End Select
+
 
                 StringSize = Me.Page.Diagram.MeasureString(Trim(lsDerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                 StringSize.Height += 2
@@ -100,8 +108,8 @@ Namespace FBM
                 Me.Shape = loFactTypeDerivationTextShape
                 loFactTypeDerivationTextShape.Tag = Me
 
-                If Me.X = 0 Then Me.X = Me.X
-                If Me.Y = 0 Then Me.Y = Me.Y + Me.Shape.Bounds.Height + 5
+                'If Me.X = 0 Then Me.X = Me.X
+                'If Me.Y = 0 Then Me.Y = Me.Y + Me.Shape.Bounds.Height + 5
 
                 Me.Shape.Move(Me.X, Me.Y)
 
@@ -116,7 +124,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -168,7 +176,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -184,7 +192,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -204,7 +212,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -259,7 +267,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -282,6 +290,19 @@ Namespace FBM
 
         Public Sub NodeSelected() Implements iPageObject.NodeSelected
 
+            Try
+                Me.FactTypeInstance.Shape.Pen.Color = Color.Pink
+                Me.FactTypeInstance.Shape.Visible = True
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
         End Sub
 
         Public Sub RepellNeighbouringPageObjects(aiDepth As Integer) Implements iPageObject.RepellNeighbouringPageObjects
@@ -292,9 +313,112 @@ Namespace FBM
 
         End Sub
 
+        Public Sub SetSize()
+
+            Try
+                'CodeSafe
+                If Me.Page.Diagram Is Nothing Then Exit Sub 'What are you going to do?
+
+                Dim StringSize = Me.Page.Diagram.MeasureString(Trim(Me.FactType.DerivationText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                StringSize.Height += 2
+
+                If StringSize.Width > 70 Then
+                    StringSize = New SizeF(70, (StringSize.Height + 2) * Me.FactType.DerivationText.Length / 100)
+                End If
+
+                Me.Shape.Resize(StringSize.Width, StringSize.Height)
+                Me.Shape.ResizeToFitText(FitSize.KeepWidth)
+                Me.Shape.Move(Me.X, Me.Y)
+
+                If Me.RichTextBox IsNot Nothing Then
+                    'See Also: DiagramView.EnterInplaceEditMode
+                    'See Also: DiagramView.CreateEditControl
+                    StringSize = Me.Page.Diagram.MeasureString(Trim(Me.FactType.DerivationText), New Font("Tahoma", 10), 1000, System.Drawing.StringFormat.GenericDefault)
+                    StringSize.Height += 2
+
+                    If StringSize.Width > 70 Then
+                        StringSize = New SizeF(70, (StringSize.Height + 2) * Me.FactType.DerivationText.Length / 100)
+                    End If
+
+                    Dim StringSizeF = Me.Page.DiagramView.DocToClient(New Rectangle(Me.Shape.Bounds.X, Me.Shape.Bounds.Y, StringSize.Width + 2, StringSize.Height))
+
+                    Me.RichTextBox.Width = StringSizeF.Width
+                    Me.RichTextBox.Height = StringSizeF.Height
+                    Me.RichTextBox.Top = StringSizeF.Y
+
+                    'OR=======================================================
+                    ' Set WordWrap to True so that we measure the height considering the current width of the RichTextBox
+                    RichTextBox.WordWrap = True
+
+                    ' Perform the layout of the text
+                    RichTextBox.PerformLayout()
+
+                    ' Get the number of lines and the height of one line
+                    Dim numberOfLines As Integer = RichTextBox.GetLineFromCharIndex(RichTextBox.TextLength) + 1
+                    Dim oneLineHeight As Integer = RichTextBox.Font.Height + 5
+
+                    ' Calculate the total height required for the text
+                    Dim requiredHeight As Integer = oneLineHeight * numberOfLines
+
+                    ' Check if the required height is different from the current height before resizing
+                    If requiredHeight <> RichTextBox.Height Then
+                        RichTextBox.Height = requiredHeight
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Overloads Sub EnableSaveButton() Implements iPageObject.EnableSaveButton
             Throw New NotImplementedException()
         End Sub
+
+        Private Sub FactType_DerivationTextChanged(asDerivationText As String) Handles FactType.DerivationTextChanged
+
+            Try
+                'CodeSafe
+                If Me.Shape Is Nothing Then Exit Sub
+
+                Dim lsDerivationText As String = asDerivationText
+
+                Select Case Me.FactType.Model.DerivationSyntaxType
+                    Case Is = pcenumDerivationSyntaxType.FactEngine
+                        If Me.FactType.IsManyTo1BinaryFactType Then
+                            '-----------------------------------------------------------------------------------------------
+                            'That's good, because needs to be at least that for Derived Fact Type.
+                            Dim lrRole As FBM.Role
+                            lrRole = Me.FactType.GetFirstRoleWithInternalUniquenessConstraint
+                            lsDerivationText = "* <b>For each</b> " & lrRole.JoinedORMObject.Name
+                            lsDerivationText &= vbCrLf & Me.FactType.DerivationText
+                        Else
+                            lsDerivationText = "* " & Me.FactType.DerivationText
+                        End If
+                    Case Is = pcenumDerivationSyntaxType.nORMa
+                        lsDerivationText = Me.FactType.DerivationText
+                End Select
+
+                Me.Shape.Text = lsDerivationText
+                Call Me.SetSize()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

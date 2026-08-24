@@ -40,11 +40,13 @@ Partial Class frmToolboxORMReadingEditor
         Me.ToolStripMenuItemIsPreferredForPredicate = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuFactTypeReading = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.DeleteFactTypeReadingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PanelChatBox = New System.Windows.Forms.Panel()
         Me.ContextMenuStrip_MoveTerms.SuspendLayout()
         CType(Me.DataGrid_Readings, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStripIsPreferred.SuspendLayout()
         Me.ContextMenuStripIsPreferredForPredicate.SuspendLayout()
         Me.ContextMenuFactTypeReading.SuspendLayout()
+        Me.PanelChatBox.SuspendLayout()
         Me.SuspendLayout()
         '
         'TextboxReading
@@ -52,7 +54,7 @@ Partial Class frmToolboxORMReadingEditor
         Me.TextboxReading.AutoWordSelection = True
         Me.TextboxReading.ContextMenuStrip = Me.ContextMenuStrip_MoveTerms
         Me.TextboxReading.ForeColor = System.Drawing.Color.Silver
-        Me.TextboxReading.Location = New System.Drawing.Point(12, 55)
+        Me.TextboxReading.Location = New System.Drawing.Point(3, 3)
         Me.TextboxReading.Multiline = False
         Me.TextboxReading.Name = "TextboxReading"
         Me.TextboxReading.Size = New System.Drawing.Size(643, 25)
@@ -79,7 +81,7 @@ Partial Class frmToolboxORMReadingEditor
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(661, 55)
+        Me.Button3.Location = New System.Drawing.Point(652, 3)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(88, 25)
         Me.Button3.TabIndex = 4
@@ -94,9 +96,9 @@ Partial Class frmToolboxORMReadingEditor
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.DataGrid_Readings.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DataGrid_Readings.ContextMenuStrip = Me.ContextMenuStripIsPreferred
-        Me.DataGrid_Readings.Location = New System.Drawing.Point(11, 84)
+        Me.DataGrid_Readings.Location = New System.Drawing.Point(11, 61)
         Me.DataGrid_Readings.Name = "DataGrid_Readings"
-        Me.DataGrid_Readings.Size = New System.Drawing.Size(800, 123)
+        Me.DataGrid_Readings.Size = New System.Drawing.Size(800, 146)
         Me.DataGrid_Readings.TabIndex = 7
         '
         'ContextMenuStripIsPreferred
@@ -114,7 +116,7 @@ Partial Class frmToolboxORMReadingEditor
         'LabelPromptFactType
         '
         Me.LabelPromptFactType.AutoSize = True
-        Me.LabelPromptFactType.Location = New System.Drawing.Point(9, 14)
+        Me.LabelPromptFactType.Location = New System.Drawing.Point(149, 9)
         Me.LabelPromptFactType.Name = "LabelPromptFactType"
         Me.LabelPromptFactType.Size = New System.Drawing.Size(103, 13)
         Me.LabelPromptFactType.TabIndex = 9
@@ -123,7 +125,7 @@ Partial Class frmToolboxORMReadingEditor
         'LabelFactTypeName
         '
         Me.LabelFactTypeName.AutoSize = True
-        Me.LabelFactTypeName.Location = New System.Drawing.Point(115, 14)
+        Me.LabelFactTypeName.Location = New System.Drawing.Point(255, 9)
         Me.LabelFactTypeName.Margin = New System.Windows.Forms.Padding(0)
         Me.LabelFactTypeName.Name = "LabelFactTypeName"
         Me.LabelFactTypeName.Size = New System.Drawing.Size(132, 13)
@@ -144,7 +146,7 @@ Partial Class frmToolboxORMReadingEditor
         '
         Me.LabelFactTypeReadingEditor.AutoSize = True
         Me.LabelFactTypeReadingEditor.ForeColor = System.Drawing.SystemColors.ControlDark
-        Me.LabelFactTypeReadingEditor.Location = New System.Drawing.Point(9, 39)
+        Me.LabelFactTypeReadingEditor.Location = New System.Drawing.Point(12, 9)
         Me.LabelFactTypeReadingEditor.Name = "LabelFactTypeReadingEditor"
         Me.LabelFactTypeReadingEditor.Size = New System.Drawing.Size(131, 13)
         Me.LabelFactTypeReadingEditor.TabIndex = 12
@@ -166,7 +168,7 @@ Partial Class frmToolboxORMReadingEditor
         '
         Me.ContextMenuFactTypeReading.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DeleteFactTypeReadingToolStripMenuItem})
         Me.ContextMenuFactTypeReading.Name = "ContextMenuFactTypeReading"
-        Me.ContextMenuFactTypeReading.Size = New System.Drawing.Size(206, 48)
+        Me.ContextMenuFactTypeReading.Size = New System.Drawing.Size(206, 26)
         '
         'DeleteFactTypeReadingToolStripMenuItem
         '
@@ -174,18 +176,28 @@ Partial Class frmToolboxORMReadingEditor
         Me.DeleteFactTypeReadingToolStripMenuItem.Size = New System.Drawing.Size(205, 22)
         Me.DeleteFactTypeReadingToolStripMenuItem.Text = "&Delete Fact Type Reading"
         '
+        'PanelChatBox
+        '
+        Me.PanelChatBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.PanelChatBox.Controls.Add(Me.TextboxReading)
+        Me.PanelChatBox.Controls.Add(Me.Button3)
+        Me.PanelChatBox.Location = New System.Drawing.Point(10, 25)
+        Me.PanelChatBox.Name = "PanelChatBox"
+        Me.PanelChatBox.Size = New System.Drawing.Size(801, 30)
+        Me.PanelChatBox.TabIndex = 13
+        '
         'frmToolboxORMReadingEditor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(824, 252)
+        Me.Controls.Add(Me.PanelChatBox)
         Me.Controls.Add(Me.LabelFactTypeReadingEditor)
         Me.Controls.Add(Me.LabelHelpTips)
         Me.Controls.Add(Me.LabelPromptFactType)
         Me.Controls.Add(Me.LabelFactTypeName)
-        Me.Controls.Add(Me.TextboxReading)
         Me.Controls.Add(Me.DataGrid_Readings)
-        Me.Controls.Add(Me.Button3)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmToolboxORMReadingEditor"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
@@ -196,6 +208,7 @@ Partial Class frmToolboxORMReadingEditor
         Me.ContextMenuStripIsPreferred.ResumeLayout(False)
         Me.ContextMenuStripIsPreferredForPredicate.ResumeLayout(False)
         Me.ContextMenuFactTypeReading.ResumeLayout(False)
+        Me.PanelChatBox.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -216,4 +229,5 @@ Partial Class frmToolboxORMReadingEditor
     Friend WithEvents ToolStripMenuItemIsPreferredForPredicate As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ContextMenuFactTypeReading As ContextMenuStrip
     Friend WithEvents DeleteFactTypeReadingToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents PanelChatBox As Panel
 End Class

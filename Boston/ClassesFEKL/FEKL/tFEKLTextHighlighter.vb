@@ -119,7 +119,8 @@ Namespace FEKL
         Public Event SwitchContext As ContextSwitchEventHandler
         Public Event KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
 
-        Public threadAutoHighlight As Thread
+        Private threadAutoHighlight As Thread
+
 
         Private Sub DoAction(ByVal text As String, ByVal position As Integer)
 
@@ -219,7 +220,7 @@ Namespace FEKL
         ClearUndo()
 
         AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
-        AddHandler textbox.KeyDown, AddressOf textbox_KeyDown
+        AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
         AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
         AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
 
@@ -258,8 +259,8 @@ Namespace FEKL
             End If
             '=============================
 
-            ' undo/redo
-            If e.KeyValue = 89 AndAlso e.Control Then
+        ' undo/redo
+        If e.KeyValue = 89 AndAlso e.Control Then
             Redo()
             ' CTRL-Y
         End If
@@ -309,53 +310,50 @@ Namespace FEKL
         Return node
     End Function
 
-        Public Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
+    Private Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
 
-            If node Is Nothing Then
-                Return Nothing
-            End If
+        If node Is Nothing Then
+            Return Nothing
+        End If
 
-            If node.Nodes.Count > 0 Then
-                If node.Nodes.Count > 1 And
+        If node.Nodes.Count > 0 Then
+            If node.Nodes.Count > 1 And _
                    node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
-                    Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
-                ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
-                    Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
-                Else
-                    Return node.Nodes(node.Nodes.Count - 1)
-                End If
+                Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
+            ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
+                Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
             Else
-                Return node
+                Return node.Nodes(node.Nodes.Count - 1)
             End If
+        Else
+            Return node
+        End If
 
-        End Function
+    End Function
 
-        ''' <summary>
-        ''' use HighlighText to start the text highlight process from the caller's thread.
-        ''' this method is not used internally. 
-        ''' </summary>
-        Public Sub HighlightText()
+    ''' <summary>
+    ''' use HighlighText to start the text highlight process from the caller's thread.
+    ''' this method is not used internally. 
+    ''' </summary>
+    Public Sub HighlightText()
+        SyncLock treelock
+            textChanged = True
+            currentText = Trim(Textbox.Text)
+        End SyncLock
+    End Sub
 
-            SyncLock treelock
-                textChanged = True
-                currentText = Textbox.Text
-            End SyncLock
-
-        End Sub
-
-        Private Sub HighlightTextInternal()
+    Private Sub HighlightTextInternal()
         ' highlight the text (used internally only)
         Lock()
 
         Dim hscroll As Integer = HScrollPos
         Dim vscroll As Integer = VScrollPos
 
-            Dim selstart As Integer = Textbox.SelectionStart
+        Dim selstart As Integer = Textbox.SelectionStart
 
-            HighlighTextCore()
+        HighlighTextCore()
 
-
-                Textbox.[Select](selstart, 0)
+        Textbox.[Select](selstart, 0)
 
         HScrollPos = hscroll
         VScrollPos = vscroll
@@ -367,42 +365,33 @@ Namespace FEKL
     ''' this method should be used only by HighlightText or RestoreState methods
     ''' </summary>
     Private Sub HighlighTextCore()
-            'Tree = Parser.Parse(Textbox.Text);
-            Try
-                Dim sb As New StringBuilder()
-                If Tree Is Nothing Then
-                    Return
-                End If
+        'Tree = Parser.Parse(Textbox.Text);
+        Dim sb As New StringBuilder()
+        If Tree Is Nothing Then
+            Return
+        End If
 
-                If Tree.Nodes.Count = 0 Then
-                    Return
-                End If
+            If Tree.Errors.Count > 0 Then
+                Exit Sub
+            End If
 
-                If Tree.Errors.Count > 0 Then
-                    Exit Sub
-                End If
+        Dim start As ParseNode = Tree.Nodes(0)
+        HightlightNode(start, sb)
 
-                Dim start As ParseNode = Tree.Nodes(0)
-                HightlightNode(start, sb)
+        ' append any trailing skipped tokens that were scanned
+        For Each skiptoken As Token In Scanner.Skipped
+            HighlightToken(skiptoken, sb)
+            sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
+        Next
 
-                ' append any trailing skipped tokens that were scanned
-                For Each skiptoken As Token In Scanner.Skipped
-                    HighlightToken(skiptoken, sb)
-                    sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
-                Next
+        sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
 
-                sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
+        AddRtfHeader(sb)
+        AddRtfEnd(sb)
 
-                AddRtfHeader(sb)
-                AddRtfEnd(sb)
+        Textbox.Rtf = sb.ToString()
 
-                Textbox.Rtf = sb.ToString()
-
-            Catch ex As Exception
-
-            End Try
-
-        End Sub
+    End Sub
 
 
     ''' <summary>
@@ -433,42 +422,36 @@ Namespace FEKL
 
     Private Sub AutoHighlightStart()
         Dim _tree As ParseTree
-            Dim _currenttext As String = ""
-            Try
-                While Not isDisposing
-                    Dim _textchanged As Boolean
-                    SyncLock treelock
-                        _textchanged = textChanged
-                        If textChanged Then
-                            textChanged = False
-                            _currenttext = currentText
-                        End If
-                    End SyncLock
-                    If Not _textchanged Then
-                        Thread.Sleep(200)
-                        Continue While
-                    End If
+        Dim _currenttext As String = ""
+        While Not isDisposing
+            Dim _textchanged As Boolean
+            SyncLock treelock
+                _textchanged = textChanged
+                If textChanged Then
+                    textChanged = False
+                    _currenttext = currentText
+                End If
+            End SyncLock
+            If Not _textchanged Then
+                Thread.Sleep(200)
+                Continue While
+            End If
 
-                    _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+            _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
 
-                    SyncLock treelock
-                        If textChanged Then
-                            Continue While
-                        Else
-                            ' assign new tree
-                            Tree = _tree
-                        End If
-                    End SyncLock
+            SyncLock treelock
+                If textChanged Then
+                    Continue While
+                Else
+                    ' assign new tree
+                    Tree = _tree
+                End If
+            End SyncLock
 
 
-                    If _tree.Errors.Count = 0 Then
-                        Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-                    End If
-                End While
-            Catch ex As Exception
-
-            End Try
-        End Sub
+            Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
+        End While
+    End Sub
 
 
     ''' <summary>
@@ -655,86 +638,89 @@ Namespace FEKL
                     Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH:
                         sb.Append("{{\cf51 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP:
+                    Case TokenType.KEYWDDATATYPEDATE:
                         sb.Append("{{\cf52 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEDATE:
+                    Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP:
                         sb.Append("{{\cf53 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPEDATETIME:
+                    Case TokenType.KEYWDDATATYPETEMPORALDATE:
                         sb.Append("{{\cf54 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETIME:
+                    Case TokenType.KEYWDDATATYPEDATETIME:
                         sb.Append("{{\cf55 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH:
+                    Case TokenType.KEYWDDATATYPETIME:
                         sb.Append("{{\cf56 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH:
+                    Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH:
                         sb.Append("{{\cf57 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH:
+                    Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH:
                         sb.Append("{{\cf58 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETEXTFIXEDLENGTH:
+                    Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH:
                         sb.Append("{{\cf59 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETEXTLARGELENGTH:
+                    Case TokenType.KEYWDDATATYPETEXTFIXEDLENGTH:
                         sb.Append("{{\cf60 ")
                         Exit Select
-                    Case TokenType.KEYWDDATATYPETEXTVARIABLELENGTH:
+                    Case TokenType.KEYWDDATATYPETEXTLARGELENGTH:
                         sb.Append("{{\cf61 ")
                         Exit Select
-                    Case TokenType.KEYWDIDENTIFIEDBY:
+                    Case TokenType.KEYWDDATATYPETEXTVARIABLELENGTH:
                         sb.Append("{{\cf62 ")
                         Exit Select
-                    Case TokenType.KEYWDISACONCEPT:
+                    Case TokenType.KEYWDIDENTIFIEDBY:
                         sb.Append("{{\cf63 ")
                         Exit Select
-                    Case TokenType.KEYWDISAKINDOF:
+                    Case TokenType.KEYWDISACONCEPT:
                         sb.Append("{{\cf64 ")
                         Exit Select
-                    Case TokenType.KEYWDISANENTITYTYPE:
+                    Case TokenType.KEYWDISAKINDOF:
                         sb.Append("{{\cf65 ")
                         Exit Select
-                    Case TokenType.KEYWDISAVALUETYPE:
+                    Case TokenType.KEYWDISANENTITYTYPE:
                         sb.Append("{{\cf66 ")
                         Exit Select
-                    Case TokenType.KEYWDISIDENTIFIEDBY:
+                    Case TokenType.KEYWDISAVALUETYPE:
                         sb.Append("{{\cf67 ")
                         Exit Select
-                    Case TokenType.KEYWDISOBJECTIFIED:
+                    Case TokenType.KEYWDISIDENTIFIEDBY:
                         sb.Append("{{\cf68 ")
                         Exit Select
-                    Case TokenType.KEYWDISWRITTENAS:
+                    Case TokenType.KEYWDISOBJECTIFIED:
                         sb.Append("{{\cf69 ")
                         Exit Select
-                    Case TokenType.KEYWDITS:
+                    Case TokenType.KEYWDISWRITTENAS:
                         sb.Append("{{\cf70 ")
                         Exit Select
-                    Case TokenType.KEYWDNL:
+                    Case TokenType.KEYWDITS:
                         sb.Append("{{\cf71 ")
                         Exit Select
-                    Case TokenType.KEYWDONE:
+                    Case TokenType.KEYWDNL:
                         sb.Append("{{\cf72 ")
                         Exit Select
-                    Case TokenType.KEYWDPAGE:
+                    Case TokenType.KEYWDONE:
                         sb.Append("{{\cf73 ")
                         Exit Select
-                    Case TokenType.KEYWDREADING:
+                    Case TokenType.KEYWDPAGE:
                         sb.Append("{{\cf74 ")
                         Exit Select
-                    Case TokenType.KEYWDTOPAGE:
+                    Case TokenType.KEYWDREADING:
                         sb.Append("{{\cf75 ")
                         Exit Select
-                    Case TokenType.KEYWDSTANDALONE:
+                    Case TokenType.KEYWDTOPAGE:
                         sb.Append("{{\cf76 ")
                         Exit Select
-                    Case TokenType.KEYWDTHEIR:
+                    Case TokenType.KEYWDSTANDALONE:
                         sb.Append("{{\cf77 ")
                         Exit Select
-                    Case TokenType.KEYWDWRITTENAS:
+                    Case TokenType.KEYWDTHEIR:
                         sb.Append("{{\cf78 ")
+                        Exit Select
+                    Case TokenType.KEYWDWRITTENAS:
+                        sb.Append("{{\cf79 ")
                         Exit Select
 
             Case Else
@@ -745,7 +731,7 @@ Namespace FEKL
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red3\green168\blue183;\red153\green0\blue0;\red153\green0\blue0;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red227\green143\blue247;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red216\green127\blue178;\red153\green0\blue0;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red3\green168\blue183;\red153\green0\blue0;\red153\green0\blue0;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red227\green143\blue247;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red216\green127\blue178;\red153\green0\blue0;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)
@@ -758,19 +744,13 @@ Namespace FEKL
 
 #Region "IDisposable Members"
 
-        Public Sub Dispose() Implements IDisposable.Dispose
-
-            isDisposing = True
-
-            RemoveHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
-            RemoveHandler Textbox.KeyDown, AddressOf textbox_KeyDown
-            RemoveHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
-
-            threadAutoHighlight.Join(1000)
-            If threadAutoHighlight.IsAlive Then
-                threadAutoHighlight.Abort()
-            End If
-        End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        isDisposing = True
+        threadAutoHighlight.Join(1000)
+        If threadAutoHighlight.IsAlive Then
+            threadAutoHighlight.Abort()
+        End If
+    End Sub
 
 #End Region
 

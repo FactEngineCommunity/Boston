@@ -6,6 +6,7 @@ Imports System.Linq
 Imports System.Text
 Imports System.Windows.Forms
 Imports System.IO
+Imports System.Data.SQLite
 Imports System.Reflection
 
 Public Class frmCSVLoader
@@ -33,7 +34,7 @@ Public Class frmCSVLoader
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -51,7 +52,8 @@ Public Class frmCSVLoader
 			End Select
 
 			Me.LabelModelName.Text = Me.mrModel.Name
-			Me.LabelTableName.Text = Me.mrTable.Name
+
+			Me.LabelTableName.Text = If(Me.mrTable Is Nothing, "No Table selected", Me.mrTable.Name)
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -59,13 +61,9 @@ Public Class frmCSVLoader
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
-	End Sub
-
-	Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
-		Me.Close()
 	End Sub
 
 	Private Sub btnGetFile_Click(sender As Object, e As EventArgs) Handles btnGetFile.Click
@@ -132,7 +130,7 @@ Public Class frmCSVLoader
 	Private Sub btnGetData_Click(sender As Object, e As EventArgs) Handles btnGetData.Click
 
 		Try
-			Call Me.GetDataFromCSV(Me.txtFileName.Text)
+			Call Me.GetDataFromCSV(Me.txtFileName.Text, Me.CheckBoxCreateNewTable.Checked)
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -140,11 +138,12 @@ Public Class frmCSVLoader
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
-	Private Sub GetDataFromCSV(ByVal asFilePath As String)
+	Private Sub GetDataFromCSV(ByVal asFilePath As String,
+							   Optional ByVal abCreateNewTable As Boolean = False)
 
 		Try
 			mrFileHandler.msDelimiter = txtDelimiter.Text
@@ -155,13 +154,103 @@ Public Class frmCSVLoader
 
 			Me.DataGridView1.DataSource = mdtData
 
+			If MsgBox("Create the table", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+
+				If abCreateNewTable Then
+
+					If Me.mrModel.TargetDatabaseConnectionString.Trim = "" Then
+						'No Database Exists
+
+						Dim lrSaveFileDialog As New SaveFileDialog()
+
+						Select Case Me.mrModel.TargetDatabaseType
+							Case Is = pcenumDatabaseType.SQLite
+								lrSaveFileDialog.Filter = "SQLite database file (*.db)|*.db"
+								lrSaveFileDialog.FilterIndex = 0
+								lrSaveFileDialog.RestoreDirectory = True
+
+								If (lrSaveFileDialog.ShowDialog() = DialogResult.OK) Then
+									If Not System.IO.File.Exists(lrSaveFileDialog.FileName()) Then
+										SQLiteConnection.CreateFile(lrSaveFileDialog.FileName)
+										Dim lsConnectionString = "Data Source=" & lrSaveFileDialog.FileName & ";Version=3;"
+										Me.mrModel.TargetDatabaseConnectionString = lsConnectionString
+									End If
+								End If
+							Case Is = pcenumDatabaseType.None
+								Boston.ShowFlashCard("Set the Database Type of the Model before creating the database/table.", Color.Salmon)
+								Exit Sub
+							Case Else
+								Boston.ShowFlashCard("The Database Type of the Model is not supported to create the database/table.", Color.Salmon)
+								Exit Sub
+						End Select
+					Else
+						'Database has ConnectionString
+						Dim lrSaveFileDialog As New SaveFileDialog()
+
+						Select Case Me.mrModel.TargetDatabaseType
+							Case Is = pcenumDatabaseType.SQLite
+
+								Dim lrSQLConnectionStringBuilder As System.Data.Common.DbConnectionStringBuilder = Nothing
+								Dim lsDatabaseLocation As String
+								Try
+									lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True) With {
+																															   .ConnectionString = Me.mrModel.TargetDatabaseConnectionString
+																															}
+									lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+
+									'Check to see if the database file exists.
+									If Not System.IO.File.Exists(lsDatabaseLocation) Then
+										Boston.ShowFlashCard("The database does not exist:".AppendLine(lsDatabaseLocation), Color.Salmon)
+										Exit Sub
+									End If
+
+								Catch ex As Exception
+									Boston.ShowFlashCard("Please fix the Database Connection String and try again." & vbCrLf & vbCrLf & ex.Message, Color.Salmon)
+									Exit Sub
+								End Try
+
+						End Select
+					End If
+
+					Dim lsEntityTypeName = Me.txtNameOnly.Text.Trim
+
+					'CodeSafe
+					If lsEntityTypeName = "" Then
+						Boston.ShowFlashCard("Please select a file before trying to create a table", Color.Salmon)
+						Exit Sub
+					End If
+
+					Dim lrEntityType = Me.mrModel.CreateEntityType(lsEntityTypeName, True, True, False, False)
+					Dim lasPredicateSet = New List(Of String) From {"has", "isfor"}
+
+					'Create the Columns for the table.
+					Me.mrModel.IsDatabaseSynchronised = True
+					For Each lrColumn In mdtData.Columns
+
+						Dim lsValueTypeName = lrColumn.ColumnName
+
+						Me.mrModel.CreateBinaryFactTypeToNewValueType($"{lsEntityTypeName}{lrColumn.ColumnName}",
+																	   lrEntityType, False, True, False, Nothing, True, Nothing, True, True, lasPredicateSet, lsValueTypeName, pcenumBinaryRelationMultiplicityType.ManyToOne
+																	 )
+
+					Next
+					Me.mrModel.IsDatabaseSynchronised = False
+
+					Me.mrTable = lrEntityType.getCorrespondingRDSTable(False)
+
+					Boston.ShowFlashCard("Table Created", pcColorPastelGreen)
+
+				End If
+
+			End If
+
 		Catch ex As Exception
 			Dim lsMessage As String
 			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -191,7 +280,10 @@ Public Class frmCSVLoader
 
 				Case Is = pcenumCSVFormFunction.ImportCSVData
 					'DataView Returned to frmToolboxTableData
+					'CSV loading into the database done back in frmToolboxTableData
 			End Select
+
+			Me.Close()
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -199,7 +291,7 @@ Public Class frmCSVLoader
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub

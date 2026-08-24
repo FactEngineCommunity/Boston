@@ -32,6 +32,11 @@ Session IS AN ENTITY TYPE
 
 Teenager IS AN ENTITY TYPE
 
+Section Type INCLUDES {Gala, Delux}
+Insurance Type INCLUDES {Hail, Flood}
+Insurance includes AT LEAST ONE Coverage
+Coverage includes ONE Maximum Payout
+
 Session IS WHERE Film is showing on DateTime at Cinema
 Session IS IDENTIFIED BY ITS Part, Bin, Warehouse
 Seat is in ONE  Section
@@ -41,11 +46,12 @@ SeatIsInCinema IS IDENTIFIED BY ITS Seat, Cinema
 Seat has ONE  Letter
 Row has ONE  RowNr
 Seat is in ONE  Row
-Person has AT MOST ONE login-LoginName
+Person has AT MOST ONE login-Name
 PersonLikesFilm IS WHERE Person likes Film
 PersonLikesFilm has AT MOST ONE Rating
 Person has AT MOST ONE DateOfBirth
 Person has ONE  Age
+Person makes ANY NUMBER OF simple-Decision
 Booking IS WHERE Person booked Session
 Booking is confirmed
 Film has AT MOST ONE Film Name
@@ -91,8 +97,20 @@ You say: Cinema IA AN ENTITY TYPE
 I say: Add a cinema name to the cinema node type
 You say: Cinema has AT MOST ONE Cinema Name
 
+I say: Person has one first-name
+You say: Person has ONE first-Name
+
+I say: Person makes any number of simple-decisions
+You say: Person makes ANY NUMBER OF simple-Decision
+
+I say: Company has one company name
+You sa: Company has ONE Company Name
+
 I say: row is in one cinema
 You say: Row is in ONE Cinema
+
+I say: employee is a kind of person
+You say: Company IS A KIND OF Person
 
 I say: part is in bin in warehouse
 You say: Part is in Bin in Warehouse

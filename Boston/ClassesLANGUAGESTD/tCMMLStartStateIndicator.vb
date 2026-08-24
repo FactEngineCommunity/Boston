@@ -43,9 +43,9 @@ Namespace STD
             If Me.FactInstance IsNot Nothing Then
                 Me.FactInstance.X = aiNewX
                 Me.FactInstance.Y = aiNewY
-            End If
 
-            Me.FactInstance.makeDirty()
+                Me.FactInstance.makeDirty()
+            End If
 
         End Sub
 

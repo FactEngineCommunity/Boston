@@ -22,8 +22,21 @@ Public Class tCMML
                       Select Page Distinct
                       Order By Page.Name
 
-
         getORMDiagramPagesForActor = larPage.ToList
+
+
+        Dim larConceptInstancePage = (From Page In lrModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.ORMModel
+                                      Where (ConceptInstance.ConceptType = pcenumConceptType.EntityType Or
+                                             ConceptInstance.ConceptType = pcenumConceptType.FactType)
+                                      Where ConceptInstance.Symbol = arActor.Name
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getORMDiagramPagesForActor.AddUnique(lrPage)
+        Next
 
     End Function
 
@@ -38,16 +51,28 @@ Public Class tCMML
 
             lrModel = arEntityType.Model
 
-            Dim larPage = From Page In lrModel.Page
-                          From EntityTypeInstance In Page.EntityTypeInstance
-                          Where Page.Language = pcenumLanguage.ORMModel
-                          Where EntityTypeInstance.EntityType IsNot Nothing
-                          Where EntityTypeInstance.EntityType.Id = arEntityType.Id
-                          Select Page Distinct
-                          Order By Page.Name
+            Dim larPage = (From Page In lrModel.Page
+                           From EntityTypeInstance In Page.EntityTypeInstance
+                           Where Page.Language = pcenumLanguage.ORMModel
+                           Where EntityTypeInstance.EntityType IsNot Nothing
+                           Where EntityTypeInstance.EntityType.Id = arEntityType.Id
+                           Select Page Distinct
+                           Order By Page.Name).ToList
 
             For Each lrPage In larPage
-                GetORMDiagramPagesForEntityType.Add(lrPage)
+                getORMDiagramPagesForEntityType.Add(lrPage)
+            Next
+
+            Dim larConceptInstancePage = (From Page In lrModel.Page
+                                          From ConceptInstance In Page.ConceptInstance
+                                          Where Page.Language = pcenumLanguage.ORMModel
+                                          Where ConceptInstance.ConceptType = pcenumConceptType.EntityType
+                                          Where ConceptInstance.Symbol = arEntityType.Id
+                                          Select Page Distinct
+                                          Order By Page.Name).ToList
+
+            For Each lrPage In larConceptInstancePage
+                getORMDiagramPagesForEntityType.AddUnique(lrPage)
             Next
 
         Catch ex As Exception
@@ -56,7 +81,7 @@ Public Class tCMML
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True,, True)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True,, True)
 
             Return New List(Of FBM.Page)
         End Try
@@ -87,6 +112,19 @@ Public Class tCMML
 
         For Each lrPage In larPage
             getORMDiagramPagesForModelElementName.Add(lrPage)
+        Next
+
+        Dim larConceptInstancePage = (From Page In arModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.ORMModel
+                                      Where (ConceptInstance.ConceptType = pcenumConceptType.EntityType Or
+                                             ConceptInstance.ConceptType = pcenumConceptType.FactType)
+                                      Where ConceptInstance.Symbol = asModelElementName
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getORMDiagramPagesForModelElementName.AddUnique(lrPage)
         Next
 
     End Function
@@ -189,6 +227,19 @@ Public Class tCMML
             GetERDiagramPagesForEntity.Add(lrPage)
         Next
 
+        Dim larConceptInstancePage = (From Page In lrModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.EntityRelationshipDiagram
+                                      Where ConceptInstance.ConceptType = pcenumConceptType.Value
+                                      Where ConceptInstance.Symbol = arEntity.Name
+                                      Where ConceptInstance.RoleId = "e6ca6889-db16-470f-9106-d20387a59c3b"
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            GetERDiagramPagesForEntity.AddUnique(lrPage)
+        Next
+
     End Function
 
     Public Function getERDiagramPagesForModelElementName(ByVal arModel As FBM.Model, ByVal asModelElementName As String) As List(Of FBM.Page)
@@ -208,6 +259,19 @@ Public Class tCMML
 
         For Each lrPage In larPage
             getERDiagramPagesForModelElementName.Add(lrPage)
+        Next
+
+        Dim larConceptInstancePage = (From Page In arModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.EntityRelationshipDiagram
+                                      Where ConceptInstance.ConceptType = pcenumConceptType.Value
+                                      Where ConceptInstance.Symbol = asModelElementName
+                                      Where ConceptInstance.RoleId = "e6ca6889-db16-470f-9106-d20387a59c3b"
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getERDiagramPagesForModelElementName.AddUnique(lrPage)
         Next
 
     End Function
@@ -242,6 +306,19 @@ Public Class tCMML
             getERDiagramPagesForEntityType.Add(lrPage)
         Next
 
+        Dim larConceptInstancePage = (From Page In lrModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.EntityRelationshipDiagram
+                                      Where ConceptInstance.ConceptType = pcenumConceptType.Value
+                                      Where ConceptInstance.Symbol = arEntityType.Id
+                                      Where ConceptInstance.RoleId = "e6ca6889-db16-470f-9106-d20387a59c3b"
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getERDiagramPagesForEntityType.AddUnique(lrPage)
+        Next
+
     End Function
 
     Public Function getPGSDiagramPagesForModelElementName(ByVal arModel As FBM.Model, asModelElementName As String) As List(Of FBM.Page)
@@ -261,6 +338,19 @@ Public Class tCMML
 
         For Each lrPage In larPage
             getPGSDiagramPagesForModelElementName.Add(lrPage)
+        Next
+
+        Dim larConceptInstancePage = (From Page In arModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.PropertyGraphSchema
+                                      Where ConceptInstance.ConceptType = pcenumConceptType.Value
+                                      Where ConceptInstance.Symbol = asModelElementName
+                                      Where ConceptInstance.RoleId = "e6ca6889-db16-470f-9106-d20387a59c3b"
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getPGSDiagramPagesForModelElementName.AddUnique(lrPage)
         Next
 
     End Function
@@ -288,14 +378,14 @@ Public Class tCMML
 
     End Function
 
-    Public Function getSTDDiagramPagesForValueType(ByRef arValueType As FBM.ValueType) As List(Of FBM.Page)
+    Public Function getStateTransitionDiagramPagesForValueType(ByRef arValueType As FBM.ValueType) As List(Of FBM.Page)
 
-        getSTDDiagramPagesForValueType = New List(Of FBM.Page)
+        getStateTransitionDiagramPagesForValueType = New List(Of FBM.Page)
 
         Dim lrModel As FBM.Model = arValueType.Model
         Dim lrValueType As FBM.ValueType = arValueType
 
-        Dim larPage = arValueType.Model.Page.FindAll(Function(x) x.Language = pcenumLanguage.StateTransitionDiagram)
+        Dim larPage = arValueType.Model.Page.FindAll(Function(x) x.Language = pcenumLanguage.StateTransitionDiagram And x.Loaded)
 
         Dim lsSQLQuery As String = ""
         Dim lrORMRecordset As ORMQL.Recordset
@@ -310,8 +400,21 @@ Public Class tCMML
             lrORMRecordset = arValueType.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
             If lrORMRecordset.Facts.Count > 0 Then
-                getSTDDiagramPagesForValueType.Add(lrPage)
+                getStateTransitionDiagramPagesForValueType.Add(lrPage)
             End If
+        Next
+
+        Dim larConceptInstancePage = (From Page In lrModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.StateTransitionDiagram
+                                      Where ConceptInstance.ConceptType = pcenumConceptType.Value
+                                      Where ConceptInstance.Symbol = lrValueType.Id
+                                      Where ConceptInstance.RoleId = "9665f3e0-8083-4a49-ad61-c8e4330ab451"
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getStateTransitionDiagramPagesForValueType.AddUnique(lrPage)
         Next
 
     End Function
@@ -340,67 +443,106 @@ Public Class tCMML
             getPGSDiagramPagesForEntityType.Add(lrPage)
         Next
 
-    End Function
+        Dim larConceptInstancePage = (From Page In lrModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.PropertyGraphSchema
+                                      Where ConceptInstance.ConceptType = pcenumConceptType.Value
+                                      Where ConceptInstance.Symbol = arEntityType.Id
+                                      Where ConceptInstance.RoleId = "e6ca6889-db16-470f-9106-d20387a59c3b"
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
 
-
-    Public Function get_orm_diagram_pages_for_value_type(ByVal ar_entity_type As FBM.ValueType) As List(Of FBM.Page)
-
-        get_orm_diagram_pages_for_value_type = New List(Of FBM.Page)
-
-        Dim lr_model As FBM.Model
-        Dim lr_page As FBM.Page
-
-        lr_model = ar_entity_type.Model
-
-        Dim lrPage = From Page In lr_model.Page _
-                     From ValueTypeInstance In Page.ValueTypeInstance _
-                     Where Page.Language = pcenumLanguage.ORMModel _
-                     And ValueTypeInstance.ValueType.Id = ar_entity_type.Id _
-                     Select Page Distinct _
-                     Order By Page.Name
-
-        For Each lr_page In lrPage
-            get_orm_diagram_pages_for_value_type.Add(lr_page)
+        For Each lrPage In larConceptInstancePage
+            getPGSDiagramPagesForEntityType.AddUnique(lrPage)
         Next
 
     End Function
 
-    Public Function getORMDiagramPagesForEntity(ByVal ar_entity As ERD.Entity) As List(Of FBM.Page)
+
+    Public Function getORMDiagramPagesForValueType(ByVal arValueType As FBM.ValueType) As List(Of FBM.Page)
+
+        getORMDiagramPagesForValueType = New List(Of FBM.Page)
+
+        Dim lrModel As FBM.Model
+        Dim lrPage As FBM.Page
+
+        lrModel = arValueType.Model
+
+        Dim larPage = (From Page In lrModel.Page
+                       From ValueTypeInstance In Page.ValueTypeInstance
+                       Where Page.Language = pcenumLanguage.ORMModel _
+                     And ValueTypeInstance.ValueType.Id = arValueType.Id
+                       Select Page Distinct
+                       Order By Page.Name).ToList
+
+        For Each lrPage In larPage
+            getORMDiagramPagesForValueType.Add(lrPage)
+        Next
+
+        Dim larConceptInstancePage = (From Page In lrModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.ORMModel
+                                      Where ConceptInstance.ConceptType = pcenumConceptType.ValueType
+                                      Where ConceptInstance.Symbol = arValueType.Id
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getORMDiagramPagesForValueType.AddUnique(lrPage)
+        Next
+
+
+    End Function
+
+    Public Function getORMDiagramPagesForEntity(ByVal arEntity As ERD.Entity) As List(Of FBM.Page)
 
         getORMDiagramPagesForEntity = New List(Of FBM.Page)
 
-        Dim lr_model As FBM.Model
-        Dim lr_page As FBM.Page
+        Dim lrModel As FBM.Model
+        Dim lrPage As FBM.Page
         'Dim lr_use_case_page As New FBM.Page(ar_entity.Model, Nothing, "", pcenumLanguage.UseCaseDiagram)
 
-        lr_model = ar_entity.Model
+        lrModel = arEntity.Model
 
         '-------------------------------------
         'Pages where Entity is an EntityType
         '-------------------------------------
-        Dim lrPage = From Page In lr_model.Page _
-                     From EntityTypeInstance In Page.EntityTypeInstance _
-                     Where Page.Language = pcenumLanguage.ORMModel _
-                     And EntityTypeInstance.Id = ar_entity.Data _
-                     Select Page Distinct _
-                     Order By Page.Name
+        Dim larPage = From Page In lrModel.Page
+                      From EntityTypeInstance In Page.EntityTypeInstance
+                      Where Page.Language = pcenumLanguage.ORMModel _
+                            And EntityTypeInstance.Id = arEntity.Data
+                      Select Page Distinct
+                      Order By Page.Name
 
-        For Each lr_page In lrPage
+        For Each lr_page In larPage
             getORMDiagramPagesForEntity.Add(lr_page)
         Next
 
         '-------------------------------------
         'Pages where Entity is an EntityType
         '-------------------------------------
-        lrPage = From Page In lr_model.Page _
-                 From FactTypeInstance In Page.FactTypeInstance _
-                 Where Page.Language = pcenumLanguage.ORMModel _
-                 And FactTypeInstance.Id = ar_entity.Data _
-                 Select Page Distinct _
-                 Order By Page.Name
+        larPage = From Page In lrModel.Page
+                  From FactTypeInstance In Page.FactTypeInstance
+                  Where Page.Language = pcenumLanguage.ORMModel _
+                  And FactTypeInstance.Id = arEntity.Data
+                  Select Page Distinct
+                  Order By Page.Name
 
-        For Each lr_page In lrPage
+        For Each lr_page In larPage
             getORMDiagramPagesForEntity.Add(lr_page)
+        Next
+
+        Dim larConceptInstancePage = (From Page In lrModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.ORMModel
+                                      Where (ConceptInstance.ConceptType = pcenumConceptType.EntityType Or
+                                             ConceptInstance.ConceptType = pcenumConceptType.FactType)
+                                      Where ConceptInstance.Symbol = arEntity.Id
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getORMDiagramPagesForEntity.AddUnique(lrPage)
         Next
 
     End Function
@@ -423,35 +565,61 @@ Public Class tCMML
 
         Return larPage.ToList
 
+        Dim larConceptInstancePage = (From Page In lrModel.Page
+                                      From ConceptInstance In Page.ConceptInstance
+                                      Where Page.Language = pcenumLanguage.ORMModel
+                                      Where (ConceptInstance.ConceptType = pcenumConceptType.EntityType Or
+                                             ConceptInstance.ConceptType = pcenumConceptType.FactType)
+                                      Where ConceptInstance.Symbol = arNode.Name
+                                      Select Page Distinct
+                                      Order By Page.Name).ToList
+
+        For Each lrPage In larConceptInstancePage
+            getORMDiagramPagesForPGSNode.AddUnique(lrPage)
+        Next
+
     End Function
 
 
-    Public Function get_orm_diagram_pages_for_FactType(ByVal arFactTypeype As FBM.FactType) As List(Of FBM.Page)
+    Public Function getORMDiagramPagesForFactType(ByVal arFactType As FBM.FactType) As List(Of FBM.Page)
 
         Dim lrModel As FBM.Model
         Dim lrPage As FBM.Page
 
         Try
-            get_orm_diagram_pages_for_FactType = New List(Of FBM.Page)
+            getORMDiagramPagesForFactType = New List(Of FBM.Page)
 
-            lrModel = arFactTypeype.Model
+            lrModel = arFactType.Model
 
-            Dim larPage = From Page In lrModel.Page _
-                         From FactTypeInstance In Page.FactTypeInstance _
-                         Where Page.Language = pcenumLanguage.ORMModel _
-                         And FactTypeInstance.FactType.Id = arFactTypeype.Id _
-                         Select Page Distinct _
-                         Order By Page.Name
+            Dim larPage = From Page In lrModel.Page
+                          From FactTypeInstance In Page.FactTypeInstance
+                          Where Page.Language = pcenumLanguage.ORMModel _
+                         And FactTypeInstance.FactType.Id = arFactType.Id
+                          Select Page Distinct
+                          Order By Page.Name
 
             For Each lrPage In larPage
-                get_orm_diagram_pages_for_FactType.Add(lrPage)
+                getORMDiagramPagesForFactType.Add(lrPage)
             Next
+
+            Dim larConceptInstancePage = (From Page In lrModel.Page
+                                          From ConceptInstance In Page.ConceptInstance
+                                          Where Page.Language = pcenumLanguage.ORMModel
+                                          Where ConceptInstance.ConceptType = pcenumConceptType.FactType
+                                          Where ConceptInstance.Symbol = arFactType.Id
+                                          Select Page Distinct
+                                          Order By Page.Name).ToList
+
+            For Each lrPage In larConceptInstancePage
+                getORMDiagramPagesForFactType.AddUnique(lrPage)
+            Next
+
 
         Catch ex As Exception
             Dim lsMessage As String
             lsMessage = "Error: tCMML.GetOrmDiagramPagesForFactType"
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -479,13 +647,25 @@ Public Class tCMML
                 GetORMDiagramPagesForRoleConstraint.Add(lrPage)
             Next
 
+            Dim larConceptInstancePage = (From Page In lrModel.Page
+                                          From ConceptInstance In Page.ConceptInstance
+                                          Where Page.Language = pcenumLanguage.ORMModel
+                                          Where ConceptInstance.ConceptType = pcenumConceptType.RoleConstraint
+                                          Where ConceptInstance.Symbol = arRoleConstraint.Id
+                                          Select Page Distinct
+                                          Order By Page.Name).ToList
+
+            For Each lrPage In larConceptInstancePage
+                GetORMDiagramPagesForRoleConstraint.AddUnique(lrPage)
+            Next
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return New List(Of FBM.Page)
         End Try
@@ -498,13 +678,13 @@ Public Class tCMML
         Try
             getORMDiagramPagesForState = New List(Of FBM.Page)
 
-            Dim lr_model As FBM.Model
+            Dim lrModel As FBM.Model
             Dim lsStateName = arState.StateName
             Dim lsValueTypeId = arState.ValueType.Id
 
-            lr_model = arState.Model
+            lrModel = arState.Model
 
-            Dim larPage = From Page In lr_model.Page
+            Dim larPage = From Page In lrModel.Page
                           From ValueTypeInstance In Page.ValueTypeInstance
                           From ValueConstraint In ValueTypeInstance.ValueType.ValueConstraint
                           Where ValueTypeInstance.Id = lsValueTypeId
@@ -517,13 +697,26 @@ Public Class tCMML
                 getORMDiagramPagesForState.Add(lrPage)
             Next
 
+
+            Dim larConceptInstancePage = (From Page In lrModel.Page
+                                          From ConceptInstance In Page.ConceptInstance
+                                          Where Page.Language = pcenumLanguage.ORMModel
+                                          Where ConceptInstance.ConceptType = pcenumConceptType.ValueType
+                                          Where ConceptInstance.Symbol = lsValueTypeId
+                                          Select Page Distinct
+                                          Order By Page.Name).ToList
+
+            For Each lrPage In larConceptInstancePage
+                getORMDiagramPagesForState.AddUnique(lrPage)
+            Next
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return New List(Of FBM.Page)
         End Try
@@ -555,13 +748,26 @@ Public Class tCMML
 
             getUseCaseDiagramPagesForActor = larPage.ToList
 
+            Dim larConceptInstancePage = (From Page In lrModel.Page
+                                          From ConceptInstance In Page.ConceptInstance
+                                          Where Page.Language = pcenumLanguage.UMLUseCaseDiagram
+                                          Where ConceptInstance.ConceptType = pcenumConceptType.Value
+                                          Where ConceptInstance.Symbol = arActor.Name
+                                          Where ConceptInstance.RoleId = "e6ca6889-db16-470f-9106-d20387a59c3b"
+                                          Select Page Distinct
+                                          Order By Page.Name).ToList
+
+            For Each lrPage In larConceptInstancePage
+                getUseCaseDiagramPagesForActor.AddUnique(lrPage)
+            Next
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function

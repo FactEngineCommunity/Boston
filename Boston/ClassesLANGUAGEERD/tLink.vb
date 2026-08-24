@@ -120,6 +120,9 @@ Namespace ERD
             End If
 
             Dim lrPen As New System.Drawing.Pen(Me.ERDLink.Color, 0.03)
+            If Me.ERDLink.Relation.RDSRelation.ResponsibleFactType IsNot Nothing AndAlso Me.ERDLink.Relation.RDSRelation.ResponsibleFactType.IsDerived Then
+                lrPen.Color = Color.MediumSlateBlue
+            End If
 
             '-----------------------------------------
             'Dash/Solid for the appropriate segments
@@ -132,6 +135,10 @@ Namespace ERD
                     pt2 = New PointF(Me.ControlPoints(liInd + 1).X, Me.ControlPoints(liInd + 1).Y)
 
                     lrPen = New System.Drawing.Pen(Me.ERDLink.Color, 0.2)
+                    If Me.ERDLink.Relation.RDSRelation.ResponsibleFactType IsNot Nothing AndAlso Me.ERDLink.Relation.RDSRelation.ResponsibleFactType.IsDerived Then
+                        lrPen.Color = Color.MediumSlateBlue
+                        lrPen.Width = 0.5
+                    End If
 
                     Select Case liInd
                         Case Is < (Me.ControlPoints.Count / 2)

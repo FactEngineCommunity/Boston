@@ -123,56 +123,13 @@ SkipEntityTypeInstance:
                     End While
 
                     lREcordset.Close()
-
-                    '20200513-VM-Remove if all seems okay
-                    ''------------------------------------------------------
-                    ''Now Link the EntityTypes to their Parent EntityTypes
-                    ''------------------------------------------------------
-                    'lsSQLQuery = " SELECT *"
-                    'lsSQLQuery &= "  FROM MetaModelParentEntityType"
-                    'lsSQLQuery &= " WHERE ModelId = '" & Trim(arPage.Model.ModelId) & "'"
-
-                    'lREcordset.Open(lsSQLQuery)
-
-                    'Dim lr_parentEntityTypeInstance As FBM.EntityTypeInstance
-
-                    'If Not lREcordset.EOF Then
-                    '    While Not lREcordset.EOF
-                    '        lrEntityTypeInstance = New FBM.EntityTypeInstance
-                    '        lrEntityTypeInstance.Id = Trim(lREcordset("EntityTypeId").Value)
-                    '        lrEntityTypeInstance = GetEntityTypeInstancesByPage.Find(AddressOf lrEntityTypeInstance.Equals)
-
-                    '        If IsSomething(lrEntityTypeInstance) Then
-                    '            '----------------------------------------------------------------------
-                    '            'The ParentEntityType is at least part of the model under review
-                    '            '  i.e. If currently looking at an ORM model...is within the ORM model
-                    '            '----------------------------------------------------------------------
-                    '            lr_parentEntityTypeInstance = New FBM.EntityTypeInstance
-                    '            lr_parentEntityTypeInstance.Id = Trim(lREcordset("ParentEntityTypeId").Value)
-                    '            lr_parentEntityTypeInstance = GetEntityTypeInstancesByPage.Find(AddressOf lr_parentEntityTypeInstance.Equals)
-
-                    '            Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
-                    '            lrSubtypeConstraint.EntityType = lrEntityTypeInstance.EntityType
-                    '            lrSubtypeConstraint.parentEntityType = lr_parentEntityTypeInstance.EntityType
-
-                    '            lrSubtypeConstraint = lrSubtypeConstraint.EntityType.SubtypeConstraint.Find(AddressOf lrSubtypeConstraint.Equals)
-
-                    '            Dim lrSubtypeConstraintInstance As FBM.SubtypeRelationshipInstance
-
-                    '            lrSubtypeConstraintInstance = lrSubtypeConstraint.CloneInstance(arPage, True)
-
-                    '            lrEntityTypeInstance.SubtypeConstraint.Add(lrSubtypeConstraintInstance)
-                    '        End If
-                    '        lREcordset.MoveNext()
-                    '    End While
-                    'End If
                 End If
 
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: TableEntityTypeInstance.GetEntityTypeInstancesByPage"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try

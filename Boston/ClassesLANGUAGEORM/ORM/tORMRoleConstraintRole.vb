@@ -46,9 +46,9 @@ Namespace FBM
 
         Public Sub New(ByRef arRole As FBM.Role,
                        ByRef arRoleConstraint As FBM.RoleConstraint,
-                       Optional ByVal ab_IsEntry As Boolean = Nothing,
-                       Optional ByVal ab_IsExit As Boolean = Nothing,
-                       Optional ByVal aiSequenceNr As Integer = Nothing,
+                       Optional ByVal ab_IsEntry As Boolean = False,
+                       Optional ByVal ab_IsExit As Boolean = False,
+                       Optional ByVal aiSequenceNr As Integer = 1,
                        Optional ByVal abMakeDirty As Boolean = False)
 
             Call Me.New()
@@ -58,17 +58,9 @@ Namespace FBM
                 Me.Role = arRole
                 Me.RoleConstraint = arRoleConstraint
 
-                If IsSomething(ab_IsEntry) Then
-                    Me.IsEntry = ab_IsEntry
-                End If
-
-                If IsSomething(ab_IsExit) Then
-                    Me.IsExit = ab_IsExit
-                End If
-
-                If IsSomething(aiSequenceNr) Then
-                    Me.SequenceNr = aiSequenceNr
-                End If
+                Me.IsEntry = ab_IsEntry
+                Me.IsExit = ab_IsExit
+                Me.SequenceNr = aiSequenceNr
 
                 Me.isDirty = abMakeDirty
 
@@ -132,7 +124,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: FBM.RoleConstraintRole.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return lrRoleConstraintRole
             End Try
@@ -195,7 +187,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrRoleConstraintRoleInstance

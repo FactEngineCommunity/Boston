@@ -13,11 +13,13 @@ Namespace FBM
                     For Each liFixType In aaiFixesToApply
 
                         Select Case liFixType
+                            Case Is = pcenumModelFixType.AddCoreModel
+                                Call Me.AddCoreModelFix()
                             Case Is = pcenumModelFixType.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType
                                 Call Me.ObjectifyingEntitTypeIdsNotTheSameAsObjectifiedFactType()
                             Case Is = pcenumModelFixType.RolesWithoutJoinedORMObject
                                 Call Me.RolesWithoutJoinedORMObject()
-                            Case Is = pcenumModelFixType.RelationsInvalidActiveRoleOnOriginColumns
+                            Case Is = pcenumModelFixType.RDSRelationsInvalidActiveRoleOnOriginColumns
                                 Call Me.RelationsInvalidActiveRoleOnOriginColumns()
                             Case Is = pcenumModelFixType.ColumnsWhereActiveRoleIsNothingTryAndFix
                                 Call Me.ColumnsWhereActiveRoleIsNothingTryAndFix()
@@ -30,17 +32,19 @@ Namespace FBM
                             Case Is = pcenumModelFixType.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder
                                 Call Me.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder()
                             Case Is = pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory
-                                Call Me.RDSColumnsThatShouldBeMandatoryMakeMandatory()
+                                Call Me.RDSColumnsThatShouldBeMandatoryMakeMandatory(arModelElementToFix)
                             Case Is = pcenumModelFixType.RDSColumnsWithoutActiveRoles
                                 Call Me.RDSColumnsWithoutActiveRoles()
                             Case Is = pcenumModelFixType.RDSTablesWithMissingBooleanColumns
                                 Call Me.RDSTablesWithMissingBooleanColumns()
                             Case Is = pcenumModelFixType.RDSTablesWithNoColumnsRemoveThoseTables
                                 Call Me.RDSTablesWithNoColumnsRemoveThoseTables()
+                            Case Is = pcenumModelFixType.RDSTablesWithSimpleReferenceSchemeAndMultiplePrimaryKeyColumns
+                                Call Me.RDSTablesWithSimpleReferenceSchemeAndMultiplePrimaryKeyColumns(arModelElementToFix)
                             Case Is = pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing
                                 Call Me.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing()
                             Case Is = pcenumModelFixType.RDSTablesWhereColumnAppearsTwiceForSameFactType
-                                Call Me.RDSTablesWhereColumnAppearsTwiceForSameFactType
+                                Call Me.RDSTablesWhereColumnAppearsTwiceForSameFactType()
                             Case Is = pcenumModelFixType.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat
                                 Call Me.RDSTablesWhereTheNumberOfPrimaryKeyColumnsDoesNotMatchTheNumberOfRolesInThePreferredIdentifierFixThat()
                             Case Is = pcenumModelFixType.DuplicateFactsRemoveDuplicates
@@ -49,16 +53,26 @@ Namespace FBM
                                 Call Me.RDSTablesAndPGSNodesThatAreMissingRelationsAddTheRelations()
                             Case Is = pcenumModelFixType.RDSTablesWithMoreThanOneRelationForTheSameFactTypeJoinPruneExtraRelations
                                 Call Me.RDSTablesWithMoreThanOneRelationForTheSameFactTypeJoinPruneExtraRelations()
+                            Case Is = pcenumModelFixType.RDSRelationsMissing
+                                Call Me.RDSRelationsMissing(arModelElementToFix)
                             Case Is = pcenumModelFixType.RDSRelationsThatHaveNoOriginColumnsRemoveRelation
                                 Call Me.RDSRelationsThatHaveNoOriginColumnsRemoveRelation()
+                            Case Is = pcenumModelFixType.RDSRelationsThatHaveZeroOriginColumnsAndZeroDestinationColumns
+                                Call Me.FixRDSRelationsThatHaveZeroOriginColumnsAndZeroDestinationColumns(arModelElementToFix)
+                            Case Is = pcenumModelFixType.RDSRelationsThatHaveWrongResponsibleFactType
+                                Call Me.RDSRelationsThatHaveWrongResponsibleFactType()
                             Case Is = pcenumModelFixType.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa
                                 Call Me.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa()
                             Case Is = pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount
                                 Call Me.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount(arModelElementToFix)
+                            Case Is = pcenumModelFixType.RDSRelationsWhereOriginColumnHasWrongTable
+                                Call Me.RDSRelationsWhereOriginColumnHasWrongTable(arModelElementToFix)
+                            Case Is = pcenumModelFixType.RDSRelationsWhereMultiplicityCardinalitiesDoNotMatchResponsibleFactTypeInternalUniquenessConstraints
+                                Call Me.FixRDSRelationsWhereMultiplicityCardinalitiesDoNotMatchResponsibleFactTypeInternalUniquenessConstraints
                             Case Is = pcenumModelFixType.SubtypeRelationshipWithNoFactType
                                 Call Me.SubtypeRelationshipWithNoFactType()
                             Case Is = pcenumModelFixType.ObjectifiedFactTypesWithNoCorrespondingRDSTable
-                                Call Me.ObjectifiedFactTypesWithNoCorrespondingRDSTable
+                                Call Me.ObjectifiedFactTypesWithNoCorrespondingRDSTable()
                         End Select
 
                     Next
@@ -72,7 +86,43 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub AddCoreModelFix()
+
+            Try
+                With New WaitCursor
+                    Call Me.AddCore(Nothing)
+
+                    For Each lrInternalUniquenessConstraint In Me.RoleConstraint.FindAll(Function(x) Not x.IsMDAModelElement And x.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint)
+
+                        Dim lrRole As FBM.Role = lrInternalUniquenessConstraint.Role(0)
+
+                        Dim larColumn = (From Table In Me.RDS.Table.ToArray
+                                         From Column In Table.Column.ToArray
+                                         Where Column.Role Is lrRole
+                                         Select Column).ToArray
+
+                        If larColumn.Count = 0 Then
+
+                            Call Me.DoRDSProcessingForRoleConstraint(lrInternalUniquenessConstraint, False, Nothing)
+
+                        End If
+
+                    Next
+
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -92,7 +142,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -117,7 +167,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -167,7 +217,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -187,6 +237,16 @@ Namespace FBM
                     Dim larRole As List(Of FBM.Role) = lrColumn.Role.getDownstreamRoleActiveRoles(larCoveredRoles)
                     If larRole.Count = 1 Then
                         lrColumn.setActiveRole(larRole(0))
+                    Else
+                        'Next best thing
+                        For Each lrRole In larRole
+                            If lrColumn.Name = lrRole.JoinedORMObject.Id Then
+                                lrColumn.setActiveRole(lrRole)
+                            ElseIf lrColumn.Name = lrRole.JoinedORMObject.Id.Replace("_", "") Then
+                                lrColumn.setActiveRole(lrRole)
+                                Exit For
+                            End If
+                        Next
                     End If
                 Next
 
@@ -196,7 +256,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -223,7 +283,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -245,7 +305,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -271,7 +331,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -296,7 +356,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -304,6 +364,7 @@ Namespace FBM
 
             Try
                 Dim larUnaryFactType = From FactType In Me.FactType
+                                       Where Not FactType.IsMDAModelElement
                                        Where FactType.Arity = 1
                                        Select FactType
 
@@ -314,11 +375,13 @@ Namespace FBM
                 For Each lrTable In larAffectedTable
 
                     Dim larTableUnaryFactType = From FactType In larUnaryFactType
+                                                Where FactType.RoleGroup.Count > 0
+                                                Where FactType.RoleGroup(0).JoinedORMObject IsNot Nothing
                                                 Where FactType.RoleGroup(0).JoinedORMObject.Id = lrTable.Name
                                                 Select FactType
 
                     For Each lrFactType In larTableUnaryFactType
-                        Dim lsColumnName As String = Viev.Strings.MakeCapCamelCase(lrFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText)
+                        Dim lsColumnName As String = FEStrings.MakeCapCamelCase(lrFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText)
                         lsColumnName = lsColumnName.RemoveDoubleWhiteSpace.RemoveWhitespace
                         Dim lrColumn As New RDS.Column(lrTable, lsColumnName, lrFactType.RoleGroup(0), lrFactType.RoleGroup(0), True)
                         Call lrTable.addColumn(lrColumn)
@@ -332,7 +395,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -353,24 +416,89 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
+
+        Private Sub RDSTablesWithSimpleReferenceSchemeAndMultiplePrimaryKeyColumns(Optional ByRef arModelElementToFix As Object = Nothing)
+
+            Try
+                Dim larTable As New List(Of RDS.Table)
+
+                If arModelElementToFix Is Nothing Then
+
+                    larTable = (From Table In Me.RDS.Table
+                                Where Table.FBMModelElement.HasSimpleReferenceScheme
+                                Where Table.getPrimaryKeyColumns.Count > 1
+                                Select Table).ToList
+
+                Else
+                    larTable.Add(CType(arModelElementToFix, RDS.Table))
+                End If
+
+                For Each lrTable In larTable
+
+                    Dim larColum = (From Column In lrTable.getPrimaryKeyColumns
+                                    Where Column.ActiveRole.JoinedORMObject.Id <> lrTable.FBMModelElement.ReferenceModeValueType.Id
+                                    Select Column)
+
+                    Dim lrPrimaryKeyIndex = lrTable.getPrimaryKeyIndex
+
+                    For Each lrColumn In larColum
+                        Call lrPrimaryKeyIndex.removeColumn(lrColumn)
+                    Next
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Sub
+
 
         ''' <summary>
         ''' RDS Columns that should be Mandatory (i.e. on Objectifed Fact Types).
         ''' </summary>
-        Private Sub RDSColumnsThatShouldBeMandatoryMakeMandatory()
+        Private Sub RDSColumnsThatShouldBeMandatoryMakeMandatory(Optional ByRef arTable As RDS.Table = Nothing)
 
             Try
-                Dim larColumn = From Table In Me.RDS.Table
-                                From Column In Table.Column
-                                Where Column.Role.FactType.IsObjectified And Column.Table.Name = Column.Role.FactType.Id And Not Column.IsMandatory
-                                Select Column
+                Dim larColumn As List(Of RDS.Column)
+                Dim lrTable As RDS.Table = arTable
+
+                If arTable Is Nothing Then
+                    larColumn = (From Table In Me.RDS.Table
+                                 From Index In Table.Index
+                                 Where Index.Type = pcenumODBCIndexType.PrimaryKey
+                                 From Column In Index.Column
+                                 Where Not Column.IsMandatory
+                                 Select Column).ToList
+                Else
+                    larColumn = (From Table In Me.RDS.Table
+                                 Where Table.Name = lrTable.Name
+                                 From Index In Table.Index
+                                 Where Index.IsPrimaryKey
+                                 From Column In Index.Column
+                                 Where Not Column.IsMandatory
+                                 Select Column).ToList
+                End If
 
                 For Each lrColumn In larColumn
-                    Call Me.createCMMLAttributeIsMandatory(lrColumn)
-                    lrColumn.IsMandatory = True
+                    Call lrColumn.setMandatory(True)
+                    Call lrColumn.triggerForceRefreshEvent()
+                Next
+                '========================
+
+                larColumn = (From Table In Me.RDS.Table
+                             From Column In Table.Column
+                             Where Column.Role.FactType.IsObjectified And Column.Table.Name = Column.Role.FactType.Id And Not Column.IsMandatory
+                             Select Column).ToList
+
+                For Each lrColumn In larColumn
+                    Call lrColumn.setMandatory(True)
                     Call lrColumn.triggerForceRefreshEvent()
                 Next
 
@@ -380,7 +508,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -408,7 +536,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -435,7 +563,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -465,7 +593,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -530,7 +658,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -593,7 +721,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -682,7 +810,7 @@ SkipColumn2:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -716,7 +844,7 @@ SkipColumn2:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -741,8 +869,123 @@ SkipColumn2:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        Private Sub RDSRelationsThatHaveWrongResponsibleFactType()
+
+            Try
+                For Each lrRDSRelation In Me.RDS.Relation
+
+                    Dim larFactType = From FactType In Me.FactType.FindAll(Function(x) x.IsLinkFactType And Not x.IsMDAModelElement)
+                                      Where FactType.Arity = 2
+                                      From OriginRole In FactType.RoleGroup.FindAll(Function(x) x.HasInternalUniquenessConstraint)
+                                      Where OriginRole.JoinedORMObject.Id = lrRDSRelation.OriginTable.Name
+                                      Where FactType.GetOtherRoleOfBinaryFactType(OriginRole.Id).JoinedORMObject.Id = lrRDSRelation.DestinationTable.Name
+                                      Select FactType
+
+                    If larFactType.Count = 1 AndAlso Not larFactType.First Is lrRDSRelation.ResponsibleFactType Then
+                        Call lrRDSRelation.SetResponsibleFactType(larFactType.First)
+                    End If
+
+                Next
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub RDSRelationsMissing(Optional ByRef arModelElementToFix As Object = Nothing)
+
+            Try
+                Dim larTable As List(Of RDS.Table)
+
+                Dim lrModelElementToFix As FBM.ModelObject
+
+                Select Case arModelElementToFix.GetType
+                    Case Is = GetType(RDS.Table)
+                        lrModelElementToFix = CType(arModelElementToFix, RDS.Table).FBMModelElement
+                    Case Is = GetType(FBM.EntityType),
+                              GetType(FBM.FactType)
+                        lrModelElementToFix = arModelElementToFix
+                    Case Else
+                        Exit Sub 'At this stage
+                End Select
+
+                Select Case arModelElementToFix.GetType
+                    Case Is = GetType(FBM.EntityType), GetType(FBM.FactType)
+
+                End Select
+
+                If arModelElementToFix IsNot Nothing Then
+                    larTable = Me.RDS.Table.FindAll(Function(x) x.FBMModelElement.Id = lrModelElementToFix.Id)
+                Else
+                    larTable = Me.RDS.Table
+                End If
+
+                For Each lrTable In larTable
+
+                    For Each lrColumn In lrTable.Column
+
+                        If lrColumn.Role.FactType.Id = lrTable.FBMModelElement.Id Then
+                            'Table is a FactType (Objectified)
+                            'Special case, not done atm. 20240501
+                            If lrColumn.Relation.Count = 0 AndAlso lrColumn.Role.HasInternalUniquenessConstraint AndAlso lrColumn.Role.JoinsValueType Is Nothing Then
+                                Call Me.generateRelationForManyToManyFactTypeRole(lrColumn.Role)
+                            End If
+
+                        ElseIf lrColumn.Role.HasInternalUniquenessConstraint Then
+
+                            Dim larRDSRelation = From RDSRelation In Me.RDS.Relation
+                                                 Where RDSRelation.OriginTable.Name = lrTable.Name
+                                                 Where RDSRelation.OriginColumns.Select(Function(x) x.Id).Contains(lrColumn.Id)
+                                                 Select RDSRelation
+
+                            If larRDSRelation.Count = 0 Then
+
+                                If lrColumn.Role.FactType.IsManyTo1BinaryFactType Then
+
+                                    Select Case lrColumn.Role.FactType.GetOtherRoleOfBinaryFactType(lrColumn.Role.Id).JoinedORMObject.GetType
+                                        Case Is = GetType(FBM.ValueType)
+                                        Case Else
+                                            Call Me.generateRelationForManyTo1BinaryFactType(lrColumn.Role)
+                                    End Select
+
+                                ElseIf lrColumn.Role.FactType.Is1To1BinaryFactType Then
+
+                                    Select Case lrColumn.Role.FactType.GetOtherRoleOfBinaryFactType(lrColumn.Role.Id).JoinedORMObject.GetType
+                                        Case Is = GetType(FBM.ValueType)
+                                        Case Else
+                                            Call Me.generateRelationFor1To1BinaryFactType(lrColumn.Role)
+                                    End Select
+
+                                End If
+                            End If
+
+                        End If
+
+                    Next
+
+                Next
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
         End Sub
 
         Private Sub RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount(Optional ByRef arModelElementToFix As Object = Nothing)
@@ -773,7 +1016,62 @@ SkipColumn2:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Private Sub RDSRelationsWhereOriginColumnHasWrongTable(Optional ByRef arModelElementToFix As Object = Nothing)
+
+            Try
+                Dim lrRDSRelation As RDS.Relation
+
+                Select Case arModelElementToFix.GetType
+                    Case Is = GetType(RDS.Table)
+
+                        Dim lrTable As RDS.Table = arModelElementToFix
+
+                        For Each lrRDSRelation In lrTable.getOutgoingRelations
+
+                            Dim larColumn = From Column In lrRDSRelation.OriginColumns
+                                            Where Column.Table.Name <> lrRDSRelation.OriginTable.Name
+                                            Select Column
+
+                            If larColumn.Count > 0 Then
+                                Call lrRDSRelation.ReplaceOriginColumnsTable()
+                            End If
+
+                        Next
+                        Exit Sub
+                End Select
+
+                lrRDSRelation = arModelElementToFix
+
+                If arModelElementToFix Is Nothing Then
+
+                    Dim larRelation = (From Relation In Me.RDS.Relation
+                                       From Column In Relation.OriginColumns
+                                       Where Column.Table.Name <> Relation.OriginTable.Name
+                                       Select Relation).Distinct
+
+                    For Each lrRelation In larRelation.ToArray
+
+                        Call lrRelation.ReplaceOriginColumnsTable()
+                    Next
+
+                Else
+
+                    Call lrRDSRelation.ReplaceOriginColumnsTable()
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -836,11 +1134,149 @@ SkipColumn2:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
 #Region "Fixes"
+
+        Private Sub FixRDSRelationsWhereMultiplicityCardinalitiesDoNotMatchResponsibleFactTypeInternalUniquenessConstraints()
+
+            Try
+                With New WaitCursor
+
+                    '20251028-VM-Remove RDS Relation Fix at bottom of list (something to do with ResponsibleFactType). Removes LinkFactType foreign key relations.
+                    'Dim larFaultyRelation = (From Relation In Me.RDS.Relation
+                    '                         Where Relation.OriginMultiplicity = pcenumCMMLMultiplicity.Many
+                    '                         Where Relation.DestinationMultiplicity = pcenumCMMLMultiplicity.One
+                    '                         Where Relation.ResponsibleFactType.InternalUniquenessConstraint.Any(Function(x) x.Role.Count > 1)
+                    '                         Select Relation).ToList
+
+                    'Boston.ShowFlashCard($"Fixing {larFaultyRelation.Count} errors.", pcColorPastelGreen)
+
+                    'For Each lrFaultyRelation In larFaultyRelation
+
+                    '    Call Me.RDS.removeRelation(lrFaultyRelation)
+                    'Next
+
+                End With
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+            End Try
+        End Sub
+
+        Private Sub FixRDSRelationsThatHaveZeroOriginColumnsAndZeroDestinationColumns(Optional ByRef arModelElementToFix As Object = Nothing)
+
+            Try
+                Dim larRDSRelation As New List(Of RDS.Relation)
+
+                If arModelElementToFix IsNot Nothing Then
+
+                    Select Case arModelElementToFix.GetType
+                        Case Is = GetType(RDS.Table)
+
+                            Dim lrTable As RDS.Table = arModelElementToFix
+
+                            larRDSRelation = (From Column In lrTable.Column
+                                              From Relation In Column.Relation
+                                              Where Relation.OriginColumns.Count = 0
+                                              Where Relation.DestinationColumns.Count = 0
+                                              Select Relation).ToList
+
+                        Case Is = GetType(RDS.Relation)
+                            larRDSRelation.Add(arModelElementToFix)
+                    End Select
+
+
+                Else
+                    larRDSRelation = (From Relation In Me.RDS.Relation
+                                      Where Relation.OriginColumns.Count = 0
+                                      Where Relation.DestinationColumns.Count = 0
+                                      Select Relation).ToList
+                End If
+
+                For Each lrRDSRelation In larRDSRelation
+
+                    If lrRDSRelation.ResponsibleFactType IsNot Nothing AndAlso
+                        lrRDSRelation.DestinationTable IsNot Nothing AndAlso
+                        lrRDSRelation.OriginTable IsNot Nothing Then
+
+                        Dim liInd = 1
+                        If lrRDSRelation.ResponsibleFactType.IsManyTo1BinaryFactType Then
+                            Dim lrRole = lrRDSRelation.ResponsibleFactType.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
+
+                            If lrRDSRelation.DestinationTable.HasPrimaryKeyIndex Then
+                                For Each lrDestinationColumn In lrRDSRelation.DestinationTable.getPrimaryKeyColumns
+
+                                    Call lrRDSRelation.AddDestinationColumn(lrDestinationColumn, liInd)
+
+                                    Dim lrOriginColumn As RDS.Column
+
+                                    lrOriginColumn = lrRDSRelation.OriginTable.Column.Find(Function(x) x.Relation.Count = 0 And x.Name = lrDestinationColumn.Name)
+
+                                    If lrOriginColumn IsNot Nothing Then
+                                        Call lrRDSRelation.AddOriginColumn(lrOriginColumn)
+                                    Else
+
+
+                                        Dim lsColumnName As String = lrRDSRelation.OriginTable.createUniqueColumnName(lrDestinationColumn.ActiveRole.JoinedORMObject.Id)
+                                        lrOriginColumn = New RDS.Column(lrRDSRelation.OriginTable, lsColumnName, lrRole, lrDestinationColumn.ActiveRole, lrRole.Mandatory)
+                                        lrRDSRelation.OriginTable.addColumn(lrOriginColumn)
+                                        Call lrRDSRelation.AddOriginColumn(lrOriginColumn)
+                                    End If
+
+                                    liInd += 1
+                                Next
+                            Else
+                                Continue For
+                            End If
+                        ElseIf lrRDSRelation.ResponsibleFactType.IsCandidatePGSNode Then
+
+                            For Each lrDestinationColumn In lrRDSRelation.DestinationTable.getPrimaryKeyColumns
+
+                                Dim larCoveredRoles As New List(Of FBM.Role)
+
+                                Dim lrRole As FBM.Role = lrRDSRelation.ResponsibleFactType.RoleGroup.Find(Function(x) x.getDownstreamRoleActiveRoles(larCoveredRoles).Any(Function(y) y Is lrDestinationColumn.ActiveRole))
+
+                                Call lrRDSRelation.AddDestinationColumn(lrDestinationColumn, liInd)
+
+                                Dim lrOriginColumn As RDS.Column
+
+                                lrOriginColumn = lrRDSRelation.OriginTable.Column.Find(Function(x) x.Relation.Count = 0 And x.Name = lrDestinationColumn.Name)
+
+                                If lrOriginColumn IsNot Nothing Then
+                                    Call lrRDSRelation.AddOriginColumn(lrOriginColumn)
+                                Else
+                                    Dim lsColumnName As String = lrRDSRelation.OriginTable.createUniqueColumnName(lrDestinationColumn.ActiveRole.JoinedORMObject.Id)
+                                    lrOriginColumn = New RDS.Column(lrRDSRelation.OriginTable, lsColumnName, lrRole, lrDestinationColumn.ActiveRole, lrRole.Mandatory)
+                                    lrRDSRelation.OriginTable.addColumn(lrOriginColumn)
+                                    Call lrRDSRelation.AddOriginColumn(lrOriginColumn)
+                                End If
+
+                                liInd += 1
+                            Next
+
+                        End If
+
+
+                    End If
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
 
         Private Sub FixRelationWhereOriginColumnCountNotEqualDestinationColumnCount(ByRef arRDSRelation As RDS.Relation)
 
@@ -885,11 +1321,15 @@ SkipColumn2:
                         Catch ex As Exception
                             'Couldn't fix it that way.
                             '=====================================================
-                            'The Column doesn't exist in the Table yet.                                            
-                            Dim lsColumnName As String = arRDSRelation.OriginTable.createUniqueColumnName(lrDestinationColumn.ActiveRole.JoinedORMObject.Id)
-                            lrNewColumn = New RDS.Column(arRDSRelation.OriginTable, lsColumnName, lrRole, lrDestinationColumn.ActiveRole, lrRole.Mandatory)
-                            arRDSRelation.OriginTable.addColumn(lrNewColumn)
-                            Call lrRDSRelation.AddOriginColumn(lrNewColumn)
+                            'The Column doesn't exist in the Table yet.
+                            Try
+                                Dim lsColumnName As String = arRDSRelation.OriginTable.createUniqueColumnName(lrDestinationColumn.ActiveRole.JoinedORMObject.Id)
+                                lrNewColumn = New RDS.Column(arRDSRelation.OriginTable, lsColumnName, lrRole, lrDestinationColumn.ActiveRole, lrRole.Mandatory)
+                                arRDSRelation.OriginTable.addColumn(lrNewColumn)
+                                Call lrRDSRelation.AddOriginColumn(lrNewColumn)
+                            Catch ex1 As Exception
+
+                            End Try
                         End Try
                     End If
                 Next
@@ -915,7 +1355,8 @@ SkipColumn2:
                     lrRole = arRDSRelation.ResponsibleFactType.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
 
                     lrNewColumn = arRDSRelation.OriginTable.Column.Find(Function(x) x.Role.Id = lrRole.Id _
-                                                                        And x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id)
+                                                                        And x.ActiveRole IsNot Nothing _
+                                                                        AndAlso x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id)
 
                     If arRDSRelation.ResponsibleFactType.IsManyTo1BinaryFactType Then
 
@@ -931,33 +1372,13 @@ SkipColumn2:
                     arRDSRelation.AddOriginColumn(lrNewColumn)
                 Next
 
-                '20220726-VM-Doesn't seem to work.
-                'If lrRDSRelation.OriginColumns.Count <> lrRDSRelation.DestinationColumns.Count Then
-
-                '    If lrRDSRelation.DestinationTable.HasPrimaryKeyIndex Then
-                '        'Replace OriginColumns. Have already fixed DestinationColumns
-                '        For Each lrOriginColumn In lrRDSRelation.OriginColumns.ToArray
-                '            Call lrRDSRelation.RemoveOriginColumn(lrOriginColumn)
-                '            Call lrRDSRelation.OriginTable.removeColumn(lrOriginColumn)
-                '        Next
-
-                '        'Replacing pointers to PrimaryKey of DestinationTable. I.e. DestinationColumns
-                '        For Each lrDestinationColumn In lrRDSRelation.DestinationTable.getPrimaryKeyColumns
-                '            Dim lrNewOriginColumn = lrDestinationColumn.Clone(lrRDSRelation.OriginTable, lrRDSRelation, True, True)
-                '            lrNewOriginColumn.Relation.Add(lrRDSRelation)
-                '            lrRDSRelation.OriginTable.addColumn(lrNewOriginColumn)
-                '            lrRDSRelation.AddOriginColumn(lrDestinationColumn)
-                '        Next
-                '    End If
-                'End If
-
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -981,7 +1402,7 @@ SkipColumn2:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1245,7 +1666,7 @@ SkipColumn2:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

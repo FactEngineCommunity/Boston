@@ -1,4 +1,5 @@
 ﻿Imports System.Reflection
+Imports Newtonsoft.Json.Linq
 
 Partial Public Class tBrain
 
@@ -32,7 +33,10 @@ Partial Public Class tBrain
             '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
             If arFEKLLineageObject IsNot Nothing Then
 
-                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsEntityTypeName & " - Object Type")
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lsEntityTypeName & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                 Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
@@ -100,7 +104,10 @@ Partial Public Class tBrain
             '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
             If arFEKLLineageObject IsNot Nothing Then
 
-                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrValueType.Id & " - Object Type")
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lrValueType.Id & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                 Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
@@ -126,6 +133,10 @@ Partial Public Class tBrain
                     ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
                         lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
                         liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                    ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE IsNot Nothing AndAlso Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER.Count > 0 Then
+                        lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.DATATYPE
+                        liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(0))
+                        liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(1))
                     End If
 
                     lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -198,7 +209,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
 
@@ -475,7 +486,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
 
@@ -495,7 +506,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -576,7 +587,7 @@ Partial Public Class tBrain
                 '---------------------------------
                 lrFactType.AddFact(lrFact, True)
 
-                Call Me.Model.checkForErrors()
+                'Call Me.Model.checkForErrors()
 
             Catch ex As Exception
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -685,7 +696,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
 
@@ -712,7 +723,10 @@ Partial Public Class tBrain
             '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
             If arFEKLLineageObject IsNot Nothing Then
 
-                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsConceptName & " - Object Type")
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lsConceptName & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                 Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
@@ -765,7 +779,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -787,9 +801,9 @@ Partial Public Class tBrain
             Me.Timeout.Stop()
 
             lsOldEntityTypeName = arQuestion.ModelObject(0).Id
-            lsEntityTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ModelObject(0).Id)
+            lsEntityTypeName = FEStrings.MakeCapCamelCase(arQuestion.ModelObject(0).Id)
 
-            If IsSomething(arQuestion.sentence) Then
+            If arQuestion.sentence IsNot Nothing Then
                 arQuestion.sentence.Sentence = arQuestion.sentence.Sentence.Replace(lsOldEntityTypeName, lsEntityTypeName)
                 arQuestion.sentence.ResetSentence()
 
@@ -817,7 +831,10 @@ Partial Public Class tBrain
             '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
             If arFEKLLineageObject IsNot Nothing Then
 
-                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrEntityType.Id & " - Object Type")
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lrEntityType.Id & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                 Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
@@ -854,7 +871,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -901,7 +918,10 @@ Partial Public Class tBrain
                                         '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
                                         If arFEKLLineageObject IsNot Nothing Then
 
-                                            Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrValueType.Id & " - Object Type")
+                                            Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lrValueType.Id & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                                             Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
                                         End If
@@ -913,7 +933,10 @@ Partial Public Class tBrain
                                         '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
                                         If arFEKLLineageObject IsNot Nothing Then
 
-                                            Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrEntityType.Id & " - Object Type")
+                                            Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lrEntityType.Id & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                                             Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
                                         End If
@@ -967,8 +990,8 @@ ModelElementFound:
             End If
 
             If arQuestion.sentence.PredicatePart.Count = 1 Then
-                lsFactTypeName &= Viev.Strings.MakeCapCamelCase(arQuestion.sentence.PredicatePart(0).PredicatePartText)
-                lsFactTypeName = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+                lsFactTypeName &= FEStrings.MakeCapCamelCase(arQuestion.sentence.PredicatePart(0).PredicatePartText)
+                lsFactTypeName = FEStrings.ProperSpace(lsFactTypeName)
             End If
 
             If lsFactTypeName.Length > 100 Then
@@ -992,7 +1015,10 @@ ModelElementFound:
             '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
             If arFEKLLineageObject IsNot Nothing Then
 
-                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsFactTypeName & " - Object Type")
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lsFactTypeName & " - Fact Type",
+                                                                        arFEKLLineageObject.Id)
                 Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
@@ -1099,7 +1125,7 @@ ModelElementFound:
                 Call Me.Model.createColumnForUnaryFactType(lrFactType)
             End If
 
-            If lrFactType.Arity = 2 And Not abStraightToActionProcessing Then
+            If lrFactType.Arity = 2 And (Not abStraightToActionProcessing Or My.Settings.BrainConfirmActionsWithUser) Then
                 Call Me.FormulateQuestionCreateInternalUniquenessConstraint(lrFactType, lrFactTypeReading)
             End If
 
@@ -1178,7 +1204,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -1192,7 +1218,8 @@ EndProcessing:
     Private Function executeStatementAddFactTypePredetermined(ByRef arQuestion As tQuestion,
                                                               Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
                                                               Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
-                                                              Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
+                                                              Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing,
+                                                              Optional ByRef arFactType As FBM.FactType = Nothing) As Boolean
 
         Dim lrFactType As FBM.FactType
         Dim lsResolvedModelElementName As String
@@ -1207,7 +1234,7 @@ EndProcessing:
 
             For Each lsResolvedModelElementName In arQuestion.FocalSymbol
                 lrModelObject = Me.Model.GetModelObjectByName(lsResolvedModelElementName)
-                If IsSomething(lrModelObject) Then
+                If lrModelObject IsNot Nothing Then
                     larModelObject.Add(lrModelObject)
                 Else
                     executeStatementAddFactTypePredetermined = False
@@ -1236,6 +1263,20 @@ EndProcessing:
 
             lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True, , , False,  ,, abBroadcastInterfaceEvent)
 
+#Region "Metadata Lineage"
+            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+            If arFEKLLineageObject IsNot Nothing Then
+
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lsFactTypeName & " - Fact Type",
+                                                                        arFEKLLineageObject.Id)
+                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+            End If
+#End Region
+
             Dim lrRole As FBM.Role
             Dim larRole As New List(Of FBM.Role)
 
@@ -1245,6 +1286,12 @@ EndProcessing:
                     Dim lsModelElementId As String = arQuestion.FocalSymbol(0)
 
                     lrRole = lrFactType.RoleGroup.Find(Function(x) x.JoinedORMObject.Id = lsModelElementId)
+                    lrRole.SetMandatory(True, abBroadcastInterfaceEvent)
+
+                ElseIf arQuestion.PlanStep.FactTypeAttributes.Contains(pcenumStepFactTypeAttributes.MandatorySecondRole) Then
+                    Dim lsModelElementId As String = arQuestion.FocalSymbol(0)
+
+                    lrRole = lrFactType.RoleGroup(1)
                     lrRole.SetMandatory(True, abBroadcastInterfaceEvent)
                 End If
 
@@ -1266,7 +1313,10 @@ EndProcessing:
             '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
             If arFEKLLineageObject IsNot Nothing Then
 
-                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsNewFactTypeName & " - Fact Type")
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lsNewFactTypeName & " - Fact Type",
+                                                                        arFEKLLineageObject.Id)
                 Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
@@ -1278,9 +1328,11 @@ EndProcessing:
                                      Select FactTypeReading
 
             If larFactTypeReading.Count > 0 Then
-                arDSCError.Success = False
-                arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
-                arDSCError.ErrorString = "A Fact Type with this predicate already exists."
+                If arDSCError IsNot Nothing Then
+                    arDSCError.Success = False
+                    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.ModelElementAlreadyExists
+                    arDSCError.ErrorString = "A Fact Type with this predicate already exists."
+                End If
                 Return False
             End If
 
@@ -1291,6 +1343,7 @@ EndProcessing:
             End If
 
             Call Me.Model.AddFactType(lrFactType)
+            arFactType = lrFactType 'Return the FactType if needed for a Reciprocal BinaryFactType.
             '===========================================================
 
             '===========================
@@ -1374,6 +1427,7 @@ EndProcessing:
 
                         Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(1, False)
                         Call lrFactTypeInstance.Move(lrFactTypeInstance.X, lrFactTypeInstance.Y, abBroadcastInterfaceEvent)
+                        Call lrFactTypeInstance.AdjustBorderHeight(True)
                     Case Else
                         'NA for ERD and PGS Pages, because will automatically look to create new links (Foreign Key References, Edge Types).
 
@@ -1384,13 +1438,19 @@ EndProcessing:
                 End If
             End If
 #End Region
+            Try
+                Me.OutputBuffer = "Okay"
+                Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+            Catch ex As Exception
+                'Not a biggie.
+            End Try
 
         Catch ex As Exception
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -1463,7 +1523,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -1491,7 +1551,7 @@ EndProcessing:
 
                 Dim lrDummyValueType As FBM.ValueType = arQuestion.ValueType(0)
                 lsOldValueTypeName = arQuestion.ValueType(0).Id
-                lsValueTypeName = Viev.Strings.MakeCapCamelCase(arQuestion.ValueType(0).Id)
+                lsValueTypeName = FEStrings.MakeCapCamelCase(arQuestion.ValueType(0).Id)
 
                 If arQuestion.sentence IsNot Nothing And Me.CurrentQuestion IsNot Nothing Then
                     arQuestion.sentence.Sentence = Me.CurrentQuestion.sentence.Sentence.Replace(lsOldValueTypeName, lsValueTypeName)
@@ -1523,7 +1583,10 @@ EndProcessing:
             '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
             If arFEKLLineageObject IsNot Nothing Then
 
-                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrValueType.Id & " - Object Type")
+                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lrValueType.Id & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                 Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
             End If
@@ -1557,7 +1620,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.Timeout.Start()
 
@@ -1583,14 +1646,17 @@ EndProcessing:
 
                 Me.Timeout.Stop()
 
-                Dim lsEntityTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ISANENTITYTYPEStatement.MODELELEMENTNAME))
+                Dim lsEntityTypeName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.ISANENTITYTYPEStatement.MODELELEMENTNAME))
 
 #Region "Metadata Lineage"
                 'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
                 '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
                 If arFEKLLineageObject IsNot Nothing Then
 
-                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsEntityTypeName & " - Object Type")
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lsEntityTypeName & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                     Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
                 End If
@@ -1668,7 +1734,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1685,13 +1751,14 @@ EndProcessing:
                 Me.Model = prApplication.WorkingModel
 
                 Me.VAQLProcessor.VALUECONSTRAINTClause.MODELELEMENTNAME = ""
-                Me.VAQLProcessor.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE = New List(Of String)
+                Me.VAQLProcessor.VALUECONSTRAINTClause.VALUESTRING = New List(Of String) 'Wrapped in SingleQuotes
+                Me.VAQLProcessor.VALUECONSTRAINTClause.VALUE = New List(Of String)
 
                 Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.VALUECONSTRAINTClause, Me.VAQLParsetree.Nodes(0))
 
                 Me.Timeout.Stop()
 
-                Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.VALUECONSTRAINTClause.MODELELEMENTNAME))
+                Dim lsValueTypeName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.VALUECONSTRAINTClause.MODELELEMENTNAME))
 
                 If Not Me.Model.ExistsModelElement(lsValueTypeName) Then
                     lsMessage = "There is no Model Element with the name, '" & lsValueTypeName & "'. Try another name"
@@ -1720,7 +1787,7 @@ EndProcessing:
                 Dim lrValueType = CType(lrModelElement, FBM.ValueType)
 
 
-                For Each lsValueConstraintValue In Me.VAQLProcessor.VALUECONSTRAINTClause.VALUECONSTRAINTVALUE
+                For Each lsValueConstraintValue In Me.VAQLProcessor.VALUECONSTRAINTClause.GetValues
 
                     If lrValueType.ValueConstraint.Contains(lsValueConstraintValue) Then
                         lsMessage = "The value, " & lsValueConstraintValue & ", already exists in the Value Constraint for Value Type, " & lsValueTypeName & "."
@@ -1750,7 +1817,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
 
@@ -1777,7 +1844,7 @@ EndProcessing:
 
                 Me.Timeout.Stop()
 
-                Dim lsModelElementName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.MODELELEMENTNAME))
+                Dim lsModelElementName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement.MODELELEMENTNAME))
 
                 Dim lrModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(lsModelElementName, True)
 
@@ -1840,7 +1907,101 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
+
+    Private Function ProcessCREATENODEStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing) As Boolean
+
+        Dim lsMessage As String
+        Dim lsErrorMessage = "Error creating the new Node."
+
+        Try
+            With New WaitCursor
+                Me.Model = prApplication.WorkingModel
+
+                Me.VAQLProcessor.CREATENODEStatement.GRAPHNODE = Nothing
+
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(Me.VAQLProcessor.CREATENODEStatement, Me.VAQLParsetree.Nodes(0))
+
+                Me.Timeout.Stop()
+
+                Dim lsNodeName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.CREATENODEStatement.GRAPHNODE.MODELELEMENTNAME(0)))
+
+#Region "Create ModelElement if required"
+
+                Dim lrModelElement = Me.Model.GetModelObjectByName(lsNodeName, True)
+
+                If lrModelElement Is Nothing Then
+
+                    Call Me.ProcessFEQLStatement($"{lsNodeName} IS AN ENTITY TYPE")
+                    lrModelElement = Me.Model.GetModelObjectByName(lsNodeName, True)
+                End If
+
+#End Region
+
+                Dim lsJSON = Me.VAQLProcessor.CREATENODEStatement.walkReturnJSONTree(CType(Me.VAQLProcessor.CREATENODEStatement.GRAPHNODE.JSONCONTAINER, VAQL.ParseNode), Nothing)
+
+                ' Deserialize the JSON string to a JObject
+                Dim jsonObject As JObject = JObject.Parse(lsJSON)
+
+#Region "Properties/Attributes on PGS.Node/ERD.Entity (RDS.Table)"
+
+                Dim lrTable As RDS.Table = lrModelElement.getCorrespondingRDSTable()
+
+                ' Iterate through the properties of the JObject
+                For Each prop As JProperty In jsonObject.Properties()
+                    Dim propName As String = prop.Name
+                    Dim propValue As JToken = prop.Value
+
+                    If lrTable.Column.Find(Function(x) x.DBName = propName) Is Nothing Then
+
+                        Call Me.ProcessFEQLStatement($"{lsNodeName} has AT MOST ONE {propName}")
+
+                    End If
+
+                Next
+
+#End Region
+
+                ' Create a new JObject with the ModelId at the top
+                Dim newJsonObject As New JObject()
+                newJsonObject("ModelId") = prApplication.WorkingModel.ModelId
+
+                ' Merge the existing jsonObject into the newJsonObject
+                newJsonObject.Merge(jsonObject)
+
+                ' Serialize the JObject back to a JSON string
+                lsJSON = newJsonObject.ToString(Newtonsoft.Json.Formatting.Indented)
+
+                'Debugger.Break()
+
+                Dim lrDataStoreData As New DataStore.Data(lsJSON, lsNodeName, Now, "FactEngine", "FactEngine", "", "", "")
+
+                Dim lrDataStore As New DataStore.Store
+                Call lrDataStore.Add(lrDataStoreData)
+
+                Try
+                    Me.OutputBuffer = "Okay"
+                    Me.OutputChannel.BeginInvoke(New SendDataDelegate(AddressOf Me.send_data), Me.OutputBuffer)
+                Catch ex As Exception
+                    'Not a biggie.
+                End Try
+
+                Return True
+
+            End With
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -1865,7 +2026,7 @@ EndProcessing:
 
                 Me.Timeout.Stop()
 
-                Dim lsPageName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.CREATEPAGEStatement.PAGENAME))
+                Dim lsPageName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.CREATEPAGEStatement.PAGENAME))
 
                 Dim lrPage As New FBM.Page(Me.Model, Nothing, lsPageName, pcenumLanguage.ORMModel)
 
@@ -1910,9 +2071,32 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
+        End Try
+
+    End Function
+
+    Private Function ProcessCREATETABLEINSTANCEStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                         Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                         Optional ByVal ajsonTableInstance As String = Nothing) As Boolean
+
+        Try
+            If ajsonTableInstance = Nothing Then
+                Return False
+            Else
+                Dim lsErrorMessage As String = Nothing
+                Return Me.Model.DatabaseConnection.CreateTableInstance(ajsonTableInstance, lsErrorMessage)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -1937,7 +2121,7 @@ EndProcessing:
 
                 Me.Timeout.Stop()
 
-                Dim lsModelElementName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.MODELELEMENTNAME))
+                Dim lsModelElementName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.ADDOBJECTTYPETOPAGEStatement.MODELELEMENTNAME))
 
                 Dim lrModelObject As FBM.ModelObject = Me.Model.GetModelObjectByName(lsModelElementName, True)
 
@@ -1995,7 +2179,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -2019,17 +2203,54 @@ EndProcessing:
 
                 Me.Timeout.Stop()
 
-                Dim lsModelElementName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.LONGDESCRIPTIONSTMT.MODELELEMENTNAME))
+                Dim lsModelElementName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.LONGDESCRIPTIONSTMT.MODELELEMENTNAME))
 
                 If Not Me.Model.ExistsModelElement(lsModelElementName) Then
-                    lsMessage = "There is no Model Element with the name, '" & lsModelElementName & "'."
-                    If arDSCError IsNot Nothing Then
-                        arDSCError.Success = False
-                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
-                        arDSCError.ErrorString = lsMessage
-                    End If
-                    Me.send_data(lsMessage)
-                    Return False
+                    'Create a ModelElement
+
+                    Select Case My.Settings.DefaultGeneralConceptToObjectTypeConversion
+                        Case Is = "Value Type"
+                            Dim lrValueType = Me.Model.CreateValueType(lsModelElementName, True, ,,, abBroadcastInterfaceEvent)
+#Region "Metadata Lineage"
+                            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+                            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+                            If arFEKLLineageObject IsNot Nothing Then
+
+                                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lrValueType.Id & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
+                                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+                            End If
+#End Region
+                        Case Is = "Entity Type"
+                            Dim lrEntityType = Me.Model.CreateEntityType(lsModelElementName, True, abBroadcastInterfaceEvent, False, True)
+#Region "Metadata Lineage"
+                            'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
+                            '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
+                            If arFEKLLineageObject IsNot Nothing Then
+
+                                Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lrEntityType.Id & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
+                                Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
+
+                            End If
+
+#End Region
+                    End Select
+#Region "Error"
+                    'lsMessage = "There is no Model Element with the name, '" & lsModelElementName & "'."
+                    'If arDSCError IsNot Nothing Then
+                    '    arDSCError.Success = False
+                    '    arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                    '    arDSCError.ErrorString = lsMessage
+                    'End If
+                    'Me.send_data(lsMessage)
+                    'Return False
+#End Region
                 End If
 
                 Dim lrModelElement = Me.Model.GetModelObjectByName(lsModelElementName)
@@ -2067,7 +2288,10 @@ EndProcessing:
                             Return False
                     End Select
 
-                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsModelElementName & lsObjectTypeIdentifier)
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lsModelElementName & lsObjectTypeIdentifier,
+                                                                        arFEKLLineageObject.Id)
                     Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
                 End If
@@ -2087,13 +2311,57 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
 
     End Function
 
+    Private Function ProcessISOBJECTIFIEDStatement(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                   Optional ByRef arDSCError As DuplexServiceClient.DuplexServiceClientError = Nothing,
+                                                   Optional ByVal arFEKLLineageObject As FEKL.FEKL4JSONObject = Nothing) As Boolean
+
+        Dim lsMessage As String
+
+        Try
+            With New WaitCursor
+
+                Dim lrModelElementClause As New VAQL.ModelElementClause
+
+                Call Me.VAQLProcessor.GetParseTreeTokensReflection(lrModelElementClause, Me.VAQLParsetree.Nodes(0))
+
+                Dim lrFactType As FBM.FactType = Me.Model.GetModelObjectByName(lrModelElementClause.MODELELEMENTNAME, True)
+
+                If lrFactType Is Nothing Then
+                    'Error
+                    lsMessage = "There is no Fact Type with the name, '" & lrModelElementClause.MODELELEMENTNAME & "'. Try another name."
+                    If arDSCError IsNot Nothing Then
+                        arDSCError.Success = False
+                        arDSCError.ErrorType = [Interface].publicConstants.pcenumErrorType.UndocumentedError
+                        arDSCError.ErrorString = lsMessage
+                    End If
+                    Me.send_data(lsMessage)
+                    Return False
+                Else
+                    Call lrFactType.Objectify()
+                End If
+
+            End With
+
+            Return True
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return False
+        End Try
+
+    End Function
 
 
     Private Function ProcessISAVALUETYPECLAUSE(Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
@@ -2115,14 +2383,17 @@ EndProcessing:
 
                 Me.Timeout.Stop()
 
-                Dim lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.ISAVALUETYPEStatement.MODELELEMENTNAME))
+                Dim lsValueTypeName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.ISAVALUETYPEStatement.MODELELEMENTNAME))
 
 #Region "Metadata Lineage"
                 'NB More than one Lineage Item Property can be stored for a Model Element, even if the Model Element already exists.
                 '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
                 If arFEKLLineageObject IsNot Nothing Then
 
-                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lsValueTypeName & " - Object Type")
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                        New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                        lsValueTypeName & " - Object Type",
+                                                                        arFEKLLineageObject.Id)
                     Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
                 End If
@@ -2167,6 +2438,10 @@ EndProcessing:
                     ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION IsNot Nothing Then
                         lsDataTypeName = Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISION.Nodes(0).Token.Text
                         liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.NUMBER)
+                    ElseIf Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE IsNot Nothing AndAlso Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER.Count > 0 Then
+                        lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.DATATYPE
+                        liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(0))
+                        liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEWRITTENASClause.DATATYPEPRECISIONANDSCALE.NUMBER(1))
                     End If
 
                     lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -2196,7 +2471,7 @@ EndProcessing:
 
                     Call lrValueType.SetDataType(liDataType, liDataTypeLength, liDataTypePrecision, abBroadcastInterfaceEvent)
 
-                    Dim lrModelError As New FBM.ModelError(127, lrValueType)
+                    Dim lrModelError As New FBM.ModelError(pcenumModelErrors.DataTypeNotSpecifiedError, lrValueType)
                     lrValueType._ModelError.RemoveAll(AddressOf lrModelError.EqualsByErrorIdModelElementId)
                     Call Me.Model.RemoveModelError(lrModelError)
                 Else
@@ -2235,7 +2510,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -2255,6 +2530,14 @@ EndProcessing:
                     Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(0)}, False, True, True, False, Nothing, True, False)
                 Case Is = "many to many"
                     Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(0), lrFactType.RoleGroup(1)}, False, True, True, False, Nothing, True, False)
+                Case Is = "at least one"
+                    Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(1)}, False, True, True, False, Nothing, True, False)
+                    Call lrFactType.RoleGroup(1).SetMandatory(True, True)
+                Case Is = "any number of"
+                    Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(1)}, False, True, True, False, Nothing, True, False)
+                Case Is = "one to one"
+                    Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(0)}, False, True, True, False, Nothing, True, False)
+                    Call lrFactType.CreateInternalUniquenessConstraint(New List(Of FBM.Role) From {lrFactType.RoleGroup(1)}, False, True, True, False, Nothing, True, False)
             End Select
 
         Catch ex As Exception
@@ -2263,7 +2546,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2280,7 +2563,7 @@ EndProcessing:
             lrEntityType1 = Me.Model.EntityType.Find(AddressOf lrEntityType1.Equals)
             lrEntityType2 = Me.Model.EntityType.Find(AddressOf lrEntityType2.Equals)
 
-            If IsSomething(lrEntityType1) And IsSomething(lrEntityType2) Then
+            If lrEntityType1 IsNot Nothing And lrEntityType2 IsNot Nothing Then
                 '----------------------------------------
                 'Create a Model level SubtypeConstraint
                 '----------------------------------------
@@ -2293,7 +2576,7 @@ EndProcessing:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2348,7 +2631,7 @@ EndProcessing:
                             GoTo FinishedCheckingLikelies
                         End If
                     Catch ex As Exception
-                        Debugger.Break()
+                        lbIsLikelyValueType = False
                     End Try
                 Next
 FinishedCheckingLikelies:
@@ -2403,7 +2686,7 @@ FinishedCheckingLikelies:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2430,7 +2713,7 @@ FinishedCheckingLikelies:
             Dim lsDataTypeName As String = ""
             Dim liDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
 
-            lsValueTypeName = Trim(Viev.Strings.MakeCapCamelCase(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME))
+            lsValueTypeName = Trim(FEStrings.MakeCapCamelCase(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.MODELELEMENTNAME))
 
             Dim liDataTypeLength As Integer = 0
             Dim liDataTypePrecision As Integer = 0
@@ -2443,6 +2726,10 @@ FinishedCheckingLikelies:
             ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.GetType Is GetType(VAQL.ParseNode) Then
                 lsDataTypeName = Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISION.Nodes(0).Token.Text
                 liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.NUMBER)
+            ElseIf Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.GetType Is GetType(VAQL.ParseNode) Then
+                lsDataTypeName = pcenumORMDataType.NumericMoney.ToString
+                liDataTypeLength = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.NUMBER(0))
+                liDataTypePrecision = CInt(Me.VAQLProcessor.VALUETYPEISWRITTENASStatement.DATATYPEPRECISIONANDSCALE.NUMBER(1))
             End If
 
             lsDataTypeName = DataTypeAttribute.Get(GetType(pcenumORMDataType), lsDataTypeName)
@@ -2517,7 +2804,10 @@ FinishedCheckingLikelies:
                 '  I.e. Process Metadata Lineage before checking to see if the Model Element already exists.
                 If arFEKLLineageObject IsNot Nothing Then
 
-                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model, lrValueType.Id & " - Object Type")
+                    Dim lrDataLineageItem = New DataLineage.DataLineageItem(Me.Model,
+                                                                            New DataLineage.DataLineageCategory(Me.Model, "Metadata Lineage", 1),
+                                                                            lrValueType.Id & " - Object Type",
+                                                                            arFEKLLineageObject.Id)
                     Call lrDataLineageItem.SaveProperties(arFEKLLineageObject, True)
 
                 End If
@@ -2544,7 +2834,7 @@ FinishedCheckingLikelies:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try

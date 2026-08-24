@@ -4,15 +4,33 @@ Imports System.Reflection
 
 Namespace FBM
 
+#Region "Custom Equality Comparer"
+    ' Define a custom equality comparer
+    Public Class CustomDictionaryEntryComparer
+        Implements IEqualityComparer(Of DictionaryEntry)
+
+        Public Shadows Function Equals(x As DictionaryEntry, y As DictionaryEntry) As Boolean Implements IEqualityComparer(Of DictionaryEntry).Equals
+            x.Symbol = y.Symbol
+        End Function
+
+        Public Shadows Function GetHashCode(obj As DictionaryEntry) As Integer Implements IEqualityComparer(Of DictionaryEntry).GetHashCode
+            ' Implement a custom GetHashCode method if necessary
+            ' You can return obj.GetHashCode() or a custom hash code based on your criteria
+            ' Example: Return obj.PropertyToCompare.GetHashCode()
+            Return obj.Symbol.GetHashCode
+        End Function
+    End Class
+#End Region
+
     '-----------------------------------------------------------------------------------------------------
     'Everything that can be displayed on the screen is a 'Symbol', even if it is an ASCII text character
     '  or logic 'Symbol'
     '-----------------------------------------------------------------------------------------------------
-    <Serializable()> _
+    <Serializable()>
     Public Class DictionaryEntry
         Implements IEquatable(Of DictionaryEntry)
         Implements IComparer(Of DictionaryEntry)
-        Implements Relational.iObjectRelationalMap(Of DictionaryEntry)
+        Implements iObjectRelationalMap(Of DictionaryEntry)
 
         '--------------------------------------------------------------------------------------------------------------------------
         'This class is predominantly used to store instance (usage) of a Symbol within a diagram (e.g. ORMDiagram, UseCaseDiagram).
@@ -199,7 +217,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -460,7 +478,7 @@ Namespace FBM
 
             For Each KLIdentityLetter In KLIdentityLetters
                 Me.KLIdentityLetter = asKLIdentityLetter & KLIdentityLetter.ToString
-                If IsSomething(aarModelDictionary.Find(AddressOf Me.MatchesKLIdentityLetter)) Then
+                If aarModelDictionary.Find(AddressOf Me.MatchesKLIdentityLetter) IsNot Nothing Then
                     '-----------------------------------------------------------------------------
                     'Do nothing, as the KL Identity Letter already exists in the ModelDictionary
                     '  Move to the next KLIdentityLetter.
@@ -514,6 +532,8 @@ Namespace FBM
                 Return pcenumConceptType.RoleConstraint
             ElseIf Me.isModelNote Then
                 Return pcenumConceptType.ModelNote
+            ElseIf Me.isGeneralConcept Then
+                Return pcenumConceptType.GeneralConcept
             End If
         End Function
 
@@ -634,7 +654,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -712,7 +732,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
                 Return False
             End Try
 

@@ -7,13 +7,9 @@
             Public AssemblyVersion As String = Nothing
             Public Path As String = Nothing
             Public Connection As IConnection = Nothing
-            Public WithEvents Manager As IManageSource = Nothing
+            Public Manager As IManageSource = Nothing
             Public SourceDescription As ISourceDescription = Nothing
             Public PluginDescription As IPluginDescription = Nothing
-
-            Private Sub Manager_ValueChanged(value As Object) Handles Manager.ValueChanged
-
-            End Sub
         End Class
 
         Public Plugins As New List(Of Plugin)
@@ -44,8 +40,8 @@
 
         End Sub
 
-        Public Function LoadAssembly(ByVal Path As String) As Boolean
 
+        Public Function LoadAssembly(ByVal Path As String) As Boolean
             Dim asm As Reflection.Assembly = Me.GetAssembly(Path)
             If asm Is Nothing Then Return False
 
@@ -53,11 +49,6 @@
             plugin.AssemblyName = asm.GetName.Name.Trim
             plugin.AssemblyVersion = asm.GetName.Version.ToString.Trim
             plugin.Path = Path
-
-            'Create and return class instance
-            'Boston plugin code.not metadrone code
-            'objPlugin = asm.CreateInstance("PluginInterface.Sources.IConnection")
-            ''plugin.Connection = DirectCast(PluginServices.CreateInstance(prApplication.Plugins(liInd)), PluginInterface.Sources.IConnection)
 
             plugin.Connection = Me.GetConnectionFromAssembly(asm)
             If plugin.Connection Is Nothing Then Return False
@@ -103,24 +94,13 @@
         End Function
 
         Private Function GetConnectionFromAssembly(ByVal asm As Reflection.Assembly) As IConnection
+            For Each typeAsm In asm.GetTypes
+                If typeAsm.GetInterface(GetType(IConnection).FullName) IsNot Nothing Then
+                    Return CType(asm.CreateInstance(typeAsm.FullName, True), IConnection)
+                End If
+            Next
 
-            Try
-                For Each typeAsm In asm.GetTypes
-                    If typeAsm.GetInterface(GetType(IConnection).FullName) IsNot Nothing Then
-                        Return CType(asm.CreateInstance(typeAsm.FullName, True), IConnection)
-                    End If
-                Next
-
-                Return Nothing
-
-            Catch ex As system.Reflection.ReflectionTypeLoadException
-                Dim lsMessage As String = ""
-                For Each inner As Exception In ex.LoaderExceptions
-                    lsMessage &= inner.Message & vbCrLf
-                Next
-                MsgBox(lsMessage)
-                Return Nothing
-            End Try
+            Return Nothing
         End Function
 
         Private Function GetManagerFromAssembly(ByVal asm As Reflection.Assembly) As IManageSource

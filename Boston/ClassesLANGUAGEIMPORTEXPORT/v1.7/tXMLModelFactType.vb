@@ -53,6 +53,56 @@ Namespace XMLModel
             End Set
         End Property
 
+        <XmlArray("Aliases")>
+        <XmlArrayItem("Alias")>
+        Public Property [Alias] As List(Of XMLModel.Alias)
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _GraphLabel As New List(Of String)
+        Public Property GraphLabel() As List(Of String)
+            Get
+                Return Me._GraphLabel
+            End Get
+            Set(ByVal value As List(Of String))
+                Me._GraphLabel = value
+            End Set
+        End Property
+
+#Region "Property Graph Schema Specific"
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Source As String
+        <XmlAttribute>
+        Public Property Source() As String
+            Get
+                Return Me._Source
+            End Get
+            Set(ByVal value As String)
+                Me._Source = value
+            End Set
+        End Property
+        Public Function ShouldSerializeSource() As Boolean
+            Return Not String.IsNullOrWhiteSpace(Source)
+        End Function
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Target As String
+        <XmlAttribute>
+        Public Property Target() As String
+            Get
+                Return Me._Target
+            End Get
+            Set(ByVal value As String)
+                Me._Target = value
+            End Set
+        End Property
+
+        Public Function ShouldSerializeTarget() As Boolean
+            Return Not String.IsNullOrWhiteSpace(Target)
+        End Function
+
+#End Region
+
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _ObjectifyingEntityTypeId As String = ""
         <XmlAttribute()> _
@@ -255,6 +305,16 @@ Namespace XMLModel
             End Set
         End Property
 
+        Private _SubtypeRelationships As New List(Of XMLModel.SubtypeRelationship)
+        Public Property SubtypeRelationships() As List(Of XMLModel.SubtypeRelationship)
+            Get
+                Return Me._SubtypeRelationships
+            End Get
+            Set(ByVal value As List(Of XMLModel.SubtypeRelationship))
+                Me._SubtypeRelationships = value
+            End Set
+        End Property
+
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _StoreFactCoordinates As Boolean
         <XmlAttribute()>
@@ -266,6 +326,25 @@ Namespace XMLModel
                 Me._StoreFactCoordinates = value
             End Set
         End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ModelElementFlags As New List(Of FBM.ModelElementFlag)
+        <XmlElement()>
+        Public Property ModelElementFlags() As List(Of FBM.ModelElementFlag)
+            Get
+                Return Me._ModelElementFlags
+            End Get
+            Set(ByVal value As List(Of FBM.ModelElementFlag))
+                Me._ModelElementFlags = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' At this stage uses exactly the same classes as in the FBM.Model.
+        ''' </summary>
+        ''' <returns></returns>
+        <XmlElement>
+        Public Property DerivationRule As DerivationRule
 
         Public Shadows Function Equals(ByVal other As FactType) As Boolean Implements System.IEquatable(Of FactType).Equals
 

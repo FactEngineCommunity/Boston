@@ -1,6 +1,7 @@
 ﻿Imports System.Reflection
 Imports System.Xml.Serialization
 Imports Boston.FBM
+Imports Newtonsoft.Json
 
 Namespace RDS
 
@@ -9,15 +10,28 @@ Namespace RDS
         Implements IEquatable(Of RDS.Table)
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <NonSerialized()>
         Public Model As RDS.Model
 
-        <XmlAttribute()>
-        Public Name As String
+        <XmlIgnore>
+        <JsonIgnore()>
+        <NonSerialized()>
+        Private _Name As String
+        <XmlAttribute>
+        <JsonProperty(Order:=1)>
+        Public Property Name As String
+            Get
+                Return Me._Name
+            End Get
+            Set(value As String)
+                Me._Name = value
+            End Set
+        End Property
 
-        <XmlIgnore()>
-        Private _DatabaseName As String = ""
 
+        <XmlAttribute>
+        <JsonIgnore()>
         Public ReadOnly Property DBName As String
             Get
                 If Me.FBMModelElement Is Nothing Then
@@ -33,6 +47,12 @@ Namespace RDS
             End Get
         End Property
 
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
+        Private _DatabaseName As String = ""
+        <XmlIgnore>
+        <JsonIgnore()>
         Public Property DatabaseName As String
             Get
                 If Me.FBMModelElement Is Nothing Then
@@ -41,9 +61,9 @@ Namespace RDS
                     Return Me._DatabaseName
                 Else
                     If Me.FBMModelElement.IsDatabaseReservedWord Then
-                        Return "[" & Me.FBMModelElement.DatabaseName & "]"
+                        Return "[" & Me.DBName & "]"
                     ElseIf My.Settings.UseSquareBracketsSQL And Me.FBMModelElement.DatabaseName.Contains(" ") Then
-                        Return "[" & Me.FBMModelElement.DatabaseName & "]"
+                        Return "[" & Me.DBName & "]"
                     Else
                         Return Me.FBMModelElement.DatabaseName
                     End If
@@ -60,6 +80,8 @@ Namespace RDS
         '''   NB An Alias is added as part of FEQL processing.
         ''' </summary>
         ''' <returns></returns>
+        <XmlIgnore()>
+        <JsonIgnore()>
         Public ReadOnly Property DBVariableName As String
             Get
                 If Me.FBMModelElement Is Nothing Then
@@ -73,27 +95,72 @@ Namespace RDS
             End Get
         End Property
 
-
-        <XmlElement()>
+        <XmlArray("Columns")>
+        <XmlArrayItem("Column")>
+        <JsonProperty(Order:=3)>
         Public Column As New List(Of RDS.Column)
 
-        <XmlElement()>
-        Public WithEvents Index As New List(Of RDS.Index)
+        '<XmlElement()>
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
+        Private WithEvents _Index As New List(Of RDS.Index)
+        <XmlArray("Indexes")>
+        <XmlArrayItem("Index")>
+        <JsonProperty(Order:=4)>
+        Public Property Index As List(Of RDS.Index)
+            Get
+                Return Me._Index
+            End Get
+            Set(value As List(Of RDS.Index))
+                Me._Index = value
+            End Set
+        End Property
 
-        <XmlAttribute()>
+        <XmlArray("ForeinKeyRelationships")>
+        <XmlArrayItem("ForeignKeyRelationship")>
+        <JsonProperty(Order:=5)>
+        Public Property ForeignKeyRelationship As List(Of RDS.Relation)
+            Get
+                Return Me.getOutgoingRelations
+            End Get
+            Set(value As List(Of RDS.Relation))
+                Throw New NotImplementedException("Not Implemented. See Table.Relation")
+            End Set
+        End Property
+
+
+        <XmlIgnore>
+        <JsonIgnore()>
+        <NonSerialized()>
         Public IsSystemTable As Boolean = False
 
-        <XmlAttribute()>
+        <XmlAttribute>
+        <JsonProperty(Order:=2)>
         Public Remarks As String = ""
 
-        <XmlAttribute()>
-        Public isPGSRelation As Boolean = False
+        <XmlAttribute>
+        <JsonIgnore()>
+        Private _IsPGSRelation As Boolean = False
+
+        <XmlAttribute>
+        <JsonIgnore()>
+        Public Property isPGSRelation As Boolean
+            Get
+                Return Me._IsPGSRelation
+            End Get
+            Set(value As Boolean)
+                Me._IsPGSRelation = value
+            End Set
+        End Property
 
         <XmlIgnore()>
+        <JsonIgnore()>
         <NonSerialized()>
         Private WithEvents _FBMModelElement As FBM.ModelObject
 
         <XmlIgnore()>
+        <JsonIgnore()>
         Public Property FBMModelElement As FBM.ModelObject 'The ModelElement that the Table relates to. Could be an EntityType or a FactType.
             Get
                 Return Me._FBMModelElement
@@ -102,12 +169,17 @@ Namespace RDS
                 Me._FBMModelElement = value
             End Set
         End Property
+
+        <XmlAttribute>
+        <JsonProperty(Order:=6)>
         Public ReadOnly Property isAbsorbed As Boolean
             Get
                 Return Me.FBMModelElement.IsAbsorbed
             End Get
         End Property
 
+        <XmlIgnore>
+        <JsonIgnore()>
         Public ReadOnly Property Arity As Integer
             Get
                 If Me.FBMModelElement.ConceptType = pcenumConceptType.FactType Then
@@ -122,6 +194,8 @@ Namespace RDS
         ''' Used to determine the number of Non ValueType Model Elements joined by a PGSRelation (a table that is a PGSRelation).
         ''' </summary>
         ''' <returns></returns>
+        <XmlIgnore()>
+        <JsonIgnore()>
         Public ReadOnly Property PGSArity As Integer
             Get
                 If Me.FBMModelElement.ConceptType = pcenumConceptType.FactType Then
@@ -140,12 +214,18 @@ Namespace RDS
             End Get
         End Property
 
+        <XmlAttribute>
+        <JsonProperty(Order:=7)>
         Public ReadOnly Property isSubtype() As Boolean
             Get
+                'CodeSafe
+                If Me.FBMModelElement Is Nothing Then Return False
                 Return Me.FBMModelElement.isSubtype
             End Get
         End Property
 
+        <XmlIgnore>
+        <JsonIgnore()>
         Public ReadOnly Property OutgoingRelations As List(Of RDS.Relation)
             Get
                 Dim larRelation = From Column In Me.Column
@@ -157,12 +237,19 @@ Namespace RDS
             End Get
         End Property
 
+        <XmlIgnore>
+        <JsonIgnore()>
         Public ReadOnly Property HasPrimaryKeyIndex As Boolean
 
             Get
                 Try
                     If Me.FBMModelElement.SubtypeRelationship.FindAll(Function(x) x.IsPrimarySubtypeRelationship) IsNot Nothing Then
                         Try
+                            Dim lrTopmostSupertypeTable As RDS.Table = Me.FBMModelElement.GetTopmostSupertype(True).getCorrespondingRDSTable
+
+                            'CodeSafe
+                            If lrTopmostSupertypeTable Is Nothing Then Return False 'Error will have been thrown when trying to get the CorrespondingRDSTable.
+
                             Return Me.FBMModelElement.GetTopmostSupertype(True).getCorrespondingRDSTable.Index.Find(Function(x) x.IsPrimaryKey) IsNot Nothing
                         Catch ex As Exception
                             Return False
@@ -182,6 +269,8 @@ Namespace RDS
         ''' Predominantly used with TypeDB at this stage. Returns the Primary Supertype Name of the FBMModelElement of the Table. Could be 'entity' or 'relation'.
         ''' </summary>
         ''' <returns></returns>
+        <XmlAttribute()>
+        <JsonProperty(Order:=8)>
         Public ReadOnly Property PrimarySupertypeName
             Get
                 Return Me.FBMModelElement.PrimarySupertypeName
@@ -192,11 +281,15 @@ Namespace RDS
         ''' TypeDB specific. The Roles 'played' by the Table.
         ''' </summary>
         <NonSerialized()>
+        <JsonIgnore()>
+        <XmlIgnore>
         Public RolesPlayed As New List(Of RDS.Plays)
 
         ''' <summary>
         ''' TypeDB Specific. Is populated if Table is both a TypeDB Relation and has a Rule.
         ''' </summary>
+        <XmlElement>
+        <JsonIgnore()>
         Public DerivationRule As String = Nothing
 
         ''' <summary>
@@ -204,21 +297,32 @@ Namespace RDS
         '''   I.e. e.g. If the Table is a 'relation' in TypeDB...then the set of RoleNames that the Table/Relation relates.
         '''   i.e. e.g. As in an ObjectifiedFactType, is the set of RoleNames related by the Table.
         ''' </summary>
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized>
         Public RelatedRoleNames As New List(Of String)
 
         ''' <summary>
         ''' Used in reverse engineering. TypeDB Specific at this stage. True if the Table is the result of a Relation in the database.
         ''' </summary>
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Public IsDBRelation As Boolean = False
 
         ''' <summary>
         ''' Used only in reverse engineering at this stage. TypeDB specific at this stage.
         ''' </summary>
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <NonSerialized()>
         Private _PrimarySupertype As String = Nothing
         ''' <summary>
         ''' Used primarily in reverse engineering. TypeDB specific at this stage. The primary supertype of the Table/Entity/Node
         ''' </summary>
         ''' <returns></returns>
+        <XmlAttribute>
+        <JsonIgnore()>
         Public Property PrimarySupertype As String
             Get
                 If Me._PrimarySupertype IsNot Nothing Then
@@ -236,16 +340,53 @@ Namespace RDS
             End Set
         End Property
 
-        Public Event ColumnRemoved(ByVal arColumn As RDS.Column)
+        '============================================
+        'OSM (Observational State Machine) Specific
+        ''' <summary>
+        ''' Even if assisted by an NPU, the user provides the data. Can also be a Reference Table further in processing.
+        ''' </summary>
+        <JsonProperty(Order:=10)>
+        Public IsUserPopulated As Boolean
+
+        ''' <summary>
+        ''' Is used for reference data within processing. May have previously been UserPopulated (even if NPU assisted to populate).
+        ''' </summary>
+        <JsonProperty(Order:=11)>''' 
+        Public IsReferenceTable As Boolean
+
+        ''' <summary>
+        ''' Instance data for this Table. I.e. The data that would be used to populate a row in an relational database, for instance, for this Table.
+        ''' </summary>
+        <NonSerialized()>
+        <JsonIgnore()>
+        <XmlIgnore()>
+        Public TableDataInstance As New List(Of RDS.TableDataInstance)
+
+        <NonSerialized>
+        Public Event ColumnRemoved(ByRef arColumn As RDS.Column)
+        <NonSerialized>
         Public Event ColumnAdded(ByRef arColumn As RDS.Column)
+        <NonSerialized>
+        Public Event ColumnModified(ByRef arColumn As RDS.Column)
+        <NonSerialized()>
+        Public Event GraphLabelAdded(ByVal asNewGraphLabel As String)
+        <NonSerialized>
         Public Event IndexAdded(ByRef arIndex As RDS.Index)
+        <NonSerialized>
         Public Event IndexModified(ByRef arIndex As RDS.Index)
+        <NonSerialized>
         Public Event IndexColumnAdded(ByRef arIndex As RDS.Index, ByRef arColumn As RDS.Column)
+        <NonSerialized>
         Public Event IndexRemoved(ByRef arIndex As RDS.Index)
+        <NonSerialized>
         Public Event IsPGSRelationChanged(ByVal abNewValue As Boolean)
+        <NonSerialized>
         Public Event JoinedFactTypeObjectified(ByRef arFactType As FBM.FactType) 'Only called when/if the underlying FactType is objectified...if Table is for FactType.
+        <NonSerialized>
         Public Event NameChanged(ByVal asOldName As String, ByVal asNewName As String)
+        <NonSerialized>
         Public Event SubtypeRelationshipAdded()
+        <NonSerialized>
         Public Event SubtypeRelationshipRemoved()
 
         ''' <summary>
@@ -267,7 +408,7 @@ Namespace RDS
         ''' Clones the table. Limited functionality at this stage. [VM-20210313]
         ''' </summary>
         ''' <returns></returns>
-        Public Function Clone() As RDS.Table
+        Public Function Clone(Optional ByVal abIncludeModel As Boolean = False) As RDS.Table
 
             Dim lrTable As New RDS.Table
             Try
@@ -284,6 +425,10 @@ Namespace RDS
                         lrTable.Index.Add(lrNewIndex)
                     Next
 
+                    If abIncludeModel Then
+                        lrTable.Model = .Model
+                    End If
+
                 End With
 
                 Return lrTable
@@ -294,7 +439,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrTable
             End Try
@@ -350,7 +495,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -365,7 +510,7 @@ Namespace RDS
                 For Each lrTable In Me.getSupertypeTables
                     For Each lrColumn In lrTable.Column
 
-                        'Move Origins of relevant Relations.
+                        'Move Origins of relevant ERD Relationships.
                         Dim larRelation = From Relation In lrColumn.OutgoingRelation
                                           Select Relation
 
@@ -374,7 +519,7 @@ Namespace RDS
                             Call Me.Model.Model.updateRelationOriginTable(lrRelation, Me)
                         Next
 
-                        'Move Destinations of relevant Relations.
+                        'Move Destinations of relevant ERD Relationships.
                         larRelation = From Relation In lrColumn.IncomingRelation
                                       Select Relation
 
@@ -400,7 +545,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -416,11 +561,12 @@ Namespace RDS
                                   Optional abForceAdd As Boolean = False) As Boolean
 
             Try
+
                 Call arColumn.setOrdinalPosition(Me.Column.Count + 1)
                 arColumn.Table = Me 'CodeSafe
 
                 'CodeSafe: Don't add the Column if it already exists.
-                If Me.Column.Contains(arColumn) And Not abForceAdd Then
+                If Me.Column.FindAll(AddressOf arColumn.EqualsByRoleActiveRole).Count > 0 And Not abForceAdd Then
                     Return False
                 End If
 
@@ -432,7 +578,7 @@ Namespace RDS
 
                 Me.Column.AddUnique(arColumn)
 
-                If arColumn.Role.isRDSForeignKeyRole Then
+                If arColumn.Role IsNot Nothing AndAlso arColumn.Role.isRDSForeignKeyRole Then 'Independent ValueType single Column Tables have no Role on the Column.
 
                     Dim lrRelation As RDS.Relation = arColumn.Role.belongsToRelation
                     If lrRelation IsNot Nothing And arColumn.Relation IsNot Nothing Then
@@ -447,13 +593,17 @@ Namespace RDS
                 'Is only IsPGSRelation if the Objectified Fact Type (i.e. The objectified relation) only references ValueTypes. 
                 'i.e.Where ObjectifiedFactType Is only joined To ValueTypes.
                 ' If Is joined To any EntityType Or another ObjectifiedFactType, Then cannot be a PGSRelation, And must be a Node.
-                If (arColumn.isPartOfPrimaryKey = False) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then '20210505-VM-Was ContributesToPrimaryKey
+                If arColumn.Role Is Nothing Then 'Independent ValueType single Column Tables have no Role on the Column.
+                    Call Me.setIsPGSRelation(False)
+                ElseIf (arColumn.isPartOfPrimaryKey = False) And arColumn.Role IsNot Nothing AndAlso (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then '20210505-VM-Was ContributesToPrimaryKey
+                    'Independent ValueType single Column Tables have no Role on the Column.
                     '--------------------------------------------------------------------
                     'Remove IsPGSRelation if join is not to a ValueType
                     'Call Me.setIsPGSRelation(False) '20200726-VM-Commented this out. See notes above.
                 ElseIf TypeOf (Me.FBMModelElement) Is FBM.FactType Then
                     'FBMModelObject is the ModelElement that the Table relates to.
-                    If Not (arColumn.isPartOfPrimaryKey) And (arColumn.FactType IsNot Me.FBMModelElement) And (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then '20210505-VM-Was ContributesToPrimaryKey
+                    If Not (arColumn.isPartOfPrimaryKey) And (arColumn.FactType IsNot Me.FBMModelElement) And arColumn.Role IsNot Nothing AndAlso (TypeOf (arColumn.Role.JoinedORMObject) IsNot FBM.ValueType) Then '20210505-VM-Was ContributesToPrimaryKey
+                        'Independent ValueType single Column Tables have no Role on the Column.
                         Call Me.setIsPGSRelation(False)
                     End If
                 End If
@@ -504,7 +654,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -588,7 +738,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return 0
             End Try
@@ -610,7 +760,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -621,6 +771,7 @@ Namespace RDS
                 Dim larIncomingRelations = From Relation In Me.Model.Model.RDS.Relation
                                            From Column In Relation.DestinationColumns
                                            Where Column.Table.Name = Me.Name
+                                           Where Not Relation.ResponsibleFactType.InternalUniquenessConstraint.Any(Function(x) x.Role.Count > 1)
                                            Select Relation Distinct
 
                 Return larIncomingRelations.ToList
@@ -631,7 +782,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RDS.Relation)
             End Try
@@ -665,19 +816,102 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RDS.Relation)
             End Try
 
         End Function
 
+        Public Function GenerateJSON() As String
+            Return ""
+        End Function
+
+        Public Function GenerateDataInstanceContext() As String
+
+            Try
+                Dim lsContext As String = ""
+
+                If Me.TableDataInstance.Count = 0 Then
+                    lsContext.AppendLine("      There are no data instances for this table.")
+                Else
+                    For Each lrTableDataInstance In Me.TableDataInstance
+                        lsContext &= "" 'JSON Serialised TableDataInstance
+                    Next
+                End If
+
+                Return lsContext
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return "<Error Creating JSON for Table: " & Me.Name & ">"
+            End Try
+
+        End Function
+
+
         Public Function getOutgoingRelations() As List(Of RDS.Relation)
 
             Try
-                Dim larOutgoingRelation = From Relation In Me.Model.Model.RDS.Relation
-                                          Where Relation.OriginTable.Name = Me.Name
-                                          Select Relation Distinct
+                Dim larOutgoingRelation = (From Relation In Me.Model.Model.RDS.Relation
+                                           Where Relation.OriginTable.Name = Me.Name
+                                           Select Relation Distinct).ToList
+
+                'CodeSafe
+                For Each lrRelation In larOutgoingRelation
+
+                    If lrRelation.OriginColumns.Count = 0 Or lrRelation.DestinationColumns.Count = 0 Then
+                        Me.Model.Model.FixErrors(New List(Of pcenumModelFixType) From {pcenumModelFixType.RDSRelationsThatHaveZeroOriginColumnsAndZeroDestinationColumns}, lrRelation)
+                    End If
+
+                    For Each lrOriginColumn In lrRelation.OriginColumns
+                        lrOriginColumn.Relation.AddUnique(lrRelation)
+                    Next
+                Next
+
+                Dim larOutgoingRelationsFromColumns = (From Table In Me.Model.Model.RDS.Table
+                                                       From Column In Table.Column
+                                                       From Relation In Column.Relation
+                                                       Where Relation.OriginTable IsNot Nothing
+                                                       Where Relation.OriginTable.Name = Me.Name
+                                                       Select Relation Distinct).ToList
+
+                ' Remove items from larOutgoingRelation that aren't in larOutgoingRelationsFromColumns
+                larOutgoingRelation.RemoveAll(Function(relation) Not larOutgoingRelationsFromColumns.Contains(relation))
+
+                'CodeSafe: Remove Relations that have Responsible Fact Type that is many-to-many
+                Dim larRelationsToRemove = (From Relation In larOutgoingRelationsFromColumns
+                                            Where Relation.ResponsibleFactType IsNot Nothing
+                                            Where Not Relation.ResponsibleFactType.IsManyTo1BinaryFactType
+                                            Where Not Relation.ResponsibleFactType.Is1To1BinaryFactType
+                                            Select Relation).ToArray
+
+                For Each lrRelation In larRelationsToRemove
+                    'larOutgoingRelation.Remove(lrRelation) '2025-03-29-VM-Commented out because was removing Relations for Many-To-Many Entity in ERD view.
+                    If lrRelation.ResponsibleFactType.RDSTable IsNot Me Then
+                        larOutgoingRelation.Remove(lrRelation)
+                    End If
+                Next
+
+                Dim larFaultyRelation = (From Relation In larOutgoingRelation
+                                         Where Relation.OriginMultiplicity = pcenumCMMLMultiplicity.Many
+                                         Where Relation.DestinationMultiplicity = pcenumCMMLMultiplicity.Many
+                                         Select Relation).ToList
+
+                larOutgoingRelation = larOutgoingRelation.Except(larFaultyRelation).ToList()
+
+                'CodeSafe: Fix damaged Relations
+                For Each lrRDSRelation In larOutgoingRelation.FindAll(Function(x) x.ResponsibleFactType IsNot Nothing)
+                    If lrRDSRelation.ResponsibleFactType.IsObjectified AndAlso lrRDSRelation.OriginTable IsNot lrRDSRelation.ResponsibleFactType.getCorrespondingRDSTable Then
+                        lrRDSRelation.OriginTable = lrRDSRelation.ResponsibleFactType.getCorrespondingRDSTable
+                    End If
+                Next
 
                 Return larOutgoingRelation.ToList
 
@@ -687,7 +921,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RDS.Relation)
             End Try
@@ -707,7 +941,7 @@ Namespace RDS
 
                 Dim lrFactTypeReading = lrFactType.FactTypeReading(0)
 
-                Return Viev.Strings.MakeLowerCapCamelCase(lrFactTypeReading.PredicatePart(0).PredicatePartText)
+                Return FEStrings.MakeLowerCapCamelCase(lrFactTypeReading.PredicatePart(0).PredicatePartText)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -716,7 +950,7 @@ Namespace RDS
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
                 If Not abIgnoreError Then
-                    prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End If
 
                 Return "ErrorGettingEdgeNameForTable"
@@ -754,7 +988,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RDS.Column)
             End Try
@@ -783,7 +1017,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -805,7 +1039,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RDS.Column)
             End Try
@@ -823,10 +1057,32 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return Nothing
             End Try
         End Function
+
+        Public Sub FindAndFixErrors()
+
+            Try
+                Dim larModeFixTypes As New List(Of pcenumModelFixType)
+                larModeFixTypes.Add(pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory)
+                larModeFixTypes.Add(pcenumModelFixType.RDSRelationsThatHaveZeroOriginColumnsAndZeroDestinationColumns)
+                larModeFixTypes.Add(pcenumModelFixType.RDSRelationsMissing)
+                larModeFixTypes.Add(pcenumModelFixType.RDSRelationsWhereOriginColumnHasWrongTable)
+
+                Call Me.Model.Model.FixErrors(larModeFixTypes, Me)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
 
         Public Function generateUniqueQualifier(ByVal asRootQualifier As String, Optional ByVal aiIndex As Integer = 0) As String
 
@@ -917,6 +1173,8 @@ Namespace RDS
             Dim larSubtypeTable As New List(Of RDS.Table)
 
             Try
+                'CodeSafe
+                If Me.FBMModelElement Is Nothing Then Return larSubtypeTable
 
                 Dim larModelObject = Me.FBMModelElement.getSubtypes(abPrimarySubtypeRelationshipsOnly)
 
@@ -937,7 +1195,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return larSubtypeTable
 
@@ -946,13 +1204,13 @@ Namespace RDS
         End Function
 
         Public Function getSupertypeTables(Optional ByRef aarSupertypeTable As List(Of RDS.Table) = Nothing,
-                                           Optional arSubtypeRelationship As FBM.tSubtypeRelationship = Nothing,
+                                           Optional arSubtypeRelationship As FBM.SubtypeRelationship = Nothing,
                                            Optional abIsRecursive As Boolean = True) As List(Of RDS.Table)
 
             Try
 
                 Dim larSupertypeTable As New List(Of RDS.Table)
-                Dim larSubtypeRelationship As New List(Of FBM.tSubtypeRelationship)
+                Dim larSubtypeRelationship As New List(Of FBM.SubtypeRelationship)
 
                 If arSubtypeRelationship Is Nothing Then
                     larSubtypeRelationship = Me.FBMModelElement.SubtypeRelationship
@@ -983,7 +1241,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of RDS.Table)
             End Try
@@ -1024,10 +1282,22 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Returns TRUE if the Table has a PrimaryKey with one Column, 
+        ''' ELSE returns FALSE
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function hasNoPrimaryKey() As Boolean
+
+            Return Me.Index.FindAll(Function(x) x.IsPrimaryKey = True).Count = 0
 
         End Function
 
@@ -1257,7 +1527,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1274,7 +1544,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1300,7 +1570,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return 0
             End Try
@@ -1309,19 +1579,35 @@ Namespace RDS
 
         Private Sub FBMModelElement_NameChanged(ByVal asOldName As String, ByVal asNewName As String) Handles _FBMModelElement.NameChanged
 
-            'For database synchronisation
-            Dim lrTempTable = Me.Clone
-            lrTempTable.Name = asOldName
+            Try
+                'For database synchronisation
+                Dim lrTempTable = Me.Clone
+                lrTempTable.Name = asOldName
 
-            Me.Name = asNewName
+                Me.Name = asNewName
 
-            RaiseEvent NameChanged(asOldName, asNewName)
+                RaiseEvent NameChanged(asOldName, asNewName)
 
-            'Database synchronisation
-            If Me.Model.Model.IsDatabaseSynchronised Then
-                Call Me.Model.Model.connectToDatabase()
-                Call Me.Model.Model.DatabaseConnection.RenameTable(lrTempTable, asNewName)
-            End If
+                'Database synchronisation
+                Try
+                    'CodeSafe
+                    If Me.Model Is Nothing Then Me.Model = Me.FBMModelElement.Model.RDS
+                    If Me.Model.Model.IsDatabaseSynchronised Then
+                        Call Me.Model.Model.connectToDatabase()
+                        Call Me.Model.Model.DatabaseConnection.RenameTable(lrTempTable, asNewName)
+                    End If
+                Catch ex As Exception
+                    'We tried.
+                End Try
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 
@@ -1345,7 +1631,7 @@ Namespace RDS
                 End If
 
                 If abRemoveWhitespace Then
-                    Return Viev.Strings.RemoveWhiteSpace(lsDatabaseName)
+                    Return FEStrings.ProperSpace(lsDatabaseName)
                 Else
                     Return lsDatabaseName
                 End If
@@ -1356,7 +1642,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return "DummyTableName"
             End Try
@@ -1383,6 +1669,8 @@ Namespace RDS
                 lsUniqueColumnName = asColumnName & aiStartingInd.ToString
             End If
 
+            lsUniqueColumnName = lsUniqueColumnName.RemoveWhitespace
+
             Try
                 If arColumn Is Nothing Then
                     If Me.Column.FindAll(Function(x) LCase(x.Name) = LCase(lsUniqueColumnName)).Count > 0 Then
@@ -1400,7 +1688,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lsUniqueColumnName
             End Try
@@ -1429,7 +1717,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Function
 
@@ -1451,7 +1739,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1484,9 +1772,12 @@ Namespace RDS
                                 End If
                         End Select
                         'CodeSafe
-                        If lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable Is Me Then Return False
+                        If lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable Is Me Then Return True
 
-                        Return lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable.IsPartOfPrimarySubtypeRelationshipPath(arTable)
+                        If Me.IsPartOfPrimarySubtypeRelationshipPath(lrSubtypeRelationship.parentModelElement.getCorrespondingRDSTable) Then
+                            Return True
+                        End If
+
                     Next
                 End If
 
@@ -1498,7 +1789,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -1526,7 +1817,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1556,7 +1847,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1600,7 +1891,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1655,7 +1946,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -1680,6 +1971,9 @@ Namespace RDS
                 If arColumn Is Nothing Then Exit Sub
                 If Me.Column.FindAll(Function(x) x.Name = lrColumn.Name).Count > 1 Then abById = True
 
+                'CodeSafe
+                Dim liInitialColumnCount As Integer = Me.Column.Count
+
                 If abById Then
                     Me.Column.RemoveAll(Function(x) x.Id = lrColumn.Id)
                 Else
@@ -1689,7 +1983,7 @@ Namespace RDS
                 Dim lrRemovedColumn As RDS.Column = arColumn
 
                 'Need speed when loading a model.
-                If pbDoDatabaseProcessing Then
+                If pbDoDatabaseProcessing And (Me.Column.Count <> liInitialColumnCount) Then
                     For Each lrColumn In Me.Column.FindAll(Function(x) x.OrdinalPosition > lrRemovedColumn.OrdinalPosition)
                         lrColumn.OrdinalPosition -= 1
                         Call Me.Model.Model.setCMMLAttributeOrdinalPosition(lrColumn.Id, lrColumn.OrdinalPosition)
@@ -1754,7 +2048,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1783,7 +2077,7 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1832,24 +2126,33 @@ Namespace RDS
 
         Public Sub removeIndex(ByRef arIndex As RDS.Index)
 
-            Call Me.Index.Remove(arIndex)
-            Call Me.Model.Index.Remove(arIndex)
+            Try
+                Call Me.Index.Remove(arIndex)
+                Call Me.Model.Index.RemoveAll(AddressOf arIndex.Equals)
 
-            Dim lsIndexQualifier = arIndex.IndexQualifier
+                Dim lsIndexQualifier = arIndex.IndexQualifier
 
-            Dim larColumn = From Column In Me.Column
-                            Where Column.Index.Find(Function(x) x.IndexQualifier = lsIndexQualifier) IsNot Nothing
-                            Select Column
+                Dim larColumn = From Column In Me.Column
+                                Where Column.Index.Find(Function(x) x.IndexQualifier = lsIndexQualifier) IsNot Nothing
+                                Select Column
 
-            For Each lrColumn In larColumn
-                Call lrColumn.removeIndex(arIndex)
-            Next
+                For Each lrColumn In larColumn
+                    Call lrColumn.removeIndex(arIndex)
+                Next
 
-            '----------------------------------------------------------------------
-            'CMML
-            Call Me.Model.Model.removeCMMLIndex(arIndex)
+                '----------------------------------------------------------------------
+                'CMML
+                Call Me.Model.Model.removeCMMLIndex(arIndex)
 
-            RaiseEvent IndexRemoved(arIndex)
+                RaiseEvent IndexRemoved(arIndex)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
 
         End Sub
 
@@ -1890,11 +2193,11 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
-        Public Sub removeSupertypeColumns(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+        Public Sub removeSupertypeColumns(ByRef arSubtypeRelationship As FBM.SubtypeRelationship)
 
             Try
                 For Each lrTable In Me.getSupertypeTables(Nothing, arSubtypeRelationship)
@@ -1912,7 +2215,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1929,26 +2232,29 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Public Sub setIsPGSRelation(ByVal abIsPGSRelation As Boolean)
+        Public Sub setIsPGSRelation(ByVal abIsPGSRelation As Boolean,
+                                    Optional ByVal abForceSet As Boolean = False,
+                                    Optional abSuppressEvent As Boolean = False)
 
             Try
                 'CodeSafe: Abort if not actually making a change.
-                If Me.isPGSRelation = abIsPGSRelation Then Exit Sub 'Nothing to do here
+                If Me.isPGSRelation = abIsPGSRelation And Not abForceSet Then Exit Sub 'Nothing to do here
 
                 Me.isPGSRelation = abIsPGSRelation
 
                 If Me.isPGSRelation Then
+                    Call Me.Model.Model.removeCMMLIsPGSRelation(Me)
                     Call Me.Model.Model.addCMMLIsPGSRelation(Me)
                 Else
                     Call Me.Model.Model.removeCMMLIsPGSRelation(Me)
                 End If
 
-                RaiseEvent IsPGSRelationChanged(abIsPGSRelation)
+                If Not abSuppressEvent Then RaiseEvent IsPGSRelationChanged(abIsPGSRelation)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -1956,7 +2262,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1972,26 +2278,31 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
 
         Public Sub setName(ByVal asNewName As String)
             Try
+                Dim lsOldName = asNewName
+
                 Call Me.Model.Model.updateCMMLTableName(Me.Name, asNewName)
                 Me.Name = asNewName
 
                 If Me.Model.Model.IsDatabaseSynchronised Then
                     Call Me.Model.Model.DatabaseConnection.RenameTable(Me, asNewName)
                 End If
+
+                RaiseEvent NameChanged(lsOldName, asNewName)
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -2092,7 +2403,7 @@ Namespace RDS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2125,7 +2436,23 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub TriggerColumnModified(ByRef arColumn As RDS.Column)
+
+            Try
+                RaiseEvent ColumnModified(arColumn)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2140,11 +2467,11 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
-        Private Sub _FBMModelElement_SubtypeRelationshipRemoved(ByRef arSubtypeConstraint As tSubtypeRelationship) Handles _FBMModelElement.SubtypeRelationshipRemoved
+        Private Sub _FBMModelElement_SubtypeRelationshipRemoved(ByRef arSubtypeConstraint As FBM.SubtypeRelationship) Handles _FBMModelElement.SubtypeRelationshipRemoved
 
             Try
                 RaiseEvent SubtypeRelationshipRemoved()
@@ -2154,9 +2481,13 @@ Namespace RDS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
+        End Sub
+
+        Private Sub _FBMModelElement_GraphLabelAdded(asNewGraphLabel As String) Handles _FBMModelElement.GraphLabelAdded
+            RaiseEvent GraphLabelAdded(asNewGraphLabel)
         End Sub
 
     End Class

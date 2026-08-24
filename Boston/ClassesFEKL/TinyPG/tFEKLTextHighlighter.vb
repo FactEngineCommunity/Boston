@@ -12,8 +12,8 @@ Imports System.Threading
 Namespace FEKL
     ' Summary:
     '     System.EventArgs is the base class for classes containing event data.
-    <Serializable()>
-    <ComVisible(True)>
+    <Serializable()> _
+    <ComVisible(True)> _
     Public Class ContextSwitchEventArgs
         Inherits EventArgs
         Public ReadOnly PreviousContext As ParseNode
@@ -56,19 +56,19 @@ Namespace FEKL
 
 
         ' some winapís required
-        <DllImport("user32", CharSet:=CharSet.Auto)>
+        <DllImport("user32", CharSet:=CharSet.Auto)> _
         Private Shared Function SendMessage(ByVal hWnd As IntPtr, ByVal msg As Integer, ByVal wParam As Integer, ByVal lParam As IntPtr) As IntPtr
         End Function
 
-        <DllImport("user32.dll")>
+        <DllImport("user32.dll")> _
         Private Shared Function PostMessageA(ByVal hWnd As IntPtr, ByVal nBar As Integer, ByVal wParam As Integer, ByVal lParam As Integer) As Boolean
         End Function
 
-        <DllImport("user32.dll", CharSet:=CharSet.Auto)>
+        <DllImport("user32.dll", CharSet:=CharSet.Auto)> _
         Private Shared Function GetScrollPos(ByVal hWnd As Integer, ByVal nBar As Integer) As Integer
         End Function
 
-        <DllImport("user32.dll")>
+        <DllImport("user32.dll")> _
         Private Shared Function SetScrollPos(ByVal hWnd As IntPtr, ByVal nBar As Integer, ByVal nPos As Integer, ByVal bRedraw As Boolean) As Integer
         End Function
 
@@ -121,6 +121,7 @@ Namespace FEKL
 
         Public threadAutoHighlight As Thread
 
+
         Private Sub DoAction(ByVal text As String, ByVal position As Integer)
 
             If stateLocked <> IntPtr.Zero Then
@@ -141,7 +142,7 @@ Namespace FEKL
                 Dim nextItem As UndoItem = ua
                 Dim i As Integer = 0
                 While i < 6
-                    Dim prevItem As UndoItem = UndoList(UndoList.Count - 2 - i)
+    Dim prevItem As UndoItem = UndoList(UndoList.Count - 2 - i)
                     canRemove = canRemove And (Math.Abs(prevItem.Text.Length - nextItem.Text.Length) <= 1 AndAlso Math.Abs(prevItem.Position - nextItem.Position) <= 1)
                     nextItem = prevItem
                     System.Math.Max(System.Threading.Interlocked.Increment(i), i - 1)
@@ -153,103 +154,103 @@ Namespace FEKL
             UndoIndex = UndoList.Count
         End Sub
 
-        Public Sub ClearUndo()
-            UndoList = New List(Of UndoItem)()
-            UndoIndex = 0
-        End Sub
+    Public Sub ClearUndo()
+        UndoList = New List(Of UndoItem)()
+        UndoIndex = 0
+    End Sub
 
-        Public Sub Undo()
-            If Not CanUndo Then
-                Return
-            End If
+    Public Sub Undo()
+        If Not CanUndo Then
+            Return
+        End If
 
-            System.Math.Max(System.Threading.Interlocked.Decrement(UndoIndex), UndoIndex + 1)
-            If UndoIndex < 1 Then
-                UndoIndex = 1
-            End If
+        System.Math.Max(System.Threading.Interlocked.Decrement(UndoIndex), UndoIndex + 1)
+        If UndoIndex < 1 Then
+            UndoIndex = 1
+        End If
 
-            ' implement undo action here
-            Dim ua As UndoItem = UndoList(UndoIndex - 1)
-            RestoreState(ua)
-        End Sub
+        ' implement undo action here
+        Dim ua As UndoItem = UndoList(UndoIndex - 1)
+        RestoreState(ua)
+    End Sub
 
-        Public Sub Redo()
-            If Not CanRedo Then
-                Return
-            End If
+    Public Sub Redo()
+        If Not CanRedo Then
+            Return
+        End If
 
-            System.Math.Max(System.Threading.Interlocked.Increment(UndoIndex), UndoIndex - 1)
-            If UndoIndex > UndoList.Count Then
-                UndoIndex = UndoList.Count
-            End If
+        System.Math.Max(System.Threading.Interlocked.Increment(UndoIndex), UndoIndex - 1)
+        If UndoIndex > UndoList.Count Then
+            UndoIndex = UndoList.Count
+        End If
 
-            Dim ua As UndoItem = UndoList(UndoIndex - 1)
-            RestoreState(ua)
+        Dim ua As UndoItem = UndoList(UndoIndex - 1)
+        RestoreState(ua)
 
-        End Sub
+    End Sub
 
-        Private Sub RestoreState(ByVal item As UndoItem)
-            Lock()
-            ' restore state
-            Textbox.Rtf = item.Text
-            Textbox.[Select](item.Position, 0)
-            HScrollPos = item.ScrollPosition.X
-            VScrollPos = item.ScrollPosition.Y
+    Private Sub RestoreState(ByVal item As UndoItem)
+        Lock()
+        ' restore state
+        Textbox.Rtf = item.Text
+        Textbox.[Select](item.Position, 0)
+        HScrollPos = item.ScrollPosition.X
+        VScrollPos = item.ScrollPosition.Y
 
-            Unlock()
-        End Sub
+        Unlock()
+    End Sub
 
-        Public ReadOnly Property CanUndo() As Boolean
-            Get
-                Return UndoIndex > 0
-            End Get
-        End Property
+    Public ReadOnly Property CanUndo() As Boolean
+        Get
+            Return UndoIndex > 0
+        End Get
+    End Property
 
-        Public ReadOnly Property CanRedo() As Boolean
-            Get
-                Return UndoIndex < UndoList.Count
-            End Get
-        End Property
+    Public ReadOnly Property CanRedo() As Boolean
+        Get
+            Return UndoIndex < UndoList.Count
+        End Get
+    End Property
 
-        Public Sub New(ByVal textbox As RichTextBox, ByVal scanner As Scanner, ByVal parser As Parser)
-            Me.Textbox = textbox
-            Me.Scanner = scanner
-            Me.Parser = parser
+    Public Sub New(ByVal textbox As RichTextBox, ByVal scanner As Scanner, ByVal parser As Parser)
+        Me.Textbox = textbox
+        Me.Scanner = scanner
+        Me.Parser = parser
 
-            ClearUndo()
+        ClearUndo()
 
-            AddHandler textbox.TextChanged, AddressOf Textbox_TextChanged
-            AddHandler textbox.KeyDown, AddressOf textbox_KeyDown
-            AddHandler textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
-            AddHandler textbox.Disposed, AddressOf Textbox_Disposed
+        AddHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
+        AddHandler textbox.KeyUp, AddressOf textbox_KeyDown
+        AddHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
+        AddHandler Textbox.Disposed, AddressOf Textbox_Disposed
 
-            Tree = New ParseTree()
-            currentContext = Tree
+        Tree = New ParseTree()
+        currentContext = Tree
 
-            threadAutoHighlight = New Thread(AddressOf AutoHighlightStart)
-            threadAutoHighlight.Start()
-        End Sub
+        threadAutoHighlight = New Thread(AddressOf AutoHighlightStart)
+        threadAutoHighlight.Start()
+    End Sub
 
 
-        Public Sub Lock()
-            ' Stop redrawing:  
-            SendMessage(Textbox.Handle, WM_SETREDRAW, 0, IntPtr.Zero)
-            ' Stop sending of events:  
-            stateLocked = SendMessage(Textbox.Handle, EM_GETEVENTMASK, 0, IntPtr.Zero)
-            ' change colors and stuff in the RichTextBox  
-        End Sub
+    Public Sub Lock()
+        ' Stop redrawing:  
+        SendMessage(Textbox.Handle, WM_SETREDRAW, 0, IntPtr.Zero)
+        ' Stop sending of events:  
+        stateLocked = SendMessage(Textbox.Handle, EM_GETEVENTMASK, 0, IntPtr.Zero)
+        ' change colors and stuff in the RichTextBox  
+    End Sub
 
-        Public Sub Unlock()
-            ' turn on events  
-            SendMessage(Textbox.Handle, EM_SETEVENTMASK, 0, stateLocked)
-            ' turn on redrawing  
-            SendMessage(Textbox.Handle, WM_SETREDRAW, 1, IntPtr.Zero)
+    Public Sub Unlock()
+        ' turn on events  
+        SendMessage(Textbox.Handle, EM_SETEVENTMASK, 0, stateLocked)
+        ' turn on redrawing  
+        SendMessage(Textbox.Handle, WM_SETREDRAW, 1, IntPtr.Zero)
 
-            stateLocked = IntPtr.Zero
-            Textbox.Invalidate()
-        End Sub
+        stateLocked = IntPtr.Zero
+        Textbox.Invalidate()
+    End Sub
 
-        Sub textbox_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
+    Sub textbox_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs)
 
             '=============================
             If e.KeyCode = Keys.Space Then
@@ -258,92 +259,90 @@ Namespace FEKL
             End If
             '=============================
 
-            ' undo/redo
-            If e.KeyValue = 89 AndAlso e.Control Then
-                Redo()
-                ' CTRL-Y
-            End If
-            If e.KeyValue = 90 AndAlso e.Control Then
-                Undo()
-                ' CTRL-Z
-            End If
+        ' undo/redo
+        If e.KeyValue = 89 AndAlso e.Control Then
+            Redo()
+            ' CTRL-Y
+        End If
+        If e.KeyValue = 90 AndAlso e.Control Then
+            Undo()
+            ' CTRL-Z
+        End If
 
-            RaiseEvent KeyDown(sender, e)
+        RaiseEvent KeyDown(sender, e)
 
-        End Sub
+    End Sub
 
-        Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
-            If stateLocked <> IntPtr.Zero Then
-                Return
-            End If
-        End Sub
+    Sub Textbox_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
+        If stateLocked <> IntPtr.Zero Then
+            Return
+        End If
+    End Sub
 
-        Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
-            If stateLocked <> IntPtr.Zero Then
-                Return
-            End If
+    Sub Textbox_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
+        If stateLocked <> IntPtr.Zero Then
+            Return
+        End If
 
-            Dim newContext As ParseNode = GetCurrentContext()
+        Dim newContext As ParseNode = GetCurrentContext()
 
-            If currentContext Is Nothing Then
-                currentContext = newContext
-            End If
-            If newContext Is Nothing Then
-                Return
-            End If
+        If currentContext Is Nothing Then
+            currentContext = newContext
+        End If
+        If newContext Is Nothing Then
+            Return
+        End If
 
-            If newContext.Token.Type <> currentContext.Token.Type Then
-                RaiseEvent SwitchContext(Me, New ContextSwitchEventArgs(currentContext, newContext))
-                'SwitchContext.Invoke(Me, New ContextSwitchEventArgs(currentContext, newContext))
-                currentContext = newContext
-            End If
+        If newContext.Token.Type <> currentContext.Token.Type Then
+            RaiseEvent SwitchContext(Me, New ContextSwitchEventArgs(currentContext, newContext))
+            'SwitchContext.Invoke(Me, New ContextSwitchEventArgs(currentContext, newContext))
+            currentContext = newContext
+        End If
 
-        End Sub
+    End Sub
 
-        ''' <summary>
-        ''' this handy function returns the section in which the user is editing currently
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function GetCurrentContext() As ParseNode
-            Dim node As ParseNode = FindNode(Tree, Textbox.SelectionStart)
-            Return node
-        End Function
+    ''' <summary>
+    ''' this handy function returns the section in which the user is editing currently
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetCurrentContext() As ParseNode
+        Dim node As ParseNode = FindNode(Tree, Textbox.SelectionStart)
+        Return node
+    End Function
 
-        Public Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
+    Private Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
 
-            If node Is Nothing Then
-                Return Nothing
-            End If
+        If node Is Nothing Then
+            Return Nothing
+        End If
 
-            If node.Nodes.Count > 0 Then
-                If node.Nodes.Count > 1 And
+        If node.Nodes.Count > 0 Then
+            If node.Nodes.Count > 1 And _
                    node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
-                    Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
-                ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
-                    Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
-                Else
-                    Return node.Nodes(node.Nodes.Count - 1)
-                End If
+                Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
+            ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
+                Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
             Else
-                Return node
+                Return node.Nodes(node.Nodes.Count - 1)
             End If
+        Else
+            Return node
+        End If
 
-        End Function
+    End Function
 
-        ''' <summary>
-        ''' use HighlighText to start the text highlight process from the caller's thread.
-        ''' this method is not used internally. 
-        ''' </summary>
-        Public Sub HighlightText()
+    ''' <summary>
+    ''' use HighlighText to start the text highlight process from the caller's thread.
+    ''' this method is not used internally. 
+    ''' </summary>
+    Public Sub HighlightText()
+        SyncLock treelock
+            textChanged = True
+            currentText = Trim(Textbox.Text)
+        End SyncLock
+    End Sub
 
-            SyncLock treelock
-                textChanged = True
-                currentText = Textbox.Text
-            End SyncLock
-
-        End Sub
-
-        Private Sub HighlightTextInternal()
+        Public Sub HighlightTextInternal()
             ' highlight the text (used internally only)
             Lock()
 
@@ -353,7 +352,6 @@ Namespace FEKL
             Dim selstart As Integer = Textbox.SelectionStart
 
             HighlighTextCore()
-
 
             Textbox.[Select](selstart, 0)
 
@@ -367,410 +365,392 @@ Namespace FEKL
         ''' this method should be used only by HighlightText or RestoreState methods
         ''' </summary>
         Private Sub HighlighTextCore()
-            'Tree = Parser.Parse(Textbox.Text);
-            Try
-                Dim sb As New StringBuilder()
-                If Tree Is Nothing Then
-                    Return
+        'Tree = Parser.Parse(Textbox.Text);
+        Dim sb As New StringBuilder()
+        If Tree Is Nothing Then
+            Return
+        End If
+
+            If Tree.Errors.Count > 0 Then
+                Exit Sub
+            End If
+
+        Dim start As ParseNode = Tree.Nodes(0)
+        HightlightNode(start, sb)
+
+        ' append any trailing skipped tokens that were scanned
+        For Each skiptoken As Token In Scanner.Skipped
+            HighlightToken(skiptoken, sb)
+            sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
+        Next
+
+        sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
+
+        AddRtfHeader(sb)
+        AddRtfEnd(sb)
+
+        Textbox.Rtf = sb.ToString()
+
+    End Sub
+
+
+    ''' <summary>
+    ''' added function to convert unicode characters in the stringbuilder to rtf unicode escapes
+    ''' </summary>
+    Function Unicode(ByVal sb As StringBuilder) As StringBuilder
+
+        Dim i As Integer
+        Dim uc As StringBuilder = New StringBuilder
+        For i = 0 To sb.Length - 1
+            Dim c As Char = sb(i)
+            If AscW(c) < 127 Then
+                uc.Append(c.ToString())
+            Else
+                uc.Append("\u" & CStr(AscW(c)) + "?")
+            End If
+        Next
+
+        Return uc
+
+    End Function
+
+    ' thread start for the automatic highlighting
+    Private Shared treelock As New Object()
+    Private isDisposing As Boolean
+    Private textChanged As Boolean
+    Private currentText As String
+
+    Private Sub AutoHighlightStart()
+        Dim _tree As ParseTree
+        Dim _currenttext As String = ""
+        While Not isDisposing
+            Dim _textchanged As Boolean
+            SyncLock treelock
+                _textchanged = textChanged
+                If textChanged Then
+                    textChanged = False
+                    _currenttext = currentText
                 End If
+            End SyncLock
+            If Not _textchanged Then
+                Thread.Sleep(200)
+                Continue While
+            End If
 
-                If Tree.Nodes.Count = 0 Then
-                    Return
+            _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+
+            SyncLock treelock
+                If textChanged Then
+                    Continue While
+                Else
+                    ' assign new tree
+                    Tree = _tree
                 End If
+            End SyncLock
 
-                If Tree.Errors.Count > 0 Then
-                    Exit Sub
-                End If
 
-                Dim start As ParseNode = Tree.Nodes(0)
-                HightlightNode(start, sb)
+            Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
+        End While
+    End Sub
 
-                ' append any trailing skipped tokens that were scanned
-                For Each skiptoken As Token In Scanner.Skipped
+
+    ''' <summary>
+    ''' inserts the RTF codes to highlight text blocks
+    ''' </summary>
+    ''' <param name="node">the node to highlight, will be appended to sb</param>
+    ''' <param name="sb">the final output string</param>
+    Private Sub HightlightNode(ByVal node As ParseNode, ByVal sb As StringBuilder)
+        If node.Nodes.Count = 0 Then
+            If (node.Token.Skipped IsNot Nothing) Then
+                For Each skiptoken As Token In node.Token.Skipped
                     HighlightToken(skiptoken, sb)
                     sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
                 Next
-
-                sb = Unicode(sb)     ' <--- without this, unicode characters will be garbled after highlighting
-
-                AddRtfHeader(sb)
-                AddRtfEnd(sb)
-
-                Textbox.Rtf = sb.ToString()
-
-            Catch ex As Exception
-
-            End Try
-
-        End Sub
-
-
-        ''' <summary>
-        ''' added function to convert unicode characters in the stringbuilder to rtf unicode escapes
-        ''' </summary>
-        Function Unicode(ByVal sb As StringBuilder) As StringBuilder
-
-            Dim i As Integer
-            Dim uc As StringBuilder = New StringBuilder
-            For i = 0 To sb.Length - 1
-                Dim c As Char = sb(i)
-                If AscW(c) < 127 Then
-                    uc.Append(c.ToString())
-                Else
-                    uc.Append("\u" & CStr(AscW(c)) + "?")
-                End If
-            Next
-
-            Return uc
-
-        End Function
-
-        ' thread start for the automatic highlighting
-        Private Shared treelock As New Object()
-        Private isDisposing As Boolean
-        Private textChanged As Boolean
-        Private currentText As String
-
-        Private Sub AutoHighlightStart()
-            Dim _tree As ParseTree
-            Dim _currenttext As String = ""
-            Try
-                While Not isDisposing
-                    Dim _textchanged As Boolean
-                    SyncLock treelock
-                        _textchanged = textChanged
-                        If textChanged Then
-                            textChanged = False
-                            _currenttext = currentText
-                        End If
-                    End SyncLock
-                    If Not _textchanged Then
-                        Thread.Sleep(200)
-                        Continue While
-                    End If
-
-                    _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
-
-                    SyncLock treelock
-                        If textChanged Then
-                            Continue While
-                        Else
-                            ' assign new tree
-                            Tree = _tree
-                        End If
-                    End SyncLock
-
-
-                    If _tree.Errors.Count = 0 Then
-                        Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-                    End If
-                End While
-            Catch ex As Exception
-
-            End Try
-        End Sub
-
-
-        ''' <summary>
-        ''' inserts the RTF codes to highlight text blocks
-        ''' </summary>
-        ''' <param name="node">the node to highlight, will be appended to sb</param>
-        ''' <param name="sb">the final output string</param>
-        Private Sub HightlightNode(ByVal node As ParseNode, ByVal sb As StringBuilder)
-            If node.Nodes.Count = 0 Then
-                If (node.Token.Skipped IsNot Nothing) Then
-                    For Each skiptoken As Token In node.Token.Skipped
-                        HighlightToken(skiptoken, sb)
-                        sb.Append(skiptoken.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace(vbLf, "\par" & vbLf))
-                    Next
-                End If
-
-                HighlightToken(node.Token, sb)
-                sb.Append(node.Token.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace("" & Chr(10) & "", "\par" & Chr(10) & ""))
-                sb.Append("}")
             End If
 
-            For Each n As ParseNode In node.Nodes
-                HightlightNode(n, sb)
-            Next
-        End Sub
+            HighlightToken(node.Token, sb)
+            sb.Append(node.Token.Text.Replace("\", "\\").Replace("{", "\{").Replace("}", "\}").Replace("" & Chr(10) & "", "\par" & Chr(10) & ""))
+            sb.Append("}")
+        End If
 
-        ''' <summary>
-        ''' inserts the RTF codes to highlight text blocks
-        ''' </summary>
-        ''' <param name="token">the token to highlight, will be appended to sb</param>
-        ''' <param name="sb">the final output string</param>
-        Private Sub HighlightToken(ByVal token As Token, ByVal sb As StringBuilder)
-            Select Case token.Type
-                Case TokenType.COMMENT
-                    sb.Append("{{\cf1 ")
-                    Exit Select
-                Case TokenType.DESCRIPTIONCONTENT
-                    sb.Append("{{\cf2 ")
-                    Exit Select
-                Case TokenType.DOUBLEQUOTE
-                    sb.Append("{{\cf3 ")
-                    Exit Select
-                Case TokenType.FOLLOWINGREADINGTEXT
-                    sb.Append("{{\cf4 ")
-                    Exit Select
-                Case TokenType.FRONTREADINGTEXT
-                    sb.Append("{{\cf5 ")
-                    Exit Select
-                Case TokenType.ID
-                    sb.Append("{{\cf6 ")
-                    Exit Select
-                Case TokenType.MODELELEMENTNAME
-                    sb.Append("{{\cf7 ")
-                    Exit Select
-                Case TokenType.PAGENAME
-                    sb.Append("{{\cf8 ")
-                    Exit Select
-                Case TokenType.POSTBOUNDREADINGTEXT
-                    sb.Append("{{\cf9 ")
-                    Exit Select
-                Case TokenType.PREBOUNDREADINGTEXT
-                    sb.Append("{{\cf10 ")
-                    Exit Select
-                Case TokenType.PREDICATEPART
-                    sb.Append("{{\cf11 ")
-                    Exit Select
-                Case TokenType.REFERENCEMODE
-                    sb.Append("{{\cf12 ")
-                    Exit Select
-                Case TokenType.ROLENAME
-                    sb.Append("{{\cf13 ")
-                    Exit Select
-                Case TokenType.SINGLEQUOTE
-                    sb.Append("{{\cf14 ")
-                    Exit Select
-                Case TokenType.SPACE
-                    sb.Append("{{\cf15 ")
-                    Exit Select
-                Case TokenType.UNARYPREDICATEPART
-                    sb.Append("{{\cf16 ")
-                    Exit Select
-                Case TokenType.VALUECONSTRAINTVALUE
-                    sb.Append("{{\cf17 ")
-                    Exit Select
-                Case TokenType.VALUE
-                    sb.Append("{{\cf18 ")
-                    Exit Select
-                Case TokenType.KEYWDADDOBJECTTYPE
-                    sb.Append("{{\cf19 ")
-                    Exit Select
-                Case TokenType.KEYWDADDOBJECTTYPESRELATEDTO
-                    sb.Append("{{\cf20 ")
-                    Exit Select
-                Case TokenType.KEYWDANYNUMBEROF
-                    sb.Append("{{\cf21 ")
-                    Exit Select
-                Case TokenType.KEYWDANYFACTTYPE
-                    sb.Append("{{\cf22 ")
-                    Exit Select
-                Case TokenType.KEYWDATLEASTONE
-                    sb.Append("{{\cf23 ")
-                    Exit Select
-                Case TokenType.KEYWDATMOSTONE
-                    sb.Append("{{\cf24 ")
-                    Exit Select
-                Case TokenType.KEYWDCREATE
-                    sb.Append("{{\cf25 ")
-                    Exit Select
-                Case TokenType.KEYWDHASLONGDESCRIPTION
-                    sb.Append("{{\cf26 ")
-                    Exit Select
-                Case TokenType.KEYWDINCLUDES
-                    sb.Append("{{\cf27 ")
-                    Exit Select
-                Case TokenType.KEYWDISA
-                    sb.Append("{{\cf28 ")
-                    Exit Select
-                Case TokenType.KEYWDISWHERE
-                    sb.Append("{{\cf29 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE
-                    sb.Append("{{\cf30 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPELOGICALYESNO
-                    sb.Append("{{\cf31 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEAUTOCOUNTER
-                    sb.Append("{{\cf32 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEDECIMAL
-                    sb.Append("{{\cf33 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION
-                    sb.Append("{{\cf34 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION
-                    sb.Append("{{\cf35 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION
-                    sb.Append("{{\cf36 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEMONEY
-                    sb.Append("{{\cf37 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER
-                    sb.Append("{{\cf38 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPESIGNEDINTEGER
-                    sb.Append("{{\cf39 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER
-                    sb.Append("{{\cf40 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER
-                    sb.Append("{{\cf41 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER
-                    sb.Append("{{\cf42 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER
-                    sb.Append("{{\cf43 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER
-                    sb.Append("{{\cf44 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEOBJECTID
-                    sb.Append("{{\cf45 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEROWID
-                    sb.Append("{{\cf46 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH
-                    sb.Append("{{\cf47 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH
-                    sb.Append("{{\cf48 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT
-                    sb.Append("{{\cf49 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPERAWDATA
-                    sb.Append("{{\cf50 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH
-                    sb.Append("{{\cf51 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP
-                    sb.Append("{{\cf52 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEDATE
-                    sb.Append("{{\cf53 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPEDATETIME
-                    sb.Append("{{\cf54 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPETIME
-                    sb.Append("{{\cf55 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH
-                    sb.Append("{{\cf56 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH
-                    sb.Append("{{\cf57 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH
-                    sb.Append("{{\cf58 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPETEXTFIXEDLENGTH
-                    sb.Append("{{\cf59 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPETEXTLARGELENGTH
-                    sb.Append("{{\cf60 ")
-                    Exit Select
-                Case TokenType.KEYWDDATATYPETEXTVARIABLELENGTH
-                    sb.Append("{{\cf61 ")
-                    Exit Select
-                Case TokenType.KEYWDIDENTIFIEDBY
-                    sb.Append("{{\cf62 ")
-                    Exit Select
-                Case TokenType.KEYWDISACONCEPT
-                    sb.Append("{{\cf63 ")
-                    Exit Select
-                Case TokenType.KEYWDISAKINDOF
-                    sb.Append("{{\cf64 ")
-                    Exit Select
-                Case TokenType.KEYWDISANENTITYTYPE
-                    sb.Append("{{\cf65 ")
-                    Exit Select
-                Case TokenType.KEYWDISAVALUETYPE
-                    sb.Append("{{\cf66 ")
-                    Exit Select
-                Case TokenType.KEYWDISIDENTIFIEDBY
-                    sb.Append("{{\cf67 ")
-                    Exit Select
-                Case TokenType.KEYWDISOBJECTIFIED
-                    sb.Append("{{\cf68 ")
-                    Exit Select
-                Case TokenType.KEYWDISWRITTENAS
-                    sb.Append("{{\cf69 ")
-                    Exit Select
-                Case TokenType.KEYWDITS
-                    sb.Append("{{\cf70 ")
-                    Exit Select
-                Case TokenType.KEYWDNL
-                    sb.Append("{{\cf71 ")
-                    Exit Select
-                Case TokenType.KEYWDONE
-                    sb.Append("{{\cf72 ")
-                    Exit Select
-                Case TokenType.KEYWDPAGE
-                    sb.Append("{{\cf73 ")
-                    Exit Select
-                Case TokenType.KEYWDREADING
-                    sb.Append("{{\cf74 ")
-                    Exit Select
-                Case TokenType.KEYWDTOPAGE
-                    sb.Append("{{\cf75 ")
-                    Exit Select
-                Case TokenType.KEYWDSTANDALONE
-                    sb.Append("{{\cf76 ")
-                    Exit Select
-                Case TokenType.KEYWDTHEIR
-                    sb.Append("{{\cf77 ")
-                    Exit Select
-                Case TokenType.KEYWDWRITTENAS
-                    sb.Append("{{\cf78 ")
-                    Exit Select
+        For Each n As ParseNode In node.Nodes
+            HightlightNode(n, sb)
+        Next
+    End Sub
 
-                Case Else
-                    sb.Append("{{\cf0 ")
-                    Exit Select
-            End Select
-        End Sub
+    ''' <summary>
+    ''' inserts the RTF codes to highlight text blocks
+    ''' </summary>
+    ''' <param name="token">the token to highlight, will be appended to sb</param>
+    ''' <param name="sb">the final output string</param>
+    Private Sub HighlightToken(ByVal token As Token, ByVal sb As StringBuilder)
+        Select Case token.Type
+                    Case TokenType.COMMENT:
+                        sb.Append("{{\cf1 ")
+                        Exit Select
+                    Case TokenType.DESCRIPTIONCONTENT:
+                        sb.Append("{{\cf2 ")
+                        Exit Select
+                    Case TokenType.DOUBLEQUOTE:
+                        sb.Append("{{\cf3 ")
+                        Exit Select
+                    Case TokenType.FOLLOWINGREADINGTEXT:
+                        sb.Append("{{\cf4 ")
+                        Exit Select
+                    Case TokenType.FRONTREADINGTEXT:
+                        sb.Append("{{\cf5 ")
+                        Exit Select
+                    Case TokenType.ID:
+                        sb.Append("{{\cf6 ")
+                        Exit Select
+                    Case TokenType.MODELELEMENTNAME:
+                        sb.Append("{{\cf7 ")
+                        Exit Select
+                    Case TokenType.PAGENAME:
+                        sb.Append("{{\cf8 ")
+                        Exit Select
+                    Case TokenType.POSTBOUNDREADINGTEXT:
+                        sb.Append("{{\cf9 ")
+                        Exit Select
+                    Case TokenType.PREBOUNDREADINGTEXT:
+                        sb.Append("{{\cf10 ")
+                        Exit Select
+                    Case TokenType.PREDICATEPART:
+                        sb.Append("{{\cf11 ")
+                        Exit Select
+                    Case TokenType.REFERENCEMODE:
+                        sb.Append("{{\cf12 ")
+                        Exit Select
+                    Case TokenType.ROLENAME:
+                        sb.Append("{{\cf13 ")
+                        Exit Select
+                    Case TokenType.SINGLEQUOTE:
+                        sb.Append("{{\cf14 ")
+                        Exit Select
+                    Case TokenType.SPACE:
+                        sb.Append("{{\cf15 ")
+                        Exit Select
+                    Case TokenType.UNARYPREDICATEPART:
+                        sb.Append("{{\cf16 ")
+                        Exit Select
+                    Case TokenType.VALUECONSTRAINTVALUE:
+                        sb.Append("{{\cf17 ")
+                        Exit Select
+                    Case TokenType.VALUE:
+                        sb.Append("{{\cf18 ")
+                        Exit Select
+                    Case TokenType.KEYWDADDOBJECTTYPE:
+                        sb.Append("{{\cf19 ")
+                        Exit Select
+                    Case TokenType.KEYWDADDOBJECTTYPESRELATEDTO:
+                        sb.Append("{{\cf20 ")
+                        Exit Select
+                    Case TokenType.KEYWDANYNUMBEROF:
+                        sb.Append("{{\cf21 ")
+                        Exit Select
+                    Case TokenType.KEYWDANYFACTTYPE:
+                        sb.Append("{{\cf22 ")
+                        Exit Select
+                    Case TokenType.KEYWDATLEASTONE:
+                        sb.Append("{{\cf23 ")
+                        Exit Select
+                    Case TokenType.KEYWDATMOSTONE:
+                        sb.Append("{{\cf24 ")
+                        Exit Select
+                    Case TokenType.KEYWDCREATE:
+                        sb.Append("{{\cf25 ")
+                        Exit Select
+                    Case TokenType.KEYWDHASLONGDESCRIPTION:
+                        sb.Append("{{\cf26 ")
+                        Exit Select
+                    Case TokenType.KEYWDINCLUDES:
+                        sb.Append("{{\cf27 ")
+                        Exit Select
+                    Case TokenType.KEYWDISA:
+                        sb.Append("{{\cf28 ")
+                        Exit Select
+                    Case TokenType.KEYWDISWHERE:
+                        sb.Append("{{\cf29 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPELOGICALTRUEFALSE:
+                        sb.Append("{{\cf30 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPELOGICALYESNO:
+                        sb.Append("{{\cf31 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEAUTOCOUNTER:
+                        sb.Append("{{\cf32 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEDECIMAL:
+                        sb.Append("{{\cf33 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEFLOATCUSTOMPRECISION:
+                        sb.Append("{{\cf34 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEFLOATDOUBLEPRECISION:
+                        sb.Append("{{\cf35 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEFLOATSINGLEPRECISION:
+                        sb.Append("{{\cf36 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEMONEY:
+                        sb.Append("{{\cf37 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPESIGNEDBIGINTEGER:
+                        sb.Append("{{\cf38 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPESIGNEDINTEGER:
+                        sb.Append("{{\cf39 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPESIGNEDSMALLINTEGER:
+                        sb.Append("{{\cf40 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDBIGINTEGER:
+                        sb.Append("{{\cf41 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDINTEGER:
+                        sb.Append("{{\cf42 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDSMALLINTEGER:
+                        sb.Append("{{\cf43 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEUNSIGNEDTINYINTEGER:
+                        sb.Append("{{\cf44 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEOBJECTID:
+                        sb.Append("{{\cf45 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEROWID:
+                        sb.Append("{{\cf46 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPERAWDATAFIXEDLENGTH:
+                        sb.Append("{{\cf47 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPERAWDATALARGELENGTH:
+                        sb.Append("{{\cf48 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPERAWDATAOLEOBJECT:
+                        sb.Append("{{\cf49 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPERAWDATA:
+                        sb.Append("{{\cf50 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPERAWDATAVARIABLELENGTH:
+                        sb.Append("{{\cf51 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEDATE:
+                        sb.Append("{{\cf52 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEAUTOTIMESTAMP:
+                        sb.Append("{{\cf53 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPETEMPORALDATE:
+                        sb.Append("{{\cf54 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPEDATETIME:
+                        sb.Append("{{\cf55 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPETIME:
+                        sb.Append("{{\cf56 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPESTRINGFIXEDLENGTH:
+                        sb.Append("{{\cf57 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPESTRINGLARGELENGTH:
+                        sb.Append("{{\cf58 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPESTRINGVARIABLELENGTH:
+                        sb.Append("{{\cf59 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPETEXTFIXEDLENGTH:
+                        sb.Append("{{\cf60 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPETEXTLARGELENGTH:
+                        sb.Append("{{\cf61 ")
+                        Exit Select
+                    Case TokenType.KEYWDDATATYPETEXTVARIABLELENGTH:
+                        sb.Append("{{\cf62 ")
+                        Exit Select
+                    Case TokenType.KEYWDIDENTIFIEDBY:
+                        sb.Append("{{\cf63 ")
+                        Exit Select
+                    Case TokenType.KEYWDISACONCEPT:
+                        sb.Append("{{\cf64 ")
+                        Exit Select
+                    Case TokenType.KEYWDISAKINDOF:
+                        sb.Append("{{\cf65 ")
+                        Exit Select
+                    Case TokenType.KEYWDISANENTITYTYPE:
+                        sb.Append("{{\cf66 ")
+                        Exit Select
+                    Case TokenType.KEYWDISAVALUETYPE:
+                        sb.Append("{{\cf67 ")
+                        Exit Select
+                    Case TokenType.KEYWDISIDENTIFIEDBY:
+                        sb.Append("{{\cf68 ")
+                        Exit Select
+                    Case TokenType.KEYWDISOBJECTIFIED:
+                        sb.Append("{{\cf69 ")
+                        Exit Select
+                    Case TokenType.KEYWDISWRITTENAS:
+                        sb.Append("{{\cf70 ")
+                        Exit Select
+                    Case TokenType.KEYWDITS:
+                        sb.Append("{{\cf71 ")
+                        Exit Select
+                    Case TokenType.KEYWDNL:
+                        sb.Append("{{\cf72 ")
+                        Exit Select
+                    Case TokenType.KEYWDONE:
+                        sb.Append("{{\cf73 ")
+                        Exit Select
+                    Case TokenType.KEYWDPAGE:
+                        sb.Append("{{\cf74 ")
+                        Exit Select
+                    Case TokenType.KEYWDREADING:
+                        sb.Append("{{\cf75 ")
+                        Exit Select
+                    Case TokenType.KEYWDTOPAGE:
+                        sb.Append("{{\cf76 ")
+                        Exit Select
+                    Case TokenType.KEYWDSTANDALONE:
+                        sb.Append("{{\cf77 ")
+                        Exit Select
+                    Case TokenType.KEYWDTHEIR:
+                        sb.Append("{{\cf78 ")
+                        Exit Select
+                    Case TokenType.KEYWDWRITTENAS:
+                        sb.Append("{{\cf79 ")
+                        Exit Select
 
-        ' define the color palette to be used here
-        Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-            sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red3\green168\blue183;\red153\green0\blue0;\red153\green0\blue0;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red227\green143\blue247;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red216\green127\blue178;\red153\green0\blue0;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
-        End Sub
+            Case Else
+                sb.Append("{{\cf0 ")
+                Exit Select
+        End Select
+    End Sub
 
-        Private Sub AddRtfEnd(ByVal sb As StringBuilder)
-            sb.Append("} ")
-        End Sub
+    ' define the color palette to be used here
+    Private Sub AddRtfHeader(ByVal sb As StringBuilder)
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red3\green168\blue183;\red153\green0\blue0;\red153\green0\blue0;\red0\green191\blue255;\red0\green191\blue255;\red153\green0\blue0;\red76\green153\blue0;\red227\green143\blue247;\red153\green76\blue0;\red153\green76\blue0;\red153\green0\blue153;\red76\green153\blue0;\red153\green76\blue0;\red153\green0\blue0;\red0\green0\blue255;\red153\green0\blue153;\red216\green127\blue178;\red153\green0\blue0;\red115\green217\blue243;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red0\green0\blue255;\red135\green207\blue243;\red135\green207\blue243;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red96\green96\blue96;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue255;\red0\green0\blue102;\red0\green0\blue255;\red135\green207\blue243;\red0\green0\blue255;\red135\green207\blue243;\red115\green217\blue243;\red0\green0\blue255;\red0\green0\blue255;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+    End Sub
 
-        Sub Textbox_Disposed(ByVal sender As Object, ByVal e As EventArgs)
-            Dispose()
-        End Sub
+    Private Sub AddRtfEnd(ByVal sb As StringBuilder)
+        sb.Append("} ")
+    End Sub
+
+    Sub Textbox_Disposed(ByVal sender As Object, ByVal e As EventArgs)
+        Dispose()
+    End Sub
 
 #Region "IDisposable Members"
 
-        Public Sub Dispose() Implements IDisposable.Dispose
-
-            isDisposing = True
-
-            RemoveHandler Textbox.TextChanged, AddressOf Textbox_TextChanged
-            RemoveHandler Textbox.KeyDown, AddressOf textbox_KeyDown
-            RemoveHandler Textbox.SelectionChanged, AddressOf Textbox_SelectionChanged
-
-            threadAutoHighlight.Join(1000)
-            If threadAutoHighlight.IsAlive Then
-                threadAutoHighlight.Abort()
-            End If
-        End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        isDisposing = True
+        threadAutoHighlight.Join(1000)
+        If threadAutoHighlight.IsAlive Then
+            threadAutoHighlight.Abort()
+        End If
+    End Sub
 
 #End Region
 

@@ -1,9 +1,7 @@
 Imports System
 Imports System.IO
 Imports System.Data.SqlClient
-Imports DynamicClassLibrary.Factory
 Imports System.Threading
-Imports System.Reflection
 Imports System.Security.AccessControl
 Imports Boston.DuplexServiceClient  'Client/Server
 Imports System.ServiceModel
@@ -11,6 +9,15 @@ Imports AutoUpdaterDotNET
 Imports System.Configuration
 Imports System.ComponentModel
 Imports System.Runtime.InteropServices
+Imports System.Diagnostics
+Imports System.Linq.Expressions
+Imports System.Xml.Serialization
+Imports System.Windows.Forms
+Imports WeifenLuo.WinFormsUI.Docking
+Imports DynamicClassLibrary.ClassFactory 'Still used in Paste operation. Remove when can. Too slow.
+Imports System.Reflection
+Imports Boston.TestManagement
+Imports System.Globalization
 
 Public Class frmMain
 
@@ -54,42 +61,66 @@ Public Class frmMain
     Public zfrmCRUDEditProject As frmCRUDEditProject = Nothing
     Public zfrmCRUDEditRole As frmCRUDEditRole = Nothing
     Public zfrmCRUDEditUser As frmCRUDEditUser = Nothing
+    Public zfrmDatabases As frmToolboxRelationalDatabaseManager = Nothing
     Public zfrm_ER_diagram_view As frmDiagramERD = Nothing
     Public zfrmOntologyORMModelView As frmDiagramORMForOntologyBrowser = Nothing
     Public zfrm_PGS_diagram_view As frmDiagramPGS = Nothing
+    Public zfrmSchemaManager As frmToolboxGraphSchemaManager = Nothing
     Public zfrmStateTransitionDiagramView As frmStateTransitionDiagram = Nothing
     Public zfrmNotifications As frmNotifications = Nothing
     Friend zfrmCodeGenerator As UI.MainForm = Nothing
+    Friend mfrmOSMTheBox As frmOSMTheBox = Nothing
     Public zfrmUMLUseCaseDiagramView As frmDiagrmUMLUseCase
-
-    'ClientServer
-    'NB See method InitialiseClient
-    'NB See method Private prDubplexServiceClient 
-    'NB See Main.Designer  Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-    'http://localhost
-    Private ServiceEndpointUri As String = My.Settings.BostonServerIPAddress & ":" & My.Settings.BostonServerPortNumber & "/WCFServices/DuplexService"
+    Public mfrmToolboxDatabaseQueryErrors As frmToolboxQueryLog = Nothing
+    Public mfrmUserTaskDashboard As frmUserTaskDashboard = Nothing
 
 #Region "Security - Disable Menu Items on Startup for Client Server"
 
     Private Sub DisableAllMenuItems()
-        For Each menuItem As ToolStripMenuItem In Me.MenuStrip_main.Items
-            DisableMenuItem(menuItem)
-        Next
+
+        Try
+            For Each menuItem As ToolStripMenuItem In Me.MenuStrip_main.Items
+                DisableMenuItem(menuItem)
+            Next
+
+            Me.ToolStrip_main.Enabled = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
     Private Sub DisableMenuItem(ByVal menuItem As ToolStripMenuItem)
-        menuItem.Enabled = False
-        For Each subItem As ToolStripItem In menuItem.DropDownItems
-            If TypeOf subItem Is ToolStripMenuItem Then
-                DisableMenuItem(CType(subItem, ToolStripMenuItem))
-            End If
-        Next
+
+        Try
+            menuItem.Enabled = False
+            For Each subItem As ToolStripItem In menuItem.DropDownItems
+                If TypeOf subItem Is ToolStripMenuItem Then
+                    DisableMenuItem(CType(subItem, ToolStripMenuItem))
+                End If
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
     End Sub
 
     Private Sub EnableAllMenuItems()
         For Each menuItem As ToolStripMenuItem In Me.MenuStrip_main.Items
             EnableMenuItem(menuItem)
         Next
+        Me.ToolStrip_main.Enabled = True
     End Sub
 
     Private Sub EnableMenuItem(ByVal menuItem As ToolStripMenuItem)
@@ -103,27 +134,93 @@ Public Class frmMain
 
 #End Region
 
+    <DllImport("user32.dll")>
+    Private Shared Function GetKeyState(ByVal nVirtKey As Integer) As Short
+    End Function
+
     Private Sub frm_main_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         Try
+            Me.StatusLabelGeneralStatus.Text = "Initialising Application"
+            prApplication = New tApplication
+            prApplication.MainForm = Me
+            Me.StatusLabelGeneralStatus.Text = "Application Initialised"
+
+            If My.Settings.UseVirtualUI And prThinfinity.BrowserInfo IsNot Nothing Then
+                If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Starting Thinfinity Virtual UI", pcenumErrorType.Information)
+                prThinfinity.Start()
+            End If
+
+            'CultureInfo
+            Try
+                Thread.CurrentThread.CurrentCulture = New CultureInfo(My.Settings.CultureInfo)
+                Thread.CurrentThread.CurrentUICulture = New CultureInfo(My.Settings.CultureInfo)
+            Catch ex As Exception
+
+            End Try
+
+
+            'So that the "shapelibrary" folder doesn't get renamed
+            Dim setup As New AppDomainSetup()
+            setup.ShadowCopyFiles = "false"
+
+            'Themeing
+            'Me.DockPanel.Theme = New VS2012LightTheme()
+            'ThemeManager
+            ThemeManager.InitializeThemes()
+            Dim liThemeType = CType([Enum].Parse(GetType(ThemeType), My.Settings.BostonThemeTypeName), ThemeType)
+            piGlobalTheme = liThemeType
+
+
+            'Security========================================================================
+            'Open them at the end of the load, and (where required) the User has logged in.
             If My.Settings.UseClientServer And My.Settings.RequireLoginAtStartup Then
                 Call Me.DisableAllMenuItems()
             End If
 
+            'Threading
+            Dim minWorkerThreads As Integer = 20
+            Dim minCompletionPortThreads As Integer = 20
+
+            ' Try to set the minimum number of threads and capture if the operation was successful
+            Dim success As Boolean = ThreadPool.SetMinThreads(minWorkerThreads, minCompletionPortThreads)
+
             '=============================================================
             'Check if User wants to Debug Load/log the startup process
             '-----------------------------------------------------------
+#Region "Check Debug Mode"
             Me.msLoadDebugMode = My.Settings.DebugMode.ToString
-            If My.Computer.Keyboard.CtrlKeyDown Then
-                My.Settings.DebugMode = pcenumDebugMode.Debug.ToString
-                pbLogStartup = True
-            ElseIf My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
 
-                If MsgBox("Boston is in Debug Mode. Do you want to keep Debugging?", MsgBoxStyle.YesNo) = MsgBoxResult.No Then
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
+                prApplication.ThrowMessage("Starting in Debug Mode", pcenumErrorType.Information)
+            End If
+
+            Const VK_CONTROL As Integer = &H11  ' Virtual-Key code for the Control key
+
+            ' Check if the Ctrl key is down using multiple methods
+            Dim ctrlKeyDown As Boolean = My.Computer.Keyboard.CtrlKeyDown OrElse
+                             (Control.ModifierKeys And Keys.Control) = Keys.Control OrElse
+                             (GetKeyState(VK_CONTROL) And &H8000) <> 0
+
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
+                prApplication.ThrowMessage("Checking Debug Mode", pcenumErrorType.Information)
+            End If
+            If ctrlKeyDown Then
+                My.Settings.DebugMode = pcenumDebugMode.Debug.ToString
+                prApplication.ThrowMessage("Starting Boston in Debug Mode. [Ctrl] key down.", pcenumErrorType.Information)
+                pbLogStartup = True
+            ElseIf My.Settings.DebugMode = pcenumDebugMode.Debug.ToString And Not My.Settings.UseClientServer And Not My.Settings.UseVirtualUI Then
+                prApplication.ThrowMessage("Confirming if the user wants to keep using Debug Mode.", pcenumErrorType.Information)
+                If MsgBox("Boston is in Debug Mode. Do you want to keep Debugging?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                    prApplication.ThrowMessage("Starting Boston in Debug Mode.", pcenumErrorType.Information)
+                    pbLogStartup = True
+                ElseIf Not My.Settings.UseVirtualUI Then
                     My.Settings.DebugMode = pcenumDebugMode.DebugCriticalErrorsOnly.ToString
                     My.Settings.Save()
                 End If
             End If
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Checked Debug Mode", pcenumErrorType.Information)
+#End Region
 
             '===============================================================================================================================================
             'NB The current SVN Repository for Boston is at:
@@ -131,17 +228,20 @@ Public Class frmMain
             '-----------------------------------------------------
             'Configuration file ends up in something like: C:\Users\Viev\AppData\Local\Viev_Pty_Ltd\Boston.exe_Url_wd25rcgtvmds0ynngskc2ps2lwmmryie\2.5.0.0
             '------------------------------------------------------------------------------------------------------------------------
-
             Dim lsMessage As String = ""
 
+            '=============================================================
+            'First Run
+            'If this is the first time Boston is being run for a new installation. FirstRun is set to True, for instance, in the Boston Professional/Student releases, not an upgrade.
             If My.Settings.FirstRun Then
+                If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("First Run", pcenumErrorType.Information)
                 Try
+                    If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Creating AppData/FactEngine/Boston folders", pcenumErrorType.Information)
                     Dim lrCommonApplicationData As New CommonApplicationData("FactEngine", "Boston")
                     Call lrCommonApplicationData.CreateFolders(True)
                 Catch ex As Exception
                     'Not a biggie. This is only rarely a problem.
                 End Try
-
             End If
 
             Me.MenuStrip_main.ImageScalingSize = New Drawing.Size(16, 16)
@@ -157,16 +257,58 @@ Public Class frmMain
             '====================================================================================
             'Notes
             '  Core v2.1 introduces changes to the StateTransitionDiagram model, with changes to the underlying ModelElements. Introduced in Boston v5.4
-            psApplicationApplicationVersionNr = "7.1"
-            psApplicationDatabaseVersionNr = "1.39"
+            psApplicationApplicationVersionNr = "9.4"
+            psApplicationDatabaseVersionNr = "1.42"
             'NB To access the Core version number go to prApplication.CMML.Core.CoreVersionNumber once the Core has loaded.
+            'NB The actual version of the production database is stored in the ReferenceFieldValue table in the database itself.
+            'E.g. With actual Table, Row, and Field Ids
+            '=============================================
+            'TableId | RowId | ReferenceFieldId | Data
+            '   1	 |  1    |  	1           | 1.41
 
             Dim loAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
             Dim loFVI As System.Diagnostics.FileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(loAssembly.Location)
             psAssemblyFileVersionNumber = loFVI.FileVersion
 
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
+                prApplication.ThrowMessage($"Application Version Number: {psApplicationApplicationVersionNr}".AppendDoubleLineBreak($"Database Version Nr: {psApplicationDatabaseVersionNr}"), pcenumErrorType.Information)
+            End If
+
+#Region "Earhart Document Search"
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Setting up Earhart", pcenumErrorType.Information)
+            If My.Settings.LiteDBFilePath.Trim = "" Then
+                My.Settings.LiteDBFilePath = Path.Combine(My.Computer.FileSystem.SpecialDirectories.CurrentUserApplicationData, "app.db")
+            End If
+
+            'Earhart AI Training File
+            If My.Settings.NLToIndexQueryTrainingFileLocation.Trim = "" Then
+                Dim lsAITrainingFileFilePath As String = Path.Combine(Boston.MyPath, "earhartaitraining\EarhartIndexQueryTrainingExamples.txt")
+                My.Settings.NLToIndexQueryTrainingFileLocation = lsAITrainingFileFilePath
+                Try
+                    File.Move(My.Settings.NLToIndexQueryTrainingFileLocation, lsAITrainingFileFilePath)
+                Catch ex As Exception
+                    Try
+                        System.IO.File.Create(lsAITrainingFileFilePath).Dispose()
+                    Catch ex1 As Exception
+                        'Likely already existed.
+                    End Try
+                End Try
+            End If
+#End Region
+
+            ' Get the local AppData folder specific to your company and application
+            Dim localAppDataFolder As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.CompanyName, Application.ProductName)
+
+#Region "Test Management - Test Case Artifacts Directory"
+            'Create the destination folder if it doesn't exist
+            Directory.CreateDirectory(localAppDataFolder)
+            Directory.CreateDirectory(Path.Combine(localAppDataFolder, "TestCaseArtifacts"))
+#End Region
+
             'Make sure the Config is up to date
             Dim loConfiguration As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal)
+#Region "Configuration File up to date"
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Checking Config File is up to date.", pcenumErrorType.Information)
             If Not loConfiguration.HasFile Then
 
                 Try
@@ -200,9 +342,11 @@ Public Class frmMain
                 My.Settings.Save()
 
             End If
+#End Region
 
 ConfigurationOK:
 
+#Region "Splash Screen"
             If Not My.Settings.UseVirtualUI Then
                 ltSplashThread = New Thread(AddressOf Me.LoadSplashScreen)
                 ltSplashThread.IsBackground = True
@@ -210,15 +354,12 @@ ConfigurationOK:
             Else
                 Call Me.LoadSplashScreen(psAssemblyFileVersionNumber)
             End If
+#End Region
+
 
             '==============================================================================================================================
-            Me.StatusLabelGeneralStatus.Text = "Initialising Application"
-            prApplication = New tApplication
-            prApplication.MainForm = Me
-            Me.StatusLabelGeneralStatus.Text = "Application Initialised"
-
             If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
-                prApplication.ThrowErrorMessage("Starting Boston", pcenumErrorType.Information)
+                prApplication.ThrowMessage("Starting Boston", pcenumErrorType.Information)
             End If
 
             prApplication.SoftwareCategory = prSoftwareCategory
@@ -229,7 +370,7 @@ ConfigurationOK:
             prApplication.ActivePages = New List(Of WeifenLuo.WinFormsUI.Docking.DockContent)
 
             Me.StatusLabelGeneralStatus.Text = "Loaded docking forms"
-            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowErrorMessage("Loaded docking forms", pcenumErrorType.Information)
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Loaded docking forms", pcenumErrorType.Information)
 
             prApplication.MainForm = Me
 
@@ -238,6 +379,7 @@ ConfigurationOK:
             Me.StatusLabelGeneralStatus.Text = "Checking For Plugins"
             '===============================================================================
             'Get the Plugins for the Application.
+#Region "Load Plugins"
             '  NB Plugins are not critical, so if the \plugins\ directory doesn't exist, then skip this step.
             Dim lsPluginDirectoryPath As String
             lsPluginDirectoryPath = Boston.MyPath & "\plugins\"
@@ -255,14 +397,22 @@ ConfigurationOK:
                     Next
                 End If
             End If
+
             '===============================================================================
-            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowErrorMessage("Checked for Plugins", pcenumErrorType.Information)
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Checked for Plugins", pcenumErrorType.Information)
+#End Region
+
+            'Database Location
+            '  With special processing for the First Run of Boston. I.e. First Run after installation.
+#Region "Database Location - If need be for embedded databases for Boston."
             '-------------------------------------------------------------------------------------------------------------
             '20170101-VM-Might pay to (first-use) copy the database to the following directory and set the user permissions to 
             '  stop MS Access "An updatable query Is required" errors, when the JetEngine can't access the database file.
             '  There's a problem storing the database in the C:\ProgramFiles\<ApplicationDirectory> because of hightened security 
             '  in later versions of MS Windows.
             'NB Initially, testing to see if changing the database directory security permissions can be done here (see below).          
+            '20230918-VM-Check this. Definitely do not want to use User\Local\AppData for various reasons.
+            '  We want to use C:\ProgramData
             Try
                 publicAccessControl.AddDirectorySecurity(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData,
                                         "Users",
@@ -283,80 +433,128 @@ ConfigurationOK:
 
             Dim lbFirstRun As Boolean = My.Settings.FirstRun
 
-
-
             Me.StatusLabelGeneralStatus.Text = "Checking Database availability"
-            If My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
-                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-                lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
-                lsDatabaseName = Path.GetFileName(lsDatabaseLocation)
-                lsDatabaseLocationDirectory = Path.GetDirectoryName(lsDatabaseLocation)
+            Select Case My.Settings.DatabaseType
 
-                Try
-                    lsDatabaseType = lrSQLConnectionStringBuilder("Provider")
-                Catch
-                    lsMessage = "No 'Provider' in Connection String, for User Configuration:"
-                    lsMessage.AppendDoubleLineBreak(Boston.GetConfigFileLocation)
-                    Throw New Exception(lsMessage)
-                End Try
-                If My.Settings.FirstRun = True Then
-                    '----------------------------------------------------------------------------------------
-                    'Move the database to My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
-                    '  and update the ConnectionString for the database.
-                    '----------------------------------------------------------------------------------------
-#Region "AppData - database.sql to AppData\Local\FactEngine\Boston\database\boston.sqlite"
-                    Try
-                        ' Get the local AppData folder specific to your company and application
-                        Dim localAppDataFolder As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.CompanyName, Application.ProductName)
+                Case Is = pcenumDatabaseType.SQLite.ToString
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-                        ' Create the destination folder if it doesn't exist
-                        Directory.CreateDirectory(localAppDataFolder)
+                    lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+                    lsDatabaseName = Path.GetFileName(lsDatabaseLocation)
+                    lsDatabaseLocationDirectory = Path.GetDirectoryName(lsDatabaseLocation)
 
-                        ' Set the source and destination file paths
-                        Dim sourceFilePath As String = Path.Combine(Application.StartupPath, "database\boston.sqlite")
-                        Dim destinationFilePath As String = Path.Combine(localAppDataFolder, "database\boston.sqlite")
+#Region "First Run. For Non-Upgrade installations. Copy boston database out of the Program Files application folder."
+                    If My.Settings.FirstRun = True Then
+                        '----------------------------------------------------------------------------------------
+                        'Move the database to My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
+                        '  and update the ConnectionString for the database.
+                        '----------------------------------------------------------------------------------------
+#Region "Move db to AppData - boston.db to AppData\Local\FactEngine\Boston\database\boston.db"
+                        Dim sourceDatabaseFilePath As String = "Unknown"
+                        Try
+                            ' Get the local AppData folder specific to your company and application
+                            localAppDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.CompanyName, Application.ProductName)
 
-                        ' Move the file
-                        File.Copy(sourceFilePath, destinationFilePath)
-                    Catch ex As Exception
-                        prApplication.ThrowErrorMessage("Failed to move the boston.sqlite database to AppData\Local", pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
-                    End Try
+                            'Create the destination folder if it doesn't exist
+                            Directory.CreateDirectory(localAppDataFolder)
+                            Directory.CreateDirectory(Path.Combine(localAppDataFolder, "database"))
+
+                            ' Set the source and destination file paths
+                            sourceDatabaseFilePath = Path.Combine(Boston.MyPath, "database\boston.db")
+                            lsCommonDatabaseFileLocation = Path.Combine(localAppDataFolder, "database\boston.db")
+
+                            'Move the Boston database file
+                            File.Copy(sourceDatabaseFilePath, lsCommonDatabaseFileLocation)
+
+                            If Not File.Exists(lsCommonDatabaseFileLocation) Then
+                                Throw New Exception("Failed to Copy database to AppData\Local. File does not exist.")
+                            End If
+
+#Region "Core Database"
+                            'NB Moved to Core database stored as XML
+
+                            'Create the destination folder if it doesn't exist
+                            Directory.CreateDirectory(Path.Combine(localAppDataFolder, "database", "XML"))
+
+                            ' Set the source and destination file paths
+                            sourceDatabaseFilePath = Path.Combine(Boston.MyPath, "coremodel\Core.fbm")
+                            Dim lsCoreModelFileLocation = Path.Combine(localAppDataFolder, "database", "XML\core.fbm")
+
+                            'Move the Boston database file
+                            File.Copy(sourceDatabaseFilePath, lsCoreModelFileLocation)
+
+                            If Not File.Exists(lsCoreModelFileLocation) Then
+                                Throw New Exception("Failed to Copy the Core Model to AppData\Local. File does not exist.")
+                            End If
 #End Region
 
+                            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then
+                                lsMessage = "Failed to move the boston.db sqlite database to AppData\Local"
+                                lsMessage.AppendLine("sourceDatabaseFilePath:  " & sourceDatabaseFilePath)
+                                lsMessage.AppendLine("CommonDatabaseFileLocation: " & lsCommonDatabaseFileLocation)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+                            End If
+                        Catch ex As Exception
+                            lsMessage = "Failed to move the boston.sqlite database to AppData\Local"
+                            lsMessage.AppendLine("sourceDatabaseFilePath: " & sourceDatabaseFilePath)
+                            lsMessage.AppendLine("CommonDatabaseFileLocation: " & lsCommonDatabaseFileLocation)
+                            lsMessage.AppendDoubleLineBreak("Error Message: " & ex.Message)
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+                        End Try
+#End Region
 
-                    lsCommonDatabaseFileLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
-                    IO.Directory.CreateDirectory(lsCommonDatabaseFileLocation)
+#Region "Old Code - ProgramData"
+                        'lsCommonDatabaseFileLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
+                        'IO.Directory.CreateDirectory(lsCommonDatabaseFileLocation)
 
-                    Dim lsFirstRunDatabaseLocation As String = ""
-                    lsFirstRunDatabaseLocation = Boston.MyPath & "\database\" & lsDatabaseName
-                    Try
-                        IO.File.Copy(lsFirstRunDatabaseLocation, lsCommonDatabaseFileLocation & "\" & lsDatabaseName, False)
-                    Catch
-                        'If the file already exists then not a problem.
-                    End Try
+                        'Dim lsFirstRunDatabaseLocation As String = ""
+                        'lsFirstRunDatabaseLocation = Boston.MyPath & "\database\" & lsDatabaseName
+                        'Try
+                        '    IO.File.Copy(lsFirstRunDatabaseLocation, lsCommonDatabaseFileLocation & "\" & lsDatabaseName, False)
+                        'Catch
+                        '    'If the file already exists then not a problem.
+                        'End Try
+#End Region
 
-                    lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
-                    lrSQLConnectionStringBuilder.Add("Provider", lsDatabaseType)
-                    lrSQLConnectionStringBuilder.Add("Data Source", lsCommonDatabaseFileLocation & "\" & lsDatabaseName)
+                        lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
+                        lrSQLConnectionStringBuilder.Add("Data Source", lsCommonDatabaseFileLocation)
+                        lrSQLConnectionStringBuilder.Add("Version", 3)
 
-                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        '---------------------------
+                        'Update Configuration File
+                        My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
+                        My.Settings.FirstRun = False
+                        My.Settings.Save()
 
-                    My.Settings.FirstRun = False
-                    My.Settings.Save()
-
-                    If pbLogStartup Then
-                        lsMessage = "FirstRun-Moved database To " & lsCommonDatabaseFileLocation
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
+                        If pbLogStartup Then
+                            lsMessage = "FirstRun-Moved database To " & lsCommonDatabaseFileLocation
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information)
+                        End If
                     End If
-                End If
+#End Region
+                Case Is = pcenumDatabaseType.MSJet.ToString
+                    Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
+                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
 
-            End If
+                    lsDatabaseLocation = lrSQLConnectionStringBuilder("Data Source")
+                    lsDatabaseName = Path.GetFileName(lsDatabaseLocation)
+                    lsDatabaseLocationDirectory = Path.GetDirectoryName(lsDatabaseLocation)
 
-            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowErrorMessage("Checked database availability", pcenumErrorType.Information)
+                    Try
+                        lsDatabaseType = lrSQLConnectionStringBuilder("Provider")
+                    Catch
+                        lsMessage = "No 'Provider' in Connection String, for User Configuration:"
+                        lsMessage.AppendDoubleLineBreak(Boston.GetConfigFileLocation)
+                        Throw New Exception(lsMessage)
+                    End Try
+            End Select
 
+            If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Checked database availability", pcenumErrorType.Information)
+#End Region
 
+            '--------------------------------------------------------------------------------------
             'DockPanel            
             Dim configFile As String = System.IO.Path.Combine(Boston.MyPath, "DockPanel.config")
 
@@ -367,17 +565,22 @@ ConfigurationOK:
             '  NB May be different from My.Settings.DatabaseVersionNumber, which is the actual version of the database installed.
             prApplication.DatabaseVersionNr = psApplicationDatabaseVersionNr
 
-#Region "Open the database & Upgrade If necessary"
             Me.StatusLabelGeneralStatus.Text = "Opening Database"
 
             'Force Save of Settings (such that in Debug Mode in Visual Studio we can at least modify default setting on the machine)
             My.Settings.Save()
 
 
-            If Boston.OpenDatabase() Then
+            '======================================
+            'Open the Boston Database.
+            If Database.OpenDatabase() Then
 
+                TimerGFSBackup.Enabled = True
+                TimerGFSBackup.Start()
+
+#Region "Open the database & Upgrade If necessary"
                 If pbLogStartup Then
-                    prApplication.ThrowErrorMessage("Successfully opened the database", pcenumErrorType.Information)
+                    prApplication.ThrowMessage("Successfully opened the database", pcenumErrorType.Information)
                 End If
 
                 '----------------------------------------------------------------------------------------------------------------------
@@ -393,10 +596,20 @@ ConfigurationOK:
                 Dim lsDatabaseVersionNumber As String = ""
                 lsDatabaseVersionNumber = TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
                 If CDbl(prApplication.DatabaseVersionNr) <> CDbl(lsDatabaseVersionNumber) Then
+
+                    lsMessage = "Identified that AddressOf database upgrade is required"
+                    lsMessage.AppendLine("Application Database Version Number (Required): " & prApplication.DatabaseVersionNr)
+                    lsMessage.AppendLine("Actual Database Version Number: " & lsDatabaseVersionNumber)
+                    lsMessage.AppendLine("Database Connection String: " & pdbConnection.DatabaseConnectionString)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, False, , False, Nothing, False)
+
                     '--------------------------------------------------------------------------------------
                     'The Boston application requires a different DatabaseVersion than the one installed
                     '--------------------------------------------------------------------------------------
                     If CDbl(prApplication.DatabaseVersionNr) > CDbl(lsDatabaseVersionNumber) Then
+
+                        TimerGFSBackup.Enabled = False
+
                         If Me.PerformDatabaseUpgrade() Then
                             '----------------------------------------------------
                             'Great. The database upgrade finished successfully.
@@ -421,7 +634,7 @@ ConfigurationOK:
                         lsMessage &= vbCrLf & vbCrLf
                         lsMessage &= "Installed database location " & vbCrLf
                         lsMessage &= lsCommonDatabaseFileLocation
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical)
                         Me.Close()
                         Me.Dispose()
                         Exit Sub
@@ -430,17 +643,58 @@ ConfigurationOK:
 #End Region
 
                 Me.StatusLabelGeneralStatus.Text = "Database Opened Successfully"
-                If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowErrorMessage("Database Opened Successfully", pcenumErrorType.Information)
+                If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Database Opened Successfully", pcenumErrorType.Information)
 
                 '=========================================================================
                 'CodeSafe - Settings
                 My.Settings.UsecaseShapeLibrary = ".\shapelibrary\usecase.shl"
 
                 With New WaitCursor
+                    '=======================================================================================================================
+                    'Load the Startup Page
+                    '-----------------------
+#Region "Load the Startup Page"
+                    Dim lrChildForm As New frmStartup
+                    lrChildForm.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+                    Me.zfrmStartup = lrChildForm
+
+                    If pbLogStartup Then prApplication.ThrowMessage("Successfully loaded the Startup page", pcenumErrorType.Information)
+                    '=======================================================================================================================
+
+                    If pbLogStartup Then prApplication.ThrowMessage("Finished loading the Main form.", pcenumErrorType.Information)
+#End Region
+
+#Region "Load the User Task Dashboard"
+                    Dim lrUserTaskDashboard As frmUserTaskDashboard = Nothing
+                    If My.Settings.UseClientServer Then
+                        lrUserTaskDashboard = Me.LoadUserTaskDashboard()
+                    End If
+#End Region
+
+                    Me.zfrmStartup.Activate()
+
                     '==========================================
                     'Client/Server                
 #Region "Client/Server"
-                    If My.Settings.UseClientServer _
+                    'Close Splash Screen
+#Region "Close Splash Screen"
+                    ' Close the form from the main UI thread
+                    For Each form As Form In Application.OpenForms
+                        If form.GetType() Is GetType(frmSplash) Then
+                            form.Invoke(Sub() form.Close())
+                            Exit For
+                        End If
+                    Next
+#End Region
+
+                    'Client/Server
+                    If My.Settings.RequireLoginAtStartup = False And My.Settings.UseClientServer Then
+                        prApplication.User = New ClientServer.User()
+                        prApplication.User = tableClientServerUser.getUserDetailsByUsername("admin", prApplication.User)
+                        prApplication.User.IsLoggedIn = True
+                        Call Me.logInUser(prApplication.User)
+
+                    ElseIf My.Settings.UseClientServer _
                           And My.Settings.RequireLoginAtStartup _
                            And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                         If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -449,12 +703,17 @@ ConfigurationOK:
                             'LogIn from populates prApplication.User
                             Call Me.logInUser(prApplication.User)
                             Call Me.EnableAllMenuItems()
+
+                            If lrUserTaskDashboard IsNot Nothing Then
+                                Call lrUserTaskDashboard.SetupForm()
+                            End If
+
                         Else
                             Me.Close()
                             Me.Dispose()
                         End If
                     ElseIf My.Settings.RequireLoginAtStartup _
-And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
+                        And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                         If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
 
                             '------------------------------------------------------------------
@@ -466,16 +725,40 @@ And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                         End If
                     End If
 
+
                     If My.Settings.UseClientServer = True Then
+
+                        '=======================================
+                        'Check if is Demo User
+                        If prApplication.User.Username = "demo" And prApplication.User.PasswordHash = ClientServer.getHash("demo") Then
+                            'Is Demo User. Start the Demo Timer.
+                            Me.TimerDemo.Enabled = True
+                            Me.TimerDemo.Start()
+                        End If
+
+                        Me.FormBorderStyle = FormBorderStyle.FixedSingle
+
                         If My.Settings.InitialiseClient Then
-                            Call Me.InitializeClient() 'Connects to the Boston Server Host
+                            Call prApplication.InitializeClient() 'Connects to the Boston Server Host
                         End If
 
                         If prUser IsNot Nothing Then
                             Call Me.logInUser(prUser)
                         End If
-                    End If
+
+#Region "Profile - Personalisation"
+
+                        If prApplication.User.Profile IsNot Nothing Then
+                            If prApplication.User.Profile.ShowTheBox Then Call Me.LoadOSMTheBox(Nothing, prApplication.User)
+                            If prApplication.User.Profile.ShowVirtualAnalyst Then Call Me.loadToolboxRichmondBrainBox(Nothing, Nothing)
+                        End If
+
 #End Region
+
+                    End If
+
+#End Region
+                    If My.Settings.DebugMode = pcenumDebugMode.Debug.ToString Then prApplication.ThrowMessage("Processed Client/Server", pcenumErrorType.Information)
 
 #Region "Core and Language Models"
                     With New WaitCursor
@@ -495,31 +778,18 @@ And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                         '=======================================
                         'Load the Language Model
                         Call TableModel.GetModelDetails(prApplication.Language.Model)
-                        Call prApplication.Language.Model.Load(abDontUseBLOBLoading:=True)
+                        Call prApplication.Language.Model.Load(abDontUseBLOBLoading:=True, abLoadPages:=False)
 
-                        prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
-
-                        If pbLogStartup Then prApplication.ThrowErrorMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
+                        If pbLogStartup Then prApplication.ThrowMessage("Successfully loaded the Language Model", pcenumErrorType.Information)
                         '=======================================
                     End With
 #End Region
 
+
+                    '==============================
+                    'Setup Form
+                    '------------
                     Call Me.SetupForm()
-
-                    '=======================================================================================================================
-                    '-----------------------
-                    'Load the Startup Page
-                    '-----------------------
-                    Dim lrChildForm As New frmStartup
-                    lrChildForm.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
-                    Me.zfrmStartup = lrChildForm
-
-                    If pbLogStartup Then prApplication.ThrowErrorMessage("Successfully loaded the Startup page", pcenumErrorType.Information)
-                    '=======================================================================================================================
-
-                    If pbLogStartup Then prApplication.ThrowErrorMessage("Finished loading the Main form.", pcenumErrorType.Information)
-
-                    Cursor.Current = Cursors.Default
 
                     While (Not prApplication.CMML.Core.Loaded) And Not My.Settings.ModelingUseThreadedXMLPageLoading
                         'Stay here until threading is done.
@@ -607,16 +877,18 @@ And Not My.Settings.UseWindowsAuthenticationVirtualUI Then
                     End Try
 #End Region
 
-                    If pbLogStartup Then prApplication.ThrowErrorMessage("Finished Registration Checking", pcenumErrorType.Information)
+                    If pbLogStartup Then prApplication.ThrowMessage("Finished Registration Checking", pcenumErrorType.Information)
 
 SkipRegistrationChecking:
                     '-----------------------------------------------------------
                     'Automatic Update Checker
                     '-------------------------
+#Region "Automatic Updates/Upgrades - Check for."
                     If My.Settings.UseAutoUpdateChecker And lbCanCheckForUpdates Then
                         AutoUpdater.InstalledVersion = New Version(psAssemblyFileVersionNumber)
-                        AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
+                        AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml") 'The Location of the file that shows which update is available.
                     End If
+#End Region
                 End With
             Else
                 '-------------------------------------------------------------------
@@ -624,13 +896,21 @@ SkipRegistrationChecking:
                 '-------------------------------------------------------------------
 
                 'Call Me.LoadCRUDRichmondConfiguration()
+                Boston.ShowFlashCard("The database didn't open. Try [Alt] key down when you start Boston and point to the database", Color.Salmon)
 
                 Me.Close()
                 Me.Dispose()
             End If
 
+
+            'Theming
+            ' Apply a default or custom theme if no theme is set
+            ThemeManager.ApplyTheme(Me, liThemeType)
+
             My.Settings.DebugMode = Me.msLoadDebugMode
-            If pbLogStartup Then prApplication.ThrowErrorMessage("Finished frmMain.Load method.", pcenumErrorType.Information)
+            If pbLogStartup Then prApplication.ThrowMessage("Finished frmMain.Load method.", pcenumErrorType.Information)
+
+            'NB The Models are loaded on a Timer on the ModelExplorer
 
         Catch ex As Exception
             Dim lsMessage1 As String
@@ -638,7 +918,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -652,8 +932,20 @@ SkipRegistrationChecking:
             Call TableModel.GetModelDetails(prApplication.CMML.Core)
             prApplication.CMML.Core.Load(True, False, abDontUseBLOBLoading:=True)
 
+            'Speed up loading of the Core Model.
+            If Not prApplication.CMML.Core.StoreAsXML Then
+                'CodeSafe - Make sure the Pages are loaded.
+                For Each lrPage In prApplication.CMML.Core.Page.Where(Function(page) Not page.Loaded).ToList()
+                    Call lrPage.Load(False)
+                Next
+
+                With New WaitCursor
+                    prApplication.CMML.Core.SetStoreAsXML(True, True)
+                End With
+            End If
+
             If pbLogStartup Then
-                prApplication.ThrowErrorMessage("Successfully loaded the Core Model", pcenumErrorType.Information)
+                prApplication.ThrowMessage("Successfully loaded the Core Model", pcenumErrorType.Information)
             End If
 
         Catch ex As Exception
@@ -662,7 +954,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -679,7 +971,7 @@ SkipRegistrationChecking:
         Try
 
             If pbLogStartup Then
-                prApplication.ThrowErrorMessage("Starting to setup the Main form.", pcenumErrorType.Information)
+                prApplication.ThrowMessage("Starting to setup the Main form.", pcenumErrorType.Information)
             End If
 
             '--------------------------------------------
@@ -709,9 +1001,21 @@ SkipRegistrationChecking:
             '-----------------------------------------------------------------------------
             'If the user setting for ShowEnterpriseTreeView is set to True, then 
             '  show the EnterpriseTreeView form.
+            'NB The Models are loaded on a Timer on the ModelExplorer. I.e. After the Main form has loaded.
             '-----------------------------------------------------------------------------
             If My.Settings.ShowModelExplorer Then
-                Call Me.LoadEnterpriseTreeViewer()
+
+                If My.Settings.UseClientServer AndAlso prApplication.User.IsLoggedIn AndAlso prApplication.User.Profile IsNot Nothing Then
+
+                    If prApplication.User.Profile.ShowEnterpriseExplorer Then
+                        Call Me.LoadEnterpriseTreeViewer()
+                    End If
+
+                Else
+                    Call Me.LoadEnterpriseTreeViewer()
+                End If
+
+
                 Me.MenuItem_ShowEnterpriseTreeView.Checked = True
             End If
 
@@ -729,7 +1033,7 @@ SkipRegistrationChecking:
             Me.ToolStrip_main.Visible = My.Settings.ShowStandardToolbar
 
             If pbLogStartup Then
-                prApplication.ThrowErrorMessage("Successfully setup the Main form.", pcenumErrorType.Information)
+                prApplication.ThrowMessage("Successfully setup the Main form.", pcenumErrorType.Information)
             End If
 
             Me.TimerNotifications.Start()
@@ -742,7 +1046,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -780,6 +1084,18 @@ SkipRegistrationChecking:
             StandardToolStripMenuItem.Checked = My.Settings.ShowStandardToolbar
 
             '--------------------------------------------------------------
+            'Session            
+            If My.Settings.UseClientServer And My.Settings.LoggingOutEndsSession Then
+                Me.mnuOption_EndSession.Visible = False
+                Me.ToolStripMenuItemLogOut.Visible = True
+                Me.ToolStripMenuItemLogOut.Text = "&Log out (End Session)"
+            Else
+                'CodeSafe
+                Me.mnuOption_EndSession.Visible = True
+                Me.ToolStripMenuItemLogOut.Text = "&Log out"
+            End If
+
+            '--------------------------------------------------------------
             'Model Explorer
             If Me.zfrmModelExplorer Is Nothing Then
                 Me.SaveToolStripMenuItem.Enabled = False
@@ -796,6 +1112,15 @@ SkipRegistrationChecking:
             Me.ToolStripMenuItemUnifiedOntology.Visible = My.Settings.ShowUnifiedOntologyBrowser
 
             '=======================================================================
+            'OSM
+            Me.ToolStripMenuItemOSM.Visible = My.Settings.OSMShowOSMMenu And
+                                              My.Settings.DatabaseType = "SQLite"
+
+            '==============================
+            'Enterprise
+            Me.ToolStripMenuItemEnterprise.Visible = My.Settings.EnterpriseShowEnterpriseMenu
+
+            '=======================================================================
             'Client/Server
             If My.Settings.ShowProjectUserMenuItems Then
                 Me.ToolStripMenuItemUser.Visible = True
@@ -804,6 +1129,9 @@ SkipRegistrationChecking:
             If My.Settings.UseClientServer Then
                 Me.ToolStripMenuItemCodeGenerator.Enabled = My.Settings.ClientServerViewCodeGenerator
                 Me.ToolStripMenuItemLogInAs.Visible = True
+                If My.Settings.UseVirtualUI Then
+                    Me.ToolStripMenuItemChatOpenAI.Visible = False
+                End If
             End If
 
             '-------------------------------------------------------------------------------------------------------
@@ -816,6 +1144,7 @@ SkipRegistrationChecking:
                     Me.ToolStripMenuItemOpenLogFile.Visible = False
                     Me.ToolStripMenuItemTestClientServer.Visible = False
                 End If
+                Me.ToolStripMenuItemOSM.Visible = prApplication.User.IsSuperuser
             End If
 
             '=======================================================================================================
@@ -879,6 +1208,8 @@ SkipRegistrationChecking:
                 If prApplication.User.IsSuperuser Then
                     Me.ToolStripMenuItemAddGroup.Enabled = True
                     Me.ToolStripMenuItemBoston.Visible = True
+                    Me.ToolStripMenuItemSuperuser.Visible = My.Settings.MainFormShowSuperUserMenu
+                    Me.ToolStripMenuItemEditConfigurationData.Visible = True
                 Else
                     Me.ToolStripMenuItemBoston.Visible = False
                 End If
@@ -898,6 +1229,11 @@ SkipRegistrationChecking:
                     Me.ToolStripMenuItemEditGroup.Visible = True
                     Me.ToolStripMenuItemEditGroup.Enabled = True
                 End If
+
+#Region "Superuser"
+                Me.ToolStripMenuItemDocumentSearch.Enabled = prApplication.User.IsSuperuser
+#End Region
+
             End If
 
             '-----------------------------------------------------------
@@ -912,15 +1248,18 @@ SkipRegistrationChecking:
                 Me.ToolStripSeparator6.Visible = False
             End If
 
-            'SuperUser
+
             If prApplication.User IsNot Nothing Then
                 Me.RegistrationToolStripMenuItem.Visible = My.Settings.UseClientServer And prApplication.User.IsSuperuser
             End If
+
+            'SuperUser
             If My.Settings.SuperuserMode Then
-                Me.ToolStripMenuItemSuperuser.Visible = True
+                Me.ToolStripMenuItemSuperuser.Visible = My.Settings.MainFormShowSuperUserMenu
                 Me.ToolStripMenuItemEditConfigurationData.Visible = True
             End If
 
+            Me.Refresh()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -928,7 +1267,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1030,7 +1369,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1068,7 +1407,7 @@ SkipRegistrationChecking:
         End If
 
         Try
-            If IsSomething(Me.DockPanel) Then
+            If Me.DockPanel IsNot Nothing Then
                 Me.DockPanel.Dispose()
             End If
         Catch
@@ -1081,8 +1420,10 @@ SkipRegistrationChecking:
             lrLogEntry.LogType = pcenumLogType.LogOut
             If My.Settings.UseVirtualUI Then
                 lrLogEntry.IPAddress = prThinfinity.BrowserInfo.IPAddress
+                lrLogEntry.BrowserId = prThinfinity.BrowserInfo.UniqueBrowserId
             Else
                 lrLogEntry.IPAddress = "NOTHING"
+                lrLogEntry.BrowserId = "NOTHING"
             End If
 
             If prApplication.User IsNot Nothing Then
@@ -1094,7 +1435,7 @@ SkipRegistrationChecking:
         End If
 
         Try
-            Call Environment.Exit(0)
+            Environment.Exit(0)
         Catch ex As Exception
         End Try
 
@@ -1120,7 +1461,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1130,7 +1471,7 @@ SkipRegistrationChecking:
 
         Try
 
-            If IsSomething(zfrmModelExplorer) Then
+            If zfrmModelExplorer IsNot Nothing Then
                 Me.zfrmModelExplorer.zoRecentNodes.Serialize(Me.zfrmModelExplorer.zsRecentNodesFileName)
             End If
 
@@ -1182,7 +1523,39 @@ SkipRegistrationChecking:
 
     End Sub
 
-    Sub load_diagram_overview_form()
+    Public Sub loadToolboxRelationalDatabaseViewForm()
+
+        Try
+
+            Dim child As New frmToolboxRelationalDatabaseManager
+
+            If prApplication.LeftToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+                '-------------------------------------------------------------
+                'Form is already loaded. Bring it to the front of the ZOrder
+                '-------------------------------------------------------------            
+                child = prApplication.LeftToolboxForms.Find(AddressOf child.EqualsByName)
+                Call child.Show()
+                child.SendToBack()
+            Else
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockLeft)
+                prApplication.RightToolboxForms.Add(child)
+                zfrmDatabases = child
+            End If
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+
+    Sub loadDiagramOverviewForm()
 
         Try
 
@@ -1207,7 +1580,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1254,7 +1627,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1302,7 +1675,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1356,9 +1729,103 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
+    End Sub
+
+    Sub loadToolboxDatabaseQueryErrors(ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane)
+
+        Dim child As New frmToolboxQueryLog
+        Dim lsMessage As String = ""
+
+        Try
+
+            Me.mfrmToolboxDatabaseQueryErrors = child
+
+            If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
+                '-------------------------------------------------------------
+                'Form is already loaded. Bring it to the front of the ZOrder
+                '-------------------------------------------------------------            
+                child = prApplication.ToolboxForms.Find(AddressOf child.EqualsByName)
+                child.Show()
+                child.BringToFront()
+                Call child.SetupForm()
+            Else
+                '----------------------------------------------
+                'Create a new instance of the ErrorList form.
+                '----------------------------------------------
+                If prApplication.ToolboxForms.Count > 0 Then
+                    '----------------------------------------------------------------------------------------
+                    'Add the ErrorList form to the Panel of a form already loaded at the bottom of the Page
+                    '----------------------------------------------------------------------------------------   
+                    Dim lrPane As WeifenLuo.WinFormsUI.Docking.DockPane
+
+                    prApplication.ToolboxForms(0).Focus()
+
+                    'child.MdiParent = Me
+
+                    Select Case prApplication.ToolboxForms(0).DockState
+                        Case Is = DockState.Document, DockState.Unknown
+                            If prApplication.ToolboxForms(0).Pane IsNot Nothing Then
+                                lrPane = prApplication.ToolboxForms(0).Pane
+                                child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Top, 0.4)
+                            Else
+                                ' Fallback: Dock in the middle at the bottom
+                                child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockBottom)
+                            End If
+                        Case Else
+                            '        lrPane = prApplication.ToolboxForms(0).Pane
+                            '        child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
+                            '        child.DockTo(lrPane, DockStyle.Fill, 0)
+                    End Select
+
+                    prApplication.ToolboxForms.Add(child)
+
+                Else
+                    '--------------------------------------------------
+                    'Add the ErrorList form to the bottom of the Page
+                    '--------------------------------------------------
+                    child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
+                    prApplication.ToolboxForms.Add(child)
+                End If
+            End If
+
+            If prApplication.WorkingModel IsNot Nothing Then
+
+                Dim liErrorStatus As pcenumDatabaseErrorStatus
+
+                If prApplication.WorkingModel.TargetDatabaseConnectionString.Trim = "" Then
+                    liErrorStatus = pcenumDatabaseErrorStatus.Error
+                    lsMessage = "The model has no Database Connection String."
+                Else
+
+                    Select Case prApplication.WorkingModel.connectToDatabase
+                        Case Is = True
+                            liErrorStatus = pcenumDatabaseErrorStatus.Success
+                            lsMessage = "The model is connected to the database"
+                        Case Is = False
+                            liErrorStatus = pcenumDatabaseErrorStatus.Error
+                            lsMessage = "The model is not connected to the database."
+                    End Select
+
+                End If
+
+                child.LogError(liErrorStatus, lsMessage)
+
+            End If
+
+
+            child.BringToFront()
+
+        Catch ex As Exception
+            Dim lsMessage1 As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
 
@@ -1409,7 +1876,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1457,7 +1924,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1500,7 +1967,7 @@ SkipRegistrationChecking:
 
     End Sub
 
-    Private Sub LoadCRUDRichmondConfiguration()
+    Private Sub LoadCRUDBostonConfiguration()
 
         Dim child As New frmCRUDBostonConfiguration
 
@@ -1570,6 +2037,444 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Public Sub LoadCRUDAddEditTestPlanForm(Optional ByRef arTestPlan As TestManagement.TestPlan = Nothing)
+
+        Try
+            Dim child As New frmCRUDAddEditTestPlan
+
+            child.mrTestPlan = arTestPlan
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Public Sub LoadCRUDAddEditConfigurationItem(Optional ByRef arConfigurationItem As TestManagement.ConfigurationItem = Nothing)
+
+        Try
+            Dim child As New frmCRUDAddEditConfigurationItem
+
+            child.mrConfigurationItem = arConfigurationItem
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Public Sub LoadCRUDAddEditResource(Optional ByRef arResource As TestManagement.Resource = Nothing)
+
+        Try
+            Dim child As New frmCRUDAddEditResource
+
+            child.mrResource = arResource
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Public Sub LoadCRUDAddEditTestCycleForm(Optional ByRef arTestCycle As TestManagement.TestCycle = Nothing)
+
+        Try
+            Dim child As New frmCRUDAddEditTestCycle
+
+            child.mrTestCycle = arTestCycle
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Public Sub LoadCRUDAddEditTestSetForm(Optional ByRef arTestSet As TestManagement.TestSet = Nothing)
+
+        Try
+            Dim child As New frmCRUDAddEditTestSet
+
+            child.mrTestSet = arTestSet
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Public Sub LoadCRUDAddEditTestPlan(Optional ByRef arTestPlan As TestManagement.TestPlan = Nothing)
+
+        Try
+            Dim child As New frmCRUDAddEditTestPlan
+
+            child.mrTestPlan = arTestPlan
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Public Function LoadUserTaskDashboard()
+
+        Try
+
+            Dim child As New frmUserTaskDashboard
+
+            child.MdiParent = Me
+
+            Me.mfrmUserTaskDashboard = child
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+
+            End With
+
+            Return child
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Function
+
+    Public Sub LoadXSDDesigner(ByRef arXSD As XSD.XSD, Optional ByRef arModel As FBM.Model = Nothing)
+
+        Try
+            Dim child As New frmXSDDesigner
+
+            child.MdiParent = Me
+            child.mrModel = arModel
+            child.mrXSD = arXSD
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+
+    Public Sub LoadTestSetManager()
+
+        Try
+            Dim child As New frmTestPlanManager
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Public Sub LoadBostonApplicationRunner(ByRef arBostonApplication As BostonApplication.Application)
+
+        Try
+
+            Dim child As New frmBostonApplicationRunner
+
+            child.mrBostonApplication = arBostonApplication
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' Loads the Add/Edit Boston Application form.
+    ''' </summary>
+    Private Sub LoadCRUDAddEditBostonApplication(Optional abEditBostonApplication As Boolean = False)
+
+        Dim child As New frmAddEditBostonApplicaiton
+
+        If abEditBostonApplication Then
+
+            Dim lrGenericSelection As New tGenericSelection
+            lrGenericSelection.ObjectName = "Boston Application"
+            lrGenericSelection.UseDataStore = True
+            lrGenericSelection.DataStoreType = GetType(OSM.Task)
+            lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+            Dim lrEntityType As New OSM.Task
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection, "Boston Application", "DataStore", "Name", "ApplicationId", "", Nothing,,,,,, True, GetType(BostonApplication.Application)) = Windows.Forms.DialogResult.OK Then
+
+                child.mrBostonApplication = lrGenericSelection.SelectedTag
+            Else
+                Exit Sub
+            End If
+
+
+        End If
+
+        child.MdiParent = Me
+
+        Me.Cursor = Cursors.WaitCursor
+        child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+        Me.Cursor = Cursors.Default
+
+    End Sub
+
+    ''' <summary>
+    ''' Loads the Add/Edit Boston Application Menu Editor form.
+    ''' </summary>
+    Private Sub LoadCRUDAddEditBostonApplicationMenuEditor()
+
+        Dim child As New frmApplicationMenuEditor
+
+
+        Dim lrGenericSelection As New tGenericSelection
+        lrGenericSelection.ObjectName = "Boston Application"
+        lrGenericSelection.UseDataStore = True
+        lrGenericSelection.DataStoreType = GetType(OSM.Task)
+        lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+
+        If Boston.DisplayGenericSelectForm(lrGenericSelection, "Boston Application", "DataStore", "Name", "ApplicationId", "", Nothing,,,,,, True, GetType(BostonApplication.Application)) = Windows.Forms.DialogResult.OK Then
+
+            child.mrBostonApplication = lrGenericSelection.SelectedTag
+        Else
+            Exit Sub
+        End If
+
+        child.MdiParent = Me
+
+        Me.Cursor = Cursors.WaitCursor
+        child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+        Me.Cursor = Cursors.Default
+
+    End Sub
+
+    ''' <summary>
+    ''' Loads the (Neural Processing Unit) Add/Edit Task form.
+    ''' </summary>
+    Private Sub LoadCRUDAddEditOSMTask(Optional abEditTask As Boolean = False)
+
+        Dim child As New frmTask
+
+        If abEditTask Then
+
+            Dim lrGenericSelection As New tGenericSelection
+            lrGenericSelection.ObjectName = "Task"
+            lrGenericSelection.UseDataStore = True
+            lrGenericSelection.DataStoreType = GetType(OSM.Task)
+            lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+            Dim lrEntityType As New OSM.Task
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection, "Task", "DataStore", "Name", "TaskId", "", Nothing,,,,,, True, GetType(OSM.Task)) = Windows.Forms.DialogResult.OK Then
+
+                child.mrTask = lrGenericSelection.SelectedTag
+            Else
+                Exit Sub
+            End If
+
+
+        End If
+
+        child.MdiParent = Me
+
+        Me.Cursor = Cursors.WaitCursor
+        child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+        Me.Cursor = Cursors.Default
+
+    End Sub
+
+    Private Sub LoadCRUDAddEditEnterprise(Optional abEditEnterprise As Boolean = False)
+
+        Dim child As New frmCRUDAddEnterprise
+
+        If abEditEnterprise Then
+
+            Dim lrGenericSelection As New tGenericSelection
+            lrGenericSelection.ObjectName = "Enterprise"
+            lrGenericSelection.UseDataStore = True
+            lrGenericSelection.DataStoreType = GetType(Enterprise.Enterprise)
+            lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+            Dim lrEntityType As New Enterprise.Enterprise
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection, "Enterprise", "DataStore", "EnterpriseName", "EnterpriseId", "", Nothing,,,,,, True, GetType(Enterprise.Enterprise)) = Windows.Forms.DialogResult.OK Then
+
+                child.zrEnterprise = lrGenericSelection.SelectedTag
+            Else
+                Exit Sub
+            End If
+
+
+        End If
+
+        child.MdiParent = Me
+
+        'Me.Cursor = Cursors.WaitCursor
+        child.Show()
+        'Me.Cursor = Cursors.Default
+
+    End Sub
+
+    ''' <summary>
+    ''' Loads the (Neural Processing Unit) Add/Edit Task form.
+    ''' </summary>
+    Private Sub LoadCRUDAddEditOSMOpenAIFunction(Optional abEditOpenAIFunction As Boolean = False)
+
+        Dim child As New frmOpenAIFunction
+
+        If abEditOpenAIFunction Then
+
+            Dim lrGenericSelection As New tGenericSelection
+            lrGenericSelection.ObjectName = "OpenAI Function"
+            lrGenericSelection.UseDataStore = True
+            lrGenericSelection.DataStoreType = GetType(OSM.OpenAIFunction)
+            lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection, "OpenAIFunction", "DataStore", "name", "name", "", Nothing,,,,,, True, GetType(OSM.OpenAIFunction), asObjectName:="OpenAI Function") = Windows.Forms.DialogResult.OK Then
+
+                child.mrOpenAIFunction = lrGenericSelection.SelectedTag
+            Else
+                Exit Sub
+            End If
+
+        End If
+
+        child.MdiParent = Me
+
+        With New WaitCursor
+            child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+        End With
+
+    End Sub
+
+
+    ''' <summary>
+    ''' Loads the Neural Processing Unit Context Space viewer.
+    ''' </summary>
+    Public Sub LoadOSMContextSpaceViewer(Optional ByRef arTask As OSM.Task = Nothing)
+
+        Dim child As frmOSMContextSpaceViewer = prApplication.ToolboxForms.Find(Function(x) x.Name = frmOSMContextSpaceViewer.Name)
+
+        If child Is Nothing Then
+            child = New frmOSMContextSpaceViewer
+            prApplication.ToolboxForms.Add(child)
+
+            If arTask IsNot Nothing Then
+                child.mrOSMTask = arTask
+            End If
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                If Me.zfrmModelExplorer IsNot Nothing Then
+                    Me.zfrmModelExplorer.TreeView.SelectedNode = Me.zfrmModelExplorer.TreeView.Nodes(0)
+                    Me.zfrmModelExplorer.TreeView.Focus()
+                    Application.DoEvents()
+                End If
+                child.Show(DockPanel, DockState.Document)
+            End With
+        Else
+            child.BringToFront()
+            Call child.SetupForm()
+        End If
+
+
+    End Sub
+
 
     Private Sub LoadCRUDAddUser()
 
@@ -1636,7 +2541,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1656,18 +2561,120 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Public Sub LoadProjectRequirementsLister(Optional ByRef arProject As ClientServer.Project = Nothing)
+
+        Try
+            Dim child As New frmProjectRequirementLister
+
+            child.mrProject = arProject
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Sub LoadCRUDAddEditProjectRequirement(Optional ByRef arProjectRequirement As TestManagement.ProjectRequirement = Nothing)
+
+        Try
+            Dim child As New frmCRUDAddEditProjectRequirement
+
+            child.mrProjectRequirement = arProjectRequirement
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Sub LoadCRUDAddEditTestCase(Optional ByRef arTestCase As TestManagement.TestCase = Nothing)
+
+        Try
+            Dim child As New frmCRUDAddEditTestCase
+
+            child.mrTestCase = arTestCase
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Sub LoadCRUDAddEditTestCaseRun(Optional ByRef arAllocatedTestCase As TestManagement.AllocatedTestCase = Nothing)
+
+        Try
+            Dim child As New frmCRUDTestCaseRun
+
+            child.mrAllocatedTestCase = arAllocatedTestCase
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
     Private Sub LoadCRUDEditUser(ByRef arUser As ClientServer.User)
 
-        Dim child As New frmCRUDEditUser
+        Try
+            Dim child As New frmCRUDEditUser
 
-        child.zrUser = arUser
-        child.MdiParent = Me
+            child.zrUser = arUser
+            child.MdiParent = Me
 
-        zfrmCRUDEditUser = child
+            zfrmCRUDEditUser = child
 
-        Me.Cursor = Cursors.WaitCursor
-        child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
-        Me.Cursor = Cursors.Default
+            Me.Cursor = Cursors.WaitCursor
+            child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            Me.Cursor = Cursors.Default
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1718,14 +2725,15 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
 
     End Function
 
-    Public Function LoadToolboxDatabaseSchemaView(Optional abRefreshModelDictionary As Boolean = False,
+    Public Function LoadToolboxDatabaseSchemaView(ByRef arModel As FBM.Model,
+                                                  Optional abRefreshModelDictionary As Boolean = False,
                                                   Optional ByRef arModelElement As FBM.ModelObject = Nothing) As frmToolboxDatabaseSchemaViewer
 
         Dim child As New frmToolboxDatabaseSchemaViewer
@@ -1738,6 +2746,8 @@ SkipRegistrationChecking:
                 child = prApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
                 Call child.Show()
 
+                child.mrModel = arModel
+
                 If abRefreshModelDictionary Then
                     Call child.SetupForm()
                 End If
@@ -1745,16 +2755,15 @@ SkipRegistrationChecking:
                 '----------------------------------------------
                 'Create a new instance of the ModelDictionary form.
                 '----------------------------------------------
-                child.mrModel = prApplication.WorkingModel
+                child.mrModel = arModel
                 If prApplication.RightToolboxForms.Count > 0 Then
                     '----------------------------------------------------------------------------------------
-                    'Add the ErrorList form to the Panel of a form already loaded at the bottom of the Page
+                    'Add the form to the Panel of a form already loaded at the bottom of the Page
                     '----------------------------------------------------------------------------------------                
                     child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockRight)
-
                 Else
                     '--------------------------------------------------
-                    'Add the ErrorList form to the bottom of the Page
+                    'Add the form to the bottom of the Page
                     '--------------------------------------------------                
                     child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockRight)
                 End If
@@ -1773,7 +2782,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -1797,7 +2806,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1819,7 +2828,7 @@ SkipRegistrationChecking:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1828,22 +2837,101 @@ SkipRegistrationChecking:
 
         Dim item As ToolStripItem = CType(sender, ToolStripItem)
 
-        If IsSomething(zfrmModelExplorer) Then
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = item.Tag
-            Me.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+        If zfrmModelExplorer IsNot Nothing Then
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = item.Tag
+            Me.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
+            prApplication.WorkingPage = lrEnterpriseView.Tag
             Call Me.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
         End If
 
     End Sub
 
+    Public Sub LoadBostonApplicationDynamicEditorm(ByRef arTable As RDS.Table,
+                                                   ByRef arFact As FBM.Fact,
+                                                   ByRef arBostonApplication As BostonApplication.Application,
+                                                   ByRef asIndexKey As String)
+
+        Try
+            Dim child As New frmBostonApplicationDynamicEditForm
+
+            child.mrTable = arTable
+            child.mrFact = arFact
+            child.mrBostonApplication = arBostonApplication
+            child.msIndexKey = asIndexKey
+
+            'CodeSafe: Make sure the Model is connected to a database.
+            If arTable.Model.Model.TargetDatabaseType = pcenumDatabaseType.None Or arTable.Model.Model.TargetDatabaseConnectionString.Trim = "" Then
+                Boston.ShowFlashCard("Connect the Model to a database", Color.Salmon)
+                Exit Sub
+            End If
+
+
+            If Me.zfrmModelExplorer IsNot Nothing Then
+                Me.zfrmModelExplorer.TreeView.SelectedNode = Me.zfrmModelExplorer.TreeView.Nodes(0)
+                Me.zfrmModelExplorer.TreeView.Focus()
+                Application.DoEvents()
+            End If
+            child.Show(Me.DockPanel, DockState.Document)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Sub LoadDynamicCRUDForm(ByRef arTable As RDS.Table, ByRef arFact As FBM.Fact)
+
+        Try
+            Dim child As New frmDynamicCRUDForm
+
+            child.mrTable = arTable
+            child.mrFact = arFact
+
+            'CodeSafe: Make sure the Model is connected to a database.
+            If arTable.Model.Model.TargetDatabaseType = pcenumDatabaseType.None Or arTable.Model.Model.TargetDatabaseConnectionString.Trim = "" Then
+                Boston.ShowFlashCard("Connect the Model to a database", Color.Salmon)
+                Exit Sub
+            End If
+
+
+            If Me.zfrmModelExplorer IsNot Nothing Then
+                Me.zfrmModelExplorer.TreeView.SelectedNode = Me.zfrmModelExplorer.TreeView.Nodes(0)
+                Me.zfrmModelExplorer.TreeView.Focus()
+                Application.DoEvents()
+            End If
+            child.Show(Me.DockPanel, DockState.Document)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Sub LoadEarhartDocumentIndexer()
+
+        'Dim child As New frmDocumentIndexer
+
+        'child.MdiParent = Me
+        'child.Show(Me.DockPanel)
+
+    End Sub
 
     Public Sub LoadEnterpriseTreeViewer()
 
         Try
             If pbLogStartup Then
-                prApplication.ThrowErrorMessage("Starting to load the Model Explorer", pcenumErrorType.Information)
+                prApplication.ThrowMessage("Starting to load the Model Explorer", pcenumErrorType.Information)
             End If
 
             Dim child As New frmToolboxEnterpriseExplorer
@@ -1853,7 +2941,7 @@ SkipRegistrationChecking:
             Me.zfrmModelExplorer = child
 
             If pbLogStartup Then
-                prApplication.ThrowErrorMessage("Successfully loaded the Model Explorer", pcenumErrorType.Information)
+                prApplication.ThrowMessage("Successfully loaded the Model Explorer", pcenumErrorType.Information)
             End If
 
         Catch ex As Exception
@@ -1862,7 +2950,36 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Sub LoadToolboxGraphSchemaManager()
+
+        Try
+            If pbLogStartup Then
+                prApplication.ThrowMessage("Starting to load the Model Explorer", pcenumErrorType.Information)
+            End If
+
+            Dim child As New frmToolboxGraphSchemaManager
+
+            child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockLeft)
+            child.SendToBack()
+
+            Me.zfrmSchemaManager = child
+
+            If pbLogStartup Then
+                prApplication.ThrowMessage("Successfully loaded the Graph Schema Manager", pcenumErrorType.Information)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1890,7 +3007,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1906,6 +3023,69 @@ SkipRegistrationChecking:
         child.Show(Me.DockPanel)
 
     End Sub
+
+    ''' <summary>
+    ''' Loads the form to edit a Table/Entity.
+    ''' </summary>
+    ''' <param name="arModel"></param>
+    ''' <param name="arTable">Supply if editing an existing Table.</param>
+    ''' <returns></returns>
+    Public Function LoadCRUDERDAddEditEntityTableForm(ByRef arModel As FBM.Model,
+                                                      Optional arTable As RDS.Table = Nothing,
+                                                      Optional arTreeNode As TreeNode = Nothing) As frmCRUDAddEditEntityTable
+
+        Dim child As New frmCRUDAddEditEntityTable
+
+        Try
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+            child.mrRDSTable = arTable
+            child.mrTreeNode = arTreeNode
+
+            child.Show(Me.DockPanel)
+
+            prApplication.ToolboxForms.Add(child)
+
+            Return child
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
+
+    End Function
+
+    Public Sub LoadCLIFGeneratorTool(ByRef arModel As FBM.Model)
+
+        Dim child As New frmCLIFGenerator
+
+        Try
+
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        End Try
+
+    End Sub
+
 
     Public Sub LoadFEKLUploaderTool(ByRef arModel As FBM.Model)
 
@@ -1925,7 +3105,33 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        End Try
+
+    End Sub
+
+    Public Sub LoadRDFGeneratorTool(ByRef arModel As FBM.Model, Optional ByVal aarModelElement As List(Of FBM.ModelObject) = Nothing)
+
+        Dim child As New frmRDFGenerator
+
+        Try
+
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+            child.GenerateRDFTriGWithSHACL(aarModelElement)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -1940,21 +3146,21 @@ SkipRegistrationChecking:
 
             If My.Settings.FactEngineUseGPT3 Then
 #Region "GPT3 Transforms"
-                Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(36, loTransformation)
+                'Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(36) ', loTransformation
 
                 Dim lsGPT3TrainingExamplesFilePath = larTransformationTuples.Where(Function(x) x.ModelId = lrModel.ModelId).Select(Function(x) x.GPT3TrainingFileLocation)(0)
 
                 If Not System.IO.File.Exists(lsGPT3TrainingExamplesFilePath) Or lsGPT3TrainingExamplesFilePath Is Nothing Then
 
                     lsMessage = "Please check the file path set up for your AI pretraining data."
-                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
+                    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
                     Exit Sub
                 End If
 #End Region
             Else
                 lsMessage = "Please check that your instance of Boston/FactEngine is set up for natural language queries using AI. Closing."
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
                 Exit Sub
             End If
 
@@ -1973,7 +3179,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1995,7 +3201,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2018,7 +3224,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2053,7 +3259,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2074,8 +3280,6 @@ SkipRegistrationChecking:
         '----------------------------------------------------
         child.zoTreeNode = ao_tree_node
 
-        child.Show(DockPanel)
-
         '---------------------------------------------------------------
         'Reference the Form back from the Page.
         '  The reason for this is because if the User elects to Edit a 
@@ -2089,6 +3293,8 @@ SkipRegistrationChecking:
         arPage.Diagram = child.Diagram
         arPage.DiagramView = child.DiagramView
         child.zrPage = arPage
+
+        child.Show(DockPanel)
 
         Call Me.ShowHideToolboxes(True)
 
@@ -2146,6 +3352,92 @@ SkipRegistrationChecking:
         Return child
 
     End Function
+
+    Public Sub loadFlowchartDiagramView(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode, Optional ByVal abLoadToolboxes As Boolean = False)
+
+        'Dim child As New frmDiagramFlowchart
+
+        'child.MdiParent = Me
+
+        ''zfrmStateTransitionDiagramView = child
+
+        ''----------------------------------------------------
+        ''Set the TreeNode from which the form was launched,
+        ''  so that when the User clicks on the Form, the
+        ''  respective TreeNode in the navigation tree can
+        ''  be selected/expanded etc
+        ''----------------------------------------------------
+        'child.zoTreeNode = ao_tree_node
+        'child.zrPage = arPage
+
+        'child.Show(DockPanel)
+
+        ''---------------------------------------------------------------
+        ''Reference the Form back from the Page.
+        ''  The reason for this is because if the User elects to Edit a 
+        ''  Page that is already opened for editing, then it is very easy
+        ''  to find the form that the page is displayed as to set the 
+        ''  ZOrder of that form to OnTop.
+        ''---------------------------------------------------------------
+        'arPage.Form = New Windows.Forms.Form
+        'arPage.Form = child
+        'arPage.ReferencedForm = child
+        'arPage.Diagram = child.Diagram
+        'arPage.DiagramView = child.DiagramView
+
+        ''---------------------------------------------------------------
+        ''Setup the 'Page' title details
+        ''---------------------------------------------------------------        
+        'Call child.LoadGenericPage()
+
+        'If abLoadToolboxes Then
+        '    Call Me.ShowHideToolboxes(True)
+        'End If
+
+    End Sub
+
+    Public Sub loadStructureChartDiagramView(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode, Optional ByVal abLoadToolboxes As Boolean = False)
+
+        Dim child As New frmDiagramStructureChart
+
+        child.MdiParent = Me
+
+        'zfrmStateTransitionDiagramView = child
+
+        '----------------------------------------------------
+        'Set the TreeNode from which the form was launched,
+        '  so that when the User clicks on the Form, the
+        '  respective TreeNode in the navigation tree can
+        '  be selected/expanded etc
+        '----------------------------------------------------
+        child.zoTreeNode = ao_tree_node
+        child.zrPage = arPage
+
+        child.Show(DockPanel)
+
+        '---------------------------------------------------------------
+        'Reference the Form back from the Page.
+        '  The reason for this is because if the User elects to Edit a 
+        '  Page that is already opened for editing, then it is very easy
+        '  to find the form that the page is displayed as to set the 
+        '  ZOrder of that form to OnTop.
+        '---------------------------------------------------------------
+        arPage.Form = New Windows.Forms.Form
+        arPage.Form = child
+        arPage.ReferencedForm = child
+        arPage.Diagram = child.Diagram
+        arPage.DiagramView = child.DiagramView
+
+        '---------------------------------------------------------------
+        'Setup the 'Page' title details
+        '---------------------------------------------------------------        
+        Call child.LoadGenericPage()
+
+        If abLoadToolboxes Then
+            Call Me.ShowHideToolboxes(True)
+        End If
+
+    End Sub
 
     Sub load_StateTransitionDiagram_view(ByRef arPage As FBM.Page, ByVal ao_tree_node As TreeNode, Optional ByVal abLoadToolboxes As Boolean = False)
 
@@ -2319,7 +3611,7 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2408,24 +3700,74 @@ SkipRegistrationChecking:
 
     End Sub
 
+    Public Sub LoadOssieGeneratorTool(ByRef arModel As FBM.Model)
+
+        Dim child As New frmOssieGeneratorProcessor
+
+        Try
+
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        End Try
+
+    End Sub
+
+    Public Sub LoadUMSGeneratorTool(ByRef arModel As FBM.Model)
+
+        Dim child As New frmUMSGeneratorProcessor
+
+        Try
+
+            child.MdiParent = Me
+
+            child.mrModel = arModel
+
+            child.Show(Me.DockPanel)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+        End Try
+
+    End Sub
+
     ''' <summary>
     ''' Loads the Jupyter Notebook toolbox.
     ''' </summary>
     ''' <remarks></remarks>
     Public Function LoadjupyterNotebook() As frmToolboxJupyterForBoston
 
-        Dim child As New frmToolboxJupyterForBoston
-
         Try
+            Dim child As New frmToolboxJupyterForBoston
+
             child.MdiParent = Me
             child.Show(Me.DockPanel)
 
-            Dim p As Process = Process.Start(Boston.MyPath & "\Jupyter\JupiterNet.exe")
-            Threading.Thread.Sleep(5000)
-            p.WaitForInputIdle()
-            SetParent(p.MainWindowHandle, child.Panel.Handle)
+#Region "Old Code that works: 20230928"
+            'Dim p As Process = Process.Start(Boston.MyPath & "\Jupyter\JupiterNet.exe")
+            'Threading.Thread.Sleep(5000)
+            'p.WaitForInputIdle()
+            'SetParent(p.MainWindowHandle, child.Panel.Handle)
 
-            MoveWindow(p.MainWindowHandle, 0, 0, Me.Width - 90, Me.Height, True)
+            'MoveWindow(p.MainWindowHandle, 0, 0, Me.Width - 90, Me.Height, True)
+#End Region
 
             Return Nothing
         Catch ex As Exception
@@ -2434,12 +3776,184 @@ SkipRegistrationChecking:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
 
     End Function
+
+    ''' <summary>
+    ''' Loads the Jupyter Notebook toolbox.
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Function LoadChatOpenAI() As frmChatOpenAI
+
+        Try
+            Dim child As New frmChatOpenAI
+
+            child.MdiParent = Me
+            child.Show(Me.DockPanel)
+
+#Region "Old Code that works: 20230928"
+            'Dim p As Process = Process.Start(Boston.MyPath & "\Jupyter\JupiterNet.exe")
+            'Threading.Thread.Sleep(5000)
+            'p.WaitForInputIdle()
+            'SetParent(p.MainWindowHandle, child.Panel.Handle)
+
+            'MoveWindow(p.MainWindowHandle, 0, 0, Me.Width - 90, Me.Height, True)
+#End Region
+
+            Return Nothing
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
+
+    End Function
+
+    Public Function LoadOSMTheBox(Optional ByRef afrmOSMTheBox As frmOSMTheBox = Nothing,
+                                  Optional ByRef arUser As ClientServer.User = Nothing) As frmOSMTheBox
+
+        Dim lsMessage As String
+
+        Try
+            Dim child As frmOSMTheBox
+
+            If afrmOSMTheBox IsNot Nothing Then
+                child = frmOSMTheBox
+            Else
+                child = New frmOSMTheBox
+                child.MdiParent = Me
+                child.Show(DockPanel)
+
+                afrmOSMTheBox = child
+                Me.mfrmOSMTheBox = child
+
+                Dim lrActivePage As WeifenLuo.WinFormsUI.Docking.DockContent = Nothing
+                For Each lrActivePageFind In prApplication.ActivePages
+
+                    lrActivePage = lrActivePageFind
+                    If lrActivePage.Pane IsNot Nothing Then
+                        Exit For
+                    End If
+                Next
+
+                If lrActivePage IsNot Nothing Then
+                    child.DockTo(lrActivePage.Pane, DockStyle.Fill, 0)
+                Else
+CouldntFindActivePage:
+                    'Boston.ShowFlashCard("I'm having trouble finding an active page. Try opening a Page in a Model and try again", Color.LightGray, 2500)
+                End If
+            End If
+
+            If arUser IsNot Nothing AndAlso arUser.Profile IsNot Nothing Then
+                Dim directoryPath As String = System.IO.Path.GetDirectoryName(arUser.Profile.LogoFileLocation)
+                If Not String.IsNullOrEmpty(directoryPath) Then
+                    directoryPath = directoryPath.TrimEnd("\"c) ' Ensure the path ends with a backslash
+                    Dim filePath As String = "file:///" & System.IO.Path.Combine(directoryPath, "index.html").Replace("\", "/")
+                    Try
+                        child.WebBrowser.Navigate(filePath)
+                    Catch ex As Exception
+                        lsMessage = ex.Message
+                        lsMessage.AppendDoubleLineBreak(filePath)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical)
+                    End Try
+
+                End If
+            End If
+
+            Return child
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
+
+    End Function
+
+    Public Sub LoadERDDiagramSpy(ByRef arTable As RDS.Table)
+
+        Try
+            Dim child As New frmDiagramERD
+
+            child.MdiParent = Me
+
+#Region "Setup the Page for the form"
+            Dim lrPage As FBM.Page
+
+            With New WaitCursor
+                Boston.WriteToStatusBar("Loading the MetaModel for Entity Relationship Diagrams")
+
+                Dim lrCorePage As New FBM.Page(prApplication.CMML.Core,
+                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
+                                               pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString,
+                                               pcenumLanguage.ORMModel)
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
+                End If
+
+                '----------------------------------------------------
+                'Create the Page for the EntityRelationshipDiagram.
+                '----------------------------------------------------
+                Boston.WriteToStatusBar("Creating the Page.")
+                lrPage = lrCorePage.Clone(arTable.Model.Model)
+                lrPage.Name = arTable.Model.Model.CreateUniquePageName("ERD-New Entity Relationship Page", 0)
+                lrPage.Language = pcenumLanguage.EntityRelationshipDiagram
+
+                child.zrPage = lrPage
+            End With
+#End Region
+            child.mbIsDiagramSpy = True
+            child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+
+            'Outgoing Relations
+            Dim larRelation As List(Of RDS.Relation)
+            If MsgBox("Get referenced tables?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                larRelation = arTable.getOutgoingRelations
+                For Each lrRelation In larRelation
+                    Call child.DropTableAtPoint(lrRelation.DestinationTable, New PointF(CSng(Rnd() * 100), CSng(Rnd() * 100)), False)
+                Next
+            End If
+
+            Call child.DropTableAtPoint(arTable, New PointF(CSng(Rnd() * 100), CSng(Rnd() * 100)), False)
+
+            'Incoming Relations
+            If MsgBox($"Get tables referencing {arTable.Name}", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                larRelation = arTable.getIncomingRelations
+                For Each lrRelation In larRelation
+                    Call child.DropTableAtPoint(lrRelation.OriginTable, New PointF(CSng(Rnd() * 100), CSng(Rnd() * 100)), False)
+                Next
+            End If
+
+            Call child.Diagram.Invalidate()
+
+            Call child.autoLayout()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
 
 
     ''' <summary>
@@ -2479,7 +3993,7 @@ CouldntFindActivePage:
                     Boston.ShowFlashCard("I'm having trouble finding an active page. Try opening a Page in a Model and try again", Color.LightGray, 2500)
                 End If
             Else
-                    child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+                child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
             End If
 
 
@@ -2568,7 +4082,7 @@ CouldntFindActivePage:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -2591,10 +4105,11 @@ CouldntFindActivePage:
         Try
             prApplication.WorkingModel = arPage.Model
 
-            prApplication.ThrowErrorMessage("Opening the Toolbox", pcenumErrorType.Information)
+            prApplication.ThrowMessage("Opening the Toolbox", pcenumErrorType.Information)
 
             child.MdiParent = Me
 
+            '20241114-VM-Was taking too long (in SSO model for ESA)
             Call arPage.Model.checkIfCanCheckForErrors()
 
             zrORMModel_view = child
@@ -2607,7 +4122,7 @@ CouldntFindActivePage:
             '----------------------------------------------------
             child.zoTreeNode = aoTreeNode
 
-            prApplication.ThrowErrorMessage("Showing the ORM Diagram Form", pcenumErrorType.Information)
+            prApplication.ThrowMessage("Showing the ORM Diagram Form", pcenumErrorType.Information)
 
             child.Show(DockPanel)
 
@@ -2634,7 +4149,7 @@ CouldntFindActivePage:
             '-----------------
             'Display the Page
             '-----------------
-            prApplication.ThrowErrorMessage("About to load the ORM Model Page", pcenumErrorType.Information)
+            prApplication.ThrowMessage("About to load the ORM Model Page", pcenumErrorType.Information)
 
 
             Call child.LoadORMModelPage(arPage)
@@ -2659,7 +4174,7 @@ CouldntFindActivePage:
 
                 lsMessage1 = "Failed Here: Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
             child.Focus()
@@ -2672,7 +4187,7 @@ CouldntFindActivePage:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -2694,7 +4209,7 @@ CouldntFindActivePage:
         Try
             prApplication.WorkingModel = arPage.Model
 
-            prApplication.ThrowErrorMessage("Opening the Toolbox", pcenumErrorType.Information)
+            prApplication.ThrowMessage("Opening the Toolbox", pcenumErrorType.Information)
 
             child.MdiParent = Me
 
@@ -2708,7 +4223,7 @@ CouldntFindActivePage:
             '----------------------------------------------------
             child.zoTreeNode = aoTreeNode
 
-            prApplication.ThrowErrorMessage("Showing the ORM Diagram Form", pcenumErrorType.Information)
+            prApplication.ThrowMessage("Showing the ORM Diagram Form", pcenumErrorType.Information)
 
             child.Show(DockPanel)
 
@@ -2735,7 +4250,7 @@ CouldntFindActivePage:
             '-----------------
             'Display the Page
             '-----------------
-            prApplication.ThrowErrorMessage("About to load the ORM Model Page", pcenumErrorType.Information)
+            prApplication.ThrowMessage("About to load the ORM Model Page", pcenumErrorType.Information)
 
 
             Call child.DisplayORMModelPage(arPage)
@@ -2760,7 +4275,7 @@ CouldntFindActivePage:
 
                 lsMessage1 = "Failed Here: Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
             child.Focus()
@@ -2773,7 +4288,7 @@ CouldntFindActivePage:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -2827,7 +4342,7 @@ CouldntFindActivePage:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2851,7 +4366,7 @@ CouldntFindActivePage:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2883,7 +4398,7 @@ CouldntFindActivePage:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3115,7 +4630,7 @@ CouldntFindActivePage:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -3191,7 +4706,7 @@ CouldntFindActivePage:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -3199,7 +4714,7 @@ CouldntFindActivePage:
     End Function
 
 
-    Public Function loadToolboxORMVerbalisationForm(ByVal arModel As FBM.Model, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane) As frmToolboxORMVerbalisation
+    Public Function loadToolboxORMVerbalisationForm(ByVal arModel As FBM.Model, ByRef aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane) As frmToolboxORMVerbalisation
 
         Dim child As New frmToolboxORMVerbalisation
 
@@ -3240,6 +4755,17 @@ CouldntFindActivePage:
                     'Add the ErrorList form to the bottom of the Page
                     '--------------------------------------------------
                     child.zrModel = arModel
+                    If aoActivePane Is Nothing Then
+                        For Each lrPage In prApplication.ActivePages
+                            aoActivePane = lrPage.Pane
+                            If aoActivePane IsNot Nothing Then Exit For
+                        Next
+                    End If
+                    If aoActivePane Is Nothing Then aoActivePane = Me.zfrmModelExplorer.Pane
+                    If aoActivePane Is Nothing Then
+                        Boston.ShowFlashCard("Can't load the Verbalisation toolbox at this stage", Color.LightGray)
+                        Return Nothing
+                    End If
                     child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
                     prApplication.ToolboxForms.Add(child)
                 End If
@@ -3254,16 +4780,23 @@ CouldntFindActivePage:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
 
     End Function
 
-    Public Function loadToolboxTableDataForm(ByVal arModel As FBM.Model, ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane) As frmToolboxTableData
+    Public Function loadToolboxTableDataForm(ByRef arModel As FBM.Model,
+                                             Optional ByVal aoActivePane As WeifenLuo.WinFormsUI.Docking.DockPane = Nothing,
+                                             Optional ByRef arRDSTable As RDS.Table = Nothing,
+                                             Optional ByRef abShowInSQLMode As Boolean = False) As frmToolboxTableData
 
         Dim child As New frmToolboxTableData
+
+        child.mrTable = arRDSTable
+        child.mrModel = arModel
+        child.mbShowInSQLMode = abShowInSQLMode
 
         Try
             If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
@@ -3271,8 +4804,9 @@ CouldntFindActivePage:
                 'Form is already loaded. Bring it to the front of the ZOrder
                 '-------------------------------------------------------------            
                 child = prApplication.ToolboxForms.Find(AddressOf child.EqualsByName)
-                'child.Show()
-                child.BringToFront()
+                child.mrModel = arModel
+
+                child.Activate()
                 Return child
             Else
                 '----------------------------------------------
@@ -3281,8 +4815,7 @@ CouldntFindActivePage:
                 If prApplication.ToolboxForms.Count > 0 Then
                     '----------------------------------------------------------------------------------------
                     'Add the ErrorList form to the Panel of a form already loaded at the bottom of the Page
-                    '----------------------------------------------------------------------------------------                
-                    child.mrModel = arModel
+                    '----------------------------------------------------------------------------------------                                    
                     'child.MdiParent = prApplication.ToolboxForms(0)
                     'child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.4)
 
@@ -3292,28 +4825,41 @@ CouldntFindActivePage:
                     'prApplication.ToolboxForms(0).Focus()
                     lrPane = prApplication.ToolboxForms(0).Pane  'DockPanel.ActivePane
                     lrDockpanel = prApplication.ToolboxForms(0).DockPanel
-                    child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
-                    'child.DockTo(prApplication.ToolboxForms(0).PanelPane, DockStyle.Right, 1)
-                    child.DockTo(lrPane, DockStyle.Fill, 0)
-                    prApplication.ToolboxForms.Add(child)
+                    'If lrPane Is Nothing Then
+                    child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+                    'Else
+                    '    child.Show(lrPane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.3)
+                    '    child.DockTo(lrPane, DockStyle.Fill, 0)
+                    'End If
+
+                    prApplication.ToolboxForms.AddUnique(child)
                 Else
-                    '--------------------------------------------------
-                    'Add the ErrorList form to the bottom of the Page
-                    '--------------------------------------------------
-                    child.mrModel = arModel
-                    child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
-                    prApplication.ToolboxForms.Add(child)
+                    '----------------------------------------------------------
+                    'Add the TableData form to the bottom of the Page if can.
+                    '----------------------------------------------------------
+                    If aoActivePane Is Nothing Then
+                        child.Show(Me.DockPanel)
+                    Else
+                        child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
+                    End If
+                    prApplication.ToolboxForms.AddUnique(child)
                 End If
+
             End If
 
+            Call Me.loadToolboxDatabaseQueryErrors(Nothing)
+
+            child.BringToFront()
+
             Return child
+
         Catch ex As Exception
             Dim lsMessage1 As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -3327,8 +4873,14 @@ CouldntFindActivePage:
         Dim child As New frmToolboxBrainBox
 
         Try
+            child.MdiParent = Me
+
             'CodeSafe
-            If aoActivePane Is Nothing Then Return Nothing
+            If aoActivePane Is Nothing Then
+                child.Show(Me.DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.DockBottom)
+                prApplication.ToolboxForms.AddUnique(child)
+                Return child
+            End If
 
             If prApplication.ToolboxForms.FindAll(AddressOf child.EqualsByName).Count > 0 Then
                 '-------------------------------------------------------------
@@ -3339,7 +4891,7 @@ CouldntFindActivePage:
                 child.BringToFront()
             Else
                 '----------------------------------------------
-                'Create a new instance of the ErrorList form.
+                'Create a new instance of the Virtual Analyst form.
                 '----------------------------------------------
                 If prApplication.ToolboxForms.Count > 0 Then
                     '----------------------------------------------------------------------------------------
@@ -3359,9 +4911,15 @@ CouldntFindActivePage:
                     '--------------------------------------------------
                     'Add the BrainBox form to the bottom of the Page
                     '--------------------------------------------------
-                    child.Show(aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
-                    Call child.setup(arPage)
-                    prApplication.ToolboxForms.Add(child)
+                    'Make sure the aoActivePane has a DockPanel
+                    Dim lrActivePane = aoActivePane
+                    If lrActivePane.DockPanel Is Nothing Then
+                        child.Show(DockPanel) ', WeifenLuo.WinFormsUI.Docking.DockState.DockBottom)
+                    Else
+                        child.Show(DockPanel) 'aoActivePane, WeifenLuo.WinFormsUI.Docking.DockAlignment.Bottom, 0.3)
+                        Call child.setup(arPage)
+                        prApplication.ToolboxForms.Add(child)
+                    End If
                 End If
             End If
 
@@ -3373,14 +4931,14 @@ CouldntFindActivePage:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
 
     End Function
 
-    Public Sub LoadToolbox()
+    Public Sub LoadToolbox(Optional ByVal aiLanguage As pcenumLanguage = pcenumLanguage.ORMModel)
 
         Dim child As New frmToolbox
 
@@ -3415,7 +4973,7 @@ CouldntFindActivePage:
             '--------------------------------------------------------------------------
             'For Boston there is only one Toolbox Shape set, the ORM toolset
             '--------------------------------------------------------------------------
-            child.SetToolbox(pcenumLanguage.ORMModel)
+            child.SetToolbox(aiLanguage)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -3423,7 +4981,7 @@ CouldntFindActivePage:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3445,7 +5003,7 @@ CouldntFindActivePage:
                 End If
             End Try
 
-            If IsSomething(zfrmModelExplorer) Then
+            If zfrmModelExplorer IsNot Nothing Then
                 Select Case zfrmModelExplorer.TreeView.SelectedNode.Tag.MenuType
                     Case Is = pcenumMenuType.modelORMModel
                         lrModel = zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag
@@ -3488,7 +5046,7 @@ SaveModel:
                         '-----------------------------------------------------
                         'Save the current 'WorkingPage' back to the database
                         '-----------------------------------------------------
-                        If IsSomething(prApplication.WorkingPage) Then
+                        If prApplication.WorkingPage IsNot Nothing Then
                             Me.Cursor = Cursors.WaitCursor
                             Boston.WriteToStatusBar("Saving Model: '" & prApplication.WorkingPage.Model.Name & "'", True)
                             Call prApplication.WorkingPage.Save()
@@ -3506,6 +5064,28 @@ SaveModel:
                 End Select
             End If
 
+            'CodeSafe
+            If lrModel Is Nothing And prApplication.WorkingModel IsNot Nothing Then
+
+                lrModel = prApplication.WorkingModel
+
+                If lrModel.IsDirty Or lrModel.hasADirtyPage Then
+                    Me.Cursor = Cursors.WaitCursor
+                    Boston.WriteToStatusBar("Saving Model: '" & lrModel.Name & "'", True)
+                    Call lrModel.Save()
+                    Boston.WriteToStatusBar("Saved Model: '" & lrModel.Name & "'")
+                    Me.Cursor = Cursors.Default
+
+                    If My.Settings.UseClientServer And My.Settings.InitialiseClient Then
+                        Dim lrInterfaceModel As New Viev.FBM.Interface.Model
+                        lrInterfaceModel.ModelId = lrModel.ModelId
+                        Dim lrBroadcast As New Viev.FBM.Interface.Broadcast
+                        lrBroadcast.Model = lrInterfaceModel
+                        Call prDuplexServiceClient.SendBroadcast(Viev.FBM.Interface.pcenumBroadcastType.ModelSaved, lrBroadcast)
+                    End If
+                End If
+            End If
+
             Me.ToolStripButton_Save.Enabled = False
 
         Catch ex As Exception
@@ -3514,7 +5094,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3530,7 +5110,7 @@ SaveModel:
         Me.MenuItem_ShowEnterpriseTreeView.Checked = Not Me.MenuItem_ShowEnterpriseTreeView.Checked
 
         If Me.MenuItem_ShowEnterpriseTreeView.Checked Then
-            If IsSomething(zfrmModelExplorer) Then
+            If zfrmModelExplorer IsNot Nothing Then
                 '---------------------------------------
                 'Enterprise TreeView is already loaded
                 '---------------------------------------
@@ -3541,7 +5121,7 @@ SaveModel:
             '------------------------------------------------
             'If the EnterpriseTreeViewer is open, close it
             '------------------------------------------------
-            If IsSomething(zfrmModelExplorer) Then
+            If zfrmModelExplorer IsNot Nothing Then
                 '---------------------------------------
                 'Enterprise TreeView is already loaded
                 '---------------------------------------                
@@ -3571,7 +5151,7 @@ SaveModel:
             'CodeSafe
             If ToolStripComboBox_zoom.SelectedItem Is Nothing Then Exit Sub
 
-            If IsSomething(lrForm) Then
+            If lrForm IsNot Nothing Then
                 If TypeOf (lrForm) Is frmDiagramORM Then
                     Dim lrfrmORMModel As frmDiagramORM
                     lrfrmORMModel = lrForm
@@ -3603,7 +5183,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, False, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, False, ex)
         End Try
 
     End Sub
@@ -3627,20 +5207,30 @@ SaveModel:
 
     Private Sub SelectAllToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SelectAllToolStripMenuItem.Click
 
-        ' Determine the active child form.
-        Dim lfrm_activeChild As Form = Me.ActiveMdiChild
+        Try
+            ' Determine the active child form.
+            Dim lfrm_activeChild As Form = Me.ActiveMdiChild
 
-        '--------------------------------------------------
-        'Exit the sub if there are no ActiveMdiChild forms
-        '--------------------------------------------------
-        If lfrm_activeChild Is Nothing Then Exit Sub
+            '--------------------------------------------------
+            'Exit the sub if there are no ActiveMdiChild forms
+            '--------------------------------------------------
+            If lfrm_activeChild Is Nothing Then Exit Sub
 
-        Select Case lfrm_activeChild.Name
-            Case Is = Me.zrORMModel_view.Name
-                Dim lfrmORMDiagram As frmDiagramORM
-                lfrmORMDiagram = lfrm_activeChild
-                Call lfrmORMDiagram.select_all()
-        End Select
+            Select Case lfrm_activeChild.GetType
+                Case Is = GetType(frmDiagramORM)
+                    Dim lfrmORMDiagram As frmDiagramORM
+                    lfrmORMDiagram = lfrm_activeChild
+                    Call lfrmORMDiagram.select_all()
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -3654,7 +5244,7 @@ SaveModel:
 
     Private Sub SaveToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveToolStripMenuItem.Click
 
-        If IsSomething(prApplication.WorkingModel) Then
+        If prApplication.WorkingModel IsNot Nothing Then
             Call prApplication.WorkingModel.Save()
         End If
 
@@ -3664,7 +5254,7 @@ SaveModel:
         '  NB If the Page is dirty will get saved above.
         '  Look at removing this code in the future.
         '-----------------------------------------------------
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             Call prApplication.WorkingPage.Save()
         End If
 
@@ -3684,7 +5274,7 @@ SaveModel:
 
             Using lrWaitCursor As New WaitCursor
                 For Each lr_tree_node In Me.zfrmModelExplorer.TreeView.Nodes(0).Nodes
-                    If IsSomething(lr_tree_node.Tag.Tag) Then
+                    If lr_tree_node.Tag.Tag IsNot Nothing Then
                         lr_model = lr_tree_node.Tag.Tag
                         If lr_model.Loaded And lr_model.IsDirty Then
                             Call lr_model.Save()
@@ -3701,7 +5291,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3718,7 +5308,7 @@ SaveModel:
 
             Using lrWaitCursor As New WaitCursor
                 For Each lr_tree_node In Me.zfrmModelExplorer.TreeView.Nodes(0).Nodes
-                    If IsSomething(lr_tree_node.Tag.Tag) Then
+                    If lr_tree_node.Tag.Tag IsNot Nothing Then
                         lr_model = lr_tree_node.Tag.Tag
                         If lr_model.Loaded And lr_model.IsDirty Then
                             Call lr_model.Save()
@@ -3735,7 +5325,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3756,7 +5346,7 @@ SaveModel:
 
     Private Sub PrintPreviewToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PrintPreviewToolStripMenuItem.Click
 
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             prApplication.WorkingPage.DiagramView.PrintOptions.DocumentName = prApplication.WorkingPage.Name
             prApplication.WorkingPage.DiagramView.PrintOptions.EnableImages = False
             prApplication.WorkingPage.DiagramView.PrintOptions.EnableInterior = True
@@ -3789,10 +5379,10 @@ SaveModel:
     Public Sub hide_unnecessary_forms(ByRef arPage As FBM.Page)
 
         Try
-            If IsSomething(arPage) Then
+            If arPage IsNot Nothing Then
                 Select Case arPage.Language
                     Case Is = pcenumLanguage.ORMModel
-                        If IsSomething(Me.zfrm_orm_reading_editor) Then
+                        If Me.zfrm_orm_reading_editor IsNot Nothing Then
                             If Me.zfrm_orm_reading_editor.Visible = False Then
                                 Try
                                     Call Me.zfrm_orm_reading_editor.Show()
@@ -3811,7 +5401,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3869,209 +5459,218 @@ SaveModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
-    Private Sub CopyToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CopyToolStripMenuItem.Click
+    Private Sub CopyToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemCopy.Click
 
-        Call Me.CopySelectedObjectsToClipboard()
+        Call Me.CopySelectedObjectsToClipboard(prApplication.WorkingPage)
 
     End Sub
 
-    Public Sub CopySelectedObjectsToClipboard()
+    Public Sub CopySelectedObjectsToClipboard(ByRef arPage As FBM.Page)
 
         Dim liInd As Integer = 0
 
-        If IsSomething(prApplication.WorkingPage) Then
-            If IsSomething(prApplication.WorkingPage.SelectedObject) Then
-                If prApplication.WorkingPage.SelectedObject.Count > 0 Then
-                    'Dim lrModel As Clipbrd.ClipboardModel = prApplication.WorkingPage.Model.CloneClipboard
-                    'Dim lrPage As New Clipbrd.ClipboardPage(lrModel, System.Guid.NewGuid.ToString, prApplication.WorkingPage.Name, pcenumLanguage.ORMModel)
+        Try
+            If arPage IsNot Nothing Then
+                If arPage.SelectedObject IsNot Nothing Then
+                    If arPage.SelectedObject.Count > 0 Then
+                        'Dim lrModel As Clipbrd.ClipboardModel = arPage.Model.CloneClipboard
+                        'Dim lrPage As New Clipbrd.ClipboardPage(lrModel, System.Guid.NewGuid.ToString, arPage.Name, pcenumLanguage.ORMModel)
 
-                    Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, System.Guid.NewGuid.ToString, True,, True)
-                    lrModel.OriginModelId = prApplication.WorkingModel.ModelId 'Used for differentiation when Pasting.
+                        Dim lrModel As New FBM.Model(pcenumLanguage.ORMModel, System.Guid.NewGuid.ToString, True,, True)
+                        lrModel.OriginModelId = arPage.Model.ModelId 'Used for differentiation when Pasting.
 
-                    Dim lrPage As New FBM.Page(lrModel, "ClipboardPage", "ClipboardPage", prApplication.WorkingPage.Language)
-                    lrPage.CopiedModelId = prApplication.WorkingModel.ModelId
-                    lrPage.CopiedPageId = prApplication.WorkingPage.PageId
+                        Dim lrPage As New FBM.Page(lrModel, "ClipboardPage", "ClipboardPage", arPage.Language)
+                        lrPage.CopiedModelId = arPage.Model.ModelId
+                        lrPage.CopiedPageId = arPage.PageId
 
-                    'Get rid of RoleInstances and RoleConstraintRoleInsances from within the set of SelectedObjects
-                    For Each lrModelObject In prApplication.WorkingPage.SelectedObject.ToArray
-                        If lrModelObject.ConceptType = pcenumConceptType.Role Then
-                            Dim lrRoleInstance As FBM.RoleInstance = lrModelObject
-                            prApplication.WorkingPage.SelectedObject.Remove(lrRoleInstance)
-                            prApplication.WorkingPage.SelectedObject.AddUnique(lrRoleInstance.FactType)
-                        End If
+                        'Get rid of RoleInstances and RoleConstraintRoleInsances from within the set of SelectedObjects
+                        For Each lrModelObject In arPage.SelectedObject.ToArray
+                            If lrModelObject.ConceptType = pcenumConceptType.Role Then
+                                Dim lrRoleInstance As FBM.RoleInstance = lrModelObject
+                                arPage.SelectedObject.Remove(lrRoleInstance)
+                                arPage.SelectedObject.AddUnique(lrRoleInstance.FactType)
+                            End If
 
-                        If lrModelObject.ConceptType = pcenumConceptType.RoleConstraintRole Then
-                            Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance = lrModelObject
-                            prApplication.WorkingPage.SelectedObject.Remove(lrRoleConstraintRoleInstance)
-                        End If
-                    Next
+                            If lrModelObject.ConceptType = pcenumConceptType.RoleConstraintRole Then
+                                Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance = lrModelObject
+                                arPage.SelectedObject.Remove(lrRoleConstraintRoleInstance)
+                            End If
+                        Next
 
-                    Dim larSelectedObject As New List(Of FBM.ModelObject)
-                    'FactTypes first
-                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType).ToArray
-                        larSelectedObject.Add(lrModelElement)
-                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
-                    Next
-                    'ValueTypes
-                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType).ToArray
-                        larSelectedObject.Add(lrModelElement)
-                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
-                    Next
-                    'EntityType
-                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType).ToArray
-                        larSelectedObject.Add(lrModelElement)
-                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
-                    Next
-                    'RoleConstraint
-                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint).ToArray
-                        larSelectedObject.Add(lrModelElement)
-                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
-                    Next
-                    'The rest
-                    For Each lrModelElement In prApplication.WorkingPage.SelectedObject.ToArray
-                        larSelectedObject.Add(lrModelElement)
-                        prApplication.WorkingPage.SelectedObject.Remove(lrModelElement)
-                    Next
+                        Dim larSelectedObject As New List(Of FBM.ModelObject)
+                        'FactTypes first
+                        For Each lrModelElement In arPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.FactType).ToArray
+                            larSelectedObject.Add(lrModelElement)
+                            arPage.SelectedObject.Remove(lrModelElement)
+                        Next
+                        'ValueTypes
+                        For Each lrModelElement In arPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType).ToArray
+                            larSelectedObject.Add(lrModelElement)
+                            arPage.SelectedObject.Remove(lrModelElement)
+                        Next
+                        'EntityType
+                        For Each lrModelElement In arPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType).ToArray
+                            larSelectedObject.Add(lrModelElement)
+                            arPage.SelectedObject.Remove(lrModelElement)
+                        Next
+                        'RoleConstraint
+                        For Each lrModelElement In arPage.SelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.RoleConstraint).ToArray
+                            larSelectedObject.Add(lrModelElement)
+                            arPage.SelectedObject.Remove(lrModelElement)
+                        Next
+                        'The rest
+                        For Each lrModelElement In arPage.SelectedObject.ToArray
+                            larSelectedObject.Add(lrModelElement)
+                            arPage.SelectedObject.Remove(lrModelElement)
+                        Next
 
-                    'CodeSafe
-                    'EntityTypes with a CompoundReferenceScheme...but the FactTypes for the ReferenceSchemeRoleConstraint are not present...just don't serialise the ReferenceSchemeRoleConstraint
-                    For Each lrModelElement In larSelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
-                        Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
-                        If lrEntityTypeInstance.EntityType.HasCompoundReferenceMode Then
-                            For Each lrRole In lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint.Role
-                                If larSelectedObject.Find(Function(x) x.Id = lrRole.FactType.Id) Is Nothing Then
-                                    lrEntityTypeInstance.ReferenceModeRoleConstraint = Nothing
-                                    lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint = Nothing
-                                End If
-                            Next
-                        End If
-                    Next
-
-                    For liInd = 1 To larSelectedObject.Count 'prApplication.WorkingPage.SelectedObject.Count
-
-                        Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
-
-                        Dim lrModelObject = larSelectedObject(liInd - 1) 'prApplication.WorkingPage.SelectedObject(liInd - 1)
-
-                        Select Case lrModelObject.ConceptType
-                            Case Is = pcenumConceptType.ValueType
-                                Dim lrValueTypeInstance As FBM.ValueTypeInstance
-                                lrValueTypeInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
-
-                                lrValueTypeInstance = lrValueTypeInstance.Clone(lrPage, lrValueTypeInstance.ValueType.IsMDAModelElement)
-                                lrPage.ValueTypeInstance.AddUnique(lrValueTypeInstance)
-
-                            Case Is = pcenumConceptType.EntityType
-                                Dim lrEntityTypeInstance As FBM.EntityTypeInstance
-                                lrEntityTypeInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
-                                Boston.IsSerializable(lrPage)
-                                lrEntityTypeInstance = lrEntityTypeInstance.Clone(lrPage, True, lrEntityTypeInstance.EntityType.IsMDAModelElement)
-                                Boston.IsSerializable(lrPage)
-                                lrPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance)
-                            Case Is = pcenumConceptType.FactType
-                                Dim lrFactTypeInstance As FBM.FactTypeInstance
-                                lrFactTypeInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
-
-                                Call Me.CloneFactTypeInstanceToPage(lrFactTypeInstance, lrPage)
-
-                            Case Is = pcenumConceptType.RoleConstraintRole
-
-                                lrRoleConstraintRoleInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
-
-                                If lrModel.RoleConstraint.Exists(AddressOf lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraint.Equals) Then
-                                    '--------------------------------------------------------------------------------------------
-                                    'The RoleConstraint is already in the Model.
-                                    '  NB More than one RoleConstraintRole for the same RoleConstraint may be in the selection.
-                                    '--------------------------------------------------------------------------------------------
-                                Else
-                                    lrModel.AddRoleConstraint(lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraint)
-                                End If
-
-                                '---------------------------------------------------------------
-                                'Make sure the FactTypes are there for Roles in RoleConstraint
-                                '---------------------------------------------------------------                                
-                                If lrModel.FactType.Exists(AddressOf lrRoleConstraintRoleInstance.RoleConstraintRole.Role.FactType.Equals) Then
-                                Else
-                                    lrModel.FactType.Add(lrRoleConstraintRoleInstance.RoleConstraintRole.Role.FactType)
-                                End If
-
-                                If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintRoleInstance.RoleConstraint.Equals) Then
-                                    '---------------------------------------------------
-                                    'The RoleConstraintInstance is already on the Page
-                                    '---------------------------------------------------
-                                Else
-                                    lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintRoleInstance.RoleConstraint)
-                                End If
-
-                                If lrPage.FactTypeInstance.Exists(AddressOf lrRoleConstraintRoleInstance.Role.FactType.Equals) Then
-                                Else
-                                    lrPage.FactTypeInstance.AddUnique(lrRoleConstraintRoleInstance.Role.FactType)
-                                End If
-
-                            Case Is = pcenumConceptType.RoleConstraint
-
-                                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-                                lrRoleConstraintInstance = lrModelObject 'prApplication.WorkingPage.SelectedObject(liInd - 1)
-
-                                '---------------------------------------------------------------
-                                'Make sure the FactTypes are there for Roles in RoleConstraint
-                                '---------------------------------------------------------------
-                                For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
-                                    If Not lrPage.FactTypeInstance.Exists(AddressOf lrRoleConstraintRoleInstance.Role.FactType.Equals) Then
-                                        Call Me.CloneFactTypeInstanceToPage(lrRoleConstraintRoleInstance.Role.FactType, lrPage)
+                        'CodeSafe
+                        'EntityTypes with a CompoundReferenceScheme...but the FactTypes for the ReferenceSchemeRoleConstraint are not present...just don't serialise the ReferenceSchemeRoleConstraint
+                        For Each lrModelElement In larSelectedObject.FindAll(Function(x) x.ConceptType = pcenumConceptType.EntityType)
+                            Dim lrEntityTypeInstance As FBM.EntityTypeInstance = lrModelElement
+                            If lrEntityTypeInstance.EntityType.HasCompoundReferenceMode Then
+                                For Each lrRole In lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint.Role
+                                    If larSelectedObject.Find(Function(x) x.Id = lrRole.FactType.Id) Is Nothing Then
+                                        lrEntityTypeInstance.ReferenceModeRoleConstraint = Nothing
+                                        lrEntityTypeInstance.EntityType.ReferenceModeRoleConstraint = Nothing
                                     End If
                                 Next
+                            End If
+                        Next
 
-                                lrRoleConstraintInstance = lrRoleConstraintInstance.Clone(lrPage, lrRoleConstraintInstance.RoleConstraint.IsMDAModelElement)
-                                lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+                        For liInd = 1 To larSelectedObject.Count 'arPage.SelectedObject.Count
 
-                            Case Is = pcenumConceptType.SubtypeRelationship
+                            Dim lrRoleConstraintRoleInstance As FBM.RoleConstraintRoleInstance
 
-                                Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrModelObject
+                            Dim lrModelObject = larSelectedObject(liInd - 1) 'arPage.SelectedObject(liInd - 1)
 
-                                lrSubtypeRelationshipInstance.FactType = Me.CloneFactTypeInstanceToPage(lrSubtypeRelationshipInstance.FactType, lrPage)
+                            Select Case lrModelObject.ConceptType
+                                Case Is = pcenumConceptType.ValueType
+                                    Dim lrValueTypeInstance As FBM.ValueTypeInstance
+                                    lrValueTypeInstance = lrModelObject 'arPage.SelectedObject(liInd - 1)
 
-                                lrSubtypeRelationshipInstance = lrSubtypeRelationshipInstance.Clone(lrPage, True)
+                                    lrValueTypeInstance = lrValueTypeInstance.Clone(lrPage, lrValueTypeInstance.ValueType.IsMDAModelElement)
+                                    lrPage.ValueTypeInstance.AddUnique(lrValueTypeInstance)
 
-                                Dim lrModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationshipInstance.ModelElement.Id)
-                                lrModelElementInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+                                Case Is = pcenumConceptType.EntityType
+                                    Dim lrEntityTypeInstance As FBM.EntityTypeInstance
+                                    lrEntityTypeInstance = lrModelObject 'arPage.SelectedObject(liInd - 1)
+                                    Boston.IsSerializable(lrPage)
+                                    lrEntityTypeInstance = lrEntityTypeInstance.Clone(lrPage, True, lrEntityTypeInstance.EntityType.IsMDAModelElement)
+                                    Boston.IsSerializable(lrPage)
+                                    lrPage.EntityTypeInstance.AddUnique(lrEntityTypeInstance)
+                                Case Is = pcenumConceptType.FactType
+                                    Dim lrFactTypeInstance As FBM.FactTypeInstance
+                                    lrFactTypeInstance = lrModelObject 'arPage.SelectedObject(liInd - 1)
 
-                        End Select
-                    Next
+                                    Call Me.CloneFactTypeInstanceToPage(lrFactTypeInstance, lrPage)
 
-                    '------------------------------------------------------------
-                    'IMPORTANT: Keep the below for testing/debugging.
-                    'Objects must be serialisable to use the Clipboard.
-                    '  Use the following to test if the Object is serialisable.
-                    '------------------------------------------------------------
-                    If Boston.IsSerializable(lrPage) Then
+                                Case Is = pcenumConceptType.RoleConstraintRole
 
-                        '----------------------------
-                        ' Create a new data format.
-                        '----------------------------
-                        Dim RichmondPage As DataFormats.Format = DataFormats.GetFormat("RichmondPage")
+                                    lrRoleConstraintRoleInstance = lrModelObject 'arPage.SelectedObject(liInd - 1)
 
-                        '------------------------------------------------------------------
-                        ' Store the Page in a DataObject using the RichmondPage format 
-                        ' as the type of format.                     
-                        '------------------------------------------------------------------
-                        Dim dataObj As IDataObject = New DataObject()
+                                    If lrModel.RoleConstraint.Exists(AddressOf lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraint.Equals) Then
+                                        '--------------------------------------------------------------------------------------------
+                                        'The RoleConstraint is already in the Model.
+                                        '  NB More than one RoleConstraintRole for the same RoleConstraint may be in the selection.
+                                        '--------------------------------------------------------------------------------------------
+                                    Else
+                                        lrModel.AddRoleConstraint(lrRoleConstraintRoleInstance.RoleConstraint.RoleConstraint)
+                                    End If
 
-                        Clipboard.Clear()
-                        dataObj.SetData(RichmondPage.Name, False, lrPage)
-                        Clipboard.SetDataObject(dataObj, True)
+                                    '---------------------------------------------------------------
+                                    'Make sure the FactTypes are there for Roles in RoleConstraint
+                                    '---------------------------------------------------------------                                
+                                    If lrModel.FactType.Exists(AddressOf lrRoleConstraintRoleInstance.RoleConstraintRole.Role.FactType.Equals) Then
+                                    Else
+                                        lrModel.FactType.Add(lrRoleConstraintRoleInstance.RoleConstraintRole.Role.FactType)
+                                    End If
+
+                                    If lrPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintRoleInstance.RoleConstraint.Equals) Then
+                                        '---------------------------------------------------
+                                        'The RoleConstraintInstance is already on the Page
+                                        '---------------------------------------------------
+                                    Else
+                                        lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintRoleInstance.RoleConstraint)
+                                    End If
+
+                                    If lrPage.FactTypeInstance.Exists(AddressOf lrRoleConstraintRoleInstance.Role.FactType.Equals) Then
+                                    Else
+                                        lrPage.FactTypeInstance.AddUnique(lrRoleConstraintRoleInstance.Role.FactType)
+                                    End If
+
+                                Case Is = pcenumConceptType.RoleConstraint
+
+                                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+                                    lrRoleConstraintInstance = lrModelObject 'arPage.SelectedObject(liInd - 1)
+
+                                    '---------------------------------------------------------------
+                                    'Make sure the FactTypes are there for Roles in RoleConstraint
+                                    '---------------------------------------------------------------
+                                    For Each lrRoleConstraintRoleInstance In lrRoleConstraintInstance.RoleConstraintRole
+                                        If Not lrPage.FactTypeInstance.Exists(AddressOf lrRoleConstraintRoleInstance.Role.FactType.Equals) Then
+                                            Call Me.CloneFactTypeInstanceToPage(lrRoleConstraintRoleInstance.Role.FactType, lrPage)
+                                        End If
+                                    Next
+
+                                    lrRoleConstraintInstance = lrRoleConstraintInstance.Clone(lrPage, lrRoleConstraintInstance.RoleConstraint.IsMDAModelElement)
+                                    lrPage.RoleConstraintInstance.AddUnique(lrRoleConstraintInstance)
+
+                                Case Is = pcenumConceptType.SubtypeRelationship
+
+                                    Dim lrSubtypeRelationshipInstance As FBM.SubtypeRelationshipInstance = lrModelObject
+
+                                    lrSubtypeRelationshipInstance.FactType = Me.CloneFactTypeInstanceToPage(lrSubtypeRelationshipInstance.FactType, lrPage)
+
+                                    lrSubtypeRelationshipInstance = lrSubtypeRelationshipInstance.Clone(lrPage, True)
+
+                                    Dim lrModelElementInstance = lrPage.EntityTypeInstance.Find(Function(x) x.Id = lrSubtypeRelationshipInstance.ModelElement.Id)
+                                    lrModelElementInstance.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+
+                            End Select
+                        Next
+
+                        '------------------------------------------------------------
+                        'IMPORTANT: Keep the below for testing/debugging.
+                        'Objects must be serialisable to use the Clipboard.
+                        '  Use the following to test if the Object is serialisable.
+                        '------------------------------------------------------------
+                        If Boston.IsSerializable(lrPage) Then
+
+                            '----------------------------
+                            ' Create a new data format.
+                            '----------------------------
+                            Dim RichmondPage As DataFormats.Format = DataFormats.GetFormat("RichmondPage")
+
+                            '------------------------------------------------------------------
+                            ' Store the Page in a DataObject using the RichmondPage format 
+                            ' as the type of format.                     
+                            '------------------------------------------------------------------
+                            Dim dataObj As IDataObject = New DataObject()
+
+                            Clipboard.Clear()
+                            dataObj.SetData(RichmondPage.Name, False, lrPage)
+                            Clipboard.SetDataObject(dataObj, True)
+
+                        End If
 
                     End If
-
                 End If
             End If
-        End If
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -4112,7 +5711,17 @@ SaveModel:
 
     Private Sub PasteToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PasteToolStripMenuItem.Click
 
-        Call Me.PasteToCurrentPageFromClipboard()
+        Try
+            Call Me.PasteToPageFromClipboard(prApplication.WorkingModel, prApplication.WorkingPage)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -4146,12 +5755,14 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
 
-    Public Sub PasteToCurrentPageFromClipboard()
+    Public Sub PasteToPageFromClipboard(ByRef arWorkingModel As FBM.Model,
+                                        ByRef arWorkingPage As FBM.Page,
+                                        Optional ByVal abSaveModel As Boolean = False)
 
         Dim lrEntityTypeInstance As FBM.EntityTypeInstance
         Dim lrValueTypeInstance As FBM.ValueTypeInstance
@@ -4160,7 +5771,7 @@ SaveModel:
         Dim lrModelNoteInstance As FBM.ModelNoteInstance
 
         Try
-            If IsSomething(prApplication.WorkingPage) Then
+            If arWorkingPage IsNot Nothing Then
 
                 '-----------------------------
                 'Set the RichmondPage format
@@ -4218,14 +5829,14 @@ SaveModel:
                 '=================================================================================
 
 
-                If lrPage.CopiedModelId = prApplication.WorkingModel.ModelId And
-                    lrPage.CopiedPageId = prApplication.WorkingPage.PageId Then
+                If lrPage.CopiedModelId = arWorkingModel.ModelId And
+                    lrPage.CopiedPageId = arWorkingPage.PageId Then
                     MsgBox("You cannot copy and paste to the same Model and Page")
                     Exit Sub
                 End If
 
 
-                If lrPage.CopiedModelId <> prApplication.WorkingModel.ModelId Then
+                If lrPage.CopiedModelId <> arWorkingModel.ModelId Then
                     '--------------------------------------------------------
                     'Must merge the Page/ModelObjects into the target Model
                     '--------------------------------------------------------
@@ -4235,10 +5846,10 @@ SaveModel:
                     '-----------------------------------------------------
                     Dim lrSignatureResolutionClass As New tClass
                     Dim loTuple As New Object
-                    lrSignatureResolutionClass.add_attribute(New tAttribute("CopiedModelObjectName", GetType(String)))
-                    lrSignatureResolutionClass.add_attribute(New tAttribute("NewModelObjectName", GetType(String)))
-                    lrSignatureResolutionClass.add_attribute(New tAttribute("Signature", GetType(String)))
-                    lrSignatureResolutionClass.add_attribute(New tAttribute("UseEncumbent", GetType(Boolean)))
+                    lrSignatureResolutionClass.add_attribute(New tAttribute("CopiedModelObjectName", GetType(String)), False)
+                    lrSignatureResolutionClass.add_attribute(New tAttribute("NewModelObjectName", GetType(String)), False)
+                    lrSignatureResolutionClass.add_attribute(New tAttribute("Signature", GetType(String)), False)
+                    lrSignatureResolutionClass.add_attribute(New tAttribute("UseEncumbent", GetType(Boolean)), False)
                     '-----------------------------------------------------------------------------------------------
                     'Create a new instance of the frmSignatureResolution to display any (if any) Signature Clashes
                     '-----------------------------------------------------------------------------------------------
@@ -4249,7 +5860,7 @@ SaveModel:
                     Dim lbDifferentSignatureFound As Boolean = False
                     For Each lrModelObject In lrPage.GetAllPageObjects
 
-                        lrEncumbentModelObject = prApplication.WorkingModel.GetModelObjectByName(lrModelObject.Id)
+                        lrEncumbentModelObject = arWorkingModel.GetModelObjectByName(lrModelObject.Id)
                         If lrEncumbentModelObject IsNot Nothing Then
                             loTuple = lrSignatureResolutionClass.clone
                             loTuple.CopiedModelObjectName = lrModelObject.Name
@@ -4296,7 +5907,7 @@ SaveModel:
                         Else
                             For Each lrTuple In larSignatureResolutionList.FindAll(Function(x) x.UseEncumbent = True)
 
-                                Dim lrEncumbentModelElement = prApplication.WorkingPage.getModelElementById(lrTuple.CopiedModelObjectName)
+                                Dim lrEncumbentModelElement = arWorkingPage.getModelElementById(lrTuple.CopiedModelObjectName)
                                 Dim lrReplaceMentModelElement = lrPage.getModelElementById(lrTuple.CopiedModelObjectName)
 
                                 lrReplaceMentModelElement = lrEncumbentModelElement
@@ -4355,10 +5966,10 @@ SaveModel:
                 '-------------------------------------------------------------------------------------------------------------
                 For Each lrValueTypeInstance In lrPage.ValueTypeInstance
                     Dim loPt As New PointF(lrValueTypeInstance.X, lrValueTypeInstance.Y)
-                    lrValueTypeInstance.ValueType.Model = prApplication.WorkingModel
+                    lrValueTypeInstance.ValueType.Model = arWorkingModel
 
-                    If prApplication.WorkingPage.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueTypeInstance.Id).Count = 0 Then
-                        prApplication.WorkingPage.DropValueTypeAtPoint(lrValueTypeInstance.ValueType, loPt, True)
+                    If arWorkingPage.ValueTypeInstance.FindAll(Function(x) x.Id = lrValueTypeInstance.Id).Count = 0 Then
+                        arWorkingPage.DropValueTypeAtPoint(lrValueTypeInstance.ValueType, loPt, True)
                     End If
                 Next
 
@@ -4366,16 +5977,16 @@ SaveModel:
                 'CodeSafe: Some RoleConstraints are within copied FactTypes (as InternalUniquenessConstraints)
                 '  and not at the Page level.
                 For Each lrRoleConstraint In lrPage.Model.RoleConstraint
-                    lrRoleConstraint.ChangeModel(prApplication.WorkingModel, False)
+                    lrRoleConstraint.ChangeModel(arWorkingModel, False)
                 Next
 
                 'RoleConstraints...change Model and make sure Ids are unique
-                If lrPage.CopiedModelId <> prApplication.WorkingModel.ModelId Then
+                If lrPage.CopiedModelId <> arWorkingModel.ModelId Then
                     For Each lrRoleConstraintInstance In lrPage.RoleConstraintInstance
 
-                        lrRoleConstraintInstance.RoleConstraint = lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False, True)
+                        lrRoleConstraintInstance.RoleConstraint = lrRoleConstraintInstance.RoleConstraint.ChangeModel(arWorkingModel, False, True)
 
-                        Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
+                        Dim lsUniqueId As String = arWorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
 
                         'Has to be unique in the copied model as well.
                         If lsUniqueId <> lrRoleConstraintInstance.Id Then
@@ -4393,9 +6004,9 @@ SaveModel:
                     'Make doubly sure have captured all the RoleConstraints, to change Model and have/set unique Id.
                     For Each lrRoleConstraint In lrPage.Model.RoleConstraint
 
-                        Call lrRoleConstraint.ChangeModel(prApplication.WorkingModel, False)
+                        Call lrRoleConstraint.ChangeModel(arWorkingModel, False)
 
-                        Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraint.Id, 0)
+                        Dim lsUniqueId As String = arWorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraint.Id, 0)
 
                         lrRoleConstraint.Id = lsUniqueId
                         lrRoleConstraint.Name = lsUniqueId
@@ -4407,9 +6018,9 @@ SaveModel:
 
                         For Each lrRoleConstraintInstance In lrFactTypeInstance.InternalUniquenessConstraint
 
-                            lrRoleConstraintInstance.RoleConstraint = lrRoleConstraintInstance.RoleConstraint.ChangeModel(prApplication.WorkingModel, False, True)
+                            lrRoleConstraintInstance.RoleConstraint = lrRoleConstraintInstance.RoleConstraint.ChangeModel(arWorkingModel, False, True)
 
-                            Dim lsUniqueId As String = prApplication.WorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
+                            Dim lsUniqueId As String = arWorkingModel.CreateUniqueRoleConstraintName(lrRoleConstraintInstance.Id, 0)
 
                             lrRoleConstraintInstance.Id = lsUniqueId
                             lrRoleConstraintInstance.Name = lsUniqueId
@@ -4425,10 +6036,10 @@ SaveModel:
                 lrPage.EntityTypeInstance.Sort(AddressOf FBM.EntityType.CompareSubtypeConstraintExistance)
                 For Each lrEntityTypeInstance In lrPage.EntityTypeInstance.ToArray
                     Dim loPt As New PointF(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
-                    lrEntityTypeInstance.EntityType = lrEntityTypeInstance.EntityType.ChangeModel(prApplication.WorkingModel, False, True)
-                    If prApplication.WorkingPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count = 0 Then
+                    lrEntityTypeInstance.EntityType = lrEntityTypeInstance.EntityType.ChangeModel(arWorkingModel, False, True)
+                    If arWorkingPage.EntityTypeInstance.FindAll(Function(x) x.Id = lrEntityTypeInstance.Id).Count = 0 Then
                         'Make sure there is a DictionaryEntry for the EntityType.
-                        Dim lrDictionaryEntry As New FBM.DictionaryEntry(prApplication.WorkingModel,
+                        Dim lrDictionaryEntry As New FBM.DictionaryEntry(arWorkingModel,
                                                                          lrEntityTypeInstance.Id,
                                                                          pcenumConceptType.EntityType,
                                                                          lrEntityTypeInstance.EntityType.ShortDescription,
@@ -4436,9 +6047,9 @@ SaveModel:
                                                                          True,
                                                                          True,
                                                                          "")
-                        Call prApplication.WorkingModel.AddModelDictionaryEntry(lrDictionaryEntry,,,,,, True,,)
+                        Call arWorkingModel.AddModelDictionaryEntry(lrDictionaryEntry,,,,,, True,,)
                         'The EntityType doesn't already exist on the Page.
-                        prApplication.WorkingPage.DropEntityTypeAtPoint(lrEntityTypeInstance.EntityType, loPt, True)
+                        arWorkingPage.DropEntityTypeAtPoint(lrEntityTypeInstance.EntityType, loPt, True)
                     End If
                 Next
 
@@ -4446,7 +6057,7 @@ SaveModel:
                 'Display any Subtype Relationships
                 '--------------------------------
                 Dim lrSubtypeRelationship As FBM.SubtypeRelationshipInstance
-                For Each lrEntityTypeInstance In prApplication.WorkingPage.EntityTypeInstance
+                For Each lrEntityTypeInstance In arWorkingPage.EntityTypeInstance
                     For Each lrSubtypeRelationship In lrEntityTypeInstance.SubtypeRelationship
                         Call lrSubtypeRelationship.DisplayAndAssociate()
                     Next
@@ -4455,8 +6066,8 @@ SaveModel:
                 '-----------------------------------------------------------------
                 'ImpliedFactTypes
                 For Each lrFactType In lrPage.Model.FactType
-                    If Not prApplication.WorkingModel.FactType.Exists(AddressOf lrFactType.Equals) Then
-                        Call lrFactType.ChangeModel(prApplication.WorkingModel, True)
+                    If Not arWorkingModel.FactType.Exists(AddressOf lrFactType.Equals) Then
+                        Call lrFactType.ChangeModel(arWorkingModel, True)
                     End If
                 Next
 
@@ -4464,18 +6075,18 @@ SaveModel:
                 lrPage.FactTypeInstance.Sort(AddressOf FBM.FactType.CompareRolesJoiningFactTypesCount)
                 For Each lrFactTypeInstance In lrPage.FactTypeInstance
                     Dim loPt As New PointF(lrFactTypeInstance.X, lrFactTypeInstance.Y)
-                    lrFactTypeInstance.FactType.Model = prApplication.WorkingModel
-                    lrFactTypeInstance.Model = prApplication.WorkingModel
-                    If prApplication.WorkingPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
-                        If prApplication.WorkingPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).IsDisplayedAssociated Then
+                    lrFactTypeInstance.FactType.Model = arWorkingModel
+                    lrFactTypeInstance.Model = arWorkingModel
+                    If arWorkingPage.FactTypeInstance.Exists(AddressOf lrFactTypeInstance.Equals) Then
+                        If arWorkingPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals).IsDisplayedAssociated Then
                             '---------------------------------------------
                             'Already on the Page and DisplayedAssociated
                             '---------------------------------------------
                         Else
-                            prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
+                            arWorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
                         End If
                     Else
-                        prApplication.WorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
+                        arWorkingPage.DropFactTypeAtPoint(lrFactTypeInstance.FactType, loPt, True)
                     End If
                 Next
 
@@ -4483,15 +6094,20 @@ SaveModel:
 
                     Dim loPt As New PointF(lrRoleConstraintInstance.X, lrRoleConstraintInstance.Y)
 
-                    If Not prApplication.WorkingPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
-                        prApplication.WorkingPage.DropRoleConstraintAtPoint(lrRoleConstraintInstance.RoleConstraint, loPt, True)
+                    If Not arWorkingPage.RoleConstraintInstance.Exists(AddressOf lrRoleConstraintInstance.Equals) Then
+                        arWorkingPage.DropRoleConstraintAtPoint(lrRoleConstraintInstance.RoleConstraint, loPt, True)
                     End If
                 Next
 
                 For Each lrModelNoteInstance In lrPage.ModelNoteInstance
                     Dim loPt As New PointF(lrModelNoteInstance.X, lrModelNoteInstance.Y)
-                    'prApplication.WorkingPage.DropModelNoteAtPoint(lrModelNoteInstance.ModelNote, loPt)
+                    'arWorkingPage.DropModelNoteAtPoint(lrModelNoteInstance.ModelNote, loPt)
                 Next
+
+                If abSaveModel Then
+                    arWorkingModel.MakeDirty(True, True)
+                    Call arWorkingModel.Save()
+                End If
 
             End If
 
@@ -4501,7 +6117,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4524,7 +6140,7 @@ SaveModel:
 
     Private Sub ToolStripButtonPrint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButtonPrint.Click
 
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             prApplication.WorkingPage.DiagramView.PrintOptions.DocumentName = prApplication.WorkingModel.Name & ", " & prApplication.WorkingPage.Name
             prApplication.WorkingPage.DiagramView.PrintOptions.EnableImages = False
             prApplication.WorkingPage.DiagramView.PrintOptions.EnableInterior = True
@@ -4551,20 +6167,20 @@ SaveModel:
 
     Private Sub OpenLogFileToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripMenuItemOpenLogFile.Click
 
-        Dim lrErrorLogFilePath As String = ""
-        Dim lrErrorLogFilePathName As String = ""
+        Dim lsErrorLogFilePath As String = ""
+        Dim lsErrorLogFilePathName As String = ""
 
-        lrErrorLogFilePath = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\Errors\"
+        lsErrorLogFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.CompanyName, Application.ProductName) & "\Errors\"
         'MsgBox(lrErrorLogFilePath)
 
-        If Not System.IO.Directory.Exists(lrErrorLogFilePath) Then
-            System.IO.Directory.CreateDirectory(lrErrorLogFilePath)
+        If Not System.IO.Directory.Exists(lsErrorLogFilePath) Then
+            System.IO.Directory.CreateDirectory(lsErrorLogFilePath)
         End If
 
-        lrErrorLogFilePathName = lrErrorLogFilePath & "errlog.txt"
+        lsErrorLogFilePathName = lsErrorLogFilePath & "errlog.txt"
 
-        If (System.IO.File.Exists(lrErrorLogFilePathName)) Then
-            System.Diagnostics.Process.Start(lrErrorLogFilePathName)
+        If (System.IO.File.Exists(lsErrorLogFilePathName)) Then
+            System.Diagnostics.Process.Start(lsErrorLogFilePathName)
         End If
 
     End Sub
@@ -4627,7 +6243,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4667,8 +6283,8 @@ SaveModel:
 
     Private Sub ToolStripButtonNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToolStripButtonNew.Click
 
-        If IsSomething(Me.zfrmModelExplorer) Then
-            If IsSomething(Me.zfrmModelExplorer.TreeView.SelectedNode) Then
+        If Me.zfrmModelExplorer IsNot Nothing Then
+            If Me.zfrmModelExplorer.TreeView.SelectedNode IsNot Nothing Then
                 Dim lrEnterpriseView As tEnterpriseEnterpriseView
                 lrEnterpriseView = Me.zfrmModelExplorer.TreeView.SelectedNode.Tag
 
@@ -4698,9 +6314,9 @@ SaveModel:
 
         Try
 
-            Call load_diagram_overview_form()
+            Call loadDiagramOverviewForm()
 
-            If IsSomething(prApplication.WorkingPage) Then
+            If prApplication.WorkingPage IsNot Nothing Then
                 Select Case prApplication.WorkingPage.Language
                     Case Is = pcenumLanguage.ORMModel,
                               pcenumLanguage.EntityRelationshipDiagram,
@@ -4716,7 +6332,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4810,28 +6426,41 @@ SaveModel:
                         Dim lsSQLFilePath = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\TempFiles\"
                         System.IO.Directory.CreateDirectory(lsSQLFilePath)
 
+                        'Close the database
                         Call prApplication.CloseDatabase()
 
                         Try
+                            'Delete the lock file if it is there.
                             System.IO.File.Delete(lsSQLFilePath & "boston.ldb")
                         Catch ex As Exception
                         End Try
-                        Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Read)
-                        System.IO.File.Copy(prApplication.DatabaseLocationName, lsSQLFilePath & "boston.mdb", True)
 
-                        Call Boston.OpenDatabase(lsSQLFilePath & "boston.mdb")
+                        'Create a backup of the database
+                        Dim lsDatabaseFileName = Path.GetFileName(prApplication.DatabaseLocationName)
+                        Boston.WaitForFile(lsSQLFilePath & lsDatabaseFileName, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Read)
+                        System.IO.File.Copy(prApplication.DatabaseLocationName, lsSQLFilePath & lsDatabaseFileName, True)
 
+                        'Open the copied database to Upgrade it.
+                        Call Database.OpenDatabase(lsSQLFilePath & lsDatabaseFileName, False)
+
+                        'Perform the Upgrade
+#Region "Perform the Upgrade"
                         Dim lrDatabaseUpgrade As New DatabaseUpgrade.Upgrade
                         While tableDatabaseUpgrade.GetNextRequiredUpgrade(lrDatabaseUpgrade, True) IsNot Nothing
 
+#Region "Inform User that Database Upgrade is happening."
                             lfrmFlashCard.ziIntervalMilliseconds = 1600
                             lsMessage = "Upgrading the database from Version " & lrDatabaseUpgrade.FromVersionNr & " to Version " & lrDatabaseUpgrade.ToVersionNr
                             lfrmFlashCard.zsText = lsMessage
                             liDialogResult = lfrmFlashCard.ShowDialog(Me, "LightGray")
+#End Region
 
                             With New WaitCursor
 
-                                If Database.DatabaseModule.PerformNextRequiredDatabaseUpgrade(lrDatabaseUpgrade.UpgradeId, lrDatabaseUpgrade.FromVersionNr, lrDatabaseUpgrade.ToVersionNr) Then
+                                If Database.DatabaseModule.PerformNextRequiredDatabaseUpgrade(lrDatabaseUpgrade.UpgradeId,
+                                                                                              lrDatabaseUpgrade.FromVersionNr,
+                                                                                              lrDatabaseUpgrade.ToVersionNr,
+                                                                                              lsSQLFilePath & lsDatabaseFileName) Then
                                     '------------------------------------------------
                                     'Update the Boston DatabaseVersionNr
                                     '------------------------------------------------
@@ -4847,19 +6476,40 @@ SaveModel:
                             End With
 
                         End While
+#End Region
 
                         prApplication.CloseDatabase()
-                        Boston.WaitForFile(prApplication.DatabaseLocationName, IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
-                        System.IO.File.Copy(lsSQLFilePath & "boston.mdb", prApplication.DatabaseLocationName, True)
-                        Boston.WaitForFile(lsSQLFilePath & "boston.mdb", IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
-                        Try
-                            System.IO.File.Delete(lsSQLFilePath & "boston.mdb")
-                            System.IO.File.Delete(lsSQLFilePath & "boston.ldb")
-                        Catch ex As Exception
-                            prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
-                        End Try
 
-                        Boston.OpenDatabase(prApplication.DatabaseLocationName)
+                        System.Threading.Thread.Sleep(3000)
+
+                        'Copy the Upgraded database to production.
+#Region "Copy the Upgraded database to production."
+                        Boston.WaitForFile(prApplication.DatabaseLocationName, IO.FileMode.Open, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite)
+                        File.Delete(prApplication.DatabaseLocationName)
+
+                        Select Case My.Settings.DatabaseType
+                            Case Is = "SQLite"
+                                pdbConnection.Execute("VACUUM")
+                        End Select
+
+                        System.IO.File.Copy(lsSQLFilePath & lsDatabaseFileName, prApplication.DatabaseLocationName, True)
+                        If Boston.WaitForFile(lsSQLFilePath & lsDatabaseFileName, IO.FileMode.Create, IO.FileAccess.ReadWrite, IO.FileShare.ReadWrite) Then
+                            Try
+                                System.IO.File.Delete(lsSQLFilePath & lsDatabaseFileName)
+                                Try
+                                    'Delete the lock file if it is there.
+                                    System.IO.File.Delete(lsSQLFilePath & "boston.ldb")
+                                Catch ex As Exception
+                                End Try
+
+                            Catch ex As Exception
+                                prApplication.ThrowMessage("Error removing the temporary copies of the Boston database".AppendDoubleLineBreak(ex.Message), pcenumErrorType.Warning, abUseFlashCard:=True)
+                            End Try
+                        End If
+#End Region
+
+                        'Open the upgraded database.
+                        Database.OpenDatabase(prApplication.DatabaseLocationName)
 
                         lfrmFlashCard = New frmFlashCard
                         lfrmFlashCard.ziIntervalMilliseconds = 5600
@@ -4867,6 +6517,7 @@ SaveModel:
                         lsMessage = "Successfully upgraded to database version: " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
                         lfrmFlashCard.zsText = lsMessage
                         liDialogResult = lfrmFlashCard.ShowDialog(Me)
+
                     Else
                         '------------------------------------------------
                         'Now, with the user, perform the actual Upgrade
@@ -4898,6 +6549,7 @@ SaveModel:
                         '----------------------------------------
                         PerformDatabaseUpgrade = True
                     Else
+#Region "Upgrade Failed message"
                         '--------------------------------------------------------------------------------
                         'Application will close because the RichmondDatabase is not at the correct version
                         '--------------------------------------------------------------------------------
@@ -4912,6 +6564,7 @@ SaveModel:
                         lsMessage = lsMessage & "Please restart Boston and complete the required database update/s."
                         Call MsgBox(lsMessage, vbExclamation)
                         Me.Close()
+#End Region
                     End If
                 Else
                     '------------------------------------------------------------------------------------------
@@ -4922,6 +6575,7 @@ SaveModel:
                     Call MsgBox(lsMessage, vbExclamation)
                 End If
             Else
+#Region "rostersdatabaseupgrade.vdb file does not exists."
                 '------------------------------------------------------------------------------------------
                 'There is no sense proceding with the upgrade because the rostersdatabaseupgrade.vdb file
                 '  does not exists. This file is required to perform the upgrade because it contains the
@@ -4941,6 +6595,7 @@ SaveModel:
                 lsMessage &= "Expecting to find this file: " & lsUpgradeDatabaseFilePath
                 Call MsgBox(lsMessage, vbExclamation)
                 PerformDatabaseUpgrade = False
+#End Region
             End If
 
         Catch ex As Exception
@@ -4949,7 +6604,7 @@ SaveModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -4965,7 +6620,7 @@ SaveModel:
             lsMessage = "Error: You might not have a default email application setup in Windows."
             lsMessage &= vbCrLf & vbCrLf
             lsMessage &= "Email support@factengine.ai for support on Boston"
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -4976,13 +6631,13 @@ SaveModel:
 
         loForm = Me.DockPanel.ActiveDocument
 
-        If IsSomething(loForm) Then
+        If loForm IsNot Nothing Then
             If loForm.Name = frmDiagramORM.Name Then
                 Dim lrPage As New FBM.Page
                 Dim lrORMForm As frmDiagramORM
                 lrORMForm = loForm
                 lrPage = lrORMForm.zrPage
-                Call Me.CopySelectedObjectsToClipboard()
+                Call Me.CopySelectedObjectsToClipboard(prApplication.WorkingPage)
             End If
         End If
 
@@ -4994,13 +6649,13 @@ SaveModel:
 
         loForm = Me.DockPanel.ActiveDocument
 
-        If IsSomething(loForm) Then
+        If loForm IsNot Nothing Then
             If loForm.Name = frmDiagramORM.Name Then
                 Dim lrPage As New FBM.Page
                 Dim lrORMForm As frmDiagramORM
                 lrORMForm = loForm
                 lrPage = lrORMForm.zrPage
-                Call Me.PasteToCurrentPageFromClipboard()
+                Call Me.PasteToPageFromClipboard(prApplication.WorkingModel, prApplication.WorkingPage)
             End If
         End If
 
@@ -5011,30 +6666,47 @@ SaveModel:
         Dim lrPage As New FBM.Page
         Dim loForm As Form
 
-        loForm = Me.DockPanel.ActiveDocument
+        Try
+            loForm = Me.DockPanel.ActiveDocument
 
-        If Me.PageDataExistsInClipboard(lrPage) Then
-            '------------------------------------
-            'Page data exists in the clipboard.
-            '------------------------------------
-            If loForm.Name = Me.zrORMModel_view.Name Then
-                '------------------------------------------------------------------------
-                'Current form is an ORM Diagram form, so can at least paste to the Page
-                '  if it isn't the same page the data was copied from
-                '------------------------------------------------------------------------
-                Dim loORMDiagramForm As frmDiagramORM
-                loORMDiagramForm = loForm
-                If IsSomething(loORMDiagramForm.zrPage) Then
-                    If lrPage.CopiedPageId <> loORMDiagramForm.zrPage.PageId Then
-                        Me.PasteToolStripMenuItem.Enabled = True
-                    Else
-                        Me.PasteToolStripMenuItem.Enabled = False
+            Select Case loForm.GetType
+                Case Is = GetType(frmDiagramERD)
+                    ToolStripMenuItemCopy.Enabled = False
+                Case Else
+                    ToolStripMenuItemCopy.Enabled = True
+            End Select
+
+            If Me.PageDataExistsInClipboard(lrPage) Then
+                '------------------------------------
+                'Page data exists in the clipboard.
+                '------------------------------------
+                If loForm.Name = Me.zrORMModel_view.Name Then
+                    '------------------------------------------------------------------------
+                    'Current form is an ORM Diagram form, so can at least paste to the Page
+                    '  if it isn't the same page the data was copied from
+                    '------------------------------------------------------------------------
+                    Dim loORMDiagramForm As frmDiagramORM
+                    loORMDiagramForm = loForm
+                    If loORMDiagramForm.zrPage IsNot Nothing Then
+                        If lrPage.CopiedPageId <> loORMDiagramForm.zrPage.PageId Then
+                            Me.PasteToolStripMenuItem.Enabled = True
+                        Else
+                            Me.PasteToolStripMenuItem.Enabled = False
+                        End If
                     End If
                 End If
+            Else
+                Me.PasteToolStripMenuItem.Enabled = False
             End If
-        Else
-            Me.PasteToolStripMenuItem.Enabled = False
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -5080,46 +6752,17 @@ SaveModel:
 
     End Sub
 
-    Private Sub InitializeClient()
-        '20200903-VM-Tested on VM on Azure. Works fine. No configuration required. Just run the BostonServer on the VM first.
-        'The 'Server: Connected' message can be seen in the bottom left corner of the Main form in the status bar.
-
-        Try
-            If prDuplexServiceClient IsNot Nothing Then
-                Try
-                    prDuplexServiceClient.Close()
-                Catch
-                    prDuplexServiceClient.Abort()
-                Finally
-                    prDuplexServiceClient = Nothing
-                End Try
-            End If
-
-            Dim DuplexCallback As New DuplexCallback()
-
-            Dim instanceContext As New InstanceContext(DuplexCallback)
-            Dim dualHttpBinding As New WSDualHttpBinding(WSDualHttpSecurityMode.None)
-            dualHttpBinding.OpenTimeout = New TimeSpan(0, 0, 5)
-            Dim endpointAddress As New EndpointAddress(ServiceEndpointUri)
-            prDuplexServiceClient = New DuplexServiceClient.DuplexServiceClient(instanceContext, dualHttpBinding, endpointAddress)
-            prDuplexServiceClient.Open()
-            prDuplexServiceClient.Connect()
-
-            'AddHandler DuplexCallback.ServiceCallbackEvent, AddressOf prDuplexServiceClient.HandleServiceCallbackEvent
-            AddHandler DuplexCallback.BroadcastEventReceived, AddressOf prDuplexServiceClient.HandleBroadcastReceived
-
-            Me.ToolStripStatusLabelClientServer.Text = "Server: Connected"
-            Me.ToolStripButtonProfile.Visible = True
-
-        Catch ex As Exception
-            MsgBox(ex.Message)
-            Me.ToolStripStatusLabelClientServer.Text = "Server: Not Connected"
-        End Try
-    End Sub
-
     Private Sub LoginToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemLogIn.Click
 
         If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
+
+            If My.Settings.InitialiseClient Then
+                Try
+                    Call prApplication.InitializeClient() 'Connects to the Boston Server Host
+                Catch ex As Exception
+                    'We tried
+                End Try
+            End If
 
             '------------------------------------------------------------------
             'LogIn from populates prApplication.User
@@ -5131,7 +6774,17 @@ SaveModel:
 
     Private Sub ToolStripButtonProfile_Click(sender As Object, e As EventArgs) Handles ToolStripButtonProfile.Click
 
-        Call Me.LoadCRUDEditUser(prApplication.User)
+        Try
+            Call Me.LoadCRUDEditUser(prApplication.User)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
 
     End Sub
 
@@ -5146,34 +6799,43 @@ SaveModel:
         Dim lrGenericSelection As New tGenericSelection()
         Dim lrUser As New ClientServer.User
 
-        Dim lsWhereClause As String = ""
+        Try
+            Dim lsWhereClause As String = ""
 
-        If prApplication.User.IsSuperuser Then
-            lsWhereClause = ""
-        Else
-            lsWhereClause = " WHERE Id = '" & prApplication.User.Id & "'"
-        End If
+            If prApplication.User.IsSuperuser Then
+                lsWhereClause = ""
+            Else
+                lsWhereClause = " WHERE Id = '" & prApplication.User.Id & "'"
+            End If
 
-        If Boston.DisplayGenericSelectForm(lrGenericSelection,
-                                               "User",
-                                               "ClientServerUser",
-                                               "FirstName & ' ' & LastName AS Name, Username",
-                                               "Username",
-                                               lsWhereClause,
-                                               Nothing,
-                                               pcenumComboBoxStyle.DropdownList,
-                                               "1,2",
-                                               2,
-                                               "120;120",
-                                               "Name,Username") = Windows.Forms.DialogResult.OK Then
+            If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                                   "User",
+                                                   "ClientServerUser",
+                                                   "FirstName " & pdbConnection.StingConcatenationSymbol & "' '" & pdbConnection.StingConcatenationSymbol & "LastName AS Name, Username",
+                                                   "Username",
+                                                   lsWhereClause,
+                                                   Nothing,
+                                                   pcenumComboBoxStyle.DropdownList,
+                                                   "1,2",
+                                                   2,
+                                                   "120;120",
+                                                   "Name,Username") = Windows.Forms.DialogResult.OK Then
 
 
-            lrUser.Username = lrGenericSelection.SelectValue
-            Call tableClientServerUser.getUserDetailsByUsername(lrUser.Username, lrUser)
+                lrUser.Username = lrGenericSelection.SelectValue
+                Call tableClientServerUser.getUserDetailsByUsername(lrUser.Username, lrUser)
 
-            Call Me.LoadCRUDEditUser(lrUser)
-        End If
+                Call Me.LoadCRUDEditUser(lrUser)
+            End If
 
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -5193,7 +6855,7 @@ SaveModel:
             Call Me.LoadCRUDAddProject()
 
         Catch ex As Exception
-            prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical)
+            prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical)
         End Try
 
     End Sub
@@ -5246,7 +6908,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5281,7 +6943,7 @@ SaveModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5343,7 +7005,7 @@ SaveModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -5426,7 +7088,7 @@ SaveModel:
 
 
         Catch ex As Exception
-            prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical)
+            prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical)
         End Try
 
     End Sub
@@ -5445,9 +7107,13 @@ SaveModel:
         Try
             '-------------------------------------------------------------------------------------------------------
             'Main Client/Server menu items
-            If prApplication.User.IsSuperuser Or prApplication.User.Function.Contains(pcenumFunction.FullPermission) Then
-                Me.ToolStripMenuItemUser.Visible = False
-                Me.ToolStripMenuItemProject.Visible = False
+            If prApplication.User IsNot Nothing Then
+                If prApplication.User.IsSuperuser Or prApplication.User.Function.Contains(pcenumFunction.FullPermission) Then
+                    Me.ToolStripMenuItemUser.Visible = False
+                    Me.ToolStripMenuItemProject.Visible = False
+                End If
+
+                prApplication.User.IsLoggedIn = False
             End If
 
             '------------------------------------------------------------------------------------------------------
@@ -5455,17 +7121,15 @@ SaveModel:
             Me.ToolStripMenuItemLogOut.Visible = False
             Me.ToolStripMenuItemLogIn.Visible = True
 
-            prApplication.User.IsLoggedIn = False
-
             '-------------------------------------
             'Display the FlashCard to show that the User has logged out
             Dim lfrmFlashCard As New frmFlashCard
-            lfrmFlashCard.zsText = "Successfully logged out."
+            lfrmFlashCard.zsText = "Successfully logged out"
             Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(Me)
 
             If My.Settings.LoggingOutEndsSession Then
 
-                If IsSomething(zfrmModelExplorer) Then
+                If zfrmModelExplorer IsNot Nothing Then
                     Me.zfrmModelExplorer.zoRecentNodes.Serialize(Me.zfrmModelExplorer.zsRecentNodesFileName)
                 End If
 
@@ -5482,7 +7146,7 @@ SaveModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5505,20 +7169,22 @@ SaveModel:
 
             If My.Settings.UseVirtualUI Then
                 If prThinfinity.BrowserInfo Is Nothing Then
-                    Dim lsMessage = "Friendly message: 'UseVirtualUI' is configured to 'True', but it seems that you are not running Boston through a browser."
+                    Dim lsMessage = "Friendly message: It seems that you are not running Boston through a browser, but 'UseVirtualUI' is configured to 'True'"
                     lsMessage &= vbCrLf & vbCrLf & "If you are running Boston through a browser, please contact FactEngine."
-                    MsgBox(lsMessage)
+                    Boston.ShowFlashCard(lsMessage, pcColorPastelGreen, 5000)
                 Else
                     Try
                         lrLogEntry.IPAddress = prThinfinity.BrowserInfo.IPAddress
+                        lrLogEntry.BrowserId = prThinfinity.BrowserInfo.UniqueBrowserId
                     Catch ex As Exception
-                        Dim lsMessage = "Friendly message: 'UseVirtualUI' is configured to 'True', but it seems that you are not running Boston through a browser."
+                        Dim lsMessage = "Friendly message: It seems that you are not running Boston through a browser, but 'UseVirtualUI' is configured to 'True'."
                         lsMessage &= vbCrLf & vbCrLf & "If you are running Boston through a browser, please contact FactEngine."
-                        MsgBox(lsMessage)
+                        Boston.ShowFlashCard(lsMessage, pcColorPastelGreen, 4500)
                     End Try
                 End If
             Else
                 lrLogEntry.IPAddress = "NOTHING"
+                lrLogEntry.BrowserId = "NOTHING"
             End If
 
             Call tableClientServerLog.AddLogEntry(lrLogEntry)
@@ -5526,7 +7192,7 @@ SaveModel:
             '-------------------------------------
             'Display the FlashCard to show that the User has logged in
             Dim lfrmFlashCard As New frmFlashCard
-            lfrmFlashCard.zsText = "Welcome to Boston!"
+            lfrmFlashCard.zsText = "Welcome to Boston"
             lfrmFlashCard.resizeToText()
             Dim liDialogResult As DialogResult = lfrmFlashCard.ShowDialog(Me)
 
@@ -5536,7 +7202,7 @@ SaveModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5544,8 +7210,8 @@ SaveModel:
     Private Sub DoNotificationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DoNotificationToolStripMenuItem.Click
 
         Dim loNotification As New CharmNotification.Notification
-        loNotification.Title = "Hellow World"
-        loNotification.Text = "Testing this notofication stuff"
+        loNotification.Title = "Hello World"
+        loNotification.Text = "Testing notifications"
         loNotification.Duration = 5000
         loNotification.ShowNotification()
 
@@ -5772,7 +7438,7 @@ SaveModel:
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5789,30 +7455,61 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
     Private Sub ToolStripMenuItemEdit_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemEdit.Click
 
-        '--------------------------------------------------------------
-        'Check to see if there is a Page in the Clipboard for Pasting
-        '--------------------------------------------------------------
-        Dim lrClipboardPage As New FBM.Page 'Clipbrd.ClipboardPage
-        Dim RichmondPage As DataFormats.Format = DataFormats.GetFormat("RichmondPage")
         Try
-            If Clipboard.ContainsData(RichmondPage.Name) Then
-                Dim myRetrievedObject As IDataObject = Clipboard.GetDataObject()
-                lrClipboardPage = CType(myRetrievedObject.GetData(RichmondPage.Name), FBM.Page) ' Clipbrd.ClipboardPage)
-                If IsSomething(lrClipboardPage) Then
-                    Me.PasteToolStripMenuItem.Enabled = True
-                Else
-                    Me.PasteToolStripMenuItem.Enabled = False
-                End If
+#Region "Only show [Copy] menu item if there is a selection, and only on ORM Diagrams"
+            ' Determine the active child form.
+            Dim lfrm_activeChild As Form = Me.ActiveMdiChild
+
+            '--------------------------------------------------
+            'Exit the sub if there are no ActiveMdiChild forms
+            '--------------------------------------------------
+            If lfrm_activeChild IsNot Nothing Then
+
+                Select Case lfrm_activeChild.GetType
+                    Case Is = GetType(frmDiagramORM)
+                        Dim lfrmORMDiagram As frmDiagramORM
+                        lfrmORMDiagram = lfrm_activeChild
+                        If lfrmORMDiagram.Diagram.Selection.Items.Count = 0 Then
+                            Me.ToolStripMenuItemCopy.Enabled = False
+                        End If
+                End Select
             End If
+#End Region
+
+            '--------------------------------------------------------------
+            'Check to see if there is a Page in the Clipboard for Pasting
+            '--------------------------------------------------------------
+            Dim lrClipboardPage As New FBM.Page 'Clipbrd.ClipboardPage
+            Dim RichmondPage As DataFormats.Format = DataFormats.GetFormat("RichmondPage")
+
+            Try
+                If Clipboard.ContainsData(RichmondPage.Name) Then
+                    Dim myRetrievedObject As IDataObject = Clipboard.GetDataObject()
+                    lrClipboardPage = CType(myRetrievedObject.GetData(RichmondPage.Name), FBM.Page) ' Clipbrd.ClipboardPage)
+                    If lrClipboardPage IsNot Nothing Then
+                        Me.PasteToolStripMenuItem.Enabled = True
+                    Else
+                        Me.PasteToolStripMenuItem.Enabled = False
+                    End If
+                End If
+            Catch ex As Exception
+                'Oh well, tried
+            End Try
+
         Catch ex As Exception
-            'Oh well, tried
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5918,7 +7615,7 @@ SaveModel:
 
     Private Sub ConfigurationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigurationToolStripMenuItem.Click
 
-        Call Me.LoadCRUDRichmondConfiguration()
+        Call Me.LoadCRUDBostonConfiguration()
 
     End Sub
 
@@ -5930,7 +7627,7 @@ SaveModel:
 #Region "Open ModelExplorer"
 
             If Me.MenuItem_ShowEnterpriseTreeView.Checked Then
-                If IsSomething(zfrmModelExplorer) Then
+                If zfrmModelExplorer IsNot Nothing Then
                     '---------------------------------------
                     'Enterprise TreeView is already loaded
                     '---------------------------------------
@@ -5941,7 +7638,7 @@ SaveModel:
                 '------------------------------------------------
                 'EnterpriseTreeViewer is not meant to be open
                 '------------------------------------------------
-                If IsSomething(zfrmModelExplorer) Then
+                If zfrmModelExplorer IsNot Nothing Then
                     'Nothing to do here.
                 Else
                     Call LoadEnterpriseTreeViewer()
@@ -5958,7 +7655,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -5982,9 +7679,9 @@ SaveModel:
 
                 lsCompactedDatabaseLocationName = New FileInfo(lsDatabaseLocationName).DirectoryName & "\BostonCompacted.vdb"
 
-                Call Boston.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
+                Call Database.CompactAccessDB(lsDatabaseLocationName, lsCompactedDatabaseLocationName)
 
-                Call Boston.OpenDatabase()
+                Call Database.OpenDatabase()
             End With
 
             MsgBox("The Boston database has successfully been compacted and repaired.")
@@ -6033,7 +7730,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6063,7 +7760,7 @@ SaveModel:
 
 
                     lrUnifiedOntology.Id = lrGenericSelection.SelectValue
-                    Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
+                    Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology, True)
 
                     Call Me.LoadUnifiedOntologyBrowser(lrUnifiedOntology, Nothing)
                 End With
@@ -6076,7 +7773,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6099,7 +7796,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6119,7 +7816,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6135,7 +7832,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6163,7 +7860,7 @@ SaveModel:
 
                 Dim lrUnifiedOntology As New Ontology.UnifiedOntology
                 lrUnifiedOntology.Id = lrGenericSelection.SelectIndex
-                Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
+                Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology, True)
                 lfrmEditUnfiedOntology.moUnifiedOntology = lrUnifiedOntology
                 Call lfrmEditUnfiedOntology.Show() 'Dialog()
 
@@ -6175,7 +7872,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6192,7 +7889,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6209,7 +7906,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6225,7 +7922,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6241,7 +7938,7 @@ SaveModel:
             If Boston.DisplayGenericSelectForm(lrGenericSelection,
                                                "User",
                                                "ClientServerUser",
-                                               "FirstName & ' ' & LastName AS Name, Username",
+                                               "FirstName " & pdbConnection.StingConcatenationSymbol & "' '" & pdbConnection.StingConcatenationSymbol & "LastName AS Name,Username",'"FirstName & ' ' & LastName AS Name, Username",
                                                "Username",
                                                lsWhereClause,
                                                Nothing,
@@ -6258,6 +7955,11 @@ SaveModel:
                 If frmLogin.ShowDialog() = Windows.Forms.DialogResult.OK Then
 
                     prApplication.User = lrUser
+
+                    'CodeSafe - For Security (Testing) Purposes
+                    Call Me.ShowHideMenuOptions()
+
+                    prApplication.User.IsSuperuser = True
 
                     Call Me.SaveAllModels()
 
@@ -6280,7 +7982,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6301,7 +8003,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -6316,7 +8018,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6336,7 +8038,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6369,7 +8071,7 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -6399,7 +8101,7 @@ SaveModel:
 
 
                     lrUnifiedOntology.Id = lrGenericSelection.SelectValue
-                    Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology)
+                    Call TableUnifiedOntology.GetUnifiedOntologyDetails(lrUnifiedOntology, True)
 
                     Call Me.LoadUnifiedOntologyBrowser(lrUnifiedOntology, Nothing)
                 End With
@@ -6412,9 +8114,639 @@ SaveModel:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
+    End Sub
+
+    Private Sub VirtualAnalystToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles VirtualAnalystToolStripMenuItem.Click
+
+        Try
+
+            Call Me.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DescriptionsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DescriptionsToolStripMenuItem.Click
+
+        Try
+            Call Me.loadToolboxDescriptions(Me.DockPanel.ActivePane)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ChatOpenAIToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemChatOpenAI.Click
+
+        Try
+            Call Me.LoadChatOpenAI()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub TimerGFSBackup_Tick(sender As Object, e As EventArgs) Handles TimerGFSBackup.Tick
+
+        Try
+            Me.TimerGFSBackup.Stop()
+            Me.TimerGFSBackup.Enabled = False
+
+            'Grandfather, Father, Son, backup
+            If My.Settings.PerformGrandfatherFatherSonBackup Then
+
+                ' Start the backup on a new thread
+                Dim backupThread As New Thread(AddressOf Database.PerformGrandfatherFatherSonBackup)
+                backupThread.IsBackground = True ' This ensures the thread won't prevent the app from closing
+                backupThread.Start() ' This starts the PerformGrandfatherFatherSonBackup method on a new thread
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub AddTaskToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddTaskToolStripMenuItem.Click
+
+        Try
+            Call prApplication.MainForm.LoadCRUDAddEditOSMTask()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub EditTaskToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditTaskToolStripMenuItem.Click
+
+        Try
+            Call prApplication.MainForm.LoadCRUDAddEditOSMTask(True)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub AddOpenAIFunctionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddOpenAIFunctionToolStripMenuItem.Click
+
+        Try
+            Call prApplication.MainForm.LoadCRUDAddEditOSMOpenAIFunction()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub EditOpenAIFunctionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditOpenAIFunctionToolStripMenuItem.Click
+
+        Try
+            Call prApplication.MainForm.LoadCRUDAddEditOSMOpenAIFunction(True)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DeleteTaskToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeleteTaskToolStripMenuItem.Click
+
+        Try
+            Dim lrGenericSelection As New tGenericSelection
+            lrGenericSelection.ObjectName = "Task"
+            lrGenericSelection.UseDataStore = True
+            lrGenericSelection.DataStoreType = GetType(OSM.Task)
+            lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+            Dim lrEntityType As New OSM.Task
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection, "Task", "DataStore", "Name", "TaskId", "", Nothing,,,,,, True, GetType(OSM.Task)) = Windows.Forms.DialogResult.OK Then
+
+                Dim lrTask As OSM.Task = lrGenericSelection.SelectedTag
+
+                If MsgBox("Are you sure you want to delete the Task: " & lrTask.Name, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                    Dim lrDataStore As New DataStore.Store
+                    Dim whereClause As Expression(Of Func(Of OSM.Task, Boolean)) = Function(t) t.TaskId = lrTask.TaskId
+                    Dim whereClauseTaskFunction As Expression(Of Func(Of OSM.TaskOpenAIFunction, Boolean)) = Function(t) t.TaskId = lrTask.TaskId
+                    Dim whereClauseTaskFEQL As Expression(Of Func(Of OSM.TaskFEQLQuery, Boolean)) = Function(t) t.TaskId = lrTask.TaskId
+
+                    lrDataStore.Delete(Of OSM.Task)(whereClause)
+                    lrDataStore.Delete(Of OSM.TaskOpenAIFunction)(whereClauseTaskFunction)
+                    lrDataStore.Delete(Of OSM.TaskFEQLQuery)(whereClauseTaskFEQL)
+                End If
+            Else
+                Exit Sub
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DeleteOpenAIFunctionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeleteOpenAIFunctionToolStripMenuItem.Click
+
+        Try
+
+            Dim lrGenericSelection As New tGenericSelection
+            lrGenericSelection.ObjectName = "Task"
+            lrGenericSelection.UseDataStore = True
+            lrGenericSelection.DataStoreType = GetType(OSM.Task)
+            lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+            Dim lrEntityType As New OSM.OpenAIFunction
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection, "OpenAIFunction", "DataStore", "name", "name", "", Nothing,,,,,, True, GetType(OSM.OpenAIFunction), asObjectName:="OpenAI Function") = Windows.Forms.DialogResult.OK Then
+
+                Dim lrOpenAIFunction As OSM.OpenAIFunction = lrGenericSelection.SelectedTag
+
+                If MsgBox("Are you sure you want to delete the OpenAI Function: " & lrOpenAIFunction.name, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                    Dim lrDataStore As New DataStore.Store
+                    Dim whereClause As Expression(Of Func(Of OSM.OpenAIFunction, Boolean)) = Function(t) t.name = lrOpenAIFunction.name
+                    Dim whereClauseTaskFunction As Expression(Of Func(Of OSM.TaskOpenAIFunction, Boolean)) = Function(t) t.OpenAIFunctionName = lrOpenAIFunction.name
+
+                    lrDataStore.Delete(Of OSM.OpenAIFunction)(whereClause)
+                    lrDataStore.Delete(Of OSM.TaskOpenAIFunction)(whereClauseTaskFunction)
+                End If
+
+            Else
+                    Exit Sub
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TheBoxToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TheBoxToolStripMenuItem.Click
+
+        Try
+            Call Me.LoadOSMTheBox()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ImportTaskToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ImportTaskToolStripMenuItem.Click
+
+        Dim lsMessage As String
+
+        Try
+            Dim openFileDialog As New OpenFileDialog()
+            openFileDialog.Filter = "OSM Task Files (*.osmtask)|*.osmtask"
+            openFileDialog.Title = "Open OSM Task File"
+
+            Dim lrOSMTask As OSM.Task = Nothing
+
+            If openFileDialog.ShowDialog() = DialogResult.OK Then
+                Try
+                    Dim serializer As New XmlSerializer(GetType(OSM.Task))
+                    Using reader As FileStream = New FileStream(openFileDialog.FileName, FileMode.Open)
+                        lrOSMTask = DirectCast(serializer.Deserialize(reader), OSM.Task)
+                    End Using
+                Catch ex As Exception
+                    lsMessage = "Error loading OSM Task: " & ex.Message.AppendLine(If(ex.InnerException IsNot Nothing, ex.InnerException.Message, ""))
+                    MessageBox.Show(lsMessage)
+                    Throw New Exception(lsMessage.AppendDoubleLineBreak(ex.ToString))
+                End Try
+            End If
+
+            Call lrOSMTask.SetTaskId(System.Guid.NewGuid.ToString)
+
+            'Save the Task
+            Dim lrDataStore As New DataStore.Store
+            Dim whereClause As Expression(Of Func(Of OSM.Task, Boolean)) = Function(t) t.TaskId = lrOSMTask.TaskId
+
+#Region "Create new Task Name"
+
+            Dim liInd = 1
+            Dim lsTestName = lrOSMTask.Name & liInd.ToString
+            Dim isUnique As Boolean = False
+
+            While Not isUnique
+                Dim loUniqueTaskNameWhereClause As Expression(Of Func(Of OSM.Task, Boolean)) = Function(t) t.Name = lsTestName
+                Dim larTask = lrDataStore.Get(loUniqueTaskNameWhereClause)
+
+                If Not larTask.Any() Then
+                    isUnique = True ' Exit the loop if no tasks with the current name are found.
+                Else
+                    liInd += 1 ' Increment and construct a new test name to check.
+                    lsTestName = lrOSMTask.Name & liInd.ToString()
+                End If
+            End While
+
+            lrOSMTask.Name = lsTestName
+#End Region
+
+            lrDataStore.Upsert(lrOSMTask, whereClause)
+
+#Region "FEQL Queries"
+            For Each lrTaskFEQLQuery In lrOSMTask.FEQLQuery
+
+                Dim whereClauseFEQL As Expression(Of Func(Of OSM.TaskFEQLQuery, Boolean)) = Function(t) t.ID = lrTaskFEQLQuery.ID
+                lrDataStore.Upsert(lrTaskFEQLQuery, whereClauseFEQL)
+
+            Next
+#End Region
+
+#Region "FEQL Queries"
+            For Each lrOpenAIFunction In lrOSMTask.OpenAIFunctions
+
+                Dim lrTaskOpenAIFunction As New OSM.TaskOpenAIFunction(lrOSMTask.TaskId, lrOpenAIFunction.name)
+
+                Dim whereClauseFEQL As Expression(Of Func(Of OSM.TaskOpenAIFunction, Boolean)) = Function(t) t.TaskId = lrOSMTask.TaskId And t.OpenAIFunctionName = lrTaskOpenAIFunction.OpenAIFunctionName
+                lrDataStore.Upsert(lrTaskOpenAIFunction, whereClauseFEQL)
+
+                Dim loWhereClauseFunction As Expression(Of Func(Of OSM.OpenAIFunction, Boolean)) = Function(t) t.name = lrTaskOpenAIFunction.OpenAIFunctionName
+                lrDataStore.Upsert(lrOpenAIFunction, loWhereClauseFunction)
+
+            Next
+#End Region
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DocumentSearchToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemDocumentSearch.Click
+
+        Call Me.LoadEarhartDocumentIndexer()
+
+    End Sub
+
+    Private Sub mnuOption_AddEnterprise_Click(sender As Object, e As EventArgs) Handles mnuOption_AddEnterprise.Click
+
+        Try
+            frmCRUDAddEnterprise.Show()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub EditEnterpriseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditEnterpriseToolStripMenuItem.Click
+
+        Try
+            Call prApplication.MainForm.LoadCRUDAddEditEnterprise(True)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ManagerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ManagerToolStripMenuItem.Click
+
+        Try
+            Dim child As New frmDocumentVectorDatabase
+
+            child.MdiParent = Me
+
+            With New WaitCursor
+                child.Show(DockPanel, WeifenLuo.WinFormsUI.Docking.DockState.Document)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub DockPanel_ContentAdded(sender As Object, e As DockContentEventArgs) Handles DockPanel.ContentAdded
+
+        Try
+            Call ThemeManager.ApplyTheme(e.Content, piGlobalTheme)
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private miTimerTicker As Integer = 1
+
+    ''' <summary>
+    ''' Demo User - Boston closer after trial login to Demo/Demo User.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    Private Sub TimerDemo_Tick(sender As Object, e As EventArgs) Handles TimerDemo.Tick
+
+        Dim lsMessage As String
+
+        Try
+            Me.miTimerTicker += 5000
+
+            Me.ToolStripStatusLabelPromptEvaluationTime.Visible = True
+            Me.ToolStripStatusLabelPromptEvaluationTimeSeconds.Visible = True
+
+            Dim ts As TimeSpan = TimeSpan.FromMilliseconds(Me.miTimerTicker)
+            Me.ToolStripStatusLabelPromptEvaluationTimeSeconds.Text = ts.ToString("mm\:ss")
+            Me.ToolStripStatusLabelPromptEvaluationTimeSeconds.Invalidate()
+
+            If Me.miTimerTicker >= 600000 Then
+                Me.TimerDemo.Enabled = False
+
+                lsMessage = "Thank you for trialling Boston. You session time is now over."
+                lsMessage.AppendDoubleLineBreak("Boston will close when you press [Okay].")
+
+                MsgBox(lsMessage)
+
+                Me.Close()
+                Me.Dispose()
+            End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub QueryEditorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles QueryEditorToolStripMenuItem.Click
+
+        Try
+            If prApplication.WorkingModel IsNot Nothing AndAlso prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                Call prApplication.WorkingModel.connectToDatabase()
+            End If
+
+            Dim lfrmToolboxTableData As New frmToolboxTableData
+            Call lfrmToolboxTableData.Show(Me.DockPanel, DockState.Document)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub AddApplicationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddApplicationToolStripMenuItem.Click
+
+        Try
+            Call prApplication.MainForm.LoadCRUDAddEditBostonApplication()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub EditApplicationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EditApplicationToolStripMenuItem.Click
+
+        Try
+            Call prApplication.MainForm.LoadCRUDAddEditBostonApplication(True)
+
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Private Sub ApplicationMenuEditorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ApplicationMenuEditorToolStripMenuItem.Click
+
+        Try
+            Call LoadCRUDAddEditBostonApplicationMenuEditor()
+
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
+    Private Sub DeleteApplicationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeleteApplicationToolStripMenuItem.Click
+
+        Try
+            Dim lrGenericSelection As New tGenericSelection
+            lrGenericSelection.ObjectName = "Boston Application"
+            lrGenericSelection.UseDataStore = True
+            lrGenericSelection.DataStoreType = GetType(OSM.Task)
+            lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+            Dim lrEntityType As New OSM.Task
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection, "Boston Application", "DataStore", "Name", "ApplicationId", "", Nothing,,,,,, True, GetType(BostonApplication.Application)) = Windows.Forms.DialogResult.OK Then
+
+                Dim lrBostonApplication As BostonApplication.Application = lrGenericSelection.SelectedTag
+
+                Dim lrDataStore As New DataStore.Store
+                Dim whereClause As Expression(Of Func(Of BostonApplication.Application, Boolean)) = Function(t) t.BostonApplicationId = lrBostonApplication.BostonApplicationId
+
+                With New WaitCursor
+                    lrDataStore.Delete(Of BostonApplication.Application)(whereClause)
+                End With
+
+            Else
+                Exit Sub
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub ApplicationRunnerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ApplicationRunnerToolStripMenuItem.Click
+
+        Try
+
+            Dim lrGenericSelection As New tGenericSelection
+            lrGenericSelection.ObjectName = "Boston Application"
+            lrGenericSelection.UseDataStore = True
+            lrGenericSelection.DataStoreType = GetType(OSM.Task)
+            lrGenericSelection.Type = pcenumGenericSelectionType.SelectFromDatabase
+            Dim lrEntityType As New OSM.Task
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection, "Boston Application", "DataStore", "Name", "ApplicationId", "", Nothing,,,,,, True, GetType(BostonApplication.Application)) = Windows.Forms.DialogResult.OK Then
+
+                Dim lrBostonApplication As BostonApplication.Application = lrGenericSelection.SelectedTag
+                Call prApplication.MainForm.LoadBostonApplicationRunner(lrBostonApplication)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub TestSetManagerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles TestSetManagerToolStripMenuItem.Click
+
+        Try
+            Call prApplication.MainForm.LoadTestSetManager
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub MyTasksToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MyTasksToolStripMenuItem.Click
+
+        Try
+            Dim lrUserTaskDashboard = Me.LoadUserTaskDashboard()
+            Call lrUserTaskDashboard.SetupForm()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub AddSolutionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddSolutionToolStripMenuItem.Click
+
+        Try
+            'CodeSafe
+            If Me.zfrmModelExplorer Is Nothing OrElse
+                Me.zfrmModelExplorer.TreeView.SelectedNode Is Nothing OrElse
+                Me.zfrmModelExplorer.TreeView.SelectedNode.Tag.MenuType <> pcenumMenuType.menuEnterprise Then
+
+                MsgBox("Please select an Enterprise in the Model Explorer before adding a Solution")
+                Exit Sub
+
+            End If
+
+            Dim lfrmAddEditSolution As New frmCRUDAddEditSolution
+
+            Dim lrSolution As New Enterprise.Solution
+            lrSolution.EnterpriseId = Me.zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag.EnterpriseId
+
+            lfrmAddEditSolution.mrSolution = lrSolution
+
+            Call lfrmAddEditSolution.Show()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub GraphSchemaManagerToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles GraphSchemaManagerToolStripMenuItem1.Click
+        Call Me.LoadToolboxGraphSchemaManager()
+    End Sub
+
+    Private Sub RelationalManagerToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RelationalManagerToolStripMenuItem.Click
+        Call Me.loadToolboxRelationalDatabaseViewForm()
     End Sub
 
 End Class

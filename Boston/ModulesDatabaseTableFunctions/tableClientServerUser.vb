@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.Linq.Expressions
+Imports System.Reflection
 
 Public Module tableClientServerUser
 
@@ -29,7 +30,7 @@ Public Module tableClientServerUser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try
@@ -85,36 +86,55 @@ Public Module tableClientServerUser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return larPermission
         End Try
 
     End Function
 
-    Public Function IsValidUser(ByVal asUsername As String, ByVal asPassword As String) As Boolean
+    Public Function IsValidUser(ByVal asUsername As String, ByVal asPasswordHash As String, Optional ByVal asLastLoginHash As String = Nothing) As Boolean
 
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New RecordsetProxy
 
-        '------------------------
-        'Initialise return value
-        '------------------------
-        IsValidUser = False
+        Try
 
-        lREcordset.ActiveConnection = pdbConnection
-        lREcordset.CursorType = pcOpenStatic
+            '------------------------
+            'Initialise return value
+            '------------------------
+            IsValidUser = False
 
-        lsSQLQuery = "SELECT COUNT(*)"
-        lsSQLQuery &= "  FROM ClientServerUser"
-        lsSQLQuery &= " WHERE Username = '" & Trim(Replace(asUsername, "'", "`")) & "'"
-        lsSQLQuery &= " AND PasswordHash = '" & Trim(Replace(ClientServer.getHash(asPassword), "'", "`")) & "'"
+            lREcordset.ActiveConnection = pdbConnection
+            lREcordset.CursorType = pcOpenStatic
 
-        lREcordset.Open(lsSQLQuery)
+            lsSQLQuery = "SELECT COUNT(*)"
+            lsSQLQuery &= "  FROM ClientServerUser"
+            lsSQLQuery &= " WHERE Username = '" & Trim(Replace(asUsername, "'", "`")) & "'"
+            If asLastLoginHash IsNot Nothing Then
+                lsSQLQuery &= " AND PasswordHash = '" & Trim(asLastLoginHash) & "'"
+            Else
+                lsSQLQuery &= " AND PasswordHash = '" & Trim(asPasswordHash) & "'"
+            End If
 
-        Return lREcordset(0).Value > 0
+            lREcordset.Open(lsSQLQuery)
 
-        lREcordset.Close()
+            Return lREcordset(0).Value > 0
+
+            lREcordset.Close()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage.AppendLine("Username: " & asUsername)
+            lsMessage.AppendLine("Password Hash: " & asPasswordHash)
+            lsMessage.AppendLine("Database Connection String: " & My.Settings.DatabaseConnectionString)
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            lsMessage.AppendDoubleLineBreak(lsSQLQuery)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Function
 
@@ -150,7 +170,7 @@ Public Module tableClientServerUser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -206,7 +226,7 @@ Public Module tableClientServerUser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return New List(Of ClientServer.User)
         End Try
@@ -245,6 +265,31 @@ Public Module tableClientServerUser
                 arUser.Role = tableClientServerUserRole.getRolesForUser(arUser, True)
                 'arUser.Function is populated in publicClientServerModule.loginUser. No need to do anything here.
 
+                'For below.
+                Dim lrDataStore As New DataStore.Store
+                Dim lsUserId As String = prApplication.User.Id
+
+
+#Region "Profile - Personalisation"
+                Dim whereClause As Expression(Of Func(Of Personalisation.Profile, Boolean)) = Function(t) t.UserId = lsUserId
+
+                Dim larProfile = lrDataStore.Get(whereClause)
+
+                If larProfile.Any() Then
+                    arUser.Profile = larProfile(0)
+                End If
+#End Region
+
+#Region "UserFlags"
+                Dim loUserFlagWhereClause As Expression(Of Func(Of ClientServer.UserFlag, Boolean)) = Function(t) t.UserId = lsUserId
+
+                Dim larUserFlag As List(Of ClientServer.UserFlag) = lrDataStore.Get(Of ClientServer.UserFlag)(loUserFlagWhereClause)
+
+                For Each lrUserFlag As ClientServer.UserFlag In larUserFlag
+                    arUser.Flag.Add(lrUserFlag.Flag)
+                Next
+#End Region
+
                 Return arUser
             Else
                 If Not abIgnoreErrorMessage Then
@@ -259,7 +304,7 @@ Public Module tableClientServerUser
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return Nothing
         End Try
@@ -267,9 +312,10 @@ Public Module tableClientServerUser
 
     End Function
 
-    Public Sub getUserDetailsById(ByVal asUserId As String,
-                                  ByRef arUser As ClientServer.User,
-                                  Optional ByVal abGetRoleDetails As Boolean = True)
+    Public Function getUserDetailsById(ByVal asUserId As String,
+                                       ByRef arUser As ClientServer.User,
+                                       Optional ByVal abGetRoleDetails As Boolean = True,
+                                       Optional abThrowError As Boolean = True) As ClientServer.User
 
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New RecordsetProxy
@@ -285,6 +331,7 @@ Public Module tableClientServerUser
             lREcordset.Open(lsSQLQuery)
 
             If Not lREcordset.EOF Then
+                If arUser Is Nothing Then arUser = New ClientServer.User
                 arUser.Id = lREcordset("Id").Value
                 arUser.Username = Trim(lREcordset("Username").Value)
                 arUser.FirstName = Trim(lREcordset("FirstName").Value)
@@ -298,22 +345,25 @@ Public Module tableClientServerUser
                     arUser.Role = tableClientServerUserRole.getRolesForUser(arUser, True)
                 End If
                 'arUser.Function is populated in publicClientServerModule.loginUser. No need to do anything here.
-            Else
+            ElseIf abThrowError Then
                 Dim lsMessage As String = "Error: getUserDetailsById: No User returned for Id: " & asUserId
                 Throw New Exception(lsMessage)
             End If
 
+            Return arUser
+
             lREcordset.Close()
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
-    End Sub
+    End Function
 
     Public Sub updateUser(ByRef arUser As ClientServer.User)
 
@@ -341,7 +391,7 @@ Public Module tableClientServerUser
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
         End Try

@@ -67,20 +67,21 @@ Partial Class frmGenericSelectMultiColumn
         Me.comboboxSelection.DropDownForeColor = System.Drawing.Color.Black
         Me.comboboxSelection.DropDownStyle = MTGCComboBox.CustomDropDownStyle.DropDown
         Me.comboboxSelection.DropDownWidth = 320
+        Me.comboboxSelection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.comboboxSelection.GridLineColor = System.Drawing.Color.LightGray
         Me.comboboxSelection.GridLineHorizontal = False
         Me.comboboxSelection.GridLineVertical = False
         Me.comboboxSelection.HighlightBorderColor = System.Drawing.Color.Blue
         Me.comboboxSelection.HighlightBorderOnMouseEvents = True
         Me.comboboxSelection.LoadingType = MTGCComboBox.CaricamentoCombo.ComboBoxItem
-        Me.comboboxSelection.Location = New System.Drawing.Point(15, 28)
+        Me.comboboxSelection.Location = New System.Drawing.Point(15, 25)
         Me.comboboxSelection.ManagingFastMouseMoving = True
         Me.comboboxSelection.ManagingFastMouseMovingInterval = 30
         Me.comboboxSelection.Name = "comboboxSelection"
         Me.comboboxSelection.NormalBorderColor = System.Drawing.Color.Black
         Me.comboboxSelection.SelectedItem = Nothing
         Me.comboboxSelection.SelectedValue = Nothing
-        Me.comboboxSelection.Size = New System.Drawing.Size(288, 21)
+        Me.comboboxSelection.Size = New System.Drawing.Size(288, 23)
         Me.comboboxSelection.TabIndex = 0
         '
         'ButtonOK

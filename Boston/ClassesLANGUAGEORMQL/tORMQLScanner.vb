@@ -117,7 +117,7 @@ Namespace TinyPG
             Patterns.Add(TokenType.WHERECLAUSECOLUMNNAMESTR, regex)
             Tokens.Add(TokenType.WHERECLAUSECOLUMNNAMESTR)
 
-            regex = new Regex("[a-zA-Z0-9,<>\-\s_\.\""+\[\]#*?$@!%]*", RegexOptions.Compiled)
+            regex = new Regex("[a-zA-Z0-9,<>\-\s_\.\""/:=+\[\]#*?$@!%]*", RegexOptions.Compiled)
             Patterns.Add(TokenType.VALUE, regex)
             Tokens.Add(TokenType.VALUE)
 
@@ -357,6 +357,10 @@ Namespace TinyPG
             Patterns.Add(TokenType.KEYWDUPDATE, regex)
             Tokens.Add(TokenType.KEYWDUPDATE)
 
+            regex = new Regex("UPSERT", RegexOptions.Compiled)
+            Patterns.Add(TokenType.KEYWDUPSERT, regex)
+            Tokens.Add(TokenType.KEYWDUPSERT)
+
             regex = new Regex("VALUES", RegexOptions.Compiled)
             Patterns.Add(TokenType.KEYWDVALUES, regex)
             Tokens.Add(TokenType.KEYWDVALUES)
@@ -550,103 +554,103 @@ Namespace TinyPG
         RENAMEINSTANCESTMT= 50
         SELECTSTMT  = 51
         UPDATESTMT  = 52
-        WHERESTMT   = 53
-        WITHPREDICATESTMT= 54
-        Start       = 55
+        UPSERTSTMT  = 53
+        WHERESTMT   = 54
+        WITHPREDICATESTMT= 55
+        Start       = 56
 
         'Terminal tokens:
-        BROPEN      = 56
-        BRCLOSE     = 57
-        COLUMNNAMESTR= 58
-        COMMA       = 59
-        DOUBLEQUOTE = 60
-        EOF         = 61
-        EQUALS      = 62
-        FACTTYPENAME= 63
-        MULTDIV     = 64
-        MODELNAME   = 65
-        MODELELEMENTNAME= 66
-        MODELID     = 67
-        NUMBER      = 68
-        PAGENAME    = 69
-        PLUSMINUS   = 70
-        PREDICATE   = 71
-        ROLENAME    = 72
-        SINGLEQUOTE = 73
-        STAR        = 74
-        USERTABLENAME= 75
-        WHERECLAUSECOLUMNNAMESTR= 76
-        VALUE       = 77
-        KEYWDADD    = 78
-        KEYWDADDFACT= 79
-        KEYWDADDFACTTYPE= 80
-        KEYWDAND    = 81
-        KEYWDATMOSTONE= 82
-        KEYWDCOUNTSTAR= 83
-        KEYWDCREATE = 84
-        KEYWDCREATECONCEPT= 85
-        KEYWDCREATEENTITYTYPE= 86
-        KEYWDCREATEFACTTYPE= 87
-        KEYWDCREATEMODEL= 88
-        KEYWDCREATEVALUETYPE= 89
-        KEYWDDELETE = 90
-        KEYWDDELETEALL= 91
-        KEYWDDELETEFACT= 92
-        KEYWDDISTINCT= 93
-        KEYWDENTITY = 94
-        KEYWDENTITYTYPE= 95
-        KEYWDEXISTS = 96
-        KEYWDEXTEND = 97
-        KEYWDEXTENDING= 98
-        KEYWDFACT   = 99
-        KEYWDFACTTYPE= 100
-        KEYWDFOR    = 101
-        KEYWDFOREACH= 102
-        KEYWDFROM   = 103
-        KEYWDIN     = 104
-        KEYWDINSERT = 105
-        KEYWDINTO   = 106
-        KEYWDITISMANDATORYTHAT= 107
-        KEYWDJOINING= 108
-        KEYWDGET    = 109
-        KEYWDLANGUAGE= 110
-        KEYWDLANGUAGEDFD= 111
-        KEYWDLANGUAGEERD= 112
-        KEYWDLANGUAGEETD= 113
-        KEYWDLANGUAGEORM= 114
-        KEYWDLANGUAGESTD= 115
-        KEYWDLANGUAGEUCD= 116
-        KEYWDMODEL  = 117
-        KEYWDMODELDICTIONARY= 118
-        KEYWDOBJECT = 119
-        KEYWDOF     = 120
-        KEYWDON     = 121
-        KEYWDONPAGE = 122
-        KEYWDOPEN   = 123
-        KEYWDPAGE   = 124
-        KEYWDPREDICATE= 125
-        KEYWDREMOVEINSTANCE= 126
-        KEYWDREMOVEMODELELEMENT= 127
-        KEYWDRENAMEINSTANCE= 128
-        KEYWDROLE   = 129
-        KEYWDROLECONSTRAINT= 130
-        KEYWDSELECT = 131
-        KEYWDSET    = 132
-        KEYWDSUPERTYPE= 133
-        KEYWDTHAT   = 134
-        KEYWDTO     = 135
-        KEYWDUPDATE = 136
-        KEYWDVALUES = 137
-        KEYWDVALUETYPE= 138
-        KEYWDWHERE  = 139
-        KEYWDWITH   = 140
-        WHITESPACE  = 141
+        BROPEN      = 57
+        BRCLOSE     = 58
+        COLUMNNAMESTR= 59
+        COMMA       = 60
+        DOUBLEQUOTE = 61
+        EOF         = 62
+        EQUALS      = 63
+        FACTTYPENAME= 64
+        MULTDIV     = 65
+        MODELNAME   = 66
+        MODELELEMENTNAME= 67
+        MODELID     = 68
+        NUMBER      = 69
+        PAGENAME    = 70
+        PLUSMINUS   = 71
+        PREDICATE   = 72
+        ROLENAME    = 73
+        SINGLEQUOTE = 74
+        STAR        = 75
+        USERTABLENAME= 76
+        WHERECLAUSECOLUMNNAMESTR= 77
+        VALUE       = 78
+        KEYWDADD    = 79
+        KEYWDADDFACT= 80
+        KEYWDADDFACTTYPE= 81
+        KEYWDAND    = 82
+        KEYWDATMOSTONE= 83
+        KEYWDCOUNTSTAR= 84
+        KEYWDCREATE = 85
+        KEYWDCREATECONCEPT= 86
+        KEYWDCREATEENTITYTYPE= 87
+        KEYWDCREATEFACTTYPE= 88
+        KEYWDCREATEMODEL= 89
+        KEYWDCREATEVALUETYPE= 90
+        KEYWDDELETE = 91
+        KEYWDDELETEALL= 92
+        KEYWDDELETEFACT= 93
+        KEYWDDISTINCT= 94
+        KEYWDENTITY = 95
+        KEYWDENTITYTYPE= 96
+        KEYWDEXISTS = 97
+        KEYWDEXTEND = 98
+        KEYWDEXTENDING= 99
+        KEYWDFACT   = 100
+        KEYWDFACTTYPE= 101
+        KEYWDFOR    = 102
+        KEYWDFOREACH= 103
+        KEYWDFROM   = 104
+        KEYWDIN     = 105
+        KEYWDINSERT = 106
+        KEYWDINTO   = 107
+        KEYWDITISMANDATORYTHAT= 108
+        KEYWDJOINING= 109
+        KEYWDGET    = 110
+        KEYWDLANGUAGE= 111
+        KEYWDLANGUAGEDFD= 112
+        KEYWDLANGUAGEERD= 113
+        KEYWDLANGUAGEETD= 114
+        KEYWDLANGUAGEORM= 115
+        KEYWDLANGUAGESTD= 116
+        KEYWDLANGUAGEUCD= 117
+        KEYWDMODEL  = 118
+        KEYWDMODELDICTIONARY= 119
+        KEYWDOBJECT = 120
+        KEYWDOF     = 121
+        KEYWDON     = 122
+        KEYWDONPAGE = 123
+        KEYWDOPEN   = 124
+        KEYWDPAGE   = 125
+        KEYWDPREDICATE= 126
+        KEYWDREMOVEINSTANCE= 127
+        KEYWDREMOVEMODELELEMENT= 128
+        KEYWDRENAMEINSTANCE= 129
+        KEYWDROLE   = 130
+        KEYWDROLECONSTRAINT= 131
+        KEYWDSELECT = 132
+        KEYWDSET    = 133
+        KEYWDSUPERTYPE= 134
+        KEYWDTHAT   = 135
+        KEYWDTO     = 136
+        KEYWDUPDATE = 137
+        KEYWDUPSERT = 138
+        KEYWDVALUES = 139
+        KEYWDVALUETYPE= 140
+        KEYWDWHERE  = 141
+        KEYWDWITH   = 142
+        WHITESPACE  = 143
     End Enum
 
-    <Serializable()>
+    <Serializable()> _
     Public Class Token 
-        Implements ICloneable
-
         Private m_startPos As Integer
         Private m_endPos As Integer
         Private m_text As String
@@ -707,7 +711,7 @@ Namespace TinyPG
             End Set
         End Property
 
-        <XmlAttribute()>
+        <XmlAttribute()> _
         Public Type As TokenType
 
         Public Sub New()
@@ -739,29 +743,6 @@ Namespace TinyPG
                 Return Type.ToString()
             End If
         End Function
-
-        Public Function Clone() As Object Implements ICloneable.Clone
-            Dim lrToken As New Token
-            Dim lrSkippedToken As Token
-            With Me
-                lrToken.m_startPos = .m_startPos
-                lrToken.m_endPos = .m_endPos
-                lrToken.m_text = .m_text
-                lrToken.m_value = .m_value
-                lrToken.Type = .Type
-
-                ' contains all prior skipped symbols
-                If .m_skipped IsNot Nothing Then
-                    lrToken.m_skipped = New List(Of Token)
-                    For Each lrSkippedToken In .m_skipped
-                        lrToken.m_skipped.Add(lrSkippedToken.Clone)
-                    Next
-                End If
-            End With
-
-            Return lrToken
-        End Function
-
     End Class
 #End Region
 End Namespace

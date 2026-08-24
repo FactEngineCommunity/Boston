@@ -46,17 +46,17 @@ Namespace ERD
             Me.Fact = arFactInstance
 
 
-            If IsSomething(aoOriginModelElement) Then
+            If aoOriginModelElement IsNot Nothing Then
                 Me.OriginModelElement = New ERD.Entity
                 Me.OriginModelElement = aoOriginModelElement
             End If
 
-            If IsSomething(aoDestinationModelElement) Then
+            If aoDestinationModelElement IsNot Nothing Then
                 Me.DestinationModelElement = New ERD.Entity
                 Me.DestinationModelElement = aoDestinationModelElement
             End If
 
-            If IsSomething(arRelation) Then
+            If arRelation IsNot Nothing Then
                 Me.Relation = New ERD.Relation
                 Me.Relation = arRelation
                 Me.Relation.Link = New ERD.Link
@@ -65,7 +65,7 @@ Namespace ERD
 
             Me.SentData.Add(asSentData)
 
-            If IsSomething(aoLink) Then
+            If aoLink IsNot Nothing Then
                 aoLink.Text = asSentData
                 aoLink.Tag = Me
                 Me.Link = aoLink
@@ -121,7 +121,7 @@ Namespace ERD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -133,11 +133,11 @@ Namespace ERD
             '---------------------------------------------------------------------
             Try
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.Link) Then
+                    If Me.Link IsNot Nothing Then
                         'If Me.Link.Text <> "" Then
                         '    Me.Link.Text = Trim(Me.FactData.Data)
                         '    Call Me.EnableSaveButton()
@@ -151,7 +151,7 @@ Namespace ERD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -159,7 +159,7 @@ Namespace ERD
 
         Private Sub Fact_Deleted() Handles Fact.Deleted
 
-            If IsSomething(Me.Page.Diagram) Then
+            If Me.Page.Diagram IsNot Nothing Then
                 Me.Page.Diagram.Links.Remove(Me.Link)
                 Me.FactInstance.FactType.Fact.Remove(Me.FactInstance)
             End If
@@ -172,7 +172,7 @@ Namespace ERD
 
         Public Sub LinkDeselected() Implements iLinkObject.LinkDeslected
 
-            If IsSomething(Me.Link) Then
+            If Me.Link IsNot Nothing Then
                 Me.Link.Pen.Color = Color.Black
             End If
 
@@ -184,7 +184,7 @@ Namespace ERD
 
         Public Overridable Sub LinkSelected() Implements iLinkObject.LinkSelected
 
-            If IsSomething(Me.Link) Then
+            If Me.Link IsNot Nothing Then
                 Me.Link.Pen.Color = Color.Blue
             End If
 

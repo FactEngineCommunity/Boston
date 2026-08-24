@@ -17,10 +17,13 @@ Public Class frmGlossary
     ''' </summary>
     Private mbHideFadedFactTypeNames As Boolean = False
 
-
     Private Sub frmGlossary_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
 
-        If prApplication.WorkingModel IsNot Nothing Then
+        If prApplication.WorkingModel Is Nothing Then
+
+            prApplication.setWorkingModel(Me.mrModel)
+
+        ElseIf prApplication.WorkingModel IsNot Nothing Then
             Me.mrModel = prApplication.WorkingModel
             Me.LabelModelName.Text = Me.mrModel.Name
             Call Me.ShowGlossary(Me.mrModel)
@@ -40,6 +43,16 @@ Public Class frmGlossary
             Else
                 Throw New Exception("There is no current Model selected. Try selecting a Model in the Model Explorer and trying again.")
             End If
+
+            'CheckedComboBox - For Object Type Names (that say which types of Object Types are shown in the Glossary list)
+#Region "ObjectTypes - CheckedComboBox"
+            Me.CheckBoxComboBoxObjectTypes.Items.Add("Entity Types")
+            Me.CheckBoxComboBoxObjectTypes.Items.Add("Value Types")
+            Me.CheckBoxComboBoxObjectTypes.Items.Add("Objectified Fact Types")
+            Me.CheckBoxComboBoxObjectTypes.CheckBoxItems.Item(0).Checked = True
+            Me.CheckBoxComboBoxObjectTypes.CheckBoxItems.Item(1).Checked = True
+            Me.CheckBoxComboBoxObjectTypes.CheckBoxItems.Item(2).Checked = True
+#End Region
 
             '======================================================================================
             'Load the Sub ORM Diagram Form/Viewer
@@ -72,7 +85,7 @@ Public Class frmGlossary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -93,7 +106,8 @@ Public Class frmGlossary
         ListBoxGlossary.Items.Clear()
 
         For Each item In items 'matchingItemList
-            ListBoxGlossary.Items.Add(New tComboboxItem(item, item.Id, item))
+            Dim liIndex = ListBoxGlossary.Items.Add(New tComboboxItem(item, item.Id, item))
+
         Next
 
         If Me.CheckBoxShowGeneralConcepts.Checked Then
@@ -104,33 +118,85 @@ Public Class frmGlossary
 
         ListBoxGlossary.EndUpdate()
 
-
-
     End Sub
 
-    Private Sub ShowGlossary(ByRef arModel As FBM.Model)
+    Private Sub listBox1_DrawItem(sender As Object, e As DrawItemEventArgs) Handles ListBoxGlossary.DrawItem
+        If e.Index < 0 Then Return
+
+        ' Get the item text
+        Dim item As Object = ListBoxGlossary.Items(e.Index).ItemData
+        Dim lsItemText As String = ListBoxGlossary.Items(e.Index).ToString
+        Dim loFont As Font = e.Font
+
+        ' Determine the color for each item
+        Dim foreColor As Color
+        Select Case item.GetType
+            Case Is = GetType(FBM.EntityType)
+                foreColor = Color.SteelBlue
+                loFont = New Font(Me.ListBoxGlossary.Font, FontStyle.Bold)
+            Case Is = GetType(FBM.ValueType)
+                foreColor = Color.SeaGreen
+                loFont = e.Font
+            Case Else
+                foreColor = Color.SteelBlue
+                loFont = New Font(Me.ListBoxGlossary.Font, FontStyle.Bold)
+        End Select
+
+        ' Check if the item is selected and change the foreColor to white
+        If (e.State And DrawItemState.Selected) = DrawItemState.Selected Then
+            foreColor = Color.White
+        End If
+
+        ' Draw the background
+        e.DrawBackground()
+
+        ' Draw the item text with the custom color
+        Using brush As New SolidBrush(foreColor)
+            e.Graphics.DrawString(lsItemText, loFont, brush, e.Bounds)
+        End Using
+
+        ' Draw the focus rectangle if the item has focus
+        e.DrawFocusRectangle()
+
+        ' Draw the item text with the custom color
+        Using brush As New SolidBrush(foreColor)
+
+
+        End Using
+
+        ' Draw the focus rectangle if the item has focus
+        e.DrawFocusRectangle()
+    End Sub
+
+    Private Sub ShowGlossary(ByRef arModel As FBM.Model,
+                             Optional ByRef aatInclusiveObjectTypes As List(Of Type) = Nothing)
 
         Dim lrEntityType As FBM.EntityType
 
         Me.ListBoxGlossary.Items.Clear()
 
-        For Each lrEntityType In arModel.EntityType.FindAll(Function(x) x.IsObjectifyingEntityType = False _
-                                                                And x.IsMDAModelElement = False)
+        Dim lbIncludeEntityTypes = If(aatInclusiveObjectTypes IsNot Nothing, aatInclusiveObjectTypes.Contains(GetType(FBM.EntityType)), True)
+        Dim lbIncludeValueTypes = If(aatInclusiveObjectTypes IsNot Nothing, aatInclusiveObjectTypes.Contains(GetType(FBM.ValueType)), True)
+        Dim lbIncludeFactTypes = If(aatInclusiveObjectTypes IsNot Nothing, aatInclusiveObjectTypes.Contains(GetType(FBM.FactType)), True)
 
+        For Each lrEntityType In arModel.EntityType.FindAll(Function(x) lbIncludeEntityTypes And (x.IsObjectifyingEntityType = False _
+                                                                And x.IsMDAModelElement = False))
             Me.ListBoxGlossary.Items.Add(New tComboboxItem(lrEntityType, lrEntityType.Id, lrEntityType))
         Next
 
-        For Each lrValueType In arModel.ValueType.FindAll(Function(x) x.IsMDAModelElement = False)
+        For Each lrValueType In arModel.ValueType.FindAll(Function(x) lbIncludeValueTypes And x.IsMDAModelElement = False)
             Me.ListBoxGlossary.Items.Add(New tComboboxItem(lrValueType, lrValueType.Id, lrValueType))
         Next
 
-        For Each lrFactType In arModel.FactType.FindAll(Function(x) (x.IsObjectified And x.IsMDAModelElement = False) Or x.isRDSTable)
+        For Each lrFactType In arModel.FactType.FindAll(Function(x) lbIncludeFactTypes And ((x.IsObjectified And x.IsMDAModelElement = False) Or x.isRDSTable))
             Me.ListBoxGlossary.Items.Add(New tComboboxItem(lrFactType, lrFactType.Id, lrFactType))
         Next
 
         If Me.CheckBoxShowGeneralConcepts.Checked Then
             For Each lrDictionaryEntry In arModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept = True)
-                Me.ListBoxGlossary.Items.Add(lrDictionaryEntry.Symbol)
+                Dim lrModelElement As New FBM.ModelObject(lrDictionaryEntry.Symbol, pcenumConceptType.GeneralConcept)
+                lrModelElement.Model = Me.mrModel
+                Me.ListBoxGlossary.Items.Add(New tComboboxItem(lrModelElement, lrModelElement.Id, lrModelElement))
             Next
         End If
 
@@ -152,7 +218,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -166,6 +232,8 @@ Public Class frmGlossary
         '      * Verbalise the FactType for the associated Role
         '  * LOOP 
         '------------------------------------------------------
+        Dim liInd As Integer = 0
+
         Dim lrVerbaliser As New FBM.ORMVerbailser
         Call lrVerbaliser.Reset()
 
@@ -181,10 +249,46 @@ Public Class frmGlossary
             Else
                 lrVerbaliser.VerbaliseQuantifier(".")
             End If
-            lrVerbaliser.HTW.WriteBreak()
-            lrVerbaliser.HTW.WriteBreak()
+
+            'IS A KIND OF | Subtyping
+            If arEntityType.SubtypeRelationship.Count > 0 Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseIndent()
+                lrVerbaliser.VerbaliseQuantifier("Is a kind of: ")
+                liInd = 0
+                For Each lrSubtypeRelationship In arEntityType.SubtypeRelationship
+                    If liInd > 0 Then lrVerbaliser.VerbaliseQuantifier(", ")
+                    lrVerbaliser.VerbaliseModelObject(lrSubtypeRelationship.parentModelElement)
+                    liInd += 1
+                Next
+            End If
+
+            'Derivation
+            If arEntityType.IsDerived Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseIndent()
+                lrVerbaliser.VerbaliseBlackText(arEntityType.DerivationText)
+                lrVerbaliser.HTW.WriteBreak()
+            End If
+
+            Dim lasSynonym = (From Synonym In Me.mrModel.Synonyms
+                              Where Synonym.BaseTerm = arEntityType.Id
+                              Select Synonym.Synonym).ToArray
+            If lasSynonym.Count > 0 Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseIndent()
+                lrVerbaliser.VerbaliseHeading("Synonyms: ")
+                lrVerbaliser.VerbaliseValue(String.Join(", ", lasSynonym))
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+            End If
+
+
 
             If (arEntityType.ShortDescription <> "") Or (arEntityType.LongDescription <> "") Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
                 lrVerbaliser.VerbaliseQuantifier("Informally: ")
                 lrVerbaliser.HTW.WriteBreak()
                 If arEntityType.ShortDescription <> "" Then
@@ -206,7 +310,6 @@ Public Class frmGlossary
             '------------------------------                   
             Dim lrTopmostSupertype As FBM.EntityType
             Dim lrFactType As FBM.FactType
-            Dim liInd As Integer = 0
 
             If arEntityType.IsSubtype Then
                 lrTopmostSupertype = arEntityType.GetTopmostSupertype
@@ -216,6 +319,8 @@ Public Class frmGlossary
 
 #Region "Reference Scheme"
             If lrTopmostSupertype.HasSimpleReferenceScheme Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
                 lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ")
                 lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
                 lrVerbaliser.VerbaliseQuantifier(" has ")
@@ -230,6 +335,8 @@ Public Class frmGlossary
                 lrVerbaliser.VerbaliseQuantifier("Reference Mode: ")
                 lrVerbaliser.VerbaliseQuantifier(lrTopmostSupertype.ReferenceMode)
             ElseIf lrTopmostSupertype.HasCompoundReferenceMode Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
                 lrVerbaliser.VerbaliseQuantifier("Reference Scheme: ")
                 For Each lrRoleConstraintRole In lrTopmostSupertype.ReferenceModeRoleConstraint.RoleConstraintRole
                     lrFactType = lrRoleConstraintRole.Role.FactType
@@ -251,18 +358,35 @@ Public Class frmGlossary
                     liInd += 1
                 Next
             Else
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
                 lrVerbaliser.VerbaliseError("Provide a Reference Mode for the Entity Type:")
                 lrVerbaliser.VerbaliseModelObject(lrTopmostSupertype)
             End If
 #End Region
-            lrVerbaliser.HTW.WriteBreak()
-            lrVerbaliser.HTW.WriteBreak()
+
+            If arEntityType.getCorrespondingRDSTable IsNot Nothing AndAlso arEntityType.getCorrespondingRDSTable.Index.FindAll(Function(x) Not x.IsPrimaryKey And x.Unique).Count > 0 Then
+                lrVerbaliser.HTW.WriteBreak()
+                For Each lrIndex In arEntityType.getCorrespondingRDSTable.Index.FindAll(Function(x) Not x.IsPrimaryKey And x.Unique)
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.VerbaliseIndent()
+                    lrVerbaliser.VerbaliseQuantifierLight("Also uniquely identified by: ")
+                    liInd = 0
+                    For Each lrColumn In lrIndex.Column
+                        If liInd > 0 Then lrVerbaliser.VerbaliseQuantifierLight(", ")
+                        lrVerbaliser.VerbaliseModelObject(lrColumn.ActiveRole.JoinedORMObject)
+                        liInd += 1
+                    Next
+
+                Next
+            End If
 
             '-------------------------------------------------
             'FOR EACH IncomingLink (from a Role)
             '  Verbalise the FactType for the associated Role
             'LOOP 
             '-------------------------------------------------
+            lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseHeading("Fact Types:")
             lrVerbaliser.HTW.WriteBreak()
@@ -283,7 +407,7 @@ Public Class frmGlossary
 
                 larFactType = (From ft In larFactType2
                                From ftr In ft.FactTypeReading
-                               Where ftr.PredicatePart.Select(Function(x) x.Role.JoinedORMObject.Id).Where(Function(str1) lasAdditionalModelElement.Any(Function(str2) str1.StartsWith(str2))).Count = lasAdditionalModelElement.Count
+                               Where ftr.PredicatePart.Select(Function(x) x.Role.JoinedORMObject.Id).Where(Function(str1) lasAdditionalModelElement.Any(Function(str2) str1.StartsWith(str2) Or str1.LCase.Contains(str2.LCase))).Count = lasAdditionalModelElement.Count
                                Select ft Distinct).ToList
             Else
 
@@ -339,9 +463,23 @@ Public Class frmGlossary
                                 If lrFactTypeReading IsNot Nothing Then
                                     lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
                                 End If
+#Region "Reverse Reading"
                                 lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
-                                lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
+                                larRole.Reverse()
+                                lrSentence = New Language.Sentence(larRole(0).JoinedORMObject.Id & " has " & larRole(1).JoinedORMObject.Id)
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                                lrFactTypeReading = lrFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleSequence)
+                                If lrFactTypeReading IsNot Nothing Then
+                                    lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
+                                Else
+                                    lrVerbaliser.VerbaliseError("unknown predicate")
+                                End If
                                 lrVerbaliser.VerbaliseModelObject(arEntityType)
+                                lrVerbaliser.VerbaliseQuantifierLight(" (And uniquely identifies ")
+                                lrVerbaliser.VerbaliseModelObject(arEntityType)
+#End Region
                             Else
                                 lrVerbaliser.HTW.WriteBreak()
                                 lrVerbaliser.VerbaliseIndent()
@@ -364,6 +502,11 @@ Public Class frmGlossary
                 End If
 
                 lrVerbaliser.HTW.RenderEndTag()
+                If lrFactType.IsDerived Then
+                    lrVerbaliser.VerbaliseIndent()
+                    lrVerbaliser.VerbaliseBlackText(lrFactType.DerivationText)
+                    lrVerbaliser.HTW.WriteBreak()
+                End If
                 lrVerbaliser.HTW.WriteBreak()
 
             Next
@@ -372,7 +515,6 @@ Public Class frmGlossary
 #Region "Constraints"
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseQuantifier("Constraints:")
-            lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
             'LINQ
@@ -391,9 +533,18 @@ Public Class frmGlossary
             Dim larAllConstraints = larConstraint.ToList
             larAllConstraints.AddRange(larSubtypeRelationshipRC.ToList)
 
-            For Each lrConstraint In larAllConstraints
-                Call lrConstraint.GenerateReadingVerbalisation(lrVerbaliser)
-            Next
+            Dim larConstraintTypes As New List(Of pcenumRoleConstraintType) From {pcenumRoleConstraintType.ExclusionConstraint, pcenumRoleConstraintType.ExclusiveORConstraint, pcenumRoleConstraintType.SubsetConstraint}
+
+            If larAllConstraints.FindAll(Function(x) larConstraintTypes.Contains(x.RoleConstraintType)).Count > 0 Then
+                lrVerbaliser.HTW.WriteBreak()
+                For Each lrConstraint In larAllConstraints
+                    Call lrConstraint.GenerateReadingVerbalisation(lrVerbaliser)
+                Next
+            Else
+                lrVerbaliser.VerbaliseIndent()
+                lrVerbaliser.VerbaliseQuantifierLight("There are no Constraints of this Entity Type.")
+                lrVerbaliser.HTW.WriteBreak()
+            End If
 #End Region
 
             lrVerbaliser.HTW.WriteBreak()
@@ -402,6 +553,7 @@ Public Class frmGlossary
 #Region "Subtype Relationships"
             Dim lrModelObject As FBM.ModelObject
             If arEntityType.childModelObjectList.Count = 0 Then
+                lrVerbaliser.VerbaliseIndent()
                 lrVerbaliser.VerbaliseQuantifierLight("There are no Subtypes of this Entity Type.")
                 lrVerbaliser.HTW.WriteBreak()
             Else
@@ -417,6 +569,7 @@ Public Class frmGlossary
             lrVerbaliser.HTW.WriteBreak()
 
             If arEntityType.parentModelObjectList.Count = 0 Then
+                lrVerbaliser.VerbaliseIndent()
                 lrVerbaliser.VerbaliseQuantifierLight("There are no Supertypes of this Entity Type.")
             Else
                 lrVerbaliser.HTW.WriteBreak()
@@ -442,6 +595,29 @@ Public Class frmGlossary
                     Next
                 End If
             End If
+#End Region
+
+#Region "Metadata Lineage Documents"
+
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.VerbaliseQuantifier("Metadata Lineage Documents")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
+            Dim larMetadataLineageDocument = tableDataLineageItemProperty.getDataLineageDocumentsByDataLineageItemName(Me.mrModel, Me.mrCurrentModelElement.DataLineageItemName, True)
+            If larMetadataLineageDocument.Count = 0 Then
+                lrVerbaliser.VerbaliseBlackText("There are none.")
+            Else
+                For Each lrDataLineageDocument In larMetadataLineageDocument
+
+                    lrVerbaliser.VerbaliseIndent()
+                    lrVerbaliser.VerbaliseMetadataLineageDocument(lrDataLineageDocument)
+                    lrVerbaliser.HTW.WriteBreak()
+
+                Next
+            End If
+
 #End Region
 
         Catch ex As Exception
@@ -471,42 +647,95 @@ Public Class frmGlossary
                 If lsSelectedString <> "" Then
                     lrModelObject = Me.mrModel.GetModelObjectByName(lsSelectedString)
 
-                    Call Me.DescribeModelElement(lrModelObject)
+                    If lrModelObject Is Nothing Then
+                        Try
+                            lrModelObject = ListBoxGlossary.SelectedItem.Tag
+                            GoTo ProcessModelElement
+                        Catch
+                            Throw New Exception("There is no Model Element associated with, " & lsSelectedString & ". Plesae contact FactEngine support.")
+                        End Try
+                    Else
+ProcessModelElement:
+                        Call Me.DescribeModelElement(lrModelObject)
 
-                    '===================================================================================
-                    'House Keeping
-                    Select Case lrModelObject.GetType
-                        Case Is = GetType(FBM.FactType)
+                        '===================================================================================
+                        'House Keeping
+                        Select Case lrModelObject.GetType
+                            Case Is = GetType(FBM.FactType)
 #Region "ORM Reading Editor - FactTypes"
-                            Dim lrORMReadingEditor As frmToolboxORMReadingEditor
-                            lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
+                                Dim lrORMReadingEditor As frmToolboxORMReadingEditor
+                                lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                            If IsSomething(lrORMReadingEditor) Then
+                                If lrORMReadingEditor IsNot Nothing Then
 
-                                '-------------------------------------------------------------------------
-                                'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
-                                '-------------------------------------------------------------------------
-                                Dim lrPage As FBM.Page = New FBM.Page(Me.mrModel,, "Glossary Page", pcenumLanguage.ORMModel)
-                                Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage)
-                                lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
-                                lrORMReadingEditor.zrFactType = lrModelObject
-                                lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
-                                lrORMReadingEditor.DataGrid_Readings.Refresh()
-                                lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
-                                lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
-                                Call lrORMReadingEditor.SetupForm(lrPage, lrFactTypeInstance)
-                            End If
+                                    '-------------------------------------------------------------------------
+                                    'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
+                                    '-------------------------------------------------------------------------
+                                    Dim lrPage As FBM.Page = New FBM.Page(Me.mrModel,, "Glossary Page", pcenumLanguage.ORMModel)
+                                    Dim lrFactTypeInstance As FBM.FactTypeInstance = CType(lrModelObject, FBM.FactType).CloneInstance(lrPage)
+                                    lrORMReadingEditor.zrFactTypeInstance = lrFactTypeInstance
+                                    lrORMReadingEditor.zrFactType = lrModelObject
+                                    lrORMReadingEditor.DataGrid_Readings.DataSource = Nothing
+                                    lrORMReadingEditor.DataGrid_Readings.Refresh()
+                                    lrORMReadingEditor.DataGrid_Readings.RefreshEdit()
+                                    lrORMReadingEditor.DataGrid_Readings.Rows.Clear()
+                                    Call lrORMReadingEditor.SetupForm(lrPage, lrFactTypeInstance)
+                                End If
 #End Region
-                    End Select
+                        End Select
 #Region "Descriptions Editor"
-                    'Setup the Descriptions toolbox
-                    Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
-                    lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
-                    If IsSomething(lrModelElementDescriptionsEditor) Then
-                        Call lrModelElementDescriptionsEditor.setDescriptions(lrModelObject)
-                    End If
+                        'Setup the Descriptions toolbox
+                        Dim lrModelElementDescriptionsEditor As frmToolboxDescriptions
+                        lrModelElementDescriptionsEditor = prApplication.GetToolboxForm(frmToolboxDescriptions.Name)
+                        If lrModelElementDescriptionsEditor IsNot Nothing Then
+                            Call lrModelElementDescriptionsEditor.setDescriptions(lrModelObject)
+                        End If
 #End Region
 
+#Region "Properties Grid"
+                        Try
+                            Select Case Me.ListBoxGlossary.SelectedItem.Tag.GetType
+                                Case Is = GetType(RDS.Table)
+                                    lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Name, True)
+                                Case Is = GetType(FBM.ValueType),
+                                          GetType(FBM.EntityType),
+                                          GetType(FBM.FactType)
+                                    lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Id, True)
+                                Case Else
+                                    Exit Sub
+                            End Select
+
+                            'CodeSafe 
+                            If lrModelObject Is Nothing Then Exit Sub
+
+                            Dim lrModelElementInstance As Object = Nothing
+
+                            Select Case lrModelObject.GetType
+                                Case Is = GetType(FBM.EntityType)
+                                    Dim lrEntityType As FBM.EntityType = lrModelObject
+                                    lrModelElementInstance = lrEntityType.CloneInstance(New FBM.Page(Me.mrModel), False, False, Nothing)
+                                Case Is = GetType(FBM.ValueType)
+                                    Dim lrValueType As FBM.ValueType = lrModelObject
+                                    lrModelElementInstance = lrValueType.CloneInstance(New FBM.Page(Me.mrModel), False, False)
+                                Case Is = GetType(FBM.FactType)
+                                    Dim lrFactType As FBM.FactType = lrModelObject
+                                    lrModelElementInstance = lrFactType.CloneInstance(New FBM.Page(Me.mrModel), False, False, 1)
+                                Case Else
+                                    Exit Sub
+                            End Select
+
+                            Call frmMain.LoadToolboxPropertyWindow(frmMain.DockPanel.ActivePane, lrModelElementInstance)
+
+                        Catch ex As Exception
+                            Dim lsMessage As String
+                            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                            lsMessage &= vbCrLf & vbCrLf & ex.Message
+                            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, abUseFlashCard:=True)
+                        End Try
+#End Region
+                    End If
                 End If
 
             End With
@@ -517,7 +746,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -534,47 +763,56 @@ Public Class frmGlossary
 
             With New WaitCursor
 
-                Select Case Me.mrModel.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
-                    Case Is = pcenumConceptType.EntityType
-                        Dim lrEntityType As FBM.EntityType
-                        lrEntityType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
-                        Call Me.VerbaliseEntityType(lrEntityType, aasAdditionalModelElement)
+                If arModelElement.ConceptType = pcenumConceptType.GeneralConcept Then
+
+                    Dim lrDictionaryEntry As FBM.DictionaryEntry = Me.mrModel.ModelDictionary.Find(Function(x) x.Symbol = arModelElement.Id)
+                    Call Me.VerbaliseGeneralConcept(lrDictionaryEntry)
+
+                Else
+
+                    Select Case Me.mrModel.GetConceptTypeByNameFuzzy(arModelElement.Id, arModelElement.Id)
+                        Case Is = pcenumConceptType.EntityType
+                            Dim lrEntityType As FBM.EntityType
+                            lrEntityType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
+                            Call Me.VerbaliseEntityType(lrEntityType, aasAdditionalModelElement)
 
 #Region "ORM Verbalisation"
-                        '-------------------------------------------------------
-                        'ORM Verbalisation
-                        '-------------------------------------------------------
-                        Dim lrToolboxForm As frmToolboxORMVerbalisation
-                        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                        If IsSomething(lrToolboxForm) Then
-                            Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
-                            lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
-                        End If
+                            '-------------------------------------------------------
+                            'ORM Verbalisation
+                            '-------------------------------------------------------
+                            Dim lrToolboxForm As frmToolboxORMVerbalisation
+                            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                            If lrToolboxForm IsNot Nothing Then
+                                Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                                lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
+                            End If
 #End Region
-                    Case Is = pcenumConceptType.ValueType
-                        Dim lrValueType As FBM.ValueType
-                        lrValueType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
-                        Call Me.VerbaliseValueType(lrValueType, aasAdditionalModelElement)
+                        Case Is = pcenumConceptType.ValueType
+                            Dim lrValueType As FBM.ValueType
+                            lrValueType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
+                            Call Me.VerbaliseValueType(lrValueType, aasAdditionalModelElement)
 
 #Region "ORM Verbalisation"
-                        '-------------------------------------------------------
-                        'ORM Verbalisation
-                        '-------------------------------------------------------
-                        Dim lrToolboxForm As frmToolboxORMVerbalisation
-                        lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                        If IsSomething(lrToolboxForm) Then
-                            Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
-                            lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
-                        End If
+                            '-------------------------------------------------------
+                            'ORM Verbalisation
+                            '-------------------------------------------------------
+                            Dim lrToolboxForm As frmToolboxORMVerbalisation
+                            lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+                            If lrToolboxForm IsNot Nothing Then
+                                Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
+                                lfrmToolboxVerbaliser.verbaliseModelElement(arModelElement)
+                            End If
 #End Region
 
-                    Case Is = pcenumConceptType.FactType
-                        Dim lrFactType As FBM.FactType
-                        lrFactType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
-                        Call Me.VerbaliseFactType(lrFactType, aasAdditionalModelElement)
-                    Case Is = pcenumConceptType.GeneralConcept
-                        Call Me.VerbaliseGeneralConcept(Me.mrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
-                End Select
+                        Case Is = pcenumConceptType.FactType
+                            Dim lrFactType As FBM.FactType
+                            lrFactType = Me.mrModel.GetModelObjectByName(arModelElement.Id)
+                            Call Me.VerbaliseFactType(lrFactType, aasAdditionalModelElement)
+                        Case Is = pcenumConceptType.GeneralConcept
+                            Call Me.VerbaliseGeneralConcept(Me.mrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id)))
+                    End Select
+
+                End If
 
                 Me.ButtonViewLineage.Visible = True
 
@@ -589,7 +827,7 @@ Public Class frmGlossary
                 '==============================================================
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
                     Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                     lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute, loMiscFilterAttribute})
                     lrPropertyGridForm.PropertyGrid.SelectedObject = Me.mrModel.ModelDictionary.Find(Function(x) LCase(x.Symbol) = LCase(arModelElement.Id))
@@ -604,90 +842,113 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 
     Private Sub DisplayORMDiagramViewForModelObject(ByRef arModelObject As FBM.ModelObject)
 
-        'Clear the ORM Diagram View's Page/Diagram
-        Call zrFrmORMDiagramViewer.zrPage.ClearFast(True)
+        Try
 
-        '==============================================================
-        Dim loPt As New PointF(50, 50)
+            'Clear the ORM Diagram View's Page/Diagram
+            Call zrFrmORMDiagramViewer.zrPage.ClearFast(True)
 
-        Select Case arModelObject.ConceptType
-            Case Is = pcenumConceptType.ValueType
-                Dim lrValueType As FBM.ValueType
-                lrValueType = arModelObject
-                Call zrFrmORMDiagramViewer.zrPage.DropValueTypeAtPoint(lrValueType, loPt)
-                Call zrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrValueType)
+            '==============================================================
+            Dim loPt As New PointF(50, 50)
 
-                For Each lrFactTypeInstance In zrFrmORMDiagramViewer.zrPage.FactTypeInstance
-                    Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
-                    Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(10, False)
+            Select Case arModelObject.ConceptType
+                Case Is = pcenumConceptType.ValueType
+                    Dim lrValueType As FBM.ValueType
+                    lrValueType = arModelObject
+                    Call zrFrmORMDiagramViewer.zrPage.DropValueTypeAtPoint(lrValueType, loPt,,, False)
+                    Call zrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrValueType)
+
+                    For Each lrFactTypeInstance In zrFrmORMDiagramViewer.zrPage.FactTypeInstance
+                        Call lrFactTypeInstance.MoveToBetweenAssociatedModelObjects(False)
+                        Call lrFactTypeInstance.RepellFromNeighbouringPageObjects(10, False)
+                    Next
+
+                Case Is = pcenumConceptType.EntityType
+                    Dim lrEntityType As FBM.EntityType
+                    lrEntityType = arModelObject
+                    Dim larSuptypeRelationship = From EntityType In Me.mrModel.EntityType
+                                                 From SubtypeRelationship In EntityType.SubtypeRelationship
+                                                 Where EntityType.Id = lrEntityType.Id
+                                                 Select SubtypeRelationship
+
+                    For Each lrSubtypeRelationship In larSuptypeRelationship
+                        If Not zrFrmORMDiagramViewer.zrPage.ContainsModelElement(lrSubtypeRelationship.parentModelElement) Then
+                            Select Case lrSubtypeRelationship.parentModelElement.ConceptType
+                                Case Is = pcenumConceptType.EntityType
+                                    Call zrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrSubtypeRelationship.parentModelElement, New PointF(30, 30))
+                            End Select
+                        End If
+                    Next
+
+                    Call zrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt,,, False)
+                    Call zrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrEntityType)
+                Case Is = pcenumConceptType.FactType
+                    Dim lrFactType As FBM.FactType
+                    lrFactType = arModelObject
+                    Call zrFrmORMDiagramViewer.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False)
+                Case Is = pcenumConceptType.RoleConstraint
+                    Dim lrRoleConstraint As FBM.RoleConstraint
+                    Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
+
+                    lrRoleConstraint = arModelObject
+
+                    Select Case lrRoleConstraint.RoleConstraintType
+                        Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
+                            lrRoleConstraintInstance = zrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                        Case Is = pcenumRoleConstraintType.RingConstraint,
+                                  pcenumRoleConstraintType.EqualityConstraint,
+                                  pcenumRoleConstraintType.ExternalUniquenessConstraint,
+                                  pcenumRoleConstraintType.ExclusiveORConstraint,
+                                  pcenumRoleConstraintType.ExclusionConstraint,
+                                  pcenumRoleConstraintType.SubsetConstraint
+                            lrRoleConstraintInstance = zrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
+                        Case Is = pcenumRoleConstraintType.FrequencyConstraint
+                            Call zrFrmORMDiagramViewer.DropFrequencyConstraintAtPoint(lrRoleConstraint, loPt)
+                    End Select
+            End Select
+
+            Dim larSuptypeRelationshipInstance = From EntityTypeInstance In Me.zrFrmORMDiagramViewer.zrPage.EntityTypeInstance
+                                                 From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
+                                                 Select SubtypeRelationshipInstance
+
+
+            For Each lrSubtypeRelationship In larSuptypeRelationshipInstance
+                Call lrSubtypeRelationship.DisplayAndAssociate()
+            Next
+
+            'Bring everyting as high as possible to the top of the Page
+            Dim liHighestY = (From ModelElement In zrFrmORMDiagramViewer.zrPage.GetAllPageObjects
+                              Where ModelElement.Shape IsNot Nothing
+                              Where ModelElement.Visible = True
+                              Select ModelElement.Y).Min
+
+            If liHighestY > 5 Then
+                For Each lrModelElement In zrFrmORMDiagramViewer.zrPage.GetAllPageObjects.FindAll(Function(x) x.Shape IsNot Nothing AndAlso x.Visible = True)
+                    lrModelElement.Move(lrModelElement.X, Math.Min(1, lrModelElement.Y - (liHighestY - 5)), False)
                 Next
+            End If
 
-            Case Is = pcenumConceptType.EntityType
-                Dim lrEntityType As FBM.EntityType
-                lrEntityType = arModelObject
-                Dim larSuptypeRelationship = From EntityType In Me.mrModel.EntityType
-                                             From SubtypeRelationship In EntityType.SubtypeRelationship
-                                             Where EntityType.Id = lrEntityType.Id
-                                             Select SubtypeRelationship
+            Call zrFrmORMDiagramViewer.AutoLayout()
+            zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
+            zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
+            zrFrmORMDiagramViewer.DiagramView.ZoomToFit()
+            If zrFrmORMDiagramViewer.DiagramView.ZoomFactor > 150 Then
+                zrFrmORMDiagramViewer.DiagramView.ZoomFactor = 150
+            End If
 
-                For Each lrSubtypeRelationship In larSuptypeRelationship
-                    If Not zrFrmORMDiagramViewer.zrPage.ContainsModelElement(lrSubtypeRelationship.parentModelElement) Then
-                        Select Case lrSubtypeRelationship.parentModelElement.ConceptType
-                            Case Is = pcenumConceptType.EntityType
-                                Call zrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrSubtypeRelationship.parentModelElement, New PointF(30, 30))
-                        End Select
-                    End If
-                Next
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                Call zrFrmORMDiagramViewer.zrPage.DropEntityTypeAtPoint(lrEntityType, loPt)
-                Call zrFrmORMDiagramViewer.LoadAssociatedFactTypes(lrEntityType)
-            Case Is = pcenumConceptType.FactType
-                Dim lrFactType As FBM.FactType
-                lrFactType = arModelObject
-                Call zrFrmORMDiagramViewer.zrPage.DropFactTypeAtPoint(lrFactType, loPt, False)
-            Case Is = pcenumConceptType.RoleConstraint
-                Dim lrRoleConstraint As FBM.RoleConstraint
-                Dim lrRoleConstraintInstance As FBM.RoleConstraintInstance
-
-                lrRoleConstraint = arModelObject
-
-                Select Case lrRoleConstraint.RoleConstraintType
-                    Case Is = pcenumRoleConstraintType.InternalUniquenessConstraint
-                        lrRoleConstraintInstance = zrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
-                    Case Is = pcenumRoleConstraintType.RingConstraint,
-                              pcenumRoleConstraintType.EqualityConstraint,
-                              pcenumRoleConstraintType.ExternalUniquenessConstraint,
-                              pcenumRoleConstraintType.ExclusiveORConstraint,
-                              pcenumRoleConstraintType.ExclusionConstraint,
-                              pcenumRoleConstraintType.SubsetConstraint
-                        lrRoleConstraintInstance = zrFrmORMDiagramViewer.zrPage.DropRoleConstraintAtPoint(lrRoleConstraint, loPt)
-                    Case Is = pcenumRoleConstraintType.FrequencyConstraint
-                        Call zrFrmORMDiagramViewer.DropFrequencyConstraintAtPoint(lrRoleConstraint, loPt)
-                End Select
-        End Select
-
-        Dim larSuptypeRelationshipInstance = From EntityTypeInstance In Me.zrFrmORMDiagramViewer.zrPage.EntityTypeInstance
-                                             From SubtypeRelationshipInstance In EntityTypeInstance.SubtypeRelationship
-                                             Select SubtypeRelationshipInstance
-
-
-        For Each lrSubtypeRelationship In larSuptypeRelationshipInstance
-            Call lrSubtypeRelationship.DisplayAndAssociate()
-        Next
-
-        Call zrFrmORMDiagramViewer.AutoLayout()
-        zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
-        zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
-        zrFrmORMDiagramViewer.DiagramView.ZoomToFit()
-        If zrFrmORMDiagramViewer.DiagramView.ZoomFactor > 150 Then
-            zrFrmORMDiagramViewer.DiagramView.ZoomFactor = 150
-        End If
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -713,6 +974,11 @@ Public Class frmGlossary
         Call lrVerbaliser.Reset()
 
         lrVerbaliser.VerbaliseHeading(arDictionaryEntry.Symbol)
+        lrVerbaliser.VerbaliseQuantifier(" is an General Concept.")
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.HTW.WriteBreak()
+        lrVerbaliser.VerbaliseIndent()
+        lrVerbaliser.VerbaliseError("Please change this General Concept to an Object Type as soon as possible.")
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.HTW.WriteBreak()
         lrVerbaliser.VerbaliseQuantifier("Informally: ")
@@ -728,8 +994,10 @@ Public Class frmGlossary
             lrVerbaliser.VerbaliseQuantifier("(Long Description) ")
             lrVerbaliser.VerbaliseQuantifierLight(arDictionaryEntry.LongDescription)
         End If
-
-
+        If arDictionaryEntry.ShortDescription.Trim = "" And arDictionaryEntry.LongDescription.Trim = "" Then
+            lrVerbaliser.VerbaliseIndent()
+            lrVerbaliser.VerbaliseQuantifierLight("There is no Short or Long Description for this Model Element yet.")
+        End If
 
         Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
@@ -773,6 +1041,11 @@ Public Class frmGlossary
         '-------------------------------------------------
         lrVerbaliser.VerbaliseQuantifier("Data Type: ")
         lrVerbaliser.HTW.Write(arValueType.DataType.ToString)
+        Select Case arValueType.DataType
+            Case Is = pcenumORMDataType.TextFixedLength,
+                      pcenumORMDataType.TextVariableLength
+                lrVerbaliser.HTW.Write("(" & arValueType.DataTypeLength & ")")
+        End Select
         lrVerbaliser.HTW.WriteBreak()
 
 
@@ -938,6 +1211,7 @@ Public Class frmGlossary
                 Case Is = 2
                     If arFactType.FactTypeReading.Count > 0 Then
                         lrFactTypeReading = arFactType.FactTypeReading(0)
+                        lrVerbaliser.VerbaliseIndent()
                         lrFactTypeReading.GetReadingText(lrVerbaliser)
                         lrVerbaliser.HTW.WriteBreak()
 
@@ -970,22 +1244,138 @@ Public Class frmGlossary
 
             lrVerbaliser.VerbaliseModelObject(arFactType)
             lrVerbaliser.VerbaliseQuantifier(" is where ")
-            Call arFactType.FactTypeReading(0).GetReadingText(lrVerbaliser)
-
-
-
-            lrVerbaliser.HTW.WriteBreak()
+            If arFactType.FactTypeReading.Count > 0 Then
+                Call arFactType.FactTypeReading(0).GetReadingText(lrVerbaliser)
+            End If
 
             lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
             lrVerbaliser.VerbaliseHeading("Fact Type Readings:")
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.HTW.WriteBreak()
 
+            liInd = 0
             For Each lrFactTypeReading In arFactType.FactTypeReading
-                lrFactTypeReading.GetReadingText(lrVerbaliser)
+                lrVerbaliser.VerbaliseIndent()
+                If liInd > 0 Then lrVerbaliser.VerbaliseIndent()
+                lrFactTypeReading.GetReadingText(lrVerbaliser, True)
                 lrVerbaliser.HTW.WriteBreak()
-                lrVerbaliser.HTW.WriteBreak()
+                liInd += 1
             Next
+            lrVerbaliser.HTW.WriteBreak()
+
+            lrVerbaliser.VerbaliseHeading("Related Facts:")
+            lrVerbaliser.HTW.WriteBreak()
+            lrVerbaliser.HTW.WriteBreak()
+
+
+#Region "Fact Types"
+            'LINQ
+            Dim larFactType As List(Of FBM.FactType) = Nothing
+
+            If aasAdditionalModelElement IsNot Nothing And Me.mrCurrentModelElement IsNot Nothing Then
+
+                Dim lasAdditionalModelElement = aasAdditionalModelElement
+
+                Dim larFactType2 = (From ft In Me.mrModel.FactType
+                                    From rl In ft.RoleGroup
+                                    Where rl.JoinedORMObject.Id = arFactType.Id
+                                    Select ft Distinct).ToList
+
+                larFactType = (From ft In larFactType2
+                               From ftr In ft.FactTypeReading
+                               Where ftr.PredicatePart.Select(Function(x) x.Role.JoinedORMObject.Id).Where(Function(str1) lasAdditionalModelElement.Any(Function(str2) str1.StartsWith(str2))).Count = lasAdditionalModelElement.Count
+                               Select ft Distinct).ToList
+            Else
+
+
+                larFactType = (From ft In Me.mrModel.FactType
+                               From rl In ft.RoleGroup
+                               Where rl.JoinedORMObject.Id = arFactType.Id
+                               Select ft Distinct).ToList
+            End If
+
+            For Each lrFactType In larFactType
+
+                lrVerbaliser.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "FTR")
+                lrVerbaliser.HTW.RenderBeginTag(HtmlTextWriterTag.Div)
+
+                If lrFactType.FactTypeReading.Count = 0 Then
+                    lrVerbaliser.VerbaliseModelObject(lrFactType)
+                Else
+                    lrFactTypeReading = lrFactType.getOutgoingFactTypeReading(arFactType)
+
+                    If lrFactTypeReading Is Nothing Then
+                        Call lrFactType.FactTypeReading(0).GetReadingText(lrVerbaliser, True)
+                    Else
+                        If lrFactTypeReading.PredicatePart(0).Role.Mandatory Then
+                            lrVerbaliser.VerbaliseQuantifierLight("Each ")
+                        End If
+                        lrFactTypeReading.GetReadingText(lrVerbaliser, True)
+                    End If
+
+                    If Not Me.mbHideFadedFactTypeNames Then
+                        lrVerbaliser.VerbaliseTextLightGray(" (")
+                        lrVerbaliser.VerbaliseModelObjectLightGray(lrFactType)
+                        lrVerbaliser.VerbaliseTextLightGray(") ")
+                    End If
+                    '=======================================================================================
+                    If lrFactType.IsBinaryFactType Then
+                        If lrFactType.Is1To1BinaryFactType Then
+                            If lrFactType.FactTypeReading.Count = 1 Then
+                                'No reverse reading is provided for the FactType.
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+
+                                Dim larRole As New List(Of FBM.Role)
+                                lrRole = lrFactType.GetRoleByJoinedObjectTypeId(arFactType.Id)
+                                larRole.Add(lrRole)
+                                lrRole = lrFactType.GetOtherRoleOfBinaryFactType(lrRole.Id)
+                                larRole.Add(lrRole)
+                                Dim lrSentence As New Language.Sentence(larRole(0).JoinedORMObject.Id & " has " & larRole(1).JoinedORMObject.Id)
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart("has"))
+                                lrSentence.PredicatePart.Add(New Language.PredicatePart(""))
+                                lrFactTypeReading = New FBM.FactTypeReading(lrFactType, larRole, lrSentence)
+                                lrFactTypeReading = lrFactType.FactTypeReading.Find(AddressOf lrFactTypeReading.EqualsByRoleSequence)
+                                If lrFactTypeReading IsNot Nothing Then
+                                    lrVerbaliser.VerbalisePredicateText(lrFactTypeReading.PredicatePart(1).PreBoundText)
+                                End If
+                                lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
+                                lrVerbaliser.VerbaliseQuantifierLight(" uniquely identifies ")
+                                lrVerbaliser.VerbaliseModelObject(arFactType)
+                            Else
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+                                lrFactType.getNotOutgoingFactTypeReadings(arFactType)(0).GetReadingText(lrVerbaliser, True)
+                            End If
+                        Else
+                            If lrFactType.FactTypeReading.Count > 1 Then
+                                lrVerbaliser.HTW.WriteBreak()
+                                lrVerbaliser.VerbaliseIndent()
+                                Try
+                                    lrFactType.getNotOutgoingFactTypeReadings(arFactType)(0).GetReadingText(lrVerbaliser, True)
+                                Catch ex As Exception
+                                    'Not a biggie.
+                                End Try
+
+                            End If
+                        End If
+                    End If
+                    '=======================================================================================                
+                End If
+
+                lrVerbaliser.HTW.RenderEndTag()
+                If lrFactType.IsDerived Then
+                    lrVerbaliser.VerbaliseIndent()
+                    lrVerbaliser.VerbaliseBlackText(lrFactType.DerivationText)
+                    lrVerbaliser.HTW.WriteBreak()
+                End If
+                lrVerbaliser.HTW.WriteBreak()
+
+            Next
+#End Region
+
 
             lrVerbaliser.HTW.WriteBreak()
             lrVerbaliser.VerbaliseHeading("Sample Facts:")
@@ -1059,9 +1449,11 @@ Public Class frmGlossary
                 '--------------------
                 'Is Binary FactType
                 '--------------------
-                Dim larRole As New List(Of FBM.Role)
+                Dim larRole As List(Of FBM.Role)
 
                 For Each lrRoleConstraint In arFactType.InternalUniquenessConstraint
+
+                    larRole = New List(Of FBM.Role)
 
                     lrVerbaliser.VerbaliseQuantifier("Role Constraint: ")
                     lrVerbaliser.VerbaliseModelObject(lrRoleConstraint)
@@ -1079,7 +1471,7 @@ Public Class frmGlossary
 
                     lrFactTypeReading = arFactType.FindSuitableFactTypeReadingByRoles(larRole)
 
-                    If IsSomething(lrFactTypeReading) Then
+                    If lrFactTypeReading IsNot Nothing Then
 
                         lrVerbaliser.VerbaliseQuantifier("Each ")
                         lrVerbaliser.VerbaliseModelObject(lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject)
@@ -1127,7 +1519,7 @@ Public Class frmGlossary
                     lrVerbaliser.VerbaliseQuantifier(" combination ")
 
                     For Each lrRole In arFactType.RoleGroup
-                        If Not IsSomething(lrRoleConstraint.Role.Find(AddressOf lrRole.Equals)) Then
+                        If Not lrRoleConstraint.Role.Find(AddressOf lrRole.Equals) IsNot Nothing Then
                             lrVerbaliser.VerbaliseQuantifier("is unique and relates to exactly one instance of ")
                             lrVerbaliser.VerbaliseModelObject(lrRole.JoinedORMObject)
                         End If
@@ -1165,6 +1557,26 @@ Public Class frmGlossary
                 Next
             End If
 
+            Dim larRingContraint = From RoleConstraint In arFactType.Model.RoleConstraint
+                                   Where RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.RingConstraint
+                                   Where RoleConstraint.Role.Any(Function(Item) arFactType.RoleGroup.Contains(Item))
+                                   Select RoleConstraint
+
+            If larRingContraint.Count > 0 Then
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.VerbaliseHeading("Ring Constraints:")
+                lrVerbaliser.HTW.WriteBreak()
+                lrVerbaliser.HTW.WriteBreak()
+                Dim lrSubVerbaliser As New Verbaliser
+                For Each lrRingConstraint In larRingContraint
+                    lrSubVerbaliser.VerbaliseRoleConstraintRingConstraint(lrRingConstraint, lrVerbaliser)
+                    lrVerbaliser.HTW.WriteBreak()
+                    lrVerbaliser.HTW.WriteBreak()
+                Next
+            End If
+
+            'Produce the document
             Me.WebBrowser.DocumentText = lrVerbaliser.Verbalise
 
         Catch ex As Exception
@@ -1173,7 +1585,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1194,7 +1606,7 @@ Public Class frmGlossary
             lasURLArgument = e.Url.ToString.Split(":")
 
             If lasURLArgument(0) = "elementid" Then
-
+#Region "ElementId - I.e. ModelElement"
                 lsModelObjectName = lasURLArgument(1)
 
                 Dim lrModelObject As FBM.ModelObject
@@ -1213,7 +1625,7 @@ Public Class frmGlossary
                         '-------------------------------------------------------
                         Dim lrToolboxForm As frmToolboxORMVerbalisation
                         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                        If IsSomething(lrToolboxForm) Then
+                        If lrToolboxForm IsNot Nothing Then
                             Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
                             lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
                         End If
@@ -1227,7 +1639,7 @@ Public Class frmGlossary
                         '-------------------------------------------------------
                         Dim lrToolboxForm As frmToolboxORMVerbalisation
                         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                        If IsSomething(lrToolboxForm) Then
+                        If lrToolboxForm IsNot Nothing Then
                             Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
                             lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
                         End If
@@ -1244,7 +1656,7 @@ Public Class frmGlossary
                         Dim lrORMReadingEditor As frmToolboxORMReadingEditor
                         lrORMReadingEditor = prApplication.GetToolboxForm(frmToolboxORMReadingEditor.Name)
 
-                        If IsSomething(lrORMReadingEditor) Then
+                        If lrORMReadingEditor IsNot Nothing Then
                             '-------------------------------------------------------------------------
                             'Tidy up the ORMFactTypeReading editor if the ORMFactTypeReading is open
                             '-------------------------------------------------------------------------
@@ -1265,7 +1677,7 @@ Public Class frmGlossary
                         '-------------------------------------------------------
                         Dim lrToolboxForm As frmToolboxORMVerbalisation
                         lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                        If IsSomething(lrToolboxForm) Then
+                        If lrToolboxForm IsNot Nothing Then
                             Dim lfrmToolboxVerbaliser As frmToolboxORMVerbalisation = CType(lrToolboxForm, frmToolboxORMVerbalisation)
                             lfrmToolboxVerbaliser.verbaliseModelElement(lrModelObject)
                         End If
@@ -1288,7 +1700,50 @@ Public Class frmGlossary
                 '  rather than the new Verbalisation. Cancelling the Navigation fixes this.
                 '------------------------------------------------------------------------------------------
                 e.Cancel = True
+#End Region
+            ElseIf lasURLArgument(0) = "metadatalineagedocument" Then
+#Region "Metadata Lineage Document"
+                Dim lsDocumentLocation = lasURLArgument(1)
+                Try
+                    lsDocumentLocation &= ":" & lasURLArgument(2)
+                Catch ex As Exception
+                    'No problem, did not contain a colon e.g. C:\<FilePath>
+                End Try
 
+                '------------------------------------------------------------------------------------------
+                'Cancel the Navigation so that the new verbalisation isn't wiped out.
+                '  i.e. Because the Navication (e.URL) isn't to an actual URL, an error WebPage is shown,
+                '  rather than the new Verbalisation. Cancelling the Navigation fixes this.
+                '------------------------------------------------------------------------------------------
+                e.Cancel = True
+
+                If MsgBox("Do you want to open this document?", MsgBoxStyle.YesNoCancel) Then
+
+#Region "Open the document if the file path exists."
+                    Dim lfrmDocumentViewer As New frmPDFDocumentViewer
+
+                    lfrmDocumentViewer.msDocumentFilePath = lsDocumentLocation
+
+                    If Not System.IO.File.Exists(lfrmDocumentViewer.msDocumentFilePath) Then
+                        MsgBox("There seems to be a problem. No file exists for that file path. Change the document Location and try again.")
+                        e.Cancel = True
+                        Exit Sub
+                    End If
+
+                    Dim liPageNumber As Integer = 0 'May in the future be able to have the first lineage item LineNr
+                    lfrmDocumentViewer.miPageNumber = liPageNumber
+
+                    lfrmDocumentViewer.msObjectTypeName = Me.mrCurrentModelElement.Id
+
+                    Dim lfrmMain As frmMain = Me.MdiParent
+
+                    With New WaitCursor
+                        lfrmDocumentViewer.Show(lfrmMain.DockPanel)
+                    End With
+#End Region
+
+                End If
+#End Region
             End If
 
         Catch ex As Exception
@@ -1297,14 +1752,14 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
     Private Sub frmGlossary_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
 
-        If IsSomething(zrFrmORMDiagramViewer) Then
+        If zrFrmORMDiagramViewer IsNot Nothing Then
             zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
             zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         End If
@@ -1313,7 +1768,7 @@ Public Class frmGlossary
 
     Private Sub SplitContainer2_SplitterMoved(sender As Object, e As SplitterEventArgs) Handles SplitContainer2.SplitterMoved
 
-        If IsSomething(zrFrmORMDiagramViewer) Then
+        If zrFrmORMDiagramViewer IsNot Nothing Then
             zrFrmORMDiagramViewer.Height = Me.SplitContainer2.Panel2.Height
             zrFrmORMDiagramViewer.Width = Me.SplitContainer2.Panel2.Width
         End If
@@ -1380,11 +1835,16 @@ Public Class frmGlossary
                 Exit Sub
             End If
 
-            Dim loModelObject As FBM.ModelObject = Me.ListBoxGlossary.SelectedItem.Tag
+            Dim loModelObject As FBM.ModelObject
+            Try
+                loModelObject = Me.ListBoxGlossary.SelectedItem.Tag
+            Catch ex As Exception
+                Throw ex
+            End Try
 
             Me.ToolStripMenuItemViewOnPage.DropDownItems.Clear()
 
-            If IsSomething(loModelObject) Then
+            If loModelObject IsNot Nothing Then
                 '-----------------------------------------------
                 'Establish the ContextMenu for the SelectedNode
                 '-----------------------------------------------
@@ -1400,29 +1860,29 @@ Public Class frmGlossary
 
 
         Catch ex As Exception
-            Dim lsMessage As String
+                Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
-    Sub OpenORMDiagram(ByVal sender As Object, ByVal e As EventArgs)
+    Sub OpenPage(ByVal sender As Object, ByVal e As EventArgs)
 
         Try
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
             Dim item As ToolStripItem = CType(sender, ToolStripItem)
 
             '---------------------------------------------------------------------------
             'Find and select the TreeViewNode in the EnterpriseTreeViewer for the Page
             '---------------------------------------------------------------------------
-            lr_enterprise_view = item.Tag
-            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
+            lrEnterpriseView = item.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
             prApplication.WorkingPage = New FBM.Page
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+            prApplication.WorkingPage = lrEnterpriseView.Tag
             Call frmMain.zfrmModelExplorer.EditPageToolStripMenuItem_Click(sender, e)
 
         Catch ex As Exception
@@ -1431,7 +1891,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1441,13 +1901,26 @@ Public Class frmGlossary
 
         Dim lrModel As FBM.Model
         Dim lrPage As FBM.Page
+        Dim larPagesCombined As New List(Of FBM.Page)
 
         Try
             lrModel = Me.mrModel
 
             aoMenuStripItem.DropDownItems.Clear()
 
-            Dim lsWorkingPageId As String = Nothing
+            'CodeSafe - Make sure the Page objects are loaded
+            If lrModel.StoreAsXML Then
+                'Precheck
+                Dim larPageObject = From Page In lrModel.Page
+                                    Where Page.Loaded = False
+                                    Select Page
+
+                If larPageObject.Count > 0 Then
+                    Call lrModel.LoadPreLoadedXMLPagesFromXML()
+                End If
+            End If
+
+                Dim lsWorkingPageId As String = Nothing
             If prApplication.WorkingPage IsNot Nothing Then
                 lsWorkingPageId = prApplication.WorkingPage.PageId
             End If
@@ -1458,30 +1931,62 @@ Public Class frmGlossary
                           Select Page Distinct
                           Order By Page.Name
 
-            If IsSomething(larPage) Then
-                For Each lrPage In larPage
+            larPagesCombined.AddRange(larPage.ToList)
+
+            Dim larERDPGSPage = From Page In lrModel.Page
+                                From FactTypeInstance In Page.FactTypeInstance
+                                Where FactTypeInstance.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString
+                                From Fact In FactTypeInstance.Fact
+                                Where Fact("Element").Data = asEntityTypeId
+                                Select Page Distinct
+                                Order By Page.Name
+
+            larPagesCombined.AddRange(larERDPGSPage.ToList)
+
+            If larPagesCombined.Count > 0 Then
+                For Each lrPage In larPagesCombined
 
                     Dim loToolStripMenuItem As ToolStripMenuItem
-                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                    Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                    Dim liPageLanguageType As pcenumMenuType
+
+                    Select Case lrPage.Language
+                        Case Is = pcenumLanguage.ORMModel
+                            liPageLanguageType = pcenumMenuType.pageORMModel
+                        Case Is = pcenumLanguage.EntityRelationshipDiagram
+                            liPageLanguageType = pcenumMenuType.pageERD
+                        Case Is = pcenumLanguage.PropertyGraphSchema
+                            liPageLanguageType = pcenumMenuType.pagePGSDiagram
+                    End Select
+
+                    lrEnterpriseView = New tEnterpriseEnterpriseView(liPageLanguageType,
                                                                lrPage,
                                                                lrPage.Model.ModelId,
-                                                               pcenumLanguage.ORMModel,
+                                                               lrPage.Language,
                                                                Nothing, lrPage.PageId)
 
 
-                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+                    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
 
-                    If IsSomething(lr_enterprise_view) Then
+                    If lrEnterpriseView IsNot Nothing Then
                         '---------------------------------------------------
                         'Add the Page(Name) to the MenuOption.DropDownItems
                         '---------------------------------------------------
-                        lr_enterprise_view.FocusModelElement = Me.mrModel.GetModelObjectByName(asEntityTypeId)
+                        lrEnterpriseView.FocusModelElement = Me.mrModel.GetModelObjectByName(asEntityTypeId)
 
                         loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                        loToolStripMenuItem.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                        AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                        loToolStripMenuItem.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                        AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenPage
+                        Select Case lrPage.Language
+                            Case Is = pcenumLanguage.ORMModel
+                                loToolStripMenuItem.Image = My.Resources.MenuImages.ORM16x16
+                            Case Is = pcenumLanguage.EntityRelationshipDiagram
+                                loToolStripMenuItem.Image = My.Resources.MenuImages.ERD16x16
+                            Case Is = pcenumLanguage.PropertyGraphSchema
+                                loToolStripMenuItem.Image = My.Resources.MenuImages.PGS16x16
+                        End Select
+
                         aoMenuStripItem.Enabled = True
                     End If
 
@@ -1498,7 +2003,7 @@ Public Class frmGlossary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
         End Try
 
     End Sub
@@ -1524,24 +2029,24 @@ Public Class frmGlossary
                           Select Page Distinct
                           Order By Page.Name
 
-            If IsSomething(larPage) Then
+            If larPage IsNot Nothing Then
                 For Each lrPage In larPage
 
                     Dim loToolStripMenuItem As ToolStripMenuItem
-                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                    Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                lrPage,
                                                                lrPage.Model.ModelId,
                                                                pcenumLanguage.ORMModel,
                                                                Nothing, lrPage.PageId)
 
-                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                    lr_enterprise_view.FocusModelElement = Me.mrModel.GetModelObjectByName(asFactTypeId)
+                    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    lrEnterpriseView.FocusModelElement = Me.mrModel.GetModelObjectByName(asFactTypeId)
                     loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                    loToolStripMenuItem.Tag = lr_enterprise_view
+                    loToolStripMenuItem.Tag = lrEnterpriseView
 
-                    AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                    AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenPage
                 Next
             Else
                 Dim loToolStripMenuItem As ToolStripMenuItem
@@ -1555,7 +2060,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1582,24 +2087,24 @@ Public Class frmGlossary
                           Select Page Distinct
                           Order By Page.Name
 
-            If IsSomething(larPage) Then
+            If larPage IsNot Nothing Then
                 For Each lrPage In larPage
 
                     Dim loToolStripMenuItem As ToolStripMenuItem
-                    Dim lr_enterprise_view As tEnterpriseEnterpriseView
+                    Dim lrEnterpriseView As tEnterpriseEnterpriseView
 
-                    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                lrPage,
                                                                lrPage.Model.ModelId,
                                                                pcenumLanguage.ORMModel,
                                                                Nothing, lrPage.PageId)
 
-                    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                    lr_enterprise_view.FocusModelElement = Me.mrModel.GetModelObjectByName(asValueTypeId)
+                    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    lrEnterpriseView.FocusModelElement = Me.mrModel.GetModelObjectByName(asValueTypeId)
                     loToolStripMenuItem = aoMenuStripItem.DropDownItems.Add(lrPage.Name)
-                    loToolStripMenuItem.Tag = lr_enterprise_view
+                    loToolStripMenuItem.Tag = lrEnterpriseView
 
-                    AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenORMDiagram
+                    AddHandler loToolStripMenuItem.Click, AddressOf Me.OpenPage
                 Next
             Else
                 Dim loToolStripMenuItem As ToolStripMenuItem
@@ -1613,7 +2118,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, False)
         End Try
 
     End Sub
@@ -1644,7 +2149,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -1702,7 +2207,7 @@ Public Class frmGlossary
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1749,7 +2254,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1765,7 +2270,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1773,15 +2278,20 @@ Public Class frmGlossary
     Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
 
         Try
-            Me.TextBoxSearch.Text = ""
-            Call Me.ShowGlossary(Me.mrModel)
+            Dim larIncludedTypes As New List(Of Type)
+            If Me.CheckBoxComboBoxObjectTypes.CheckBoxItems.Item(0).Checked Then larIncludedTypes.Add(GetType(FBM.EntityType))
+            If Me.CheckBoxComboBoxObjectTypes.CheckBoxItems.Item(1).Checked Then larIncludedTypes.Add(GetType(FBM.ValueType))
+            If Me.CheckBoxComboBoxObjectTypes.CheckBoxItems.Item(2).Checked Then larIncludedTypes.Add(GetType(FBM.FactType))
+
+            Me.TextboxSearch.Text = ""
+            Call Me.ShowGlossary(Me.mrModel, larIncludedTypes)
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1805,7 +2315,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1835,7 +2345,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1858,7 +2368,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1891,7 +2401,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1907,7 +2417,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1924,7 +2434,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1939,7 +2449,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1971,7 +2481,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1981,7 +2491,18 @@ Public Class frmGlossary
         Dim lrModelObject As FBM.ModelObject
         Try
             Try
-                lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Id)
+                Try
+                    lrModelObject = Me.mrCurrentModelElement
+                    If lrModelObject Is Nothing Then Throw New Exception("trip")
+                Catch ex As Exception
+                    If Me.ListBoxGlossary.SelectedItem.Tag.ConceptType = pcenumConceptType.GeneralConcept Then
+                        lrModelObject = Me.ListBoxGlossary.SelectedItem.Tag
+                    Else
+                        lrModelObject = Me.mrModel.GetModelObjectByName(Me.ListBoxGlossary.SelectedItem.Tag.Id)
+                    End If
+                End Try
+
+                If lrModelObject Is Nothing Then Throw New Exception("Couldn't find Model Element for: " & Me.ListBoxGlossary.Text)
             Catch
                 Exit Sub
             End Try
@@ -1994,7 +2515,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2016,7 +2537,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -2036,7 +2557,7 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2060,7 +2581,118 @@ Public Class frmGlossary
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CloseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CloseToolStripMenuItem.Click
+
+        Try
+            Me.Hide()
+            Me.Close()
+            Me.Dispose()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemCopyToModel_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemCopyToModel.Click
+
+        Dim lsMessage As String
+
+        Try
+            Dim lrGenericSelection As New tGenericSelection
+
+            If Boston.DisplayGenericSelectForm(lrGenericSelection,
+                                               "Models",
+                                               "MetaModelModel",
+                                               "ModelName",
+                                               "ModelId",
+                                               "WHERE ModelId <> '" & Me.mrModel.ModelId & "'",
+                                               Nothing,
+                                                pcenumComboBoxStyle.DropdownList
+                                                ) = DialogResult.OK Then
+
+                Dim lsModelId As String = lrGenericSelection.SelectIndex
+
+                Dim lrCopyToModel As FBM.Model = prApplication.Models.Find(Function(x) x.ModelId = lsModelId)
+
+                lsMessage = "Are you sure you want to copy the model element, " & Me.mrCurrentModelElement.Id & ", to the Model, " & lrCopyToModel.Name & "?"
+
+                If lrCopyToModel IsNot Nothing AndAlso MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+
+                    If Not lrCopyToModel.Loaded Then
+                        Boston.ShowFlashCard("Loading the Model, " & lrCopyToModel.Name, Color.LightGray)
+                        lrCopyToModel.Load(False)
+                    End If
+
+                    Dim lrCopyFromPage As New FBM.Page(Me.mrCurrentModelElement.Model, "CopyFromPage", "CopyFromPage", pcenumLanguage.ORMModel)
+
+#Region "Add to Page and Copy to Clipboard"
+                    lrCopyFromPage.SelectedObject.Clear()
+                    Select Case Me.mrCurrentModelElement.GetType
+
+                        Case Is = GetType(FBM.ValueType)
+                            Dim lrValueTypeInstance = CType(Me.mrCurrentModelElement, FBM.ValueType).CloneInstance(lrCopyFromPage, True, True)
+                            lrCopyFromPage.SelectedObject.Add(lrValueTypeInstance)
+
+                        Case Is = GetType(FBM.EntityType)
+                            Dim lrEntityTypeInstance = CType(Me.mrCurrentModelElement, FBM.EntityType).CloneInstance(lrCopyFromPage, True, True, False)
+                            lrCopyFromPage.SelectedObject.Add(lrEntityTypeInstance)
+
+                        Case Is = GetType(FBM.FactType)
+                            Dim lrFactTypeInstance = CType(Me.mrCurrentModelElement, FBM.FactType).CloneInstance(lrCopyFromPage, True)
+                            lrCopyFromPage.SelectedObject.Add(lrFactTypeInstance)
+
+                    End Select
+
+                    Call frmMain.CopySelectedObjectsToClipboard(lrCopyFromPage)
+#End Region
+
+                    Dim lrCopyToPage As New FBM.Page(lrCopyToModel, "CopyToPage", "CopyToPage", pcenumLanguage.ORMModel)
+
+                    'Paste to the CopyToModel
+                    '  Page with ModelElement is in Clipboard
+                    Call frmMain.PasteToPageFromClipboard(lrCopyToModel, lrCopyToPage, True)
+
+                End If
+            End If
+
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub mrModel_ModelElementAdded(ByRef arModelElement As FBM.ModelObject) Handles mrModel.ModelElementAdded
+
+        Try
+            'CodeSafe
+            If Me.DockState = WeifenLuo.WinFormsUI.Docking.DockState.Hidden Then Exit Sub
+
+            Call Me.ShowGlossary(Me.mrModel)
+
+            Call Me.FocusModelElement(arModelElement)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

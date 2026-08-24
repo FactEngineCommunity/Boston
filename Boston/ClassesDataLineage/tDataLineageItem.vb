@@ -9,6 +9,8 @@ Namespace DataLineage
 
         Public Name As String 'DataLineageItemName
 
+        Public SetId As String 'The Id of the set of Properties loaded.
+
         Public DataLineageCategory As New DataLineage.DataLineageCategory
 
         Public DataLineageItemProperty As New List(Of DataLineage.DataLineageItemProperty)
@@ -17,17 +19,22 @@ Namespace DataLineage
         Public Sub New()
         End Sub
 
-        Public Sub New(ByRef arModel As FBM.Model, ByVal asName As String)
+        Public Sub New(ByRef arModel As FBM.Model,
+                       ByRef arDataLineageCategory As DataLineage.DataLineageCategory,
+                       ByVal asName As String,
+                       ByVal asSetId As String)
             Try
                 Me.Model = arModel
+                Me.DataLineageCategory = arDataLineageCategory
                 Me.Name = asName
+                Me.SetId = asSetId
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -55,44 +62,52 @@ Namespace DataLineage
 
                 liLineageSetNumber += 1
 
+                'Id
+                Dim lrDataLineageProperty As New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Id", arFEKLLineageObject.Id, liLineageSetNumber)
+                lrDataLineageProperty.Category = Me.DataLineageCategory.Name
+                Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Document Name
-                Dim lrDataLineageProperty As New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Specification Document Name", arFEKLLineageObject.DocumentName, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Specification Document Name", arFEKLLineageObject.DocumentName, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Document Location
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Document Location", arFEKLLineageObject.DocumentLocation, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Document Location", arFEKLLineageObject.DocumentLocation, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Document Location JSON
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Document Location JSON", arFEKLLineageObject.DocumentLocationJson, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Document Location JSON", arFEKLLineageObject.DocumentLocationJson, liLineageSetNumber)
+                lrDataLineageProperty.Category = Me.DataLineageCategory.Name
+                Me.DataLineageItemProperty.Add(lrDataLineageProperty)
+                'Actual Text
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Actual Text", arFEKLLineageObject.ActualText, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Page Number
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Page Number", arFEKLLineageObject.PageNumber, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Page Number", arFEKLLineageObject.PageNumber, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Line Number
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Line Number", arFEKLLineageObject.LineNumber, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Line Number", arFEKLLineageObject.LineNumber, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Section Id
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Section Id", arFEKLLineageObject.SectionId, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Section Id", arFEKLLineageObject.SectionId, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Section Name
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Section Name", arFEKLLineageObject.SectionName, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Section Name", arFEKLLineageObject.SectionName, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Requirement Id
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Requirement Id", arFEKLLineageObject.RequirementId, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Requirement Id", arFEKLLineageObject.RequirementId, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'Start Offset
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "Start Offset", arFEKLLineageObject.StartOffset, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "Start Offset", arFEKLLineageObject.StartOffset, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
                 'End Offset
-                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me.Model, Me.Name, "End Offset", arFEKLLineageObject.EndOffset, liLineageSetNumber)
+                lrDataLineageProperty = New DataLineage.DataLineageItemProperty(Me, Me.Model, Me.Name, "End Offset", arFEKLLineageObject.EndOffset, liLineageSetNumber)
                 lrDataLineageProperty.Category = Me.DataLineageCategory.Name
                 Me.DataLineageItemProperty.Add(lrDataLineageProperty)
 
@@ -100,17 +115,16 @@ Namespace DataLineage
                     Call lrDataLineageProperty.Save(abIgnoreErrors)
                 Next
 
-
 SkipLineage:
 #End Region
 
-            Catch ex As Exception
-                Dim lsMessage As String
+                Catch ex As Exception
+                    Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

@@ -18,20 +18,35 @@ Namespace Language
 
         Public Function GetNounOverviewForWord(ByVal asWord As String) As String
 
+            Try
+                Dim lbIsNoun As Boolean = False
+                Dim lrSearchSet As Wnlib.SearchSet = Nothing
+                Dim larArrayList As New ArrayList
 
-            Dim lbIsNoun As Boolean = False
-            Dim lrSearchSet As Wnlib.SearchSet = Nothing
-            Dim larArrayList As New ArrayList
+                'CodeSafe
+                If asWord Is Nothing Then Return Nothing
 
-            Me.hasmatch = False
+                Me.hasmatch = False
 
-            Call Me.OverviewFor(asWord, "noun", lbIsNoun, lrSearchSet, larArrayList)
+                Call Me.OverviewFor(asWord, "noun", lbIsNoun, lrSearchSet, larArrayList)
 
-            If lbIsNoun Then
-                Return larArrayList(0).word
-            End If
+                If lbIsNoun Then
+                    Return larArrayList(0).word
+                End If
 
-            Return Nothing
+                Return Nothing
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage.AppendDoubleLineBreak("Word: " & asWord)
+
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,,, ex)
+            End Try
+
 
         End Function
 

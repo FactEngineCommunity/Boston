@@ -15,8 +15,8 @@ Namespace FBM
 
         <XmlIgnore()>
         Private WithEvents _ValueType As FBM.ValueType 'The ValueType for which the ValueTypeIstance acts as View/Proxy.
-        <XmlIgnore()> _
-        <Browsable(False)> _
+        <XmlIgnore()>
+        <Browsable(False)>
         Public Property ValueType() As FBM.ValueType
             Get
                 Return Me._ValueType
@@ -64,20 +64,20 @@ Namespace FBM
         [ReadOnly](False),
         DescriptionAttribute("The List of Values that Objects of this Value Type may take."),
         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
-        Public Shadows Property ValueConstraint() As Viev.Strings.StringCollection  'NB This is what is edited in the PropertyGrid
+        Public Shadows Property ValueConstraint() As FEStrings.StringCollection  'NB This is what is edited in the PropertyGrid
             Get
                 Return Me._ValueConstraintList
             End Get
-            Set(ByVal Value As Viev.Strings.StringCollection)
+            Set(ByVal Value As FEStrings.StringCollection)
                 Me._ValueConstraintList = Value
             End Set
         End Property
 
-        Public Overloads Property Instances As Viev.Strings.StringCollection
+        Public Overloads Property Instances As FEStrings.StringCollection
             Get
                 Return Me.ValueType.Instances
             End Get
-            Set(value As Viev.Strings.StringCollection)
+            Set(value As FEStrings.StringCollection)
                 Me.ValueType.Instances = value
             End Set
         End Property
@@ -117,7 +117,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._X = value
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     Dim loRectangle As New Rectangle(Me.X, Me.Shape.Bounds.Y, Me.Shape.Bounds.Width, Me.Shape.Bounds.Height)
                     Me.Shape.SetRect(loRectangle, False)
                 End If
@@ -132,7 +132,7 @@ Namespace FBM
             End Get
             Set(ByVal value As Integer)
                 Me._Y = value
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     Dim loRectangle As New Rectangle(Me.Shape.Bounds.X, Me.Y, Me.Shape.Bounds.Width, Me.Shape.Bounds.Height)
                     Me.Shape.SetRect(loRectangle, False)
                 End If
@@ -198,6 +198,27 @@ Namespace FBM
             End Set
         End Property
 
+        Public Property Width As Integer Implements iPageObject.Width
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                'Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Height As Integer Implements iPageObject.Height
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                'Throw New NotImplementedException()
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Parameterless Constructor
+        ''' </summary>
         Public Sub New()
 
             Me.ValueType = New FBM.ValueType
@@ -224,7 +245,7 @@ Namespace FBM
                 Me.Id = System.Guid.NewGuid.ToString
             End If
 
-            If IsSomething(as_entity_type_name) Then
+            If as_entity_type_name IsNot Nothing Then
                 Me.Name = as_entity_type_name
             Else
                 Me.Name = "New Value Type"
@@ -287,7 +308,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tValueTypeInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrValueTypeInstance
             End Try
@@ -434,7 +455,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -463,6 +484,31 @@ Namespace FBM
 
         End Function
 
+        Public Overridable Overloads Sub AddSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject)
+
+            Dim lrSubtypeConstraint As New FBM.SubtypeRelationship
+
+            Try
+                '----------------------------------------
+                'Create a Model level SubtypeConstraint
+                '----------------------------------------
+                With New WaitCursor
+                    lrSubtypeConstraint = Me.ValueType.CreateSubtypeRelationship(CType(arParentModelElement, Object).ModelLevelElement)
+                    Me.Model.Save(False)
+
+                End With
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Overloads Function GetAdjoinedRoles(Optional abIgnoreReferenceModeFactTypes As Boolean = False) As List(Of FBM.RoleInstance)
 
             Try
@@ -485,7 +531,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -633,7 +679,7 @@ Namespace FBM
             Catch ex As Exception
                 Dim lsMessage As String = ""
                 lsMessage = "Error: tValueTypeInstance.IsReferenceModeForFactTypeOnPage: " & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return False
             End Try
 
@@ -670,7 +716,7 @@ RemoveAnyway:
                         Me.Page.RemoveValueTypeInstance(Me, abBroadcastInterfaceEvent)
                     Else
                         lsMessage = "You cannot remove the Value Type, '" & Trim(Me.Name) & "' until all Fact Types with Roles assigned to the Value Type have been removed from the Page."
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
                         Return False
                     End If
                 End If
@@ -680,7 +726,7 @@ RemoveAnyway:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -807,7 +853,7 @@ RemoveAnyway:
                 Me.Symbol = Me.ValueType.Id
                 Me.Name = Me.ValueType.Id
 
-                If IsSomething(Me.Shape) And IsSomething(Me.Page.Form) Then
+                If Me.Shape IsNot Nothing And Me.Page.Form IsNot Nothing Then
                     Dim G As Graphics
                     Dim liValueTypeNameStringSize As New SizeF
                     G = Me.Page.Form.CreateGraphics
@@ -827,7 +873,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -843,7 +889,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -864,11 +910,11 @@ RemoveAnyway:
             Try
                 Me.Name = Me.ValueType.Name
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.Shape) Then
+                    If Me.Shape IsNot Nothing Then
                         If Me.Shape.Text <> "" Then
                             '---------------------------------------------------------------------------------
                             'Is the type of EntityTypeInstance that 
@@ -909,7 +955,7 @@ RemoveAnyway:
                 'VM 20101218-Use the following and e above to fix the below
                 ' -> "ValueConstraintValue", e.OldValue.ToString, e.ChangedItem.Value.ToString
                 'was -> Optional ByVal asAttributeName As String = Nothing, Optional ByVal aoOldValue As Object = Nothing, Optional ByVal aoNewValue As Object = Nothing
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "DBName"
                             Call Me.ValueType.SetDBName(Me.DBName)
@@ -938,10 +984,44 @@ RemoveAnyway:
                         Case Is = "DataTypePrecision"
                             With New WaitCursor
                                 Call Me.ValueType.SetDataTypePrecision(Me.DataTypePrecision)
+
+                                Select Case Me.DataType
+                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision
+                                        Me.ValueType.SetDataTypeLength(0)
+                                    Case Is = pcenumORMDataType.NumericDecimal,
+                                              pcenumORMDataType.NumericMoney
+                                    Case Is = pcenumORMDataType.RawDataFixedLength,
+                                                  pcenumORMDataType.RawDataLargeLength,
+                                                  pcenumORMDataType.RawDataVariableLength,
+                                                  pcenumORMDataType.TextFixedLength,
+                                                  pcenumORMDataType.TextLargeLength,
+                                                  pcenumORMDataType.TextVariableLength
+                                        Me.ValueType.SetDataTypePrecision(0)
+                                    Case Else
+                                        Me.ValueType.SetDataTypeLength(0)
+                                        Me.ValueType.SetDataTypePrecision(0)
+                                End Select
                             End With
                         Case Is = "DataTypeLength"
                             With New WaitCursor
                                 Call Me.ValueType.SetDataTypeLength(Me.DataTypeLength)
+
+                                Select Case Me.DataType
+                                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                              pcenumORMDataType.NumericDecimal,
+                                              pcenumORMDataType.NumericMoney
+
+                                    Case Is = pcenumORMDataType.RawDataFixedLength,
+                                              pcenumORMDataType.RawDataLargeLength,
+                                              pcenumORMDataType.RawDataVariableLength,
+                                              pcenumORMDataType.TextFixedLength,
+                                              pcenumORMDataType.TextLargeLength,
+                                              pcenumORMDataType.TextVariableLength
+                                        Me.ValueType.SetDataTypePrecision(0)
+                                    Case Else
+                                        Me.ValueType.SetDataTypeLength(0)
+                                        Me.ValueType.SetDataTypePrecision(0)
+                                End Select
                             End With
                         Case Is = "IsIndependent"
                             With New WaitCursor
@@ -1009,7 +1089,7 @@ RemoveAnyway:
                                     End If
                                 End If
 
-                                If IsSomething(Me.Shape) Then
+                                If Me.Shape IsNot Nothing Then
                                     Me.Shape.Text = Trim(Me.Name)
                                 End If
                             End If
@@ -1037,7 +1117,7 @@ RemoveAnyway:
                 Dim liValueTypeNameStringSize As New SizeF
 
                 'If Shape/Form exist
-                If IsSomething(Me.Shape) And Me.Page.Form IsNot Nothing Then
+                If Me.Shape IsNot Nothing And Me.Page.Form IsNot Nothing Then
                     G = Me.Page.Form.CreateGraphics
                     liValueTypeNameStringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
                     Dim loRectangle As New Rectangle(Me.X, Me.Y, liValueTypeNameStringSize.Width + 4, liValueTypeNameStringSize.Height + 4)
@@ -1069,7 +1149,7 @@ RemoveAnyway:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1077,6 +1157,32 @@ RemoveAnyway:
         Private Sub tValueTypeInstance_updated() Handles Me.updated
 
         End Sub
+
+        Public Function JoinedFactTypeInstances() As List(Of FBM.FactTypeInstance)
+
+            Dim larFactTypeInstance As New List(Of FBM.FactTypeInstance)
+
+            Try
+
+                Dim larFactTypeInstances = From FactTypeInstance In Me.Page.FactTypeInstance
+                                           From Role In FactTypeInstance.RoleGroup
+                                           Where Role.JoinsValueType Is Me
+                                           Select FactTypeInstance
+
+                Return larFactTypeInstances.ToList
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return larFactTypeInstance
+            End Try
+
+        End Function
 
         Public Sub MouseDown() Implements iPageObject.MouseDown
 
@@ -1131,7 +1237,13 @@ RemoveAnyway:
 
         Public Sub NodeSelected() Implements iPageObject.NodeSelected
 
+            'CodeSafe - Make Sure
+            If Not Me.Shape.Selected Then
+                Me.Shape.Selected = True
+            End If
+
             Call Me.SetAppropriateColour()
+
         End Sub
 
         Public Sub NodeDeselected() Implements FBM.iPageObject.NodeDeselected
@@ -1141,10 +1253,12 @@ RemoveAnyway:
 
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
 
-            If IsSomething(Me.Shape) Then
+            If Me.Shape IsNot Nothing Then
                 If Me.Shape.Selected Then
+                    Me.Shape.Pen.Width = 0.7
                     Me.Shape.Pen.Color = Color.Blue
                 Else
+                    Me.Shape.Pen.Width = 0.5
                     If Me.ValueType.HasModelError Then
                         Me.Shape.Pen.Color = Color.Red
                     Else
@@ -1206,7 +1320,7 @@ RemoveAnyway:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1327,7 +1441,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1345,7 +1459,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1363,7 +1477,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1400,7 +1514,7 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1427,7 +1541,51 @@ RemoveAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Private Sub _ValueType_SubtypeRelationshipAdded(ByRef arSubtypeRelationship As SubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean) Handles _ValueType.SubtypeRelationshipAdded
+
+            Try
+                '-----------------------------------------------------------------------------------------------------------
+                'Check to see whether the Supertype is on the Page
+                Dim lsParentModelElementId As String = arSubtypeRelationship.parentModelElement.Id
+                Dim lrParentModelElement As FBM.ModelObject = Me.Page.getModelElementById(lsParentModelElementId)
+                If lrParentModelElement Is Nothing Then
+                    '---------------------------------------------------------------------------------------------------------------
+                    'The Parent EntityType is not on the Page, so abort
+                    Exit Sub
+                End If
+
+                Dim lrSubtypeRelationshipInstance As New FBM.SubtypeRelationshipInstance
+                lrSubtypeRelationshipInstance = arSubtypeRelationship.CloneInstance(Me.Page)
+
+                '-------------------------------------------------------------
+                'CodeSafe
+                If Me.Page IsNot Nothing Then
+                    Dim lrFactType = lrSubtypeRelationshipInstance.SubtypeRelationship.FactType
+                    Dim lrFactTypeInstance = Me.Page.DropFactTypeAtPoint(lrFactType, New PointF(0, 0), False,, , abBroadcastInterfaceEvent, False)
+                    lrFactTypeInstance.SubtypeRelationshipInstance = lrSubtypeRelationshipInstance
+                    Call lrSubtypeRelationshipInstance.DisplayAndAssociate()
+                End If
+
+                Me.SubtypeRelationship.AddUnique(lrSubtypeRelationshipInstance)
+
+                Call Me.Page.MakeDirty()
+
+                If Me.Page.Form IsNot Nothing Then
+                    Call Me.EnableSaveButton()
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

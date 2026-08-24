@@ -9,10 +9,13 @@ Public Class ReferenceTable
     <XmlAttribute>
     Public Name As String
 
-    Public ReferenceTuple As New List(Of ReferenceTuple)
+    Public ReferenceTuples As New List(Of ReferenceTuple)
 
+    <NonSerialized>
+    <XmlIgnore>
     <DebuggerBrowsable(DebuggerBrowsableState.Never)>
     Private _Column As New List(Of tReferenceField)
+    <XmlIgnore>
     Public ReadOnly Property Column As List(Of tReferenceField)
         Get
             If Me._Column.Count = 0 Then
@@ -38,10 +41,19 @@ End Class
 <Serializable>
 Public Class ReferenceTuple
 
+    <XmlIgnore>
+    Private _RowId As String
     <XmlAttribute>
-    Public RowId As String
+    Public Property RowId As String
+        Get
+            Return Me._RowId
+        End Get
+        Set(value As String)
+            Me._RowId = value
+        End Set
+    End Property
 
-    Public KeyValuePair As New List(Of KeyValuePair)
+    Public KeyValuePairs As New List(Of KeyValuePair)
 
     ''' <summary>
     ''' Parameterless Constructor
@@ -58,11 +70,29 @@ End Class
 <Serializable>
 Public Class KeyValuePair
 
+    <XmlIgnore>
+    Private _Key As String
     <XmlAttribute>
-    Public Key As String
+    Public Property Key As String
+        Get
+            Return Me._Key
+        End Get
+        Set(value As String)
+            Me._Key = value
+        End Set
+    End Property
 
+    <XmlIgnore>
+    Private _Value As String
     <XmlAttribute>
-    Public Value As String
+    Public Property Value As String
+        Get
+            Return Me._Value
+        End Get
+        Set(value As String)
+            Me._Value = value
+        End Set
+    End Property
 
     ''' <summary>
     ''' Parameterless Constructor

@@ -48,7 +48,7 @@ Public Class frmToolboxErrorList
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
 
@@ -78,11 +78,13 @@ Public Class frmToolboxErrorList
                 larAllErrors.AddRange(larModelError.ToList)
                 larAllErrors.AddRange(larCMMLModelError.ToList)
 
-                DataGrid_ErrorList.DataSource = larAllErrors
+                DataGrid_ErrorList.DataSource = larAllErrors 'See CellFormatting for showing the ErrorId rather than its Text (for the Enum)
             End If
 
             Me.cManager = CType(DataGrid_ErrorList.BindingContext(Me.zrModel.ModelError), CurrencyManager)
             Me.DataGrid_ErrorList.Columns(1).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            Me.DataGrid_ErrorList.Columns("ErrorId").DefaultCellStyle.Format = "D"
+            Me.DataGrid_ErrorList.Columns("SubErrorId").DefaultCellStyle.Format = "D"
             Me.DataGrid_ErrorList.Refresh()
 
         Catch ex As Exception
@@ -91,7 +93,7 @@ Public Class frmToolboxErrorList
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -108,7 +110,7 @@ Public Class frmToolboxErrorList
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
 
@@ -189,6 +191,7 @@ Public Class frmToolboxErrorList
             '==========================================================================================================
             If lrModelError IsNot Nothing Then
 
+#Region "Load Pages that the ModelElement is on."
                 Dim larPage As New List(Of FBM.Page)
                 Dim loMenuOption As ToolStripItem
 
@@ -208,11 +211,11 @@ Public Class frmToolboxErrorList
                     Case Else
                         Select Case lrModelError.ModelObject.ConceptType
                             Case Is = pcenumConceptType.ValueType
-                                larPage = prApplication.CMML.get_orm_diagram_pages_for_value_type(lrModelError.ModelObject)
+                                larPage = prApplication.CMML.getORMDiagramPagesForValueType(lrModelError.ModelObject)
                             Case Is = pcenumConceptType.EntityType
                                 larPage = prApplication.CMML.getORMDiagramPagesForEntityType(lrModelError.ModelObject)
                             Case Is = pcenumConceptType.FactType
-                                larPage = prApplication.CMML.get_orm_diagram_pages_for_FactType(lrModelError.ModelObject)
+                                larPage = prApplication.CMML.getORMDiagramPagesForFactType(lrModelError.ModelObject)
                             Case Is = pcenumConceptType.RoleConstraint
                                 larPage = prApplication.CMML.GetORMDiagramPagesForRoleConstraint(lrModelError.ModelObject)
                         End Select
@@ -243,7 +246,7 @@ Public Class frmToolboxErrorList
 
                         lrEnterpriseView.FocusModelElement = lrModelError.ModelObject
 
-                        If IsSomething(lrEnterpriseView) Then
+                        If lrEnterpriseView IsNot Nothing Then
                             '---------------------------------------------------
                             'Add the Page(Name) to the MenuOption.DropDownItems
                             '---------------------------------------------------
@@ -253,7 +256,24 @@ Public Class frmToolboxErrorList
                         End If
                     Next
                 End If
+#End Region
 
+#Region "Set the Fix (if any) for the ModelError"
+                Select Case lrModelError.ErrorId
+                    Case Is = pcenumModelErrors.RDSRelationsWithMismatchedOriginAndDestinationColumnCount
+
+                        Me.ToolStripMenuItemApplyFix.Tag = New With {.ModelElement = lrModelError.CMMLModelElement, .FixType = pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount}
+                        Me.ToolStripMenuItemApplyFix.Enabled = True
+
+                    Case Is = pcenumModelErrors.RDSTableWithSimpleReferenceSchemeButMultiplePrimaryKeyColumns
+
+                        Me.ToolStripMenuItemApplyFix.Tag = New With {.ModelElement = lrModelError.CMMLModelElement, .FixType = pcenumModelFixType.RDSTablesWithSimpleReferenceSchemeAndMultiplePrimaryKeyColumns}
+                        Me.ToolStripMenuItemApplyFix.Enabled = True
+
+                    Case Else
+                        Me.ToolStripMenuItemApplyFix.Enabled = False
+                End Select
+#End Region
             End If
             '==========================================================================================================
 
@@ -263,7 +283,7 @@ Public Class frmToolboxErrorList
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -292,7 +312,7 @@ Public Class frmToolboxErrorList
         With New WaitCursor
 
             RemoveHandler zrModel.ModelErrorAdded, AddressOf Me.zrModel_ModelErrorAdded
-            Call Me.zrModel.checkForErrors()
+            Call Me.zrModel.checkForErrors(Me.CheckBoxShowDatabaseMappingErrors.Checked, Me.CheckBoxShowRelationalModelErrors.Checked)
             AddHandler zrModel.ModelErrorAdded, AddressOf Me.zrModel_ModelErrorAdded
         End With
     End Sub
@@ -303,10 +323,10 @@ Public Class frmToolboxErrorList
 
         If Me.DataGrid_ErrorList.SelectedRows.Count = 1 Then
             ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedRows(0).Index).Cells(0).Value
-            lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedRows(0).Index)
+            lrModelError = Me.DataGrid_ErrorList.SelectedRows(0).DataBoundItem
         ElseIf Me.DataGrid_ErrorList.SelectedCells.Count = 1 Then
             ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex).Cells(0).Value
-            lrModelError = Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex)
+            lrModelError = Me.DataGrid_ErrorList.CurrentRow.DataBoundItem
         Else
             ziSelectedErrorNumber = 0
         End If
@@ -322,7 +342,7 @@ Public Class frmToolboxErrorList
             If lrPropertyGridForm IsNot Nothing Then
                 Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                 lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
                     Dim lrModelElementInstance As FBM.ModelObject = Nothing
                     Dim lrPage As New FBM.Page
                     Select Case lrModelError.ModelObject.ConceptType
@@ -343,17 +363,38 @@ Public Class frmToolboxErrorList
                 End If
             End If
 
+#Region "Verbalisation"
+            Dim lrORMToolboxVerbalisation As frmToolboxORMVerbalisation
+            lrORMToolboxVerbalisation = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
+
+            If lrORMToolboxVerbalisation IsNot Nothing Then
+
+                Select Case lrModelError.ErrorId
+                    Case Is = pcenumModelErrors.RDSRelationsWithMismatchedOriginAndDestinationColumnCount
+                        Dim lrRelation As RDS.Relation = lrModelError.CMMLModelElement
+                        Call lrORMToolboxVerbalisation.VerbaliseRelation(lrRelation.ResponsibleFactType, lrRelation, False)
+                    Case Else
+
+                End Select
+
+            End If
+#End Region
+
         End If
         '==========================================================================================================
 
 
     End Sub
 
-    Private Sub zrModel_ModelErrorAdded() Handles zrModel.ModelErrorAdded
+    'Private Sub zrModel_ModelErrorAdded() Handles zrModel.ModelErrorAdded
+
+    'End Sub
+
+    Private Sub zrModel_ModelErrorAdded(ByRef abUpdateErrorList As Boolean) Handles zrModel.ModelErrorAdded
 
         If Me.IsDisposed Then Exit Sub
 
-        Call Me.UpdateErrorList()
+        If abUpdateErrorList Then Call Me.UpdateErrorList()
 
     End Sub
 
@@ -378,7 +419,7 @@ Public Class frmToolboxErrorList
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
 
@@ -448,7 +489,7 @@ Public Class frmToolboxErrorList
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -467,7 +508,70 @@ Public Class frmToolboxErrorList
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemApplyFix_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemApplyFix.Click
+
+        Try
+            With New WaitCursor
+                Dim laiFixType As New List(Of pcenumModelFixType)
+                laiFixType.Add(Me.ToolStripMenuItemApplyFix.Tag.FixType)
+                Call prApplication.WorkingModel.FixErrors(laiFixType, Me.ToolStripMenuItemApplyFix.Tag.ModelElement)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+    Private Sub ShowInDiagramSpyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ShowInDiagramSpyToolStripMenuItem.Click
+
+        Try
+            Dim lrModelError As FBM.ModelError = Nothing
+
+            If Me.DataGrid_ErrorList.SelectedRows.Count = 1 Then
+                ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedRows(0).Index).Cells(0).Value
+                lrModelError = Me.DataGrid_ErrorList.SelectedRows(0).DataBoundItem 'Me.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedRows(0).Index)
+            ElseIf Me.DataGrid_ErrorList.SelectedCells.Count = 1 Then
+                ziSelectedErrorNumber = Me.DataGrid_ErrorList.Rows(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex).Cells(0).Value
+                lrModelError = Me.DataGrid_ErrorList.CurrentRow.DataBoundItem '.zrModel.ModelError(Me.DataGrid_ErrorList.SelectedCells(0).RowIndex)
+            Else
+                ziSelectedErrorNumber = 0
+            End If
+
+            '==========================================================================================================
+            If lrModelError IsNot Nothing Then
+
+                Select Case lrModelError.ErrorId
+                    Case pcenumModelErrors.RDSTableWithSimpleReferenceSchemeButMultiplePrimaryKeyColumns,
+                         pcenumModelErrors.RDSRelationsWithMismatchedOriginAndDestinationColumnCount
+
+                        Dim lrTable = lrModelError.ModelObject.getCorrespondingRDSTable()
+                        Call frmMain.LoadERDDiagramSpy(lrTable)
+                    Case Else
+                        Dim lrDiagramSpyPage As New FBM.DiagramSpyPage(Me.zrModel, "123", "Diagram Spy", pcenumLanguage.ORMModel)
+                        Call frmMain.LoadDiagramSpy(lrDiagramSpyPage, lrModelError.ModelObject, Control.ModifierKeys = Keys.Control)
+
+                End Select
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
         End Try
 
     End Sub

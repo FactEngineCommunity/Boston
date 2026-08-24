@@ -1,6 +1,6 @@
-﻿Imports System.Reflection
+﻿Imports DynamicClassLibrary.ClassFactory
+Imports System.Reflection
 Imports System.Runtime.CompilerServices
-Imports DynamicClassLibrary.Factory
 
 Namespace ORMQL
 
@@ -613,7 +613,7 @@ Namespace ORMQL
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -689,7 +689,7 @@ Namespace ORMQL
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -780,7 +780,7 @@ Namespace ORMQL
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -826,7 +826,7 @@ Namespace ORMQL
 
                 Call lrModelElement.removeInstance(lrRemoveInstanceStatement.VALUE)
 
-                If Me.Model.StoreAsXML Then Me.Model.Save()
+                'If Me.Model.StoreAsXML Then Me.Model.Save() '20250825-VM-Commented out. Was taking a long time for the SSO model (ESA).
 
                 Return True
 
@@ -836,7 +836,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -872,7 +872,7 @@ Namespace ORMQL
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -923,7 +923,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -978,7 +978,7 @@ Namespace ORMQL
                 Dim lrORMQlREcordset As New ORMQL.Recordset
 
                 lrORMQlREcordset.Facts = larFact
-                lrORMQlREcordset.Columns = lrselectStatement.COLUMNNAMESTR
+                lrORMQlREcordset.ColumnNames = lrselectStatement.COLUMNNAMESTR
 
                 Return lrORMQlREcordset
 
@@ -988,7 +988,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New ORMQL.Recordset
             End Try
@@ -1008,382 +1008,350 @@ Namespace ORMQL
 
             Try
 
-                    '---------------------------------------------------------------------------------
-                    'Create a DynamicClass within the Factor, to store the ParseTreeTokens as they
-                    '  are collected from the ParseText
-                    '---------------------------------------------------------------------------------
-                    Dim lrFactList As New List(Of FBM.Fact)
-                    Dim larFactList As New List(Of FBM.FactInstance)
-                    Dim lrRoleData As FBM.FactData
-                    Dim lsSelectType As String = ""
-                    Dim lrPage As FBM.Page
+                '---------------------------------------------------------------------------------
+                'Create a DynamicClass within the Factor, to store the ParseTreeTokens as they
+                '  are collected from the ParseText
+                '---------------------------------------------------------------------------------
+                Dim lrFactList As New List(Of FBM.Fact)
+                Dim larFactList As New List(Of FBM.FactInstance)
+                Dim lrRoleData As FBM.FactData
+                Dim lsSelectType As String = ""
+                Dim lrPage As FBM.Page
 
-                    '=============================================================
-                    Dim lrselectStatement As ORMQL.SelectStatement
-                    lrselectStatement = prApplication.ORMQL.SelectStatement
+                '=============================================================
+                Dim lrselectStatement As ORMQL.SelectStatement
+                lrselectStatement = prApplication.ORMQL.SelectStatement
 
-                    lrselectStatement.COLUMNLIST = New List(Of Object)
-                    lrselectStatement.KEYWDDISTINCT = New Object
-                    lrselectStatement.COLUMNNAMESTR = New List(Of String)
-                    lrselectStatement.MODELID = Nothing
-                    lrselectStatement.USERTABLENAME = Nothing
-                    lrselectStatement.PAGENAME = Nothing
-                    lrselectStatement.WHERESTMT = New Object
+                lrselectStatement.COLUMNLIST = New List(Of Object)
+                lrselectStatement.KEYWDDISTINCT = New Object
+                lrselectStatement.COLUMNNAMESTR = New List(Of String)
+                lrselectStatement.MODELID = Nothing
+                lrselectStatement.USERTABLENAME = Nothing
+                lrselectStatement.PAGENAME = Nothing
+                lrselectStatement.WHERESTMT = New Object
 
-                    '----------------------------------
-                    'Get the Tokens from the ParseTree
-                    '----------------------------------
-                    Call Me.GetParseTreeTokensReflection(lrselectStatement, Me.Parsetree.Nodes(0))
-                    '======================================================================
+                '----------------------------------
+                'Get the Tokens from the ParseTree
+                '----------------------------------
+                Call Me.GetParseTreeTokensReflection(lrselectStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
 
-                    ''-------------------------
-                    ''Create the DynamicObject
-                    ''-------------------------
-                    'Dim lrSelectStatement As New Object
-                    'lrSelectStatement = prApplication.ORMQL.SelectStatement
-
-                    'lrSelectStatement.COLUMNLIST.CLear()
-                    'lrSelectStatement.KEYWDDISTINCT = New Object
-                    'lrSelectStatement.COLUMNNAMESTR.Clear()
-                    'lrSelectStatement.MODELID.Clear()
-                    'lrSelectStatement.USERTABLENAME.Clear()
-                    'lrSelectStatement.PAGENAME.Clear()
-                    'lrSelectStatement.WHERESTMT = New Object
-
-                    ''----------------------------------
-                    ''Get the Tokens from the ParseTree
-                    ''----------------------------------
-
-                    'Call Me.GetParseTreeTokens(lrSelectStatement, Me.Parsetree.Nodes(0))
-
-                    '-------------------------------------------------------------
-                    'Check if the Select query is targeted at a particular Model
-                    '-------------------------------------------------------------
-                    If lrselectStatement.MODELID IsNot Nothing Then
-                        If (String.Compare(lrselectStatement.MODELID, Me.Model.ModelId)) = 0 Then
-                            '-------------------------------------------------------------
-                            'User has elected to search the current model, so do nothing
-                            '-------------------------------------------------------------
-                        Else
-                            '-----------------------------------------
-                            'Send the query to the appropriate Model
-                            '-----------------------------------------
-                            Dim lsModelId As String = lrselectStatement.MODELID
-                            Dim lrModel As FBM.Model '(pcenumLanguage.ORMModel, "", lsModelId)
-                            lrModel = prApplication.Models.Find(Function(x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
-
-                            If IsSomething(lrModel) Then
-                                Dim lrReturnObject As New Object
-                                lrReturnObject = lrModel.ORMQL.ProcessORMQLStatement(asORMQLStatement)
-                                Return lrReturnObject
-                            End If
-                        End If
-                    End If
-
-
-                    '----------------------------------------------------------------
-                    'Check to see if there are any Parse Errors in the ORMQL Statment
-                    '----------------------------------------------------------------
-                    If Me.Parsetree.Errors.Count > 0 Then
-                        Dim lr_error As TinyPG.ParseError
-                        For Each lr_error In Me.Parsetree.Errors
-                            Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: " & lr_error.Message)
-                        Next
-                        Return False
-                        Exit Function
-                    End If
-
-                    '---------------------------------------------------------
-                    'Find the FactType that the SELECT statement is for.
-                    '---------------------------------------------------------
-                    If lrselectStatement.PAGENAME Is Nothing Then
-                        'lrFactType = New FBM.FactType(Me.Model, lrSelectStatement.USERTABLENAME(0).ToString, False)
-                        '20200504-VM-Faster as below. Remove above and comment below if all okay after a period of time
-                        lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrselectStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
+                '-------------------------------------------------------------
+                'Check if the Select query is targeted at a particular Model
+                '-------------------------------------------------------------
+                If lrselectStatement.MODELID IsNot Nothing Then
+                    If (String.Compare(lrselectStatement.MODELID, Me.Model.ModelId)) = 0 Then
+                        '-------------------------------------------------------------
+                        'User has elected to search the current model, so do nothing
+                        '-------------------------------------------------------------
                     Else
-                        lrPage = Me.Model.Page.Find(Function(x) x.Name = lrselectStatement.PAGENAME)
-                        'lrFactType = New FBM.FactTypeInstance(Me.Model, lrPage, pcenumLanguage.ORMModel, lrSelectStatement.USERTABLENAME(0).ToString, True)
-                        '20200504-VM-Faster as below. Remove above and comment below if all okay after a period of time
-                        lrFactType = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrselectStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
-                    End If
-
-                    If lrFactType Is Nothing Then
-                        Dim lsInterimMessage As String
-                        lsInterimMessage = "Cannot find Fact Type Instance, '" & lrselectStatement.USERTABLENAME
-                        If lrselectStatement.PAGENAME IsNot Nothing Then
-                            lsInterimMessage &= "', on Page, '" & lrselectStatement.PAGENAME & "'."
-                        End If
-                        Throw New Exception(lsInterimMessage)
-                    End If
-
-                    If Not lrFactType.ExistsRoleNameForEveryRole Then
-                        Throw New Exception("Error: The FactType, '" & lrFactType.Name & "', must have a RoleName for each Role before creating a SELECT statement.")
-                    End If
-
-                    If lrFactType Is Nothing Then
-                        'Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrSelectStatement.USERTABLENAME(0).ToString)
-                        Dim lr_error As New TinyPG.ParseError("Error: Can't find FactType with Name: " & lrselectStatement.USERTABLENAME, 101, Nothing)
-                        Me.Parsetree.Errors.Add(lr_error)
-                        Return Me.Parsetree.Errors
-                        Exit Function
-                    End If
-
-                    ''-------------------------
-                    ''Create the DynamicObject
-                    ''-------------------------
-                    'Dim lrWhereClauseTree As Object = prApplication.ORMQL.WhereClauseTree
-                    'lrWhereClauseTree.COMPARISON.Clear()
-
-                    '=============================================================                
-                    Dim lrWhereClauseTree = New ORMQL.WhereClauseTree
-
-                    '----------------------------------
-                    'Get the Tokens from the ParseTree
-                    '----------------------------------
-                    Call Me.GetParseTreeTokensReflection(lrWhereClauseTree, Me.Parsetree.Nodes(0))
-                    '======================================================================
-
-
-                    '=============================================
-                    'Process the Where Clause (if there is one)
-                    '=============================================
-                    If lrselectStatement.WHERESTMT.GetType Is GetType(Object) Then
-                        '----------------------
-                        'No WHERECLAUSE found
-                        '  Retrieve all the Facts from the FactType
                         '-----------------------------------------
-                        Select Case lrFactType.GetType.ToString
-                            Case Is = GetType(FBM.FactType).ToString
-                                lrFactList = lrFactType.Fact
-                            Case Is = GetType(FBM.FactTypeInstance).ToString
-                                Dim lrReturnFactTypeInstance As FBM.FactTypeInstance = lrFactType
-                                'lrReturnFactTypeInstance = lrFactType
-                                larFactList = lrReturnFactTypeInstance.Fact
-                                For Each lrReturnFactInstance In larFactList
-                                    lrFactList.Add(lrReturnFactInstance)
-                                Next
-                        End Select
+                        'Send the query to the appropriate Model
+                        '-----------------------------------------
+                        Dim lsModelId As String = lrselectStatement.MODELID
+                        Dim lrModel As FBM.Model '(pcenumLanguage.ORMModel, "", lsModelId)
+                        lrModel = prApplication.Models.Find(Function(x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
 
-                        '==================================================================
-                        '20200504-VM-Was formerly the below which did not return the actual Facts.
-                        'This might have been because they would otherwise get accidentally modified. I can't remember why.
-                        'If the above (returning the actual facts) does not work, consider uncommenting out the below.
-                        'lrFactList = lrFactType.CloneFacts
-                    Else
-                        '-------------------------------------
-                        'The ORMQL Statement has a WHERESTMT
-                        '-------------------------------------
-                        lrWhereClauseTree.COMPARISON.Clear()
-                        Call Me.GetParseTreeTokensReflection(lrWhereClauseTree, lrselectStatement.WHERESTMT) 'Me.parsetree.Nodes(0))
-
-                        '-----------------------------------------------------------------------------
-                        'Create a FactPredicate. Used for Lambda search on the FactType.Fact
-                        '  to retrieve the set of Facts that match the Predicates of the WHERESTMT
-                        '-----------------------------------------------------------------------------
-                        Dim lrFactPredicate As New FBM.FactPredicate
-
-                        '-------------------------------
-                        'Get the COMPARISON predicates
-                        '-------------------------------                    
-                        For Each lrComparison In lrWhereClauseTree.COMPARISON
-                            lrCustomClass = lrComparison
-
-                            lrSerializer = New System.Xml.Serialization.XmlSerializer(lrCustomClass.GetType())
-                            xml = New XDocument
-
-                            lrWriter = xml.CreateWriter
-                            lrSerializer.Serialize(lrWriter, lrCustomClass)
-                            lrWriter.Close()
-
-                            Dim lasColumnName As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Token>
-                                                                            Where p.@Type = "WHERECLAUSECOLUMNNAMESTR"
-                                                                            Select p.<Text>.Value
-                                                                        %>
-                                                            </Comparison>
-
-                            lsColumnName = lasColumnName.Value
-
-                            Dim lrDataValue As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
-                                                                          Where p.@Type = "VALUE"
-                                                                          Select p.<Text>.Value
-                                                                      %>
-                                                          </Comparison>
-
-                            Dim lsDataValue = lrDataValue.Value
-
-                            lrRoleData = New FBM.FactData(New FBM.Role(lrFactType, lsColumnName, True), New FBM.Concept(lsDataValue))
-
-                            lrFactPredicate.data.Add(lrRoleData)
-                        Next
-
-                        '--------------------------------------------------------------------
-                        'Retrieve all the Facts from the FactType that match the predicate.
-                        '--------------------------------------------------------------------
-                        Select Case lrFactType.GetType.ToString
-                            Case Is = GetType(FBM.FactType).ToString
-                                lrFactList = lrFactType.Fact.FindAll(AddressOf lrFactPredicate.Equals)
-                            Case Is = GetType(FBM.FactTypeInstance).ToString
-                                Dim lrReturnFactTypeInstance As FBM.FactTypeInstance = lrFactType
-                                'lrReturnFactTypeInstance = lrFactType 'As above to make faster
-                                larFactList = lrReturnFactTypeInstance.Fact.FindAll(AddressOf lrFactPredicate.Equals)
-                                Dim lrReturnFactInstance As FBM.FactInstance
-                                For Each lrReturnFactInstance In larFactList
-                                    lrFactList.Add(lrReturnFactInstance)
-                                Next
-                        End Select
-
-                    End If 'The ORMQL Statement has a WHERESTMT
-
-                    '=============================================================
-                    'If KEYWDDISTINCT then return only the distinct set of Facts
-                    '=============================================================
-                    If lrselectStatement.KEYWDDISTINCT.GetType Is GetType(Object) Then
-                        '----------------------
-                        'No DISTINCT required
-                        '----------------------
-                    Else
-                        '---------------------------------------
-                        'Return only the distinct set of Facts
-                        '---------------------------------------
-                        Dim larReturnDictionarySet As New Dictionary(Of String, String)
-                        Dim lsKey As String = ""
-
-                        For Each lrFact In lrFactList.ToArray
-                            '-----------------------------------
-                            'Create the key for the Dictionary
-                            '-----------------------------------
-                            lsKey = lrFact.EnumerateDataAsKey(lrselectStatement.COLUMNNAMESTR)
-
-                            If larReturnDictionarySet.ContainsKey(lsKey) Then
-                                lrFactList.Remove(lrFact)
-                            Else
-                                larReturnDictionarySet.Add(lsKey, lsKey)
-                            End If
-                        Next
-
+                        If lrModel IsNot Nothing Then
+                            Dim lrReturnObject As New Object
+                            lrReturnObject = lrModel.ORMQL.ProcessORMQLStatement(asORMQLStatement)
+                            Return lrReturnObject
+                        End If
                     End If
+                End If
 
 
-                    '-----------------------------------------------------------
-                    'Construct the DictionarySet for the Facts in the FactList
-                    '-----------------------------------------------------------
+                '----------------------------------------------------------------
+                'Check to see if there are any Parse Errors in the ORMQL Statment
+                '----------------------------------------------------------------
+                If Me.Parsetree.Errors.Count > 0 Then
+                    Dim lr_error As TinyPG.ParseError
+                    For Each lr_error In Me.Parsetree.Errors
+                        Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: " & lr_error.Message)
+                    Next
+                    Return False
+                    Exit Function
+                End If
 
-                    '-------------------------------------------------------------------------------------------
-                    'Get the type of SELECT type for each column. Can be either, Attribute, Count(*), or *
-                    '-------------------------------------------------------------------------------------------                
-                    For Each lrColumn In lrselectStatement.COLUMNLIST
+                '---------------------------------------------------------
+                'Find the FactType that the SELECT statement is for.
+                '---------------------------------------------------------
+                If lrselectStatement.PAGENAME Is Nothing Then
+                    lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrselectStatement.USERTABLENAME)
+                Else
+                    lrPage = Me.Model.Page.Find(Function(x) x.Name = lrselectStatement.PAGENAME)
+                    If lrPage Is Nothing Then Throw New Exception($"Page,{lrselectStatement.PAGENAME} , does not exist in the Model")
+                    lrFactType = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrselectStatement.USERTABLENAME)
+                End If
 
-                        'MsgBox(Boston.IsSerializable(customClass).ToString)
-                        Dim serializer As New System.Xml.Serialization.XmlSerializer(lrColumn.GetType())
-                        '
+
+                If lrFactType Is Nothing Then
+                    Dim lsInterimMessage As String
+                    lsInterimMessage = "Cannot find Fact Type Instance, '" & lrselectStatement.USERTABLENAME
+                    If lrselectStatement.PAGENAME IsNot Nothing Then
+                        lsInterimMessage &= "', on Page, '" & lrselectStatement.PAGENAME & "'."
+                    End If
+                    Throw New Exception(lsInterimMessage)
+                End If
+
+
+                If Not lrFactType.ExistsRoleNameForEveryRole Then
+                    Throw New Exception("Error: The FactType, '" & lrFactType.Name & "', must have a RoleName for each Role before creating a SELECT statement.")
+                End If
+
+
+                If lrFactType Is Nothing Then
+                    'Throw New ApplicationException("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrSelectStatement.USERTABLENAME(0).ToString)
+                    Dim lr_error As New TinyPG.ParseError("Error: Can't find FactType with Name: " & lrselectStatement.USERTABLENAME, 101, Nothing)
+                    Me.Parsetree.Errors.Add(lr_error)
+                    Return Me.Parsetree.Errors
+                    Exit Function
+                End If
+
+                '=============================================================                
+                Dim lrWhereClauseTree = New ORMQL.WhereClauseTree
+
+                '----------------------------------
+                'Get the Tokens from the ParseTree
+                '----------------------------------
+                Call Me.GetParseTreeTokensReflection(lrWhereClauseTree, Me.Parsetree.Nodes(0))
+                '======================================================================
+
+                '=============================================
+                'Process the Where Clause (if there is one)
+                '=============================================
+                If lrselectStatement.WHERESTMT.GetType Is GetType(Object) Then
+                    '----------------------
+                    'No WHERECLAUSE found
+                    '  Retrieve all the Facts from the FactType
+                    '-----------------------------------------
+                    Select Case lrFactType.GetType.ToString
+                        Case Is = GetType(FBM.FactType).ToString
+                            lrFactList = lrFactType.Fact
+                        Case Is = GetType(FBM.FactTypeInstance).ToString
+                            Dim lrReturnFactTypeInstance As FBM.FactTypeInstance = lrFactType
+                            'lrReturnFactTypeInstance = lrFactType
+                            larFactList = lrReturnFactTypeInstance.Fact
+                            For Each lrReturnFactInstance In larFactList
+                                lrFactList.Add(lrReturnFactInstance)
+                            Next
+                    End Select
+                Else
+                    '-------------------------------------
+                    'The ORMQL Statement has a WHERESTMT
+                    '-------------------------------------
+                    lrWhereClauseTree.COMPARISON.Clear()
+
+                    Call Me.GetParseTreeTokensReflection(lrWhereClauseTree, lrselectStatement.WHERESTMT) 'Me.parsetree.Nodes(0))
+
+                    '-----------------------------------------------------------------------------
+                    'Create a FactPredicate. Used for Lambda search on the FactType.Fact
+                    '  to retrieve the set of Facts that match the Predicates of the WHERESTMT
+                    '-----------------------------------------------------------------------------
+                    Dim lrFactPredicate As New FBM.FactPredicate
+
+                    '-------------------------------
+                    'Get the COMPARISON predicates
+                    '-------------------------------                    
+                    For Each lrComparison In lrWhereClauseTree.COMPARISON
+                        lrCustomClass = lrComparison
+
+                        lrSerializer = New System.Xml.Serialization.XmlSerializer(lrCustomClass.GetType())
                         xml = New XDocument
 
-                        Dim writer As System.Xml.XmlWriter = xml.CreateWriter
-                        serializer.Serialize(writer, lrColumn)
-                        writer.Close()
+                        lrWriter = xml.CreateWriter
+                        lrSerializer.Serialize(lrWriter, lrCustomClass)
+                        lrWriter.Close()
 
-                        Dim lasSelectType As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
-                                                                        Select p.@Type
+                        Dim lasColumnName As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                                                                        Where p.@Type = "WHERECLAUSECOLUMNNAMESTR"
+                                                                        Select p.<Text>.Value
                                                                     %>
                                                         </Comparison>
 
-                        lsSelectType = lasSelectType.Value
+                        lsColumnName = lasColumnName.Value
 
-                        Select Case lsSelectType
-                            Case Is = "KEYWDCOUNTSTAR"
-                                lrFact = New FBM.Fact()
+                        Dim lrDataValue As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                                                                      Where p.@Type = "VALUE"
+                                                                      Select p.<Text>.Value
+                                                                  %>
+                                                      </Comparison>
 
-                                lrFact.DictionarySet.Add("Count", lrFactList.Count)
-                                lrFact.Symbol = "Count"
+                        Dim lsDataValue = lrDataValue.Value
 
-                                Dim lrDummyFactType As New FBM.FactType(Me.Model, "DummyFactType", True)
-                                lrRoleData = New FBM.FactData(New FBM.Role(lrDummyFactType, "Count", True), New FBM.Concept("Count"))
-                                lrRoleData.setData(lrFactList.Count, pcenumConceptType.Value, False)
+                        lrRoleData = New FBM.FactData(New FBM.Role(lrFactType, lsColumnName, True), New FBM.Concept(lsDataValue))
 
-                                lrFact.Data.Add(lrRoleData)
-
-                                lrFactList = New List(Of FBM.Fact)
-                                lrFactList.Add(lrFact)
-                                lrselectStatement.COLUMNNAMESTR.Add("Count")
-                                Exit For
-                            Case Is = "STAR"
-                                If lrFactList.Count > 0 Then
-                                    lrselectStatement.COLUMNNAMESTR.Clear()
-                                    If lrFactList(0).GetType Is GetType(FBM.Fact) Then
-                                        For Each lrRoleData In lrFactList(0).Data
-                                            lrselectStatement.COLUMNNAMESTR.Add(lrRoleData.Role.Name)
-                                        Next
-                                    Else
-                                        Dim lrFactInstance As New FBM.FactInstance
-                                        Dim lrFactDataInstance As FBM.FactDataInstance
-                                        lrFactInstance = lrFactList(0)
-                                        For Each lrFactDataInstance In lrFactInstance.Data
-                                            lrselectStatement.COLUMNNAMESTR.Add(lrFactDataInstance.Role.Name)
-                                        Next
-                                    End If
-                                End If
-                                For Each lrFact In lrFactList
-                                    For Each lrRoleData In lrFact.Data
-                                        If StrComp(lrRoleData.Role.Name, "") = 0 Then
-                                            If Not lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Id) Then
-                                                lrFact.DictionarySet.Add(lrRoleData.Role.Id, lrRoleData.Data)
-                                            End If
-                                        Else
-                                            If Not lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Name) Then
-                                                lrFact.DictionarySet.Add(lrRoleData.Role.Name, lrRoleData.Data)
-                                            End If
-                                        End If
-                                    Next
-                                Next
-                            Case Is = "COLUMNNAMESTR"
-
-                            Case Is = "COLUMNNAMESTRCOMMACOLUMNNAME"
-                                If lrFactList.Count > 0 Then
-                                    'lrSelectStatement.COLUMNNAMESTR.Clear()
-                                    'For Each lrRoleData In lrFactList(0).Data
-                                    '    lrSelectStatement.COLUMNNAMESTR.Add(lrRoleData.Role.Name)
-                                    'Next
-                                End If
-                                For Each lrFact In lrFactList
-                                    For Each lrRoleData In lrFact.Data
-                                        If StrComp(lrRoleData.Role.Name, "") = 0 Then
-                                            If lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Id) Then
-                                            Else
-                                                lrFact.DictionarySet.Add(lrRoleData.Role.Id, lrRoleData.Data)
-                                            End If
-                                        Else
-                                            If lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Name) Then
-                                            Else
-                                                lrFact.DictionarySet.Add(lrRoleData.Role.Name, lrRoleData.Data)
-                                            End If
-                                        End If
-                                    Next
-                                Next
-                        End Select
-
+                        lrFactPredicate.data.Add(lrRoleData)
                     Next
 
-                    Dim lrORMQlREcordset As New ORMQL.Recordset
+                    '--------------------------------------------------------------------
+                    'Retrieve all the Facts from the FactType that match the predicate.
+                    '--------------------------------------------------------------------
+                    Select Case lrFactType.GetType.ToString
+                        Case Is = GetType(FBM.FactType).ToString
+                            lrFactList = lrFactType.Fact.FindAll(AddressOf lrFactPredicate.Equals)
+                        Case Is = GetType(FBM.FactTypeInstance).ToString
+                            Dim lrReturnFactTypeInstance As FBM.FactTypeInstance = lrFactType
+                            'lrReturnFactTypeInstance = lrFactType 'As above to make faster
+                            larFactList = lrReturnFactTypeInstance.Fact.FindAll(AddressOf lrFactPredicate.Equals)
+                            Dim lrReturnFactInstance As FBM.FactInstance
+                            For Each lrReturnFactInstance In larFactList
+                                lrFactList.Add(lrReturnFactInstance)
+                            Next
+                    End Select
 
-                    lrORMQlREcordset.Facts = lrFactList
-                    lrORMQlREcordset.Columns = lrselectStatement.COLUMNNAMESTR
+                End If 'The ORMQL Statement has a WHERESTMT
+
+                '=============================================================
+                'If KEYWDDISTINCT then return only the distinct set of Facts
+                '=============================================================
+                If lrselectStatement.KEYWDDISTINCT.GetType Is GetType(Object) Then
+                    '----------------------
+                    'No DISTINCT required
+                    '----------------------
+                Else
+                    '---------------------------------------
+                    'Return only the distinct set of Facts
+                    '---------------------------------------
+                    Dim larReturnDictionarySet As New Dictionary(Of String, String)
+                    Dim lsKey As String = ""
+
+                    For Each lrFact In lrFactList.ToArray
+                        '-----------------------------------
+                        'Create the key for the Dictionary
+                        '-----------------------------------
+                        lsKey = lrFact.EnumerateDataAsKey(lrselectStatement.COLUMNNAMESTR)
+
+                        If larReturnDictionarySet.ContainsKey(lsKey) Then
+                            lrFactList.Remove(lrFact)
+                        Else
+                            larReturnDictionarySet.Add(lsKey, lsKey)
+                        End If
+                    Next
+
+                End If
 
 
-                    Return lrORMQlREcordset
+                '-----------------------------------------------------------
+                'Construct the DictionarySet for the Facts in the FactList
+                '-----------------------------------------------------------
 
-                Catch ex As Exception
-                    Dim lsMessage1 As String
-                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                '-------------------------------------------------------------------------------------------
+                'Get the type of SELECT type for each column. Can be either, Attribute, Count(*), or *
+                '-------------------------------------------------------------------------------------------                
+                For Each lrColumn In lrselectStatement.COLUMNLIST
 
-                    lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                    lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                    'MsgBox(Boston.IsSerializable(customClass).ToString)
+                    Dim serializer As New System.Xml.Serialization.XmlSerializer(lrColumn.GetType())
+                    '
+                    xml = New XDocument
 
-                    If Not abIgnoreErrorMessage Then
-                        prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-                    End If
+                    Dim writer As System.Xml.XmlWriter = xml.CreateWriter
+                    serializer.Serialize(writer, lrColumn)
+                    writer.Close()
 
-                    Return New ORMQL.Recordset
-                End Try
+                    Dim lasSelectType As XElement = <Comparison><%= From p In xml.<ParseNode>.<Nodes>.<ParseNode>.<Nodes>.<ParseNode>.<Token>
+                                                                    Select p.@Type
+                                                                %>
+                                                    </Comparison>
+
+                    lsSelectType = lasSelectType.Value
+
+                    Select Case lsSelectType
+                        Case Is = "KEYWDCOUNTSTAR"
+                            lrFact = New FBM.Fact()
+
+                            lrFact.DictionarySet.Add("Count", lrFactList.Count)
+                            lrFact.Symbol = "Count"
+
+                            Dim lrDummyFactType As New FBM.FactType(Me.Model, "DummyFactType", True)
+                            lrRoleData = New FBM.FactData(New FBM.Role(lrDummyFactType, "Count", True), New FBM.Concept("Count"))
+                            lrRoleData.setData(lrFactList.Count, pcenumConceptType.Value, False)
+
+                            lrFact.Data.Add(lrRoleData)
+
+                            lrFactList = New List(Of FBM.Fact)
+                            lrFactList.Add(lrFact)
+                            lrselectStatement.COLUMNNAMESTR.Add("Count")
+                            Exit For
+                        Case Is = "STAR"
+                            If lrFactList.Count > 0 Then
+                                lrselectStatement.COLUMNNAMESTR.Clear()
+                                If lrFactList(0).GetType Is GetType(FBM.Fact) Then
+                                    For Each lrRoleData In lrFactList(0).Data
+                                        lrselectStatement.COLUMNNAMESTR.Add(lrRoleData.Role.Name)
+                                    Next
+                                Else
+                                    Dim lrFactInstance As New FBM.FactInstance
+                                    Dim lrFactDataInstance As FBM.FactDataInstance
+                                    lrFactInstance = lrFactList(0)
+                                    For Each lrFactDataInstance In lrFactInstance.Data
+                                        lrselectStatement.COLUMNNAMESTR.Add(lrFactDataInstance.Role.Name)
+                                    Next
+                                End If
+                            End If
+                            For Each lrFact In lrFactList
+                                For Each lrRoleData In lrFact.Data
+                                    If StrComp(lrRoleData.Role.Name, "") = 0 Then
+                                        If Not lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Id) Then
+                                            lrFact.DictionarySet.Add(lrRoleData.Role.Id, lrRoleData.Data)
+                                        End If
+                                    Else
+                                        If Not lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Name) Then
+                                            lrFact.DictionarySet.Add(lrRoleData.Role.Name, lrRoleData.Data)
+                                        End If
+                                    End If
+                                Next
+                            Next
+                        Case Is = "COLUMNNAMESTR"
+
+                        Case Is = "COLUMNNAMESTRCOMMACOLUMNNAME"
+                            If lrFactList.Count > 0 Then
+                                'lrSelectStatement.COLUMNNAMESTR.Clear()
+                                'For Each lrRoleData In lrFactList(0).Data
+                                '    lrSelectStatement.COLUMNNAMESTR.Add(lrRoleData.Role.Name)
+                                'Next
+                            End If
+                            For Each lrFact In lrFactList
+                                For Each lrRoleData In lrFact.Data
+                                    If StrComp(lrRoleData.Role.Name, "") = 0 Then
+                                        If lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Id) Then
+                                        Else
+                                            lrFact.DictionarySet.Add(lrRoleData.Role.Id, lrRoleData.Data)
+                                        End If
+                                    Else
+                                        If lrFact.DictionarySet.Keys.Contains(lrRoleData.Role.Name) Then
+                                        Else
+                                            lrFact.DictionarySet.Add(lrRoleData.Role.Name, lrRoleData.Data)
+                                        End If
+                                    End If
+                                Next
+                            Next
+                    End Select
+
+                Next
+
+                Dim lrORMQlREcordset As New ORMQL.Recordset
+
+                lrORMQlREcordset.Facts = lrFactList
+                lrORMQlREcordset.ColumnNames = lrselectStatement.COLUMNNAMESTR
+
+                Return lrORMQlREcordset
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+
+                If Not abIgnoreErrorMessage Then
+                    prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                End If
+
+                Return New ORMQL.Recordset
+            End Try
+
 
         End Function
 
@@ -1509,7 +1477,7 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1589,12 +1557,243 @@ Namespace ORMQL
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
 
         End Function
+
+        Private Function ProcessUPSERTStatement(ByVal asORMQLStatement As String) As Object
+
+            Dim lrFact As New FBM.Fact
+            Dim lrFactType As FBM.FactType
+            Dim lsColumnName As String = ""
+
+            Try
+
+                '----------------------------------------------------------------------------------
+                'Create the UpSert Object
+                '  Use InsertStatement Object, as same syntax other than UPSERT instead of INSERT
+                '----------------------------------------------------------------------------------
+                '=============================================================
+                Dim lrinsertStatement As New ORMQL.InsertStatement
+                'lrinsertStatement = prApplication.ORMQL.insertStatement
+
+                lrinsertStatement.USERTABLENAME = Nothing
+                lrinsertStatement.PAGENAME = Nothing
+                lrinsertStatement.MODELID = Nothing
+                lrinsertStatement.COLUMNNAMESTR = New List(Of String)
+                lrinsertStatement.VALUE = New List(Of String)
+
+                '----------------------------------
+                'Get the Tokens from the ParseTree
+                '----------------------------------
+                Call Me.GetParseTreeTokensReflection(lrinsertStatement, Me.Parsetree.Nodes(0))
+                '======================================================================
+
+                If Me.Parsetree.Errors.Count > 0 Then
+                    Return Me.Parsetree.Errors
+                    Exit Function
+                End If
+
+                '-------------------------------------------------------------
+                'Check if the Select query is targeted at a particular Model
+                '-------------------------------------------------------------
+#Region "Particular Model Processsing"
+                If lrinsertStatement.MODELID IsNot Nothing Then
+                    If (String.Compare(lrinsertStatement.MODELID, Me.Model.ModelId)) = 0 Then
+                        '-------------------------------------------------------------
+                        'User has elected to search the current model, so do nothing
+                        '-------------------------------------------------------------
+                    Else
+                        Dim lsModelId As String = lrinsertStatement.MODELID
+                        Dim lrModel As FBM.Model '(pcenumLanguage.ORMModel, "", lsModelId)
+
+                        lrModel = prApplication.Models.Find(Function(x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
+
+                        If lrModel IsNot Nothing Then
+                            Dim lrReturnObject As New Object
+                            lrReturnObject = lrModel.ORMQL.ProcessORMQLStatement(asORMQLStatement)
+                            Return lrReturnObject
+                        Else
+                            Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Model with ModelId: '" & lsModelId & "'", 100, Nothing))
+                            Return Me.Parsetree.Errors
+                            Exit Function
+                        End If
+                    End If
+                End If
+#End Region
+
+                '---------------------------------------------------------
+                'Find the FactType that the INSERT INTO statement is for.
+                '---------------------------------------------------------                
+                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrinsertStatement.USERTABLENAME)
+
+                If lrFactType Is Nothing Then
+#Region "Error - No Fact Type of that name"
+                    Dim lrParseNode = New TinyPG.ParseNode()
+                    lrParseNode.Token = New TinyPG.Token(0, 0)
+                    Try
+                        Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: " & lrinsertStatement.USERTABLENAME, 100, lrParseNode))
+                    Catch ex As Exception
+                        Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: <Unknown>", 100, lrParseNode))
+                    End Try
+
+                    Return Me.Parsetree.Errors
+                    Exit Function
+#End Region
+                End If
+
+                Dim lrRole As FBM.Role
+
+#Region "See if Fact already Exists"
+                'Get the Roles that form the effective primary key of the FactType
+                Dim larRole = lrFactType.RoleGroup.FindAll(Function(x) x.HasInternalUniquenessConstraint).ToList
+
+                Dim lsSQLQuery As String = "SELECT * FROM " & lrinsertStatement.USERTABLENAME
+                lsSQLQuery.AppendLine(" WHERE ")
+                Dim liInd = 0
+                For Each lrRole In larRole
+                    If liInd > 0 Then lsSQLQuery.AppendString(" AND ")
+                    If lrinsertStatement.COLUMNNAMESTR.Contains(lrRole.Name) Then
+                        lsSQLQuery.AppendLine(lrRole.Name & " = '" & lrinsertStatement.VALUE(lrinsertStatement.COLUMNNAMESTR.IndexOf(lrRole.Name)) & "'")
+                    Else
+#Region "Invalid UPSERT statement"
+                        Dim lrParseNode = New TinyPG.ParseNode()
+                        lrParseNode.Token = New TinyPG.Token(0, 0)
+                        Try
+                            Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Role/ with Name: " & lrRole.Name & " in UPSERT statement for FactType, " & lrinsertStatement.USERTABLENAME, 100, lrParseNode))
+                        Catch ex As Exception
+                            Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: <Unknown>", 100, lrParseNode))
+                        End Try
+
+                        Return Me.Parsetree.Errors
+                        Exit Function
+#End Region
+                    End If
+                    liInd += 1
+                Next
+
+                Dim lrRecordset As ORMQL.Recordset = Me.ProcessORMQLStatement(lsSQLQuery)
+
+                If lrRecordset.Facts.Count > 0 Then
+
+                    liInd = 0
+                    Dim lsSQLStatement = "UPDATE " & lrinsertStatement.USERTABLENAME & " SET "
+                    For Each lsRoleName In lrinsertStatement.COLUMNNAMESTR.FindAll(Function(x) Not larRole.Select(Function(y) y.Name).Contains(x))
+                        'ORMQL only supports 1 RoleName in SET statement at this stage, so will have trouble if more than one. Error will be thrown
+                        lsSQLStatement.AppendLine(lsRoleName & " = '" & lrinsertStatement.VALUE(lrinsertStatement.COLUMNNAMESTR.IndexOf(lsRoleName)) & "'")
+                        liInd += 1
+                    Next
+                    lsSQLStatement.AppendLine(" WHERE ")
+                    liInd = 0
+                    For Each lsRoleName In larRole.Select(Function(x) x.Name)
+                        If liInd > 0 Then lsSQLStatement.AppendString(" AND ")
+                        lsSQLStatement.AppendLine(lsRoleName & " = '" & lrinsertStatement.VALUE(lrinsertStatement.COLUMNNAMESTR.IndexOf(lsRoleName)) & "'")
+                        liInd += 1
+                    Next
+
+                    Call Me.ProcessORMQLStatement(lsSQLStatement)
+
+                    Return True
+
+                End If
+#End Region
+
+                '---------------------------------------------
+                'Create the Fact, because it does not exist.
+                '---------------------------------------------
+                lrFact = New FBM.Fact(lrFactType, True)
+                liInd = 0
+                Dim lrFactData As FBM.FactData
+                Dim lrModelDictionaryEntry As New FBM.DictionaryEntry
+
+                For Each lsColumnName In lrinsertStatement.COLUMNNAMESTR
+                    'lrRole.Name = lsColumnName
+                    lrRole = lrFactType.RoleGroup.Find(Function(x) x.Name = lsColumnName) 'AddressOf lrRole.EqualsByName)
+
+                    If lrRole Is Nothing Then
+                        Throw New Exception("No Role found for RoleName: '" & lsColumnName & "'")
+                    End If
+
+                    Dim lrConcept As FBM.Concept = New FBM.Concept(Trim(lrinsertStatement.VALUE(liInd).ToString))
+
+                    '----------------------------------------------------------------------------------------
+                    'Link the FactData.Concept to the corresponding ModelDictionary.DictionaryEntry.Concept
+                    '----------------------------------------------------------------------------------------
+                    lrModelDictionaryEntry = New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.Value)
+
+                    lrModelDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrModelDictionaryEntry, True, True, False)
+
+                    lrFactData = New FBM.FactData(lrRole, lrModelDictionaryEntry.Concept, lrFact)
+
+                    lrFact.Data.Add(lrFactData)
+                    liInd += 1
+                Next
+                lrFact.makeDirty()
+                lrFactType.AddFact(lrFact)
+                lrFactType.isDirty = True
+
+                '---------------------------------------------------
+                'Check to see if the Fact is to be added to a Page
+                '---------------------------------------------------
+                If lrinsertStatement.PAGENAME IsNot Nothing Then
+                    '--------------
+                    'Get the Page
+                    '--------------
+                    Dim lrPage As FBM.Page
+                    lrPage = Me.Model.Page.Find(Function(x) x.Name = lrinsertStatement.PAGENAME)
+
+                    If lrPage IsNot Nothing Then
+                        '-----------------------------------------------------------
+                        'Find the FactTypeInstance to add the new FactInstance to.
+                        '-----------------------------------------------------------
+                        Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
+                        lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
+
+                        If lrFactTypeInstance IsNot Nothing Then
+                            Dim lrFactInstance As FBM.FactInstance
+                            lrFactTypeInstance.FactTable.TableShape.AddRow()
+
+                            lrFactInstance = lrPage.CreateFactInstance(lrFactTypeInstance, lrFact)
+
+                            '--------------------------------------------------
+                            'Add the new FactInstance to the FactTypeInstance
+                            '--------------------------------------------------
+                            lrFactTypeInstance.AddFactInstance(lrFactInstance)
+                            lrFactTypeInstance.isDirty = True
+
+                            lrFactTypeInstance.FactTable.ResortFactTable()
+
+                            lrPage.MakeDirty()
+
+                            Return lrFactInstance
+                            Exit Function
+                        Else
+                            Throw New Exception("No FactTypeInstance found for FactType.Name: " & lrFactType.Name & " on Page.Name: " & lrPage.Name)
+                        End If
+
+                    Else
+                        Throw New Exception("No Page found in the Model for :" & lrinsertStatement.PAGENAME(0))
+                    End If
+                Else
+                    Return lrFact
+                    Exit Function
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return Nothing
+            End Try
+
+        End Function
+
 
 
         Private Function ProcessINSERTStatement(ByVal asORMQLStatement As String) As Object
@@ -1604,27 +1803,8 @@ Namespace ORMQL
             Dim lsColumnName As String = ""
 
             Try
-
-                '-------------------------
-                'Create the DynamicObject
-                '-------------------------
-                'Dim lrInsertStatement As New Object
-                'lrInsertStatement = prApplication.ORMQL.InsertStatement
-
-                'lrInsertStatement.USERTABLENAME.Clear()
-                'lrInsertStatement.COLUMNNAMESTR.Clear()
-                'lrInsertStatement.PAGENAME.Clear()
-                'lrInsertStatement.MODELID.Clear()
-                'lrInsertStatement.VALUE.Clear()
-
-                ''----------------------------------
-                ''Get the Tokens from the ParseTree
-                ''----------------------------------
-                'Call Me.GetParseTreeTokens(lrInsertStatement, Me.Parsetree.Nodes(0))
-
                 '=============================================================
                 Dim lrinsertStatement As New ORMQL.InsertStatement
-                'lrinsertStatement = prApplication.ORMQL.insertStatement
 
                 lrinsertStatement.USERTABLENAME = Nothing
                 lrinsertStatement.PAGENAME = Nothing
@@ -1657,7 +1837,7 @@ Namespace ORMQL
 
                         lrModel = prApplication.Models.Find(Function(x) x.ModelId = lsModelId) 'AddressOf lrModel.Equals)
 
-                        If IsSomething(lrModel) Then
+                        If lrModel IsNot Nothing Then
                             Dim lrReturnObject As New Object
                             lrReturnObject = lrModel.ORMQL.ProcessORMQLStatement(asORMQLStatement)
                             Return lrReturnObject
@@ -1672,8 +1852,7 @@ Namespace ORMQL
                 '---------------------------------------------------------
                 'Find the FactType that the INSERT INTO statement is for.
                 '---------------------------------------------------------
-                'lrFactType = New FBM.FactType(Me.Model, lrInsertStatement.USERTABLENAME(0).ToString, False)
-                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrinsertStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
+                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrinsertStatement.USERTABLENAME)
 
                 If lrFactType Is Nothing Then
                     Dim lrParseNode = New TinyPG.ParseNode()
@@ -1733,14 +1912,14 @@ Namespace ORMQL
                     Dim lrPage As FBM.Page
                     lrPage = Me.Model.Page.Find(Function(x) x.Name = lrinsertStatement.PAGENAME)
 
-                    If IsSomething(lrPage) Then
+                    If lrPage IsNot Nothing Then
                         '-----------------------------------------------------------
                         'Find the FactTypeInstance to add the new FactInstance to.
                         '-----------------------------------------------------------
                         Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
                         lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
 
-                        If IsSomething(lrFactTypeInstance) Then
+                        If lrFactTypeInstance IsNot Nothing Then
                             Dim lrFactInstance As FBM.FactInstance
                             lrFactTypeInstance.FactTable.TableShape.AddRow()
 
@@ -1775,9 +1954,9 @@ Namespace ORMQL
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
-                Return Nothing
+                Return lsMessage
             End Try
 
 
@@ -1788,18 +1967,6 @@ Namespace ORMQL
             Dim lrFact As New FBM.Fact
             Dim lrFactType As FBM.FactType
             Dim lsColumnName As String = ""
-
-            'Dim lrAddFactStatement As New Object
-            'lrAddFactStatement = prApplication.ORMQL.AddFactStatement
-
-            'lrAddFactStatement.USERTABLENAME = ""
-            'lrAddFactStatement.VALUE = ""
-            'lrAddFactStatement.PAGENAME = ""
-
-            ''----------------------------------
-            ''Get the Tokens from the ParseTree
-            ''----------------------------------
-            'Call Me.GetParseTreeTokens(lrAddFactStatement, Me.Parsetree.Nodes(0))
 
             '=============================================================
             Dim lrAddFactStatement As ORMQL.AddFactStatement
@@ -1815,12 +1982,10 @@ Namespace ORMQL
             Call Me.GetParseTreeTokensReflection(lrAddFactStatement, Me.Parsetree.Nodes(0))
             '======================================================================
 
-            '========================================
-            '---------------------------------------------------------
+            '===========================================================            
             'Find the FactType that the ADD FACT statement is for.
             '---------------------------------------------------------
-            'lrFactType = New FBM.FactType(lrAddFactStatement.USERTABLENAME, True)
-            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrAddFactStatement.USERTABLENAME) 'AddressOf lrFactType.EqualsByName)
+            lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrAddFactStatement.USERTABLENAME)
 
             If lrFactType Is Nothing Then
                 Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: '" & lrAddFactStatement.USERTABLENAME & "' within the Model.", 100, Nothing))
@@ -1831,8 +1996,7 @@ Namespace ORMQL
             '-----------------
             'Create the Fact
             '-----------------
-            'lrFact = New FBM.Fact(lrAddFactStatement.VALUE, lrFactType)
-            lrFact = lrFactType.Fact.Find(Function(x) x.Id = lrAddFactStatement.VALUE) 'AddressOf lrFact.EqualsById)
+            lrFact = lrFactType.Fact.Find(Function(x) x.Id = lrAddFactStatement.VALUE)
 
             If lrFact Is Nothing Then
                 Dim lrNode As New TinyPG.ParseNode()
@@ -1848,10 +2012,10 @@ Namespace ORMQL
                 Dim lrPage As FBM.Page
                 lrPage = Me.Model.Page.Find(Function(x) x.Name = lrAddFactStatement.PAGENAME)
 
-                If IsSomething(lrPage) Then
+                If lrPage IsNot Nothing Then
                     Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
                     lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
-                    If IsSomething(lrFactTypeInstance) Then
+                    If lrFactTypeInstance IsNot Nothing Then
                         lrFactInstance = lrFactTypeInstance.AddFact(lrFact, False)
                         Return lrFactInstance
                     Else
@@ -2016,14 +2180,14 @@ Namespace ORMQL
                 '--------------
                 Dim lrPage As FBM.Page = Me.Model.Page.Find(Function(x) x.Name = lrDeleteStatement.PAGENAME)
 
-                If IsSomething(lrPage) Then
+                If lrPage IsNot Nothing Then
                     '---------------------------
                     'Find the FactTypeInstance 
                     '---------------------------
                     Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
                     lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
 
-                    If IsSomething(lrFactTypeInstance) Then
+                    If lrFactTypeInstance IsNot Nothing Then
                         Dim lrFactInstance As FBM.FactInstance
                         lrFactInstance = lrFact.CloneInstance(lrPage)
                         '20200710-VM-Was the following. Remove if all okay.
@@ -2141,14 +2305,14 @@ Namespace ORMQL
                 Dim lrPage As FBM.Page
                 lrPage = Me.Model.Page.Find(Function(x) x.Name = lrDeleteFactStatement.PAGENAME(0))
 
-                If IsSomething(lrPage) Then
+                If lrPage IsNot Nothing Then
                     '-----------------------------------------------------------
                     'Find the FactTypeInstance to delete the FactInstance from.
                     '-----------------------------------------------------------
                     Dim lrFactTypeInstance As FBM.FactTypeInstance '= lrFactType.CloneInstance(lrPage, False)
                     lrFactTypeInstance = lrPage.FactTypeInstance.Find(Function(x) x.Id = lrFactType.Id) 'AddressOf lrFactTypeInstance.Equals)
 
-                    If IsSomething(lrFactTypeInstance) Then
+                    If lrFactTypeInstance IsNot Nothing Then
                         Dim lrFactInstance As FBM.FactInstance
                         'lrFactInstance = lrFact.CloneInstance(lrPage)
                         lrFactInstance = lrFactTypeInstance.Fact.Find(Function(x) x.Id - lrFact.Id) 'AddressOf lrFactInstance.EqualsById)
@@ -2175,7 +2339,7 @@ Namespace ORMQL
             'Create the DynamicClass within the Factory
             '-------------------------------------------
             Dim lrClass As New tClass
-            lrClass.add_attribute(New tAttribute("USERTABLENAME", GetType(List(Of String))))
+            lrClass.add_attribute(New tAttribute("USERTABLENAME", GetType(List(Of String))), False)
 
 
             '-------------------------
@@ -2232,9 +2396,9 @@ Namespace ORMQL
             'Create the DynamicClass within the Factory
             '-------------------------------------------
             Dim lrClass As New tClass
-            lrClass.add_attribute(New tAttribute("USERTABLENAME", GetType(List(Of String))))
-            lrClass.add_attribute(New tAttribute("COLUMNNAME", GetType(List(Of String))))
-            lrClass.add_attribute(New tAttribute("VALUE", GetType(List(Of String))))
+            lrClass.add_attribute(New tAttribute("USERTABLENAME", GetType(List(Of String))), False)
+            lrClass.add_attribute(New tAttribute("COLUMNNAME", GetType(List(Of String))), False)
+            lrClass.add_attribute(New tAttribute("VALUE", GetType(List(Of String))), False)
 
             '-------------------------
             'Create the DynamicObject
@@ -2253,9 +2417,9 @@ Namespace ORMQL
             Dim lrDynamicClass As New tClass
             Dim lsAttributeName As String
             For Each lsAttributeName In lrParseValuesObject.COLUMNNAME
-                lrDynamicClass.add_attribute(New tAttribute(lsAttributeName, GetType(String)))
+                lrDynamicClass.add_attribute(New tAttribute(lsAttributeName, GetType(String)), False)
             Next
-            lrDynamicClass.add_attribute(New tAttribute("ConceptType", GetType(Integer)))
+            lrDynamicClass.add_attribute(New tAttribute("ConceptType", GetType(Integer)), False)
 
             lrDynamicObject = lrDynamicClass.clone
 
@@ -2281,69 +2445,6 @@ Namespace ORMQL
 
                     Return Me.processADDROLEStatement()
 
-                    ''-------------------------------------------
-                    ''Create the DynamicClass within the Factory
-                    ''-------------------------------------------
-                    'Dim lrClass As New DynamicClassLibrary.Factory.tClass
-                    'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("USERTABLENAME", GetType(String)))
-                    'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("VALUE", GetType(String)))
-                    'lrClass.add_attribute(New DynamicClassLibrary.Factory.tAttribute("PAGENAME", GetType(String)))
-
-                    ''-------------------------
-                    ''Create the DynamicObject
-                    ''-------------------------
-                    'Dim lr_object As New Object
-                    'lr_object = lrClass.clone
-
-                    'lr_object.USERTABLENAME = ""
-                    'lr_object.VALUE = ""
-                    'lr_object.PAGENAME = ""
-
-                    ''----------------------------------
-                    ''Get the Tokens from the ParseTree
-                    ''----------------------------------
-                    'Call Me.GetParseTreeTokens(lr_object, Me.Parsetree.Nodes(0))
-
-                    ''---------------------------------------------------------
-                    ''Find the FactType that the ADD FACT statement is for.
-                    ''---------------------------------------------------------
-                    'lrFactType = New FBM.FactType(lr_object.USERTABLENAME, True)
-                    'lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.EqualsByName)
-
-                    'If lrFactType Is Nothing Then
-                    '    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find FactType with Name: '" & lr_object.USERTABLENAME(0).ToString & "' within the Model.", 100, Nothing))
-                    '    Return Me.Parsetree.Errors
-                    '    Exit Function
-                    'End If
-
-                    ''-----------------
-                    ''Create the Fact
-                    ''-----------------
-                    'lrFact = New FBM.Fact(lr_object.VALUE, lrFactType)
-
-                    'lrFact = lrFactType.Fact.Find(AddressOf lrFact.EqualsById)
-
-                    'If lrFact Is Nothing Then
-                    '    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Fact with Id: '" & lr_object.VALUE & "' within the Model level FactType.Id :" & lr_object.USERTABLENAME, 100, Nothing))
-                    '    Return Me.Parsetree.Errors
-                    '    Exit Function
-                    'End If
-
-                    'Dim lrPage As New FBM.Page(Me.Model, lr_object.PAGENAME, lr_object.PAGENAME, pcenumLanguage.ORMModel)
-                    'lrPage = Me.Model.Page.Find(AddressOf lrPage.EqualsByName)
-
-                    'If IsSomething(lrPage) Then
-                    '    Dim lrFactTypeInstance As FBM.FactTypeInstance = lrFactType.CloneInstance(lrPage)
-                    '    lrFactTypeInstance = lrPage.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-                    '    If IsSomething(lrFactTypeInstance) Then
-                    '        lrFactTypeInstance.AddFact(lrFact)
-                    '    End If
-                    'Else
-                    '    Me.Parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: Can't find Page with Name: '" & lr_object.PageID(0).ToString & "'.", 100, Nothing))
-                    '    Return Me.Parsetree.Errors
-                    'End If
-
-                    'Return lrFact
                 Case Else
                     Return Nothing
             End Select
@@ -2354,6 +2455,7 @@ Namespace ORMQL
         Public Function ProcessORMQLStatement(ByVal as_ORMQL_statement As String, Optional abIgnoreErrorMessage As Boolean = False) As Object
 
             Dim lrFact As New FBM.Fact
+            Dim lsMessage As String = Nothing
 
             Try
                 '---------------------------
@@ -2401,13 +2503,41 @@ Namespace ORMQL
                         Exit Function
                     Case Is = "INSERTSTMT"
 
-                        lrFact = Me.ProcessINSERTStatement(as_ORMQL_statement)
+                        Dim loINSERTReturn As Object = Nothing
+
+                        loINSERTReturn = Me.ProcessINSERTStatement(as_ORMQL_statement)
+
+                        'CodeSafe
+                        Select Case loINSERTReturn.GetType
+                            Case Is = GetType(String)
+                                'Error Message
+                                Throw New Exception($"Error Inserting ORM Fact: {as_ORMQL_statement}".AppendLine(loINSERTReturn))
+                            Case Is = GetType(FBM.Fact)
+                                lrFact = loINSERTReturn
+                            Case Is = GetType(TinyPG.ParseErrors)
+                                Dim loParseErrors As TinyPG.ParseErrors = loINSERTReturn
+                                For Each lrParseError In loParseErrors
+                                    Throw New Exception(lrParseError.Message)
+                                    Exit For
+                                Next
+                        End Select
 
                         '---------------------------------------------------------------------------
                         'Exit the sub because have found what the User was
                         '  trying to do, and have done it (i.e. Inserted a new Fact in the FactType
                         '---------------------------------------------------------------------------
                         Return lrFact
+                        Exit Function
+
+                    Case Is = "UPSERTSTMT"
+
+                        Me.ProcessUPSERTStatement(as_ORMQL_statement)
+
+                        '---------------------------------------------------------------------------
+                        'Exit the sub because have found what the User was
+                        '  trying to do, and have done it (i.e. Inserted a new Fact in the FactType
+                        '---------------------------------------------------------------------------
+                        Return True
                         Exit Function
                     Case Is = "ADDMODELELEMENTTOPAGESTMT"
 
@@ -2475,14 +2605,20 @@ Namespace ORMQL
                 End Select
 
             Catch ex As Exception
-                'Me.parsetree.Errors.Add(New TinyPG.ParseError("Error: tModel.ProcessORMQLStatement: " & ex.Message, 100, lrCustomClass))
-                'Return Me.parsetree.Errors
-                If IsSomething(ex.InnerException) Then
-                    Return ex.Message & vbCrLf & "Inner Exception" & vbCrLf & ex.InnerException.Message & vbCrLf & vbCrLf & "Stack Trace" & vbCrLf & ex.StackTrace
-                Else
-                    Return ex.Message & vbCrLf & "Inner Exception" & vbCrLf & vbCrLf & "Stack Trace" & vbCrLf & ex.StackTrace
-                End If
 
+                lsMessage = ex.Message
+
+                prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace, True, ,,,, ex)
+
+                If ex.InnerException IsNot Nothing Then
+                    lsMessage.AppendLine("Inner Exception").AppendLine(ex.InnerException.Message)
+                    lsMessage.AppendDoubleLineBreak("Stack Trace:").AppendLine(ex.StackTrace)
+                    Return lsMessage
+                Else
+                    lsMessage.AppendLine("Inner Exception: ''")
+                    lsMessage.AppendDoubleLineBreak("Stack Trace" & vbCrLf & ex.StackTrace)
+                    Return lsMessage
+                End If
 
             End Try
 

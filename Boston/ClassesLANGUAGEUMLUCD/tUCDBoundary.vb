@@ -5,10 +5,8 @@
         Public X As Integer
         Public Y As Integer
 
-        Sub New(Optional ByVal aiConceptType As pcenumConceptType = Nothing)
-            If IsSomething(aiConceptType) Then
-                Me.ConceptType = aiConceptType
-            End If
+        Sub New(Optional ByVal aiConceptType As pcenumConceptType = pcenumConceptType.None)
+            Me.ConceptType = aiConceptType
         End Sub
 
         Public Sub RefreshShape(Optional ByVal aoChangedPropertyItem As PropertyValueChangedEventArgs = Nothing)

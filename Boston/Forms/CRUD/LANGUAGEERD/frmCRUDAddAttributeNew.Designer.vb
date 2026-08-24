@@ -26,7 +26,15 @@ Partial Class frmCRUDAddAttributeNew
         Dim DataTypeLabel As System.Windows.Forms.Label
         Me.GroupBoxMain = New System.Windows.Forms.GroupBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.TableLayoutPanelMain = New System.Windows.Forms.TableLayoutPanel()
         Me.LabelPromptAttributeOk = New System.Windows.Forms.Label()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.TableLayoutPanelFKReference = New System.Windows.Forms.TableLayoutPanel()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.CheckBoxMakeForeignKeyReference = New System.Windows.Forms.CheckBox()
+        Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
+        Me.LabelPromptSelectReferencedTable = New System.Windows.Forms.Label()
+        Me.ListBoxReferencedTable = New System.Windows.Forms.ListBox()
         Me.TextBoxDataTypePrecision = New System.Windows.Forms.TextBox()
         Me.LabelPromptPrecision = New System.Windows.Forms.Label()
         Me.TextBoxDataTypeLength = New System.Windows.Forms.TextBox()
@@ -43,6 +51,10 @@ Partial Class frmCRUDAddAttributeNew
         DataTypeLabel = New System.Windows.Forms.Label()
         Me.GroupBoxMain.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.TableLayoutPanelMain.SuspendLayout()
+        Me.Panel1.SuspendLayout()
+        Me.TableLayoutPanelFKReference.SuspendLayout()
+        Me.TableLayoutPanel3.SuspendLayout()
         Me.SuspendLayout()
         '
         'NameLabel
@@ -65,19 +77,25 @@ Partial Class frmCRUDAddAttributeNew
         '
         'GroupBoxMain
         '
+        Me.GroupBoxMain.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBoxMain.Controls.Add(Me.GroupBox1)
         Me.GroupBoxMain.Controls.Add(Me.LabelEntityTypeName)
         Me.GroupBoxMain.Controls.Add(Me.LabelPromptEntityTypeName)
         Me.GroupBoxMain.Location = New System.Drawing.Point(3, 2)
         Me.GroupBoxMain.Name = "GroupBoxMain"
-        Me.GroupBoxMain.Size = New System.Drawing.Size(739, 239)
+        Me.GroupBoxMain.Size = New System.Drawing.Size(745, 306)
         Me.GroupBoxMain.TabIndex = 0
         Me.GroupBoxMain.TabStop = False
         '
         'GroupBox1
         '
+        Me.GroupBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.BackColor = System.Drawing.SystemColors.Control
-        Me.GroupBox1.Controls.Add(Me.LabelPromptAttributeOk)
+        Me.GroupBox1.Controls.Add(Me.TableLayoutPanelMain)
         Me.GroupBox1.Controls.Add(Me.TextBoxDataTypePrecision)
         Me.GroupBox1.Controls.Add(Me.LabelPromptPrecision)
         Me.GroupBox1.Controls.Add(Me.TextBoxDataTypeLength)
@@ -89,21 +107,120 @@ Partial Class frmCRUDAddAttributeNew
         Me.GroupBox1.Controls.Add(Me.ComboBoxAttribute)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 51)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(709, 182)
+        Me.GroupBox1.Size = New System.Drawing.Size(715, 249)
         Me.GroupBox1.TabIndex = 20
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Attribute Details :"
+        '
+        'TableLayoutPanelMain
+        '
+        Me.TableLayoutPanelMain.ColumnCount = 1
+        Me.TableLayoutPanelMain.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanelMain.Controls.Add(Me.LabelPromptAttributeOk, 0, 0)
+        Me.TableLayoutPanelMain.Controls.Add(Me.Panel1, 0, 1)
+        Me.TableLayoutPanelMain.Location = New System.Drawing.Point(325, 29)
+        Me.TableLayoutPanelMain.Name = "TableLayoutPanelMain"
+        Me.TableLayoutPanelMain.RowCount = 2
+        Me.TableLayoutPanelMain.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 54.0!))
+        Me.TableLayoutPanelMain.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelMain.Size = New System.Drawing.Size(374, 214)
+        Me.TableLayoutPanelMain.TabIndex = 28
+        Me.TableLayoutPanelMain.Visible = False
         '
         'LabelPromptAttributeOk
         '
         Me.LabelPromptAttributeOk.AutoSize = True
         Me.LabelPromptAttributeOk.Font = New System.Drawing.Font("Arial Unicode MS", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LabelPromptAttributeOk.Location = New System.Drawing.Point(325, 33)
+        Me.LabelPromptAttributeOk.Location = New System.Drawing.Point(3, 0)
         Me.LabelPromptAttributeOk.MaximumSize = New System.Drawing.Size(300, 0)
         Me.LabelPromptAttributeOk.Name = "LabelPromptAttributeOk"
         Me.LabelPromptAttributeOk.Size = New System.Drawing.Size(122, 15)
         Me.LabelPromptAttributeOk.TabIndex = 27
         Me.LabelPromptAttributeOk.Text = "LabelPromptAttributeOk"
+        '
+        'Panel1
+        '
+        Me.Panel1.Controls.Add(Me.TableLayoutPanelFKReference)
+        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Panel1.Location = New System.Drawing.Point(3, 57)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(368, 154)
+        Me.Panel1.TabIndex = 28
+        '
+        'TableLayoutPanelFKReference
+        '
+        Me.TableLayoutPanelFKReference.ColumnCount = 1
+        Me.TableLayoutPanelFKReference.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanelFKReference.Controls.Add(Me.Label1, 0, 0)
+        Me.TableLayoutPanelFKReference.Controls.Add(Me.CheckBoxMakeForeignKeyReference, 0, 1)
+        Me.TableLayoutPanelFKReference.Controls.Add(Me.TableLayoutPanel3, 0, 2)
+        Me.TableLayoutPanelFKReference.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutPanelFKReference.Location = New System.Drawing.Point(0, 0)
+        Me.TableLayoutPanelFKReference.Name = "TableLayoutPanelFKReference"
+        Me.TableLayoutPanelFKReference.RowCount = 3
+        Me.TableLayoutPanelFKReference.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40.0!))
+        Me.TableLayoutPanelFKReference.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
+        Me.TableLayoutPanelFKReference.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanelFKReference.Size = New System.Drawing.Size(368, 154)
+        Me.TableLayoutPanelFKReference.TabIndex = 0
+        Me.TableLayoutPanelFKReference.Visible = False
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.ForeColor = System.Drawing.Color.Gray
+        Me.Label1.Location = New System.Drawing.Point(3, 0)
+        Me.Label1.MaximumSize = New System.Drawing.Size(370, 0)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(337, 26)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = "Check the box below and select an Entity/Node-Type if you want this column to ref" &
+    "erence that Entity/Node-Type:"
+        '
+        'CheckBoxMakeForeignKeyReference
+        '
+        Me.CheckBoxMakeForeignKeyReference.AutoSize = True
+        Me.CheckBoxMakeForeignKeyReference.ForeColor = System.Drawing.Color.SteelBlue
+        Me.CheckBoxMakeForeignKeyReference.Location = New System.Drawing.Point(3, 43)
+        Me.CheckBoxMakeForeignKeyReference.Name = "CheckBoxMakeForeignKeyReference"
+        Me.CheckBoxMakeForeignKeyReference.Size = New System.Drawing.Size(165, 17)
+        Me.CheckBoxMakeForeignKeyReference.TabIndex = 1
+        Me.CheckBoxMakeForeignKeyReference.Text = "Make Foreign Key Reference"
+        Me.CheckBoxMakeForeignKeyReference.UseVisualStyleBackColor = True
+        '
+        'TableLayoutPanel3
+        '
+        Me.TableLayoutPanel3.ColumnCount = 1
+        Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel3.Controls.Add(Me.LabelPromptSelectReferencedTable, 0, 0)
+        Me.TableLayoutPanel3.Controls.Add(Me.ListBoxReferencedTable, 0, 1)
+        Me.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TableLayoutPanel3.Location = New System.Drawing.Point(3, 68)
+        Me.TableLayoutPanel3.Name = "TableLayoutPanel3"
+        Me.TableLayoutPanel3.RowCount = 2
+        Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle())
+        Me.TableLayoutPanel3.Size = New System.Drawing.Size(362, 83)
+        Me.TableLayoutPanel3.TabIndex = 2
+        '
+        'LabelPromptSelectReferencedTable
+        '
+        Me.LabelPromptSelectReferencedTable.AutoSize = True
+        Me.LabelPromptSelectReferencedTable.ForeColor = System.Drawing.Color.Gray
+        Me.LabelPromptSelectReferencedTable.Location = New System.Drawing.Point(3, 0)
+        Me.LabelPromptSelectReferencedTable.Name = "LabelPromptSelectReferencedTable"
+        Me.LabelPromptSelectReferencedTable.Size = New System.Drawing.Size(186, 13)
+        Me.LabelPromptSelectReferencedTable.TabIndex = 0
+        Me.LabelPromptSelectReferencedTable.Text = "Select Referenced Entity/Node-Type:"
+        '
+        'ListBoxReferencedTable
+        '
+        Me.ListBoxReferencedTable.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.ListBoxReferencedTable.FormattingEnabled = True
+        Me.ListBoxReferencedTable.Location = New System.Drawing.Point(3, 23)
+        Me.ListBoxReferencedTable.Name = "ListBoxReferencedTable"
+        Me.ListBoxReferencedTable.Size = New System.Drawing.Size(356, 57)
+        Me.ListBoxReferencedTable.TabIndex = 1
         '
         'TextBoxDataTypePrecision
         '
@@ -187,7 +304,7 @@ Partial Class frmCRUDAddAttributeNew
         '
         Me.ButtonCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ButtonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.ButtonCancel.Location = New System.Drawing.Point(769, 51)
+        Me.ButtonCancel.Location = New System.Drawing.Point(766, 49)
         Me.ButtonCancel.Name = "ButtonCancel"
         Me.ButtonCancel.Size = New System.Drawing.Size(75, 23)
         Me.ButtonCancel.TabIndex = 2
@@ -198,14 +315,14 @@ Partial Class frmCRUDAddAttributeNew
         '
         Me.LabelHelp.BackColor = System.Drawing.SystemColors.Info
         Me.LabelHelp.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.LabelHelp.Location = New System.Drawing.Point(0, 244)
+        Me.LabelHelp.Location = New System.Drawing.Point(0, 314)
         Me.LabelHelp.Name = "LabelHelp"
-        Me.LabelHelp.Size = New System.Drawing.Size(856, 66)
+        Me.LabelHelp.Size = New System.Drawing.Size(858, 66)
         Me.LabelHelp.TabIndex = 12
         '
         'ButtonOkay
         '
-        Me.ButtonOkay.Location = New System.Drawing.Point(769, 20)
+        Me.ButtonOkay.Location = New System.Drawing.Point(766, 20)
         Me.ButtonOkay.Name = "ButtonOkay"
         Me.ButtonOkay.Size = New System.Drawing.Size(75, 23)
         Me.ButtonOkay.TabIndex = 13
@@ -217,7 +334,7 @@ Partial Class frmCRUDAddAttributeNew
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(856, 310)
+        Me.ClientSize = New System.Drawing.Size(858, 380)
         Me.ControlBox = False
         Me.Controls.Add(Me.ButtonOkay)
         Me.Controls.Add(Me.ButtonCancel)
@@ -232,6 +349,13 @@ Partial Class frmCRUDAddAttributeNew
         Me.GroupBoxMain.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.TableLayoutPanelMain.ResumeLayout(False)
+        Me.TableLayoutPanelMain.PerformLayout()
+        Me.Panel1.ResumeLayout(False)
+        Me.TableLayoutPanelFKReference.ResumeLayout(False)
+        Me.TableLayoutPanelFKReference.PerformLayout()
+        Me.TableLayoutPanel3.ResumeLayout(False)
+        Me.TableLayoutPanel3.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -250,4 +374,12 @@ Partial Class frmCRUDAddAttributeNew
     Friend WithEvents LabelPromptPrecision As Label
     Friend WithEvents LabelPromptAttributeOk As Label
     Friend WithEvents ButtonOkay As Button
+    Friend WithEvents TableLayoutPanelMain As TableLayoutPanel
+    Friend WithEvents Panel1 As Panel
+    Friend WithEvents Label1 As Label
+    Friend WithEvents TableLayoutPanelFKReference As TableLayoutPanel
+    Friend WithEvents CheckBoxMakeForeignKeyReference As CheckBox
+    Friend WithEvents TableLayoutPanel3 As TableLayoutPanel
+    Friend WithEvents LabelPromptSelectReferencedTable As Label
+    Friend WithEvents ListBoxReferencedTable As ListBox
 End Class

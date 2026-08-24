@@ -77,18 +77,34 @@ Namespace FBM
             End Set
         End Property
 
+        Public Property Width As Integer Implements iPageObject.Width
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Height As Integer Implements iPageObject.Height
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         Public Sub New()
 
         End Sub
 
-        Public Sub New(ByVal as_Symbol As String, Optional ByVal aiConceptType As pcenumConceptType = Nothing)
+        Public Sub New(ByVal as_Symbol As String, Optional ByVal aiConceptType As pcenumConceptType = pcenumConceptType.None)
 
             Me.Id = Trim(as_Symbol)
             Me.Symbol = Trim(as_Symbol)
 
-            If IsSomething(aiConceptType) Then
-                Me.ConceptType = aiConceptType
-            End If
+            Me.ConceptType = aiConceptType
 
         End Sub
 
@@ -126,11 +142,11 @@ Namespace FBM
             '  referenced by Objects of this Class
             '---------------------------------------------------------------------
             Try
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.Shape) Then
+                    If Me.Shape IsNot Nothing Then
                         If Me.Shape.Text <> "" Then
                             '---------------------------------------------------------------------------------
                             'Is the type of EntityTypeInstance that 

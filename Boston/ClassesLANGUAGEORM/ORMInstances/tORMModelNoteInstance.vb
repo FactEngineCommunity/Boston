@@ -8,6 +8,7 @@ Namespace FBM
     Public Class ModelNoteInstance
         Inherits FBM.ModelNote
         Implements FBM.iPageObject
+        Implements IEquatable(Of FBM.ModelNoteInstance)
 
         Public WithEvents ModelNote As FBM.ModelNote
 
@@ -49,12 +50,16 @@ Namespace FBM
         Public Property X As Integer Implements FBM.iPageObject.X 'The X coordinate of the PageObject
         Public Property Y As Integer Implements FBM.iPageObject.Y 'The Y coordinate of the PageObject
 
+        Public Property Width As Integer Implements FBM.iPageObject.Width 'The X coordinate of the PageObject
+        Public Property Height As Integer Implements FBM.iPageObject.Height 'The Y coordinate of the PageObject
+
+        Private _InstanceNumber As Integer = 1
         Public Property InstanceNumber As Integer Implements iPageObject.InstanceNumber
             Get
-                Throw New NotImplementedException()
+                Return Me._InstanceNumber
             End Get
             Set(value As Integer)
-                Throw New NotImplementedException()
+                Me._InstanceNumber = value
             End Set
         End Property
 
@@ -107,7 +112,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: tModelNoteInstance.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrModelNoteInstance
             End Try
@@ -121,9 +126,15 @@ Namespace FBM
             lrConceptInstance.Symbol = Me.ModelNote.Id
             lrConceptInstance.X = Me.X
             lrConceptInstance.Y = Me.Y
+            lrConceptInstance.Width = Me.Width
+            lrConceptInstance.Height = Me.Height
 
             Return lrConceptInstance
 
+        End Function
+
+        Public Shadows Function Equals(other As ModelNoteInstance) As Boolean Implements IEquatable(Of ModelNoteInstance).Equals
+            Return Me.Id = other.Id And Me.InstanceNumber = other.InstanceNumber
         End Function
 
         Public Sub MouseDown() Implements FBM.iPageObject.MouseDown
@@ -160,14 +171,24 @@ Namespace FBM
                 Dim loDroppedNode As ShapeNode
                 Dim StringSize As SizeF
 
-                StringSize = Me.Page.Diagram.MeasureString(Trim(Me.NoteText), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
+                Dim loFont = New Font("Arial", 9, FontStyle.Regular)
+
+                StringSize = Me.Page.Diagram.MeasureString(Trim(Me.NoteText), loFont, 1000, System.Drawing.StringFormat.GenericDefault)
                 StringSize.Height += 5
                 StringSize.Width += 3
 
-                If StringSize.Width > 70 Then
-                    StringSize = New SizeF(70, (StringSize.Height + 2) * Me.NoteText.Length / 100)
+                If Me.Width = 0 And Me.Height = 0 Then
+                    If StringSize.Width > 70 Then
+                        Dim liHeight = (StringSize.Height + 4) * Me.NoteText.Length / 100
+                        liHeight = If(liHeight < 8, 8, liHeight)
+                        StringSize = New SizeF(70, liHeight)
+                        Me.Width = StringSize.Width
+                        Me.Height = StringSize.Height
+                    End If
+                Else
+                    StringSize.Width = Me.Width
+                    StringSize.Height = Me.Height
                 End If
-
                 '--------------------------------------------------------------------
                 'Create a Shape for the ValueTypeInstance on the DiagramView object
                 '--------------------------------------------------------------------            
@@ -179,12 +200,13 @@ Namespace FBM
                 loDroppedNode.AllowOutgoingLinks = True
                 loDroppedNode.Text = " " & Trim(Me.NoteText)
                 loDroppedNode.TextFormat.Alignment = StringAlignment.Near
+                loDroppedNode.Font = loFont
                 If Me.NoteText.Length > 5 Then
                     Call loDroppedNode.ResizeToFitText(FitSize.KeepWidth)
                 Else
                     loDroppedNode.Resize(40, 10)
                 End If
-                loDroppedNode.Resize(loDroppedNode.Bounds.Width + 1, loDroppedNode.Bounds.Height + 2)
+                loDroppedNode.Resize(loDroppedNode.Bounds.Width + 1, loDroppedNode.Bounds.Height + 1)
 
                 loDroppedNode.ShadowOffsetX = 1
                 loDroppedNode.ShadowOffsetY = 1
@@ -206,7 +228,7 @@ Namespace FBM
 
                 Dim lrJoinedORMObject As Object = Me.JoinedObjectType
 
-                If IsSomething(lrJoinedORMObject) Then
+                If lrJoinedORMObject IsNot Nothing Then
                     If lrJoinedORMObject.Id = "" Then
                         '---------------------------------------------------------------------------
                         'The ModelNote is not joined to any ModelElement on the Page.
@@ -247,7 +269,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -283,7 +305,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -292,12 +314,38 @@ Namespace FBM
                                 Optional ByVal asSelectedGridItemLabel As String = "")
 
             Try
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "NoteText"
                             Me.ModelNote.SetText(Me.NoteText)
                     End Select
                 End If
+
+                Dim StringSize As SizeF
+                Dim loFont = New Font("Arial", 9, FontStyle.Regular)
+                Dim liHeight As Integer
+
+                StringSize = Me.Page.Diagram.MeasureString(Trim(Me.NoteText), loFont, 1000, System.Drawing.StringFormat.GenericDefault)
+                StringSize.Height += 5
+                StringSize.Width += 3
+
+                If Me.Width = 0 And Me.Height = 0 Then
+                    If StringSize.Width > 70 Then
+                        liHeight = (StringSize.Height + 4) * Me.NoteText.Length / 100
+                        liHeight = If(liHeight < 8, 8, liHeight)
+                        StringSize = New SizeF(70, liHeight)
+                        Me.Width = StringSize.Width
+                        Me.Height = StringSize.Height
+                    End If
+                Else
+                    StringSize.Width = Me.Width
+                    StringSize.Height = Me.Height
+                    liHeight = Me.Height
+                End If
+
+                liHeight = If(liHeight < 8, 8, liHeight)
+
+                Me.Shape.Resize(StringSize.Width, liHeight)
 
                 If Me.Shape IsNot Nothing Then
                     Me.Shape.Text = Me.NoteText
@@ -309,7 +357,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -325,28 +373,28 @@ Namespace FBM
                     Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
                     lrEntityTypeInstance.Id = arJoinedModelObject.Id
                     lrEntityTypeInstance = Me.Page.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
-                    If IsSomething(lrEntityTypeInstance) Then
+                    If lrEntityTypeInstance IsNot Nothing Then
                         Me.Link.Destination = lrEntityTypeInstance.Shape
                     End If
                 Case Is = pcenumConceptType.ValueType
                     Dim lrValueTypeInstance As New FBM.ValueTypeInstance
                     lrValueTypeInstance.Id = arJoinedModelObject.Id
                     lrValueTypeInstance = Me.Page.ValueTypeInstance.Find(AddressOf lrValueTypeInstance.Equals)
-                    If IsSomething(lrValueTypeInstance) Then
+                    If lrValueTypeInstance IsNot Nothing Then
                         Me.Link.Destination = lrValueTypeInstance.Shape
                     End If
                 Case Is = pcenumConceptType.FactType
                     Dim lrFactTypeInstance As New FBM.FactTypeInstance
                     lrFactTypeInstance.Id = arJoinedModelObject.Id
                     lrFactTypeInstance = Me.Page.FactTypeInstance.Find(AddressOf lrFactTypeInstance.Equals)
-                    If IsSomething(lrFactTypeInstance) Then
+                    If lrFactTypeInstance IsNot Nothing Then
                         Me.Link.Destination = lrFactTypeInstance.Shape
                     End If
                 Case Is = pcenumConceptType.RoleConstraint
                     Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
                     lrRoleConstraintInstance.Id = arJoinedModelObject.Id
                     lrRoleConstraintInstance = Me.Page.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)
-                    If IsSomething(lrRoleConstraintInstance) Then
+                    If lrRoleConstraintInstance IsNot Nothing Then
                         Me.Link.Destination = lrRoleConstraintInstance.Shape
                     End If
             End Select
@@ -391,7 +439,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -410,7 +458,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

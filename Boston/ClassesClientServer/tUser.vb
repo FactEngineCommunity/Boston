@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.Linq.Expressions
+Imports System.Reflection
 Imports System.Xml.Serialization
 
 Namespace ClientServer
@@ -31,6 +32,18 @@ Namespace ClientServer
 
         Public ProjectPermission As New List(Of ClientServer.Permission)
 
+        Public Profile As Personalisation.Profile = Nothing
+
+        Public Flag As New List(Of pcenumUserFlag)
+
+        'CallInPIN As Integer 'Stored in ClientServer.UserCallInPIN
+
+        ''' <summary>
+        ''' Parameterless Constructor.
+        ''' </summary>
+        Public Sub New()
+        End Sub
+
         Public Function FullName() As String
 
             Return Me.FirstName & " " & Me.LastName
@@ -58,7 +71,7 @@ Namespace ClientServer
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -142,6 +155,49 @@ Namespace ClientServer
             Return larPermission
 
         End Function
+
+        Public Sub GetFlags()
+
+            Try
+                Dim lrDataStore As New DataStore.Store
+                Dim whereClause As Expression(Of Func(Of ClientServer.UserFlag, Boolean)) = Function(t) t.UserId = Me.Id
+
+                Dim larUserFlag = lrDataStore.Get(Of UserFlag)(whereClause)
+
+                For Each lrUserFlag As UserFlag In larUserFlag
+
+                    Me.Flag.Add(lrUserFlag.Flag)
+
+                Next
+            Catch ex As Exception
+
+            End Try
+
+        End Sub
+
+        Public Sub Save()
+
+            Try
+                If tableClientServerUser.getUserDetailsByUsername(Me.Username, Me, False) IsNot Nothing Then
+                    Call tableClientServerUser.updateUser(Me)
+                Else
+                    Call tableClientServerUser.addUser(Me)
+                End If
+
+                Dim lrDataStore As New DataStore.Store
+                Dim whereClause As Expression(Of Func(Of ClientServer.UserFlag, Boolean)) = Function(t) t.UserId = Me.Id
+
+                For Each lrUserFlag In Me.Flag
+
+                    Call lrDataStore.Upsert(Of ClientServer.UserFlag)(lrUserFlag, whereClause)
+
+                Next
+
+            Catch ex As Exception
+
+            End Try
+
+        End Sub
 
     End Class
 

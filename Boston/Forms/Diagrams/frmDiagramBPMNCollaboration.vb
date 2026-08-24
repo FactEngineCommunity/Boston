@@ -18,7 +18,7 @@ Public Class frmDiagramBPMNCollaboration
 
     ' Initialize grid
     Dim header As MindFusion.Diagramming.Lanes.Header = Nothing
-    Dim grid As MindFusion.Diagramming.Lanes.Grid
+    Private WithEvents grid As MindFusion.Diagramming.Lanes.Grid
     Dim ColumnHeaders As MindFusion.Diagramming.Lanes.HeaderCollection
     Dim RowHeaders As MindFusion.Diagramming.Lanes.HeaderCollection
 
@@ -27,63 +27,7 @@ Public Class frmDiagramBPMNCollaboration
     Dim zNodeColection As New List(Of DiagramNode)
     Dim zTextColection As New List(Of DiagramNode)
 
-    Private Sub frmDiagramETD_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
-
-        Call Me.SetToolbox()
-
-        frmMain.ToolStripComboBox_zoom.Enabled = True
-
-    End Sub
-
-    Private Sub frmDiagramETD_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-
-        '-------------------------------------------
-        'Process the page associated with the form.
-        '-------------------------------------------
-        If IsSomething(Me.zrPage) Then
-            If Me.zrPage.IsDirty Then
-                Select Case MsgBox("Changes have been made to the Page, '" & Me.zrPage.Name & "'. Would you like to save those changes?", MsgBoxStyle.YesNoCancel)
-                    Case Is = MsgBoxResult.Yes
-                        Me.zrPage.Save()
-                    Case Is = MsgBoxResult.Cancel
-                        e.Cancel = True
-                        Exit Sub
-                End Select
-            End If
-            Me.zrPage.Form = Nothing
-            Me.zrPage.ReferencedForm = Nothing
-        End If
-
-        '----------------------------------------------
-        'Reset the PageLoaded flag on the Page so
-        '  that the User can open the Page again
-        '  if they want.
-        '----------------------------------------------        
-        Me.zrPage.FormLoaded = False
-
-        prApplication.WorkingModel = Nothing
-        prApplication.WorkingPage = Nothing
-
-        '------------------------------------------------
-        'If the 'Properties' window is open, reset the
-        '  SelectedObject
-        '------------------------------------------------
-        If Not IsNothing(frmMain.zfrm_properties) Then
-            frmMain.zfrm_properties.PropertyGrid.SelectedObject = Nothing
-        End If
-
-        Me.Hide()
-
-        frmMain.ToolStripButton_Save.Enabled = False
-
-    End Sub
-
-
-    Private Sub frm_EventTraceDiagram_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.GotFocus
-
-        Call SetToolbox()
-
-    End Sub
+    Dim marPoolProcess As New List(Of UML.Process)
 
     Private Sub frm_EventTraceDiagram_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
@@ -101,6 +45,8 @@ Public Class frmDiagramBPMNCollaboration
         Me.grid = Me.Diagram.LaneGrid
         Me.ColumnHeaders = Me.grid.ColumnHeaders
         Me.RowHeaders = Me.grid.RowHeaders
+        Me.grid.AllowResizeHeaders = True
+
 
     End Sub
 
@@ -136,188 +82,233 @@ Public Class frmDiagramBPMNCollaboration
         Me.RowHeaders.Clear()
         Me.ColumnHeaders.Clear()
 
-        'header = New Header("Week " + i.ToString() + ", 2007")
-        'header.SubHeaders.Add(New Header("S"))
-        'header.SubHeaders.Add(New Header("M"))
-        'header.SubHeaders.Add(New Header("T"))
-        'header.SubHeaders.Add(New Header("W"))
-        'header.SubHeaders.Add(New Header("T"))
-        'header.SubHeaders.Add(New Header("F"))
-        'header.SubHeaders.Add(New Header("S"))
-        'columns.Add(header)
-
-        Dim lsOverallProcessName As String = "New Process"
         Dim lrRecordset As New ORMQL.Recordset
+        Dim lrRecordset2, lrRecordset3 As ORMQL.Recordset
         Dim lsSqlQuery As String = ""
 
         Try
-
-#Region "Overall Process Name"
-
-            lsSqlQuery = "SELECT * "
-            lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreBPMNCollaborationHasCoreBPMNCollaborationName.ToString
-            lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
-
-            If Not lrRecordset.EOF Then
-                lsOverallProcessName = lrRecordset("CollaborationName").Data
-            End If
-
-#End Region
-
-#Region "Actors"
-            lsSqlQuery = "SELECT DISTINCT Element "
-            lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-            lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSqlQuery &= " WHERE ElementType = 'Actor'"
-
-            lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
-
-            While Not lrRecordset.EOF
-
-                Dim lrCMMLActor = Me.zrPage.Model.UML.Actor.Find(Function(x) x.Name = lrRecordset("Element").Data)
-
-                Dim lrActor As New BPMN.Actor(Me.zrPage, lrCMMLActor)
-                lrFactDataInstance = lrRecordset("Element")
-                lrActor = lrFactDataInstance.CloneBPMNActor(Me.zrPage)
-
-                '----------------------------------------------
-                'CMML
-                lrActor.CMMLActor = Me.zrPage.Model.UML.Actor.Find(Function(x) x.Name = lrActor.Name)
-
-                'Dim lrRecordsetSequenceNr As New ORMQL.Recordset
-                'lsSqlQuery = "SELECT *"
-                'lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreElementSequenceNr.ToString
-                'lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                'lsSqlQuery &= " WHERE Element = '" & lrActor.Name & "'"
-
-                'lrRecordsetSequenceNr = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
-
-                'lrActor.SequenceNr = Convert.ToSingle(lrRecordsetSequenceNr("SequenceNr").Data)
-
-                Me.zrPage.UMLDiagram.Actor.Add(lrActor)
-
-                lrRecordset.MoveNext()
-            End While
-
-            Dim loDiagramHeader = New Header(lsOverallProcessName)
-            loDiagramHeader.RotateTitle = True
-            Me.grid.RowHeaders.Add(loDiagramHeader)
-
-            Dim lrActorInSequence As UML.Actor
-            'Me.zrPage.UMLDiagram.Actor.Sort(AddressOf CMML.Actor.CompareSequenceNrs) '20220624-VM-Not currently used.
-            For Each lrActorInSequence In Me.zrPage.UMLDiagram.Actor
-                header = New Header(lrActorInSequence.Name)
-                loDiagramHeader.SubHeaders.Add(header)
-                'Me.RowHeaders.Add(header)
-                header.Width = 10 'Me.Diagram.Bounds.Width / Me.zrPage.UMLDiagram.Actor.Count
-                header.Height = 40
-                header.TitleFormat.Alignment = StringAlignment.Center
-                header.TitleFormat.LineAlignment = StringAlignment.Center
-                header.RotateTitle = True
-            Next
-#End Region
 
             Dim lrColumnHeader As New MindFusion.Diagramming.Lanes.Header()
             lrColumnHeader.Width = 200
             Me.grid.ColumnHeaders.Add(lrColumnHeader)
 
-#Region "Processes"
-            lsSqlQuery = "SELECT DISTINCT Element "
-            lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+#Region "Load Overall Pool Processes"
+
+            lsSqlQuery = "SELECT * "
+            lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreBPMNCollaborationContainsCoreElement.ToString
             lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-            lsSqlQuery &= " WHERE ElementType = 'Process'"
 
             lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
+
             While Not lrRecordset.EOF
 
                 lrFactDataInstance = lrRecordset("Element")
-                lrProcess = lrFactDataInstance.CloneBPMNProcess(arPage)
-                lrProcess.X = lrFactDataInstance.X
-                lrProcess.Y = lrFactDataInstance.Y
-                lrProcess.CMMLProcess = Me.zrPage.Model.UML.Process.Find(Function(x) x.Id = lrProcess.Id)
+                Dim lrPoolProcess = lrFactDataInstance.CloneBPMNProcess(arPage)
+                lrPoolProcess.Id = lrRecordset("Element").Data
+
+                lrPoolProcess.CMMLProcess = Me.zrPage.Model.UML.Process.Find(Function(x) x.Id = lrPoolProcess.Id)
+
+#Region "Process Name - Get from CMML"
+
+                lsSqlQuery = "SELECT *"
+                lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementName.ToString
+                lsSqlQuery &= " WHERE Element = '" & lrPoolProcess.Id & "'"
+
+                lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
+
+                If Not lrRecordset2.EOF Then
+                    lrPoolProcess.Name = lrRecordset2("ElementName").Data
+                End If
+#End Region
+
+                Me.marPoolProcess.Add(lrPoolProcess)
+
+#Region "Load Pool"
+#Region "Actors"
+                lsSqlQuery = "SELECT DISTINCT Actor "
+                lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString
+                lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                lsSqlQuery &= " WHERE Process = '" & lrPoolProcess.Id & "'"
+
+                lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
+
+                While Not lrRecordset2.EOF
+
+                    Dim lrCMMLActor = Me.zrPage.Model.UML.Actor.Find(Function(x) x.Name = lrRecordset2("Actor").Data)
+
+                    Dim lrActor As New BPMN.Actor(Me.zrPage, lrCMMLActor)
+                    lrFactDataInstance = lrRecordset2("Actor")
+                    lrActor = lrFactDataInstance.CloneBPMNActor(Me.zrPage)
+
+                    '----------------------------------------------
+                    'CMML
+                    lrActor.CMMLActor = Me.zrPage.Model.UML.Actor.Find(Function(x) x.Name = lrActor.Name)
+#Region "SequenceNr"
+                    'Dim lrRecordsetSequenceNr As New ORMQL.Recordset
+                    'lsSqlQuery = "SELECT *"
+                    'lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreElementSequenceNr.ToString
+                    'lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                    'lsSqlQuery &= " WHERE Element = '" & lrActor.Name & "'"
+
+                    'lrRecordsetSequenceNr = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
+                    'lrActor.SequenceNr = Convert.ToSingle(lrRecordsetSequenceNr("SequenceNr").Data)
+#End Region
+
+                    Me.zrPage.UMLDiagram.Actor.Add(lrActor)
+
+                    Dim lrActorProcessRelation = New UML.ActorProcessRelation(Me.zrPage.UMLDiagram, lrActor, lrPoolProcess)
+                    Me.zrPage.UMLDiagram.ActorProcessRelation.Add(lrActorProcessRelation)
+
+#Region "Graphics - Add Actor to Pool"
+                    Dim loDiagramHeader = New Header(lrPoolProcess.Name)
+                    loDiagramHeader.RotateTitle = True
+                    Me.grid.RowHeaders.Add(loDiagramHeader)
+
+                    header = New Header(lrActorProcessRelation.Actor.Name)
+                    loDiagramHeader.SubHeaders.Add(header)
+                    'Me.RowHeaders.Add(header)
+                    header.Width = 10 'Me.Diagram.Bounds.Width / Me.zrPage.UMLDiagram.Actor.Count
+                    header.Height = 40
+                    header.TitleFormat.Alignment = StringAlignment.Center
+                    header.TitleFormat.LineAlignment = StringAlignment.Center
+                    header.RotateTitle = True
+#End Region
+
+                    lrRecordset2.MoveNext()
+                End While
+
+                Dim columns As HeaderCollection = grid.ColumnHeaders
+
+                'Me.zrPage.UMLDiagram.Actor.Sort(AddressOf CMML.Actor.CompareSequenceNrs) '20220624-VM-Not currently used.
+                'For Each lrActorProcessRelation In Me.zrPage.UMLDiagram.ActorProcessRelation
+                '    header = New Header(lrActorProcessRelation.Actor.Name)
+                '    loDiagramHeader.SubHeaders.Add(header)
+                '    'Me.RowHeaders.Add(header)
+                '    header.Width = 10 'Me.Diagram.Bounds.Width / Me.zrPage.UMLDiagram.Actor.Count
+                '    header.Height = 40
+                '    header.TitleFormat.Alignment = StringAlignment.Center
+                '    header.TitleFormat.LineAlignment = StringAlignment.Center
+                '    header.RotateTitle = True
+                'Next
+#End Region
+
+
+#Region "Processes"
+                lsSqlQuery = "SELECT DISTINCT Element "
+                lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                lsSqlQuery &= " WHERE ElementType = 'Process'"
+
+                lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
+                While Not lrRecordset2.EOF
+
+                    lrFactDataInstance = lrRecordset2("Element")
+                    lrProcess = lrFactDataInstance.CloneBPMNProcess(arPage)
+                    lrProcess.X = lrFactDataInstance.X
+                    lrProcess.Y = lrFactDataInstance.Y
+                    lrProcess.CMMLProcess = Me.zrPage.Model.UML.Process.Find(Function(x) x.Id = lrProcess.Id)
+
+                    'CodeSafe
+                    If Me.zrPage.UMLDiagram.Process.Contains(lrProcess) Then GoTo SkipProcess
+
+                    Me.zrPage.UMLDiagram.Process.AddUnique(lrProcess)
 
 #Region "Process Text - Get from CMML"
 
-                lsSqlQuery = "SELECT *"
-                lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreProcessHasProcessText.ToString
-                lsSqlQuery &= " WHERE Process = '" & lrProcess.Id & "'"
+                    lsSqlQuery = "SELECT *"
+                    lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreProcessHasProcessText.ToString
+                    lsSqlQuery &= " WHERE Process = '" & lrProcess.Id & "'"
 
-                Dim lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
+                    lrRecordset3 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
 
-                If Not lrRecordset2.EOF Then
-                    lrProcess.Text = lrRecordset2("ProcessText").Data
-                End If
+                    If Not lrRecordset3.EOF Then
+                        lrProcess.Text = lrRecordset3("ProcessText").Data
+                    End If
 #End Region
 
-                Call lrProcess.DisplayAndAssociate()
+                    Call lrProcess.DisplayAndAssociate()
 
-                Me.zrPage.UMLDiagram.Process.Add(lrProcess)
 
-                lrRecordset.MoveNext()
-            End While
+SkipProcess:
+                    lrRecordset2.MoveNext()
+                End While
 #End Region
 
-            Me.zrPage.UMLDiagram.ActorToProcessParticipationRelationFTI = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString)
-            Me.zrPage.UMLDiagram.PocessToProcessRelationFTI = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString)
+                Me.zrPage.UMLDiagram.ActorToProcessParticipationRelationFTI = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreActorToProcessParticipationRelation.ToString)
+                Me.zrPage.UMLDiagram.PocessToProcessRelationFTI = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString)
 
 #Region "Process to Process Participation Relations"
 
-            Dim larProcessId = (From Process In Me.zrPage.UMLDiagram.Process
-                                Select Process.Id).ToList
+                Dim larProcessId = (From Process In Me.zrPage.UMLDiagram.Process
+                                    Select Process.Id).ToList
 
-            Dim larCMMLProcessProcessRelation = From ProcessProcessRelation In Me.zrPage.Model.UML.ProcessProcessRelation
-                                                Where larProcessId.Contains(ProcessProcessRelation.Process1.Id)
-                                                Select ProcessProcessRelation
+                Dim larCMMLProcessProcessRelation = From ProcessProcessRelation In Me.zrPage.Model.UML.ProcessProcessRelation
+                                                    Where larProcessId.Contains(ProcessProcessRelation.Process1.Id)
+                                                    Select ProcessProcessRelation
 
-            Dim lrProcess1, lrProcess2 As BPMN.Process
+                Dim lrProcess1, lrProcess2 As BPMN.Process
 
-            For Each lrCMMLProcessProcessRelation In larCMMLProcessProcessRelation
+                For Each lrCMMLProcessProcessRelation In larCMMLProcessProcessRelation
 
-                lrProcess1 = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrCMMLProcessProcessRelation.Process1.Id)
-                lrProcess2 = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrCMMLProcessProcessRelation.Process2.Id)
+                    lrProcess1 = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrCMMLProcessProcessRelation.Process1.Id)
+                    lrProcess2 = Me.zrPage.UMLDiagram.Process.Find(Function(x) x.Id = lrCMMLProcessProcessRelation.Process2.Id)
 
-                If lrProcess1 IsNot Nothing And lrProcess2 IsNot Nothing Then
+                    If lrProcess1 IsNot Nothing And lrProcess2 IsNot Nothing Then
 
-                    lsSqlQuery = "SELECT *"
-                    lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
-                    lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
-                    lsSqlQuery &= " WHERE Process1 = '" & lrProcess1.Id & "'"
-                    lsSqlQuery &= " AND Process2 = '" & lrProcess2.Id & "'"
+                        lsSqlQuery = "SELECT *"
+                        lsSqlQuery &= " FROM " & pcenumCMMLRelations.CoreProcessToProcessParticipationRelation.ToString
+                        lsSqlQuery &= " ON PAGE '" & Me.zrPage.Name & "'"
+                        lsSqlQuery &= " WHERE Process1 = '" & lrProcess1.Id & "'"
+                        lsSqlQuery &= " AND Process2 = '" & lrProcess2.Id & "'"
 
-                    lrRecordset = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
+                        lrRecordset2 = Me.zrPage.Model.ORMQL.ProcessORMQLStatement(lsSqlQuery)
 
-                    Dim lrBPMNProcessProcessRelation As BPMN.ProcessProcessRelation
-                    If lrRecordset.EOF Then
-                        lrFactInstance = Me.zrPage.UMLDiagram.PocessToProcessRelationFTI.AddFact(lrCMMLProcessProcessRelation.Fact)
-                    Else
-                        lrFactInstance = lrRecordset.CurrentFact
+                        Dim lrBPMNProcessProcessRelation As BPMN.ProcessProcessRelation
+                        If lrRecordset2.EOF Then
+                            lrFactInstance = Me.zrPage.UMLDiagram.PocessToProcessRelationFTI.AddFact(lrCMMLProcessProcessRelation.Fact)
+                        Else
+                            lrFactInstance = lrRecordset2.CurrentFact
+                        End If
+
+                        lrBPMNProcessProcessRelation = lrFactInstance.CloneBPMNProcessProcessRelation(Me.zrPage, lrProcess1, lrProcess2)
+
+                        'CodeSafe
+                        If Me.zrPage.UMLDiagram.ProcessProcessRelation.Contains(lrBPMNProcessProcessRelation) Then GoTo SkipProcessProcessRelation
+                        If lrBPMNProcessProcessRelation.Process1 Is Nothing Or lrBPMNProcessProcessRelation.Process2 Is Nothing Then GoTo SkipProcessProcessRelation
+
+                        Me.zrPage.UMLDiagram.ProcessProcessRelation.AddUnique(lrBPMNProcessProcessRelation)
+
+                        '------------------------------------------
+                        'Link the Processes
+                        '------------------------------------------                    
+                        lrBPMNProcessProcessRelation.Fact = lrFactInstance
+                        lrBPMNProcessProcessRelation.IsExtends = lrCMMLProcessProcessRelation.IsExtends
+                        lrBPMNProcessProcessRelation.IsIncludes = lrCMMLProcessProcessRelation.IsIncludes
+                        lrBPMNProcessProcessRelation.CMMLProcessProcessRelation = lrCMMLProcessProcessRelation 'Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
+                        lrBPMNProcessProcessRelation.IsExtends = lrCMMLProcessProcessRelation.IsExtends
+
+
+
+                        Dim lo_link As DiagramLink
+                        lo_link = Me.Diagram.Factory.CreateDiagramLink(lrProcess1.Shape, lrProcess2.Shape)
+                        lo_link.AutoRoute = True
+                        lrBPMNProcessProcessRelation.Link = lo_link
+                        lo_link.Tag = lrBPMNProcessProcessRelation
+
                     End If
-
-                    lrBPMNProcessProcessRelation = lrFactInstance.CloneBPMNProcessProcessRelation(Me.zrPage, lrProcess1, lrProcess2)
-
-                    '------------------------------------------
-                    'Link the Processes
-                    '------------------------------------------                    
-                    lrBPMNProcessProcessRelation.Fact = lrFactInstance
-                    lrBPMNProcessProcessRelation.IsExtends = lrCMMLProcessProcessRelation.IsExtends
-                    lrBPMNProcessProcessRelation.IsIncludes = lrCMMLProcessProcessRelation.IsIncludes
-                    lrBPMNProcessProcessRelation.CMMLProcessProcessRelation = lrCMMLProcessProcessRelation 'Me.zrPage.Model.UML.ProcessProcessRelation.Find(Function(x) x.Process1.Id = lrProcess1.Id And x.Process2.Id = lrProcess2.Id)
-                    lrBPMNProcessProcessRelation.IsExtends = lrCMMLProcessProcessRelation.IsExtends
-
-                    Me.zrPage.UMLDiagram.ProcessProcessRelation.Add(lrBPMNProcessProcessRelation)
-
-                    Dim lo_link As DiagramLink
-                    lo_link = Me.Diagram.Factory.CreateDiagramLink(lrProcess1.Shape, lrProcess2.Shape)
-                    lo_link.AutoRoute = True
-                    lrBPMNProcessProcessRelation.Link = lo_link
-                    lo_link.Tag = lrBPMNProcessProcessRelation
-
-                End If
-            Next
+SkipProcessProcessRelation:
+                Next
 #End Region
 
+#End Region
+
+                lrRecordset.MoveNext()
+            End While
+
+#End Region
+
+
+#Region "Old code-20230901"
             '        '==================================
             '        'Draw the Processes
             '        '==================================
@@ -475,9 +466,11 @@ Public Class frmDiagramBPMNCollaboration
             '            lrRecordset.MoveNext()
             '        End While
             '#End Region
+#End Region
 
             Me.Diagram.RouteAllLinks()
 
+#Region "Tidy up"
             Dim count As Integer
             Dim i As Integer
             count = Me.ColumnHeaders.Count
@@ -517,15 +510,17 @@ Public Class frmDiagramBPMNCollaboration
                     '20220624-VM-Do nothing at this stage.
                 End Try
             Next i
-
-            Me.Diagram.EnableLanes = True
-
+#End Region
             ' Ensure the document is big enough to contain the grid
             Dim width As Single = Math.Max(50, grid.ColumnCount * 6 + 20)
             Dim height As Single = Math.Max(50, grid.RowCount * 6 + 20)
 
             Me.Diagram.Bounds = New RectangleF(0, 0, width, height)
             Me.Diagram.AlignToGrid = False
+
+            Me.grid.AllowResizeHeaders = True
+            Me.Diagram.EnableLanes = True
+            Me.DiagramView.Enabled = True
 
             Me.Diagram.Invalidate()
             Me.zrPage.FormLoaded = True
@@ -536,7 +531,7 @@ Public Class frmDiagramBPMNCollaboration
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -551,7 +546,7 @@ Public Class frmDiagramBPMNCollaboration
             Dim lrToolboxForm As frmToolbox
             lrToolboxForm = prApplication.GetToolboxForm(frmToolbox.Name)
 
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
 
                 lrToolboxForm.ShapeListBox.IconSize = New Size(40, 40)
                 lrToolboxForm.ShapeListBox.BackColor = Color.White
@@ -593,7 +588,7 @@ Public Class frmDiagramBPMNCollaboration
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -744,7 +739,7 @@ Public Class frmDiagramBPMNCollaboration
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
         ArrangeLinks()
@@ -870,7 +865,7 @@ SkipPopup:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 #End Region
 
@@ -882,7 +877,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -954,8 +949,8 @@ SkipPopup:
         '    'Add the Page(Name) to the MenuOption.DropDownItems
         '    '---------------------------------------------------
         '    lo_menu_option = Me.MenuOptionUseCaseDiagramActor.DropDownItems.Add(lr_page.Name)
-        '    Dim lr_enterprise_view As tEnterpriseEnterpriseView
-        '    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram,
+        '    Dim lrEnterpriseView As tEnterpriseEnterpriseView
+        '    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram,
         '                                               lr_page,
         '                                               lr_page.Model.EnterpriseId,
         '                                               lr_page.Model.SubjectAreaId,
@@ -964,7 +959,7 @@ SkipPopup:
         '                                               lr_page.Model.ModelId,
         '                                               pcenumLanguage.UseCaseDiagram,
         '                                               Nothing, lr_page.PageId)
-        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
         '    AddHandler lo_menu_option.Click, AddressOf Me.morph_to_UseCase_diagram
         'Next
 
@@ -988,8 +983,8 @@ SkipPopup:
         '    '  they will not be in the TreeView and so a menuOption
         '    '  is now added for those hidden Pages.
         '    '----------------------------------------------------------
-        '    Dim lr_enterprise_view As tEnterpriseEnterpriseView
-        '    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+        '    Dim lrEnterpriseView As tEnterpriseEnterpriseView
+        '    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
         '                                               lr_page,
         '                                               lr_model.EnterpriseId,
         '                                               lr_model.SubjectAreaId,
@@ -1000,13 +995,13 @@ SkipPopup:
         '                                               Nothing,
         '                                               lr_page.PageId)
 
-        '    lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-        '    If IsSomething(lr_enterprise_view) Then
+        '    lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+        '    If lrEnterpriseView IsNot Nothing Then
         '        '---------------------------------------------------
         '        'Add the Page(Name) to the MenuOption.DropDownItems
         '        '---------------------------------------------------
         '        lo_menu_option = Me.MenuOptionORMDiagramActor.DropDownItems.Add(lr_page.Name)
-        '        lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+        '        lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
         '        AddHandler lo_menu_option.Click, AddressOf Me.morph_to_ORM_diagram
         '    End If
         'Next
@@ -1029,8 +1024,8 @@ SkipPopup:
         '    '---------------------------------------------------
         '    lo_menu_option = Me.MenuOptionDataFlowDiagramActor.DropDownItems.Add(lr_page.Name)
 
-        '    Dim lr_enterprise_view As tEnterpriseEnterpriseView
-        '    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram,
+        '    Dim lrEnterpriseView As tEnterpriseEnterpriseView
+        '    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram,
         '                                               lr_page,
         '                                               lr_page.Model.EnterpriseId,
         '                                               lr_page.Model.SubjectAreaId,
@@ -1040,7 +1035,7 @@ SkipPopup:
         '                                               pcenumLanguage.DataFlowDiagram,
         '                                               Nothing, lr_page.PageId)
 
-        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
         '    AddHandler lo_menu_option.Click, AddressOf Me.morph_to_DataFlowDiagram
         'Next
         '============================================================================================================================
@@ -1076,20 +1071,22 @@ SkipPopup:
         Dim lr_shape_node As ShapeNode
 
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = item.Tag
-            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = item.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
+            prApplication.WorkingPage = lrEnterpriseView.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Actor/EntityType being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
-            lr_page = lr_enterprise_view.Tag
-            Dim lrEntityTypeInstanceList = From EntityTypeInstance In lr_page.EntityTypeInstance
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
+
+            Dim lrEntityTypeInstanceList = From EntityTypeInstance In lrPage.EntityTypeInstance
                                            Where EntityTypeInstance.Id = lr_actor.Data
-                                           Select New FBM.EntityTypeInstance(lr_page.Model,
+                                           Select New FBM.EntityTypeInstance(lrPage.Model,
                                                                     pcenumLanguage.ORMModel,
                                                                     EntityTypeInstance.Name,
                                                                     True,
@@ -1104,9 +1101,9 @@ SkipPopup:
             '----------------------------------------------------------------
             'Retreive the actual EntityTypeInstance on the destination page
             '----------------------------------------------------------------
-            lrEntityTypeInstance = lr_page.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
+            lrEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrEntityTypeInstance.Equals)
 
-            If lr_page.Loaded Then
+            If lrPage.Loaded Then
                 lr_shape_node = lrEntityTypeInstance.Shape.Clone(True)
                 Me.MorphVector(0).Shape = lr_shape_node
             Else
@@ -1159,7 +1156,7 @@ SkipPopup:
 
         Me.HiddenDiagram.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
             lrEnterpriseView = lrMenuItem.Tag
             Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
@@ -1170,6 +1167,7 @@ SkipPopup:
             '---------------------------------------------
             Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
             lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
 
             '----------------------------------------------------------------------
             'Populate the MorphVector with each Process Shape on the current Page
@@ -1262,18 +1260,20 @@ SkipPopup:
 
         Me.HiddenDiagram.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = item.Tag
-            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = item.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
+            prApplication.WorkingPage = lrEnterpriseView.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Actor/EntityType being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
-            lr_page = lr_enterprise_view.Tag
-            Dim lrActor = From FactType In lr_page.FactTypeInstance
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
+
+            Dim lrActor = From FactType In lrPage.FactTypeInstance
                           From Fact In FactType.Fact
                           From RoleData In Fact.Data
                           Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString
@@ -1333,18 +1333,18 @@ SkipPopup:
                 liConceptType = pcenumConceptType.Process
         End Select
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = item.Tag
-            Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = item.Tag
+            Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
+            prApplication.WorkingPage = lrEnterpriseView.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Process/Entity being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
-
-            lr_page = lr_enterprise_view.Tag
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
 
             '---------------------------------------------------------------
             'Populate the MorphVector with each Process Shape on the Page
@@ -1356,7 +1356,7 @@ SkipPopup:
                     'Skip. Is already added to the MorphVector collection when the ContextMenu.Diagram as loaded
                     '---------------------------------------------------------------------------------------------
                 Else
-                    Dim lrEntityList = From FactTypeInstance In lr_page.FactTypeInstance
+                    Dim lrEntityList = From FactTypeInstance In lrPage.FactTypeInstance
                                        From Fact In FactTypeInstance.Fact
                                        From FactData In Fact.Data
                                        Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
@@ -1382,7 +1382,7 @@ SkipPopup:
 
             Select Case liConceptType
                 Case Is = pcenumConceptType.Actor
-                    Dim lrEntityList = From FactType In lr_page.FactTypeInstance
+                    Dim lrEntityList = From FactType In lrPage.FactTypeInstance
                                        From Fact In FactType.Fact
                                        From RoleData In Fact.Data
                                        Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString _
@@ -1393,7 +1393,7 @@ SkipPopup:
                         Exit For
                     Next
                 Case Is = pcenumConceptType.Process
-                    Dim lrEntityList = From FactTypeInstance In lr_page.FactTypeInstance
+                    Dim lrEntityList = From FactTypeInstance In lrPage.FactTypeInstance
                                        From Fact In FactTypeInstance.Fact
                                        From FactData In Fact.Data
                                        Where FactTypeInstance.Name = pcenumCMMLRelations.CoreElementHasElementType.ToString _
@@ -1505,7 +1505,7 @@ SkipPopup:
                 Me.zrPage.SelectedObject.AddUnique(loLink.Tag)
                 Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
 
-            ElseIf IsSomething(loNode) Then
+            ElseIf loNode IsNot Nothing Then
 #Region "Node Processing"
                 '----------------------------
                 'Mouse is over an ShapeNode
@@ -1545,7 +1545,7 @@ SkipPopup:
 #End Region
 
 #Region "Commented out. old stuff"
-                'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+                'If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
                 '    '----------------------------
                 '    'Mouse is over an ShapeNode
                 '    '----------------------------
@@ -1617,7 +1617,7 @@ SkipPopup:
                 '                Diagram.Selection.Clear()
 #End Region
 
-            ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
+            ElseIf Diagram.GetLinkAt(lo_point, 2) IsNot Nothing Then
                 '-------------------------
                 'User clicked on a link
                 '-------------------------
@@ -1643,7 +1643,7 @@ SkipPopup:
                 '  NB See Diagram.DoubleClick where if a 'Process' is DoubleClicked on,
                 '  then 'InPlaceEdit' is temporarily allowed.
                 '------------------------------------------------------------------------------
-                Me.DiagramView.AllowInplaceEdit = False
+                'Me.DiagramView.AllowInplaceEdit = False  '20230901-VM-Commented out to see if can modify swimlane sizes with mouse
 
                 '-----------------------------------------------------------------------------------------------------------
                 'If the PropertiesForm is loaded, set the 'SelectedObject' property of the PropertyGrid to the UseCaseModel
@@ -1661,7 +1661,7 @@ SkipPopup:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1748,7 +1748,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2630,7 +2630,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2655,7 +2655,7 @@ SkipTag:
         '-------------------------------------------------------
         lo_point = Diagram.PixelToUnit(e.Location)
 
-        If IsSomething(Diagram.GetItemAt(lo_point, False)) Then
+        If Diagram.GetItemAt(lo_point, False) IsNot Nothing Then
             '----------------------------------------------
             'Mouse is over a DiagramItem
             '----------------------------------------------
@@ -2789,8 +2789,8 @@ SkipTag:
         '    'Add the Page(Name) to the MenuOption.DropDownItems
         '    '---------------------------------------------------
         '    lo_menu_option = Me.MenuOptionUseCaseDiagramProcess.DropDownItems.Add(lr_page.Name)
-        '    Dim lr_enterprise_view As tEnterpriseEnterpriseView
-        '    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram,
+        '    Dim lrEnterpriseView As tEnterpriseEnterpriseView
+        '    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageUseCaseDiagram,
         '                                               lr_page,
         '                                               lr_page.Model.EnterpriseId,
         '                                               lr_page.Model.SubjectAreaId,
@@ -2799,7 +2799,7 @@ SkipTag:
         '                                               lr_page.Model.ModelId,
         '                                               pcenumLanguage.UseCaseDiagram,
         '                                               Nothing, lr_page.PageId)
-        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
         '    AddHandler lo_menu_option.Click, AddressOf Me.morph_to_UseCase_diagram
         'Next
 
@@ -2820,8 +2820,8 @@ SkipTag:
         '    'Add the Page(Name) to the MenuOption.DropDownItems
         '    '----------------------------------------------------
         '    lo_menu_option = Me.MenuOptionDataFlowDiagramProcess.DropDownItems.Add(lr_page.Name)
-        '    Dim lr_enterprise_view As tEnterpriseEnterpriseView
-        '    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
+        '    Dim lrEnterpriseView As tEnterpriseEnterpriseView
+        '    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
         '                                               lr_page,
         '                                               lr_page.Model.EnterpriseId,
         '                                               lr_page.Model.SubjectAreaId,
@@ -2830,7 +2830,7 @@ SkipTag:
         '                                               lr_page.Model.ModelId,
         '                                               pcenumLanguage.DataFlowDiagram,
         '                                               Nothing, lr_page.PageId)
-        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
         '    AddHandler lo_menu_option.Click, AddressOf Me.morph_to_DataFlowDiagram
         'Next
 
@@ -2847,8 +2847,8 @@ SkipTag:
         '    'Add the Page(Name) to the MenuOption.DropDownItems
         '    '---------------------------------------------------
         '    lo_menu_option = Me.ToolStripMenuItemFlowChart.DropDownItems.Add(lr_page.Name)
-        '    Dim lr_enterprise_view As tEnterpriseEnterpriseView
-        '    lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageFlowChart,
+        '    Dim lrEnterpriseView As tEnterpriseEnterpriseView
+        '    lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageFlowChart,
         '                                               lr_page,
         '                                               lr_page.Model.EnterpriseId,
         '                                               lr_page.Model.SubjectAreaId,
@@ -2857,7 +2857,7 @@ SkipTag:
         '                                               lr_page.Model.ModelId,
         '                                               pcenumLanguage.FlowChart,
         '                                               Nothing, lr_page.PageId)
-        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+        '    lo_menu_option.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
         '    AddHandler lo_menu_option.Click, AddressOf Me.MorphToFlowChartDiagram
         'Next
         'UnCommentOut-ToHere
@@ -2905,7 +2905,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2950,7 +2950,7 @@ SkipTag:
             '-------------------------------------------------------
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Select Case e.Link.Tag.ConceptType
                 End Select
@@ -2970,7 +2970,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -2978,7 +2978,7 @@ SkipTag:
 
 
         Try
-            If IsSomething(e.Node) Then
+            If e.Node IsNot Nothing Then
 
                 'CodeSafe
                 If e.Node.Tag Is Nothing Then Exit Sub
@@ -2999,7 +2999,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3031,7 +3031,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3053,7 +3053,7 @@ SkipTag:
 
             lrShape = e.Node
 
-            If IsSomething(e.Node.Tag) Then
+            If e.Node.Tag IsNot Nothing Then
 
                 Select Case e.Node.Tag.ConceptType
                     Case Is = pcenumConceptType.Process
@@ -3114,7 +3114,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -3175,7 +3175,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3232,7 +3232,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3283,7 +3283,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -3343,7 +3343,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3376,7 +3376,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3579,7 +3579,7 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3599,9 +3599,68 @@ SkipTag:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
+
+    Private Sub frmDiagramETD_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
+
+        Call Me.SetToolbox()
+
+        frmMain.ToolStripComboBox_zoom.Enabled = True
+
+    End Sub
+
+    Private Sub frmDiagramETD_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+
+        '-------------------------------------------
+        'Process the page associated with the form.
+        '-------------------------------------------
+        If Me.zrPage IsNot Nothing Then
+            If Me.zrPage.IsDirty Then
+                Select Case MsgBox("Changes have been made to the Page, '" & Me.zrPage.Name & "'. Would you like to save those changes?", MsgBoxStyle.YesNoCancel)
+                    Case Is = MsgBoxResult.Yes
+                        Me.zrPage.Save()
+                    Case Is = MsgBoxResult.Cancel
+                        e.Cancel = True
+                        Exit Sub
+                End Select
+            End If
+            Me.zrPage.Form = Nothing
+            Me.zrPage.ReferencedForm = Nothing
+        End If
+
+        '----------------------------------------------
+        'Reset the PageLoaded flag on the Page so
+        '  that the User can open the Page again
+        '  if they want.
+        '----------------------------------------------        
+        Me.zrPage.FormLoaded = False
+
+        prApplication.WorkingModel = Nothing
+        prApplication.WorkingPage = Nothing
+
+        '------------------------------------------------
+        'If the 'Properties' window is open, reset the
+        '  SelectedObject
+        '------------------------------------------------
+        If Not IsNothing(frmMain.zfrm_properties) Then
+            frmMain.zfrm_properties.PropertyGrid.SelectedObject = Nothing
+        End If
+
+        Me.Hide()
+
+        frmMain.ToolStripButton_Save.Enabled = False
+
+    End Sub
+
+
+    Private Sub frm_EventTraceDiagram_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.GotFocus
+
+        Call SetToolbox()
+
+    End Sub
+
 
 End Class

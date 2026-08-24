@@ -93,12 +93,37 @@ Namespace PGS
 
         Public PrimaryKey As New List(Of ERD.Attribute)
 
-        Public Shadows TableShape As ERD.TableNode
+        Public Shadows TableShape As MindFusion.Diagramming.TableNode
+
+        Private _IsDisplayedAssociated As Boolean = False
 
         Public ReadOnly Property IsDisplayedAssociated
             Get
-                Return Me.Shape IsNot Nothing
+                If Me._IsDisplayedAssociated Then
+                    Return True
+                Else
+                    Return Me.Shape IsNot Nothing
+                End If
+
             End Get
+        End Property
+
+        Private _Visible As Boolean = True
+        Public Overrides Property Visible As Boolean
+            Get
+                'CodeSafe
+                If Me.Shape Is Nothing Then Return False
+
+                Return Me.Shape.Visible
+            End Get
+            Set(value As Boolean)
+                Me._IsDisplayedAssociated = value
+                Me._Visible = value
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Visible = value
+                End If
+                Me.Shape.Visible = False
+            End Set
         End Property
 
         Public Shadows Property X As Integer Implements FBM.iPageObject.X
@@ -219,7 +244,7 @@ Namespace PGS
 
             Dim lrAttribute As New ERD.Attribute(lsAttributeName)
 
-            If IsSomething(Me.Attribute.Find(AddressOf lrAttribute.EqualsByName)) Then
+            If Me.Attribute.Find(AddressOf lrAttribute.EqualsByName) IsNot Nothing Then
                 lsAttributeName = Me.CreateUniqueAttributeName(asAttributeName, aiCounter + 1)
             End If
 
@@ -234,7 +259,23 @@ Namespace PGS
             Dim G As Graphics
 
             Try
-                G = Me.Page.Form.CreateGraphics
+                Dim larPGSNodeShapeNode As New List(Of ShapeNode)
+                For Each lrShapeNode In Me.Page.Diagram.Nodes
+                    If lrShapeNode.Tag.Name = Me.Name Then
+                        larPGSNodeShapeNode.Add(lrShapeNode)
+                    End If
+                Next
+                If larPGSNodeShapeNode.Count > 0 Then
+                    For Each lrShapeNode In larPGSNodeShapeNode
+                        Call Me.Page.Diagram.Nodes.Remove(lrShapeNode)
+                    Next
+                End If
+
+                Try
+                    G = Me.Page.Form.CreateGraphics
+                Catch
+                    'Was accessing disposed object. 20251104-VM-
+                End Try
                 StringSize = Me.Page.Diagram.MeasureString(Trim(Me.Name), Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
 
                 '=====================================================================            
@@ -282,13 +323,15 @@ Namespace PGS
 
                 loDroppedNode.Image = My.Resources.ORMShapes.Blank
 
+                Me._IsDisplayedAssociated = True
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -297,7 +340,7 @@ Namespace PGS
 
             Try
                 If Me.Attribute.Count > 0 Then
-                    Throw New Exception("Method called for Entity, '" & Me.Name & "', that already has Attributes loaded.")
+                    Exit Sub 'Throw New Exception("Method called for Entity, '" & Me.Name & "', that already has Attributes loaded.")
                 ElseIf Me.Page Is Nothing Then
                     Throw New Exception("Method called for Entity, '" & Me.Name & "', that has no Page.")
                 End If
@@ -310,6 +353,9 @@ Namespace PGS
                     lrERAttribute.Column = lrColumn
                     lrERAttribute.Model = Me.Page.Model
                     lrERAttribute.Id = lrColumn.Id
+                    lrERAttribute.DataType = lrColumn.getMetamodelDataType
+                    lrERAttribute.DataTypeLength = lrColumn.getMetamodelDataTypeLength
+                    lrERAttribute.DataTypePrecision = lrColumn.getMetamodelDataTypePrecision
                     lrERAttribute.Entity = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = Me.Name)
                     lrERAttribute.AttributeName = lrColumn.Name
                     lrERAttribute.ResponsibleRole = lrColumn.Role
@@ -356,7 +402,7 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -439,7 +485,7 @@ Namespace PGS
                                 Optional ByVal asSelectedGridItemLabel As String = "")
             Try
 
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "Name"
                             '-----------------------------------------------------------------------------
@@ -480,6 +526,38 @@ Namespace PGS
 
         End Sub
 
+        Public Sub ResetAttributeCellColours()
+
+            Try
+                Dim lrCell As MindFusion.Diagramming.TableNode.Cell
+                Dim liInd As Integer = 0
+
+                'CodeSafe
+                If Me.TableShape Is Nothing Then Exit Sub
+
+                For liInd = 0 To Me.TableShape.RowCount - 1
+                    lrCell = Me.TableShape.Item(0, liInd)
+                    lrCell.Brush = New MindFusion.Drawing.SolidBrush(Color.White)
+                    lrCell.TextColor = Color.Black
+                    Try
+                        Dim lrAttribute As ERD.Attribute = lrCell.Tag
+                        Call lrAttribute.SetAppropriateColour()
+                    Catch ex As Exception
+                        'Tried
+                    End Try
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,, True, ex)
+            End Try
+
+        End Sub
+
         Public Overloads Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
 
             If CType(Me.RDSTable.FBMModelElement, Object).ModelError.Count > 0 Then
@@ -504,7 +582,7 @@ Namespace PGS
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -520,7 +598,7 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -572,29 +650,45 @@ Namespace PGS
                 Else
                     If Me.PGSRelation Is Nothing Then
                         'Need to create or find the Relation
-                        Me.PGSRelation = Me.Page.ERDiagram.Relation.Find(Function(x) x.ActualPGSNode Is Me)
+                        Me.PGSRelation = Me.Page.ERDiagram.Relation.Find(Function(x) x.ActualPGSNode IsNot Nothing AndAlso x.ActualPGSNode.Name = Me.Name)
 
                         If Me.PGSRelation Is Nothing Then
-                            'Still haven't found the Relation, so must create it.
-                            'VM-Use code from frmDiagramPGS.LoadPGSDiagramPage
-                            Call Me.loadPGSRelationAndLink() 'Does the displaying and associating
+
+                            'CodeSafe
+                            Dim lrPGSRelation = Me.Page.ERDiagram.Relation.Find(Function(x) x.RDSRelation IsNot Nothing AndAlso x.RDSRelation.ResponsibleFactType IsNot Nothing AndAlso x.RDSRelation.ResponsibleFactType.Id = Me.Name)
+
+                            If lrPGSRelation Is Nothing Then
+                                'Still haven't found the Relation, so must create it.
+                                'VM-Use code from frmDiagramPGS.LoadPGSDiagramPage
+                                Call Me.loadPGSRelationAndLink() 'Does the displaying and associating                                
+                            Else
+                                '2024-09-24-VM-Test this. Is above, but was not being displayed.
+                                Call Me.loadPGSRelationAndLink() 'Does the displaying and associating                                
+                            End If
+
                         Else
                             Me.PGSRelation.Link.DisplayAndAssociate
                         End If
                     Else
                         Me.PGSRelation.Link.DisplayAndAssociate
+                        Me.Page.ERDiagram.Relation.AddUnique(Me.PGSRelation)
                     End If
 
                     Me.Page.Diagram.Nodes.Remove(Me.Shape)
+                    Me.Visible = False
 
                     'Relations
                     Dim lrERDRelation As ERD.Relation
-                    For Each lrDiagramLink In Me.Shape.OutgoingLinks
-                        lrERDRelation = lrDiagramLink.Tag
-                        If lrERDRelation IsNot Nothing Then
-                            Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
-                        End If
-                    Next
+                    If Me.Shape IsNot Nothing Then
+                        For Each lrDiagramLink In Me.Shape.OutgoingLinks
+                            Dim lrPGSLink As PGS.Link = lrDiagramLink.Tag
+                            lrERDRelation = lrPGSLink.Relation
+                            If lrERDRelation IsNot Nothing Then
+                                Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
+                            End If
+                        Next
+                    End If
+
                     'CodeSafe
                     For Each lrERDRelation In Me.Page.ERDiagram.Relation.FindAll(Function(x) x.OriginEntity.Name = Me.Name)
                         Call Me.Page.ERDiagram.Relation.RemoveAll(AddressOf lrERDRelation.Equals)
@@ -604,12 +698,13 @@ Namespace PGS
                     Dim lsSQLQuery As String = ""
                     lsSQLQuery = "SELECT *"
                     lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
+                    'lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
                     lsSQLQuery &= " WHERE IsPGSRelation = '" & Me.RDSTable.Name & "'"
 
                     Dim lrRecordsetIsPGSRelation As ORMQL.Recordset
                     lrRecordsetIsPGSRelation = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    If Not lrRecordsetIsPGSRelation.EOF Then
+                    If lrRecordsetIsPGSRelation.EOF Then
                         lsSQLQuery = "ADD FACT '" & lrRecordsetIsPGSRelation.CurrentFact.Id & "'"
                         lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
                         lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
@@ -618,7 +713,7 @@ Namespace PGS
                     End If
                 End If
 
-                Call Me.Page.MakeDirty()
+                    Call Me.Page.MakeDirty()
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -626,7 +721,7 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -658,35 +753,52 @@ Namespace PGS
                     Dim lrNode2 As PGS.Node = Nothing
 
                     Dim lsRelationId As String = ""
+                    Dim larNode As New List(Of PGS.Node)
+                    Try
+                        While Not lrRecordset1.EOF
+                            lsRelationId = lrRecordset1("Relation").Data
 
-                    While Not lrRecordset1.EOF
-                        lsRelationId = lrRecordset1("Relation").Data
+                            lsSQLQuery = "SELECT *"
+                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                            lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
+                            lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
 
-                        lsSQLQuery = "SELECT *"
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
-                        lsSQLQuery &= " ON PAGE '" & Me.Page.Name & "'"
-                        lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
+                            lrRecordset2 = Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                        lrRecordset2 = Me.Page.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            If liInd = 1 Then
+                                lrNode2 = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset2("Entity").Data)
+                                larNode.Add(lrNode2)
+                            Else
+                                lrNode1 = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset2("Entity").Data)
+                                larNode.Add(lrNode1)
+                            End If
 
-                        If liInd = 1 Then
-                            lrNode2 = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset2("Entity").Data)
-                        Else
-                            lrNode1 = Me.Page.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset2("Entity").Data)
-                        End If
+                            liInd += 1
+                            lrRecordset1.MoveNext()
+                        End While
+                    Catch ex As Exception
+                        'CodeSafe - Organic Computing. Get the nodes from the FactType.
 
-                        liInd += 1
-                        lrRecordset1.MoveNext()
-                    End While
+                        Dim larLinkNode = (From Entity In Me.Page.ERDiagram.Entity
+                                           Where Not larNode.Contains(CType(Entity, PGS.Node))
+                                           Where CType(Me.FBMModelElement, FBM.FactType).ModelObjects.Select(Function(x) x.Id).Contains(Entity.Name)
+                                           Where Not larNode.Select(Function(x) x.Name).Contains(Entity.Name)
+                                           Select Entity).ToList
+
+                        For Each lrNodeType In larLinkNode
+                            larNode.AddUnique(lrNodeType)
+                        Next
+
+                    End Try
 
                     Dim lrRelation As New ERD.Relation(Me.Page.Model,
                                                        Me.Page,
                                                        lsRelationId,
-                                                       lrNode1,
+                                                       larNode(0),
                                                        pcenumCMMLMultiplicity.One,
                                                        False,
                                                        False,
-                                                       lrNode2,
+                                                       larNode(1),
                                                        pcenumCMMLMultiplicity.One,
                                                        False,
                                                        Me.RDSTable)
@@ -701,7 +813,7 @@ Namespace PGS
                     lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
 
                     Dim lrLink As PGS.Link
-                    lrLink = New PGS.Link(Me.Page, New FBM.FactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
+                    lrLink = New PGS.Link(Me.Page, New FBM.FactInstance, larNode(0), larNode(1), Nothing, Nothing, lrRelation)
                     lrLink.RDSRelation = lrRDSRelation
                     lrLink.DisplayAndAssociate()
                     lrLink.Link.Text = lrRelation.ActualPGSNode.Id
@@ -718,7 +830,7 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -764,7 +876,7 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -804,12 +916,12 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
-        Private Sub RDSTable_ColumnRemoved(arColumn As Column) Handles RDSTable.ColumnRemoved
+        Private Sub RDSTable_ColumnRemoved(ByRef arColumn As Column) Handles RDSTable.ColumnRemoved
 
             Try
                 'CodeSafe
@@ -834,7 +946,7 @@ Namespace PGS
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

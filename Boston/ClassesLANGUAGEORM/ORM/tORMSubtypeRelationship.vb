@@ -3,11 +3,11 @@ Imports System.Reflection
 
 
 Namespace FBM
-    <Serializable()> _
-    Public Class tSubtypeRelationship
+    <Serializable()>
+    Public Class SubtypeRelationship
         Inherits FBM.ModelObject
-        Implements iObjectRelationalMap(Of FBM.tSubtypeRelationship)
-        Implements IEquatable(Of FBM.tSubtypeRelationship)
+        Implements iObjectRelationalMap(Of FBM.SubtypeRelationship)
+        Implements IEquatable(Of FBM.SubtypeRelationship)
 
         <XmlIgnore()>
         Public Overrides Property ConceptType As pcenumConceptType
@@ -47,6 +47,7 @@ Namespace FBM
         Public FactType As New FBM.FactType
 
         Public Event IsPrimarySubtypeRelationshipChanged(ByVal abIsPrimarySubtypeRelationship As Boolean)
+        Public Shadows Event RemovedFromModel()
 
         Public Sub New()
 
@@ -72,7 +73,7 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Overloads Function Clone(ByRef arModel As FBM.Model, Optional abAddToModel As Boolean = False) As Object
 
-            Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
+            Dim lrSubtypeRelationship As New FBM.SubtypeRelationship
 
             With Me
                 lrSubtypeRelationship.Model = arModel
@@ -152,14 +153,14 @@ Namespace FBM
                     lsMessage.AppendLine("Supertype: " & Me.parentModelElement.Id)
                 End If
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
 
         End Function
 
-        Public Shadows Function Equals(ByVal other As FBM.tSubtypeRelationship) As Boolean Implements System.IEquatable(Of FBM.tSubtypeRelationship).Equals
+        Public Shadows Function Equals(ByVal other As FBM.SubtypeRelationship) As Boolean Implements System.IEquatable(Of FBM.SubtypeRelationship).Equals
 
             Return (Me.ModelElement.Id = other.ModelElement.Id) And (Me.parentModelElement.Id = other.parentModelElement.Id)
 
@@ -197,19 +198,21 @@ Namespace FBM
 
                 Call Me.FactType.RemoveFromModel(True, False, True, True)
 
+                RaiseEvent RemovedFromModel()
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
 
-        Public Shadows Sub Save(Optional ByRef abRapidSave As Boolean = False) Implements iObjectRelationalMap(Of FBM.tSubtypeRelationship).Save
+        Public Shadows Sub Save(Optional ByRef abRapidSave As Boolean = False) Implements iObjectRelationalMap(Of FBM.SubtypeRelationship).Save
 
             If abRapidSave Then
                 Call TableSubtypeRelationship.add_parentEntityType(Me)
@@ -276,22 +279,22 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
 
-        Public Sub Create() Implements iObjectRelationalMap(Of FBM.tSubtypeRelationship).Create
+        Public Sub Create() Implements iObjectRelationalMap(Of FBM.SubtypeRelationship).Create
 
             Call TableSubtypeRelationship.add_parentEntityType(Me)
         End Sub
 
-        Public Sub Delete() Implements iObjectRelationalMap(Of FBM.tSubtypeRelationship).Delete
+        Public Sub Delete() Implements iObjectRelationalMap(Of FBM.SubtypeRelationship).Delete
             Call TableSubtypeRelationship.DeleteParentEntityType(Me)
         End Sub
 
-        Public Function Load() As FBM.tSubtypeRelationship Implements iObjectRelationalMap(Of FBM.tSubtypeRelationship).Load
+        Public Function Load() As FBM.SubtypeRelationship Implements iObjectRelationalMap(Of FBM.SubtypeRelationship).Load
 
             Return Me
         End Function

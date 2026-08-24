@@ -41,7 +41,12 @@ Namespace FactEngine
 
             If Me.Connection Is Nothing Then Throw New Exception("The connection to the database has been lost. Close and reopen FactEngine.")
 
-            lrRecordset = Me.Connection.GO(asQuery)
+            Select Case Me.FBMModel.TargetDatabaseType
+                Case Is = pcenumDatabaseType.FactEngineSemanticLayer
+                    lrRecordset = Me.Connection.GOAbstractionLayer(asQuery)
+                Case Else
+                    lrRecordset = Me.Connection.GO(asQuery)
+            End Select
 
             Return lrRecordset
 
@@ -60,11 +65,14 @@ Namespace FactEngine
         End Function
 
         Public Function establishConnection(ByVal aiDatabaseType As pcenumDatabaseType,
-                                            ByVal asDatabaseConnectionString As String) As FactEngine.DatabaseConnection
+                                            ByVal asDatabaseConnectionString As String,
+                                            Optional ByVal abThrowError As Boolean = True) As FactEngine.DatabaseConnection
 
             Try
 
                 Select Case aiDatabaseType
+                    Case Is = pcenumDatabaseType.MSJet
+                        Me.Connection = New FactEngine.MSJet(Me.FBMModel, asDatabaseConnectionString)
                     Case Is = pcenumDatabaseType.SQLite
                         Me.Connection = New FactEngine.SQLiteConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit, False)
                     Case Is = pcenumDatabaseType.MongoDB
@@ -85,6 +93,8 @@ Namespace FactEngine
                         Me.Connection = New FactEngine.KuzuDBConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                     Case Is = pcenumDatabaseType.EdgeDB
                         Me.Connection = New FactEngine.EdgeDBConnection(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
+                    Case Is = pcenumDatabaseType.FactEngineSemanticLayer
+                        Me.Connection = New FactEngine.Interlink(Me.FBMModel, asDatabaseConnectionString, My.Settings.FactEngineDefaultQueryResultLimit)
                 End Select
 
                 Me.FBMModel.DatabaseConnection = Me.Connection
@@ -93,12 +103,15 @@ Namespace FactEngine
 
             Catch ex As Exception
 
-                Dim lsMessage1 As String
+                Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage.AppendDoubleLineBreak(ex.Message)
+
+                If abThrowError Then
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+                End If
 
                 Return Nothing
             End Try

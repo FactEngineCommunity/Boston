@@ -54,10 +54,10 @@ Public Class frmCRUDRoleInstance
         If Me.zbExtendingExistingFactType Then
             lsFactTypeName = Me.zrBaseFactType.Name
             lsFactTypeName &= ComboBox_join_object.SelectedItem.text
-            Me.TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+            Me.TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
         Else
             lsFactTypeName = ComboBox_join_object.SelectedItem.text
-            Me.TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+            Me.TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
         End If
 
         TextBox_RoleName.Text = Trim(Me.zrRole.Name)
@@ -70,9 +70,9 @@ Public Class frmCRUDRoleInstance
         '---------------------------------------------------
         'Get the count of ObjectifiedFactTypes on the Page
         '---------------------------------------------------
-        Dim orderCounts = (From FactTypeInstance In Me.zrPage.FactTypeInstance _
-                          Where FactTypeInstance.IsObjectified = True _
-                          Select FactTypeInstance).Count()
+        Dim orderCounts = (From FactTypeInstance In Me.zrPage.FactTypeInstance
+                           Where FactTypeInstance.IsObjectified = True
+                           Select FactTypeInstance).Count()
 
         If orderCounts = 0 Then
             Me.RadioButton_nested_FactType.Enabled = False
@@ -123,7 +123,7 @@ Public Class frmCRUDRoleInstance
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -149,7 +149,7 @@ Public Class frmCRUDRoleInstance
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -165,10 +165,10 @@ Public Class frmCRUDRoleInstance
         Dim lsFactTypeName As String = ""
 
         Try
-            lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Viev.Strings.MakeCapCamelCase(Trim(TextBox_FactTypeName.Text)))
+            lsFactTypeName = FEStrings.ProperSpace(FEStrings.MakeCapCamelCase(Trim(TextBox_FactTypeName.Text)))
             lsFactTypeName = arRole.Model.CreateUniqueFactTypeName(lsFactTypeName, 0)
 
-            arRole.Name = Trim(TextBox_RoleName.Text)                        
+            arRole.Name = Trim(TextBox_RoleName.Text)
             arRole.Mandatory = checkbox_mandatory.Checked
 
             If RadioButton_entity_type.Checked Then
@@ -182,7 +182,7 @@ Public Class frmCRUDRoleInstance
 
             End If
 
-            arRole.FactType.SetName(lsFactTypeName)
+            arRole.FactType.setName(lsFactTypeName)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -190,7 +190,7 @@ Public Class frmCRUDRoleInstance
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -210,10 +210,10 @@ Public Class frmCRUDRoleInstance
         If Me.zbExtendingExistingFactType Then
             lsFactTypeName = Me.zrBaseFactType.Name
             lsFactTypeName &= ComboBox_join_object.SelectedItem.text
-            TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+            TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
         Else
             lsFactTypeName = ComboBox_join_object.SelectedItem.text
-            TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+            TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
         End If
 
     End Sub
@@ -229,10 +229,10 @@ Public Class frmCRUDRoleInstance
             If Me.zbExtendingExistingFactType Then
                 lsFactTypeName = Me.zrBaseFactType.Name
                 lsFactTypeName &= ComboBox_join_object.SelectedItem.text
-                TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+                TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
             Else
                 lsFactTypeName = ComboBox_join_object.SelectedItem.text
-                TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+                TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
             End If
 
         Catch ex As Exception
@@ -241,7 +241,7 @@ Public Class frmCRUDRoleInstance
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -258,10 +258,10 @@ Public Class frmCRUDRoleInstance
             If Me.zbExtendingExistingFactType Then
                 lsFactTypeName = Me.zrBaseFactType.Name
                 lsFactTypeName &= ComboBox_join_object.SelectedItem.text
-                TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+                TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
             Else
                 lsFactTypeName = ComboBox_join_object.SelectedItem.text
-                TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+                TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
             End If
 
         Catch ex As Exception
@@ -270,7 +270,7 @@ Public Class frmCRUDRoleInstance
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -304,10 +304,10 @@ Public Class frmCRUDRoleInstance
         If Me.zbExtendingExistingFactType Then
             lsFactTypeName = Me.zrBaseFactType.Name
             lsFactTypeName &= ComboBox_join_object.SelectedItem.text
-            TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+            TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
         Else
             lsFactTypeName = ComboBox_join_object.SelectedItem.text
-            TextBox_FactTypeName.Text = Viev.Strings.RemoveWhiteSpace(lsFactTypeName)
+            TextBox_FactTypeName.Text = FEStrings.ProperSpace(lsFactTypeName)
         End If
 
     End Sub

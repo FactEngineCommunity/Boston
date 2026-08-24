@@ -59,11 +59,11 @@ Partial Class frmCRUDModel
         Me.LabelPromptNamespace = New System.Windows.Forms.Label()
         Me.LabelProject = New System.Windows.Forms.Label()
         Me.LabelPromptProject = New System.Windows.Forms.Label()
-        Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
         Me.LabelModelId = New System.Windows.Forms.Label()
         Me.ButtonReplaceDatabaseModel = New System.Windows.Forms.Button()
         Me.CheckBoxSaveToXML = New System.Windows.Forms.CheckBox()
         Me.LabelPromptIsDatabaseSynchronised = New System.Windows.Forms.Label()
+        Me.ButtonCopyModelIdToClipboard = New System.Windows.Forms.Button()
         Me.TabPageReverseEngineering = New System.Windows.Forms.TabPage()
         Me.TabPageConnection = New System.Windows.Forms.TabPage()
         Me.GroupBoxConnection = New System.Windows.Forms.GroupBox()
@@ -85,9 +85,16 @@ Partial Class frmCRUDModel
         Me.LabelPromptDefaultReferenceMode = New System.Windows.Forms.Label()
         Me.CheckBoxAutomaticallyCreateReferenceMode = New System.Windows.Forms.CheckBox()
         Me.CheckBoxUseNeo4jStyleEdgeLabels = New System.Windows.Forms.CheckBox()
+        Me.ORMModelling = New System.Windows.Forms.TabPage()
+        Me.CheckBoxHideReferenceModesByDefault = New System.Windows.Forms.CheckBox()
+        Me.Projects = New System.Windows.Forms.TabPage()
+        Me.LabelPromptProjectsForGroup = New System.Windows.Forms.Label()
+        Me.ListBoxProjects = New System.Windows.Forms.ListBox()
         Me.ButtonApply = New System.Windows.Forms.Button()
         Me.BackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
+        Me.LabelPromptDerivationSyntaxType = New System.Windows.Forms.Label()
+        Me.ComboBoxDerivationSyntaxType = New System.Windows.Forms.ComboBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxReverseEngineering.SuspendLayout()
@@ -101,6 +108,8 @@ Partial Class frmCRUDModel
         Me.TabPageConnection.SuspendLayout()
         Me.GroupBoxConnection.SuspendLayout()
         Me.GraphModeling.SuspendLayout()
+        Me.ORMModelling.SuspendLayout()
+        Me.Projects.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button_Cancel
@@ -195,9 +204,9 @@ Partial Class frmCRUDModel
         Me.ButtonFileSelect.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.ButtonFileSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonFileSelect.ForeColor = System.Drawing.Color.White
-        Me.ButtonFileSelect.Location = New System.Drawing.Point(275, 23)
+        Me.ButtonFileSelect.Location = New System.Drawing.Point(272, 22)
         Me.ButtonFileSelect.Name = "ButtonFileSelect"
-        Me.ButtonFileSelect.Size = New System.Drawing.Size(16, 16)
+        Me.ButtonFileSelect.Size = New System.Drawing.Size(18, 18)
         Me.ButtonFileSelect.TabIndex = 8
         Me.ButtonFileSelect.UseVisualStyleBackColor = False
         Me.ButtonFileSelect.Visible = False
@@ -392,11 +401,13 @@ Partial Class frmCRUDModel
         Me.TabControl1.Controls.Add(Me.TabPageReverseEngineering)
         Me.TabControl1.Controls.Add(Me.TabPageConnection)
         Me.TabControl1.Controls.Add(Me.GraphModeling)
+        Me.TabControl1.Controls.Add(Me.ORMModelling)
+        Me.TabControl1.Controls.Add(Me.Projects)
         Me.TabControl1.Location = New System.Drawing.Point(8, 8)
         Me.TabControl1.Margin = New System.Windows.Forms.Padding(2)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(629, 524)
+        Me.TabControl1.Size = New System.Drawing.Size(629, 528)
         Me.TabControl1.TabIndex = 9
         '
         'Tab1
@@ -406,7 +417,7 @@ Partial Class frmCRUDModel
         Me.Tab1.Margin = New System.Windows.Forms.Padding(2)
         Me.Tab1.Name = "Tab1"
         Me.Tab1.Padding = New System.Windows.Forms.Padding(2)
-        Me.Tab1.Size = New System.Drawing.Size(621, 498)
+        Me.Tab1.Size = New System.Drawing.Size(621, 502)
         Me.Tab1.TabIndex = 0
         Me.Tab1.Text = "Database"
         Me.Tab1.UseVisualStyleBackColor = True
@@ -414,17 +425,17 @@ Partial Class frmCRUDModel
         'Advanced
         '
         Me.Advanced.Controls.Add(Me.GroupBoxClientServer)
-        Me.Advanced.Controls.Add(Me.ButtonCopyModelIdToClipboard)
         Me.Advanced.Controls.Add(Me.LabelModelId)
         Me.Advanced.Controls.Add(Me.ButtonReplaceDatabaseModel)
         Me.Advanced.Controls.Add(Me.CheckBoxSaveToXML)
         Me.Advanced.Controls.Add(Me.LabelPromptIsDatabaseSynchronised)
         Me.Advanced.Controls.Add(Me.CheckBoxIsDatabaseSynchronised)
+        Me.Advanced.Controls.Add(Me.ButtonCopyModelIdToClipboard)
         Me.Advanced.Location = New System.Drawing.Point(4, 22)
         Me.Advanced.Margin = New System.Windows.Forms.Padding(2)
         Me.Advanced.Name = "Advanced"
         Me.Advanced.Padding = New System.Windows.Forms.Padding(2)
-        Me.Advanced.Size = New System.Drawing.Size(621, 498)
+        Me.Advanced.Size = New System.Drawing.Size(621, 502)
         Me.Advanced.TabIndex = 1
         Me.Advanced.Text = "Advanced"
         Me.Advanced.UseVisualStyleBackColor = True
@@ -480,18 +491,6 @@ Partial Class frmCRUDModel
         Me.LabelPromptProject.TabIndex = 0
         Me.LabelPromptProject.Text = "Project:"
         '
-        'ButtonCopyModelIdToClipboard
-        '
-        Me.ButtonCopyModelIdToClipboard.FlatAppearance.BorderSize = 0
-        Me.ButtonCopyModelIdToClipboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonCopyModelIdToClipboard.Image = Global.Boston.My.Resources.Resources.CopyToClipboard16x16
-        Me.ButtonCopyModelIdToClipboard.Location = New System.Drawing.Point(13, 125)
-        Me.ButtonCopyModelIdToClipboard.Name = "ButtonCopyModelIdToClipboard"
-        Me.ButtonCopyModelIdToClipboard.Size = New System.Drawing.Size(20, 23)
-        Me.ButtonCopyModelIdToClipboard.TabIndex = 12
-        Me.ToolTip.SetToolTip(Me.ButtonCopyModelIdToClipboard, "Copy the Model's Id to the clipboard.")
-        Me.ButtonCopyModelIdToClipboard.UseVisualStyleBackColor = True
-        '
         'LabelModelId
         '
         Me.LabelModelId.AutoSize = True
@@ -532,13 +531,25 @@ Partial Class frmCRUDModel
         Me.LabelPromptIsDatabaseSynchronised.Text = "Warning: When 'Is Database Synchronised' is checked, Boston will modify the datab" &
     "ase when you change the ORM Model within the Model."
         '
+        'ButtonCopyModelIdToClipboard
+        '
+        Me.ButtonCopyModelIdToClipboard.FlatAppearance.BorderSize = 0
+        Me.ButtonCopyModelIdToClipboard.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCopyModelIdToClipboard.Image = Global.Boston.My.Resources.Resources.CopyToClipboard16x16
+        Me.ButtonCopyModelIdToClipboard.Location = New System.Drawing.Point(13, 125)
+        Me.ButtonCopyModelIdToClipboard.Name = "ButtonCopyModelIdToClipboard"
+        Me.ButtonCopyModelIdToClipboard.Size = New System.Drawing.Size(20, 23)
+        Me.ButtonCopyModelIdToClipboard.TabIndex = 12
+        Me.ToolTip.SetToolTip(Me.ButtonCopyModelIdToClipboard, "Copy the Model's Id to the clipboard.")
+        Me.ButtonCopyModelIdToClipboard.UseVisualStyleBackColor = True
+        '
         'TabPageReverseEngineering
         '
         Me.TabPageReverseEngineering.Controls.Add(Me.GroupBoxReverseEngineering)
         Me.TabPageReverseEngineering.Location = New System.Drawing.Point(4, 22)
         Me.TabPageReverseEngineering.Margin = New System.Windows.Forms.Padding(2)
         Me.TabPageReverseEngineering.Name = "TabPageReverseEngineering"
-        Me.TabPageReverseEngineering.Size = New System.Drawing.Size(621, 498)
+        Me.TabPageReverseEngineering.Size = New System.Drawing.Size(621, 502)
         Me.TabPageReverseEngineering.TabIndex = 2
         Me.TabPageReverseEngineering.Text = "Reverse Engineering"
         Me.TabPageReverseEngineering.UseVisualStyleBackColor = True
@@ -548,7 +559,7 @@ Partial Class frmCRUDModel
         Me.TabPageConnection.Controls.Add(Me.GroupBoxConnection)
         Me.TabPageConnection.Location = New System.Drawing.Point(4, 22)
         Me.TabPageConnection.Name = "TabPageConnection"
-        Me.TabPageConnection.Size = New System.Drawing.Size(621, 498)
+        Me.TabPageConnection.Size = New System.Drawing.Size(621, 502)
         Me.TabPageConnection.TabIndex = 3
         Me.TabPageConnection.Text = "Connection"
         Me.TabPageConnection.UseVisualStyleBackColor = True
@@ -688,7 +699,7 @@ Partial Class frmCRUDModel
         Me.GraphModeling.Controls.Add(Me.CheckBoxUseNeo4jStyleEdgeLabels)
         Me.GraphModeling.Location = New System.Drawing.Point(4, 22)
         Me.GraphModeling.Name = "GraphModeling"
-        Me.GraphModeling.Size = New System.Drawing.Size(621, 498)
+        Me.GraphModeling.Size = New System.Drawing.Size(621, 502)
         Me.GraphModeling.TabIndex = 4
         Me.GraphModeling.Text = "Graph Modeling"
         Me.GraphModeling.UseVisualStyleBackColor = True
@@ -739,6 +750,59 @@ Partial Class frmCRUDModel
         Me.CheckBoxUseNeo4jStyleEdgeLabels.Text = "Use Neo4j Style Edge Labels"
         Me.CheckBoxUseNeo4jStyleEdgeLabels.UseVisualStyleBackColor = True
         '
+        'ORMModelling
+        '
+        Me.ORMModelling.Controls.Add(Me.ComboBoxDerivationSyntaxType)
+        Me.ORMModelling.Controls.Add(Me.LabelPromptDerivationSyntaxType)
+        Me.ORMModelling.Controls.Add(Me.CheckBoxHideReferenceModesByDefault)
+        Me.ORMModelling.Location = New System.Drawing.Point(4, 22)
+        Me.ORMModelling.Name = "ORMModelling"
+        Me.ORMModelling.Size = New System.Drawing.Size(621, 502)
+        Me.ORMModelling.TabIndex = 6
+        Me.ORMModelling.Text = "ORM Modelling"
+        Me.ORMModelling.UseVisualStyleBackColor = True
+        '
+        'CheckBoxHideReferenceModesByDefault
+        '
+        Me.CheckBoxHideReferenceModesByDefault.AutoSize = True
+        Me.CheckBoxHideReferenceModesByDefault.Location = New System.Drawing.Point(26, 29)
+        Me.CheckBoxHideReferenceModesByDefault.Name = "CheckBoxHideReferenceModesByDefault"
+        Me.CheckBoxHideReferenceModesByDefault.Size = New System.Drawing.Size(185, 17)
+        Me.CheckBoxHideReferenceModesByDefault.TabIndex = 0
+        Me.CheckBoxHideReferenceModesByDefault.Text = "Hide &Reference Modes by default"
+        Me.CheckBoxHideReferenceModesByDefault.UseVisualStyleBackColor = True
+        '
+        'Projects
+        '
+        Me.Projects.Controls.Add(Me.LabelPromptProjectsForGroup)
+        Me.Projects.Controls.Add(Me.ListBoxProjects)
+        Me.Projects.Location = New System.Drawing.Point(4, 22)
+        Me.Projects.Name = "Projects"
+        Me.Projects.Size = New System.Drawing.Size(621, 502)
+        Me.Projects.TabIndex = 5
+        Me.Projects.Text = "Projects"
+        Me.Projects.UseVisualStyleBackColor = True
+        '
+        'LabelPromptProjectsForGroup
+        '
+        Me.LabelPromptProjectsForGroup.AutoSize = True
+        Me.LabelPromptProjectsForGroup.Location = New System.Drawing.Point(7, 7)
+        Me.LabelPromptProjectsForGroup.Name = "LabelPromptProjectsForGroup"
+        Me.LabelPromptProjectsForGroup.Size = New System.Drawing.Size(198, 13)
+        Me.LabelPromptProjectsForGroup.TabIndex = 3
+        Me.LabelPromptProjectsForGroup.Text = "This Model is available in these Projects:"
+        '
+        'ListBoxProjects
+        '
+        Me.ListBoxProjects.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ListBoxProjects.FormattingEnabled = True
+        Me.ListBoxProjects.Location = New System.Drawing.Point(3, 29)
+        Me.ListBoxProjects.Name = "ListBoxProjects"
+        Me.ListBoxProjects.Size = New System.Drawing.Size(615, 459)
+        Me.ListBoxProjects.TabIndex = 2
+        '
         'ButtonApply
         '
         Me.ButtonApply.Enabled = False
@@ -753,11 +817,28 @@ Partial Class frmCRUDModel
         '
         Me.BackgroundWorker.WorkerReportsProgress = True
         '
+        'LabelPromptDerivationSyntaxType
+        '
+        Me.LabelPromptDerivationSyntaxType.AutoSize = True
+        Me.LabelPromptDerivationSyntaxType.Location = New System.Drawing.Point(23, 59)
+        Me.LabelPromptDerivationSyntaxType.Name = "LabelPromptDerivationSyntaxType"
+        Me.LabelPromptDerivationSyntaxType.Size = New System.Drawing.Size(120, 13)
+        Me.LabelPromptDerivationSyntaxType.TabIndex = 1
+        Me.LabelPromptDerivationSyntaxType.Text = "Derivation Syntax Type:"
+        '
+        'ComboBoxDerivationSyntaxType
+        '
+        Me.ComboBoxDerivationSyntaxType.FormattingEnabled = True
+        Me.ComboBoxDerivationSyntaxType.Location = New System.Drawing.Point(149, 56)
+        Me.ComboBoxDerivationSyntaxType.Name = "ComboBoxDerivationSyntaxType"
+        Me.ComboBoxDerivationSyntaxType.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBoxDerivationSyntaxType.TabIndex = 2
+        '
         'frmCRUDModel
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(763, 540)
+        Me.ClientSize = New System.Drawing.Size(728, 544)
         Me.Controls.Add(Me.ButtonApply)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.Button_Cancel)
@@ -787,6 +868,10 @@ Partial Class frmCRUDModel
         Me.GroupBoxConnection.PerformLayout()
         Me.GraphModeling.ResumeLayout(False)
         Me.GraphModeling.PerformLayout()
+        Me.ORMModelling.ResumeLayout(False)
+        Me.ORMModelling.PerformLayout()
+        Me.Projects.ResumeLayout(False)
+        Me.Projects.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -855,4 +940,11 @@ Partial Class frmCRUDModel
     Friend WithEvents TextBoxDefaultReferenceMode As TextBox
     Friend WithEvents LabelPromptDefaultReferenceMode As Label
     Friend WithEvents CheckBoxHideOtherwiseForeignKeyColumns As CheckBox
+    Friend WithEvents Projects As TabPage
+    Friend WithEvents LabelPromptProjectsForGroup As Label
+    Friend WithEvents ListBoxProjects As ListBox
+    Friend WithEvents ORMModelling As TabPage
+    Friend WithEvents CheckBoxHideReferenceModesByDefault As CheckBox
+    Friend WithEvents ComboBoxDerivationSyntaxType As ComboBox
+    Friend WithEvents LabelPromptDerivationSyntaxType As Label
 End Class

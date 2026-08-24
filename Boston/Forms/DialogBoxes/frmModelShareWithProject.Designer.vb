@@ -60,7 +60,7 @@ Partial Class frmModelShareWithProject
         Me.GroupBoxMoveModel.Size = New System.Drawing.Size(461, 247)
         Me.GroupBoxMoveModel.TabIndex = 0
         Me.GroupBoxMoveModel.TabStop = False
-        Me.GroupBoxMoveModel.Text = "Move Model:"
+        Me.GroupBoxMoveModel.Text = "Share Model:"
         '
         'ButtonClose
         '
@@ -195,7 +195,7 @@ Partial Class frmModelShareWithProject
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmModelShareWithProject"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Move Model"
+        Me.Text = "Share Model"
         Me.GroupBoxMoveModel.ResumeLayout(False)
         Me.GroupBoxMoveModel.PerformLayout()
         Me.GroupBoxCurrentLocation.ResumeLayout(False)

@@ -4,6 +4,8 @@ Imports System.IO
 Imports System.Reflection
 Imports System.Data.Common
 Imports System.ComponentModel
+Imports AutoUpdaterDotNET
+Imports System.Globalization
 
 Public Class frmCRUDBostonConfiguration
 
@@ -13,7 +15,7 @@ Public Class frmCRUDBostonConfiguration
 
     Sub LoadDebugModes()
 
-        Dim loWorkingClass As New Object
+        'Dim loWorkingClass As New Object
         Dim lloDebugModes As New List(Of Object)
         Dim liReferenceTableId As Integer = 0
         Dim liInd As Integer = 0
@@ -21,7 +23,7 @@ Public Class frmCRUDBostonConfiguration
 
         If pdbConnection IsNot Nothing AndAlso pdbConnection.State <> 0 Then
             liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DebugMode")
-            lloDebugModes = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
+            lloDebugModes = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId) ', loWorkingClass
 
             For liInd = 1 To lloDebugModes.Count
                 liNewIndex = Me.ComboBoxDebugMode.Items.Add(lloDebugModes(liInd - 1).DebugMode)
@@ -45,13 +47,45 @@ Public Class frmCRUDBostonConfiguration
         Call Me.LoadDebugModes()
 
         Try
+            'Boston Details
+#Region "Boston Details"
+            Dim lsBostonDetails As String = "Boston"
+
+            lsBostonDetails &= $"Version: {prApplication.ApplicationVersionNr}, Assembly Version: {psAssemblyFileVersionNumber}"
+            lsBostonDetails.AppendLine($"Boston database version: v{prApplication.DatabaseVersionNr}")
+            If prApplication.CMML.Core IsNot Nothing Then
+                lsBostonDetails.AppendLine($"Core version number: {prApplication.CMML.Core.CoreVersionNumber}") 'Or could use: My.Settings.CoreVersionNumber
+            End If
+
+            Me.LabelPromptBostonDetails.Text = lsBostonDetails
+
+#End Region
+
+            'Theme Light|Dark etc
+            Me.ComboBoxThemeType.DataSource = [Enum].GetValues(GetType(ThemeType))
+            Dim themeEnumValue As ThemeType
+            If [Enum].TryParse(Of ThemeType)(My.Settings.BostonThemeTypeName, themeEnumValue) Then
+                Me.ComboBoxThemeType.SelectedIndex = Me.ComboBoxThemeType.Items.IndexOf(themeEnumValue)
+            Else
+                Me.ComboBoxThemeType.SelectedIndex = -1 ' or set a default value
+            End If
 
             'Error Management
             Me.CheckBoxThrowInformationDebugMessagesToScreen.Checked = My.Settings.ThrowInformationDebugMessagesToScreen
             Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked = My.Settings.ThrowCriticalDebugMessagesToScreen
-            Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
             Me.CheckBoxShowStackTrace.Checked = My.Settings.BostonErrorMessagesShowStackTrace
             Me.CheckBoxUseFlashCardErrorMessages.Checked = My.Settings.BostonErrorMessagesShowFlashCard
+
+            'Error Reporting
+            Me.CheckBoxAutomaticallyReportErrorEvents.Checked = My.Settings.UseAutomatedErrorReporting
+            Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.Checked = My.Settings.OptOutOfAutomatedErrorReportingAltogether
+            'CodeSafe
+            If My.Settings.OptOutOfAutomatedErrorReportingAltogether Then
+                Me.CheckBoxAutomaticallyReportErrorEvents.Checked = False
+            End If
+
+            'Backup
+            Me.CheckBoxPerformGrandfatherFatherSonBackups.Checked = My.Settings.PerformGrandfatherFatherSonBackup
 
             'Import/Export
             Me.CheckBoxExportSuppressMDAModelElements.Checked = My.Settings.ExportFBMExcludeMDAModelElements
@@ -61,6 +95,8 @@ Public Class frmCRUDBostonConfiguration
             '-----------------
             Me.CheckBoxVirtualAnalystDisplayBriana.Checked = My.Settings.DisplayBrianaVirtualAnalyst
             Me.CheckBoxStartVirtualAnalystInQuietMode.Checked = My.Settings.StartVirtualAnalystInQuietMode
+            Me.CheckBoxBrainConfirmActionsWithUser.Checked = My.Settings.BrainConfirmActionsWithUser
+            Me.TextBoxAssemblyAIAPKey.Text = My.Settings.OSMAssemblyAIAPIKey.Trim
 
             '---------------------------------------------------------
             'Database
@@ -78,6 +114,7 @@ Public Class frmCRUDBostonConfiguration
 
             'Boston Tab
             Me.CheckBoxAutomaticallyCheckForUpdates.Checked = My.Settings.UseAutoUpdateChecker
+            Me.ButtonRefreshMenuOptions.Visible = My.Settings.SuperuserMode
 
             Me.ComboBoxDatabaseType.Enabled = True
 
@@ -105,6 +142,7 @@ Public Class frmCRUDBostonConfiguration
             Me.CheckBoxFactEngineUseTransformations.Checked = My.Settings.FactEngineUseTransformations
             Me.CheckBoxFactEngineUseGPT3.Checked = My.Settings.FactEngineUseGPT3
             Me.TextBoxFactEngineOpenAIAPIKey.Text = Trim(My.Settings.FactEngineOpenAIAPIKey)
+            Call Me.LoadCultureInfoItems
 
             'ER Diagrams
             Me.CheckBoxHideUnknownPredicates.Checked = My.Settings.ERDViewHideUnknowPredicates
@@ -131,9 +169,15 @@ Public Class frmCRUDBostonConfiguration
             Me.ComboBoxDefaultGeneralConceptConversion.SelectedIndex = Me.ComboBoxDefaultGeneralConceptConversion.Items.IndexOf(My.Settings.DefaultGeneralConceptToObjectTypeConversion)
             Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Checked = My.Settings.ModelingUseThreadedXMLPageLoading
             Me.CheckBoxHideReferenceModeOnReferenceModeSet.Checked = My.Settings.HideAllReferenceModesOnReferenceModeSet
+            Me.CheckBoxSaveNewModelsAsXML.Checked = My.Settings.SaveNewModelsAsXML
 
             'Code Generation
             Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Checked = My.Settings.CodeGenerationUseSquareBracketsSQLTableNames
+
+            'Update Checker
+            Me.ButtonCheckForUpdatesNow.Visible = Me.CheckBoxAutomaticallyCheckForUpdates.Checked
+
+            Call Me.LoadFactEngineModelCompaniesAndModelNames()
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -141,7 +185,7 @@ Public Class frmCRUDBostonConfiguration
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         Finally
 
@@ -151,6 +195,34 @@ Public Class frmCRUDBostonConfiguration
 
         End Try
 
+    End Sub
+
+    Private Sub LoadCultureInfoItems()
+
+        Try
+            ' Get all specific cultures
+            Dim cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+
+            ' Populate the ComboBox with their names, e.g. "en-US", "fr-FR"
+            ComboBoxCultureInfo.Items.AddRange(
+                cultures.Select(Function(c) c.Name).OrderBy(Function(n) n).ToArray()
+            )
+
+            ' Optionally select the current culture
+            If My.Settings.CultureInfo = "" Then
+                ComboBoxCultureInfo.SelectedItem = CultureInfo.CurrentCulture.Name
+            Else
+                ComboBoxCultureInfo.SelectedItem = My.Settings.CultureInfo
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
     End Sub
 
     Private Sub SetupUsingSuperUserMode()
@@ -166,7 +238,7 @@ Public Class frmCRUDBostonConfiguration
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -179,6 +251,8 @@ Public Class frmCRUDBostonConfiguration
     End Sub
 
     Private Sub Button_Cancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button_Cancel.Click
+
+        'Call ThemeManager.ApplyTheme(prApplication.MainForm, piGlobalTheme)
 
         Me.Hide()
         Me.Close()
@@ -215,11 +289,21 @@ Public Class frmCRUDBostonConfiguration
 
                 End If
 
+                'Theme Light|Dark etc
+                My.Settings.BostonThemeTypeName = Me.ComboBoxThemeType.SelectedItem.ToString()
+
                 My.Settings.DebugMode = ComboBoxDebugMode.SelectedItem
                 My.Settings.DatabaseType = Me.ComboBoxDatabaseType.SelectedItem.ToString
                 My.Settings.DatabaseConnectionString = Me.TextBoxDatabaseConnectionString.Text
+
+                'Virtual Analyst
                 My.Settings.DisplayBrianaVirtualAnalyst = Me.CheckBoxVirtualAnalystDisplayBriana.Checked
                 My.Settings.StartVirtualAnalystInQuietMode = Me.CheckBoxStartVirtualAnalystInQuietMode.Checked
+                My.Settings.BrainConfirmActionsWithUser = Me.CheckBoxBrainConfirmActionsWithUser.Checked
+                My.Settings.OSMAssemblyAIAPIKey = Me.TextBoxAssemblyAIAPKey.Text.Trim
+
+                'Backups
+                My.Settings.PerformGrandfatherFatherSonBackup = Me.CheckBoxPerformGrandfatherFatherSonBackups.Checked
 
                 'Database
                 My.Settings.ModelLoadPagesUseThreading = Me.CheckBoxUseThreadingDatabaseLoad.Checked
@@ -227,6 +311,7 @@ Public Class frmCRUDBostonConfiguration
 
                 'Import/Export
                 My.Settings.ExportFBMExcludeMDAModelElements = Me.CheckBoxExportSuppressMDAModelElements.Checked
+                My.Settings.ImportExportColumnNameForFKReferenceEqualsReferencedEntityName = Me.CheckBoxImportColumnNameEqualsFKReferencedEntityName.Checked
 
                 'Error messages
                 My.Settings.ThrowCriticalDebugMessagesToScreen = Me.CheckBoxThrowCriticalDebugMessagesToScreen.Checked
@@ -248,7 +333,15 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.ShowStackTraceFactEngineQuery = Me.CheckBoxFactEngineShowStackTrace.Checked
                 My.Settings.FactEngineUseTransformations = Me.CheckBoxFactEngineUseTransformations.Checked
                 My.Settings.FactEngineUseGPT3 = Me.CheckBoxFactEngineUseGPT3.Checked
+                If My.Settings.FactEngineUseGPT3 Then
+                    My.Settings.FactEngineUseTransformations = True
+                End If
                 My.Settings.FactEngineOpenAIAPIKey = Trim(Me.TextBoxFactEngineOpenAIAPIKey.Text)
+                My.Settings.FactEngineUserDateFormat = Me.ComboBoxFactEngineUserDateFormat.Text
+                My.Settings.FactEngineUserDateTimeFormat = Me.ComboBoxFactEngineUserDateTimeFormat.Text
+                My.Settings.FactEngineModelCompany = Trim(Me.ComboBoxFactEngineModelCompany.Text)
+                My.Settings.FactEngineModelName = Trim(Me.ComboBoxFactEngineModel.Text)
+                My.Settings.CultureInfo = Me.ComboBoxCultureInfo.Text.Trim
 
                 My.Settings.ERDViewHideUnknowPredicates = Me.CheckBoxHideUnknownPredicates.Checked
 
@@ -257,7 +350,10 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.ReverseEngineeringDefaultReferenceMode = Trim(Me.TextBoxReverseEngineeringDefaultReferenceMode.Text)
                 My.Settings.DiagramSpyShowLinkFactTypes = Me.CheckBoxDiagramSpyShowLinkFactTypes.Checked
                 My.Settings.UseAutoUpdateChecker = Me.CheckBoxAutomaticallyCheckForUpdates.Checked
+
+                'Error Reporting
                 My.Settings.UseAutomatedErrorReporting = Me.CheckBoxAutomaticallyReportErrorEvents.Checked
+                My.Settings.OptOutOfAutomatedErrorReportingAltogether = Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.Checked
 
                 'Modelling
                 My.Settings.UseDefaultReferenceModeNewEntityTypes = Me.CheckBoxUseDefaultReferenceMode.Checked
@@ -265,6 +361,7 @@ Public Class frmCRUDBostonConfiguration
                 My.Settings.DefaultGeneralConceptToObjectTypeConversion = Me.ComboBoxDefaultGeneralConceptConversion.SelectedItem.ToString
                 My.Settings.ModelingUseThreadedXMLPageLoading = Me.CheckBoxModelllingUseThreadingLoadingXMLPage.Checked
                 My.Settings.HideAllReferenceModesOnReferenceModeSet = Me.CheckBoxHideReferenceModeOnReferenceModeSet.Checked
+                My.Settings.SaveNewModelsAsXML = Me.CheckBoxSaveNewModelsAsXML.Checked
 
                 'CodeGeneration
                 'Code Generation
@@ -294,6 +391,8 @@ Public Class frmCRUDBostonConfiguration
                     Process.Start(Application.ExecutablePath)
                     Application.Exit()
                 End If
+
+                Call prApplication.ShowHideMenuOptions()
             Else
                 MsgBox(lsReturnString)
             End If
@@ -304,7 +403,7 @@ Public Class frmCRUDBostonConfiguration
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -400,16 +499,51 @@ TestConnectionString:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
 
     End Function
 
+    Private Sub LoadFactEngineModelCompaniesAndModelNames()
+
+        Try
+            'Dim loWorkingClass As New Object
+            Dim larModelCompaniesAndModelNames As New List(Of Object)
+            Dim liReferenceTableId As Integer = 0
+            Dim liInd As Integer = 0
+            Dim liNewIndex As Integer = 0
+
+            liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("FactEngineModelCompanyModels")
+            larModelCompaniesAndModelNames = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId) ', loWorkingClass
+
+            If larModelCompaniesAndModelNames.Count > 0 Then
+                Me.ComboBoxFactEngineModelCompany.Items.Add(larModelCompaniesAndModelNames(0).ModelCompany)
+                Me.ComboBoxFactEngineModelCompany.SelectedIndex = 0
+
+                For Each lrModelCompanyModelName In larModelCompaniesAndModelNames
+                    If lrModelCompanyModelName.ModelCompany = Me.ComboBoxFactEngineModelCompany.Text Then
+                        liNewIndex = Me.ComboBoxFactEngineModel.Items.Add(lrModelCompanyModelName.ModelName)
+
+                        If lrModelCompanyModelName.ModelName = My.Settings.FactEngineModelName Then
+                            Me.ComboBoxFactEngineModel.SelectedIndex = liNewIndex
+                        End If
+
+                    End If
+                Next
+            End If
+
+
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+
     Sub LoadDatabaseTypes()
 
-        Dim loWorkingClass As New Object
+        'Dim loWorkingClass As New Object
         Dim larDatabaseType As New List(Of Object)
         Dim liReferenceTableId As Integer = 0
         Dim liInd As Integer = 0
@@ -417,7 +551,7 @@ TestConnectionString:
 
         If pdbConnection IsNot Nothing AndAlso pdbConnection.State <> 0 Then
             liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
-            larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
+            larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId) ', loWorkingClass
 
             Dim laiDatabaseType = {pcenumDatabaseType.MSJet, pcenumDatabaseType.SQLite, pcenumDatabaseType.PostgreSQL}
 
@@ -493,7 +627,7 @@ TestConnectionString:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
         '===========================================================
@@ -537,7 +671,7 @@ TestConnectionString:
         'Catch ex As Exception
         '    Dim lsMessage As String = ""
         '    lsMessage = "Error: frnToolboxEnterpriseTree.ExportToORMCMMLToolStripMenuItem: " & vbCrLf & vbCrLf & ex.Message
-        '    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        '    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         'End Try
 
@@ -587,15 +721,17 @@ TestConnectionString:
             lsMessage &= vbCrLf & vbCrLf & "Please contact support if you have any questions."
             MsgBox(lsMessage, MsgBoxStyle.Exclamation)
 
-            Call frmMain.ShowHideMenuOptions()
+            Call prApplication.ShowHideMenuOptions()
 
             Call Me.SetupUsingSuperUserMode()
+
+            Me.ButtonRefreshMenuOptions.Visible = True
 
         End If
 
     End Sub
 
-    Private Sub GroupBox4_Click(sender As Object, e As EventArgs) Handles GroupBox4.Click
+    Private Sub GroupBox4_Click(sender As Object, e As EventArgs) Handles GroupBoxBoston.Click
 
         Try
             mbSuperUserModeClicks += 1
@@ -611,7 +747,7 @@ TestConnectionString:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -619,16 +755,18 @@ TestConnectionString:
     Private Sub ButtonReplaceCoreMetamodel_Click(sender As Object, e As EventArgs) Handles ButtonReplaceCoreMetamodel.Click
 
         Try
-            Call DatabaseUpgradeFunctions.ReplaceCoreModel(True)
+            With New WaitCursor
+                Call DatabaseUpgradeFunctions.ReplaceCoreModel(True)
+            End With
             Boston.WriteToStatusBar("")
-            MsgBox("Core Metamodel Replaced.")
+            Boston.ShowFlashCard("Core Metamodel Replaced.", Color.FromArgb(177, 223, 174))
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -680,29 +818,29 @@ TestConnectionString:
                         Call TableReferenceTable.AddReferenceTable(lrReferenceTable)
 
                         Dim liInd = 1
-                        For Each lrKeyValuePair In lrReferenceTable.ReferenceTuple(0).KeyValuePair
+                        For Each lrKeyValuePair In lrReferenceTable.ReferenceTuples(0).KeyValuePairs
                             Dim lrReferenceField As New tReferenceField(lrReferenceTable.ReferenceTableId, liInd, lrKeyValuePair.Key, 3, 100, False, False)
                             Call tableReferenceField.AddReferenceField(lrReferenceField)
                             liInd += 1
                         Next
                     Else
                         Dim liInd = 1
-                        For Each lrKeyValuePair In lrReferenceTable.ReferenceTuple(0).KeyValuePair
+                        For Each lrKeyValuePair In lrReferenceTable.ReferenceTuples(0).KeyValuePairs
                             Dim lrReferenceField As New tReferenceField(lrReferenceTable.ReferenceTableId, liInd, lrKeyValuePair.Key, 3, 100, False, False)
                             tableReferenceField.CreateReferenceFieldIfNotExists(lrReferenceField)
                             liInd += 1
                         Next
                     End If
 
-                    For Each lrReferenceTuple In lrReferenceTable.ReferenceTuple
-                        For Each lrKeyValuePair In lrReferenceTuple.KeyValuePair
+                    For Each lrReferenceTuple In lrReferenceTable.ReferenceTuples
+                        For Each lrKeyValuePair In lrReferenceTuple.KeyValuePairs
                             Dim lrReferenceFieldValue As New tReferenceFieldValue(lrReferenceTable.ReferenceTableId, 1, lrReferenceTuple.RowId, lrKeyValuePair.Value)
                             lrReferenceFieldValue.ReferenceFieldId = tableReferenceField.GetReferenceTableFieldIdByLabel(lrReferenceTable.ReferenceTableId, lrKeyValuePair.Key)
                             Call TableReferenceFieldValue.AddReferenceFieldValue(lrReferenceFieldValue, True)
                         Next
                     Next
 
-                    prApplication.ThrowErrorMessage("Configuration loaded successfully. Reference Table Name: " & lrReferenceTable.Name, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+                    prApplication.ThrowMessage("Configuration loaded successfully. Reference Table Name: " & lrReferenceTable.Name, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
                 End If
 
             End If
@@ -712,7 +850,7 @@ TestConnectionString:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -735,7 +873,7 @@ TestConnectionString:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -784,7 +922,7 @@ TestConnectionString:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -804,7 +942,100 @@ TestConnectionString:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonCheckForUpdatesNow_Click(sender As Object, e As EventArgs) Handles ButtonCheckForUpdatesNow.Click
+
+        Try
+            If MsgBox("Have you saved all your work?".AppendDoubleLineBreak("Recommended: Save all your work before doing an upgrade."), MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
+                AutoUpdater.InstalledVersion = New Version(psAssemblyFileVersionNumber)
+                AutoUpdater.Start("https://www.factengine.ai/products/Boston/update-info.xml")
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CheckBoxAutomaticallyCheckForUpdates_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxAutomaticallyCheckForUpdates.CheckedChanged
+
+        Try
+            Me.ButtonCheckForUpdatesNow.Visible = Me.CheckBoxAutomaticallyCheckForUpdates.Checked
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub LabelUserConfigurationFileLocation_DoubleClick(sender As Object, e As EventArgs) Handles LabelUserConfigurationFileLocation.DoubleClick
+
+        Try
+            Dim processInfo As New ProcessStartInfo("notepad.exe")
+            processInfo.Arguments = Boston.GetConfigFileLocation
+
+            Try
+                Process.Start(processInfo)
+            Catch ex As Exception
+                ' Handle any exceptions here, if needed
+                MessageBox.Show("Error opening the file: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CheckBoxOptOutOfAutomatedErrorReportingAltogether_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxOptOutOfAutomatedErrorReportingAltogether.CheckedChanged
+
+        Try
+            If Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.Checked Then
+                Me.CheckBoxAutomaticallyReportErrorEvents.Checked = False
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ComboBoxThemeType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxThemeType.SelectedIndexChanged
+
+        Try
+            piGlobalTheme = Me.ComboBoxThemeType.SelectedItem
+
+            Call ThemeManager.ApplyTheme(prApplication.MainForm, piGlobalTheme)
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

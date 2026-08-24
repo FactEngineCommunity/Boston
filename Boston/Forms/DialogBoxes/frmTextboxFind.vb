@@ -32,7 +32,8 @@ Imports System.Windows.Forms
 
 Public Class frmTextboxFind
 
-    Public mRichTextBox As RichTextBox
+    Public mRichTextBox As RichTextBox = Nothing
+    Public mScintillaTextBox As ScintillaNET.Scintilla = Nothing
     Private foundIndex As Integer
     Private foundWord As String
 
@@ -63,21 +64,82 @@ Public Class frmTextboxFind
 
     Private Sub FindText(ByVal findWhat As String, ByVal findOption As RichTextBoxFinds)
 
-        Dim findIndex As Integer = 0
-        If findWhat.Equals(foundWord) Then findIndex = foundIndex
+        ' 1. Determine our baseline starting search index
+        Dim searchStartIndex As Integer = 0
 
-        If findOption = RichTextBoxFinds.Reverse Then
-            findIndex = Me.mRichTextBox.Find(findWhat, 0, findIndex, findOption)
-        Else
-            findIndex = Me.mRichTextBox.Find(findWhat, findIndex, findOption)
+        ' If we are searching for the same word again, start from our last tracked index
+        If findWhat.Equals(foundWord) Then
+            searchStartIndex = foundIndex
         End If
-        If findIndex > 0 Then
+
+        Dim findIndex As Integer = -1
+        Dim isReverse As Boolean = ((findOption And RichTextBoxFinds.Reverse) = RichTextBoxFinds.Reverse)
+
+        ' --- RICH TEXT BOX PATH ---
+        If Me.mRichTextBox IsNot Nothing Then
+            If isReverse Then
+                ' RichTextBox backward search requires: (text, startRange, endRange, options)
+                findIndex = Me.mRichTextBox.Find(findWhat, 0, searchStartIndex, findOption)
+            Else
+                ' Forward search: (text, startRange, options)
+                findIndex = Me.mRichTextBox.Find(findWhat, searchStartIndex, findOption)
+            End If
+
+            If findIndex <> -1 Then
+                Me.mRichTextBox.Select(findIndex, findWhat.Length)
+                Me.mRichTextBox.ScrollToCaret()
+            End If
+
+            ' --- SCINTILLA TEXT BOX PATH ---
+        ElseIf Me.mScintillaTextBox IsNot Nothing Then
+            ' Map RichTextBoxFinds over to Scintilla's native SearchFlags
+            Dim scintillaFlags As ScintillaNET.SearchFlags = ScintillaNET.SearchFlags.None
+            If (findOption And RichTextBoxFinds.MatchCase) = RichTextBoxFinds.MatchCase Then
+                scintillaFlags = scintillaFlags Or ScintillaNET.SearchFlags.MatchCase
+            End If
+            If (findOption And RichTextBoxFinds.WholeWord) = RichTextBoxFinds.WholeWord Then
+                scintillaFlags = scintillaFlags Or ScintillaNET.SearchFlags.WholeWord
+            End If
+            Me.mScintillaTextBox.SearchFlags = scintillaFlags
+
+            ' Set boundaries based on direction
+            If isReverse Then
+                ' To search backward in Scintilla, make TargetStart greater than TargetEnd
+                ' If we're at the beginning or haven't matched yet, default to the text length
+                If searchStartIndex = 0 Then searchStartIndex = Me.mScintillaTextBox.TextLength
+                Me.mScintillaTextBox.TargetStart = searchStartIndex
+                Me.mScintillaTextBox.TargetEnd = 0
+            Else
+                ' Search forward: from current tracking point to the end of the file
+                Me.mScintillaTextBox.TargetStart = searchStartIndex
+                Me.mScintillaTextBox.TargetEnd = Me.mScintillaTextBox.TextLength
+            End If
+
+            ' Execute search
+            findIndex = Me.mScintillaTextBox.SearchInTarget(findWhat)
+
+            If findIndex <> -1 Then
+                ' Select the matched text components set by TargetStart/TargetEnd bounds
+                Me.mScintillaTextBox.SetSelection(Me.mScintillaTextBox.TargetStart, Me.mScintillaTextBox.TargetEnd)
+                Me.mScintillaTextBox.ScrollCaret()
+            End If
+        End If
+
+        ' --- TRACKING SEARCH STATE ---
+        If findIndex <> -1 Then
             foundWord = findWhat
-            If findOption = RichTextBoxFinds.Reverse Then
+            If isReverse Then
+                ' If going backward, the next search starts immediately before this match
                 foundIndex = findIndex
             Else
+                ' If going forward, the next search starts immediately after this match
                 foundIndex = findIndex + findWhat.Length
             End If
+        Else
+            ' Reset state if nothing is found so a fresh click starts from the beginning/end again
+            foundWord = String.Empty
+            foundIndex = 0
+            MessageBox.Show("Finished searching the document.", "Find", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
 

@@ -1,6 +1,12 @@
-﻿Imports System.Reflection
+﻿Imports System.Data.SQLite
+Imports System.Reflection
+Imports Boston.FactEngine.DatabaseConnection
 
 Namespace FactEngine
+
+    ''' <summary>
+    ''' All the database connectors derive from this class (SQL Server, ORACLE, SQLite, Neo4j etc)
+    ''' </summary>
     Public Class DatabaseConnection
 
         Public DatabaseConnectionString As String = Nothing
@@ -51,14 +57,51 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return "#" & asDate & "#"
             End Try
 
         End Function
 
+        Public Overridable Function DateTimeWrap(ByVal asDate As String) As String
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FactEngine.SQLiteConnection)
+                        Return "'" & Me.FormatDateTime(asDate, True) & "'"
+                    Case Else
+                        Return "#" & asDate & "#"
+                End Select
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return "#" & asDate & "#"
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' ToDo...FieldFilter needs to be implemented as a class.
+        ''' </summary>
+        ''' <param name="arTable">The RDS Table for which the rows are being returned.</param>
+        ''' <param name="larFieldFilter">The set of Field Filters that are to be applied within the query to return the rows.</param>
+        ''' <param name="aiMaxRows">The LIMIT (maximum number of rows) over the result set.</param>
+        ''' <returns></returns>
+        Public Function getTableRecordsByCriteria(ByRef arTable As RDS.Table, ByVal larFieldFilter As List(Of String), aiMaxRows As Integer) As ORMQL.Recordset
+            Return New ORMQL.Recordset
+        End Function
+
         Public Overridable Function GO(ByVal asQuery As String) As ORMQL.Recordset
+            Return New ORMQL.Recordset
+        End Function
+
+        Public Overridable Function GOAbstractionLayer(ByVal asQuery As String) As ORMQL.Recordset
             Return New ORMQL.Recordset
         End Function
 
@@ -83,6 +126,22 @@ Namespace FactEngine
         ''' <param name="arIndex">The Index to be added to the database.</param>
         Public Overridable Sub addIndex(ByRef arIndex As RDS.Index)
         End Sub
+
+
+        ''' <summary>
+        ''' Appends a String data type Column with a string, with a line break before hand if required.
+        ''' </summary>
+        ''' <param name="asTableName">The Table being updated</param>
+        ''' <param name="asColumnName">The Table being updated</param>
+        ''' <param name="asAppendString"></param>
+        ''' <param name="jsonWhereString">The set of Key/Value pairs for the WHERE clause</param>
+        ''' <param name="abWithLineBreak">True if a LineBreak is required, else False</param>
+        Public Overridable Function AppendStringColumn(ByVal asTableName As String,
+                                                       ByVal asColumnName As String,
+                                                       ByVal asAppendString As String,
+                                                       ByVal jsonWhereString As String,
+                                                       Optional ByVal abWithLineBreak As Boolean = False) As Boolean
+        End Function
 
         ''' <summary>
         ''' Adds the given Relation/ForeignKey to the database. Relation holds relative Tables.
@@ -115,6 +174,14 @@ Namespace FactEngine
         End Sub
 
         ''' <summary>
+        ''' Returns True if a Column with the given name exists in the database for the Column's Table, else returns False.
+        ''' </summary>
+        ''' <param name="asTableName"></param>
+        ''' <returns></returns>
+        Public Overridable Function ColumnExists(ByVal asTableName As String, ByVal asColumnName As String) As Boolean
+        End Function
+
+        ''' <summary>
         ''' Sets whether the specified Column is mandatory or not, in the database.
         ''' </summary>
         ''' <param name="arColumn">The Column to have its schema definition changed.</param>
@@ -140,11 +207,27 @@ Namespace FactEngine
         End Sub
 
         ''' <summary>
+        ''' Creates a Table Instance (Row in a Table) given JSON in the format: {"Order" : {"Order_Id":123, "Customer_Id":456}}
+        ''' </summary>
+        ''' <param name="jsonString"></param>
+        Public Overridable Function CreateTableInstance(ByVal jsonString As String, ByRef asErrorMessage As String) As Boolean
+            Return False
+        End Function
+
+        ''' <summary>
         ''' Some databases, like PostgreSQL use a date to string operator for use in LIKE clauses.
         ''' </summary>
         ''' <returns></returns>
         Public Overridable Function dateToTextOperator() As String
             Return ""
+        End Function
+
+        ''' <summary>
+        ''' Deletes a Table Instance (Row in a Table) given JSON in the format: {"Order" : {"Order_Id":123, "Customer_Id":456}}
+        ''' </summary>
+        ''' <param name="jsonString"></param>
+        Public Overridable Function DeleteTableInstance(ByVal jsonString As String) As Boolean
+            Return False
         End Function
 
         Public Overridable Function Execute(asQuery As String) As ORMQL.Recordset
@@ -163,7 +246,7 @@ Namespace FactEngine
             Return ""
         End Function
 
-        Public Overridable Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column) As String
+        Public Overridable Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column, Optional abIgnoreColumnISNOTNULL As Boolean = False) As String
             Return ""
         End Function
 
@@ -178,7 +261,8 @@ Namespace FactEngine
         ''' <param name="asTableName">Optional table name for the table in the CREATE statement.</param>
         ''' <returns></returns>
         Public Overridable Function generateCREATETABLEStatement(ByRef arTable As RDS.Table,
-                                                                Optional asTableName As String = Nothing) As String
+                                                                Optional asTableName As String = Nothing,
+                                                                 Optional abIgnoreColumnISNOTNULL As Boolean = False) As String
             Return ""
         End Function
 
@@ -186,8 +270,11 @@ Namespace FactEngine
             Return New List(Of RDS.Column)
         End Function
 
-        Public Overridable Sub getDatabaseTypes()
+        Public Overridable Sub getDatabaseDataTypes()
         End Sub
+
+        Public Overridable Function GetDatabaseName(connectionString As String) As String
+        End Function
 
         Public Overridable Function getBostonDataTypeByDatabaseDataType(ByVal asDatabaseDataType As String) As pcenumORMDataType
             Return pcenumORMDataType.TextVariableLength
@@ -225,8 +312,16 @@ Namespace FactEngine
             Return New List(Of RDS.Relation)
         End Function
 
+        Public Overridable Function GetNodeDetails(ByVal asTableName As String, ByVal aasIdentiferList As List(Of String), ByVal abUseUniqueIndex As Boolean) As List(Of KeyValuePair)
+            Return New List(Of KeyValuePair)
+        End Function
+
         Public Overridable Function getRelationLabels() As List(Of String)
             Return New List(Of String)
+        End Function
+
+        Public Overridable Function getTableRowCount(ByRef arTable As RDS.Table) As Integer
+            Return 0
         End Function
 
         ''' <summary>
@@ -289,6 +384,18 @@ Namespace FactEngine
         Public Overridable Sub removeTable(ByRef arTable As RDS.Table)
         End Sub
 
+
+        'Define a delegate for the custom function registered with the database, as below RegisterCustomFunction
+        Public Delegate Function CustomFunctionDelegate(ctx As SQLiteContext, args() As Object) As Object
+
+        ''' <summary>
+        ''' Register a custom function with database
+        ''' </summary>
+        Public Overridable Sub RegisterCustomFunctions()
+            ' Register the custom function using the provided delegate
+            'E.g. SQLiteFunction.RegisterFunction(connection, "HammingDistance", functionPtr)
+        End Sub
+
         ''' <summary>
         ''' Renames the given Column to the new column name.
         ''' </summary>
@@ -311,6 +418,28 @@ Namespace FactEngine
         Public Overridable Sub CommitTrans()
         End Sub
 
+        Public Function StingConcatenationSymbol() As String
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FactEngine.MSJet),
+                              GetType(FactEngine.MSAccessConnection)
+                        Return "&"
+                    Case Is = GetType(FactEngine.SQLiteConnection)
+                        Return "||"
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Function
+
         ''' <summary>
         ''' Returns True if a Table with the given name exists in the database, else returns False.
         ''' </summary>
@@ -331,6 +460,14 @@ Namespace FactEngine
                                                          ByVal asNewValue As String,
                                                          ByVal aarPKColumn As List(Of RDS.Column)) As ORMQL.Recordset
             Return New ORMQL.Recordset
+        End Function
+
+        ''' <summary>
+        ''' Updates a Table Instance (Row in a Table) given JSON in the format: {"Order" : {"Order_Id":123, "Customer_Id":456}}
+        ''' </summary>
+        ''' <param name="jsonString"></param>
+        Public Overridable Function UpdateTableInstance(ByVal jsonString As String) As Boolean
+            Return False
         End Function
 
     End Class

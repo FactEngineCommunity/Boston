@@ -229,11 +229,11 @@ Namespace SourcePlugins.Boston
         End Property
 
         Public _BostonModel As FBM.Model
-        Public Property BostonModel As Model Implements IManageSource.BostonModel
+        Public Property BostonModel As FBM.Model Implements IManageSource.BostonModel
             Get
                 Return Me._BostonModel
             End Get
-            Set(value As Model)
+            Set(value As FBM.Model)
                 Me._BostonModel = value
             End Set
         End Property
@@ -288,7 +288,7 @@ Namespace SourcePlugins.Boston
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -707,7 +707,7 @@ Namespace SourcePlugins.Boston
 
         End Sub
 
-        Private Sub ApplicationLink_ModelAdded(ByRef arModel As Model) Handles ApplicationLink.ModelAdded
+        Private Sub ApplicationLink_ModelAdded(ByRef arModel As FBM.Model, ByRef arCallingForm As Form) Handles ApplicationLink.ModelAdded
 
             Dim loComboBoxItem = New tComboboxItem(arModel.ModelId, arModel.Name, arModel)
             Me.ComboBoxModel.Items.Add(loComboBoxItem)

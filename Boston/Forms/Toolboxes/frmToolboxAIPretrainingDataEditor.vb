@@ -16,7 +16,7 @@ Public Class frmToolboxAIPretrainingDataEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -28,8 +28,8 @@ Public Class frmToolboxAIPretrainingDataEditor
         Try
             If My.Settings.FactEngineUseGPT3 Then
 #Region "GPT3 Transforms"
-                Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(36, loTransformation)
+                'Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(36) ', loTransformation
 
                 Dim lsGPT3TrainingExamplesFilePath = larTransformationTuples.Where(Function(x) x.ModelId = Me.mrModel.ModelId).Select(Function(x) x.GPT3TrainingFileLocation)(0)
 
@@ -41,13 +41,13 @@ Public Class frmToolboxAIPretrainingDataEditor
 
                 Else
                     lsMessage = "Please check the file path set up for your AI pretraining data."
-                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
+                    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
                     Me.Close()
                 End If
 #End Region
             Else
                 lsMessage = "Please check that your instance of Boston/FactEngine is set up for natural language queries using AI. Closing."
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False, False, True,,,)
                 Me.Close()
             End If
 
@@ -56,7 +56,7 @@ Public Class frmToolboxAIPretrainingDataEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -74,7 +74,7 @@ Public Class frmToolboxAIPretrainingDataEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -91,7 +91,7 @@ Public Class frmToolboxAIPretrainingDataEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -107,7 +107,7 @@ Public Class frmToolboxAIPretrainingDataEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -125,7 +125,7 @@ Public Class frmToolboxAIPretrainingDataEditor
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

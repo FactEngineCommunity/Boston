@@ -37,6 +37,10 @@
         ModelElementAppearsOnNoPage = 130
         PopulationContainstNULLValueError = 131
         CMMLModelError = 140 'E.g. When there are errors within an RDS Table. E.g. When Columns have ActiveRole = Nothing etc.
+        RDSTableNotInDatabase = 141
+        RDSColumnNotInDatabase = 142
+        RDSRelationsWithMismatchedOriginAndDestinationColumnCount = 200
+        RDSTableWithSimpleReferenceSchemeButMultiplePrimaryKeyColumns = 201
     End Enum
 
     Public Enum pcenumModelSubErrorType
@@ -44,7 +48,7 @@
         None = 500
         RDSRelationOriginDestintaionColumnCountMismatch = 501
         RDSColumnNotInCorrespondingDatabaseEntity = 502
-
+        RDSTableNotInDatabase = 503
     End Enum
 
 

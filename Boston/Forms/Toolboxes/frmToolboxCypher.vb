@@ -48,7 +48,7 @@
                     lsCREATEStatement &= "CREATE "
                     lsCREATEStatement &= "("
                     lsCREATEStatement &= LCase(lrEntity.Name) & "1" & ":"
-                    lsCREATEStatement &= Viev.Strings.MakeCapCamelCase(lrEntity.Name)
+                    lsCREATEStatement &= FEStrings.MakeCapCamelCase(lrEntity.Name)
                     lsCREATEStatement &= ")"
                     Me.RichTextBox1.AppendText(lsCREATEStatement)
                     Me.RichTextBox1.AppendText(vbCrLf & vbCrLf)
@@ -57,7 +57,7 @@
                     lsCREATEStatement &= "CREATE "
                     lsCREATEStatement &= "("
                     lsCREATEStatement &= LCase(lrEntity.Name) & "1" & ":"
-                    lsCREATEStatement &= Viev.Strings.MakeCapCamelCase(lrEntity.Name)
+                    lsCREATEStatement &= FEStrings.MakeCapCamelCase(lrEntity.Name)
                     lsCREATEStatement &= "{"
                     For Each lrAttribute In lrEntity.Attribute
                         lsCREATEStatement &= LCase(lrAttribute.Name) & ":''"

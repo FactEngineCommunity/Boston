@@ -32,11 +32,11 @@ Namespace SourcePlugins.Boston
         End Property
 
         Public _BostonModel As FBM.Model
-        Public Property BostonModel As Model Implements IConnection.BostonModel
+        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
             Get
                 Return Me._BostonModel
             End Get
-            Set(value As Model)
+            Set(value As FBM.Model)
                 Me._BostonModel = value
             End Set
         End Property

@@ -187,7 +187,7 @@ Namespace FBM
             Catch ex As Exception
                 lsMessage = "Error: tFactTable.DisplayAndAssociate"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -261,7 +261,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -302,7 +302,7 @@ SkipThat:
                 Dim lsMessage As String
                 lsMessage = "Error: tFactTable.ResetBlackCellText"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -372,14 +372,14 @@ SkipThat:
 
                         lrFactDataInstance = lrFactInstance.Data.Find(AddressOf lrFactDataInstance.EqualsByRole)
 
-                        If IsSomething(lrFactDataInstance) Then
+                        If lrFactDataInstance IsNot Nothing Then
                             lsMessage &= vbCrLf & "Found"
                         Else
                             lsMessage &= vbCrLf & "Not Found"
-                            Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
+                            Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information)
                             Throw New System.Exception(lsMessage)
                         End If
-                        Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
+                        Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information)
 
                         lrFactDataInstance.TableShape = Me.TableShape
                         lrFactDataInstance.Cell = Me.TableShape.Item(liInd, liRowNr)
@@ -406,7 +406,7 @@ SkipThat:
                                 lrJoinedFactType = lrFactDataInstance.Role.JoinedORMObject  ' was lrFactDataInstance.JoinedObjectType
                                 lrJoinedFact = lrJoinedFactType.Fact.Find(AddressOf lrJoinedFact.EqualsById)
 
-                                If IsSomething(lrJoinedFact) Then
+                                If lrJoinedFact IsNot Nothing Then
                                     lrFactDataInstance.Cell.Text = lrJoinedFact.EnumerateAsBracketedFact
                                 Else
                                     If abCellReflectsError Then
@@ -434,14 +434,14 @@ SkipThat:
                     'lsMessage = "ResortFactTable:"
                     'lsMessage &= vbCrLf & "FactDataInstance.Fact.Id:" & lrFactDataInstance.Fact.Id
                     'lsMessage &= vbCrLf & "FactDataInstance.FactData.FactId:" & lrFactDataInstance.FactData.Fact.Id
-                    'Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
+                    'Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information)
 
                     liRowNr += 1
                 Next
 
                 Me.TableShape.ResizeToFitText(True)
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     Me.Page.Diagram.Invalidate()
                 End If
 
@@ -452,7 +452,7 @@ SkipThat:
                 lsMessage1 &= vbCrLf & vbCrLf & "FactTypeName: " & Me.FactTypeInstance.Name
                 lsMessage1 &= vbCrLf & vbCrLf & "PageId: " & Me.FactTypeInstance.Page.PageId
                 lsMessage1 &= vbCrLf & vbCrLf & "PageId: " & Me.FactTypeInstance.Page.Name
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, loErr.StackTrace,,,,,, loErr)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, loErr.StackTrace,,,,,, loErr)
             End Try
 
         End Sub
@@ -487,7 +487,7 @@ SkipThat:
                 Dim lsMessage As String
                 lsMessage = "Error: tFactTable.Save"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

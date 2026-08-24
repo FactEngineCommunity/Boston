@@ -30,7 +30,7 @@ Partial Class GroupInviter
         '
         'PictureBox1
         '
-        Me.PictureBox1.Image = Global.Boston.My.Resources.MenuImagesMain.Group16x16
+        Me.PictureBox1.Image = Global.Boston.My.Resources.MenuImages.Group16x16
         Me.PictureBox1.Location = New System.Drawing.Point(9, 8)
         Me.PictureBox1.Name = "PictureBox1"
         Me.PictureBox1.Size = New System.Drawing.Size(20, 19)

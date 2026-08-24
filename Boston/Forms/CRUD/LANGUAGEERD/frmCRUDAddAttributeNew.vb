@@ -2,19 +2,12 @@
 
 Public Class frmCRUDAddAttributeNew
 
-    Public zrAttribute As ERD.Attribute 'The Attribute/s being added to the zrEtntity
-    Public zrEntity As Object 'The Entity to which the new Attribute will be added.    
-    Public zrModel As FBM.Model 'The Model being worked with
+    ''' <summary>
+    ''' True if this form used to Edit/Modify a Column/Attribute/Property.
+    ''' </summary>
+    Public lbEditMode As Boolean = False
 
-    Public zbAttributeIsMandatory As Boolean = False 'Used to return whether the Attribute is Mandatory.
-    Public zbDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
-    Public ziDataTypeLength As Integer = 0
-    Public ziDataTypePrecision As Integer = 0
-
-    '---------------------------------------------
-    'Just for form setup
-    '---------------------------------------------
-    Private msUniqueAttributeName
+    Public mbUseDatabasesDataTypes As Boolean = False
 
     ''' <summary>
     ''' NB 20150319-VM-It is still undecided as to whether to use the ObjectifyingEntityType or FactType for this member
@@ -22,10 +15,34 @@ Public Class frmCRUDAddAttributeNew
     '''   and cannot join to the ObjectifyingEntityType.
     ''' </summary>
     ''' <remarks></remarks>
+    Public zrModel As FBM.Model 'The Model being worked with
+
     Public zrModelObject As FBM.ModelObject 'The EntityType or FactType that the zrEntity represents.
-    Public zrValueType As FBM.ValueType 'The ValueType that the Attribute represents (if not an Attribute that references an Entity/EntityType)
-    Public zsValueTypeName As String
+    Public zrValueType As FBM.ValueType 'The ValueType that the Attribute represents (if not an Attribute that references an Entity/EntityType)    
     Public zrFactType As FBM.FactType 'The FactType linking the EntityType to the ValueType (if Attribute is not part of a Relation) or EntityType (if is an Attribute that references an Entity/EntityType)
+    Public zrRDSTable As RDS.Table 'The Table of the Attribute/Column.
+    Public zrRDSColumn As RDS.Column 'The RDS Column of the Attribute.
+
+    ''' <summary>
+    ''' If the user elects to make a Foreign Key Relationship, this member is populated.
+    ''' </summary>
+    Public mrForeignKeyModelObject As FBM.ModelObject = Nothing
+
+    Public zsValueTypeName As String
+
+
+    Public zrAttribute As ERD.Attribute 'The Attribute/s being added to the zrEtntity
+    Public zrEntity As Object 'The Entity to which the new Attribute will be added.    
+
+    Public miDataType As pcenumORMDataType = pcenumORMDataType.DataTypeNotSet
+    Public mbIsMandatory As Boolean = False 'Used to return whether the Attribute is Mandatory.
+    Public miDataTypeLength As Integer = 0
+    Public miDataTypePrecision As Integer = 0
+
+    '---------------------------------------------
+    'Just for form setup
+    '---------------------------------------------
+    Private msUniqueAttributeName
 
     Public Overloads Function ShowDialog(ByVal asUniqueAttributeName As String)
 
@@ -37,7 +54,7 @@ Public Class frmCRUDAddAttributeNew
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
         Return MyBase.ShowDialog()
@@ -52,35 +69,105 @@ Public Class frmCRUDAddAttributeNew
 
     Private Sub SetupForm()
 
-        Me.LabelPromptAttributeOk.Text = ""
+        Try
 
-        Me.zsValueTypeName = Me.zrValueType.Id
+            Me.LabelPromptAttributeOk.Text = ""
 
-        Me.LabelEntityTypeName.Text = Me.zrModelObject.Name
+            Me.zsValueTypeName = Me.zrValueType.Id
 
-        RemoveHandler Me.ComboBoxAttribute.TextChanged, AddressOf Me.ComboBoxAttribute_TextChanged
-        Me.ComboBoxAttribute.Text = Me.msUniqueAttributeName
-        AddHandler Me.ComboBoxAttribute.TextChanged, AddressOf Me.ComboBoxAttribute_TextChanged
+            Me.LabelEntityTypeName.Text = Me.zrModelObject.Name
+            Me.TextBoxDataTypeLength.Text = Me.zrValueType.DataTypeLength
+            Me.TextBoxDataTypePrecision.Text = Me.zrValueType.DataTypePrecision
+            If Me.zrRDSTable IsNot Nothing AndAlso Me.zrRDSColumn IsNot Nothing Then
+                'When this form used for Editing, rather than Adding.
+                Me.CheckBoxIsMandatory.Checked = Me.zrRDSColumn.IsMandatory
+            End If
 
-        Me.ComboBoxAttribute.SelectAll()
+            'Length and Precision (DataType based)
+#Region "Length and Precision"
+            If Not Me.zrValueType.DataTypeUsesLength Then
+                Me.LabelPromptLength.Visible = False
+                Me.TextBoxDataTypeLength.Visible = False
+            End If
 
-        '--------------------------------------------------------------------------------------
-        'Populate the AttributeName ComboBox with the list of ValueType/Names for all of the
-        '  ValueTypes within the Model, that are not already associated with the Entity.
-        '  NB If the User selects one of the ValueTypes, then a FactType will be created
-        '  linked to either that ValueType or the Entity to which it is the ReferenceMode.
-        '--------------------------------------------------------------------------------------
-        Call Me.LoadModelValueTypes(Me.zrModel)
+            If Not Me.zrValueType.DataTypeUsesPrecision Then
+                Me.LabelPromptLength.Visible = False
+                Me.TextBoxDataTypePrecision.Visible = False
+            End If
+#End Region
 
-        Call Me.PopulatDataTypes()
+
+
+            RemoveHandler Me.ComboBoxAttribute.TextChanged, AddressOf Me.ComboBoxAttribute_TextChanged
+            Me.ComboBoxAttribute.Text = Me.msUniqueAttributeName
+            AddHandler Me.ComboBoxAttribute.TextChanged, AddressOf Me.ComboBoxAttribute_TextChanged
+
+            Me.ComboBoxAttribute.SelectAll()
+
+            '--------------------------------------------------------------------------------------
+            'Populate the AttributeName ComboBox with the list of ValueType/Names for all of the
+            '  ValueTypes within the Model, that are not already associated with the Entity.
+            '  NB If the User selects one of the ValueTypes, then a FactType will be created
+            '  linked to either that ValueType or the Entity to which it is the ReferenceMode.
+            '--------------------------------------------------------------------------------------
+            Call Me.LoadModelValueTypes(Me.zrModel)
+
+            Call Me.PopulatDataTypes()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
     Private Sub PopulatDataTypes()
 
-        ComboBoxDataType.DataSource = [Enum].GetValues(GetType(pcenumORMDataType))
-        Me.ComboBoxDataType.SelectedIndex = 0
+        Try
+            If Me.mbUseDatabasesDataTypes And Me.zrModel.TargetDatabaseType <> pcenumDatabaseType.None Then
 
+                Me.ComboBoxDataType.DataSource = Me.zrModel.DatabaseDataTypes
+
+                ' Find the index of the value that matches zrValueType.DataType
+                Dim selectedIndex As Integer
+                If zrValueType.DataType <> pcenumORMDataType.DataTypeNotSet Then
+                    selectedIndex = ComboBoxDataType.Items.IndexOf(Me.zrModel.getDatabaseDataTypeFromORMDataType(Me.zrModel.TargetDatabaseType, zrValueType.DataType))
+                End If
+
+                ' Set the ComboBox's selected index
+                If selectedIndex >= 0 Then
+                    ComboBoxDataType.SelectedIndex = selectedIndex
+                Else
+                    ComboBoxDataType.SelectedIndex = 0 ' Default to the first item if not found
+                End If
+
+            Else
+                    'Use ORM/Boston Datatypes.
+                    ComboBoxDataType.DataSource = [Enum].GetValues(GetType(pcenumORMDataType))
+
+                ' Find the index of the value that matches zrValueType.DataType
+                Dim selectedIndex As Integer = ComboBoxDataType.Items.IndexOf(Me.zrValueType.DataType)
+
+                ' Set the ComboBox's selected index
+                If selectedIndex >= 0 Then
+                    ComboBoxDataType.SelectedIndex = selectedIndex
+                Else
+                    ComboBoxDataType.SelectedIndex = 0 ' Default to the first item if not found
+                End If
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
     Private Sub LoadModelValueTypes(ByVal arModel As FBM.Model)
@@ -96,12 +183,12 @@ Public Class frmCRUDAddAttributeNew
 
     Private Function CheckFields() As Boolean
 
-        Dim lsAttributeName = Viev.Strings.MakeCapCamelCase(Trim(Me.ComboBoxAttribute.Text))
-        Dim lrTable As RDS.Table = Me.zrEntity.RDSTable
+        Dim lsAttributeName As String = FEStrings.MakeCapCamelCase(Trim(Me.ComboBoxAttribute.Text), True)
+        Dim lrTable As RDS.Table = If(Me.zrEntity Is Nothing, Me.zrModelObject.getCorrespondingRDSTable, Me.zrEntity.RDSTable)
 
         If lsAttributeName.Length = 0 Then
             Return False
-        ElseIf lrTable.Column.Find(Function(x) lcase(x.Name) = lcase(lsAttributeName)) IsNot Nothing Then
+        ElseIf lbEditMode And lrTable.Column.Find(Function(x) x.Name.Trim.ToLower = lsAttributeName.Trim.ToLower) Is Nothing Then
             Return False
         End If
 
@@ -171,7 +258,7 @@ OkayToProceed:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -196,7 +283,7 @@ OkayToProceed:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -205,27 +292,84 @@ OkayToProceed:
         Try
             Me.LabelPromptAttributeOk.Text = ""
 
-            Dim lsAttributeName = Viev.Strings.MakeCapCamelCase(Trim(Me.ComboBoxAttribute.Text))
-            Dim lrTable As RDS.Table = Me.zrEntity.RDSTable
+            Dim lsAttributeName = FEStrings.MakeCapCamelCase(Trim(Me.ComboBoxAttribute.Text), True)
+            Dim lrTable As RDS.Table = If(Me.zrEntity IsNot Nothing, Me.zrEntity.RDSTable, Me.zrRDSTable)
             Dim lrModelElement As FBM.ModelObject = Me.zrModel.GetModelObjectByName(lsAttributeName)
 
             If lsAttributeName.Length > 0 Then
-                If lrTable.Column.Find(Function(x) LCase(x.Name) = LCase(Trim(Me.ComboBoxAttribute.Text))) IsNot Nothing Then
+
+                Me.TableLayoutPanelMain.Visible = True
+
+                If lrTable.Column.Find(Function(x) LCase(x.Name) = LCase(Trim(Me.ComboBoxAttribute.Text)) And x IsNot Me.zrRDSColumn) IsNot Nothing Then
+
                     Me.LabelPromptAttributeOk.Font = New Font("Arial Unicode MS", 8)
-                    Me.LabelPromptAttributeOk.Text = "A Property/Column for the Node Type/Entity " & Me.zrEntity.Name & " already exists with this Attribute Name."
+                    Me.LabelPromptAttributeOk.Text = "A Property/Column for the Node Type/Entity " & If(Me.zrEntity IsNot Nothing, Me.zrEntity.RDSTable.Name, Me.zrRDSTable.Name) & " already exists with this Attribute Name."
                     Me.LabelPromptAttributeOk.ForeColor = Color.Red
+                    Me.TableLayoutPanelFKReference.Visible = False
+
                 ElseIf lrModelElement IsNot Nothing Then
+                    Me.TableLayoutPanelFKReference.Visible = False
                     Me.LabelPromptAttributeOk.Font = New Font("Arial Unicode MS", 8)
                     Select Case lrModelElement.GetType
                         Case Is = GetType(FBM.EntityType)
-                            Me.LabelPromptAttributeOk.Text = "An Entity Type exists in the Model for with this Name. You can't use that name."
-                            Me.LabelPromptAttributeOk.ForeColor = Color.Red
+                            'Might be making a Foreign Key Reference.
+#Region "Load Tables"
+                            Me.TableLayoutPanelFKReference.Visible = True
+
+                            Dim larTable = (From Table In Me.zrModel.RDS.Table
+                                            From Column In Table.Column
+                                            Where Column.ActiveRole IsNot Nothing
+                                            Where Column.ActiveRole.JoinedORMObject.Id = Me.ComboBoxAttribute.Text.Trim
+                                            Select Table).Distinct
+
+                            Me.ListBoxReferencedTable.SelectedIndex = -1
+                            Me.ListBoxReferencedTable.Items.Clear()
+                            For Each lrTable In larTable
+                                Dim lrComboboxItem = New tComboboxItem(lrTable, lrTable.Name, lrTable)
+                                Me.ListBoxReferencedTable.Items.Add(lrComboboxItem)
+                            Next
+#End Region
                         Case Is = GetType(FBM.FactType)
-                            Me.LabelPromptAttributeOk.Text = "A Fact Type exists in the Model for with this Name. You can't use that name."
-                            Me.LabelPromptAttributeOk.ForeColor = Color.Red
+                            If CType(lrModelElement, FBM.FactType).IsObjectified Then
+                                'Might be making a Foreign Key Reference.
+#Region "Load Tables"
+                                Me.TableLayoutPanelFKReference.Visible = True
+
+                                Dim larTable = (From Table In Me.zrModel.RDS.Table
+                                                From Column In Table.Column
+                                                Where Column.ActiveRole IsNot Nothing
+                                                Where Column.ActiveRole.JoinedORMObject.Id = Me.ComboBoxAttribute.Text.Trim
+                                                Select Table).Distinct
+
+                                Me.ListBoxReferencedTable.SelectedIndex = -1
+                                Me.ListBoxReferencedTable.Items.Clear()
+                                For Each lrTable In larTable
+                                    Dim lrComboboxItem = New tComboboxItem(lrTable, lrTable.Name, lrTable)
+                                    Me.ListBoxReferencedTable.Items.Add(lrComboboxItem)
+                                Next
+#End Region
+                            End If
                         Case Is = GetType(FBM.ValueType)
-                            Me.LabelPromptAttributeOk.Text = "A Value Type already exists in the Model for with this Name. Only proceed if you are okay to reuse the Value Type for this Property/Column."
-                            Me.LabelPromptAttributeOk.ForeColor = Color.Orange
+                            'Might be making a Foreign Key Reference.
+#Region "Load Tables"
+                            Me.TableLayoutPanelFKReference.Visible = True
+
+                            Dim larTable = (From Table In Me.zrModel.RDS.Table
+                                            From Column In Table.Column
+                                            Where Column.ActiveRole IsNot Nothing
+                                            Where Column.ActiveRole.JoinedORMObject.Id = Me.ComboBoxAttribute.Text.Trim
+                                            Select Table).Distinct
+
+                            Me.ListBoxReferencedTable.SelectedIndex = -1
+                            Me.ListBoxReferencedTable.Items.Clear()
+                            For Each lrTable In larTable
+                                Dim lrComboboxItem = New tComboboxItem(lrTable, lrTable.Name, lrTable)
+                                Me.ListBoxReferencedTable.Items.Add(lrComboboxItem)
+                            Next
+#End Region
+
+                            'Me.LabelPromptAttributeOk.Text = "A Value Type already exists in the Model for with this Name. Only proceed if you are okay to reuse the Value Type for this Property/Column."
+                            'Me.LabelPromptAttributeOk.ForeColor = Color.Orange
                         Case Else
                             Me.LabelPromptAttributeOk.Text = "A Model Element already exists in the Model for with this Name. You can't use that name."
                             Me.LabelPromptAttributeOk.ForeColor = Color.Red
@@ -234,7 +378,10 @@ OkayToProceed:
                     Me.LabelPromptAttributeOk.Font = New Font("Arial Unicode MS", 10)
                     Me.LabelPromptAttributeOk.Text = (ChrW(&H2714)).ToString() '(ChrW(&H221A)).ToString() 'Tick
                     Me.LabelPromptAttributeOk.ForeColor = Color.Green
+                    Me.TableLayoutPanelFKReference.Visible = False
                 End If
+            Else
+                Me.TableLayoutPanelMain.Visible = False
             End If
 
         Catch ex As Exception
@@ -243,7 +390,7 @@ OkayToProceed:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -252,11 +399,31 @@ OkayToProceed:
 
         If Me.CheckFields Then
 
-            Me.zsValueTypeName = Viev.Strings.MakeCapCamelCase(Trim(Me.ComboBoxAttribute.Text))
-            Me.zbAttributeIsMandatory = Me.CheckBoxIsMandatory.Checked
-            Me.zbDataType = Me.ComboBoxDataType.SelectedItem
-            Me.ziDataTypeLength = CInt(If(Me.TextBoxDataTypeLength.Text.Trim = "", "0", Me.TextBoxDataTypeLength.Text.Trim))
-            Me.ziDataTypePrecision = CInt(If(Me.TextBoxDataTypePrecision.Text.Trim = "", "0", Me.TextBoxDataTypePrecision.Text.Trim))
+            Me.zsValueTypeName = FEStrings.MakeCapCamelCase(Trim(Me.ComboBoxAttribute.Text))
+            Me.mbIsMandatory = Me.CheckBoxIsMandatory.Checked
+            If Me.mbUseDatabasesDataTypes And Me.zrModel.IsConnectedToDatabase Then
+                Me.miDataType = Me.zrModel.DatabaseConnection.getBostonDataTypeByDatabaseDataType(Me.ComboBoxDataType.SelectedItem)
+            Else
+                Me.miDataType = Me.ComboBoxDataType.SelectedItem
+            End If
+            Me.mbIsMandatory = Me.CheckBoxIsMandatory.Checked
+            Me.miDataTypeLength = CInt(If(Me.TextBoxDataTypeLength.Text.Trim = "", "0", Me.TextBoxDataTypeLength.Text.Trim))
+            Me.miDataTypePrecision = CInt(If(Me.TextBoxDataTypePrecision.Text.Trim = "", "0", Me.TextBoxDataTypePrecision.Text.Trim))
+
+            If Me.ListBoxReferencedTable.SelectedIndex >= 0 Then
+                Me.mrForeignKeyModelObject = Me.ListBoxReferencedTable.SelectedItem.ItemData.FBMModelElement
+
+                Dim lrTable = Me.mrForeignKeyModelObject.getCorrespondingRDSTable
+
+                Dim lsMessage As String = "The referenced Entity/Table/Node Type has no Primary Key."
+                lsMessage.AppendDoubleLineBreak("Please select another reference or add a Primary Key to the Entity/Table/Node Type.")
+
+                If lrTable.getPrimaryKeyColumns.Count = 0 Then
+                    Boston.ShowFlashCard(lsMessage, Color.Salmon)
+                    Exit Sub
+                End If
+            End If
+
             Me.DialogResult = Windows.Forms.DialogResult.OK
 
             Me.Close()
@@ -268,4 +435,185 @@ OkayToProceed:
 
     End Sub
 
+    Private Sub ListBoxReferencedTable_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBoxReferencedTable.SelectedIndexChanged
+
+        Try
+            'CodeSafe
+            If Me.ListBoxReferencedTable.SelectedIndex < 0 Then Exit Sub
+
+            'Only really want to lock in the data type for the Attribute if the MakeForeignKeyReference Checkbox is checked.
+            If Not Me.CheckBoxMakeForeignKeyReference.Checked Then Exit Sub
+
+            Me.CheckBoxIsMandatory.Enabled = True
+            Me.ComboBoxDataType.Enabled = True
+            Me.TextBoxDataTypeLength.Enabled = True
+            Me.TextBoxDataTypePrecision.Enabled = True
+
+            Dim lrModelElement = Me.ListBoxReferencedTable.SelectedItem.ItemData.FBMModelElement
+
+            Select Case lrModelElement.GetType
+                Case Is = GetType(FBM.EntityType)
+
+                    Dim lrEntityType = CType(lrModelElement, FBM.EntityType)
+
+                    Dim lsDataType As String
+
+                    Dim lrTable = lrEntityType.getCorrespondingRDSTable(False)
+
+                    If lrTable.getPrimaryKeyColumns.Count = 0 Then
+                        Boston.ShowFlashCard("This Entity/Table/Node Type has no Primary Key", Color.Salmon)
+                        Exit Sub
+                    End If
+
+                    If lrEntityType.HasSimpleReferenceScheme Then
+
+                        lsDataType = lrEntityType.ReferenceModeValueType.DBDataType
+
+                        Dim selectedItem = ComboBoxDataType.Items.Cast(Of Object)().FirstOrDefault(Function(item) item = lsDataType)
+                        ComboBoxDataType.SelectedItem = If(selectedItem, ComboBoxDataType.Items(0))
+
+                        Me.CheckBoxIsMandatory.Checked = True
+
+                        Dim lrColum = lrTable.getPrimaryKeyColumns(0)
+                        Me.TextBoxDataTypeLength.Text = lrColum.getMetamodelDataTypeLength
+                        Me.TextBoxDataTypePrecision.Text = lrColum.getMetamodelDataTypePrecision
+
+                        'Disable the appropriate fields                        
+                        Me.ComboBoxDataType.Enabled = False
+                        Me.TextBoxDataTypeLength.Enabled = False
+                        Me.TextBoxDataTypePrecision.Enabled = False
+
+                    Else
+                        Dim lrColumn = lrTable.Column.Find(Function(x) x.Name = Me.ComboBoxAttribute.Text.Trim)
+
+                        If lrColumn IsNot Nothing Then
+                            Me.TextBoxDataTypeLength.Text = lrColumn.getMetamodelDataTypeLength
+                            Me.TextBoxDataTypePrecision.Text = lrColumn.getMetamodelDataTypePrecision
+
+                            lsDataType = lrColumn.DBDataType
+                            Dim selectedItem = ComboBoxDataType.Items.Cast(Of Object)().FirstOrDefault(Function(item) item = lsDataType)
+                            ComboBoxDataType.SelectedItem = If(selectedItem, ComboBoxDataType.Items(0))
+
+                            'Disable the appropriate fields                            
+                            Me.ComboBoxDataType.Enabled = False
+                            Me.TextBoxDataTypeLength.Enabled = False
+                            Me.TextBoxDataTypePrecision.Enabled = False
+                        End If
+
+                    End If
+
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CheckBoxMakeForeignKeyReference_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxMakeForeignKeyReference.CheckedChanged
+
+        Try
+            If Me.CheckBoxMakeForeignKeyReference.Checked Then
+
+                'CodeSafe
+                If Me.ListBoxReferencedTable.SelectedIndex < 0 Then Exit Sub
+
+                Me.CheckBoxIsMandatory.Enabled = True
+                Me.ComboBoxDataType.Enabled = True
+                Me.TextBoxDataTypeLength.Enabled = True
+                Me.TextBoxDataTypePrecision.Enabled = True
+
+                Dim lrModelElement = Me.ListBoxReferencedTable.SelectedItem.ItemData.FBMModelElement
+
+                Select Case lrModelElement.GetType
+                    Case Is = GetType(FBM.EntityType)
+
+                        Dim lrEntityType = CType(lrModelElement, FBM.EntityType)
+
+                        Dim lsDataType As String
+
+                        If lrEntityType.HasSimpleReferenceScheme Then
+
+                            lsDataType = lrEntityType.ReferenceModeValueType.DBDataType
+
+                            Dim selectedItem = ComboBoxDataType.Items.Cast(Of Object)().FirstOrDefault(Function(item) item = lsDataType)
+                            ComboBoxDataType.SelectedItem = If(selectedItem, ComboBoxDataType.Items(0))
+
+                            Me.CheckBoxIsMandatory.Checked = True
+
+                            Dim lrTable = lrEntityType.getCorrespondingRDSTable(False)
+
+                            Dim lrColum = lrTable.getPrimaryKeyColumns(0)
+                            Me.TextBoxDataTypeLength.Text = lrColum.getMetamodelDataTypeLength
+                            Me.TextBoxDataTypePrecision.Text = lrColum.getMetamodelDataTypePrecision
+
+                            'Disable the appropriate fields
+                            Me.ComboBoxDataType.Enabled = False
+                            Me.TextBoxDataTypeLength.Enabled = False
+                            Me.TextBoxDataTypePrecision.Enabled = False
+
+                        End If
+
+                End Select
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ComboBoxDataType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxDataType.SelectedIndexChanged
+
+        Try
+            Dim liORMDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
+
+            If Me.mbUseDatabasesDataTypes And Me.zrModel.IsConnectedToDatabase Then
+                liORMDataType = Me.zrModel.DatabaseConnection.getBostonDataTypeByDatabaseDataType(Me.ComboBoxDataType.SelectedItem)
+            Else
+                liORMDataType = Me.ComboBoxDataType.SelectedItem
+            End If
+
+            Dim lrValueType As New FBM.ValueType(Me.zrModel, pcenumLanguage.ORMModel, "DummyValueType", "DummyValueType")
+            lrValueType.DataType = liORMDataType
+
+            'Length and Precision (DataType based)
+#Region "Length and Precision"
+            If Not lrValueType.DataTypeUsesLength Then
+                Me.TextBoxDataTypeLength.Enabled = True
+                Me.TextBoxDataTypeLength.Text = "0"
+                Me.LabelPromptLength.Visible = False
+                Me.TextBoxDataTypeLength.Visible = False
+
+            Else
+                Me.LabelPromptLength.Visible = True
+                Me.TextBoxDataTypeLength.Visible = True
+            End If
+
+            If Not lrValueType.DataTypeUsesPrecision Then
+                Me.TextBoxDataTypePrecision.Enabled = True
+                Me.TextBoxDataTypePrecision.Text = "0"
+                Me.LabelPromptPrecision.Visible = False
+                Me.TextBoxDataTypePrecision.Visible = False
+            Else
+                Me.LabelPromptPrecision.Visible = True
+                Me.TextBoxDataTypePrecision.Visible = True
+            End If
+#End Region
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
 End Class

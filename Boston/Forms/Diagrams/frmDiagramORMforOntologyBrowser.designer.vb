@@ -78,7 +78,6 @@ Partial Class frmDiagramORMForOntologyBrowser
         Me.mnuOption_ViewGrid = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemCopyMultiple = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemPaste = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator34 = New System.Windows.Forms.ToolStripSeparator()
         Me.AutoLayoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.mnuOption_CopyImageToClipboard = New System.Windows.Forms.ToolStripMenuItem()
@@ -459,7 +458,7 @@ Partial Class frmDiagramORMForOntologyBrowser
         '
         'ContextMenuStrip_Diagram
         '
-        Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem1, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemCopyMultiple, Me.ToolStripMenuItemPaste, Me.ToolStripSeparator34, Me.AutoLayoutToolStripMenuItem, Me.mnuOption_CopyImageToClipboard})
+        Me.ContextMenuStrip_Diagram.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ViewToolStripMenuItem1, Me.ShowHideToolStripMenuItem, Me.ToolStripSeparator3, Me.ToolStripMenuItemCopyMultiple, Me.ToolStripSeparator34, Me.AutoLayoutToolStripMenuItem, Me.mnuOption_CopyImageToClipboard})
         Me.ContextMenuStrip_Diagram.Name = "ContextMenuStrip_Diagram"
         Me.ContextMenuStrip_Diagram.Size = New System.Drawing.Size(208, 148)
         '
@@ -601,13 +600,6 @@ Partial Class frmDiagramORMForOntologyBrowser
         Me.ToolStripMenuItemCopyMultiple.Name = "ToolStripMenuItemCopyMultiple"
         Me.ToolStripMenuItemCopyMultiple.Size = New System.Drawing.Size(207, 22)
         Me.ToolStripMenuItemCopyMultiple.Text = "&Copy"
-        '
-        'ToolStripMenuItemPaste
-        '
-        Me.ToolStripMenuItemPaste.Enabled = False
-        Me.ToolStripMenuItemPaste.Name = "ToolStripMenuItemPaste"
-        Me.ToolStripMenuItemPaste.Size = New System.Drawing.Size(207, 22)
-        Me.ToolStripMenuItemPaste.Text = "&Paste"
         '
         'ToolStripSeparator34
         '
@@ -1824,7 +1816,6 @@ Partial Class frmDiagramORMForOntologyBrowser
     Friend WithEvents ContextMenuStrip_FactType As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents ContextMenuStripModelNote As ContextMenuStrip
     Friend WithEvents ToolStripMenuItemModelNoteRemoveFromPageAndModel As ToolStripMenuItem
-    Friend WithEvents ToolStripMenuItemPaste As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator34 As ToolStripSeparator
     Friend WithEvents ToolStripMenuItemCopy As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator40 As ToolStripSeparator

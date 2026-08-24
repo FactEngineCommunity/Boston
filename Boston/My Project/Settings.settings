@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DatabaseVersionNumber" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.39</Value>
+      <Value Profile="(Default)">1.42</Value>
     </Setting>
     <Setting Name="DisplayStatusBar" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -21,7 +21,7 @@
       <Value Profile="(Default)">.\help\Boston.chm</Value>
     </Setting>
     <Setting Name="DatabaseConnectionString" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\ProgramData\FactEngine\Boston\4.0.0.0\database\boston.vdb</Value>
+      <Value Profile="(Default)">Data Source=D:\00-FactEngine\11-Production\Boston\Databases\boston.db;Version=3;</Value>
     </Setting>
     <Setting Name="ThrowCriticalDebugMessagesToScreen" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -51,13 +51,10 @@
       <Value Profile="(Default)">.\shapelibrary\orm.shl</Value>
     </Setting>
     <Setting Name="DatabaseType" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MSJet</Value>
+      <Value Profile="(Default)">SQLite</Value>
     </Setting>
     <Setting Name="ShowFactTablesOnORMModelLoad" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="EnterpriseTreeSearchList" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DefaultBrainMode" Type="System.String" Scope="User">
       <Value Profile="(Default)">NaturalLanguage</Value>
@@ -119,7 +116,7 @@
     <Setting Name="ShowProjectUserMenuItems" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="DefaultPageZoomFactor" Type="System.Int32" Scope="User">
+    <Setting Name="DefaultPageZoomFactor" Type="System.String" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
     <Setting Name="ShapeLibraryClassDiagram" Type="System.String" Scope="User">
@@ -131,7 +128,7 @@
     <Setting Name="SilentDatabaseUpgrade" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="FactEngineDefaultQueryResultLimit" Type="System.Int32" Scope="User">
+    <Setting Name="FactEngineDefaultQueryResultLimit" Type="System.String" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="FactEngineUseAIIndentificationQueries" Type="System.Boolean" Scope="User">
@@ -183,7 +180,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AutomaticallyDeleteTroublesomeColumns" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="NORMAImportingThrowRoleConstraintRoleWarnings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -243,7 +240,7 @@
       <Value Profile="(Default)">Entity Type</Value>
     </Setting>
     <Setting Name="CoreVersionNumber" Type="System.String" Scope="User">
-      <Value Profile="(Default)">2.4</Value>
+      <Value Profile="(Default)">2.6</Value>
     </Setting>
     <Setting Name="ClientServerViewCodeGenerator" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -258,10 +255,10 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="FactEngineOpenAIAPIKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)">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</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ImportExportColumnNameForFKReferenceEqualsReferencedEntityName" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ModelingUseThreadedXMLPageLoading" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -275,7 +272,7 @@
     <Setting Name="DatabaseStoreModelsAsBLOBsParallelToXML" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="LLMChunkSize" Type="System.Int32" Scope="User">
+    <Setting Name="LLMChunkSize" Type="System.String" Scope="User">
       <Value Profile="(Default)">500</Value>
     </Setting>
     <Setting Name="HideAllReferenceModesOnReferenceModeSet" Type="System.Boolean" Scope="User">
@@ -283,6 +280,81 @@
     </Setting>
     <Setting Name="EnableKnowledgeExtraction" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="EnableBPMN" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="PerformGrandfatherFatherSonBackup" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="OptOutOfAutomatedErrorReportingAltogether" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="BrainConfirmActionsWithUser" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="SaveNewModelsAsXML" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="OSMShowOSMMenu" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="OSMAssemblyAIAPIKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="MainFormShowSuperUserMenu" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LiteDBFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="NLToIndexQueryTrainingFileLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LiteDBPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="GroqAPIKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="FactEngineReturnNodePropertyIdentificationColumns" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EnterpriseShowEnterpriseMenu" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ERDAllowAddEntityTableForm" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="StructureChartShapeLibrary" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.\shapelibrary\structurechart.shl</Value>
+    </Setting>
+    <Setting Name="RDSOnXMLLoadIgnoreTroublesomeColumns" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ERDDatabaseMappingShadingGlobal" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="BostonThemeTypeName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Blue</Value>
+    </Setting>
+    <Setting Name="BostonShowDatabasesForm" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="EnterpriseTreeSearchList" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="FactEngineModelCompany" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OpenAI</Value>
+    </Setting>
+    <Setting Name="FactEngineModelName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">gpt-4-1106-preview</Value>
+    </Setting>
+    <Setting Name="FlagCMMLIntegrityErrors" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CultureInfo" Type="System.String" Scope="User">
+      <Value Profile="(Default)">en-AU</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -123,13 +123,33 @@
   <metadata name="TimerInput.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>218, 17</value>
   </metadata>
-  <metadata name="StatusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="StatusStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>329, 17</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="ToolStripSplitButtonMike.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHTSURBVEhL7ZVNq3lRFMblSyjvCRNvE98BGRooAxPJF5Ak
+        BsoHUOZeBigzZWIkShgjZsqcgSKZPLe12uf/v5d9jmN6u7/anWetvfZ59ql91jZAJ9frFcPhEKPRiLVe
+        dBnkcjkYDAbE43HEYjHWlNPDW4NyuQyz2Syi/7jdblQqFRGp89aAdquG1pyCZsV6vYbFYhHRKy6XC5vN
+        RkRyNA0WiwW8Xq+IXvH7/VyjxVsDj8cjold8Ph+Wy6WI5Gga0OI/g19qcDqd+EmL3x3T1WrF+nw+8/MZ
+        qQH1m36/j91uB6fTKbKvkPl+v8dgMEA0GhXZn0gN8vk8isUiaz2tolQqoVAosH5GuvpwOPxbTDtLJpOs
+        v5NOp7m7EkajEcfjkfUzqtszmUxotVqs7XY7d9R6vY5Go8H9yeFw8Fyn05F2WwVVA7pU6CvG4zHH0+kU
+        mUwG2WwWs9mMc5PJhGtutxvHMlQNCMUkEAjwibrf73g8HpjP5wiHwzx3uVxEtRxNA4V2u41gMMgvpBEK
+        hTinB10GCrVajccnfGRQrVZ5fIKmAd1WkUgEiUQCqVQKNpsNVquVNeXoCG+3W1EtR9OAWkaz2US320Wv
+        1+O/mwZpytGc0lbkAF/dpBv7MVj1VAAAAABJRU5ErkJggg==
+</value>
+  </data>
   <metadata name="ContextMenuStripBrainBox.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>446, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <metadata name="TimerFormRefresh.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>644, 17</value>
+  </metadata>
+  <metadata name="TimerTaskManagement.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>795, 17</value>
+  </metadata>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAMAICAAAAEAIACoEAAANgAAABAQAAABACAAaAQAAN4QAAAYGAAAAQAgAIgJAABGFQAAKAAAACAA

@@ -9,6 +9,10 @@
         LogOut
     End Enum
 
+    Public Enum pcenumUserFlag
+        IsDemoUser
+    End Enum
+
     Public Enum pcenumPermission
         FullRights
         NoRights

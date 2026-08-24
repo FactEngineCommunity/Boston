@@ -4,6 +4,7 @@
     Public Enum pcenumBrainMode
         ORMQL
         NaturalLanguage
+        OSM 'Observable State Machine. Neural Processing Unit
     End Enum
 
     Public Enum pcenumSentenceType
@@ -119,6 +120,7 @@
         ManyToMany
         ManyToOne
         MandatoryFirstRole
+        MandatorySecondRole
         OneToMany
         UnaryFactType
     End Enum

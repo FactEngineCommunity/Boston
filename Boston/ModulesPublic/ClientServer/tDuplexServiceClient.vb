@@ -48,21 +48,42 @@ Namespace DuplexServiceClient
 
         Public Sub SendBroadcast(ByVal aiBroadcastType As Viev.FBM.Interface.pcenumBroadcastType,
                                       ByRef arBroadcast As Viev.FBM.Interface.Broadcast) Implements BostonWCFServiceLibrary.IDuplexService.SendBroadcast
-            Try
 
+            Dim lsMessage As String
+
+            Try
                 Channel.SendBroadcast(aiBroadcastType, arBroadcast)
 
             Catch ex As Exception
-                Dim lsMessage As String
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-                lsMessage = "Error sending Client/Server Broadcast. The session may have timed out."
-                lsMessage.AppendDoubleLineBreak("Try restarting Boston.")
-                lsMessage.AppendDoubleLineBreak("If this message repeats, the Boston Server may be down.")
+
+                Try
+                    If (prDuplexServiceClient.State = CommunicationState.Closed Or
+                        prDuplexServiceClient.State = CommunicationState.Faulted) And prApplication.User IsNot Nothing Then
+
+                        Dim lrDuplexServiceClient As DuplexServiceClient = Nothing
+                        If prApplication.InitializeClient(False, lrDuplexServiceClient) Then 'Connects to the Boston Server Host
+                            If lrDuplexServiceClient IsNot Nothing Then
+                                Call lrDuplexServiceClient.SendBroadcast(aiBroadcastType, arBroadcast)
+                            End If
+                        Else
+                            Throw New Exception("Tried/Failed to Reconnect to the Boston Server.")
+                        End If
+                    End If
+
+                Catch ex1 As Exception
+                    Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+                    lsMessage = "Error sending Client/Server Broadcast. The session may have timed out."
+                    lsMessage.AppendDoubleLineBreak("Try restarting Boston.")
+                    lsMessage.AppendDoubleLineBreak("If this message repeats, the Boston Server may be down.")
 
 
-                lsMessage.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
-                lsMessage.AppendDoubleLineBreak(ex.Message)
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, False, False, True, MessageBoxButtons.OK, False, ex)
+                    lsMessage.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
+                    lsMessage.AppendDoubleLineBreak(ex1.Message)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+                End Try
+
+
+
             End Try
 
         End Sub
@@ -363,7 +384,7 @@ Namespace DuplexServiceClient
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -467,7 +488,7 @@ Namespace DuplexServiceClient
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -558,7 +579,7 @@ Namespace DuplexServiceClient
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

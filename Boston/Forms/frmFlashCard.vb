@@ -17,7 +17,7 @@ Public Class frmFlashCard
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
         Return MyBase.ShowDialog()
@@ -31,10 +31,13 @@ Public Class frmFlashCard
             Select Case asColor
                 Case Is = "LightGray"
                     loColor = Color.LightGray
+                    Me.Label1.ForeColor = Color.Black
                 Case Is = "White"
                     loColor = Color.White
+                    Me.Label1.ForeColor = Color.FromArgb(255, 65, 162, 188)
                 Case Else
                     loColor = Color.LightGray
+                    Me.Label1.ForeColor = Color.Black
             End Select
 
             Me.Label1.BackColor = loColor
@@ -45,7 +48,7 @@ Public Class frmFlashCard
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
         Return MyBase.ShowDialog()
@@ -57,8 +60,10 @@ Public Class frmFlashCard
             Dim loColor As Color
             If asColor.HasValue Then
                 loColor = asColor.Value
+                Me.Label1.ForeColor = Color.Black
             Else
                 loColor = Color.LightGray
+                Me.Label1.ForeColor = Color.Black
             End If
 
             Me.Label1.BackColor = loColor
@@ -68,7 +73,7 @@ Public Class frmFlashCard
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
         Return MyBase.ShowDialog()
@@ -76,16 +81,18 @@ Public Class frmFlashCard
 
     Public Overloads Function ShowDialog(ByVal asOwner As IWin32Window, Optional ByVal asColor As String = "Gray")
 
-        Call MyBase.ShowDialog(asOwner)
         Try
             Dim loColor As Color
             Select Case asColor
                 Case Is = "LightGray"
                     loColor = Color.LightGray
+                    Me.Label1.ForeColor = Color.Black
                 Case Is = "White"
                     loColor = Color.White
+                    Me.Label1.ForeColor = Color.FromArgb(255, 65, 162, 188)
                 Case Else
                     loColor = Color.LightGray
+                    Me.Label1.ForeColor = Color.Black
             End Select
 
             Me.Label1.BackColor = loColor
@@ -96,7 +103,7 @@ Public Class frmFlashCard
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
         Return MyBase.ShowDialog()
@@ -117,6 +124,8 @@ Public Class frmFlashCard
         Me.Timer.Start()
 
         Me.Button.Visible = False
+
+        Me.Label1.ForeColor = Color.Black
 
     End Sub
 

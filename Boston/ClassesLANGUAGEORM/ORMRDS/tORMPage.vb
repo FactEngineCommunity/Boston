@@ -28,11 +28,11 @@ Namespace FBM
 
             Try
                 'CodeSafe
-                If arRelation.ResponsibleFactType.RoleGroup(0).JoinedORMObject.GetType = GetType(FBM.ValueType) Or arRelation.ResponsibleFactType.RoleGroup(1).JoinedORMObject.GetType = GetType(FBM.ValueType) Then
-                    'This is a problem, because the FactType should not be a PGSRelationNodeLink, but rather a Property on a Node Type that is a list,
-                    '  but there is little we can do about it at this stage. Abort displaying the link, because there will by no Value Type as a Node Type to link to.
-                    Exit Sub
-                End If
+                'If arRelation.ResponsibleFactType.RoleGroup(0).JoinedORMObject.GetType = GetType(FBM.ValueType) Or arRelation.ResponsibleFactType.RoleGroup(1).JoinedORMObject.GetType = GetType(FBM.ValueType) Then
+                '    'This is a problem, because the FactType should not be a PGSRelationNodeLink, but rather a Property on a Node Type that is a list,
+                '    '  but there is little we can do about it at this stage. Abort displaying the link, because there will by no Value Type as a Node Type to link to.
+                '    Exit Sub
+                'End If
 
 
                 lsSQLQuery = "SELECT *"
@@ -72,7 +72,7 @@ Namespace FBM
                     Try
                         lrERDRelation.ActualPGSNode.PGSRelation = lrERDRelation
                     Catch ex As Exception
-                        Call prApplication.ThrowErrorMessage("Node with name, '" & arOriginatingNode.Name & "', is not on Page, '" & Me.Name & "'", pcenumErrorType.Warning)
+                        Call prApplication.ThrowMessage("Node with name, '" & arOriginatingNode.Name & "', is not on Page, '" & Me.Name & "'", pcenumErrorType.Warning)
                     End Try
 
                     'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
@@ -116,9 +116,9 @@ Namespace FBM
                         lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                         If liInd = 1 Then
-                            lrNode2 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset1("Entity").Data)
-                        Else
                             lrNode1 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset1("Entity").Data)
+                        Else
+                            lrNode2 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRecordset1("Entity").Data)
                         End If
 
                         liInd += 1
@@ -130,12 +130,18 @@ Namespace FBM
                         lrNode2 = Me.ERDiagram.Entity.Find(Function(x) x.Name = lrRelation.ResponsibleFactType.RoleGroup(1).JoinedORMObject.Id)
                     End If
 
-                    Dim lrERDRelation As ERD.Relation
+                    Dim lrERDRelation As ERD.Relation = Nothing
 
-                    lrERDRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lrRelation.Id)
+                    If lrRelation IsNot Nothing Then
+                        lrERDRelation = Me.ERDiagram.Relation.Find(Function(x) x.Id = lrRelation.Id)
+                    Else
+                        'Dummy RDS Relation
+                        lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString)
+                        lrRelation.ResponsibleFactType = arOriginatingNode.RDSTable.FBMModelElement
+                    End If
 
                     If lrERDRelation Is Nothing Then
-                        lrERDRelation = New ERD.Relation(Me.Model,
+                            lrERDRelation = New ERD.Relation(Me.Model,
                                                      Me,
                                                      lrRelation.Id,
                                                      lrNode1,
@@ -146,26 +152,34 @@ Namespace FBM
                                                      pcenumCMMLMultiplicity.One,
                                                      False,
                                                      arOriginatingNode.RDSTable)
-                    Else
-                        lrERDRelation.OriginEntity = lrNode1
-                    End If
+                        Else
+                            lrERDRelation.OriginEntity = lrNode1
+                        End If
 
-                    lrERDRelation.RDSRelation = arRelation
-                    lrERDRelation.IsPGSRelationNode = True
-                    Dim lrOriginatingNode = arOriginatingNode
-                    lrERDRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
+                        lrERDRelation.RDSRelation = arRelation
+                        lrERDRelation.IsPGSRelationNode = True
+                        Dim lrOriginatingNode = arOriginatingNode
+                        lrERDRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
 
-                    Try
-                        lrERDRelation.ActualPGSNode.PGSRelation = lrERDRelation
-                    Catch ex As Exception
-                        Call prApplication.ThrowErrorMessage("Node with name, '" & arOriginatingNode.Name & "', is not on Page, '" & Me.Name & "'", pcenumErrorType.Warning)
-                    End Try
+                        Try
+                            lrERDRelation.ActualPGSNode.PGSRelation = lrERDRelation
+                        Catch ex As Exception
+                            Call prApplication.ThrowMessage("Node with name, '" & arOriginatingNode.Name & "', is not on Page, '" & Me.Name & "'", pcenumErrorType.Warning)
+                        End Try
 
                     'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
                     '  because the relation is actually a PGSRelationNode.                    
-                    lrERDRelation.RelationFactType = lrRelation.ResponsibleFactType
+                    lrERDRelation.RelationFactType = arOriginatingNode.RDSTable.FBMModelElement
 
-                    If lrRelation.ResponsibleFactType.FactTypeReading.Count = 1 Then
+                    If Not String.IsNullOrWhiteSpace(lrERDRelation.RelationFactType.Source) Then
+                        If Not lrNode1.Id = lrRelation.ResponsibleFactType.Source Then
+                            Dim lrNode3 As FBM.ModelObject = lrNode1
+                            lrNode1 = lrNode2
+                            lrNode2 = lrNode3
+                        End If
+                    End If
+
+                    If lrERDRelation.RelationFactType.FactTypeReading.Count = 1 Then
                         Dim lrFactTypeReading = lrRelation.ResponsibleFactType.FactTypeReading(0)
                         Try
                             If Not lrFactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrNode1.Name Then
@@ -175,25 +189,25 @@ Namespace FBM
                                 lrNode2 = lrTempNode
                             End If
                         Catch ex As Exception
-                            prApplication.ThrowErrorMessage("Error resolving edge direction", pcenumErrorType.Warning,, False,, True,, True, Nothing)
+                            prApplication.ThrowMessage("Error resolving edge direction", pcenumErrorType.Warning,, False,, True,, True, Nothing)
                         End Try
 
                     End If
 
                     Dim lrLink As PGS.Link
 
-                    lrLink = New PGS.Link(Me, lrFactInstance, lrNode1, lrNode2, Nothing, Nothing, lrERDRelation)
-                    lrLink.RDSRelation = lrRelation
+                        lrLink = New PGS.Link(Me, lrFactInstance, lrNode1, lrNode2, Nothing, Nothing, lrERDRelation)
+                        lrLink.RDSRelation = lrRelation
 
-                    lrLink.DisplayAndAssociate()
+                        lrLink.DisplayAndAssociate()
 
-                    Call lrLink.setPredicate() '20200725-VM-Remove the following if all seems okay....Text = lrERDRelation.ActualPGSNode.Id
-                    Call lrLink.setHeadShapes()
-                    lrERDRelation.Link = lrLink
+                        Call lrLink.setPredicate() '20200725-VM-Remove the following if all seems okay....Text = lrERDRelation.ActualPGSNode.Id
+                        Call lrLink.setHeadShapes()
+                        lrERDRelation.Link = lrLink
 
-                    ERDiagram.Relation.AddUnique(lrERDRelation)
+                        ERDiagram.Relation.AddUnique(lrERDRelation)
 
-                End If
+                    End If
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -201,7 +215,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -266,7 +280,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New PGS.Node
             End Try
@@ -376,7 +390,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -399,7 +413,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

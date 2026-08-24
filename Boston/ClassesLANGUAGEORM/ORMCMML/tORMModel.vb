@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.ComponentModel
+Imports System.Reflection
 
 Namespace FBM
 
@@ -6,6 +7,71 @@ Namespace FBM
 
         <NonSerialized()>
         Public Event StateTransitionAdded(ByRef lrFact As FBM.Fact)
+
+        Public Sub AddCore(Optional aoBackgroundWorker As BackgroundWorker = Nothing)
+
+            Try
+#Region "Has No Core Model"
+                '==================================================
+                'RDS - Create a CMML Page and then dispose of it.
+                Dim lrPage As FBM.Page '(lrModel)
+                Dim lrCorePage As FBM.Page
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
+
+                'StateTransitionDiagrams
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the StateTransitionDiagram into the metamodel
+
+                'Derivations
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreDerivations.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the CoreDerivations into the metamodel
+
+                'UseCaseDiagrams
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page Model Elements for the CoreUMLUseCaseDiagram into the metamodel
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreProperty.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreProperty.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(Me, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreRelationship.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreRelationship.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(Me, False, True, False) 'Injects the lrCorePage's Model Elements into the Model. No need to do anything more with the lrCorePage at all.
+                '==================================================
+
+                'CodeSafe: Set the CoreModel VersionNr of the Model.
+                Me.CoreVersionNumber = prApplication.CMML.Core.CoreVersionNumber
+#End Region
+
+                Call Me.createEntityRelationshipArtifacts()
+                Call Me.PopulateAllCoreStructuresFromCoreMDAElements(aoBackgroundWorker)
+            Catch ex As Exception
+
+            End Try
+        End Sub
+
 
         Public Sub addCMMLColumnToRelationOrigin(ByRef arRelation As RDS.Relation,
                                                  ByRef arColumn As RDS.Column,
@@ -53,7 +119,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -104,7 +170,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -127,10 +193,31 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
+
+        Public Function addCMMLRelationIsForFactType(ByRef arRDSRelation As RDS.Relation, ByRef arFactType As FBM.FactType)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString
+                lsSQLQuery &= "(Relation, FactType)"
+                lsSQLQuery &= $" VALUES ('{arRDSRelation.Id}','{arFactType.Id}')"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Function
 
         ''' <summary>
         ''' For the STM (State Transition Model), for Value Type/Value Constraints within the Model.
@@ -158,7 +245,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -197,7 +284,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -228,7 +315,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -251,7 +338,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -273,7 +360,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -296,7 +383,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -318,7 +405,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -340,7 +427,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -362,7 +449,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -384,7 +471,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -406,7 +493,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -428,7 +515,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -437,7 +524,7 @@ Namespace FBM
         ''' Changes the name of an Attribute in the RDS
         ''' </summary>
         ''' <param name="arColumn"></param>
-        Public Sub changeCMMLAttributeName(ByRef arColumn As RDS.Column)
+        Public Sub updateCMMLAttributeName(ByRef arColumn As RDS.Column)
 
             Dim lsSQLQuery As String
 
@@ -449,7 +536,24 @@ Namespace FBM
 
         End Sub
 
-        Public Sub changeCMMLAttributeEntityForColumn(ByRef arColumn As RDS.Column, ByRef arTable As RDS.Table)
+        ''' <summary>
+        ''' Changes the name of an Attribute in the RDS
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        Public Sub updateCMMLPropertyDBName(ByRef arColumn As RDS.Column)
+
+            Dim lsSQLQuery As String
+
+            lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CorePropertyHasDBName.ToString
+            lsSQLQuery &= " SET DBName = '" & arColumn.DBName & "'"
+            lsSQLQuery &= " WHERE Property = '" & arColumn.Id & "'"
+
+            Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+        End Sub
+
+
+        Public Sub updateCMMLAttributeEntityForColumn(ByRef arColumn As RDS.Column, ByRef arTable As RDS.Table)
 
             Try
 
@@ -468,11 +572,11 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
-        Public Sub changeCMMLStateName(ByRef arState As STM.State, ByVal asOldStateName As String)
+        Public Sub updateCMMLStateName(ByRef arState As STM.State, ByVal asOldStateName As String)
 
             Dim lsSQLQuery As String
 
@@ -490,7 +594,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -514,7 +618,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -522,7 +626,8 @@ Namespace FBM
         ''' <summary>
         ''' Connects to the database if it is not already connected
         ''' </summary>
-        Public Function connectToDatabase(Optional abForceConnection As Boolean = False) As Boolean
+        Public Function connectToDatabase(Optional abForceConnection As Boolean = False,
+                                          Optional abThrowErrors As Boolean = True) As Boolean
 
             Try
                 'CodeSafe
@@ -538,7 +643,7 @@ Namespace FBM
                     End If
                 ElseIf Me.DatabaseConnection Is Nothing Then
                     'Try and establish a connection
-                    Call Me.DatabaseManager.establishConnection(Me.TargetDatabaseType, Me.TargetDatabaseConnectionString)
+                    Call Me.DatabaseManager.establishConnection(Me.TargetDatabaseType, Me.TargetDatabaseConnectionString, False)
                     If Me.DatabaseConnection Is Nothing Then
                         Throw New Exception("No database connection has been established. Please check the database connection settings for the Model in the Model Configuration Form.")
                     End If
@@ -568,9 +673,13 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, ex.StackTrace, False,, True)
+
+                If abThrowErrors Then
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information, ex.StackTrace, False,, True)
+                End If
 
                 Return False
+
             End Try
         End Function
 
@@ -653,20 +762,33 @@ Namespace FBM
 
                 '====================================================================================================
                 Dim lbForceStorePropertyInformation As Boolean = False
-                If arColumn.Role.TypeOfJoin = pcenumRoleJoinType.EntityType Then
-                    If arColumn.Role.JoinsEntityType.IsObjectifyingEntityType Then
-                        lbForceStorePropertyInformation = True
-                    End If
+
+                If arColumn.Role Is Nothing Then
+                    'Independent ValueType single Column Tables have no Role on the Column.
+                    lbForceStorePropertyInformation = True
+                ElseIf arColumn.Role.TypeOfJoin = pcenumRoleJoinType.EntityType Then
+                    'If arColumn.Role.JoinsEntityType.IsObjectifyingEntityType Then '20240124-VM-Was, can't understand why was not for ordinary EntityType (??). Rmove if not missed after 6 months.
+                    lbForceStorePropertyInformation = True
+                    'End If
                 End If
                 If asEntityName = arColumn.Table.Name And asEntityName = arColumn.Role.JoinedORMObject.GetTopmostNonAbsorbedSupertype(True).Id Then
                     'Column may be for Supertype of absorbed Subtype.
                     lbForceStorePropertyInformation = True
                 End If
-                If lbForceStorePropertyInformation Or (asEntityName = arColumn.Role.JoinedORMObject.Id Or asEntityName = arColumn.Role.FactType.Id) And lrRecordsetCount("Count").Data = 0 Then
+
+                If (lbForceStorePropertyInformation Or (asEntityName = arColumn.JoinedORMObjectId Or asEntityName = arColumn.Role.FactType.Id)) And lrRecordsetCount("Count").Data = 0 Then
                     'Columns can be reused on Subtype Entities, and don't need their definition twice,
                     '  just their relationship with the ERD Entity (above).
 
                     lsSQLQuery = "INSERT INTO CorePropertyHasPropertyName (Property, PropertyName)"
+                    lsSQLQuery &= " VALUES ("
+                    lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
+                    lsSQLQuery &= " ,'" & asAttributeName & "'"
+                    lsSQLQuery &= " )"
+
+                    lrFact = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    lsSQLQuery = "INSERT INTO CorePropertyHasDBName (Property, DBName)"
                     lsSQLQuery &= " VALUES ("
                     lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
                     lsSQLQuery &= " ,'" & asAttributeName & "'"
@@ -691,11 +813,14 @@ Namespace FBM
 
                     Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    lsSQLQuery = "INSERT INTO CorePropertyHasActiveRole (Property, Role)"
-                    lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
-                    lsSQLQuery &= " ,'" & arColumn.ActiveRole.Id & "'"
-                    lsSQLQuery &= " )"
+                    If arColumn.ActiveRole IsNot Nothing Then
+                        'Independent ValueType single Column Tables have no Role/ActiveRole on the Column.                    
+                        lsSQLQuery = "INSERT INTO CorePropertyHasActiveRole (Property, Role)"
+                        lsSQLQuery &= " VALUES ("
+                        lsSQLQuery &= " '" & lsPropertyInstanceId & "'"
+                        lsSQLQuery &= " ,'" & arColumn.ActiveRole.Id & "'"
+                        lsSQLQuery &= " )"
+                    End If
 
                     Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -741,7 +866,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -880,7 +1005,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1022,7 +1147,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1050,7 +1175,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1078,7 +1203,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1108,7 +1233,91 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub setCMMLCoreRelationEnforcesOnCascadeUpdate(ByRef arRDSRelation As RDS.Relation, ByVal abEnforcesOnCascadeUpdate As Boolean)
+
+            Dim lsSQLQuery As String
+
+            Try
+
+                If abEnforcesOnCascadeUpdate Then
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreRelationEnforcesOnCascadeUpdate.ToString
+                    lsSQLQuery &= " (Relation)"
+                    lsSQLQuery &= " VALUES ('" & arRDSRelation.Id & "')"
+                Else
+                    lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreRelationEnforcesOnCascadeUpdate.ToString
+                    lsSQLQuery &= " WHERE Relation = '" & arRDSRelation.Id & "'"
+                End If
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub setCMMLCoreRelationEnforcesOnCascadeDelete(ByRef arRDSRelation As RDS.Relation, ByVal abEnforcesOnCascadeDelete As Boolean)
+
+            Dim lsSQLQuery As String
+
+            Try
+
+                If abEnforcesOnCascadeDelete Then
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreRelationEnforcesOnCascadeDelete.ToString
+                    lsSQLQuery &= " (Relation)"
+                    lsSQLQuery &= " VALUES ('" & arRDSRelation.Id & "')"
+                Else
+                    lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreRelationEnforcesOnCascadeDelete.ToString
+                    lsSQLQuery &= " WHERE Relation = '" & arRDSRelation.Id & "'"
+                End If
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub setCMMLCoreRelationEnforcesReferentialIntegrity(ByRef arRDSRelation As RDS.Relation, ByVal abEnforcesReferentialIntegrity As Boolean)
+
+            Dim lsSQLQuery As String
+
+            Try
+
+                If abEnforcesReferentialIntegrity Then
+                    lsSQLQuery = "INSERT INTO " & pcenumCMMLRelations.CoreRelationEnforcesReferentialIntegrity.ToString
+                    lsSQLQuery &= " (Relation)"
+                    lsSQLQuery &= " VALUES ('" & arRDSRelation.Id & "')"
+                Else
+                    lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreRelationEnforcesReferentialIntegrity.ToString
+                    lsSQLQuery &= " WHERE Relation = '" & arRDSRelation.Id & "'"
+                End If
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1158,7 +1367,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1192,7 +1401,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1223,6 +1432,9 @@ Namespace FBM
         Public Sub createColumnForUnaryFactType(ByRef arFactType As FBM.FactType)
 
             Try
+                'CodeSafe
+                If arFactType.IsMDAModelElement Then Exit Sub 'We don't create Tables/Columns for the Core model.
+
                 'RDS
                 If arFactType.Arity = 1 Then
                     'Unary FactType, so add boolean Column to the corresponding RDS Table.
@@ -1242,7 +1454,7 @@ Namespace FBM
                     Dim lsColumnName = "DummyFactTypeReadingRequired"
 
                     If lrFactType.FactTypeReading.Count > 0 Then
-                        lsColumnName = Viev.Strings.MakeCapCamelCase(lrFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText, True)
+                        lsColumnName = FEStrings.MakeCapCamelCase(lrFactType.FactTypeReading(0).PredicatePart(0).PredicatePartText, True)
                     End If
 
                     lsColumnName = lrTable.createUniqueColumnName(lsColumnName, Nothing, 0)
@@ -1263,7 +1475,7 @@ Namespace FBM
                 lsMessage = appEx.Message
                 lsMessage.AppendDoubleLineBreak("Error: " & mb.ReflectedType.Name & "." & mb.Name)
 
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
 
             Catch ex As Exception
                 Dim lsMessage1 As String
@@ -1271,7 +1483,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1361,7 +1573,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return False
 
             End Try
@@ -1446,7 +1658,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1498,7 +1710,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1515,14 +1727,14 @@ Namespace FBM
             'Dim lrColumn As RDS.Column
             'Dim lrTable As RDS.Table
 
-            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
-            'lsSQLQuery &= " WHERE ModelObject = '" & lrAttribute.Entity.Id & "'"
+            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+            lsSQLQuery &= " WHERE FactType = '" & arFactType.Id & "'"
             'lsSQLQuery &= " AND Attribute = '" & lrAttribute.Name & "'"
 
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-            'lsSQLQuery &= " WHERE Property = '" & lrAttribute.Name & "'"
+            lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+            lsSQLQuery &= " WHERE FactType = '" & arFactType.Id & "'"
 
             Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
@@ -1560,7 +1772,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -1601,7 +1813,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1623,7 +1835,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1657,7 +1869,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1684,7 +1896,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1706,7 +1918,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1728,7 +1940,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1767,7 +1979,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1796,7 +2008,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1822,7 +2034,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1868,7 +2080,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1894,7 +2106,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1919,7 +2131,30 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub setCMMLPropertyOrdinalPositionForEntity(ByVal asAttributeId As String, ByVal asEntityName As String, ByVal aiOrdinalPosition As Integer)
+
+            Try
+                Dim lsSQLQuery As String = ""
+
+                lsSQLQuery = "UPDATE " & pcenumCMMLRelations.CorePropertyHasOrdinalPositionForEntity.ToString
+                lsSQLQuery &= " SET OrdinalPosition = '" & aiOrdinalPosition.ToString & "'"
+                lsSQLQuery &= " WHERE Property = '" & asAttributeId & "'"
+                lsSQLQuery &= "   AND Entity = '" & asEntityName & "'"
+
+                Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1931,14 +2166,22 @@ Namespace FBM
 
                 If abIsPrimaryKey Then
 
-                    lsSQLQuery = "INSERT INTO "
-                    lsSQLQuery &= pcenumCMMLRelations.CoreIndexIsPrimaryKey.ToString
-                    lsSQLQuery &= " (Index)"
-                    lsSQLQuery &= " VALUES ("
-                    lsSQLQuery &= "'" & arIndex.Name & "'"
-                    lsSQLQuery &= ")"
+                    lsSQLQuery = $"SELECT * FROM {pcenumCMMLRelations.CoreIndexIsPrimaryKey.ToString}"
+                    lsSQLQuery &= $" WHERE Index = '{arIndex.Name}'"
 
-                    Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    Dim lrRecordset As ORMQL.Recordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrRecordset.EOF Then
+
+                        lsSQLQuery = "INSERT INTO "
+                        lsSQLQuery &= pcenumCMMLRelations.CoreIndexIsPrimaryKey.ToString
+                        lsSQLQuery &= " (Index)"
+                        lsSQLQuery &= " VALUES ("
+                        lsSQLQuery &= "'" & arIndex.Name & "'"
+                        lsSQLQuery &= ")"
+
+                        Call Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                    End If
 
                 Else
                     lsSQLQuery = "DELETE FROM " & pcenumCMMLRelations.CoreIndexIsPrimaryKey.ToString
@@ -1954,7 +2197,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -2025,7 +2268,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -2043,7 +2286,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -2122,7 +2365,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2180,7 +2423,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2203,7 +2446,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2225,7 +2468,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2247,7 +2490,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2269,7 +2512,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2291,7 +2534,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2313,7 +2556,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2335,7 +2578,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2377,6 +2620,21 @@ Namespace FBM
             End If
             lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Elements into the core metamodel.
 
+            'Core Property
+            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreProperty.ToString)
+            If lrCorePage Is Nothing Then
+                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreProperty.ToString & "', in the Core Model.")
+            End If
+            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Elements into the core metamodel.                
+
+#Region "Core Relationship"
+            lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreRelationship.ToString)
+            If lrCorePage Is Nothing Then
+                Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreRelationship.ToString & "', in the Core Model.")
+            End If
+            lrPage = lrCorePage.Clone(Me, False, True, False) 'Clone the Page's Model Elements into the core metamodel.                
+#End Region
+
 #Region "Core UML Use Case Diagram"
             lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
             If lrCorePage Is Nothing Then
@@ -2409,11 +2667,11 @@ Namespace FBM
             Dim lsSQLQuery As String
 
             If Me.CoreVersionNumber <> My.Settings.CoreVersionNumber Then
-                prApplication.ThrowErrorMessage("Upgrading the model to the new core version. This won't take long.", pcenumErrorType.Warning,, False, False, True,, True)
+                prApplication.ThrowMessage("Upgrading the model to the new core version. This won't take long.", pcenumErrorType.Warning,, False, False, True,, True,, True)
                 Boston.WriteToStatusBar("Updating the core for Model, " & Me.Name, True)
             End If
 
-            If Me.CoreVersionNumber = "" Then
+            If {"", "1.0"}.Contains(Me.CoreVersionNumber) Then
 #Region " '' CoreVesionNumber"
                 'Entity Relationship Diagrams / Property Graph Schema
                 Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
@@ -2568,7 +2826,7 @@ Namespace FBM
                 If lrCorePage Is Nothing Then
                     Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString & "', in the Core Model.")
                 End If
-                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the State Transition Diagrams into the core metamodel.                
+                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Element for the Use Case Diagrams into the core metamodel.                
 #End Region
                 Me.CoreVersionNumber = "2.4"
                 Me.MakeDirty(False, False)
@@ -2576,8 +2834,575 @@ Namespace FBM
             End If
 #End Region
 
+#Region "2.4"
+            If {"2.4", "2.5"}.Contains(Me.CoreVersionNumber) Then
+
+#Region "Core Property"
+                Dim lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreProperty.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreProperty.ToString & "', in the Core Model.")
+                End If
+                Dim lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Elements into the core metamodel.                
+
+                lsSQLQuery = "SELECT * FROM CoreERDAttribute"
+                Dim lrRecordset As ORMQL.Recordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                'CodeSafe
+                prApplication.WorkingModel = Me
+                prApplication.Brain.Model = Me
+                prApplication.WorkingPage = Nothing
+
+                Dim liInd As Integer = 1
+                prApplication.WriteToStatusBar("...upgrading")
+                With New WaitCursor
+                    While Not lrRecordset.EOF
+
+                        lsSQLQuery = "CoreProperty, '" & lrRecordset("Attribute").Data & "', has CoreDBName,''."
+                        Call prApplication.Brain.ProcessFEQLStatement(lsSQLQuery)
+
+                        'prApplication.WriteToStatusBar("Upgrading to Core v2.4", False, CInt(liInd / lrRecordset.Facts.Count) * 100, False)
+
+                        liInd += 1
+                        lrRecordset.MoveNext()
+                    End While
+                End With
+#End Region
+
+#Region "Core Relationship"
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreRelationship.ToString)
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreRelationship.ToString & "', in the Core Model.")
+                End If
+                lrPage = lrCorePage.Clone(Me, True, True, False) 'Clone the Page's Model Elements into the core metamodel.                
+#End Region
+
+                Me.CoreVersionNumber = "2.6"
+                Me.MakeDirty(False, False)
+                If abSaveModel Then Call Me.Save()
+            End If
+#End Region
+
         End Sub
 
+        Private Function GetCoreKeyValue(ByVal aiRelation As pcenumCMMLRelations, ByVal asKeyName As String, ByVal asKeyIndexValue As String) As ORMQL.Recordset
+
+            Dim lrRecordset As New ORMQL.Recordset
+
+            Try
+                Dim lrFactType = Me.FactType.Find(Function(x) x.Id = aiRelation.ToString)
+                If lrFactType Is Nothing Then
+                    Throw New Exception("Core Fact Type not found:" & aiRelation.ToString)
+                End If
+
+                Dim lrFactPredicate As New FBM.FactPredicate
+                Dim lrRoleData = New FBM.FactData(New FBM.Role(lrFactType, asKeyName, True), New FBM.Concept(asKeyIndexValue))
+                lrFactPredicate.data.Add(lrRoleData)
+
+
+                '--------------------------------------------------------------------
+                'Retrieve all the Facts from the FactType that match the predicate.
+                '--------------------------------------------------------------------
+
+                Dim larFactList = From Fact In lrFactType.Fact
+                                  From FactData In Fact.Data
+                                  Where FactData.Role.Name = asKeyName
+                                  Where FactData.Data = asKeyIndexValue
+                                  Select Fact
+
+                'Dim larFactList = lrFactType.Fact.FindAll(AddressOf lrFactPredicate.Equals)
+
+                lrRecordset.Facts = larFactList.ToList
+
+                If larFactList.Count > 0 Then
+                    lrRecordset.ColumnNames = larFactList(0).FactType.RoleGroup.Select(Function(x) x.Name).ToList
+                End If
+
+                Return lrRecordset
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return lrRecordset
+            End Try
+
+        End Function
+
+        Private Function GetCoreKeyValue(ByVal aiRelation As pcenumCMMLRelations, ByVal aasKeyName() As String, ByVal aasKeyIndexValue() As String) As ORMQL.Recordset
+
+            Dim lrRecordset As New ORMQL.Recordset
+
+            Try
+                Dim lrFactType = Me.FactType.Find(Function(x) x.Id = aiRelation.ToString)
+                If lrFactType Is Nothing Then
+                    Throw New Exception("Core Fact Type not found:" & aiRelation.ToString)
+                End If
+
+                Dim lrFactPredicate As New FBM.FactPredicate
+                Dim liInd = 0
+                For Each lsKeyName In aasKeyName
+                    Dim lrRoleData = New FBM.FactData(New FBM.Role(lrFactType, lsKeyName, True), New FBM.Concept(aasKeyIndexValue(liInd)))
+                    lrFactPredicate.data.Add(lrRoleData)
+                    liInd += 1
+                Next
+
+                '--------------------------------------------------------------------
+                'Retrieve all the Facts from the FactType that match the predicate.
+                '--------------------------------------------------------------------
+                Dim larFactList = lrFactType.Fact.FindAll(AddressOf lrFactPredicate.Equals)
+
+                'Dim larFactList = lrFactType.Fact.FindAll(AddressOf lrFactPredicate.Equals)
+
+                lrRecordset.Facts = larFactList.ToList
+
+                If larFactList.Count > 0 Then
+                    lrRecordset.ColumnNames = larFactList(0).Data.Select(Function(x) x.Role.Name).ToList 'FactType.RoleGroup.Select(Function(x) x.Name).ToList
+                End If
+
+                Return lrRecordset
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return lrRecordset
+            End Try
+
+        End Function
+
+        Public Function GetSertKeyValue(ByVal aiRelation As pcenumCMMLRelations, ByVal aasKeyName() As String, ByVal aasKeyIndexValue() As String, ByVal asValue As String) As ORMQL.Recordset
+
+            Try
+                '============================================================================================
+                'First check to see if the Fact exists for the FactType/Relation
+                Dim lrRecordset = Me.GetCoreKeyValue(aiRelation, aasKeyName, aasKeyIndexValue)
+
+                If lrRecordset.Facts.Count = 0 Then
+                    '========================================================================================
+                    'Fact does not exist, so create a new Fact and add it to the FactType/Relation
+
+                    Dim lrFactType = Me.FactType.Find(Function(x) x.Id = aiRelation.ToString)
+                    If lrFactType Is Nothing Then
+                        Throw New Exception("Core Fact Type not found:" & aiRelation.ToString)
+                    End If
+
+                    Dim lrRole As FBM.Role
+                    Dim lrFactData As FBM.FactData
+                    Dim lrFact = New FBM.Fact(lrFactType, True)
+                    Dim larRole As New List(Of FBM.Role)
+                    Dim lrModelDictionaryEntry As FBM.DictionaryEntry
+                    Dim liInd = 0
+
+                    For Each lsKeyName In aasKeyName
+
+                        lrRole = lrFactType.RoleGroup.Find(Function(x) x.Name = lsKeyName) 'AddressOf lrRole.EqualsByName)
+                        larRole.Add(lrRole)
+
+                        lrModelDictionaryEntry = New FBM.DictionaryEntry(Me, aasKeyIndexValue(liInd), pcenumConceptType.Value)
+                        lrModelDictionaryEntry = Me.AddModelDictionaryEntry(lrModelDictionaryEntry, True, True, False)
+
+                        lrFactData = New FBM.FactData(lrRole, lrModelDictionaryEntry.Concept, lrFact)
+
+                        lrFact.Data.Add(lrFactData)
+
+                        liInd += 1
+                    Next
+
+                    Dim lrLastRole = lrFactType.RoleGroup.Find(Function(x) Not larRole.Contains(x))
+                    lrModelDictionaryEntry = New FBM.DictionaryEntry(Me, asValue, pcenumConceptType.Value)
+                    lrModelDictionaryEntry = Me.AddModelDictionaryEntry(lrModelDictionaryEntry, True, True, False)
+                    lrFactData = New FBM.FactData(lrLastRole, lrModelDictionaryEntry.Concept, lrFact, True)
+                    lrFact.Data.Add(lrFactData)
+
+                    lrFactType.AddFact(lrFact, False, Nothing)
+
+                    lrRecordset.Facts.Add(lrFact)
+
+                End If
+
+                Return lrRecordset
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return New ORMQL.Recordset()
+            End Try
+
+        End Function
+
+        Private Sub GetTableDetailsFromCMML(ByRef arTable As RDS.Table, ByRef aiInd As Integer)
+
+            Dim lrORMRecordset2 As ORMQL.Recordset
+            Dim lrORMRecordset3 As ORMQL.Recordset
+            Dim lrResponsibleRole As FBM.Role
+            Dim lrActiveRole As FBM.Role
+            Dim lrColumn As RDS.Column
+            Dim lrTable = arTable
+            Dim lrDummyTable As RDS.Table
+            Dim lsSQLQuery As String = ""
+            Dim lsColumnName As String = ""
+
+
+            Try
+
+#Region "Get Table Details | Columns"
+                '==========================================================================================================
+                'Columns
+
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreERDAttribute.ToString
+                lsSQLQuery &= " WHERE ModelObject = '" & lrTable.Name & "'"
+
+                'lrORMRecordset2 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                lrORMRecordset2 = Me.GetCoreKeyValue(pcenumCMMLRelations.CoreERDAttribute, "ModelObject", lrTable.Name)
+
+                Dim lsColumnId As String = "" 'Used also for Debugging/ErrorThrowing.
+                Dim lrSupertypeColumn As RDS.Column = Nothing
+
+                Dim liInd = 1 'Used for OrdinalPosition if does not exist.
+                While Not lrORMRecordset2.EOF
+
+                    lrColumn = Nothing
+
+                    Try
+                        lsColumnId = lrORMRecordset2("Attribute").Data
+
+                        'Responsible Role
+                        lsSQLQuery = "SELECT *"
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
+                        lsSQLQuery &= " WHERE Property = '" & lsColumnId & "'"
+
+                        'lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                        lrORMRecordset3 = Me.GetCoreKeyValue(pcenumCMMLRelations.CorePropertyIsForRole, "Property", lsColumnId)
+
+                        If lrORMRecordset3("Role").Data = "" Then Throw New Exception("No Responsible Role for Property")
+
+                        lrResponsibleRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
+
+                        Dim lrResponsibleRoleTable As RDS.Table = lrResponsibleRole.getCorrespondingRDSTable
+                        If lrTable IsNot lrResponsibleRoleTable And lrResponsibleRoleTable.Column.Count > 0 Then
+
+                            lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Id = lsColumnId)
+                            If lrSupertypeColumn Is Nothing Then
+                                'CodeSafe...fall back to ResponsibleRole
+                                lrSupertypeColumn = lrResponsibleRoleTable.Column.Find(Function(x) x.Role.Id = lrResponsibleRole.Id)
+                            End If
+                            lrColumn = lrSupertypeColumn 'So can get/set OrdinalPosition if required. See setting of OrdinalPosition by Table below.
+
+                            lrDummyTable = lrTable
+
+                            Dim lrNewColumn = lrSupertypeColumn.Clone(lrDummyTable, Nothing, True)
+
+                            Dim lrExistingColumn = lrTable.Column.Find(Function(x) x.Role Is lrNewColumn.Role And x.ActiveRole Is lrNewColumn.ActiveRole)
+                            If lrExistingColumn Is Nothing Then
+                                Call lrTable.Column.Add(lrNewColumn)
+                                lrColumn = lrNewColumn 'So can get/set OrdinalPosition if required. See setting of OrdinalPosition by Table below.
+                            End If
+                        Else
+                            'Column Name
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM CorePropertyHasPropertyName" '(Property, PropertyName)
+                            'lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+
+                            'lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrORMRecordset3 = Me.GetCoreKeyValue(pcenumCMMLRelations.CorePropertyHasPropertyName, "Property", lrORMRecordset2("Attribute").Data)
+                            lsColumnName = lrORMRecordset3("PropertyName").Data
+
+                            'Active Role
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasActiveRole.ToString
+                            'lsSQLQuery &= " WHERE Property = '" & lrORMRecordset2("Attribute").Data & "'"
+
+                            'lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrORMRecordset3 = Me.GetCoreKeyValue(pcenumCMMLRelations.CorePropertyHasActiveRole, "Property", lrORMRecordset2("Attribute").Data)
+                            If lrORMRecordset3("Role").Data <> "" Then
+                                lrActiveRole = Me.Role.Find(Function(x) x.Id = lrORMRecordset3("Role").Data)
+                            End If
+
+                            'New Column
+                            lrColumn = New RDS.Column(lrTable, lsColumnName, lrResponsibleRole, lrActiveRole)
+                            lrColumn.Id = lsColumnId
+
+                            lrORMRecordset3 = Me.GetCoreKeyValue(pcenumCMMLRelations.CorePropertyHasDBName, "Property", lrORMRecordset2("Attribute").Data)
+                            lrColumn.DBName = lrORMRecordset3("DBName").Data
+
+                            'IsMandatory
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsMandatory.ToString
+                            'lsSQLQuery &= " WHERE IsMandatory = '" & lrColumn.Id & "'"
+
+                            'lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrORMRecordset3 = Me.GetCoreKeyValue(pcenumCMMLRelations.CoreIsMandatory, "IsMandatory", lrColumn.Id)
+                            lrColumn.IsMandatory = Not lrORMRecordset3.EOF
+
+                            'Fact Type
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
+                            'lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
+
+                            'lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrORMRecordset3 = Me.GetCoreKeyValue(pcenumCMMLRelations.CorePropertyIsForFactType, "Property", lrColumn.Id)
+                            If lrORMRecordset3("FactType").Data <> "" Then
+                                lrColumn.FactType = Me.FactType.Find(Function(x) x.Id = lrORMRecordset3("FactType").Data)
+                            End If
+
+                            'Ordinal Position
+                            'lsSQLQuery = "SELECT *"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
+                            'lsSQLQuery &= " WHERE Property = '" & lrColumn.Id & "'"
+
+                            'lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                            'Special handling for OrdinalPosition of Subtypes                    
+                            If lrTable.isSubtype Then
+                                lrORMRecordset3 = Me.GetSertKeyValue(pcenumCMMLRelations.CorePropertyHasOrdinalPositionForEntity, {"Property", "Entity"}, {lrColumn.Id, lrTable.Name}, liInd)
+                                lrColumn.OrdinalPosition = lrORMRecordset3("OrdinalPosition").Data
+                            Else
+                                lrORMRecordset3 = Me.GetCoreKeyValue(pcenumCMMLRelations.CorePropertyHasOrdinalPosition, "Property", lrColumn.Id)
+                                lrColumn.OrdinalPosition = lrORMRecordset3("Position").Data
+                            End If
+
+
+                            'NB Special handling for Ordinal Position of Subtypes below Try
+
+                            'Is Derived Fact Type Parameter
+                            'lsSQLQuery = " SELECT COUNT(*)"
+                            'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreAttributeIsDerivedFactTypeParameter.ToString
+                            'lsSQLQuery &= " WHERE IsDerivedFactTypeParameter = '" & lrColumn.Id & "'"
+
+                            'lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            lrORMRecordset3 = Me.GetCoreKeyValue(pcenumCMMLRelations.CoreAttributeIsDerivedFactTypeParameter, "IsDerivedFactTypeParameter", lrColumn.Id)
+
+                            If lrORMRecordset3.Facts.Count > 0 Then 'Not doing SELECT COUNT(*) and more. lrORMRecordset3(0).Data > 0 Then
+                                lrColumn.IsDerivationParameter = True
+                            End If
+
+                            lrTable.Column.AddUnique(lrColumn)
+                        End If
+
+                    Catch ex As Exception
+#Region "Exception Handling"
+                        If My.Settings.AutomaticallyDeleteTroublesomeColumns Then
+                            'NB This is not advisable. Turning it on deleted all the columns in the CinemaBookings Model.
+                            'Call Me.removeCMMLAttribute(lsColumnId)
+                        ElseIf My.Settings.RDSOnXMLLoadIgnoreTroublesomeColumns Then
+                            liInd += 1
+                            lrORMRecordset2.MoveNext()
+                            Continue While
+                        Else
+
+                            Dim lsErrorMessage As String = "Trouble loading Column for Table, " & lrTable.Name & ". Column.Id = " & lsColumnId
+                            lsErrorMessage &= vbCrLf & vbCrLf & "Skipping loading of the Column from the ORM model (only) as a precaution."
+                            If Me.IsDatabaseSynchronised Then
+                                lsErrorMessage &= " Contact support for instructions how to fix this problem."
+                            End If
+                            lsErrorMessage.AppendDoubleLineBreak("Optionally you can delete the Column from the database altogether. Click [Yes] to delete the Column, or [No] to keep the Column.")
+                            lsErrorMessage.AppendString(" You should only delete the Column if you know what you are doing or as advised by support. Backup your database before deleting core elements.")
+
+                            'Dim lbDatabaseSynchronisation As Boolean = Me.IsDatabaseSynchronised
+                            'Me.IsDatabaseSynchronised = False
+                            'Call Me.removeCMMLAttribute(lrTable.Name, lsColumnId)
+                            'Me.IsDatabaseSynchronised = lbDatabaseSynchronisation
+
+                            lsErrorMessage &= vbCrLf & vbCrLf & ex.StackTrace
+                            If prApplication.ThrowMessage(lsErrorMessage, pcenumErrorType.Information,
+                                                                ex.StackTrace,
+                                                                False,
+                                                                False,
+                                                                True,
+                                                                MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                                '20210813-VM-If this gets out of hand, remove this functionality.
+                                Call Me.removeCMMLAttribute(lsColumnId)
+                            End If
+                        End If
+#End Region
+                    End Try
+
+                    liInd += 1
+                    lrORMRecordset2.MoveNext()
+                End While
+                '==========================================================================================================
+                '===========================
+                'Indexes                    
+                Call Me.loadIndexesForTable(lrTable)
+
+                Dim larNullActiveRoles = From Column In lrTable.Column
+                                         Where Column.ActiveRole Is Nothing
+                                         Select Column
+
+                If larNullActiveRoles.Count > 0 Then
+                    'CodeSafe
+                    For Each lrColumn In larNullActiveRoles.ToArray
+                        Try
+                            If lrColumn.Role.FactType.Id = lrColumn.Table.Name And
+lrColumn.Role.FactType.IsObjectified Then
+                                If lrColumn.Role.JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                                    lrColumn.ActiveRole = lrColumn.Role
+                                    Call Me.updateORSetCMMLPropertyActiveRole(lrColumn)
+                                End If
+                            End If
+                        Catch ex As Exception
+                            'CodeSafe
+                            If lrColumn.ActiveRole Is Nothing And lrColumn.Role Is Nothing And lrColumn.FactType Is Nothing Then
+                                Call lrTable.removeColumn(lrColumn)
+                            End If
+                        End Try
+                    Next
+                End If
+
+                aiInd += 1 'For reporting progress on Tables loaded.
+#End Region 'Table Details
+
+            Catch ex As Exception
+
+            End Try
+        End Sub
+
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="aoBackgroundWorker">To report progress. Start at 80%.</param>
+        Public Sub PopulateAllCoreStructuresFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
+
+            Try
+                Dim loBackgroundWorker = aoBackgroundWorker
+
+                '20240229-VM-For now. Set pbDoDatabaseProcessing = True at end
+                pbDoDatabaseProcessing = False
+
+                'CodeSafe
+                If Me.RDS.Table.Count > 0 Then Exit Sub
+
+
+                Me.RDSLoading = True
+                Dim lsMessage As String
+
+                Dim lsSQLQuery As String = ""
+                Dim lrTable As RDS.Table
+
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE ElementType = 'Entity'"
+
+                Dim lrORMRecordset,
+                    lrORMRecordset3 As ORMQL.Recordset
+
+                lrORMRecordset = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                Dim lrModelElement As FBM.ModelObject
+                Dim lsColumnName As String = ""
+
+
+
+                While Not lrORMRecordset.EOF
+#Region "Tables"
+                    '-----------------------------------------------------
+                    'Get the underlying ModelElement
+                    lrModelElement = Me.GetModelObjectByName(lrORMRecordset("Element").Data,,,,, pcenumConceptType.EntityType)
+
+                    If lrModelElement Is Nothing Then
+                        'This is dire. Create a dummy FBMEntityType for the Table, and add the EntityType to the Model. 
+                        '  The user can then elect to delete the EntityType/Table if it shouldn't be in the model
+                        Dim lrEntityType = Me.CreateEntityType(lrORMRecordset("Element").Data, True, False, False, True)
+                        lrModelElement = lrEntityType
+
+                        'Let the user know what happened.
+                        lsMessage = "The Table, '" & lrModelElement.Name & "', within the relational model had no corresponding Object-Role Model model element."
+                        lsMessage &= vbCrLf & vbCrLf & "An Entity Type has been created in the model to cater for this. If you no longer need this model element remove it from the model."
+                        Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical)
+                    End If
+
+                    lrTable = New RDS.Table(Me.RDS, lrORMRecordset("Element").Data, lrModelElement)
+                    Me.RDS.Table.AddUnique(lrTable)
+
+                    'PGS Relation
+                    Try
+                        lsSQLQuery = " SELECT COUNT(*)"
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreIsPGSRelation.ToString
+                        lsSQLQuery &= " WHERE IsPGSRelation = '" & lrTable.Name & "'"
+
+                        lrORMRecordset3 = Me.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                        If lrORMRecordset3(0).Data > 0 Then
+                            lrTable.isPGSRelation = True
+                        End If
+                    Catch ex As Exception
+                        'Not a biggie at this stage.
+                    End Try
+
+                    lrORMRecordset.MoveNext()
+                End While 'Stepping through Tables
+
+                '==Sort the tables===========================
+                Dim larSortedTables = Me.RDS.Table.OrderBy(Function(x) x.getSupertypeTables.Count)
+
+                Dim maxConcurrentThreads As Integer = 2 ' Environment.ProcessorCount * 2 ' Adjust as needed
+
+                '==Get the Table details===========================
+#Region "Table Details. Columns etc"
+                Dim liInd As Integer = 0 'For reporting progress on Tables loaded.
+                For Each lrTable In larSortedTables
+
+                    Boston.WriteToStatusBar("Loading Model. CMML Load for Entity: " & lrTable.Name, True)
+
+                    'Table/Column Details
+                    Call Me.GetTableDetailsFromCMML(lrTable, liInd)
+
+                    If aoBackgroundWorker IsNot Nothing Then aoBackgroundWorker.ReportProgress(Viev.Lesser(99, 80 + CInt(19 * (liInd / larSortedTables.Count))))
+
+                Next
+#End Region
+                '===================================================
+#End Region
+
+
+                '==========================================================================================================
+                'Relations                
+                Call Me.populateRDSRelationsFromCoreMDAElements()
+
+                '==========================================================
+                'State Transition Model
+                '  NB Is called from within this thread so as to not clash on the ORMQL Parser.
+                If CDbl(Viev.NullVal(Me.CoreVersionNumber, 0)) >= 2.1 Then
+                    Call Me.PopulateSTMStructureFromCoreMDAElements()
+                End If
+
+                If CDbl(Viev.NullVal(Me.CoreVersionNumber, 0)) >= 2.2 Then
+                    Call Me.PopulateCMMLStructureFromCoreMDAElements()
+                End If
+
+                pbDoDatabaseProcessing = True
+
+                SyncLock Me
+                    Me.RDSLoading = False
+                End SyncLock
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Me.RDSLoading = False
+            End Try
+
+        End Sub
 
 
         Public Sub PopulateCMMLStructureFromCoreMDAElements(Optional ByRef aoBackgroundWorker As System.ComponentModel.BackgroundWorker = Nothing)
@@ -2619,7 +3444,7 @@ Namespace FBM
                         'Let the user know what happened.
                         lsMessage = "The Actor, '" & lrModelElement.Name & "', within the relational model had no corresponding Object-Role Model model element."
                         lsMessage &= vbCrLf & vbCrLf & "An Entity Type has been created in the model to cater for this. If you no longer need this model element remove it from the model."
-                        Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical)
+                        Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical)
                     End If
 
                     lrActor = New CMML.Actor(Me.UML, lrORMRecordset("Element").Data, lrModelElement)
@@ -2842,7 +3667,7 @@ SkipBPMNFactTypes:
                     End If
 #End Region
 
-                    Me.UML.ProcessProcessRelation.Add(lrProcessProcessRelation)
+                    Me.UML.ProcessProcessRelation.AddUnique(lrProcessProcessRelation)
 
                     'lrProcess1.Process.Add(lrProcess2)
 
@@ -2857,7 +3682,7 @@ SkipBPMNFactTypes:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Me.RDSLoading = False
             End Try

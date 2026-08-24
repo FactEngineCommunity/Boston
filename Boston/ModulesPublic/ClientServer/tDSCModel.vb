@@ -32,7 +32,7 @@
 
             arModel.IsDirty = False
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 Select Case frmMain.zfrmModelExplorer.TreeView.SelectedNode.Tag.MenuType
                     Case Is = pcenumMenuType.modelORMModel
                         If arModel Is frmMain.zfrmModelExplorer.TreeView.SelectedNode.Tag.Tag Then
@@ -66,7 +66,7 @@
 
             Call arModel.Save()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 If frmMain.zfrmModelExplorer.TreeView.SelectedNode IsNot Nothing Then
                     Select Case frmMain.zfrmModelExplorer.TreeView.SelectedNode.Tag.MenuType
                         Case Is = pcenumMenuType.modelORMModel

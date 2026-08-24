@@ -12,6 +12,9 @@ Namespace FBM
             Dim lsPropertyInstanceId As String = ""
 
             Try
+                'CodeSafe
+                If Me.Language = pcenumLanguage.ORMModel Then Exit Sub
+
                 lsPropertyInstanceId = arRDSColumn.Id
 
                 Boston.WriteToStatusBar("Adding Property to Page: '" & lsPropertyInstanceId & "'")
@@ -120,7 +123,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -271,7 +274,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -345,7 +348,7 @@ SkipAdding:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -397,7 +400,7 @@ SkipAdding:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -756,7 +759,7 @@ SkipAdding:
                                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                                 lsMessage &= vbCrLf & vbCrLf & "For Table/Entity: " & lsEntityName
                                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, True)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, abUseFlashCard:=True, abSuppressLogging:=False)
                             End Try
 
                         End If
@@ -947,7 +950,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
 
@@ -1560,7 +1563,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
 
@@ -1696,7 +1699,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1735,7 +1738,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1783,128 +1786,6 @@ SkipRelation:
                 Else
 #Region "Non-Subtype Entity"
                     Call arEntityInstance.GetAttributesFromRDSColumns(True)
-                    '=====================
-                    'Load the Attributes
-                    '=====================
-                    'lsSQLQuery = "SELECT *"
-                    'lsSQLQuery &= " FROM CoreERDAttribute"
-                    'lsSQLQuery &= " WHERE ModelObject = '" & arEntityInstance.Name & "'"
-
-                    'lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    'Dim lrERAttribute As ERD.Attribute
-                    'Dim lrRecordset1 As ORMQL.Recordset
-
-                    'While Not lrRecordset.EOF
-
-                    '    Dim lsMandatory As String = ""
-
-                    '    lrERAttribute = New ERD.Attribute With {
-                    '    .Id = lrRecordset("Attribute").Data
-                    '}
-
-                    '    lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
-                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreERDAttribute.ToString
-                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                    '    lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery) 'lrRecordset("Attribute")
-
-                    '    lrFactDataInstance = lrFactInstance.GetFactDataInstanceByRoleName("Attribute")
-                    '    lrERAttribute = lrFactDataInstance.CloneAttribute(Me)
-
-                    '    '-------------------------------
-                    '    'Get the Name of the Attribute
-                    '    '-------------------------------
-                    '    lsSQLQuery = "SELECT *"
-                    '    lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                    '    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'"
-
-                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    '    lrERAttribute.AttributeName = lrRecordset1("PropertyName").Data
-
-                    '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                    '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    '    '-------------------------------------------------
-                    '    'Check to see whether the Attribute is Mandatory
-                    '    '-------------------------------------------------
-                    '    lsSQLQuery = "SELECT *"
-                    '    lsSQLQuery &= " FROM CoreIsMandatory"
-                    '    lsSQLQuery &= " WHERE IsMandatory = '" & lrRecordset("Attribute").Data & "'"
-
-                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    '    If lrRecordset1.Facts.Count = 1 Then
-                    '        lrERAttribute.Mandatory = True
-                    '        lsMandatory = "*"
-
-                    '        lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    '        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
-                    '        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                    '        Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    '    End If
-
-                    '    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                    '    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
-
-                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    '    'lrERAttribute.OrdinalPosition = CInt(lrRecordset1("Position").Data)
-
-                    '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                    '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    '    '=============
-                    '    'Role
-                    '    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                    '    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
-
-                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                    '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    '    '=============
-
-                    '    '=============
-                    '    'FactType
-                    '    lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                    '    lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
-
-                    '    lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                    '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                    '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                    '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                    '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                    '    '=============
-
-                    '---------------------------------------------------
-                    'Add the Attribute to the ER Entity
-                    '---------------------------------------------------
-                    'lrERAttribute.Entity = arEntityInstance
-
-                    '    arEntityInstance.Attribute.AddUnique(lrERAttribute)
-                    '    Me.ERDiagram.Attribute.AddUnique(lrERAttribute)
-
-                    '    Dim lrColumn As RDS.Column = arEntityInstance.RDSTable.Column.Find(Function(x) x.Id = lrERAttribute.Id)
-                    '    lrERAttribute.Column = lrColumn
-
-                    '    lrERAttribute.ActiveRole = lrColumn.ActiveRole
-                    '    lrERAttribute.ResponsibleRole = lrColumn.Role
-
-                    '    lrRecordset.MoveNext()
-                    'End While
 
                     '-------------------------------------------------------------------
                     'Paint the sorted Attributes (By Ordinal Position) for each Entity
@@ -1935,7 +1816,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1943,15 +1824,7 @@ SkipRelation:
         Public Sub DropExistingPGSNodeAtPoint(ByRef arPGSNode As PGS.Node, ByVal aoPointF As PointF)
 
             Try
-                Dim lsSQLQuery As String = ""
-                Dim lrRecordset As ORMQL.Recordset
-                Dim lrFactInstance As FBM.FactInstance
-                Dim lrRDSTable As RDS.Table
-
-                lrRDSTable = arPGSNode.RDSTable
                 '==================================================================================================================
-
-                Dim lrFactDataInstance As FBM.FactDataInstance
                 arPGSNode.X = aoPointF.X
                 arPGSNode.Y = aoPointF.Y
 
@@ -1964,116 +1837,6 @@ SkipRelation:
 
                 arPGSNode.GetAttributesFromRDSColumns()
 
-                '=====================
-                'Load the Attributes
-                '=====================
-                lsSQLQuery = "SELECT *"
-                lsSQLQuery &= " FROM CoreERDAttribute"
-                lsSQLQuery &= " WHERE ModelObject = '" & arPGSNode.Name & "'"
-
-                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                Dim lrRecordset1 As ORMQL.Recordset = Nothing
-
-                While Not lrRecordset.EOF
-
-                    Dim lsMandatory As String = ""
-
-                    Try
-#Region "Attributes/Properties"
-                        'lsSQLQuery = "ADD FACT '" & lrRecordset.CurrentFact.Id & "'"
-                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreERDAttribute.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        'lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery) 'lrRecordset("Attribute")
-
-                        'lrFactDataInstance = lrFactInstance.GetFactDataInstanceByRoleName("Attribute")
-
-                        ''-------------------------------
-                        ''Get the Name of the Attribute
-                        ''-------------------------------
-                        'lsSQLQuery = "SELECT *"
-                        'lsSQLQuery &= " FROM " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                        'lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasPropertyName.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        ''-------------------------------------------------
-                        ''Check to see whether the Attribute is Mandatory
-                        ''-------------------------------------------------
-                        'lsSQLQuery = "SELECT *"
-                        'lsSQLQuery &= " FROM CoreIsMandatory"
-                        'lsSQLQuery &= " WHERE IsMandatory = '" & lrRecordset("Attribute").Data & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'If lrRecordset1.Facts.Count = 1 Then
-                        '    lsMandatory = "*"
-
-                        '    lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        '    lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreIsMandatory.ToString
-                        '    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        '    Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        'End If
-
-                        'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                        'lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyHasOrdinalPosition.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        ''=============
-                        ''Role
-                        'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                        'lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForRole.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        ''=============
-
-                        ''=============
-                        ''FactType
-                        'lsSQLQuery = "SELECT * FROM " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                        'lsSQLQuery &= " WHERE Property = '" & lrRecordset("Attribute").Data & "'" '& lrERAttribute.FactDataInstance.Fact.Id & "'"
-
-                        'lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-
-                        'lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
-                        'lsSQLQuery &= " TO " & pcenumCMMLRelations.CorePropertyIsForFactType.ToString
-                        'lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-
-                        'Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
-                        '=============
-#End Region
-                    Catch ex As Exception
-                        Dim lsMessage As String
-                        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                        lsMessage &= vbCrLf & vbCrLf & ex.Message
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
-                    End Try
-
-                    lrRecordset.MoveNext()
-                End While
-
                 Call Me.MakeDirty()
 
             Catch ex As Exception
@@ -2082,7 +1845,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2109,7 +1872,7 @@ SkipRelation:
                     If Me.Model.GetModelObjectByName(arTable.Name).ConceptType = pcenumConceptType.EntityType Then
                         lsMessage &= vbCrLf & vbCrLf & "i.e. Make sure the Entity Type, '" & arTable.Name & "', at least has a Primary Reference Scheme in your Object-Role Model."
                     End If
-                    Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
+                    Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information, Nothing, False, False, True)
                     Return Nothing
                 Else
 
@@ -2137,7 +1900,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2171,7 +1934,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2245,7 +2008,7 @@ SkipRelation:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2310,7 +2073,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2376,7 +2139,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2386,7 +2149,9 @@ SkipRelation:
         ''' </summary>
         ''' <param name="arEntity"></param>
         ''' <remarks></remarks>
-        Public Sub loadRelationsForEntity(ByRef arEntity As ERD.Entity, Optional abSavePage As Boolean = True)
+        Public Sub loadRelationsForEntity(ByRef arEntity As ERD.Entity,
+                                          Optional abSavePage As Boolean = True,
+                                          Optional abAddFacts As Boolean = True)
 
             Dim lsSQLQuery As String = ""
             Dim lrRecordset As ORMQL.Recordset
@@ -2457,7 +2222,7 @@ SkipRelation:
 
                             If lrRecordset1.EOF Then
                                 Dim lsMessage = "Relation without a Origin Entity. Relation.Id: " & lsRelationId
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, False)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, False)
                                 lrOrigingEREntity = Nothing
                             Else
                                 lrOrigingEREntity.Symbol = lrRecordset1("Entity").Data
@@ -2480,7 +2245,7 @@ SkipRelation:
                             End If
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             lsSQLQuery = "ADD FACT '" & lrRecordset1.CurrentFact.Id & "'"
                             If liInd = 1 Then
@@ -2491,7 +2256,7 @@ SkipRelation:
                             End If
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             lsSQLQuery = "SELECT *"
                             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreOriginMultiplicity.ToString  '(ERDEntity, Multiplicity)
@@ -2505,7 +2270,7 @@ SkipRelation:
                             lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginMultiplicity.ToString
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             lsSQLQuery = "SELECT *"
                             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString '(ERDEntity, Multiplicity)
@@ -2519,7 +2284,7 @@ SkipRelation:
                             lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationMultiplicity.ToString
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             lsSQLQuery = "SELECT *"
                             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString '(Relation, FactType)
@@ -2531,7 +2296,7 @@ SkipRelation:
                             lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             '===================================================================
                             'Origin/Destination Mandatory requirements
@@ -2547,7 +2312,7 @@ SkipRelation:
                                 lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginIsMandatory.ToString
                                 lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                                If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                                 lrRecordset2.MoveNext()
                             End While
@@ -2559,15 +2324,19 @@ SkipRelation:
                             lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                             Dim lbRelationDestinationIsMandatory As Boolean = lrRecordset2.Facts.Count > 0
 
+
                             While Not lrRecordset2.EOF
+
                                 lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
                                 lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationIsMandatory.ToString
                                 lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                                If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                                 lrRecordset2.MoveNext()
+
                             End While
+
 
                             '----------------------------------------------------------------------------
                             'Create the Relation for the ERD
@@ -2598,7 +2367,7 @@ SkipRelation:
                             lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreOriginPredicate.ToString
                             lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                            Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                            If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                             lsSQLQuery = "SELECT *"
                             lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreDestinationPredicate.ToString  '(Relation, Predicate)
@@ -2612,7 +2381,7 @@ SkipRelation:
                                 lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreDestinationPredicate.ToString
                                 lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
 
-                                Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                                If abAddFacts Then Call Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
                             End If
 
                             '-----------------------------------
@@ -2627,6 +2396,9 @@ SkipRelation:
                             Dim lrFactType As New FBM.FactType(Me.Model, lrRecordset2("FactType").Data, True)
                             lrFactType = Me.Model.FactType.Find(AddressOf lrFactType.Equals)
                             lrRelation.RelationFactType = lrFactType
+
+                            'Don't load Many-to-Many Relationships (PGSRelationshipNodes)
+                            If lrFactType.IsCandidatePGSNode AndAlso lrRelation.OriginEntity.getCorrespondingRDSTable IsNot lrFactType.getCorrespondingRDSTable Then Continue For
 
                             lsSQLQuery = "ADD FACT '" & lrRecordset2.CurrentFact.Id & "'"
                             lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
@@ -2790,7 +2562,7 @@ SkipRelation:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2806,7 +2578,8 @@ SkipRelation:
 
             Try
                 Dim larTable = From Table In Me.Model.RDS.Table
-                               Where Table.isPGSRelation = True
+                               Where Table.isPGSRelation = True Or
+                                   (Table.FBMModelElement.IsCandidatePGSNode And Table.FBMModelElement.GetType = GetType(FBM.FactType))
                                Select Table
 
                 For Each lrTable In larTable
@@ -2852,28 +2625,25 @@ SkipRelation:
 
                             liInd += 1
 
-                            lrRecordset.MoveNext()
-                        End While
+                            If (lrNode1 IsNot Nothing) And (lrNode2 IsNot Nothing) And (lrNode1 Is arPGSNode Or lrNode2 Is arPGSNode) Then
 
-                        If (lrNode1 IsNot Nothing) And (lrNode2 IsNot Nothing) And (lrNode1 Is arPGSNode Or lrNode2 Is arPGSNode) Then
+                                Call Me.addRDSTableToPage(lrTable) 'Because we want this Table on this Page going forward. Won't add twice. Has precheck.
 
-                            Call Me.addRDSTableToPage(lrTable) 'Because we want this Table on this Page going forward. Won't add twice. Has precheck.
+                                lsSQLQuery = "SELECT *"
+                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                                lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                                lsSQLQuery &= " WHERE ElementType = 'Entity'"
+                                lsSQLQuery &= " AND Element = '" & lrTable.Name & "'"
 
-                            lsSQLQuery = "SELECT *"
-                            lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
-                            lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
-                            lsSQLQuery &= " WHERE ElementType = 'Entity'"
-                            lsSQLQuery &= " AND Element = '" & lrTable.Name & "'"
+                                lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                            lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+                                Dim lrFactDataInstance As FBM.FactDataInstance = lrRecordset("Element")
+                                lrOriginatingNode = lrFactDataInstance.ClonePGSNodeType(Me)
+                                lrOriginatingNode.RDSTable = lrTable
 
-                            Dim lrFactDataInstance As FBM.FactDataInstance = lrRecordset("Element")
-                            lrOriginatingNode = lrFactDataInstance.ClonePGSNodeType(Me)
-                            lrOriginatingNode.RDSTable = lrTable
+                                Me.ERDiagram.Entity.AddUnique(lrOriginatingNode)
 
-                            Me.ERDiagram.Entity.AddUnique(lrOriginatingNode)
-
-                            Dim lrRelation As New ERD.Relation(Me.Model,
+                                Dim lrRelation As New ERD.Relation(Me.Model,
                                                                    Me,
                                                                    lsRelationId,
                                                                    lrNode1,
@@ -2884,28 +2654,31 @@ SkipRelation:
                                                                    pcenumCMMLMultiplicity.One,
                                                                    False)
 
-                            lrRelation.IsPGSRelationNode = True
-                            lrRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
+                                lrRelation.IsPGSRelationNode = True
+                                lrRelation.ActualPGSNode = Me.ERDiagram.Entity.Find(Function(x) x.Id = lrOriginatingNode.Id)
 
-                            'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
-                            '  because the relation is actually a PGSRelationNode.
-                            Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
-                            lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
+                                'NB Even though the RDSRelation is stored against the Link (below), the Predicates for the Link come from the ResponsibleFactType.
+                                '  because the relation is actually a PGSRelationNode.
+                                Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+                                lrRelation.RelationFactType = lrRDSRelation.ResponsibleFactType
 
-                            If Not Me.ERDiagram.Relation.Contains(lrRelation) Then
+                                If Not Me.ERDiagram.Relation.Contains(lrRelation) Then
 
-                                If abAddToPage Then Call Me.addRDSRelation(lrRDSRelation)
+                                    If abAddToPage Then Call Me.addRDSRelation(lrRDSRelation)
 
-                                Me.ERDiagram.Relation.AddUnique(lrRelation)
+                                    Me.ERDiagram.Relation.AddUnique(lrRelation)
+                                End If
+
+                                Dim lrLink As PGS.Link
+                                lrLink = New PGS.Link(Me, New FBM.FactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
+                                lrLink.RDSRelation = lrRDSRelation
+                                lrLink.DisplayAndAssociate()
+                                lrLink.Link.Text = lrRelation.ActualPGSNode.Id
+
                             End If
 
-                            Dim lrLink As PGS.Link
-                            lrLink = New PGS.Link(Me, New FBM.FactInstance, lrNode1, lrNode2, Nothing, Nothing, lrRelation)
-                            lrLink.RDSRelation = lrRDSRelation
-                            lrLink.DisplayAndAssociate()
-                            lrLink.Link.Text = lrRelation.ActualPGSNode.Id
-
-                        End If
+                            lrRecordset.MoveNext()
+                        End While
 
                     End If
 
@@ -2918,7 +2691,7 @@ SkipRelation:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2929,13 +2702,14 @@ SkipRelation:
         ''' <param name="arPGSNode"></param>
         ''' <param name="abAddToPage"></param>
         ''' <param name="aasLoadedRelationIds"></param>
+        ''' <param name="abForceLoad">Used, for instance, when changing and EdgeType to a NodeType on the PropertyGraphSchema</param>
         Public Sub loadRelationsForPGSNode(ByRef arPGSNode As PGS.Node,
                                            Optional ByVal abAddToPage As Boolean = False,
-                                           Optional ByRef aasLoadedRelationIds As List(Of String) = Nothing)
+                                           Optional ByRef aasLoadedRelationIds As List(Of String) = Nothing,
+                                           Optional ByRef abForceLoad As Boolean = False)
 
             Dim lsSQLQuery As String = ""
-            Dim lrRecordset As ORMQL.Recordset
-            Dim lrRecordset1 As ORMQL.Recordset
+            Dim lrRecordset, lrRecordset1 As ORMQL.Recordset
             Dim lsMessage As String = Nothing
             Dim lrFactInstance As New FBM.FactInstance
             Dim mb As MethodBase
@@ -2954,16 +2728,16 @@ SkipRelation:
 
                     lsSQLQuery = "SELECT *"
                     If liInd = 1 Then
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForEntity.ToString '(Node Type)->(Target Node Type)
                     Else
-                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString
+                        lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationHasDestinationEntity.ToString '(Target Node Type)<-(Node Type)
                     End If
                     lsSQLQuery &= " WHERE Entity = '" & arPGSNode.Name & "'"
 
                     lrRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
-                    Dim lrOriginNode As PGS.Node
-                    Dim lrDestinationNode As PGS.Node
+                    Dim lrOriginNode As PGS.Node = Nothing
+                    Dim lrDestinationNode As PGS.Node = Nothing
                     Dim lsRelationId As String = ""
 
                     While Not lrRecordset.EOF
@@ -2972,11 +2746,31 @@ SkipRelation:
                         '------------------------
                         lsRelationId = lrRecordset("Relation").Data
 
+                        Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+
+                        'CodeSafe: Self healing
+                        If lrRDSRelation.ResponsibleFactType Is Nothing Then
+                            Me.Model.RDS.removeRelation(lrRDSRelation)
+                            Continue While
+                        End If
+
+                        'CodeSafe
+                        If lrRDSRelation.ResponsibleFactType.IsCandidatePGSNode Then
+                            'lrRecordset.MoveNext() '20251030-VM-Put this check and Continue in here, but was not loading RelationshipNodes as Edges.
+                            'Continue While
+                        End If
+
                         If liInd = 1 Then
+#Region "First pass: (Target Node Type)->(Node Type)"
+                            'Outgoing Relationships (Target Node Type)->(Node Type)
                             lrOriginNode = New PGS.Node
                             lrDestinationNode = New PGS.Node
                             lrOriginNode.Symbol = lrRecordset("Entity").Data
                             lrOriginNode = Me.ERDiagram.Entity.Find(AddressOf lrOriginNode.EqualsBySymbol)
+
+                            If lrOriginNode Is Nothing And abForceLoad And arPGSNode IsNot Nothing Then
+                                lrOriginNode = arPGSNode
+                            End If
 
                             '-----------------------------
                             'Find the Destination Entity
@@ -2993,13 +2787,15 @@ SkipRelation:
                             Catch ex As Exception
                                 GoTo SkipRelation
                             End Try
-
-                        Else '=2
+#End Region
+                        Else '=2 (Target Node Type)<-(Node Type)
                             lrOriginNode = New PGS.Node
                             lrDestinationNode = New PGS.Node
                             lrDestinationNode.Symbol = lrRecordset("Entity").Data
                             lrDestinationNode = Me.ERDiagram.Entity.Find(AddressOf lrDestinationNode.EqualsBySymbol)
 
+#Region "Questionalable Code"
+                            '20251030-VM-Removed
                             '-----------------------------
                             'Find the Destination Entity
                             '-----------------------------
@@ -3009,63 +2805,122 @@ SkipRelation:
 
                             lrRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
+                            If lrRecordset1.EOF Then
+                                lsSQLQuery = "SELECT *"
+                                lsSQLQuery &= " FROM " & pcenumCMMLRelations.CoreRelationIsForFactType.ToString
+                                lsSQLQuery &= " WHERE Relation = '" & lsRelationId & "'"
+
+                                Dim lrRecordset2 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                                If Not lrRecordset.EOF Then
+                                    Dim lsFactTypeName = lrRecordset2("FactType").Data
+
+                                    Dim lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = lsFactTypeName)
+
+                                    If lrTable IsNot Nothing Then
+
+                                    End If
+
+                                End If
+                            End If
+
                             'CodeSafe
                             Try
                                 lrOriginNode.Symbol = "<Nothing Delete This Relation>"
                                 lrOriginNode.Symbol = lrRecordset1("Entity").Data
                                 lrOriginNode = Me.ERDiagram.Entity.Find(AddressOf lrOriginNode.EqualsBySymbol)
+
+                                If lrOriginNode Is Nothing And abForceLoad And arPGSNode IsNot Nothing Then
+                                    lrOriginNode = arPGSNode
+                                End If
+
                             Catch ex As Exception
 
                                 lsMessage = "Couldn't find Origin Node in CoreRelationIsForEntity for Relation/Edge with Id: " & lsRelationId
                                 lsMessage.AppendLine("Origin Node Name: " & lrOriginNode.Symbol)
                                 lsMessage.AppendDoubleLineBreak("Boston will put the Node Type on the Page if it can find information for the Node Type.")
                                 lsMessage.AppendDoubleLineBreak("Click [Yes] if you would prefer Boston to simply delete the relation and not try to fix the problem.")
+
 #Region "Error management for missing Origin Node Type."
-                                Dim liMessageResponse As MsgBoxResult
-                                liMessageResponse = prApplication.ThrowErrorMessage(lsMessage,
-                                                                                    pcenumErrorType.Warning,
-                                                                                    ex.StackTrace, False, False, True, MessageBoxButtons.YesNo)
+                                '20251030-VM-Removed
+                                'Dim liMessageResponse As MsgBoxResult
+                                'liMessageResponse = prApplication.ThrowMessage(lsMessage,
+                                '                                                    pcenumErrorType.Warning,
+                                '                                                    ex.StackTrace, False, False, True, MessageBoxButtons.YesNo)
 
-                                Dim lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = lrOriginNode.Symbol)
+                                'Dim lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = lrOriginNode.Symbol)
 
-                                Dim larRelation = From Relation In Me.Model.RDS.Relation
-                                                  Where Relation.Id = lsRelationId
-                                                  Select Relation
+                                'Dim larRelation = From Relation In Me.Model.RDS.Relation
+                                '                  Where Relation.Id = lsRelationId
+                                '                  Select Relation
 
-                                If lrTable IsNot Nothing Then
-                                    lrOriginNode = Me.LoadPGSNodeTypeFromRDSTable(lrTable, New PointF(20, 20))
-                                Else
-                                    If larRelation.Count = 0 Then
-                                        lsMessage = "Could not find inforation for a Node Type, " & lrOriginNode.Symbol & "."
-                                        If liMessageResponse = MsgBoxResult.Yes Then
-                                            Call Me.Model.removeCMMLRelation(New RDS.Relation(lsRelationId))
-                                        Else
-                                            lsMessage.AppendDoubleLineBreak("Consider removing the Relation/Edge between " & lrOriginNode.Symbol & " and " & lrDestinationNode.Symbol & ".")
-                                            MsgBox(lsMessage)
-                                        End If
-                                    Else
-                                        Dim lrRelation = larRelation(0)
-                                        If lrRelation.OriginTable IsNot Nothing Then
-                                            Me.Model.updateRelationOriginTable(larRelation(0), lrRelation.OriginTable)
-                                            Me.LoadPGSNodeTypeFromRDSTable(lrRelation.OriginTable, New PointF(20, 20))
-                                        Else
-                                            MsgBox("Removing the relation from the Model.")
-                                            Call Me.Model.RDS.removeRelation(lrRelation)
-                                        End If
-                                    End If
-                                    lrOriginNode = Nothing
+                                'If lrTable IsNot Nothing Then
+                                '    lrOriginNode = Me.LoadPGSNodeTypeFromRDSTable(lrTable, New PointF(20, 20))
+                                'Else
+                                '    If larRelation.Count = 0 Then
+                                '        lsMessage = "Could not find inforation for a Node Type, " & lrOriginNode.Symbol & "."
+                                '        If liMessageResponse = MsgBoxResult.Yes Then
+                                '            Call Me.Model.removeCMMLRelation(New RDS.Relation(lsRelationId))
+                                '        Else
+                                '            lsMessage.AppendDoubleLineBreak("Consider removing the Relation/Edge between " & lrOriginNode.Symbol & " and " & lrDestinationNode.Symbol & ".")
+                                '            MsgBox(lsMessage)
+                                '        End If
+                                '    Else
+                                '        Dim lrRelation = larRelation(0)
+                                '        If lrRelation.OriginTable IsNot Nothing Then
+                                '            Me.Model.updateRelationOriginTable(larRelation(0), lrRelation.OriginTable)
+                                '            Me.LoadPGSNodeTypeFromRDSTable(lrRelation.OriginTable, New PointF(20, 20))
+                                '        Else
+                                '            MsgBox("Removing the relation from the Model.")
+                                '            Call Me.Model.RDS.removeRelation(lrRelation)
+                                '        End If
+                                '    End If
+                                '    lrOriginNode = Nothing
 
-                                End If
+                                'End If
 #End Region
                             End Try
 
-                        End If
+                        End If '1 or 2. First or second pass.
+#End Region
 
+                        '==============================================================================================================================
+                        'Create the ERD Relation
                         If (lrOriginNode IsNot Nothing) And (lrDestinationNode IsNot Nothing) And Not lasRelationId.Contains(lsRelationId) Then
+                            'Have found the Origin and Destination and the Relationship hasn't been loaded before.
 
                             lasRelationId.Add(lsRelationId)
 
-                            Dim lrRDSRelation As RDS.Relation = Me.Model.RDS.Relation.Find(Function(x) x.Id = lsRelationId)
+                            'CodeSafe - Force LinkFactType as ResponsibleFactType if required.
+#Region "CodeSafe: Fix Responsible Fact Type if necessary"
+                            '20251030-VM-Removed for now.
+                            'Try
+                            '    Dim larResponsibleFactType = From FactType In Me.Model.FactType
+                            '                                 Where FactType.IsLinkFactType AndAlso FactType.RoleGroup(0).JoinedORMObject Is lrRDSRelation.OriginColumns(0).Role.FactType
+                            '                                 Where FactType.Arity = 2
+                            '                                 Where FactType.RoleGroup(0).JoinedORMObject Is lrOriginNode.RDSTable.FBMModelElement
+                            '                                 Where FactType.RoleGroup(1).JoinedORMObject Is lrDestinationNode.RDSTable.FBMModelElement
+                            '                                 Select FactType
+
+                            '    For Each lrFactType In larResponsibleFactType
+                            '        If lrRDSRelation.ResponsibleFactType IsNot lrFactType Then
+                            '            lrRDSRelation.SetResponsibleFactType(lrFactType)
+                            '        End If
+                            '        Exit For
+                            '    Next
+                            'Catch ex As Exception
+                            '    'Tried. Leave this as sometimes OriginColumn count might be wrong.
+                            'End Try
+#End Region
+
+                            'CodeSafe
+                            If lrRDSRelation Is Nothing Then Continue For 'There is no corresponding RDSRelation in the RDS Model
+                            If lrRDSRelation.ResponsibleFactType Is Nothing Then Continue For 'For some reason the RDSRelation has no ResponsibleFactType
+
+                            'Don't load Many-to-Many Relationships (PGSRelationshipNodes)
+                            If abForceLoad And lrRDSRelation.ResponsibleFactType.IsCandidatePGSNode Then GoTo loadRelationsForPGSNodeForced
+                            If lrRDSRelation.ResponsibleFactType.IsCandidatePGSNode Then Continue For
+loadRelationsForPGSNodeForced:
 
                             Dim lrRelation As ERD.Relation
 
@@ -3101,9 +2956,10 @@ SkipRelation:
                         End If
 SkipRelation:
                         lrRecordset.MoveNext()
-                    End While
 
-                Next 'From/To arPGSNode
+                    End While 'Have Found outgoing/incoming Relationship
+
+                Next 'From/To arPGSNode. First or second pass. (Target Node Type)->(Node Type) or (Target Node Type)<-(Node Type)
 
                 Call Me.MakeDirty()
                 If abAddToPage Then Call Me.Save()
@@ -3118,7 +2974,7 @@ SkipRelation:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -3256,7 +3112,7 @@ SkipRelation:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

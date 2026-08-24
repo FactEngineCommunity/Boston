@@ -35,7 +35,7 @@ Public Module tableDatabaseUpgrade
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
             pdbConnection.RollbackTrans()
         End Try
@@ -128,7 +128,7 @@ Public Module tableDatabaseUpgrade
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -137,26 +137,38 @@ Public Module tableDatabaseUpgrade
 
     Function GetMinimumUpgradeVersionRequired() As String
 
-        Dim lsSQLQuery As String = ""
-        Dim lrRecordset As New RecordsetProxy
+        Try
+            Dim lsSQLQuery As String = ""
+            Dim lrRecordset As New RecordsetProxy
 
-        lrRecordset.ActiveConnection = pdbConnection
-        lrRecordset.CursorType = pcOpenStatic
+            lrRecordset.ActiveConnection = pdbConnection
+            lrRecordset.CursorType = pcOpenStatic
 
-        lsSQLQuery = "SELECT MIN(cdbl(trim(ToVersion)))"
-        lsSQLQuery &= " FROM DatabaseUpgrade"
-        lsSQLQuery &= " WHERE SuccessfulImplementation = FALSE"
-        lsSQLQuery &= "   AND cdbl(trim(ToVersion)) > " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1).ToString
+            lsSQLQuery = "SELECT MIN(cdbl(trim(ToVersion)))"
+            lsSQLQuery &= " FROM DatabaseUpgrade"
+            lsSQLQuery &= " WHERE SuccessfulImplementation = FALSE"
+            lsSQLQuery &= "   AND cdbl(trim(ToVersion)) > " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1).ToString
 
-        lrRecordset.Open(lsSQLQuery, , , pc_cmd_table)
+            lrRecordset.Open(lsSQLQuery, , , pc_cmd_table)
 
-        If (Not lrRecordset.EOF) And (Not IsDBNull(lrRecordset(0).Value)) Then
-            GetMinimumUpgradeVersionRequired = lrRecordset(0).Value
-            lrRecordset.Close()
-        Else
-            MsgBox("Error: GetMinimumUpgradeVersionRequired: no record returned")
-            GetMinimumUpgradeVersionRequired = ""
-        End If
+            If (Not lrRecordset.EOF) And (Not IsDBNull(lrRecordset(0).Value)) Then
+                GetMinimumUpgradeVersionRequired = lrRecordset(0).Value
+                lrRecordset.Close()
+            Else
+                MsgBox("Error: GetMinimumUpgradeVersionRequired: no record returned")
+                GetMinimumUpgradeVersionRequired = ""
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Nothing
+        End Try
 
     End Function
 
@@ -178,7 +190,7 @@ Public Module tableDatabaseUpgrade
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -193,40 +205,75 @@ Public Module tableDatabaseUpgrade
         lrRecordset.ActiveConnection = pdbConnection
         lrRecordset.CursorType = pcOpenStatic
 
-        lsSQLQuery = "SELECT *"
-        lsSQLQuery &= " FROM DatabaseUpgrade"
-        lsSQLQuery &= " WHERE (csng(ToVersion) = ("
-        lsSQLQuery &= "                     SELECT MAX(csng(upg2.ToVersion))"
-        lsSQLQuery &= "                       FROM DatabaseUpgrade upg2"
-        lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yet
-        lsSQLQuery &= "                        AND csng(ToVersion) <= " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
-        lsSQLQuery &= "                     )"
-        lsSQLQuery &= "   AND SuccessfulImplementation = FALSE)" 'i.e. Upgrade has not been performed yet
-        lsSQLQuery &= "   OR"
-        lsSQLQuery &= " (ToVersion = ("
-        lsSQLQuery &= "                     SELECT MIN(csng((upg3.ToVersion))"
-        lsSQLQuery &= "                       FROM DatabaseUpgrade upg3"
-        lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yet
-        lsSQLQuery &= "                        AND csng(upg3.ToVersion) >= " & TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
-        lsSQLQuery &= "                     )"
-        lsSQLQuery &= "   AND SuccessfulImplementation = FALSE)" 'i.e. Upgrade has not been performed yet\
-        lsSQLQuery &= " ORDER BY csng(ToVersion) DESC"
+        Try
 
+            Dim lsCurrentVersionNr = TableReferenceFieldValue.GetReferenceFieldValue(1, 1)
 
-        lrRecordset.Open(lsSQLQuery, , , pc_cmd_table)
+            Select Case My.Settings.DatabaseType
+                Case Is = "MSJet"
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM DatabaseUpgrade"
+                    lsSQLQuery &= " WHERE (csng(ToVersion) = ("
+                    lsSQLQuery &= "                     SELECT MAX(csng(upg2.ToVersion))"
+                    lsSQLQuery &= "                       FROM DatabaseUpgrade upg2"
+                    lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yet
+                    lsSQLQuery &= "                        AND csng(ToVersion) <= " & lsCurrentVersionNr
+                    lsSQLQuery &= "                     )"
+                    lsSQLQuery &= "   AND SuccessfulImplementation = FALSE)" 'i.e. Upgrade has not been performed yet
+                    lsSQLQuery &= "   OR"
+                    lsSQLQuery &= " (CSng(ToVersion) = ("
+                    lsSQLQuery &= "                     SELECT MIN(csng(upg3.ToVersion))"
+                    lsSQLQuery &= "                       FROM DatabaseUpgrade upg3"
+                    lsSQLQuery &= "                      WHERE SuccessfulImplementation = FALSE" 'i.e. Upgrade has not been performed yet
+                    lsSQLQuery &= "                        AND csng(upg3.ToVersion) >= " & lsCurrentVersionNr
+                    lsSQLQuery &= "                     )"
+                    lsSQLQuery &= "   AND SuccessfulImplementation = FALSE)" 'i.e. Upgrade has not been performed yet\
+                    lsSQLQuery &= " ORDER BY csng(ToVersion) DESC"
 
-        If Not lrRecordset.EOF Then
-            ar_upgrade.UpgradeId = lrRecordset("UpgradeId").Value
-            ar_upgrade.FromVersionNr = Trim(lrRecordset("FromVersion").Value)
-            ar_upgrade.ToVersionNr = Trim(lrRecordset("ToVersion").Value)
-            ar_upgrade.SuccessfulImplementation = lrRecordset("SuccessfulImplementation").Value
-            lrRecordset.Close()
+                Case Is = "SQLite"
 
-            Return ar_upgrade
-        Else
-            If Not abSilent Then MsgBox("Error: GetNextRequiredUpgrade: no record returned")
-            Return Nothing
-        End If
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery &= " FROM DatabaseUpgrade"
+                    lsSQLQuery &= " WHERE CAST(ToVersion AS REAL) = ("
+                    lsSQLQuery &= "         SELECT MAX(CAST(upg2.ToVersion AS REAL))"
+                    lsSQLQuery &= "         FROM DatabaseUpgrade upg2"
+                    lsSQLQuery &= "         WHERE SuccessfulImplementation = 0"
+                    lsSQLQuery &= "           AND CAST(upg2.ToVersion AS REAL) <= " & lsCurrentVersionNr
+                    lsSQLQuery &= "     )"
+                    lsSQLQuery &= "     AND SuccessfulImplementation = 0"
+                    lsSQLQuery &= "     OR CAST(ToVersion AS REAL) = ("
+                    lsSQLQuery &= "         SELECT MIN(CAST(upg3.ToVersion AS REAL))"
+                    lsSQLQuery &= "         FROM DatabaseUpgrade upg3"
+                    lsSQLQuery &= "         WHERE SuccessfulImplementation = 0"
+                    lsSQLQuery &= "           AND CAST(upg3.ToVersion AS REAL) >= " & lsCurrentVersionNr
+                    lsSQLQuery &= "     )"
+                    lsSQLQuery &= "     AND SuccessfulImplementation = 0"
+                    lsSQLQuery &= " ORDER BY CAST(ToVersion AS REAL) DESC"
+            End Select
+
+            lrRecordset.Open(lsSQLQuery, , , pc_cmd_table)
+
+            If Not lrRecordset.EOF Then
+                ar_upgrade.UpgradeId = lrRecordset("UpgradeId").Value
+                ar_upgrade.FromVersionNr = Trim(lrRecordset("FromVersion").Value)
+                ar_upgrade.ToVersionNr = Trim(lrRecordset("ToVersion").Value)
+                ar_upgrade.SuccessfulImplementation = lrRecordset("SuccessfulImplementation").Value
+                lrRecordset.Close()
+
+                Return ar_upgrade
+            Else
+                If Not abSilent Then MsgBox("Error: GetNextRequiredUpgrade: no record returned")
+                Return Nothing
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Function
 
@@ -270,7 +317,7 @@ Public Module tableDatabaseUpgrade
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

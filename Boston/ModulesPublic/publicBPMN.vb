@@ -9,7 +9,7 @@
         Flow
         Conversation
         [Event]
-        Gateway
+        Gateway 'NB The default is Gateway for a Decision
     End Enum
 
     'Public Enum pcenumBPMNElementType

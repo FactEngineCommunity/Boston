@@ -22,14 +22,17 @@ Public Class frmGenericSelectMultiColumn
         Dim lREcordset As New RecordsetProxy
 
         Try
-
-            lREcordset.ActiveConnection = pdbConnection
+            If Me.zoGenericSelection.DatabaseConnection Is Nothing Then
+                lREcordset.ActiveConnection = pdbConnection
+            Else
+                lREcordset.ActiveConnection = Me.zoGenericSelection.DatabaseConnection
+            End If
             lREcordset.CursorType = pcOpenStatic
 
             lsSQLQuery = "SELECT " & zoGenericSelection.SelectField & ", " & zoGenericSelection.IndexField
             lsSQLQuery &= " FROM " & zoGenericSelection.TableName
             lsSQLQuery &= " " & zoGenericSelection.WhereClause
-            If IsSomething(zoGenericSelection.OrderByFields) Then
+            If zoGenericSelection.OrderByFields IsNot Nothing Then
                 lsSQLQuery &= " ORDER BY " & zoGenericSelection.OrderByFields & " ASC"
             End If
 
@@ -45,9 +48,9 @@ Public Class frmGenericSelectMultiColumn
             Dim lasFields() As String
 
             If zoGenericSelection.FieldList <> "" Then
-                lasFields = Viev.Strings.RemoveWhiteSpace(zoGenericSelection.FieldList).Split(",")
+                lasFields = FEStrings.ProperSpace(zoGenericSelection.FieldList).Split(",")
             Else
-                lasFields = Viev.Strings.RemoveWhiteSpace(zoGenericSelection.SelectField).Split(",")
+                lasFields = FEStrings.ProperSpace(zoGenericSelection.SelectField).Split(",")
             End If
 
 
@@ -55,7 +58,7 @@ Public Class frmGenericSelectMultiColumn
             Dim dtLoading As New DataTable("UsStates")
 
             For Each lsField In lasFields
-                dtLoading.Columns.Add(lsField, System.Type.GetType("System.String"))
+                dtLoading.Columns.Add(lsField.Trim, System.Type.GetType("System.String"))
             Next
 
             While Not lREcordset.EOF
@@ -63,7 +66,7 @@ Public Class frmGenericSelectMultiColumn
                 dr = dtLoading.NewRow
 
                 For Each lsField In lasFields
-                    dr(lsField) = lREcordset(lsField).Value
+                    dr(lsField.Trim) = lREcordset(lsField.Trim).Value
                 Next
 
                 dtLoading.Rows.Add(dr)
@@ -78,7 +81,7 @@ Public Class frmGenericSelectMultiColumn
             comboboxSelection.SourceDataString = New String(lasFields.Count - 1) {}
             Dim liInd As Integer = 0
             For Each lsField In lasFields
-                comboboxSelection.SourceDataString.SetValue(lsField, liInd)
+                comboboxSelection.SourceDataString.SetValue(lsField.Trim, liInd)
                 liInd += 1
             Next
             comboboxSelection.SourceDataTable = dtLoading
@@ -106,7 +109,7 @@ Public Class frmGenericSelectMultiColumn
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -130,7 +133,7 @@ Public Class frmGenericSelectMultiColumn
         If Me.CheckFields() Then
             Select Case Me.comboboxSelection.DropDownStyle
                 Case Is = ComboBoxStyle.DropDownList
-                    If IsSomething(Me.comboboxSelection.SelectedItem) Then
+                    If Me.comboboxSelection.SelectedItem IsNot Nothing Then
                         Me.zoGenericSelection.SelectIndex = comboboxSelection.SelectedIndex
                     Else
                         Throw New Exception("No item selected, frmGenericSelect")
@@ -158,4 +161,5 @@ Public Class frmGenericSelectMultiColumn
         End If
 
     End Sub
+
 End Class

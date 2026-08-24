@@ -176,7 +176,7 @@ Public Class frmDatabaseUpgrade
                                             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                                             lsMessage1 &= vbCrLf & lsCommand
                                             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                                            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                                            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                                             GoTo error_handler
                                         End If
@@ -281,7 +281,7 @@ Public Class frmDatabaseUpgrade
 
             lsMessage &= vbCrLf & vbCrLf & ex.Message
 
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             pdbConnection.RollbackTrans()
 
@@ -385,7 +385,7 @@ error_handler:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 

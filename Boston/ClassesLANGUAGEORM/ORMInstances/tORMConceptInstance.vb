@@ -29,8 +29,14 @@ Namespace FBM
         <XmlAttribute()> _
         Public X As Integer
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Y As Integer
+
+        <XmlAttribute()>
+        Public Width As Integer
+
+        <XmlAttribute()>
+        Public Height As Integer
 
         <XmlAttribute()> _
         Public Orientation As Integer
@@ -79,6 +85,13 @@ Namespace FBM
             Me.Y = aiY
 
         End Sub
+
+        Function EqualsBySymbolType(other As FBM.ConceptInstance) As Boolean
+            ' Your custom comparison logic here
+
+            Return Me.Symbol = other.Symbol And Me.ConceptType.ToString = other.ConceptType.ToString
+
+        End Function
 
         Public Function EqualsBySymbolRoleId(ByVal other As FBM.ConceptInstance) As Boolean
 

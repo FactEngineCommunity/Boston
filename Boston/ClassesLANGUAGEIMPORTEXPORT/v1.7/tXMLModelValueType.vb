@@ -131,13 +131,28 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _IsIndependent As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsIndependent As Boolean
             Get
                 Return Me._IsIndependent
             End Get
             Set(ByVal value As Boolean)
                 Me._IsIndependent = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' If the Value Type IsIndependent, then there is an ObjectifyingFactType that objectifies the Value Type, else Nothing
+        ''' </summary>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ObjectifyingFactTypeId As String = Nothing
+        <XmlAttribute()>
+        Public Property ObjectifyingFactTypeId As String
+            Get
+                Return Me._ObjectifyingFactTypeId
+            End Get
+            Set(ByVal value As String)
+                Me._ObjectifyingFactTypeId = value
             End Set
         End Property
 

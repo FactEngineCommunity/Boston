@@ -26,7 +26,12 @@ Namespace UI
 
         Public Shared ReadOnly Property CurrentThemeName() As String
             Get
-                Return ThemedColours.GetCurrentThemeName
+                Try
+                    Return ThemedColours.GetCurrentThemeName
+                Catch ex As Exception
+                    Return ""
+                End Try
+
             End Get
         End Property
 
@@ -52,30 +57,28 @@ Namespace UI
 #End Region
 
         Private Shared Function GetCurrentThemeIndex() As Integer
-            Dim theme As Integer = ColorScheme.NoTheme
+            Try
+                If VisualStyleInformation.IsSupportedByOS AndAlso
+                           VisualStyleInformation.IsEnabledByUser AndAlso
+                           Application.RenderWithVisualStyles Then
 
-            If VisualStyleInformation.IsSupportedByOS _
-                AndAlso VisualStyleInformation.IsEnabledByUser _
-                AndAlso Application.RenderWithVisualStyles Then
+                    Select Case VisualStyleInformation.ColorScheme
+                        Case NormalColor : Return ColorScheme.NormalColor
+                        Case HomeStead : Return ColorScheme.HomeStead
+                        Case Metallic : Return ColorScheme.Metallic
+                    End Select
+                End If
+            Catch
+                Return ColorScheme.NoTheme
+            End Try
 
+            Return ColorScheme.NoTheme
 
-                Select Case VisualStyleInformation.ColorScheme
-                    Case NormalColor
-                        theme = ColorScheme.NormalColor
-                    Case HomeStead
-                        theme = ColorScheme.HomeStead
-                    Case Metallic
-                        theme = ColorScheme.Metallic
-                    Case Else
-                        theme = ColorScheme.NoTheme
-                End Select
-            End If
-
-            Return theme
         End Function
 
         Private Shared Function GetCurrentThemeName() As String
-            Dim theme As String = NoTheme
+
+            Dim theme As String = "NoTheme"
 
             If VisualStyleInformation.IsSupportedByOS _
                 AndAlso VisualStyleInformation.IsEnabledByUser _

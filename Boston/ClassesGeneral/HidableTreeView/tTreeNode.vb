@@ -47,9 +47,16 @@
 
 
                 Do While P IsNot Nothing
-                    Dim Res = TreeView.CascadeNodeEventRaiser(Me, P)
+                    Dim Res As Boston.BostonTreeView.CascadeNodeEventArgs
+                    Try
+                        Res = TreeView.CascadeNodeEventRaiser(Me, P)
+                    Catch ex As Exception
+                        Exit Do
+                    End Try
+
                     If Res.CancelCascade Then Exit Do
                     If Res.Handled = False Then
+
                         'we set CascadeUp to false and cycle through all parents manually to be able to pass in CascadeNodeEventRaiser the real originating node of those callings
                         P.Hidden(False) = value
                         P = P.Parent

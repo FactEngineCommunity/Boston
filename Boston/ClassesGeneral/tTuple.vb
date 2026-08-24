@@ -1,7 +1,5 @@
-Imports DynamicClassLibrary.Factory
 
 Public Class tTuple
-    Inherits tClass
 
     Public TupleId As String 'The UniqueIdentifier for the Tuple
     Public AttributeList As New List(Of String)

@@ -71,7 +71,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -88,7 +88,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -161,7 +161,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
 
@@ -201,7 +201,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -242,7 +242,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -282,7 +282,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -316,7 +316,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -354,7 +354,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -397,7 +397,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -420,7 +420,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -468,21 +468,30 @@ Namespace DatabaseUpgradeFunctions
                     lbReplaceeCoreMetamodel = True
                 End If
 
+                'Store in the database
+                prApplication.CMML.Core = lrNewCoreModel
+                prApplication.CMML.Core.StoreAsXML = True
+
                 If lbReplaceeCoreMetamodel Then
                     'Only replace the Core if it needs replacing.
 
                     'Delete the existing Core model from the database
                     Dim lrCoreModel As New FBM.Model("Core", "Core")
-                    Call TableModel.DeleteModel(lrCoreModel)
+                    lrCoreModel.StoreAsXML = True 'Safeguard
+                    lrCoreModel.EmptyModel(True, False)
+                    'Call TableModel.DeleteModel(lrCoreModel) '20240303-VM-Was, but was overflowing memory on save. Now just save as XML.
 
                     'Replace the in-memory Core model (prApplication.CMML.Core) with the newly loaded Core model.
                     prApplication.CMML.Core = lrNewCoreModel
+                    prApplication.CMML.Core.LoadUnloadedPagesFromConceptInstances()
 
                     'Store in the database
-                    prApplication.CMML.Core.StoreAsXML = False
+                    'prApplication.CMML.Core.StoreAsXML = False '20240303-VM-Was, but was overflowing memory on save. Now just save as XML.
+                    '* Save the in-memory Core model (prApplication.CMML.Core) to the database.
+                    'Call prApplication.CMML.Core.Save() '20240303-VM-Was, but was overflowing memory on save. Now just save as XML.
 
                     '* Save the in-memory Core model (prApplication.CMML.Core) to the database.
-                    Call prApplication.CMML.Core.Save()
+                    Call prApplication.CMML.Core.Save(,, False, False)
                 End If
 
             Catch ex As Exception
@@ -491,7 +500,7 @@ Namespace DatabaseUpgradeFunctions
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

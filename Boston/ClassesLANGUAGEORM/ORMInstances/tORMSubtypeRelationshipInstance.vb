@@ -26,7 +26,7 @@ Namespace FBM
         ''' </summary>
         ''' <remarks></remarks>
         Public Shadows ModelElement As FBM.ModelObject
-        Public Shadows parentModelElement As FBM.ModelObject
+        Public Shadows ParentModelElement As FBM.ModelObject
 
         ''' <summary>
         ''' The FactTypeInstance of the FactType that represents the Subtype
@@ -34,7 +34,17 @@ Namespace FBM
         ''' <remarks></remarks>
         Public Shadows FactType As FBM.FactTypeInstance
 
-        Public Shadows WithEvents SubtypeRelationship As FBM.tSubtypeRelationship
+        Public Shadows WithEvents SubtypeRelationship As FBM.SubtypeRelationship
+
+        '<XmlIgnore()>
+        'Private _ModelElement As FBM.ModelObject = Nothing
+
+        '<XmlIgnore()>
+        'Public ReadOnly Property ModelElement As ModelObject Implements iPageObject.ModelElement
+        '    Get
+        '        Return Me.SubtypeRelationship
+        '    End Get
+        'End Property
 
         <XmlIgnore>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -119,6 +129,24 @@ Namespace FBM
             End Set
         End Property
 
+        Public Property Width As Integer Implements iPageObject.Width
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Height As Integer Implements iPageObject.Height
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         ''' <summary>
         ''' Parameterless Constructor
         ''' </summary>
@@ -175,7 +203,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrSubtypeRelationshipInstance
             End Try
@@ -240,16 +268,16 @@ Namespace FBM
                     Me.parentModelElement = Me.Page.getModelElement(Me.SubtypeRelationship.parentModelElement, True)
                 End If
 
-                If IsSomething(Me.parentModelElement) Then
+                If Me.ParentModelElement IsNot Nothing Then
 
-                    If Me.parentModelElement.IsObjectifyingEntityType Then
+                    If Me.ParentModelElement.IsObjectifyingEntityType Then
                         Try
-                            loNode = CType(Me.parentModelElement, FBM.EntityTypeInstance).ObjectifiedFactType.Shape
+                            loNode = CType(Me.ParentModelElement, FBM.EntityTypeInstance).ObjectifiedFactType.Shape
                         Catch ex As Exception
-                            loNode = CType(Me.parentModelElement, Object).Shape
+                            loNode = CType(Me.ParentModelElement, Object).Shape
                         End Try
                     Else
-                        loNode = CType(Me.parentModelElement, Object).Shape
+                        loNode = CType(Me.ParentModelElement, Object).Shape
                     End If
 
                     '-------------------------------------------------------------------
@@ -275,7 +303,7 @@ Namespace FBM
 
                     lo_subtype_link.Tag = Me
                     Me.Link = lo_subtype_link
-                    CType(Me.ModelElement, Object).OutgoingLink.Add(lo_subtype_link)
+                    'CType(Me.ModelElement, Object).OutgoingLink.Add(lo_subtype_link)
                 End If
 
             Catch ex As Exception
@@ -284,7 +312,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -294,7 +322,7 @@ Namespace FBM
 
             Try
                 'Managing changes to properties.
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "IsPrimarySubtypeRelationship"
                             Call Me.SubtypeRelationship.setIsPrimarySubtypeRelationship(Me.IsPrimarySubtypeRelationship)
@@ -320,7 +348,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -397,6 +425,24 @@ Namespace FBM
         Public Function ShapeMidPoint() As Point Implements iPageObject.ShapeMidPoint
             Throw New NotImplementedException()
         End Function
+
+        Private Sub SubtypeRelationship_RemovedFromModel() Handles SubtypeRelationship.RemovedFromModel
+
+            Try
+                If Me.Page.Diagram IsNot Nothing Then
+                    Me.Page.Diagram.Links.Remove(Me.Link)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
     End Class
 
 End Namespace

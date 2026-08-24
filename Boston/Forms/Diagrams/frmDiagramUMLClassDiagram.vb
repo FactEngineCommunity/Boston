@@ -23,7 +23,7 @@ Public Class frmUMLClassDiagram
         '-------------------------------------------
         'Process the page associated with the form.
         '-------------------------------------------
-        If IsSomething(Me.zrPage) Then
+        If Me.zrPage IsNot Nothing Then
             If Me.zrPage.IsDirty Then
                 Select Case MsgBox("Changes have been made to the Page. Would you like to save those changes?", MsgBoxStyle.YesNoCancel)
                     Case Is = MsgBoxResult.Yes
@@ -84,17 +84,17 @@ Public Class frmUMLClassDiagram
 
     Private Sub frmUMLClassDiagram_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
-        If IsSomething(Me.zoTreeNode) Then
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+        If Me.zoTreeNode IsNot Nothing Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
             End If
 
-            If IsSomething(frmMain.zfrm_model_dictionary) Then
+            If frmMain.zfrm_model_dictionary IsNot Nothing Then
                 Call frmMain.zfrm_model_dictionary.LoadToolboxModelDictionary(Me.zrPage.Language)
             End If
         End If
 
-        If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
+        If frmMain.zfrm_KL_theorem_writer IsNot Nothing Then
             frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
         End If
 
@@ -123,7 +123,7 @@ Public Class frmUMLClassDiagram
 
             'End If
             child = prApplication.RightToolboxForms.Find(AddressOf child.EqualsByName)
-            'If IsSomething(frmMain.zfrm_toolbox) Then
+            'If frmMain.zfrm_toolbox IsNot Nothing Then
             'frmMain.zfrm_toolbox
             child.ShapeListBox.Shapes = lsl_shape_library.Shapes
 
@@ -209,7 +209,7 @@ Public Class frmUMLClassDiagram
         '------------------------------------------------------------------------------
         Dim lrFactTypeInstance As New FBM.FactTypeInstance
         lrFactTypeInstance = arPage.FactTypeInstance.Find(Function(p) p.Id = pcenumCMMLRelations.ElementHasElementType.ToString)
-        If IsSomething(lrFactTypeInstance) Then
+        If lrFactTypeInstance IsNot Nothing Then
             '------------------------------------------------------------------
             'At least one Actor/Process relation has already been established
             '------------------------------------------------------------------
@@ -241,7 +241,7 @@ Public Class frmUMLClassDiagram
         'Load the Classes.
         '--------------------
         Richmond.WriteToStatusBar("Loading Classes")
-        If IsSomething(Me.UMLClassDiagram.ElementHasElementType) Then
+        If Me.UMLClassDiagram.ElementHasElementType IsNot Nothing Then
             For Each lrFactInstance In Me.UMLClassDiagram.ElementHasElementType.Fact
                 '--------------------------------------------------------------------------
                 'Qualify the Fact is for 'Element's that have an 'ElementType' of 'Class'
@@ -475,7 +475,7 @@ Public Class frmUMLClassDiagram
         Richmond.WriteToStatusBar("Linking Subtypes")
         Dim lrEREntityOrigin As New FBM.FactDataInstance
         Dim lrEREntityDestination As New FBM.FactDataInstance
-        If IsSomething(Me.UMLClassDiagram.Generalisation) Then
+        If Me.UMLClassDiagram.Generalisation IsNot Nothing Then
             For Each lrFactInstance In Me.UMLClassDiagram.Generalisation.Fact
 
                 Dim lrOriginEntity As New ERD.Entity
@@ -690,7 +690,7 @@ Public Class frmUMLClassDiagram
         'Create enumeration Entities on the Page
         '=========================================
         Richmond.WriteToStatusBar("Loading Enumeration Classes")
-        If IsSomething(Me.UMLClassDiagram.EnumerationHasEnumerationName) Then
+        If Me.UMLClassDiagram.EnumerationHasEnumerationName IsNot Nothing Then
             For Each lrFactInstance In Me.UMLClassDiagram.EnumerationHasEnumerationName.Fact
                 '--------------------------------------------------------------------------
                 'Qualify the Fact is for 'Element's that have an 'ElementType' of 'Class'
@@ -723,7 +723,7 @@ Public Class frmUMLClassDiagram
 
                 Dim lrEREntity As New FBM.FactDataInstance
                 Dim lrEnumerationLiteralFactInstance As New FBM.FactInstance
-                If IsSomething(Me.UMLClassDiagram.EnumerationHasEnumerationLiteral) Then
+                If Me.UMLClassDiagram.EnumerationHasEnumerationLiteral IsNot Nothing Then
                     For Each lrEnumerationLiteralFactInstance In Me.UMLClassDiagram.EnumerationHasEnumerationLiteral.Fact
 
                         Dim lrERAttribute As New ERD.Entity
@@ -1026,7 +1026,7 @@ Public Class frmUMLClassDiagram
         Dim loNode As MindFusion.Diagramming.DiagramNode
 
 
-        If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             loNode = Diagram.GetNodeAt(lo_point)
             If TypeOf loNode Is MindFusion.Diagramming.ShapeNode Then
                 loNode.Pen = New MindFusion.Drawing.Pen(Color.Brown)
@@ -1150,7 +1150,7 @@ Public Class frmUMLClassDiagram
             Case Else
                 lrShape = e.Node
 
-                If IsSomething(e.Node.Tag) Then
+                If e.Node.Tag IsNot Nothing Then
                     For Each lrLink In lrShape.GetAllLinks
                         If lrLink.Origin Is lrShape Then
                             lrORMObject = lrLink.Origin.Tag
@@ -1236,7 +1236,7 @@ Public Class frmUMLClassDiagram
         '--------------------------------------------------
         prApplication.WorkingPage = Me.zrPage
 
-        If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             '----------------------------
             'Mouse is over an ShapeNode
             '----------------------------
@@ -1263,7 +1263,7 @@ Public Class frmUMLClassDiagram
                 frmMain.zfrm_properties.PropertyGrid.SelectedObject = loNode.Tag
             End If
 
-            'If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+            'If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             '    '----------------------------
             '    'Mouse is over an ShapeNode
             '    '----------------------------
@@ -1333,7 +1333,7 @@ Public Class frmUMLClassDiagram
             '                '---------------------------------------------------------------------------
             '                me.zrPage.SelectedObject.Clear()
             '                Diagram.Selection.Clear()
-        ElseIf IsSomething(Diagram.GetLinkAt(lo_point, 2)) Then
+        ElseIf Diagram.GetLinkAt(lo_point, 2) IsNot Nothing Then
             '-------------------------
             'User clicked on a link
             '-------------------------
@@ -1412,7 +1412,7 @@ Public Class frmUMLClassDiagram
         '-------------------------------------------------------
         lo_point = Diagram.PixelToUnit(e.Location)
 
-        If IsSomething(Diagram.GetItemAt(lo_point, False)) Then
+        If Diagram.GetItemAt(lo_point, False) IsNot Nothing Then
             '----------------------------------------------
             'Mouse is over a DiagramItem
             '----------------------------------------------
@@ -1559,7 +1559,7 @@ Public Class frmUMLClassDiagram
         Me.Diagram1.Invalidate()
 
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = item.Tag
 
@@ -1613,7 +1613,7 @@ Public Class frmUMLClassDiagram
 
         Me.Diagram1.Invalidate()
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
             Dim lr_enterprise_view As tEnterpriseEnterpriseView
             lr_enterprise_view = item.Tag
             frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
@@ -1624,10 +1624,10 @@ Public Class frmUMLClassDiagram
             '------------------------------------------------------------------
             Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
             lr_page = lr_enterprise_view.Tag
-            Dim lrActor = From FactType In lr_page.FactTypeInstance _
-                          From Fact In FactType.Fact _
-                          From RoleData In Fact.Data _
-                          Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString _
+            Dim lrActor = From FactType In lr_page.FactTypeInstance
+                          From Fact In FactType.Fact
+                          From RoleData In Fact.Data
+                          Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString
                           Select New FBM.FactDataInstance(Me.zrPage, Fact, RoleData.Role, RoleData.Concept, RoleData.X, RoleData.Y)
 
             Dim lrFactDataInstance As New Object
@@ -1675,17 +1675,17 @@ Public Class frmUMLClassDiagram
 
     Private Sub frm_UseCaseModel_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.GotFocus
 
-        If IsSomething(Me.zoTreeNode) Then
-            If IsSomething(frmMain.zfrmModelExplorer) Then
+        If Me.zoTreeNode IsNot Nothing Then
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
                 frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
             End If
         End If
 
-        If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
+        If frmMain.zfrm_KL_theorem_writer IsNot Nothing Then
             frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
         End If
 
-        If IsSomething(Me.zrPage) Then
+        If Me.zrPage IsNot Nothing Then
             Me.zrPage.SelectedObject.Clear()
         End If
 
@@ -1722,7 +1722,7 @@ Public Class frmUMLClassDiagram
 
         Dim lrShape As MindFusion.Diagramming.DiagramNode
 
-        If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
 
             lrShape = Diagram.GetNodeAt(lo_point)
 
@@ -1740,7 +1740,7 @@ Public Class frmUMLClassDiagram
                     lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
 
 
-                    If IsSomething(lrPropertyGridForm) And IsSomething(loTableNode) Then
+                    If lrPropertyGridForm IsNot Nothing And loTableNode IsNot Nothing Then
                         Dim lrModelObject As FBM.ModelObject
                         lrModelObject = loTableNode.Tag
                         lrPropertyGridForm.PropertyGrid.BrowsableAttributes = Nothing
@@ -1763,7 +1763,7 @@ Public Class frmUMLClassDiagram
             Dim lrPropertyGridForm As frmToolboxProperties
 
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
-            If IsSomething(lrPropertyGridForm) Then
+            If lrPropertyGridForm IsNot Nothing Then
 
                 Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
                 ' And you pass it to the PropertyGrid,
@@ -1791,7 +1791,7 @@ Public Class frmUMLClassDiagram
 
         Dim lrPropertyGridForm As frmToolboxProperties
 
-        If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+        If prApplication.GetToolboxForm(frmToolboxProperties.Name) IsNot Nothing Then
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
             If Me.Diagram.Selection.Items.Count > 0 Then

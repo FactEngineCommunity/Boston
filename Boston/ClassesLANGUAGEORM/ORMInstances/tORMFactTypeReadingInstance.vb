@@ -15,8 +15,8 @@ Namespace FBM
         'The FactTypeReading for which the FactTypeReadingInstance acts as View/Proxy.
         <XmlIgnore()> _
         Private WithEvents _FactTypeReading As New FBM.FactTypeReading
-        <XmlIgnore()> _
-        <Browsable(False)> _
+        <XmlIgnore()>
+        <Browsable(False)>
         Public Property FactTypeReading() As FBM.FactTypeReading
             Get
                 Return Me._FactTypeReading
@@ -99,6 +99,24 @@ Namespace FBM
             End Set
         End Property
 
+        Public Property Width As Integer Implements iPageObject.Width
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
+        Public Property Height As Integer Implements iPageObject.Height
+            Get
+                Return 0
+            End Get
+            Set(value As Integer)
+                Throw New NotImplementedException()
+            End Set
+        End Property
+
         ''' <summary>
         ''' Parameterless Constructor
         ''' </summary>
@@ -126,7 +144,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -196,22 +214,27 @@ Namespace FBM
 
                 'CodeSafe
                 'NB This code also in FactTypeIntance.AdjustBorderHeight
-                If Not Me.FactType.ShapeIsWithinRadius(Me.FactType.FactTypeReadingShape.ShapeMidPoint, 80) And Me.FactType.Arity = 1 Then
-                    Me.FactType.FactTypeReadingShape.Move(Me.Shape.Bounds.X + Me.Shape.Bounds.Width + 1, Me.Y, True) 'FactTypeReadingShape.Shape.Bounds.Y)
-                ElseIf Not Me.FactType.ShapeIsWithinRadius(Me.FactType.FactTypeReadingShape.ShapeMidPoint, 50) And Me.FactType.Arity > 1 Then
-                    Me.FactType.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.X) - (Me.FactType.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Y + Me.Shape.Bounds.Height) - 6, True)
-                End If
-                If Me.FactType.ShapeIsWithinRadius(Me.FactType.FactTypeReadingShape.ShapeMidPoint, 4) Then
-                    Me.FactType.FactTypeReadingShape.Move(((Me.Shape.Bounds.Width / 2) + Me.Shape.Bounds.X) - (Me.FactType.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.Y + Me.Shape.Bounds.Height) + 2, True)
-                End If
+                Me.FactType.FactTypeReadingShape = Me
+                Try
+                    If Not Me.FactType.ShapeIsWithinRadius(Me.ShapeMidPoint, 80) And Me.FactType.Arity = 1 Then
+                        Me.FactType.FactTypeReadingShape.Move(Me.FactType.Shape.Bounds.X + Me.FactType.Shape.Bounds.Width + 1, Me.Y, True) 'FactTypeReadingShape.Shape.Bounds.Y)
+                    ElseIf Not Me.FactType.ShapeIsWithinRadius(Me.FactType.FactTypeReadingShape.ShapeMidPoint, 50) And Me.FactType.Arity > 1 Then
+                        Me.FactType.FactTypeReadingShape.Move(((Me.FactType.Shape.Bounds.Width / 2) + Me.FactType.Shape.Bounds.X) - (Me.FactType.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.FactType.Shape.Bounds.Y + Me.FactType.Shape.Bounds.Height) - 6, True)
+                    End If
+                    If Me.FactType.ShapeIsWithinRadius(Me.FactType.FactTypeReadingShape.ShapeMidPoint, 4) Then
+                        Me.FactType.FactTypeReadingShape.Move(((Me.FactType.Shape.Bounds.Width / 2) + Me.FactType.Shape.Bounds.X) - (Me.FactType.FactTypeReadingShape.Shape.Bounds.Width / 2), (Me.FactType.Shape.Bounds.Y + Me.FactType.Shape.Bounds.Height), True)
+                    End If
+                Catch ex As Exception
+                    'We tried
+                End Try
 
             Catch ex As Exception
-                Dim lsMessage1 As String
+                    Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -293,7 +316,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -304,7 +327,7 @@ Namespace FBM
                                 Optional ByVal asSelectedGridItemLabel As String = "")
 
             Try
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     Me.Shape.Text = ""
                     If (Me.FactType.Arity = 2) And Me.PredicatePart.Count > 0 Then
                         If (Me.FactType.RoleGroup(0).Id <> Me.PredicatePart(0).RoleId) Then
@@ -324,12 +347,19 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
 
         Public Sub MouseDown() Implements iPageObject.MouseDown
+
+            'CodeSafe
+            Me.Page.SelectedObject.RemoveAll(Function(x) x Is Nothing)
+
+            Me.Page.SelectedObject.AddUnique(Me.FactType)
+            Me.Shape.Pen.Color = Color.Blue
+            Me.Shape.Selected = True
 
         End Sub
 
@@ -382,18 +412,21 @@ Namespace FBM
                                 ByVal abBroadcastInterfaceEvent As Boolean,
                                 Optional ByVal abMakeDirty As Boolean = True) Implements iPageObject.Move
 
-            Me.Shape.Detach()
-
             Me.X = aiNewX
             Me.Y = aiNewY
             Me.FactType.FactTypeReadingPoint = New Point(aiNewX, aiNewY)
 
+            'CodeSafe
+            'Only move the shape if it exists.
             If Me.Shape IsNot Nothing Then
-                Me.Shape.Move(aiNewX, aiNewY)
+                Me.Shape.Detach()
+
+                If Me.Shape IsNot Nothing Then
+                    Me.Shape.Move(aiNewX, aiNewY)
+                End If
+
+                Me.Shape.AttachTo(Me.FactType.Shape, AttachToNode.TopLeft)
             End If
-
-            Me.Shape.AttachTo(Me.FactType.Shape, AttachToNode.TopLeft)
-
             If abMakeDirty Then
                 Me.makeDirty()
                 Me.Page.MakeDirty()
@@ -443,7 +476,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

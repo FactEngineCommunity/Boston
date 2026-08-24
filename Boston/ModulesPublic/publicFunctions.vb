@@ -1,4 +1,5 @@
 Imports System.IO
+Imports System.Runtime.InteropServices
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Text.RegularExpressions
 Imports System.Runtime.Serialization
@@ -15,15 +16,17 @@ Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Globalization
 Imports System.Threading.Tasks
+Imports Azure
+Imports Azure.AI.OpenAI
 Imports OpenAI_API
 Imports OpenAI_API.Completions
 Imports OpenAI_API.Models
 Imports System.Net
 Imports NAudio.Wave
 Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Namespace Boston
-
     Public Module publicFunctions
 
         Private ReadOnly random As Random = New Random()
@@ -34,21 +37,41 @@ Namespace Boston
         ''' </summary>
         ''' <param name="arException">Provide Exception Object</param>
         ''' <returns>Tab Separated String Of Extracted Exception</returns>
-        Public Function ExtractLineAndMethod(ByRef arException As Exception, Optional abShowStackTrace As Boolean = False) As String
+        Public Function ExtractExceptionLine(ByRef arException As Exception) As String
 
-            Dim lrStackTrace As New StackTrace(arException, True)
-            Dim lrMethodBase As MethodBase = lrStackTrace.GetFrame(lrStackTrace.FrameCount - 1).GetMethod()
             Try
-                Dim lsMethodName As String = $"{lrMethodBase.ReflectedType.Name}.{lrMethodBase.Name}"
-                Dim liLineNumber As Integer = lrStackTrace.GetFrame(lrStackTrace.FrameCount - 1).GetFileLineNumber()
-                Dim lsMessage As String = $"Error: {lsMethodName} - {liLineNumber}" & vbCrLf & vbCrLf & arException.Message
-                If abShowStackTrace Then
-                    lsMessage &= vbCrLf & vbCrLf & arException.StackTrace.ToString()
-                End If
-                Return lsMessage
-            Finally
-                lrStackTrace = Nothing
-                lrMethodBase = Nothing
+                Dim lrStackTrace As New StackTrace(arException, True)
+                Dim lrMethodBase As MethodBase = lrStackTrace.GetFrame(lrStackTrace.FrameCount - 1).GetMethod()
+                Try
+                    Dim liLineNumber As Integer = lrStackTrace.GetFrame(lrStackTrace.FrameCount - 1).GetFileLineNumber()
+                    If liLineNumber = 0 Then
+
+                        Dim keyword As String = ":line"
+                        Dim index As Integer = arException.StackTrace.IndexOf(keyword)
+
+                        If index <> -1 Then
+                            ' Add the length of the keyword to the index to start after it.
+                            Dim result As String = arException.StackTrace.Substring(index + keyword.Length)
+                            result = Environment.StackTrace
+                            ' Trim any leading spaces.
+                            result = result.Trim()
+
+                            Console.WriteLine(result)
+                        Else
+                            Return 0.ToString
+                        End If
+
+                    End If
+                    Return liLineNumber.ToString
+                Catch
+                    Return "Unkown"
+                Finally
+                    lrStackTrace = Nothing
+                    lrMethodBase = Nothing
+                End Try
+
+            Catch ex As Exception
+                Return "Errror Retrieving Line Number"
             End Try
 
         End Function
@@ -67,6 +90,16 @@ Namespace Boston
 
             Return CInt(Int((aiMax * Rnd()) + aiMin))
 
+        End Function
+
+        <DllImport("user32.dll")>
+        Public Function GetKeyState(ByVal nVirtKey As Integer) As Short
+        End Function
+        Public Function IsCtrlPressed() As Boolean
+            ' The key code for the Control key
+            Const VK_CONTROL As Integer = &H11
+            ' Check the high-order bit
+            Return (GetKeyState(VK_CONTROL) And &H8000) = &H8000
         End Function
 
         Public Declare Function GetAsyncKeyState Lib "user32" (ByVal vKey As System.Windows.Forms.Keys) As Integer 'was vKey As Long
@@ -141,7 +174,7 @@ Namespace Boston
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return originalFont
             End Try
@@ -153,7 +186,7 @@ Namespace Boston
 
         End Function
 
-        Public Sub WaitForFile(ByVal fullPath As String, ByVal mode As FileMode, ByVal access As FileAccess, ByVal share As FileShare)
+        Public Function WaitForFile(ByVal fullPath As String, ByVal mode As FileMode, ByVal access As FileAccess, ByVal share As FileShare) As Boolean
             Try
                 For numTries As Integer = 0 To 10 - 1
                     Dim fs As FileStream = Nothing
@@ -172,10 +205,14 @@ Namespace Boston
                 Next
 
             Catch ex As Exception
+                Return False
             Finally
                 System.Threading.Thread.Sleep(50)
             End Try
-        End Sub
+
+            Return True
+
+        End Function
 
         Public Function ResizeImage(ByVal image As Image, ByVal width As Integer, ByVal height As Integer) As Bitmap
             Dim destRect = New Rectangle(0, 0, width, height)
@@ -217,355 +254,6 @@ Namespace Boston
             Return propertyInfo IsNot Nothing
         End Function
 
-        Public Function OpenDatabase(Optional ByVal asDatabaseLocationFile As String = Nothing) As Boolean
-
-            Dim lsMessage As String = ""
-            Dim lsConnectionString As String = ""
-            Dim lsDatabaseLocation As String = ""
-            Dim lsDataProvider As String = ""
-
-            Try
-                '------------------------------------------------
-                'Define the location of your database
-                'as follows if you want to use a relative folder.
-                '------------------------------------------------
-                lsConnectionString = Trim(My.Settings.DatabaseConnectionString)
-
-                '-------------------------------------------
-                'Sample Database ConnectionStrings
-                '-------------------------------------------
-#Region "Exapmle Database ConnectionStrings"
-                'SQL Server Connection String Sample
-                'DRIVER=SQL Server;UID=s2\vmorgante;PWD=cisco1;Trusted_Connection=;DATABASE=PreviewDialler;WSID=SIS2WKVM;APP=Microsoft Office 2003;SERVER=SIS2DB02;Description=PreviewDialler
-                'lrSQLConnectionStringBuilder used to interogate the connection string.
-                'Dim lrSQLConnectionStringBuilder As New SqlConnectionStringBuilder
-                'lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
-                '-----------------------------------
-                'MDB Connection String Sample
-                'Provider=Microsoft.Jet.OLEDB.4.0; Data Source=C:\Program Files\PreviewDialler\database\PREVIEWDIALLER.mdb
-                '-------------------------------------------
-#End Region
-                '------------------------------------------------
-                'Construct the connection string
-                '------------------------------------------------                 
-                Dim lrSQLConnectionStringBuilder As New System.Data.Common.DbConnectionStringBuilder(True)
-                Dim lsDatabaseType As String = My.Settings.DatabaseType
-
-#Region "User Intervention on Startup"
-                If My.Computer.Keyboard.AltKeyDown Then
-                    Dim lfrmCRUDBostonConfiguration As New frmCRUDBostonConfiguration
-                    Call lfrmCRUDBostonConfiguration.ShowDialog()
-                    My.Settings.DatabaseConnectionString = lfrmCRUDBostonConfiguration.msConnectionString
-                    My.Settings.DatabaseType = lfrmCRUDBostonConfiguration.msDatabaseType
-                    lfrmCRUDBostonConfiguration.Dispose()
-                    lsConnectionString = My.Settings.DatabaseConnectionString
-                    lsDatabaseType = My.Settings.DatabaseType
-                End If
-#End Region
-
-TestDatabase:
-                If lsDatabaseType = pcenumDatabaseType.PostgreSQL.ToString Then
-#Region "Postgres"
-                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
-
-                    pdbConnection = New FactEngine.PostgreSQLConnection(Nothing, lsConnectionString, 10000, False)
-                    pdb_OLEDB_connection = New FactEngine.PostgreSQLConnection(Nothing, lsConnectionString, 10000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
-#End Region
-                ElseIf My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
-#Region "SQLite"
-                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
-
-                    pdbConnection = New FactEngine.SQLiteConnection(Nothing, lsConnectionString, 1000, False)
-                    pdb_OLEDB_connection = New FactEngine.SQLiteConnection(Nothing, lsConnectionString, 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
-
-                    If pbLogStartup Then
-                        Call prApplication.ThrowErrorMessage("pdbConnection IsNot Nothing: " & (pdbConnection IsNot Nothing).ToString, pcenumErrorType.Warning)
-                        Call prApplication.ThrowErrorMessage("pdbConnection.Connection IsNot Nothing: " & (pdbConnection.Connection IsNot Nothing).ToString, pcenumErrorType.Warning)
-                    End If
-
-#Region "SHIFT KEY DOWN - User Points to database"
-                    If My.Computer.Keyboard.ShiftKeyDown Then
-UserSelectedDatabaseSQLite:
-                        Using lrOpenFileDialog As New OpenFileDialog
-
-                            lrOpenFileDialog.Filter = "Boston Database (*.db)|*.db; *.db|All Files|*.*"
-
-                            If System.IO.Directory.Exists(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database") Then
-                                lrOpenFileDialog.InitialDirectory = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
-                            End If
-
-                            If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
-
-                                If File.Exists(lrOpenFileDialog.FileName) Then
-                                    lsDatabaseLocation = lrOpenFileDialog.FileName
-                                    'Reaffirm/Set My.Settings.DatabaseConnectionString (for upgrades etc).
-                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
-                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                                    My.Settings.Save()
-                                    GoTo CheckExistsDatabaseLocation
-                                Else
-                                    MsgBox("No file exists at the given location/name.")
-                                End If
-                            End If
-
-                        End Using
-
-                    End If
-#End Region
-
-                    lsDatabaseLocation = Boston.returnIfTrue(asDatabaseLocationFile IsNot Nothing, asDatabaseLocationFile, lrSQLConnectionStringBuilder("Data Source"))
-
-CheckExistsDatabaseLocationSQLite:
-                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
-
-
-                    If Not System.IO.File.Exists(lsDatabaseLocation) Then
-                        '-----------------------------------
-                        'Try and find the database locally
-                        '-----------------------------------
-                        Try
-                            lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
-                            If lsDatabaseLocation IsNot Nothing Then
-                                If System.IO.File.Exists(lsDatabaseLocation) Then
-                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
-
-                                    If Not File.Exists(lsDatabaseLocation) Then GoTo StillCannotFindTheDatabase
-
-                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                                    lsConnectionString = My.Settings.DatabaseConnectionString
-                                    GoTo OpenConnection
-                                End If
-                            End If
-                        Catch ex As Exception
-                            'Not a biggie.
-                        End Try
-
-StillCannotFindTheDatabaseSQLite:
-                        If Not My.Settings.SilentPreConfiguration Then
-
-                            lsMessage = "Cannot find the Boston database at the default/configured location:"
-                            lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
-                            lsMessage.AppendDoubleLineBreak("If this is a not a new installation of Boston, contact FactEngine support.")
-                            lsMessage.AppendDoubleLineBreak("Click [Yes] to locate the database yourself or [No] to close Boston.")
-                            lsMessage.AppendDoubleLineBreak("The default name for the Boston database is boston.vdb")
-
-
-                            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                                GoTo UserSelectedDatabaseSQLite
-                            Else
-                                Return False
-                            End If
-
-                        End If
-                    End If
-#End Region
-                ElseIf My.Settings.DatabaseType = pcenumDatabaseType.MSJet.ToString Then
-#Region "MS Jet"
-                    lrSQLConnectionStringBuilder.ConnectionString = lsConnectionString
-
-                    pdbConnection = New FactEngine.MSAccessConnection(Nothing, Nothing) ' ADODB.Connection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
-                    pdb_OLEDB_connection = New OleDb.OleDbConnection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
-
-#Region "SHIFT KEY DOWN - User Points to database"
-                    If My.Computer.Keyboard.ShiftKeyDown Then
-UserSelectedDatabase:
-                        Using lrOpenFileDialog As New OpenFileDialog
-
-                            lrOpenFileDialog.Filter = "Boston Database (*.vdb, *.mdb)|*.vdb; *.mdb|All Files|*.*"
-
-                            If System.IO.Directory.Exists(My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database") Then
-                                lrOpenFileDialog.InitialDirectory = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\database"
-                            End If
-
-                            If lrOpenFileDialog.ShowDialog = DialogResult.OK Then
-
-                                If File.Exists(lrOpenFileDialog.FileName) Then
-                                    lsDatabaseLocation = lrOpenFileDialog.FileName
-                                    'Reaffirm/Set My.Settings.DatabaseConnectionString (for upgrades etc).
-                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
-                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                                    My.Settings.Save()
-                                    GoTo CheckExistsDatabaseLocation
-                                Else
-                                    MsgBox("No file exists at the given location/name.")
-                                End If
-                            End If
-
-                        End Using
-#End Region
-                    End If
-
-                    lsDatabaseLocation = Boston.returnIfTrue(asDatabaseLocationFile IsNot Nothing, asDatabaseLocationFile, lrSQLConnectionStringBuilder("Data Source"))
-                    lsDataProvider = lrSQLConnectionStringBuilder("Provider")
-
-CheckExistsDatabaseLocation:
-                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
-
-
-                    If Not System.IO.File.Exists(lsDatabaseLocation) Then
-#Region "Database can't be found"
-                        '-----------------------------------
-                        'Try and find the database locally
-                        '-----------------------------------
-                        Try
-                            lsDatabaseLocation = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\SOFTWARE\Boston", "DatabaseLocation", Nothing)
-                            If lsDatabaseLocation IsNot Nothing Then
-                                If My.Computer.Keyboard.CtrlKeyDown Then GoTo LastDitch : 
-                                If System.IO.File.Exists(lsDatabaseLocation) Then
-                                    lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
-
-                                    If Not File.Exists(lsDatabaseLocation) Then GoTo StillCannotFindTheDatabase
-
-                                    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                                    lsConnectionString = My.Settings.DatabaseConnectionString
-                                    GoTo OpenConnection
-                                Else
-LastDitch:
-                                    MsgBox("Cannot find the Boston Database. Set the Database Type and Connection String and restart Boston.")
-                                    Dim lfrmCRUDBostonConfiguration As New frmCRUDBostonConfiguration
-                                    Call lfrmCRUDBostonConfiguration.ShowDialog()
-                                    My.Settings.DatabaseConnectionString = lfrmCRUDBostonConfiguration.msConnectionString
-                                    My.Settings.DatabaseType = lfrmCRUDBostonConfiguration.msDatabaseType
-                                    lsConnectionString = My.Settings.DatabaseConnectionString
-                                    lsDatabaseType = My.Settings.DatabaseType
-                                    GoTo TestDatabase
-                                End If
-                            End If
-                        Catch ex As Exception
-                            'Not a biggie.
-                        End Try
-
-StillCannotFindTheDatabase:
-                        If Not My.Settings.SilentPreConfiguration Then
-
-                            lsMessage = "Cannot find the Boston database at the default/configured location:"
-                            lsMessage.AppendDoubleLineBreak(lsDatabaseLocation)
-                            lsMessage.AppendDoubleLineBreak("If this is a not a new installation of Boston, contact FactEngine support.")
-                            lsMessage.AppendDoubleLineBreak("Click [Yes] to locate the database yourself or [No] to close Boston.")
-                            lsMessage.AppendDoubleLineBreak("The default name for the Boston database is boston.vdb")
-
-
-                            If MsgBox(lsMessage, MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
-                                GoTo UserSelectedDatabase
-                            Else
-                                Return False
-                            End If
-
-                        End If
-
-#Region "Abandoned 20220830"
-                        'If System.IO.File.Exists(lsLocalDatabaseLocation) Then
-                        '    lrSQLConnectionStringBuilder("Data Source") = lsLocalDatabaseLocation
-                        '    My.Settings.DatabaseConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                        '    lsMessage = "Saving the following as the Database Connection String for your installation of Boston."
-                        '    lsMessage.AppendDoubleLineBreak(lrSQLConnectionStringBuilder.ConnectionString)
-                        '    lsMessage.AppendDoubleLineBreak("Boston will start but you won't be able to use this database. Contact FactEngine to find out how to connect to the correct database.")
-                        '    lsMessage.AppendDoubleLineBreak("To make changes to the Boston database connection string, go to [Boston]->[Configuration]")
-
-                        '    If Not My.Settings.SilentPreConfiguration Then
-                        '        MsgBox(lsMessage)
-                        '    End If
-
-                        '    My.Settings.Save()
-                        '    lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                        'Else
-                        '    lsMessage = "Cannot find the Boston database at:"
-                        '    lsMessage &= vbCrLf & vbCrLf
-                        '    lsMessage &= lsDatabaseLocation
-                        '    lsMessage &= vbCrLf
-                        '    lsMessage &= "or..."
-                        '    lsMessage &= vbCrLf
-                        '    lsMessage &= lsLocalDatabaseLocation
-                        '    lsMessage &= vbCrLf & vbCrLf
-                        '    'lsMessage &= "Adjust the setting, 'database_connection_str', in the 'Boston.exe.config' file and restart Boston."
-                        '    lsMessage &= "Adjust the Database Connection String for your database and restart Boston."
-                        '    MsgBox(lsMessage)
-                        '    frmCRUDBostonConfiguration.ShowDialog()
-                        '    Return False
-                        'End If
-#End Region
-#End Region
-                    End If
-#End Region
-                End If
-
-
-OpenConnection:
-                Dim regKey As Microsoft.Win32.RegistryKey
-                regKey = My.Computer.Registry.CurrentUser.OpenSubKey("SOFTWARE", True)
-                regKey.CreateSubKey("Boston")
-                regKey.Close()
-                regKey = My.Computer.Registry.CurrentUser.OpenSubKey("SOFTWARE\Boston", True)
-                regKey.SetValue("DatabaseLocation", lsDatabaseLocation)
-
-                Dim loConfiguration As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal)
-                regKey.SetValue("ConfigurationFileLocation", loConfiguration.FilePath)
-                'Below Failed...because no permissions.
-                'My.Computer.Registry.SetValue("HKEY_LOCAL_MACHINE\SOFTWARE\Boston\Variables", "DatabaseLocation", lsDatabaseLocation)
-
-                '------------------------------------------------
-                'Open the (database) connection
-                '------------------------------------------------
-                lsConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                If pbLogStartup Then prApplication.ThrowErrorMessage("pdbConnection Opening", pcenumErrorType.Warning)
-
-                If pdbConnection.Open(lsConnectionString) Then
-
-                    If pbLogStartup Then
-                        prApplication.ThrowErrorMessage("pdbConnection Opened", pcenumErrorType.Warning)
-                    End If
-                Else
-                    Throw New Exception("Failed to Open database. Method: Open.")
-                End If
-
-#Region "OLEDB"
-                Select Case My.Settings.DatabaseType
-                    Case Is = pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.MSJet.ToString
-
-                        'lsDatabaseLocation
-                        lrSQLConnectionStringBuilder = New System.Data.Common.DbConnectionStringBuilder(True)
-                        lrSQLConnectionStringBuilder("Data Source") = lsDatabaseLocation
-                        lrSQLConnectionStringBuilder("Provider") = "Microsoft.ACE.OLEDB.12.0" ' "Microsoft.Jet.OLEDB.4.0"
-
-                        pdb_OLEDB_connection.ConnectionString = lrSQLConnectionStringBuilder.ConnectionString
-                        pdb_OLEDB_connection.Open()
-                End Select
-#End Region
-                Return True
-
-            Catch lo_ex As Exception
-
-                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
-
-                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-                lsMessage &= vbCrLf & vbCrLf & lo_ex.Message
-                lsMessage.AppendDoubleLineBreak("Error: There was an error opening Boston database: ")
-                lsMessage.AppendDoubleLineBreak(lsConnectionString)
-                lsMessage.AppendDoubleLineBreak("'" & Trim(lo_ex.Message) & "'" & vbCrLf & lo_ex.StackTrace)
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning)
-                Return False
-            End Try
-
-        End Function
-
-        Public Sub CompactAccessDB(ByVal sFilePath As String, ByVal sNewFilePath As String)
-            Try
-                Dim sCompactError As String = ""
-
-                Dim lsSourceConnectionString, lsNewConnectionString As String
-                lsSourceConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}", sFilePath)
-                lsNewConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};Jet OLEDB:Engine Type=5", sNewFilePath)
-                Dim jro As New JRO.JetEngine 'new instance of the jet engine
-                jro.CompactDatabase(lsSourceConnectionString, lsNewConnectionString)
-
-                System.IO.File.Delete(sFilePath)
-                System.IO.File.Move(sNewFilePath, sFilePath)
-
-            Catch ex As System.Exception
-                Throw New Exception(ex.Message)
-            End Try
-        End Sub
-
         Public Function PageDataExistsInClipboard(ByRef arPage As FBM.Page) As Boolean
 
             Dim RichmondPage As DataFormats.Format = DataFormats.GetFormat("RichmondPage")
@@ -601,7 +289,7 @@ OpenConnection:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return False
             End Try
@@ -614,7 +302,7 @@ OpenConnection:
         ''' </summary>
         ''' <param name="arGenericSelection"></param>
         ''' <param name="as_form_title"></param>
-        ''' <param name="as_select_object"></param>
+        ''' <param name="aiSelectColumn"></param>
         ''' <param name="as_select_field"></param>
         ''' <param name="as_index_field"></param>
         ''' <param name="as_where_clause">SQL WHERE Clause. Include the 'WHERE' token.</param>
@@ -628,7 +316,7 @@ OpenConnection:
         ''' <remarks></remarks>
         Public Function DisplayGenericSelectForm(ByRef arGenericSelection As tGenericSelection,
                                                  ByVal as_form_title As String,
-                                                 ByVal as_select_object As String,
+                                                 ByVal asTableName As String,
                                                  ByVal as_select_field As String,
                                                  ByVal as_index_field As String,
                                                  Optional ByVal as_where_clause As String = "",
@@ -637,20 +325,26 @@ OpenConnection:
                                                  Optional ByVal asOrderByFields As String = Nothing,
                                                  Optional ByVal aiSelectColumn As Integer = 1,
                                                  Optional ByVal asColumnWidthString As String = "100",
-                                                 Optional ByVal asFieldList As String = ""
+                                                 Optional ByVal asFieldList As String = "",
+                                                 Optional ByVal abUseDataStore As Boolean = False,
+                                                 Optional ByVal atDataStoreType As Type = Nothing,
+                                                 Optional ByVal asObjectName As String = Nothing
                                                  ) As DialogResult
 
             arGenericSelection.SelectField = as_select_field
             arGenericSelection.IndexField = as_index_field
-            arGenericSelection.TableName = as_select_object
+            arGenericSelection.TableName = asTableName
             arGenericSelection.FormTitle = as_form_title
             arGenericSelection.SelectColumn = aiSelectColumn
             arGenericSelection.ColumnWidthString = asColumnWidthString
             arGenericSelection.FieldList = asFieldList
+            arGenericSelection.UseDataStore = abUseDataStore
+            arGenericSelection.DataStoreType = atDataStoreType
+            arGenericSelection.ObjectName = asObjectName
 
             Try
 
-                If IsSomething(asOrderByFields) Then
+                If asOrderByFields IsNot Nothing Then
                     arGenericSelection.OrderByFields = asOrderByFields
                 Else
                     arGenericSelection.OrderByFields = as_select_field
@@ -661,42 +355,39 @@ OpenConnection:
                     arGenericSelection.WhereClause = ""
                 End If
 
-                If IsSomething(ao_combobox_item) Then
+                If ao_combobox_item IsNot Nothing Then
                     arGenericSelection.TupleList.Add(ao_combobox_item)
                 End If
 
                 Select Case aiSelectColumn
                     Case Is = 1
                         Dim lfrm_generic_select_frm As New frmGenericSelect
-                        If IsSomething(aiComboboxStyle) Then
-                            Select Case aiComboboxStyle
-                                Case Is = pcenumComboBoxStyle.Dropdown
-                                    lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDown
-                                Case Is = pcenumComboBoxStyle.DropdownList
-                                    lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDownList
-                                Case Is = pcenumComboBoxStyle.Simple
-                                    lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.Simple
-                            End Select
-                        Else
-                            lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDown
-                        End If
+
+                        Select Case aiComboboxStyle
+                            Case Is = pcenumComboBoxStyle.Dropdown
+                                lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDown
+                            Case Is = pcenumComboBoxStyle.DropdownList
+                                lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDownList
+                            Case Is = pcenumComboBoxStyle.Simple
+                                lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.Simple
+                            Case Else
+                                lfrm_generic_select_frm.combobox_selection.DropDownStyle = ComboBoxStyle.DropDown
+                        End Select
 
                         lfrm_generic_select_frm.zoGenericSelection = arGenericSelection
                         DisplayGenericSelectForm = lfrm_generic_select_frm.ShowDialog()
                     Case Is > 1
                         Dim lfrm_generic_select_frm As New frmGenericSelectMultiColumn
-                        If IsSomething(aiComboboxStyle) Then
-                            Select Case aiComboboxStyle
-                                Case Is = pcenumComboBoxStyle.Dropdown
-                                    lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDown
-                                Case Is = pcenumComboBoxStyle.DropdownList
-                                    lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDownList
-                                Case Is = pcenumComboBoxStyle.Simple
-                                    lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.Simple
-                            End Select
-                        Else
-                            lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDown
-                        End If
+                        Select Case aiComboboxStyle
+                            Case Is = pcenumComboBoxStyle.Dropdown
+                                lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDown
+                            Case Is = pcenumComboBoxStyle.DropdownList
+                                lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDownList
+                            Case Is = pcenumComboBoxStyle.Simple
+                                lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.Simple
+                            Case Else
+                                lfrm_generic_select_frm.comboboxSelection.DropDownStyle = ComboBoxStyle.DropDown
+                        End Select
 
                         lfrm_generic_select_frm.zoGenericSelection = arGenericSelection
                         DisplayGenericSelectForm = lfrm_generic_select_frm.ShowDialog()
@@ -708,7 +399,7 @@ OpenConnection:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return DialogResult.Abort
             End Try
@@ -739,8 +430,8 @@ OpenConnection:
         ''' <param name="aiInterval">The interval, in milliseconds, to display the FlashCard for.</param>
         Public Sub ShowFlashCard(ByVal asText As String,
                                  ByVal aoColor? As Color,
-                                 ByVal aiInterval As Integer,
-                                 Optional ByVal aiFontSize As Single = 8.25)
+                                 Optional ByVal aiInterval As Integer = 2500,
+                                 Optional ByVal aiFontSize As Single = 10)
 
             Try
                 Dim lfrmFlashCard As New frmFlashCard
@@ -753,8 +444,27 @@ OpenConnection:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
+        End Sub
+
+        Public Sub MakeRoundedCorners(ByRef aoForm As Form)
+
+            Dim liArcRadius As Integer = 35
+
+            aoForm.FormBorderStyle = FormBorderStyle.None
+            Dim p As New Drawing2D.GraphicsPath()
+            p.StartFigure()
+            p.AddArc(New Rectangle(0, 0, liArcRadius, liArcRadius), 180, 90)
+            p.AddLine(liArcRadius, 0, aoForm.Width - liArcRadius, 0)
+            p.AddArc(New Rectangle(aoForm.Width - liArcRadius, 0, liArcRadius, liArcRadius), -90, 90)
+            p.AddLine(aoForm.Width, liArcRadius, aoForm.Width, aoForm.Height - liArcRadius)
+            p.AddArc(New Rectangle(aoForm.Width - liArcRadius, aoForm.Height - liArcRadius, liArcRadius, liArcRadius), 0, 90)
+            p.AddLine(aoForm.Width - liArcRadius, aoForm.Height, liArcRadius, aoForm.Height)
+            p.AddArc(New Rectangle(0, aoForm.Height - liArcRadius, liArcRadius, liArcRadius), 90, 90)
+            p.CloseFigure()
+            aoForm.Region = New Region(p)
+
         End Sub
 
         ''' <summary>
@@ -800,28 +510,41 @@ OpenConnection:
         ''' <param name="aiProgressPercent"></param>
         ''' <param name="abAppendMessageOnly">As when adding dots (.) to a message that already exists.</param>
         Public Sub WriteToStatusBar(ByVal asMessage As String,
-                                    Optional ByVal abRefreshForm As Boolean = False,
-                                    Optional ByVal aiProgressPercent As Integer = 0,
-                                    Optional abAppendMessageOnly As Boolean = False)
+                    Optional ByVal abRefreshForm As Boolean = False,
+                    Optional ByVal aiProgressPercent As Integer = 0,
+                    Optional abAppendMessageOnly As Boolean = False)
 
-            If abAppendMessageOnly Then
-                frmMain.StatusLabelGeneralStatus.Text = frmMain.StatusLabelGeneralStatus.Text & asMessage
-            Else
-                frmMain.StatusLabelGeneralStatus.Text = asMessage
+            ' CodeSafe
+            If prApplication Is Nothing OrElse prApplication.MainForm Is Nothing Then Exit Sub
+
+            ' Check if this method was called from a different thread than the UI thread
+            If prApplication.MainForm.InvokeRequired Then
+                ' Call this same method but on the UI thread
+                prApplication.MainForm.Invoke(New Action(Sub()
+                                                             WriteToStatusBar(asMessage, abRefreshForm, aiProgressPercent, abAppendMessageOnly)
+                                                         End Sub))
+                Return
             End If
 
+            ' The following code is guaranteed to run on the UI thread
+            If abAppendMessageOnly Then
+                prApplication.MainForm.StatusLabelGeneralStatus.Text &= asMessage
+            Else
+                prApplication.MainForm.StatusLabelGeneralStatus.Text = asMessage
+            End If
 
             If aiProgressPercent > 0 Then
-                frmMain.ToolStripProgressBar.Visible = True
-                frmMain.ToolStripProgressBar.Value = aiProgressPercent
+                prApplication.MainForm.ToolStripProgressBar.Visible = True
+                prApplication.MainForm.ToolStripProgressBar.Value = aiProgressPercent
             Else
-                frmMain.ToolStripProgressBar.Visible = False
+                prApplication.MainForm.ToolStripProgressBar.Visible = False
             End If
 
             If abRefreshForm Then
-                frmMain.Refresh()
+                prApplication.MainForm.StatusLabelGeneralStatus.Invalidate()
+                prApplication.MainForm.ToolStripProgressBar.Invalidate()
+                prApplication.MainForm.Update()  ' Force immediate update
             End If
-            frmMain.Invalidate()
 
         End Sub
 
@@ -831,8 +554,20 @@ OpenConnection:
                 'frmMain.zfrmModelExplorer.CircularProgressBar.Value = aiProgressPercent
                 'frmMain.zfrmModelExplorer.Invalidate()
                 frmMain.ToolStripProgressBar.Visible = True
-                frmMain.ToolStripProgressBar.Value = aiProgressPercent
-                frmMain.Refresh()
+                Try
+                    frmMain.ToolStripProgressBar.Value = aiProgressPercent
+                Catch ex As Exception
+                    'You never know.
+                End Try
+
+
+                ' Assuming your main form has a unique name, replace "YourMainFormName" with the actual name.
+                Dim mainForm As frmMain = Application.OpenForms.OfType(Of frmMain)().FirstOrDefault()
+
+                If mainForm IsNot Nothing Then
+                    ' Now you have a reference to the main form, and you can call Invalidate on its controls.
+                    mainForm.ToolStripProgressBar.Invalidate()
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -840,28 +575,30 @@ OpenConnection:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
 
         Public Function IsSerializable(ByVal obj As Object) As Boolean
-
-            Dim mem As System.IO.MemoryStream = New System.IO.MemoryStream()
-            Dim bin As BinaryFormatter = New BinaryFormatter()
-            'Dim bin = New XmlSerializer(obj.GetType)
             Try
-
-                bin.Serialize(mem, obj)
                 Return True
+                '20251122-VM-Use the following in the future.
+                'Public Function IsSerializableWithContract(Of TRoot)(obj As TRoot, knownTypes As IEnumerable(Of Type)) As Boolean
+                'Try
+                'Dim serializer As New DataContractSerializer(GetType(TRoot), knownTypes)
 
+
+                Dim serializer As New DataContractSerializer(obj.GetType())
+                Using mem As New MemoryStream()
+                    serializer.WriteObject(mem, obj)
+                End Using
+                Return True
             Catch Serex As System.Runtime.Serialization.SerializationException
 
                 MsgBox("Your object cannot be serialized. The reason is: " & Serex.ToString() & Serex.GetType.ToString)
                 Return False
-
             Catch ex As Exception
-
                 MsgBox("Your object cannot be serialized. The reason is: " & ex.ToString() & ex.GetType.ToString)
                 Return False
             End Try
@@ -891,7 +628,7 @@ OpenConnection:
                 Dim lsMessage As String
                 lsMessage = "Error: publicFunctions.ConvertNumberToLetters"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -939,7 +676,7 @@ OpenConnection:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1018,6 +755,8 @@ OpenConnection:
             Return asciiString
         End Function
 
+#Region "ENUMS"
+
         Public Function GetEnumFromDescriptionAttribute(Of T)(description As String) As T
             Dim type = GetType(T)
             If Not type.IsEnum Then
@@ -1038,6 +777,22 @@ OpenConnection:
             Next
             Return Nothing
         End Function
+
+        Public Function GetEnumDescriptions(Of TEnum As Structure)() As List(Of String)
+            Dim descriptions As New List(Of String)
+            For Each value In [Enum].GetValues(GetType(TEnum))
+                Dim fieldInfo = GetType(TEnum).GetField(value.ToString())
+                Dim attributes = CType(fieldInfo.GetCustomAttributes(GetType(DescriptionAttribute), False), DescriptionAttribute())
+                If attributes.Length > 0 Then
+                    descriptions.Add(attributes(0).Description)
+                Else
+                    descriptions.Add(value.ToString())
+                End If
+            Next
+            Return descriptions
+        End Function
+
+#End Region
 
         Public Function ReadEmbeddedRessourceToString(assembly As Assembly, searchPattern As String) As String
 
@@ -1138,6 +893,73 @@ OpenConnection:
             Return pascalCase
         End Function
 
+        Function GetGroqResponse(jsonData As String) As JObject
+            Dim url As String = "https://api.groq.com/openai/v1/chat/completions"
+            Dim apiKey As String = My.Settings.GroqAPIKey
+
+            Dim request As WebRequest = WebRequest.Create(url)
+            request.Method = "POST"
+            request.ContentType = "application/json"
+            request.Headers.Add("Authorization", "Bearer " & apiKey)
+
+            Dim bytes As Byte() = System.Text.Encoding.UTF8.GetBytes(jsonData)
+            request.ContentLength = bytes.Length
+
+            Dim jsonResult As JObject = Nothing
+
+            Try
+                Using stream As Stream = request.GetRequestStream()
+                    stream.Write(bytes, 0, bytes.Length)
+                End Using
+
+                Using response As HttpWebResponse = CType(request.GetResponse(), HttpWebResponse)
+                    Using streamReader As New StreamReader(response.GetResponseStream())
+                        Dim result As String = streamReader.ReadToEnd()
+                        jsonResult = JObject.Parse(result)
+                        Return jsonResult
+                    End Using
+                End Using
+            Catch exWeb As WebException
+                If exWeb IsNot Nothing Then
+                    Using errorResponse As HttpWebResponse = CType(exWeb.Response, HttpWebResponse)
+                        Using reader As New StreamReader(errorResponse.GetResponseStream())
+                            Dim errorText As String = reader.ReadToEnd()
+                            prApplication.ThrowMessage(errorText, pcenumErrorType.Critical)
+                        End Using
+                    End Using
+                End If
+            Catch ex As Exception
+                ' Handle or log the exception as needed
+                Console.WriteLine("Error: " & ex.Message)
+                Return Nothing
+            End Try
+        End Function
+
+        'Function GetGroqResponse(userMessage As String) As Object
+        '    Dim url As String = "https://api.groq.com/openai/v1" '"https://api.groq.com/openai/v1/chat/completions"
+        '    Dim apiKey As String = My.Settings.GroqAPIKey
+        '    Dim data As String = "{""messages"": [{""role"": ""user"", ""content"": """ & "Hello World" & """}], ""model"": ""gpt-4-32k-0613""}" '""mixtral-8x7b-32768""}"
+
+        '    Dim request As WebRequest = WebRequest.Create(url)
+        '    request.Method = "POST"
+        '    request.Headers.Add("Authorization", "Bearer " & apiKey)
+        '    request.ContentType = "application/json"
+
+        '    Using streamWriter As New StreamWriter(request.GetRequestStream())
+        '        streamWriter.Write(data)
+        '        streamWriter.Flush()
+        '        streamWriter.Close()
+        '    End Using
+
+        '    Dim response As WebResponse = request.GetResponse()
+        '    Using streamReader As New StreamReader(response.GetResponseStream())
+        '        Dim result As String = streamReader.ReadToEnd()
+        '        Dim jsonResult As JObject = JObject.Parse(result)
+        '        Return jsonResult
+        '    End Using
+
+        'End Function
+
         Public Function GetGPT3Result(ByRef arOpenAIAPI As OpenAI_API.OpenAIAPI, ByVal asNLQuery As String, Optional ByVal asActualNLQuery As String = "") As OpenAI_API.Completions.CompletionResult
 
             Try
@@ -1150,7 +972,7 @@ OpenConnection:
 
                 Return Task.Run(Function() lrOpenAIAPI.Completions.CreateCompletionAsync(
                                            New OpenAI_API.Completions.CompletionRequest(prompt:=asNLQuery,
-                                                                                         model:=OpenAI_API.Models.Model.DavinciText,
+                                                                                         model:=OpenAI_API.Models.Model.GPT4,
                                                                                          temperature:=0,
                                                                                          max_tokens:=liMaxTokens)
                                 ), _cancellationTokenSource.Token).Result
@@ -1162,40 +984,41 @@ OpenConnection:
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage.AppendDoubleLineBreak(ex.InnerException.Message)
                 lsMessage.AppendDoubleLineBreak(ex.Message)
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, False,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, False,,,,, ex)
 
                 Return Nothing
             End Try
 
         End Function
 
-        Public Function GetGPTChatResponse(ByVal arOpenAIAPI As OpenAI_API.OpenAIAPI, ByVal asPrompt As String, Optional ByVal asActualNLQuery As String = "") As OpenAI_API.Chat.ChatResult
+        Public Function GetGPTChatResponse(ByVal asPrompt As String, Optional ByVal asActualNLQuery As String = "") As NullableResponse(Of ChatCompletions)
+
             Try
-                Dim _timeout As Integer = 10000 ' 5 seconds
+                Dim apiKey As String = My.Settings.FactEngineOpenAIAPIKey
 
-                ' Task to execute the main operation
-                Dim chatTask = Task.Run(Function() arOpenAIAPI.Chat.CreateChatCompletionAsync(
-                                              New OpenAI_API.Chat.ChatRequest() With {
-                                                                                     .Model = Model.ChatGPTTurbo,
-                                                                                     .Temperature = 0,
-                                                                                     .MaxTokens = 2000,
-                                                                                     .TopP = 1,
-                                                                                     .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asPrompt)}
-                                                                                     }
-                                                )
-                                        )
+                ' Create the client
+                Dim lrOpenAIClient = New OpenAIClient(apiKey)  'Azure: New OpenAIClient(New Uri(apiUrl), New AzureKeyCredential(apiKey))
 
-                ' Wait for either the main task to complete or the timeout task to complete
-                Dim completedTask = Task.WhenAny(chatTask, Task.Delay(_timeout)).Result
+                Dim lrChatCompletionsOptions As New ChatCompletionsOptions() With {
+                            .User = "Bot",
+                            .MaxTokens = 4000,
+                            .Functions = {},
+                            .Temperature = Single.Parse("0.2")
+                    }
 
-                ' Check if the main task completed or timed out
-                If completedTask Is chatTask Then
-                    ' Main task completed successfully
-                    Return chatTask.Result
-                Else
-                    ' Main task timed out, handle this scenario (e.g., log an error or return a default result)
-                    Return New OpenAI_API.Chat.ChatResult()
-                End If
+                Dim lrChatMessage = New ChatMessage(ChatRole.User, asPrompt)
+
+                lrChatCompletionsOptions.Messages.Clear()
+                lrChatCompletionsOptions.Messages.Add(lrChatMessage)
+                lrChatCompletionsOptions.ChoiceCount = 1 '20240113-VM-Was 10, then 5....now reduced to 1. See KickStartTimer.
+                lrChatCompletionsOptions.FrequencyPenalty = 0
+                lrChatCompletionsOptions.Temperature = 1
+                lrChatCompletionsOptions.MaxTokens = 2000
+
+                Dim response As NullableResponse(Of ChatCompletions) = lrOpenAIClient.GetChatCompletions(My.Settings.FactEngineModelName, lrChatCompletionsOptions)
+
+                Return response
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
@@ -1203,7 +1026,70 @@ OpenConnection:
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage.AppendDoubleLineBreak(ex.InnerException.Message)
                 lsMessage.AppendDoubleLineBreak(ex.Message)
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical,,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace, False,,,,, ex)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+
+        ''' <summary>
+        ''' 20250825-VM-Write a version of this function that uses the Azure OpenAI client.
+        '''   This way we don't have to use the Model enum, but rather can use the text name of the model. E.g. "ChatGPTTurbo" rather than Model.ChatGPTTurbo.
+        '''   See above
+        ''' </summary>
+        ''' <param name="arOpenAIAPI"></param>
+        ''' <param name="asPrompt"></param>
+        ''' <param name="asActualNLQuery"></param>
+        ''' <returns></returns>
+        Public Function GetGPTChatResponse(arOpenAIAPI As OpenAI_API.OpenAIAPI, ByVal asPrompt As String, Optional ByVal asActualNLQuery As String = "") As OpenAI_API.Chat.ChatResult
+            Try
+                Dim _timeout As Integer = 5000 ' 5 seconds
+                Dim _cancellationTokenSource As New System.Threading.CancellationTokenSource
+
+                Dim lrOpenAIAPI = arOpenAIAPI
+
+                Return Task.Run(Function() lrOpenAIAPI.Chat.CreateChatCompletionAsync(
+                                                      New OpenAI_API.Chat.ChatRequest() With {
+                                                                                     .Model = Model.ChatGPTTurbo,
+                                                                                     .Temperature = 0,
+                                                                                     .MaxTokens = 2000,
+                                                                                     .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asPrompt)}
+                                                                                     }
+                                                ), _cancellationTokenSource.Token
+                                        ).Result
+
+                ' Task to execute the main operation
+                'Dim chatTask = Task.Run(Function() lrOpenAIAPI.Chat.CreateChatCompletionAsync(
+                '                              New OpenAI_API.Chat.ChatRequest() With {
+                '                                                                     .Model = Model.ChatGPTTurbo,
+                '                                                                     .Temperature = 0,
+                '                                                                     .MaxTokens = 500,
+                '                                                                     .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asPrompt)}
+                '                                                                     }
+                '                                )
+                '                        )
+
+                '' Wait for either the main task to complete or the timeout task to complete
+                'Dim completedTask = Task.WhenAny(chatTask, Task.Delay(_timeout)).Result
+
+                '' Check if the main task completed or timed out
+                'If completedTask Is chatTask Then
+                '    ' Main task completed successfully
+                '    Return chatTask.Result
+                'Else
+                '    ' Main task timed out, handle this scenario (e.g., log an error or return a default result)
+                '    Return New OpenAI_API.Chat.ChatResult()
+                'End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage.AppendDoubleLineBreak(ex.InnerException.Message)
+                lsMessage.AppendDoubleLineBreak(ex.Message)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical,,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1235,7 +1121,7 @@ OpenConnection:
 
         '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
         '        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        '        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         '        Return Nothing
         '    End Try
@@ -1243,9 +1129,9 @@ OpenConnection:
         'End Function
 
         Public Sub GetElevenLabsSpeech(ByVal asTextToSpeak As String,
-                                       ByVal arVoice As BackCast.Voice,
-                                       Optional ByRef arUtterance As BackCast.Utterance = Nothing,
-                                       Optional ByVal abSuppressPlaying As Boolean = False)
+                                            ByVal arVoice As BackCast.Voice,
+                                            Optional ByRef arUtterance As BackCast.Utterance = Nothing,
+                                            Optional ByVal abSuppressPlaying As Boolean = False)
 
             Try
 
@@ -1295,6 +1181,7 @@ OpenConnection:
                                 Using outputDevice As IWavePlayer = New WaveOutEvent()
                                     outputDevice.Init(waveStream)
                                     outputDevice.Play()
+                                    Call prApplication.Brain.TriggerSpeaking()
                                     While outputDevice.PlaybackState = PlaybackState.Playing
                                         System.Threading.Thread.Sleep(100)
                                     End While
@@ -1313,7 +1200,7 @@ OpenConnection:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
             End Try
         End Sub
 

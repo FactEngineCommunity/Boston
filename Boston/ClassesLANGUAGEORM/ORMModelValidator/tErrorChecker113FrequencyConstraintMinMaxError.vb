@@ -22,6 +22,22 @@ Namespace Validation
 
                 For Each lrRoleConstraint In Me.Model.RoleConstraint.FindAll(Function(x) x.RoleConstraintType = pcenumRoleConstraintType.FrequencyConstraint)
 
+                    'CodeSafe
+                    If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
+#Region "Faulty FrequencyConstraint Error: No RoleConstraintRole"
+                        lsErrorMessage = "Frequency Constraint, " & lrRoleConstraint.Id & " links no Roles. Consider recreating this Frequency Constraint."
+
+                        lrModelError = New FBM.ModelError(pcenumModelErrors.FrequencyConstraintMinMaxError,
+                                      lsErrorMessage,
+                                      Nothing,
+                                      lrRoleConstraint)
+
+                        lrRoleConstraint.AddModelError(lrModelError)
+                        Me.Model.AddModelError(lrModelError, False)
+#End Region
+                        Continue For
+                    End If
+
                     For Each lrFactData In lrRoleConstraint.RoleConstraintRole(0).Role.Data
 
                         Dim liFactDataCount = From fd In lrRoleConstraint.RoleConstraintRole(0).Role.Data
@@ -41,7 +57,7 @@ Namespace Validation
                                       lrRoleConstraint)
 
                             lrRoleConstraint.AddModelError(lrModelError)
-                            Me.Model.AddModelError(lrModelError)
+                            Me.Model.AddModelError(lrModelError, False)
 
                         End If
                     Next
@@ -65,7 +81,7 @@ Namespace Validation
                                       lrRoleConstraint)
 
                             lrRoleConstraint.AddModelError(lrModelError)
-                            Me.Model.AddModelError(lrModelError)
+                            Me.Model.AddModelError(lrModelError, False)
                         End If
                     Next
 
@@ -77,7 +93,7 @@ Namespace Validation
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

@@ -1,4 +1,9 @@
-﻿Imports System.Reflection
+﻿Imports System.Data.Entity.Infrastructure
+Imports System.Reflection
+Imports System.Text.RegularExpressions
+Imports Boston.frmToolboxQueryLog
+Imports DocumentFormat.OpenXml.Drawing
+Imports tevton.SyntaxHighlight
 
 Public Class frmToolboxTableData
 
@@ -8,6 +13,11 @@ Public Class frmToolboxTableData
     Public mrRDSRelation As RDS.Relation = Nothing
     Private mrRecordset As ORMQL.Recordset
     Private mrDataGridList As ORMQL.RecordsetDataGridList
+    Private mbUsingQueryTextBox As Boolean = False
+    Public mbShowInSQLMode As Boolean = False
+
+    Private dic As New SyntaxHighlightDictionary()
+    Private highlighter As New RichTextBoxHighlighter()
 
     'For Cell text editting
     Private OldValue, NewValue As String
@@ -25,19 +35,83 @@ Public Class frmToolboxTableData
 
     End Sub
 
-    Public Sub SetupForm()
+    Public Sub SetupForm(Optional ByVal aiDataLimit As Integer = 100)
 
         'RemoveHandler Me.AdvancedDataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
 
         Dim lsSQLQuery As String = ""
 
         Try
-            Call Me.mrModel.connectToDatabase(True)
+            Call Me.HideSQLControls()
 
-            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+            Me.ToolStripStatusLabel.Text = ""
+
+            'Syntax Highlighter
+#Region "Syntax Highlighter"
+            highlighter.Dictionary = dic
+            highlighter.HookToRichTextBox(Me.RichTextBoxQuery)
+
+            dic.Font = Me.RichTextBoxQuery.Font
+            dic.ForegroundColor = Me.RichTextBoxQuery.ForeColor
+            dic.BackgroundColor = Me.RichTextBoxQuery.BackColor
+            dic.Add(New SyntaxHighlightItem("keywords",
+                New String() {"\bSELECT\b", "\bINSERT\b", "\bDELETE\b",
+                "\bUPDATE\b", "\bFROM\b", "\bWHERE\b", "\bAND\b"},
+                FontStyle.Bold, RegexOptions.IgnoreCase))
+            dic.Add(New SyntaxHighlightItem("keywords",
+                        New String() {"\bCREATE\b", "\bDROP\b", "\bALTER\b", "\bTABLE\b", "\bINDEX\b",
+                        "\bVIEW\b", "\bTRIGGER\b", "\bUNION\b", "\bALL\b", "\bGROUP\b", "\bBY\b",
+                        "\bHAVING\b", "\bORDER\b", "\bLIMIT\b", "\bOFFSET\b", "\bAS\b", "\bJOIN\b",
+                        "\bINNER\b", "\bOUTER\b", "\bLEFT\b", "\bRIGHT\b", "\bON\b", "\bDISTINCT\b",
+                        "\bNULL\b", "\bIS\b", "\bIN\b", "\bLIKE\b", "\bGLOB\b", "\bBETWEEN\b",
+                        "\bCASE\b", "\bWHEN\b", "\bTHEN\b", "\bELSE\b", "\bEND\b", "\bCAST\b", "\bPRIMARY KEY\b", "\bVALUES\b", "\bASC\b", "\bDESC\b"},
+                        FontStyle.Bold, RegexOptions.IgnoreCase))
+            dic.Add(New SyntaxHighlightItem("strings",
+                New String() {"'[^'\r\n]*'"},
+                FontStyle.Regular, Color.Blue, Color.Transparent))
+            dic.Add(New SyntaxHighlightItem("comments",
+                New String() {"--.*", "/\*[\d\D]*?\*/"},
+                FontStyle.Italic, Color.Gray, Color.Transparent))
+            dic.Add(New SyntaxHighlightItem("datatypes",
+                New String() {"\bINTEGER\b", "\bREAL\b", "\bTEXT\b", "\bBLOB\b", "\bNUMERIC\b",
+                "\bBOOLEAN\b", "\bDATE\b", "\bDATETIME\b"},
+                FontStyle.Regular, Color.Purple, Color.Transparent))
+            dic.Add(New SyntaxHighlightItem("functions",
+                New String() {"\bABS\b", "\bROUND\b", "\bLENGTH\b", "\bUPPER\b", "\bLOWER\b",
+                "\bTRIM\b", "\bSUBSTR\b", "\bREPLACE\b", "\bIFNULL\b", "\bCOALESCE\b",
+                "\bMAX\b", "\bMIN\b", "\bCOUNT\b", "\bAVG\b", "\bSUM\b", "\bRANDOM\b"},
+                FontStyle.Bold, Color.DarkCyan, Color.Transparent))
+            dic.Add(New SyntaxHighlightItem("numbers",
+                New String() {"\b\d+(\.\d+)?\b"},
+                FontStyle.Regular, Color.Teal, Color.Transparent))
+            dic.Add(New SyntaxHighlightItem("operators",
+                New String() {"\b=\b", "\b<\b", "\b>\b", "\b<=\b", "\b>=\b", "\b<>\b", "\b!=\b",
+                "\b\+\b", "\b-\b", "\b/\b", "\b\*\b", "\bAND\b", "\bOR\b", "\bNOT\b"},
+                FontStyle.Regular, Color.DarkRed, Color.Transparent))
+            dic.Add(New SyntaxHighlightItem("comments",
+                New String() {"--.*", "/\*[\d\D]*?\*/"},
+                FontStyle.Italic, Color.Green, Color.Transparent))
+            dic.Add(New SyntaxHighlightItem("brackets",
+                New String() {"\(", "\)", "\[", "\]", "\{", "\}", ";", ","},
+                FontStyle.Regular, Color.Brown, Color.Transparent))
+            dic.Add(New SyntaxHighlightItem("booleans",
+                New String() {"\bTRUE\b", "\bFALSE\b"},
+                FontStyle.Bold, Color.DarkBlue, Color.Transparent))
+#End Region
+
+            Call Me.LoadDatabaseModels()
+
+            'Hide the SQL Panel/Row.
+            Me.TableLayoutPanelMain.RowStyles(0).SizeType = SizeType.Absolute
+            Me.TableLayoutPanelMain.RowStyles(0).Height = 0 ' Set the height to 0 to hide the row
+
+            'Connect to the database if mrModel IsNot Nothing.
+            If Me.mrModel IsNot Nothing Then Call Me.mrModel.connectToDatabase(True)
+
+            If prApplication.WorkingModel IsNot Nothing AndAlso prApplication.WorkingModel.DatabaseConnection Is Nothing Then
             Else
                 If Me.mrTable IsNot Nothing Then
-
+#Region "mrTable IsNot Nothing"
                     Dim larColumn As New List(Of RDS.Column) 'Needed if a virtual table is needed for a Neo4j/Graph Edge Type;
 
                     Select Case Me.mrModel.TargetDatabaseType
@@ -79,8 +153,15 @@ Public Class frmToolboxTableData
 
                             lsSQLQuery &= "get " & lsColumnList & ";"
                         Case Else
-                            lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
-                            lsSQLQuery &= " LIMIT 100"
+                            lsSQLQuery = "SELECT "
+                            Dim liInd = 0
+                            For Each lrColumn In mrTable.Column.FindAll(Function(x) Not x.FactType.IsDerived).OrderBy(Function(x) x.OrdinalPosition)
+                                If liInd > 0 Then lsSQLQuery &= ", "
+                                lsSQLQuery &= lrColumn.DBName
+                                liInd += 1
+                            Next
+                            lsSQLQuery &= " FROM " & mrTable.DatabaseName & vbCrLf
+                            lsSQLQuery &= $" LIMIT {aiDataLimit}"
                     End Select
 
                     If Me.mrTable Is Nothing Then
@@ -94,9 +175,9 @@ Public Class frmToolboxTableData
 
                     End If
 
-
+#End Region
                 ElseIf Me.mrFactType IsNot Nothing Then
-
+#Region "mrFactType IsNot Nothing"
                     Dim lrRDSRelation As RDS.Relation = Nothing
 
                     Try
@@ -166,12 +247,9 @@ Public Class frmToolboxTableData
                     Else
                         Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Nothing, larColumn)
                     End If
-
-
+#End Region
                 End If
             End If
-
-            Me.ToolStripStatusLabel.Text = ""
 
             Me.AdvancedDataGridView.RowTemplate.Height = Me.AdvancedDataGridView.Font.Height + 8
 
@@ -182,6 +260,10 @@ Public Class frmToolboxTableData
             End If
 
             'AddHandler Me.AdvancedDataGridView.RowsRemoved, AddressOf DataGridView_RowsRemoved
+            RemoveHandler Me.ToolStripComboBoxTable.SelectedIndexChanged, AddressOf ToolStripComboBoxTable_SelectedIndexChanged
+            AddHandler Me.ToolStripComboBoxTable.SelectedIndexChanged, AddressOf ToolStripComboBoxTable_SelectedIndexChanged
+
+            If Me.mbShowInSQLMode Then Call Me.SwitchToSQLMode(True)
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -189,7 +271,47 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub LoadDatabaseModels()
+
+        Try
+            Dim larDatabaseModel As New List(Of FBM.Model)
+
+            If prApplication.SoftwareCategory = pcenumSoftwareCategory.Boston4SQLite Then
+                larDatabaseModel = (From Model In prApplication.Models
+                                    Where Model.TargetDatabaseType = pcenumDatabaseType.SQLite
+                                    Select Model).ToList
+            Else
+                larDatabaseModel = (From Model In prApplication.Models
+                                    Where Model.TargetDatabaseType <> pcenumDatabaseType.None
+                                    Select Model).ToList
+            End If
+
+
+            For Each lrModel In larDatabaseModel
+
+                Dim lrComboBoxItem = New tComboboxItem(lrModel, lrModel.Name.Trim, lrModel)
+
+                Dim liNewIndex = Me.ToolStripComboBoxDatabase.Items.Add(lrComboBoxItem)
+
+                If Me.mrModel IsNot Nothing AndAlso Me.mrModel.ModelId = lrModel.ModelId Then
+                    Me.ToolStripComboBoxDatabase.SelectedIndex = liNewIndex
+                End If
+
+            Next
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -200,22 +322,61 @@ Public Class frmToolboxTableData
     ''' <param name="asDatabaseQuery"></param>
     ''' <param name="arTable"></param>
     ''' <param name="aarColumn">If for an Edge Type a virtual table needs to be created, with Unique Identifiers (e.g. FirstName + ' ' + LastName) rather than the Many-2-Many Foreign Key reference Ids.</param>
-    Private Sub PopulateDataGridFromDatabaseQuery(ByVal asDatabaseQuery As String,
+    Private Function PopulateDataGridFromDatabaseQuery(ByVal asDatabaseQuery As String,
                                                   Optional arTable As RDS.Table = Nothing,
-                                                  Optional aarColumn As List(Of RDS.Column) = Nothing)
+                                                  Optional aarColumn As List(Of RDS.Column) = Nothing) As ORMQL.Recordset
+
+        Dim lsMessage As String
 
         Try
+            'CodeSafe
+            If Me.mrModel IsNot Nothing Then prApplication.WorkingModel = Me.mrModel
+            If Me.ToolStripComboBoxDatabase.SelectedIndex >= 0 Then
+                If Me.ToolStripComboBoxDatabase.SelectedItem.Tag IsNot Me.mrModel Then
+                    Me.mrModel = Me.ToolStripComboBoxDatabase.SelectedItem.Tag
+                    prApplication.WorkingModel = Me.mrModel
+                End If
+            End If
+
+            '20251028-VM-NB Connection.getTableRecordsByCriteria yet to be implmented, for filtering. With LIMIT/max-rows-returned.
+
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                prApplication.WorkingModel.connectToDatabase()
+            End If
+            If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+                Boston.ShowFlashCard("The Model {} cannot be connected to a database.", Color.Salmon)
+                Return Nothing
+            End If
+
+            If Me.mrModel Is Nothing Then
+                lsMessage = "Select a Database/Model before running a query."
+                lsMessage.AppendDoubleLineBreak("Make sure the model is loaded first.")
+                Boston.ShowFlashCard(lsMessage, pcColorPastelGreen)
+                Return Nothing
+            End If
+
             If asDatabaseQuery IsNot Nothing Then
+                Me.mrRecordset = Nothing
+
                 Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO(asDatabaseQuery)
+            End If
+
+            If Me.mrRecordset.ErrorReturned Then
+                Throw New ApplicationException(Me.mrRecordset.ErrorString)
             End If
 
             Dim lrTable As RDS.Table
             If arTable Is Nothing And aarColumn IsNot Nothing Then
                 lrTable = New RDS.Table(Me.mrModel.RDS, "DummyEdgeTable", Nothing)
                 lrTable.Column = aarColumn
-            Else
+            ElseIf arTable IsNot Nothing Then
                 lrTable = arTable.Clone
                 lrTable.Model = arTable.Model
+                lrTable.Column = lrTable.Column.OrderBy(Function(x) x.OrdinalPosition).ToList
+                If Me.mrRecordset.Columns.Count = 0 Then
+                    Me.mrRecordset.Columns = lrTable.Column
+                End If
+
                 Select Case Me.mrModel.TargetDatabaseType
                     Case Is = pcenumDatabaseType.KuzuDB
                         Try
@@ -233,11 +394,17 @@ Public Class frmToolboxTableData
 
             If aarColumn IsNot Nothing Then
                 Dim liInd = 0
-                Me.mrRecordset.Columns.Clear() '20270717-VM-Wasn't here.
-                For Each lrColumn In aarColumn
-                    Me.mrRecordset.Columns.Add(lrColumn.Name)
-                    liInd += 1
-                Next
+                If aarColumn.Count = 0 Then
+                    For Each lsColumnName In Me.mrRecordset.ColumnNames
+                        lrTable.Column.Add(New RDS.Column(lrTable, lsColumnName, Nothing, Nothing, False, Nothing))
+                    Next
+                Else
+                    Me.mrRecordset.Columns.Clear() '20270717-VM-Wasn't here.
+                    For Each lrColumn In aarColumn
+                        Me.mrRecordset.ColumnNames.Add(lrColumn.Name)
+                        liInd += 1
+                    Next
+                End If
             End If
 
             If Me.mrRecordset.Facts.Count = 0 And Me.mrTable IsNot Nothing Then
@@ -247,7 +414,7 @@ Public Class frmToolboxTableData
                         Dim larColumn = Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey)
 
                         For Each lrColumn In larColumn
-                            Me.mrRecordset.Columns.Add(LCase(mrTable.DatabaseName) & "." & lrColumn.Name)
+                            Me.mrRecordset.ColumnNames.Add(LCase(mrTable.DatabaseName) & "." & lrColumn.Name)
                         Next
 
                     Case Is = pcenumDatabaseType.TypeDB
@@ -260,19 +427,64 @@ Public Class frmToolboxTableData
             Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, lrTable)
             Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
 
+            For i As Integer = 0 To AdvancedDataGridView.Columns.Count - 1
+                AdvancedDataGridView.Columns(i).DisplayIndex = i
+            Next
+
+            For liInd = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+
+                Me.AdvancedDataGridView.Columns(liInd).AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+                Me.AdvancedDataGridView.Columns(liInd).DataGridView.AutoSize = False
+                Me.AdvancedDataGridView.Columns(liInd).DataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
+                Me.AdvancedDataGridView.Columns(liInd).DataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None
+                Me.AdvancedDataGridView.Columns(liInd).DataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
+            Next
+
             If Me.mrRecordset.Facts.Count = 0 Then
                 Me.ButtonAddRow.Enabled = True
             End If
 
+            Dim liErrorStatus As pcenumDatabaseErrorStatus = pcenumDatabaseErrorStatus.Success
+
+            If frmMain.mfrmToolboxDatabaseQueryErrors IsNot Nothing Then
+                Call frmMain.mfrmToolboxDatabaseQueryErrors.LogError(liErrorStatus, $"{Now.ToString("[HH:mm:ss]")} Success")
+            End If
+
+            Return Me.mrRecordset
+
+        Catch appEx As ApplicationException
+
+            If frmMain.mfrmToolboxDatabaseQueryErrors Is Nothing Then
+
+                lsMessage = "Error: " & appEx.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+                Me.ToolStripStatusLabel.Text = lsMessage
+
+            Else
+                Dim liErrorStatus As pcenumDatabaseErrorStatus
+                Select Case Me.mrRecordset.ErrorReturned
+                    Case Is = True
+                        liErrorStatus = pcenumDatabaseErrorStatus.Error
+                    Case Is = False
+                        liErrorStatus = pcenumDatabaseErrorStatus.Success
+                End Select
+
+                Call frmMain.mfrmToolboxDatabaseQueryErrors.LogError(liErrorStatus, $"{Now.ToString("[HH:mm:ss]")} {Me.mrRecordset.ErrorString}")
+
+            End If
+
+            Return Me.mrRecordset
+
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+            Return Me.mrRecordset
         End Try
-    End Sub
+    End Function
 
     Private Sub frmToolboxTableData_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
 
@@ -306,26 +518,26 @@ Public Class frmToolboxTableData
                               pcenumDatabaseType.SQLServer,
                               pcenumDatabaseType.ODBC
 #Region "SQL"
-                        lsSQLQuery = "INSERT INTO [" & Me.mrTable.Name & "] ("
+                        lsSQLQuery = "INSERT INTO [" & Me.mrTable.DBName & "] ("
 
                         Dim lrColumn As RDS.Column
                         Dim larColumn As New List(Of RDS.Column)
                         liInd = 0
-                        For Each lsColumn In Me.mrRecordset.Columns
+                        For Each lsColumn In Me.mrRecordset.ColumnNames
                             If liInd > 0 Then lsSQLQuery &= ","
                             lsSQLQuery &= lsColumn
-                            lrColumn = Me.mrTable.Column.Find(Function(x) x.Name = lsColumn)
+                            lrColumn = Me.mrTable.Column.Find(Function(x) x.DBName = lsColumn)
                             larColumn.Add(lrColumn)
                             liInd += 1
                         Next
                         lsSQLQuery &= ") VALUES ("
                         liInd = 0
-                        For Each lsColumn In Me.mrRecordset.Columns
+                        For Each lsColumn In Me.mrRecordset.ColumnNames
                             If liInd > 0 Then lsSQLQuery &= ","
                             lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.DataTypeWrapper(larColumn(liInd).getMetamodelDataType) ' Was DataTypeIsText, "'", "")
                             Select Case larColumn(liInd).getMetamodelDataType
                                 Case Is = pcenumORMDataType.TemporalDate,
-                                  pcenumORMDataType.TemporalDateAndTime
+                                          pcenumORMDataType.TemporalDateAndTime
                                     lsSQLQuery &= Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(lrFact.Data(liInd).Data)
                                 Case Else
                                     lsSQLQuery &= lrFact.Data(liInd).Data
@@ -453,7 +665,7 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -484,7 +696,7 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -647,7 +859,12 @@ Public Class frmToolboxTableData
 
 
             If e.RowIndex <= Me.mrRecordset.Facts.Count - 1 Then
-                Dim lsColumnName = Me.mrRecordset.Columns(e.ColumnIndex)
+                Dim lsColumnName As String
+                If Me.mrRecordset.ColumnNames.Count > 0 Then
+                    lsColumnName = Me.mrRecordset.ColumnNames(e.ColumnIndex)
+                Else
+                    lsColumnName = Me.mrRecordset.Columns(e.ColumnIndex).Name
+                End If
                 Try
                     Me.OldValue = mrRecordset.Facts(e.RowIndex).Data(e.ColumnIndex).Data
                     'Me.OldValue = Me.mrRecordset.Facts(e.RowIndex)(lsColumnName.Substring(lsColumnName.IndexOf(".") + 1)).Data
@@ -677,7 +894,7 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -697,7 +914,12 @@ Public Class frmToolboxTableData
 
 #Region "Get the Column"
             Dim liIndex = Me.AdvancedDataGridView.Columns(e.ColumnIndex).DisplayIndex
-            Dim lsColumn As String = Me.mrRecordset.Columns(liIndex) 'e.ColumnIndex)
+            Dim lsColumn As String = Me.mrRecordset.ColumnNames(liIndex) 'e.ColumnIndex)
+
+            Dim lasColumnNames = Me.mrTable.Column.OrderBy(Function(x) x.OrdinalPosition).Select(Function(x) x.Name)
+            If lasColumnNames(liIndex) <> lsColumn Then
+                lsColumn = lasColumnNames(liIndex)
+            End If
 
             Select Case Me.mrModel.TargetDatabaseType
                 Case Is = pcenumDatabaseType.Neo4j,
@@ -718,14 +940,14 @@ Public Class frmToolboxTableData
                 lrTable = Me.mrDataGridList.mrTable
             End If
 
-            Dim lrColumn As RDS.Column = lrTable.Column.Find(Function(x) x.Name = lsColumnName)
+            Dim lrColumn As RDS.Column = lrTable.Column.Find(Function(x) x.DBName = lsColumnName)
 
             If lrColumn Is Nothing Then
                 lsMessage = "A column with the name, " & lsColumnName & ", does not exist in the Entity, " & Me.mrTable.Name & ", in the Model you are working on."
                 Me.ToolStripStatusLabel.Text = lsMessage
                 Me.ToolStripStatusLabel.ForeColor = Color.Red
-                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(liIndex)).Data = Me.OldValue 'Was e.ColumnIndex
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True)
+                Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.ColumnNames(liIndex)).Data = Me.OldValue 'Was e.ColumnIndex
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True)
                 Exit Sub
             End If
 #End Region
@@ -735,11 +957,15 @@ Public Class frmToolboxTableData
                 Case Is = pcenumORMDataType.TemporalDate,
                               pcenumORMDataType.TemporalDateAndTime
                     Me.NewValue = Me.mrTable.Model.Model.DatabaseConnection.FormatDateTime(Me.NewValue)
+
+                    If Me.NewValue = "" Then
+                        Boston.ShowFlashCard("Please check your CultureInfo setting in Boston's Configuration".AppendDoubleLineBreak("The date could not be converted to the appropriate format"), Color.Salmon)
+                    End If
                 Case Else
                     'Nothing to do.
             End Select
 #End Region
-            lsColumnName = Me.mrRecordset.Columns(liIndex)
+            lsColumnName = Me.mrRecordset.ColumnNames(liIndex)
             If Me.mrRecordset.Facts(0).FactType.RoleGroup(0).Name.Contains(".") Then
                 If Me.mrTable Is Nothing Then
                     lsColumnName = Me.mrRecordset.Facts(e.RowIndex).FactType.RoleGroup(liIndex).Name
@@ -764,7 +990,8 @@ Public Class frmToolboxTableData
             'No need to continue if is new Record/Row.
             If Me.mrRecordset.Facts(e.RowIndex).IsNewFact Then Exit Sub
 
-            If Me.mrRDSRelation Is Nothing AndAlso Me.mrTable IsNot Nothing AndAlso Not Me.mrTable.isPGSRelation Then
+            If Me.mrModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage) = pcenumDatabaseQueryLanguage.SQL Or
+                    (Me.mrRDSRelation Is Nothing AndAlso Me.mrTable IsNot Nothing AndAlso Not Me.mrTable.isPGSRelation) Then
 #Region "Table - Straight/Standard Table"
                 '---------------------------------------------
                 'Straight Table. I.e. mrTable isnot Nothing.
@@ -781,13 +1008,13 @@ Public Class frmToolboxTableData
 
                 If larPKColumn.Count = 0 Then
                     lsMessage = "Please ensure that your table/node-type has a primary key/uniqueness constraint."
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
                 End If
 
                 Dim liColumnIndex As Integer
                 Dim lsValue As String
                 For Each lrPKColumn In larPKColumn
-                    liColumnIndex = Me.mrRecordset.Columns.IndexOf(lrPKColumn.Name)
+                    liColumnIndex = Me.mrRecordset.ColumnNames.IndexOf(lrPKColumn.Name)
                     If lrPKColumn.Name = lsColumnName Then 'Me.mrRecordset.Columns(e.ColumnIndex) 
                         lsValue = lsOldValue
                     Else
@@ -797,7 +1024,7 @@ Public Class frmToolboxTableData
                     lrPKColumn.TemporaryData = lsValue
                 Next
 
-                Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.Name, lrColumn, Me.NewValue, larPKColumn)
+                Dim lrRecordset = prApplication.WorkingModel.DatabaseConnection.UpdateAttributeValue(Me.mrTable.DBName, lrColumn, Me.NewValue, larPKColumn)
 
                 If Not lrRecordset.ErrorReturned Then
                     Me.ToolStripButtonCommit.Enabled = False
@@ -806,7 +1033,7 @@ Public Class frmToolboxTableData
                 Else
                     Me.ToolStripStatusLabel.Text = lrRecordset.ErrorString
                     Me.ToolStripStatusLabel.ForeColor = Color.Red
-                    Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(e.ColumnIndex)).Data = Me.OldValue
+                    Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.ColumnNames(e.ColumnIndex)).Data = Me.OldValue
                 End If
 #End Region
             ElseIf Me.mrTable IsNot Nothing AndAlso Me.mrTable.isPGSRelation Then
@@ -862,7 +1089,7 @@ Public Class frmToolboxTableData
 
 
                     lsQuery.AppendString(lsMatchClause)
-                    Dim lsCreateWhereClause = String.Format(lsWhereClause, Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(0)).Data, Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(1)).Data)
+                    Dim lsCreateWhereClause = String.Format(lsWhereClause, Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.ColumnNames(0)).Data, Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.ColumnNames(1)).Data)
                     lsQuery.AppendLine(lsCreateWhereClause)
 
                     '==CREATE======================================
@@ -939,7 +1166,7 @@ Public Class frmToolboxTableData
 
                             If larPKColumn.Count = 0 Then
                                 lsMessage = "Please ensure that your table/node-type has a primary key/uniqueness constraint."
-                                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
+                                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True, Nothing, True)
                             End If
 
                             If Me.mrRDSRelation.DestinationTable.getPrimaryKeyColumns.Count = 1 Then
@@ -956,7 +1183,7 @@ Public Class frmToolboxTableData
                                 lsDatabaseQuery.AppendString(Me.mrRDSRelation.DestinationTable.DatabaseName & "." & Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).Name)
                                 lsDatabaseQuery.AppendString(" = ")
                                 lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
-                                lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.Columns(0)).Data))
+                                lsDatabaseQuery.AppendString(Database.MakeStringSafe(Me.mrRecordset.Facts(e.RowIndex)(Me.mrRecordset.ColumnNames(0)).Data))
                                 lsDatabaseQuery.AppendString(Boston.returnIfTrue(Me.mrRDSRelation.DestinationTable.getFirstUniquenessConstraintColumns(0).DataTypeIsNumeric, "", "'"))
 
 
@@ -1009,7 +1236,7 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1048,7 +1275,7 @@ Public Class frmToolboxTableData
 
                                     lsSQLQuery &= lrColumn.Name & ": "
 
-                                    Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(LCase(Me.mrTable.Name) & "." & lrColumn.Name)
+                                    Dim liValueColumnIndex = mrRecordset.ColumnNames.IndexOf(LCase(Me.mrTable.Name) & "." & lrColumn.Name)
                                     lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                                     lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
                                     lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
@@ -1067,7 +1294,7 @@ Public Class frmToolboxTableData
                                 For Each lrColumn In Me.mrTable.getPrimaryKeyColumns
                                     If liInd > 0 Then lsSQLQuery &= " AND "
                                     lsSQLQuery.AppendString(lrColumn.Name & " = ")
-                                    Dim liValueColumnIndex = mrRecordset.Columns.IndexOf(lrColumn.Name)
+                                    Dim liValueColumnIndex = mrRecordset.ColumnNames.IndexOf(lrColumn.Name)
                                     lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
                                     lsSQLQuery &= lrFact.Data(liValueColumnIndex).Data
                                     lsSQLQuery &= Boston.returnIfTrue(lrColumn.DataTypeIsText, "'", "")
@@ -1091,7 +1318,7 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1099,6 +1326,11 @@ Public Class frmToolboxTableData
     Private Sub ButtonAddRow_Click(sender As Object, e As EventArgs) Handles ButtonAddRow.Click
 
         Try
+            'CodeSafe
+            If Me.ToolStripComboBoxTable.SelectedIndex = -1 Then
+                Boston.ShowFlashCard("Select a Table/Entity/Node before adding records.", Color.Salmon)
+            End If
+
             Dim lrDummyFactType As New FBM.FactType(Me.mrModel, "DummyFactType", True)
             Dim lrFact = New FBM.Fact(lrDummyFactType, False)
             lrFact.Id = System.Guid.NewGuid.ToString
@@ -1166,96 +1398,238 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
+    Public Class FilterObject
+        Implements IEquatable(Of FilterObject)
+
+        Public ColumnIndex As Integer
+
+        Public ColumnName As String
+
+        Public Filter As String
+
+        ''' <summary>
+        ''' Parameterless Constructor
+        ''' </summary>
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal asColumnName As String, ByVal asFilter As String)
+            Me.ColumnName = asColumnName
+            Me.Filter = asFilter
+        End Sub
+
+        Public Overloads Function Equals(other As FilterObject) As Boolean Implements IEquatable(Of FilterObject).Equals
+            Return Me.ColumnName = other.ColumnName
+        End Function
+    End Class
+
+    Public Filter As New List(Of FilterObject)
+
     Private Sub AdvancedDataGridView_FilterStringChanged(sender As Object, e As EventArgs) Handles AdvancedDataGridView.FilterStringChanged
 
         Dim lsSQLQuery As String = ""
+        Dim lsMessage As String
 
         Try
+#Region "Build the Filter String"
+
+            Dim lsFilterString As String
+            lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+
+            Dim lsColumnName = ""
+            Dim pattern As String = "\[([^\]]+)\]"
+
+            ' Use regular expression to match the column name
+            Dim match As Match = Regex.Match(Me.AdvancedDataGridView.FilterString, pattern)
+
+            If match.Success Then
+                lsColumnName = match.Groups(1).Value
+            End If
+
+            If lsFilterString = "" Then
+                Me.msFilterString = ""
+
+                For Each lrADGColumn As Object In Me.AdvancedDataGridView.Columns
+                    If lrADGColumn.HeaderCell.FilterString = "" Then
+                        Me.Filter.RemoveAll(Function(x) x.ColumnName = lrADGColumn.Name)
+                    End If
+                Next
+
+            Else
+                Me.Filter.RemoveAll(Function(x) x.ColumnName = lsColumnName)
+
+                Dim lrFilterObject As New FilterObject(lsColumnName, Me.AdvancedDataGridView.FilterString)
+                Me.Filter.AddUnique(lrFilterObject)
+
+                If Me.msFilterString <> "" Then
+                    Me.msFilterString.AppendString(" AND " & lsFilterString)
+                Else
+                    Me.msFilterString = lsFilterString
+                End If
+            End If
+            lsFilterString = Me.msFilterString
+#End Region
+
+
+
             If prApplication.WorkingModel.DatabaseConnection Is Nothing Then
+
+
+
             Else
                 Dim larColumn As List(Of RDS.Column) = Nothing
 
-                If Me.mrTable Is Nothing Then
+
+                If Me.mbUsingQueryTextBox Then
+
+                    lsMessage = "Filtering unavailable for written quueries"
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+
                 Else
+                    If Me.mrTable Is Nothing Then
 
-                    Select Case Me.mrModel.TargetDatabaseType
-                        Case Is = pcenumDatabaseType.Neo4j,
-                                  pcenumDatabaseType.KuzuDB
+                        Select Case Me.mrModel.TargetDatabaseType
+                            Case Is = pcenumDatabaseType.SQLite
 
-                            If Me.mrTable.isPGSRelation Then
-                                '=======================================================================================
-                                'Example
-                                'MATCH(person: Person)
-                                'WHERE person.FirstName = {firstName} And person.LastName = {lastName}
-                                'With person
-                                'MATCH(carType: CarType)
-                                'WHERE carType.CarTypeName = {carTypeName}
-                                'MATCH (person:Person)-[:DRIVES]->(carType:CarType)
-                                'Return ID(person) As personId, person.FirstName As firstName, person.LastName As lastName, ID(carType) As carTypeId, carType.CarTypeName As carTypeName
+                                lsSQLQuery = Me.RichTextBoxQuery.Text.Trim
 
-                                'Later we'll use this for CREATE as well.
-                                'CREATE(person)-[:DRIVES]->(carType)
-                                '=====================================================================================
-                                Dim larRelation = mrTable.getRelations
+                                Me.msFilterString = String.Join(" AND ", Me.Filter.Select(Function(lrFilterObject) lrFilterObject.Filter))
 
-                                lsSQLQuery = "MATCH "
-                                lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")" & vbCrLf
-                                lsSQLQuery &= "MATCH "
-                                lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
-
-                                '================WHERE===================
-                                For liInd = 0 To Me.mrDataGridList.mrTable.Column.Count - 1
-                                    For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
-                                        If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
-                                            Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
-                                        End If
-                                    Next
-                                Next
-
-                                Dim lsFilterString As String = Me.AdvancedDataGridView.FilterString
-
-                                For Each lrColumn In Me.mrDataGridList.mrTable.Column
-                                    lsFilterString = lsFilterString.Replace("[" & lrColumn.Name & "]", LCase(lrColumn.Table.Name) & "." & lrColumn.Name)
-                                Next
-
-                                'lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
-                                lsFilterString = lsFilterString.Replace("(", "[").Replace(")", "]")
-                                lsFilterString = lsFilterString.Replace("%", ".*")
-                                lsFilterString = lsFilterString.Replace("LIKE", "=~")
-                                Try
-                                    lsFilterString = lsFilterString.Substring(1, lsFilterString.Length - 2)
-                                Catch ex As Exception
-                                    'Not a biggie at this stage.
-                                End Try
-
-                                'WHERE Clause                    
-                                If Trim(lsFilterString) <> "" Then
-                                    lsSQLQuery &= " WHERE " & lsFilterString
+                                ' Check if the SQL query already contains a WHERE clause
+                                If lsSQLQuery.ToUpper().Contains("WHERE") Then
+                                    ' If it does, we just add the filter with AND
+                                    lsSQLQuery &= " AND " & Me.msFilterString
+                                ElseIf Me.AdvancedDataGridView.FilterString.Trim <> "" Then
+                                    ' If it doesn't, we add a WHERE clause with the filter
+                                    lsSQLQuery &= " WHERE " & Me.msFilterString
                                 End If
-                                '========================================
 
-                                lsSQLQuery.AppendLine("MATCH ")
-                                lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")"
-                                lsSQLQuery &= "-[:" & Me.mrTable.DBName & "]->"
-                                lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
-                                lsSQLQuery.AppendLine("RETURN ")
-                                Dim lsColumnList As String = String.Join(" + ' ' + ", larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(0).DestinationTable.Name) & "." & x.Name))
-                                lsColumnList &= ", " & String.Join(" + ' ' + ", larRelation(1).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(1).DestinationTable.Name) & "." & x.Name))
-                                larColumn = New List(Of RDS.Column)
-                                larColumn.AddRange(larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Clone(Nothing, Nothing)).ToList())
-                                larColumn.AddRange(larRelation(1).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Clone(Nothing, Nothing)).ToList())
-                                lsSQLQuery &= lsColumnList & ";"
+                                Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Nothing, New List(Of RDS.Column))
+                        End Select
+
+                    Else
 
 
-                            Else
-                                'Normal Table/NodeType
+                        Select Case Me.mrModel.TargetDatabaseType
+                            Case Is = pcenumDatabaseType.Neo4j,
+                                      pcenumDatabaseType.KuzuDB
+#Region "Neo4j, KuzuDB"
 
-                                lsSQLQuery = "MATCH (" & LCase(mrTable.Name) & ":" & mrTable.DatabaseName & ")" & vbCrLf
+                                If Me.mrTable.isPGSRelation Then
+                                    '=======================================================================================
+                                    'Example
+                                    'MATCH(person: Person)
+                                    'WHERE person.FirstName = {firstName} And person.LastName = {lastName}
+                                    'With person
+                                    'MATCH(carType: CarType)
+                                    'WHERE carType.CarTypeName = {carTypeName}
+                                    'MATCH (person:Person)-[:DRIVES]->(carType:CarType)
+                                    'Return ID(person) As personId, person.FirstName As firstName, person.LastName As lastName, ID(carType) As carTypeId, carType.CarTypeName As carTypeName
+
+                                    'Later we'll use this for CREATE as well.
+                                    'CREATE(person)-[:DRIVES]->(carType)
+                                    '=====================================================================================
+                                    Dim larRelation = mrTable.getRelations
+
+                                    lsSQLQuery = "MATCH "
+                                    lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")" & vbCrLf
+                                    lsSQLQuery &= "MATCH "
+                                    lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
+
+                                    '================WHERE===================
+                                    For liInd = 0 To Me.mrDataGridList.mrTable.Column.Count - 1
+                                        For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+                                            If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
+                                                Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                                            End If
+                                        Next
+                                    Next
+
+                                    lsFilterString = Me.AdvancedDataGridView.FilterString
+
+                                    For Each lrColumn In Me.mrDataGridList.mrTable.Column
+                                        lsFilterString = lsFilterString.Replace("[" & lrColumn.Name & "]", LCase(lrColumn.Table.Name) & "." & lrColumn.Name)
+                                    Next
+
+                                    'lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+                                    lsFilterString = lsFilterString.Replace("(", "[").Replace(")", "]")
+                                    lsFilterString = lsFilterString.Replace("%", ".*")
+                                    lsFilterString = lsFilterString.Replace("LIKE", "=~")
+                                    Try
+                                        lsFilterString = lsFilterString.Substring(1, lsFilterString.Length - 2)
+                                    Catch ex As Exception
+                                        'Not a biggie at this stage.
+                                    End Try
+
+                                    'WHERE Clause                    
+                                    If Trim(lsFilterString) <> "" Then
+                                        lsSQLQuery &= " WHERE " & lsFilterString
+                                    End If
+                                    '========================================
+
+                                    lsSQLQuery.AppendLine("MATCH ")
+                                    lsSQLQuery &= "(" & LCase(larRelation(0).DestinationTable.Name) & ":" & larRelation(0).DestinationTable.Name & ")"
+                                    lsSQLQuery &= "-[:" & Me.mrTable.DBName & "]->"
+                                    lsSQLQuery &= "(" & LCase(larRelation(1).DestinationTable.Name) & ":" & larRelation(1).DestinationTable.Name & ")" & vbCrLf
+                                    lsSQLQuery.AppendLine("RETURN ")
+                                    Dim lsColumnList As String = String.Join(" + ' ' + ", larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(0).DestinationTable.Name) & "." & x.Name))
+                                    lsColumnList &= ", " & String.Join(" + ' ' + ", larRelation(1).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) LCase(larRelation(1).DestinationTable.Name) & "." & x.Name))
+                                    larColumn = New List(Of RDS.Column)
+                                    larColumn.AddRange(larRelation(0).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Clone(Nothing, Nothing)).ToList())
+                                    larColumn.AddRange(larRelation(1).DestinationTable.getFirstUniquenessConstraintColumns.Select(Function(x) x.Clone(Nothing, Nothing)).ToList())
+                                    lsSQLQuery &= lsColumnList & ";"
+
+
+                                Else
+                                    'Normal Table/NodeType
+
+                                    lsSQLQuery = "MATCH (" & LCase(mrTable.Name) & ":" & mrTable.DatabaseName & ")" & vbCrLf
+
+                                    For liInd = 0 To Me.mrTable.Column.Count - 1
+                                        For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
+                                            If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
+                                                Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
+                                            End If
+                                        Next
+                                    Next
+
+                                    lsFilterString = Me.AdvancedDataGridView.FilterString
+
+                                    For Each lrColumn In Me.mrTable.Column
+                                        lsFilterString = lsFilterString.Replace("[" & lrColumn.Name & "]", LCase(Me.mrTable.Name) & "." & lrColumn.Name)
+                                    Next
+
+                                    'lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
+                                    lsFilterString = lsFilterString.Replace("(", "[").Replace(")", "]")
+                                    lsFilterString = lsFilterString.Replace("%", ".*")
+                                    lsFilterString = lsFilterString.Replace("LIKE", "=~")
+                                    Try
+                                        lsFilterString = lsFilterString.Substring(1, lsFilterString.Length - 2)
+                                    Catch ex As Exception
+                                        'Not a biggie at this stage.
+                                    End Try
+
+                                    'WHERE Clause                    
+                                    If Trim(lsFilterString) <> "" Then
+                                        lsSQLQuery &= " WHERE " & lsFilterString
+                                    End If
+                                    Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
+                                    lsSQLQuery &= vbCrLf & "RETURN " & lsColumnList
+                                    lsSQLQuery &= vbCrLf & " LIMIT 100"
+                                End If
+
+#End Region
+                            Case Is = pcenumDatabaseType.SQLite,
+                                          pcenumDatabaseType.SQLServer,
+                                          pcenumDatabaseType.ORACLE,
+                                          pcenumDatabaseType.ODBC
+#Region "SQL"
+                                lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
 
                                 For liInd = 0 To Me.mrTable.Column.Count - 1
                                     For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
@@ -1265,73 +1639,19 @@ Public Class frmToolboxTableData
                                     Next
                                 Next
 
-                                Dim lsFilterString As String = Me.AdvancedDataGridView.FilterString
-
-                                For Each lrColumn In Me.mrTable.Column
-                                    lsFilterString = lsFilterString.Replace("[" & lrColumn.Name & "]", LCase(Me.mrTable.Name) & "." & lrColumn.Name)
-                                Next
-
-                                'lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
-                                lsFilterString = lsFilterString.Replace("(", "[").Replace(")", "]")
-                                lsFilterString = lsFilterString.Replace("%", ".*")
-                                lsFilterString = lsFilterString.Replace("LIKE", "=~")
-                                Try
-                                    lsFilterString = lsFilterString.Substring(1, lsFilterString.Length - 2)
-                                Catch ex As Exception
-                                    'Not a biggie at this stage.
-                                End Try
-
                                 'WHERE Clause                    
                                 If Trim(lsFilterString) <> "" Then
                                     lsSQLQuery &= " WHERE " & lsFilterString
                                 End If
-                                Dim lsColumnList As String = String.Join(",", Me.mrTable.Column.FindAll(Function(x) Not x.isPartOfPrimaryKey).Select(Function(x) LCase(mrTable.DatabaseName) & "." & x.Name))
-                                lsSQLQuery &= vbCrLf & "RETURN " & lsColumnList
-                                lsSQLQuery &= vbCrLf & " LIMIT 100"
-                            End If
 
-                        Case Is = pcenumDatabaseType.SQLite,
-                                  pcenumDatabaseType.SQLServer,
-                                  pcenumDatabaseType.ORACLE,
-                                  pcenumDatabaseType.ODBC
-#Region "SQL"
-                            lsSQLQuery = "SELECT * FROM " & mrTable.DatabaseName & vbCrLf
-
-                            For liInd = 0 To Me.mrTable.Column.Count - 1
-                                For liInd2 = 0 To Me.AdvancedDataGridView.Columns.Count - 1
-                                    If Me.AdvancedDataGridView.Columns(liInd2).Name = Me.mrTable.Column(liInd).Name Then
-                                        Call Me.AdvancedDataGridView.EnableFilter(Me.AdvancedDataGridView.Columns(liInd2))
-                                    End If
-                                Next
-                            Next
-
-                            Dim lsFilterString As String
-                            lsFilterString = Me.AdvancedDataGridView.FilterString.Replace("[", "").Replace("]", "")
-
-                            If lsFilterString = "" Then
-                                Me.msFilterString = ""
-                            Else
-                                If Me.msFilterString <> "" Then
-                                    Me.msFilterString.AppendString(" AND " & lsFilterString)
-                                Else
-                                    Me.msFilterString = lsFilterString
-                                End If
-                            End If
-                            lsFilterString = Me.msFilterString
-
-                            'WHERE Clause                    
-                            If Trim(lsFilterString) <> "" Then
-                                lsSQLQuery &= " WHERE " & lsFilterString
-                            End If
-
-                            lsSQLQuery &= vbCrLf & "LIMIT 100"
+                                lsSQLQuery &= vbCrLf & "LIMIT 100"
 #End Region
-                    End Select
+                        End Select
+                    End If
 
-
-                    If Me.mrTable.isPGSRelation Then
+                    If Me.mrTable IsNot Nothing AndAlso Me.mrTable.isPGSRelation Then
                         Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery,, larColumn)
-                    Else
+                    ElseIf Me.mrTable IsNot Nothing Then
                         Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Me.mrTable)
                     End If
 
@@ -1339,17 +1659,16 @@ Public Class frmToolboxTableData
             End If
 
         Catch ex As Exception
-            Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
-    Private Sub ToolStripButtonCSVImport_Click(sender As Object, e As EventArgs) Handles ToolStripButtonCSVImport.Click
+    Public Sub ToolStripButtonCSVImport_Click(sender As Object, e As EventArgs) Handles ToolStripButtonCSVImport.Click
 
         Try
             Dim lfrmCSVLoader As New frmCSVLoader
@@ -1361,6 +1680,20 @@ Public Class frmToolboxTableData
             Call lfrmCSVLoader.ShowDialog()
 
             If lfrmCSVLoader.mdtData IsNot Nothing Then
+
+
+                If Me.mrTable Is Nothing And lfrmCSVLoader.mrTable IsNot Nothing Then
+                    Me.mrTable = lfrmCSVLoader.mrTable
+
+                    Select Case Me.mrModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
+                        Case Is = pcenumDatabaseQueryLanguage.SQL
+                            Me.mrRecordset = prApplication.WorkingModel.DatabaseConnection.GO($"SELECT * FROM {Me.mrTable.Name}")
+                        Case Else
+                            Boston.ShowFlashCard("Database not supported for CSV upload to new Table/NodeType.", Color.Salmon)
+                            Exit Sub
+                    End Select
+
+                End If
 
                 '=====================================================================
                 'Import the CSV Data to the Recordset
@@ -1383,6 +1716,11 @@ Public Class frmToolboxTableData
                             larColumn = Me.mrTable.Column.ToList
                     End Select
 
+                    'CodeSafe
+                    If Me.mrRecordset.Columns.Count = 0 Then
+                        Me.mrRecordset.Columns = larColumn
+                    End If
+
                     For Each lrColumn In larColumn
 
                         Select Case Me.mrModel.TargetDatabaseType
@@ -1400,6 +1738,17 @@ Public Class frmToolboxTableData
                         End If
                     Next
 
+                    Dim lasColumnName As New List(Of String)
+
+                    If Me.mrRecordset Is Nothing Then
+                        lasColumnName = larColumn.Select(Function(x) x.Name).ToList
+                    ElseIf Me.mrRecordset.ColumnNames.Count = 0 Then
+                        lasColumnName = larColumn.Select(Function(x) x.Name).ToList
+                        Me.mrRecordset.ColumnNames = lasColumnName
+                    Else
+                        lasColumnName = Me.mrRecordset.ColumnNames
+                    End If
+
                     For Each lrRow As DataRow In lfrmCSVLoader.mdtData.Rows
 
                         Dim lrFact = New FBM.Fact(lrDummyFactType, False)
@@ -1413,7 +1762,7 @@ Public Class frmToolboxTableData
 
                             Dim lrRole = New FBM.Role(lrDummyFactType, larColumn(liInd).TemporaryData, True, Nothing)
                             lrDummyFactType.RoleGroup.AddUnique(lrRole)
-                            lrRole.SequenceNr = Me.mrRecordset.Columns.FindIndex(Function(x) x = larColumn(liInd).TemporaryData) + 1
+                            lrRole.SequenceNr = lasColumnName.FindIndex(Function(x) x = larColumn(liInd).TemporaryData) + 1
 
                             Dim lrFactData = New FBM.FactData(lrRole, New FBM.Concept(""), lrFact)
                             lrFactData.setData(loColumnValue.ToString, pcenumConceptType.Value, False)
@@ -1423,6 +1772,9 @@ Public Class frmToolboxTableData
                         Next
 
                         lrFact.Data = lrFact.Data.OrderBy(Function(f) f.Role.SequenceNr).ToList()
+                        lrFact.isDirty = True
+                        lrFact.IsNewFact = True
+                        Me.ToolStripButtonCommit.Enabled = True
 
                         Me.mrRecordset.Facts.Add(lrFact)
                     Next
@@ -1430,13 +1782,15 @@ Public Class frmToolboxTableData
                     Me.mrDataGridList = New ORMQL.RecordsetDataGridList(Me.mrRecordset, Me.mrTable)
                     Me.AdvancedDataGridView.DataSource = Me.mrDataGridList
 
+                    Boston.ShowFlashCard("Data Loaded. Remember to save to database.", pcColorPastelGreen)
+
                 Catch ex As Exception
                     Dim lsMessage As String
                     Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                     lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End Try
 
             End If
@@ -1447,7 +1801,7 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1470,7 +1824,176 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripMenuItemEditInForm_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemEditInForm.Click
+
+        Try
+            If Me.AdvancedDataGridView.SelectedRows.Count = 0 Then
+                Boston.ShowFlashCard("Please select a row first", pcColorPastelGreen, 1500)
+            ElseIf Me.AdvancedDataGridView.SelectedRows.Count = 1 Then
+                Dim lrFact As FBM.Fact = Me.mrRecordset.Facts(Me.AdvancedDataGridView.SelectedRows(0).Index)
+
+                Call prApplication.MainForm.LoadDynamicCRUDForm(Me.mrTable, lrFact)
+            ElseIf Me.AdvancedDataGridView.SelectedRows.Count > 1 Then
+                Boston.ShowFlashCard("Please select only one row", pcColorPastelGreen, 1500)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripButtonEditViaDynamicForm_Click(sender As Object, e As EventArgs) Handles ToolStripButtonEditViaDynamicForm.Click
+
+        Try
+            If Me.AdvancedDataGridView.SelectedRows.Count = 0 Then
+                Call prApplication.MainForm.LoadDynamicCRUDForm(Me.mrTable, Nothing)
+            ElseIf Me.AdvancedDataGridView.SelectedRows.Count = 1 Then
+                Dim lrFact As FBM.Fact = Me.mrRecordset.Facts(Me.AdvancedDataGridView.SelectedRows(0).Index)
+
+                Call prApplication.MainForm.LoadDynamicCRUDForm(Me.mrTable, lrFact)
+            ElseIf Me.AdvancedDataGridView.SelectedRows.Count > 1 Then
+                Boston.ShowFlashCard("Please select only one row to edit a record", pcColorPastelGreen, 1500)
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripButtonSQL_Click(sender As Object, e As EventArgs) Handles ToolStripButtonSQL.Click
+
+        Call Me.SwitchToSQLMode
+
+    End Sub
+
+    Private Sub SwitchToSQLMode(Optional abForceSwitch As Boolean = False)
+
+        If ToolStripButtonSQL.Checked Or abForceSwitch Then
+            Me.SplitContainer1.Panel1Collapsed = False
+            Me.TableLayoutPanelMain.RowStyles(0).SizeType = SizeType.Percent
+            Me.TableLayoutPanelMain.RowStyles(0).Height = 30
+
+            Me.mbUsingQueryTextBox = True
+            Me.ButtonAddRow.Enabled = False
+        Else
+            Me.SplitContainer1.Panel1Collapsed = True
+
+            Me.mbUsingQueryTextBox = False
+            Me.ButtonAddRow.Enabled = True
+        End If
+
+        Me.TableLayoutPanelMain.PerformLayout()
+        Me.TableLayoutPanelMain.Refresh()
+
+    End Sub
+
+    Public Sub HideSQLControls()
+
+        Me.SplitContainer1.Panel1Collapsed = True
+
+        Me.ToolStripButtonSQL.Checked = False
+        Me.mbUsingQueryTextBox = False
+        Me.ButtonAddRow.Enabled = True
+
+        Me.TableLayoutPanelMain.PerformLayout()
+        Me.TableLayoutPanelMain.Refresh()
+
+    End Sub
+
+    Private Sub ToolStripButtonGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonGO.Click
+        Try
+            Dim lsSQLQuery As String = Me.RichTextBoxQuery.Text.Trim
+            Dim larColumn As New List(Of RDS.Column)
+
+            '20251028-VM-NB Connection.getTableRecordsByCriteria yet to be implmented, for filtering.
+
+            'Preliminary setup
+            Me.ToolStripStatusLabel.Text = ""
+
+            With New WaitCursor
+                Dim lrRecordset As ORMQL.Recordset = Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Nothing, larColumn)
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ToolStripComboBoxDatabase_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolStripComboBoxDatabase.SelectedIndexChanged
+
+        Try
+            Dim lrModel As FBM.Model = Me.ToolStripComboBoxDatabase.SelectedItem.Tag
+
+            'CodeSafe
+            If lrModel Is Nothing Then Exit Sub
+
+            Me.mrModel = lrModel
+
+            Me.ToolStripComboBoxTable.Items.Clear()
+
+            Dim larTable As List(Of RDS.Table) = lrModel.RDS.Table
+
+            'CodeSafe
+            If Me.mrModel.DatabaseConnection Is Nothing Then
+                Me.mrModel.connectToDatabase()
+            End If
+
+            If lrModel.RDS.Table.Count = 0 Then
+                larTable = Me.mrModel.DatabaseConnection.getTables
+                For Each lrTable In larTable
+                    lrTable.Column = Me.mrModel.DatabaseConnection.getColumnsByTable(lrTable)
+                Next
+            End If
+
+            For Each lrRDSTable In larTable
+
+                Dim lrComboboxItem As New tComboboxItem(lrRDSTable, lrRDSTable.Name.Trim, lrRDSTable)
+                Dim liNewIndex = Me.ToolStripComboBoxTable.Items.Add(lrComboboxItem)
+
+                If lrRDSTable Is Me.mrTable Then
+                    RemoveHandler Me.ToolStripComboBoxTable.SelectedIndexChanged, AddressOf ToolStripComboBoxTable_SelectedIndexChanged
+                    Me.ToolStripComboBoxTable.SelectedIndex = liNewIndex
+                    AddHandler Me.ToolStripComboBoxTable.SelectedIndexChanged, AddressOf ToolStripComboBoxTable_SelectedIndexChanged
+                End If
+            Next
+
+            If Me.ToolStripComboBoxDatabase.SelectedIndex >= 0 Then
+                'All good.
+            Else
+                Me.ToolStripComboBoxTable.SelectedIndex = -1
+            End If
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1493,11 +2016,170 @@ Public Class frmToolboxTableData
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
 
     End Function
 
+    Private Sub RichTextBoxQuery_TextChanged(sender As Object, e As EventArgs) Handles RichTextBoxQuery.TextChanged
+
+    End Sub
+
+    Private Sub ToolStripComboBoxTable_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolStripComboBoxTable.SelectedIndexChanged
+
+        Try
+            'Form setup
+            Me.ButtonAddRow.Enabled = True
+            Me.ToolStripStatusLabel.Text = ""
+
+            Dim lrRDSTable As RDS.Table = Me.ToolStripComboBoxTable.SelectedItem.Tag
+
+            Me.mrModel = lrRDSTable.Model.Model
+            Me.mrTable = lrRDSTable
+
+            With New WaitCursor
+
+                Dim lsColumnList = String.Join(", ", lrRDSTable.Column.OrderBy(Function(x) x.OrdinalPosition).Select(Function(x) x.Name))
+
+                Dim lrRecordset = Me.PopulateDataGridFromDatabaseQuery($"SELECT {lsColumnList} FROM {lrRDSTable.Name}", lrRDSTable, Nothing)
+
+                Me.ToolStripStatusLabel.Text = lrRecordset.Facts.Count & " rows selected."
+            End With
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub CopyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CopyToolStripMenuItem.Click
+
+        Try
+            If Me.AdvancedDataGridView.SelectedRows.Count = 0 Then
+                Boston.ShowFlashCard("Please select a row first", pcColorPastelGreen, 1500)
+            Else
+                Dim lrFact As FBM.Fact
+                Dim lsClipboardData As String = ""
+                For liInd = 1 To Me.AdvancedDataGridView.SelectedRows.Count
+                    Dim liRowIndex = Me.AdvancedDataGridView.SelectedRows(liInd - 1).Index
+                    lrFact = Me.mrRecordset.Facts(liRowIndex)
+
+                    Dim liInd2 = 0
+                    For Each lrFactData In lrFact.Data
+                        If liInd2 > 0 Then lsClipboardData &= vbTab
+                        lsClipboardData &= lrFactData.Data
+                        liInd2 += 1
+                    Next
+                    lsClipboardData &= vbCrLf
+                Next
+
+                My.Computer.Clipboard.SetText(lsClipboardData)
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub CopyWithHeaderToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CopyWithHeaderToolStripMenuItem.Click
+
+        Try
+            If Me.AdvancedDataGridView.SelectedRows.Count = 0 Then
+                Boston.ShowFlashCard("Please select a row first", pcColorPastelGreen, 1500)
+            Else
+                Dim lrFact As FBM.Fact
+                Dim lsClipboardData As String = ""
+
+                Dim lsColumnNames = Strings.Join(Me.mrRecordset.ColumnNames.ToArray, vbTab)
+
+                lsClipboardData = lsColumnNames & vbCrLf
+
+                For liInd = Me.AdvancedDataGridView.SelectedRows.Count To 1 Step -1
+                    Dim liRowIndex = Me.AdvancedDataGridView.SelectedRows(liInd - 1).Index
+                    lrFact = Me.mrRecordset.Facts(liRowIndex)
+
+                    Dim liInd2 = 0
+                    For Each lrFactData In lrFact.Data
+                        If liInd2 > 0 Then lsClipboardData &= vbTab
+                        lsClipboardData &= lrFactData.Data
+                        liInd2 += 1
+                    Next
+                    lsClipboardData &= vbCrLf
+                Next
+
+                My.Computer.Clipboard.SetText(lsClipboardData)
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub RichTextBoxQuery_KeyDown(sender As Object, e As KeyEventArgs) Handles RichTextBoxQuery.KeyDown
+
+        Try
+            If e.KeyCode = Keys.F5 Then
+                Dim lsSQLQuery As String = Nothing
+
+                ' Check if any text is selected
+                If Me.RichTextBoxQuery.SelectedText.Trim() <> String.Empty Then
+                    lsSQLQuery = Me.RichTextBoxQuery.SelectedText.Trim()
+                Else
+                    lsSQLQuery = Me.RichTextBoxQuery.Text.Trim()
+                End If
+
+                Dim larColumn As New List(Of RDS.Column)
+
+                With New WaitCursor
+                    Call Me.PopulateDataGridFromDatabaseQuery(lsSQLQuery, Nothing, larColumn)
+                End With
+
+            End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Public Sub ShowSQL(ByVal asSQL As String)
+
+        Try
+            Me.RichTextBoxQuery.Text = asSQL
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+    End Sub
+
 End Class
+

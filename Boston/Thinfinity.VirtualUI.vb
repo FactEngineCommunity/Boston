@@ -402,6 +402,7 @@ Namespace Cybele.Thinfinity
                 RegKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Cybele Software\Setups\Thinfinity\VirtualUI", False)
             End If
             If RegKey IsNot Nothing Then
+
                 If IntPtr.Size = 8 Then
                     Return DirectCast(RegKey.GetValue("TargetDir_x64", Nothing), String)
                 Else

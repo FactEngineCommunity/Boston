@@ -139,7 +139,7 @@ Namespace CSD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
 
@@ -164,7 +164,7 @@ Namespace CSD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -205,7 +205,7 @@ Namespace CSD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -214,6 +214,9 @@ Namespace CSD
         Public Function ExportORMQLRecordsetToCSV(ByRef arRecordset As ORMQL.Recordset, ByVal abExcludeTitles As Boolean) As Boolean
 
             Try
+                Dim liColumnCount As Integer
+                liColumnCount = If(arRecordset.ColumnNames.Count > 0, arRecordset.ColumnNames.Count, arRecordset.ColumnNames.Count)
+
                 If arRecordset Is Nothing Then
                     Return False
                 End If
@@ -226,11 +229,9 @@ Namespace CSD
 
                 Dim oSW As StreamWriter = New StreamWriter(New FileStream(mrFileInfo.FullName, FileMode.Create))
 
-                Dim liColumnCount As Integer = arRecordset.Columns.Count
-
                 If Not abExcludeTitles Then
 
-                    For Each lsColumnName As String In arRecordset.Columns
+                    For Each lsColumnName As String In arRecordset.ColumnNames
                         sLine.AppendFormat("{0}{1}", lsColumnName, msDelimiter)
                     Next
 
@@ -241,7 +242,7 @@ Namespace CSD
                 For Each lrFact In arRecordset.Facts
                     sLine.Length = 0
 
-                    For liColumnInd As Integer = 0 To arRecordset.Columns.Count - 1
+                    For liColumnInd As Integer = 0 To liColumnCount - 1
                         sLine.AppendFormat("{0}{1}", Convert.ToString(lrFact.Data(liColumnInd).Data), If(liColumnInd + 1 < liColumnCount, msDelimiter, ""))
                     Next
 
@@ -258,7 +259,7 @@ Namespace CSD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try

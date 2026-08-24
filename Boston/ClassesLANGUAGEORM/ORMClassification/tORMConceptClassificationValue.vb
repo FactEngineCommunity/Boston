@@ -1,13 +1,22 @@
-﻿Imports System.Reflection
-Imports Newtonsoft.Json
+﻿Imports Newtonsoft.Json
 Imports System.ComponentModel
+Imports System.Xml.Serialization
+Imports System.Reflection
 
 Namespace KnowledgeGraph
+
+    <Serializable()>
     Public Class ConceptClassificationValue
 
+        <XmlIgnore>
         <JsonIgnore>
         Public Model As FBM.Model
 
+        <XmlAttribute>
+        <JsonProperty>
+        Public Property Identifier As String = System.Guid.NewGuid.ToString
+
+        <XmlAttribute>
         <JsonIgnore>
         Private _ModelId As String = ""
         Public Property ModelId As String
@@ -23,6 +32,7 @@ Namespace KnowledgeGraph
             End Set
         End Property
 
+        <XmlIgnore>
         <JsonIgnore>
         Private _Concept As String = ""
         Public Property Concept As String
@@ -38,10 +48,12 @@ Namespace KnowledgeGraph
             End Set
         End Property
 
+        <XmlIgnore>
         <JsonIgnore>
         <Browsable(False)>
         Public ModelElement As FBM.ModelObject
 
+        <XmlAttribute>
         <JsonIgnore>
         Private _ClassificationType As String = ""
         Public Property ClassificationType As String  'E.g. Q6 Facet, Type, Level
@@ -53,8 +65,11 @@ Namespace KnowledgeGraph
             End Set
         End Property
 
+        <XmlIgnore>
         <JsonIgnore>
         Public _ClassificationValue As String = "" 'E.g. Q6 Abbreviation, Agent, Metadata
+
+        <XmlAttribute>
         Public Property ClassificationValue As String
             Get
                 Return Me._ClassificationValue
@@ -83,7 +98,7 @@ Namespace KnowledgeGraph
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

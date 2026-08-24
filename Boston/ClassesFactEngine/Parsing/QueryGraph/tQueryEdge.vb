@@ -2,6 +2,13 @@
 
 Namespace FactEngine
 
+    ''' <summary>
+    ''' A QueryEdge consists of a BaseNode, a TargetNode, a Predicate, a linked FactType. A set of QueryEdges creates a QueryGraph.
+    '''   NB A QueryGraph in the FactEngine sense is a contiguous set of QueryEdges because (controlled) natural language is linear, rather than tree like.
+    '''   When the QueryGraph (formed from a natural language query) is analised, an effective tree|AST is formed when creating the resultant SQL|Cypher|TypeQL query etc.
+    '''   - A BaseNode may not actually be the BaseNode to which the predicate relates, but is rather/merely the noun before the predicate, as in natural language.
+    '''   - The actual BaseNode is resolved on analysis of the QueryGraph.
+    ''' </summary>
     <Serializable>
     Public Class QueryEdge
         Implements IEquatable(Of FactEngine.QueryEdge)
@@ -13,7 +20,10 @@ Namespace FactEngine
         Public WhichClause As FEQL.WHICHCLAUSE
 
         Public BaseNode As FactEngine.QueryNode = Nothing
+        Public BaseNodeIdentifierList As New List(Of String)
+
         Public TargetNode As FactEngine.QueryNode = Nothing
+        Public TargetNodeIdentifierList As New List(Of String)
         Public Predicate As String = ""
 
         Public IdentifierList As New List(Of String)
@@ -87,7 +97,7 @@ Namespace FactEngine
         ''' </summary>
         Public Property [Alias] As String
             Get
-                If Me.FBMFactType.isRDSTable Then
+                If Me.FBMFactType IsNot Nothing AndAlso Me.FBMFactType.isRDSTable Then
                     Return Me._Alias
                 Else
                     Return Me._Alias
@@ -265,6 +275,7 @@ Namespace FactEngine
         Public Function getAndSetFBMFactType(ByRef arBaseNode As FactEngine.QueryNode,
                                              ByRef arTargetNode As FactEngine.QueryNode,
                                              ByVal asPredicate As String,
+                                             ByVal aiWhichClauseType As FactEngine.pcenumWhichClauseType,
                                              Optional ByVal arPreviousTargetNode As FactEngine.QueryNode = Nothing,
                                              Optional ByVal abUsePreviousFoundBaseNodeIfFound As Boolean = False) As Exception
 
@@ -601,8 +612,8 @@ PartialFactTypeMatch:
                     'Throw New Exception(Me.ErrorMessage)
                 End If
 
-                    'Return if successful
-                    If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
+                'Return if successful
+                If Me.FBMFactType IsNot Nothing And Me.FBMFactTypeReading IsNot Nothing And Me.FBMPredicatePart IsNot Nothing Then
                     Me.IsPartialFactTypeMatch = True
                     Return Nothing
                 End If
@@ -701,7 +712,9 @@ PartialFactTypeMatch:
 
                 lrFactType = Me.QueryGraph.Model.getFactTypeByPredicateFarSideModelElement(asPredicate, arTargetNode.FBMModelObject, True, Me.QueryGraph.getNodeModelElementList(, lbIgnoreTargetNodes))
 
-                If lrFactType IsNot Nothing Then
+                Dim laiWhichClauseType() = {FactEngine.pcenumWhichClauseType.PredicateWHICHModelElement, FactEngine.pcenumWhichClauseType.WhichPredicateNodePropertyIdentification}
+
+                If lrFactType IsNot Nothing And Not laiWhichClauseType.Contains(aiWhichClauseType) Then
                     Dim lrModelElement As FBM.ModelObject = arTargetNode.FBMModelObject
                     Dim larFactTypeReading = From FactTypeReading In lrFactType.FactTypeReading
                                              Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id = lrModelElement.Id
@@ -764,7 +777,11 @@ PartialFactTypeMatch:
                                                  Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = lrModelElement.Id
                                                  Select FactTypeReading
 
-                        lrFactTypeReading = larFactTypeReading.First
+                        Try
+                            lrFactTypeReading = larFactTypeReading.First
+                        Catch
+                            GoTo FailNearSideModelElementPredicate
+                        End Try
 
                         If Me.TargetNode.FBMModelObject.isSubtypeOfModelElement(lrFactTypeReading.PredicatePart(1).Role.JoinedORMObject) Then
 
@@ -772,13 +789,14 @@ PartialFactTypeMatch:
                             Me.FBMFactTypeReading = lrFactTypeReading
                             Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
                         Else
+FailNearSideModelElementPredicate:
                             Me.FBMFactType = Nothing
                             Me.FBMFactTypeReading = Nothing
                             Me.FBMPredicatePart = Nothing
                         End If
 
                     Catch ex As Exception
-                        Throw New Exception("Nearside Model ElementPredicate: " & ex.Message)
+                        Throw New Exception("Nearside ModelElement Predicate: " & ex.Message.AppendLine("Line: " & Boston.ExtractExceptionLine(ex)))
                     End Try
                 End If
 
@@ -842,10 +860,15 @@ PartialFactTypeMatch:
                         larModelObject(1) = arTargetNode.FBMModelObject
 
                         'Because is only one FactType
-                        Me.FBMFactTypeReading = (From FactTypeReading In Me.BaseNode.FBMModelObject.getOutgoingFactTypeReadings
-                                                 Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is Me.BaseNode.FBMModelObject
-                                                 Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is Me.TargetNode.FBMModelObject
-                                                 Select FactTypeReading).First
+                        Try
+                            Me.FBMFactTypeReading = (From FactTypeReading In Me.BaseNode.FBMModelObject.getOutgoingFactTypeReadings
+                                                     Where FactTypeReading.FactType.Arity = 2
+                                                     Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject Is Me.BaseNode.FBMModelObject
+                                                     Where FactTypeReading.PredicatePart(1).Role.JoinedORMObject Is Me.TargetNode.FBMModelObject
+                                                     Select FactTypeReading).First
+                        Catch
+                            GoTo EndReifiedFactTypeLinkFactTypePredicateRequringAnInjectedQueryEdge
+                        End Try
 
                         Me.FBMFactType = Me.FBMFactTypeReading.FactType
 
@@ -859,6 +882,7 @@ PartialFactTypeMatch:
 
                         Me.InjectsQueryEdge = lrQueryEdge
                     End If
+EndReifiedFactTypeLinkFactTypePredicateRequringAnInjectedQueryEdge:
                 End If
 
                 'Return if successful
@@ -886,6 +910,10 @@ PartialFactTypeMatch:
                     Me.FBMFactTypeReading = lrFactTypeReading
                     Me.FBMPredicatePart = Me.FBMFactTypeReading.PredicatePart(0)
 
+                    '20231109-VM-Too risky at this stage to default to this. Is bottom-of-the-barrel.
+                    lsMessage = "Warning: Could not find a Fact Type with the predicate: " & arBaseNode.Name & " " & asPredicate & " " & arTargetNode.Name
+                    lsMessage.AppendLine("Check to see if your query matches the model.")
+                    Throw New ApplicationException(lsMessage)
                 End If
 
 #End Region
@@ -926,9 +954,12 @@ FinalCleanup:
 
                 Return Nothing
 
-
+            Catch appex As ApplicationException
+                Dim lrApplicationException As New ApplicationException(appex.Message.AppendLine("Line:" & Boston.ExtractExceptionLine(appex)))
+                lrApplicationException.Data.Add("QueryEdgeGetFBMFactTypeFail", Me)
+                Throw lrApplicationException
             Catch ex As Exception
-                Dim lrApplicationException As New ApplicationException(ex.Message)
+                Dim lrApplicationException As New ApplicationException(ex.Message.AppendLine("Line:" & Boston.ExtractExceptionLine(ex)))
                 lrApplicationException.Data.Add("QueryEdgeGetFBMFactTypeFail", Me)
                 Throw lrApplicationException
             End Try
@@ -952,7 +983,7 @@ FinalCleanup:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -986,7 +1017,7 @@ FinalCleanup:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -996,6 +1027,9 @@ FinalCleanup:
         Public Function getTargetSQLComparator() As String
 
             Try
+
+                'CodeSafe
+                If Me.TargetNode Is Nothing Then Return " = "
 
                 Select Case Me.TargetNode.Comparitor
                     Case Is = FEQL.pcenumFEQLComparitor.Bang
@@ -1041,7 +1075,7 @@ FinalCleanup:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -1061,7 +1095,7 @@ FinalCleanup:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return False
             End Try
@@ -1081,7 +1115,7 @@ FinalCleanup:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

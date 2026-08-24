@@ -25,7 +25,7 @@ Namespace TableModelNoteInstance
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -63,7 +63,7 @@ Namespace TableModelNoteInstance
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -107,7 +107,7 @@ Namespace TableModelNoteInstance
                     If lrModelNoteInstance.ModelNote Is Nothing Then GoTo SkipModelNote
 
 
-                    If IsSomething(lrModelNoteInstance.ModelNote.JoinedObjectType) Then
+                    If lrModelNoteInstance.ModelNote.JoinedObjectType IsNot Nothing Then
                         lrModelNoteInstance.JoinedObjectType = New FBM.ModelObject
                         Select Case lrModelNoteInstance.ModelNote.JoinedObjectType.ConceptType
                             Case Is = pcenumConceptType.EntityType
@@ -134,7 +134,7 @@ SkipModelNote:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

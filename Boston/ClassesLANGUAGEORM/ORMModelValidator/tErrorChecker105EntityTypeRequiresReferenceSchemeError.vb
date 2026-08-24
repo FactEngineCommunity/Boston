@@ -11,6 +11,10 @@ Namespace Validation
         End Sub
 
         Public Overrides Sub CheckForErrors()
+            Call Me.CheckForErrors(Nothing)
+        End Sub
+
+        Public Overloads Sub CheckForErrors(Optional ByRef arEntityType As FBM.EntityType = Nothing)
             MyBase.CheckForErrors()
 
             Dim lrEntityType As FBM.EntityType
@@ -20,8 +24,29 @@ Namespace Validation
             Dim lrTopMostSupertype As FBM.EntityType
 
             Try
+                Dim larEntityType As New List(Of FBM.EntityType)
 
-                For Each lrEntityType In Me.Model.EntityType
+                'CodeSafe - Fix any ObjectifyingEntityType issues.
+#Region "CodeSafe - Fix any ObjectifyingEntityType issues."
+                larEntityType = (From EntityType In Me.Model.EntityType
+                                 Where Not EntityType.IsObjectifyingEntityType
+                                 From FactType In Me.Model.FactType
+                                 Where FactType.IsObjectified
+                                 Where FactType.Id = EntityType.Id
+                                 Select EntityType).ToList
+
+                For Each lrErrorEntityType In larEntityType
+                    lrErrorEntityType.SetIsObjectifyingEntityType(True, False)
+                Next
+#End Region
+
+                larEntityType = Me.Model.EntityType
+                If arEntityType IsNot Nothing Then
+                    larEntityType = New List(Of FBM.EntityType) From {arEntityType}
+                End If
+
+                For Each lrEntityType In larEntityType
+
                     lbErrorFound = False
                     If (lrEntityType.IsObjectifyingEntityType = False) And
                         (lrEntityType.HasCompoundReferenceMode = False) And (lrEntityType.HasSimpleReferenceScheme = False) Then
@@ -47,7 +72,7 @@ Namespace Validation
 
                         lrEntityType._ModelError.Add(lrModelError)
 
-                        Me.Model.AddModelError(lrModelError)
+                        Me.Model.AddModelError(lrModelError, False)
                     Else
                         'CodeSafe
                         lrEntityType._ModelError.RemoveAll(Function(x) x.ErrorId = pcenumModelErrors.EntityTypeRequiresReferenceSchemeError)
@@ -61,7 +86,7 @@ Namespace Validation
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

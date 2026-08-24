@@ -26,6 +26,9 @@ Imports java.util
 Imports Syn.WordNet
 Imports Newtonsoft.Json
 Imports OpenAI_API.Models
+Imports iTextSharp.text.pdf
+Imports iTextSharp.text.pdf.parser
+Imports WordNetClasses.WN
 
 Public Class frmKnowledgeExtraction
 
@@ -135,7 +138,7 @@ Public Class frmKnowledgeExtraction
 
 				lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 				lsMessage &= vbCrLf & vbCrLf & ex.Message
-				prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+				prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 			End Try
 
 		End Function
@@ -214,7 +217,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -229,7 +232,7 @@ Public Class frmKnowledgeExtraction
 			Me.ToolStripStatusLabelChunkCount.Text = ""
 
 			Me.ComboBoxOpenAIModel.DataSource = [Enum].GetValues(GetType(pcenumOpenAIModel))
-			Me.ComboBoxOpenAIModel.SelectedIndex = 0
+			Me.ComboBoxOpenAIModel.SelectedIndex = 3
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -237,7 +240,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -248,7 +251,10 @@ Public Class frmKnowledgeExtraction
 
 			CloseButtons()
 			MyData.TheDoc = MyFun.DocStandardization(MyData.TheDoc)
-			StatusLabel.Text = "Document standardization process has been completed."
+			Me.WriteToStatusBar("Document standardization process has been completed.", True, 0)
+
+			Boston.ShowFlashCard("Step 1 complete", pcColorPastelGreen)
+
 			OpenButton()
 
 		Catch ex As Exception
@@ -257,7 +263,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -269,8 +275,11 @@ Public Class frmKnowledgeExtraction
 
 		Try
 			With New WaitCursor
-				MyData.TheDoc = MyFun.RemoveStop(MyData.TheDoc, Me.progressBar1)
-				StatusLabel.Text = "Remove stop-words has been completed."
+				MyData.TheDoc = MyFun.RemoveStop(MyData.TheDoc, Me.progressBarMain)
+
+				Boston.ShowFlashCard("Step 2 complete", pcColorPastelGreen)
+
+				Me.WriteToStatusBar("Remove stop-words has been completed.", True, 0)
 				OpenButton()
 			End With
 
@@ -283,9 +292,11 @@ Public Class frmKnowledgeExtraction
 	Private Sub KeywordExtractionButton_Click(sender As Object, e As EventArgs) Handles KeywordExtractionMaxButton.Click
 
 		Try
-			Dim thread As New Thread(New ThreadStart(AddressOf DoWork))
-			thread.IsBackground = True
-			thread.Start()
+			With New WaitCursor
+				Dim thread As New Thread(New ThreadStart(AddressOf DoWork))
+				thread.IsBackground = True
+				thread.Start()
+			End With
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -293,7 +304,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
@@ -313,8 +324,8 @@ Public Class frmKnowledgeExtraction
 
 				For i As Integer = 0 To MyData.WordsFre.Length - 1
 					MyData.WordsFre(i).EntropyDifference_Max()
-					progressBar1.Value = i * 100 \ MyData.WordsFre.Length
-					StatusLabel.Text = "Keyword extraction process is ongoing: " & progressBar1.Value & "%"
+					progressBarMain.Value = i * 100 \ MyData.WordsFre.Length
+					StatusLabel.Text = "Keyword extraction process is ongoing: " & progressBarMain.Value & "%"
 				Next
 
 				MyFun.QuickSort(MyData.WordsFre, 0, MyData.WordsFre.Length - 1)
@@ -328,15 +339,21 @@ Public Class frmKnowledgeExtraction
 					End If
 				Next
 				Dim lvi As ListViewItem() = New ListViewItem(WordsNum - 1) {}
+				Dim lsWord As String = Nothing
 				For i As Integer = 0 To WordsNum - 1
+					lsWord = MyData.WordsFre(i).Word.ToString()
 					lvi(i) = New ListViewItem()
+					lvi(i).Name = lsWord
+					lvi(i).Text = lsWord
 					lvi(i).SubItems(0).Text = (i + 1).ToString()
-					lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
+					lvi(i).SubItems.Add(lsWord)
 
-					If Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
+					If Me.mrModel.GetModelObjectByName(FEStrings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
 						MyData.WordsFre(i).IsInModel = True
 						Dim loFont = New Font("Arial", 10, FontStyle.Bold)
 						lvi(i).SubItems(1).Font = loFont
+						lvi(i).SubItems(1).Text = lsWord
+						lvi(i).SubItems(1).Name = lsWord
 						lvi(i).ForeColor = Color.RoyalBlue
 						'lvi(i).BackColor = Color.Beige
 					End If
@@ -348,9 +365,9 @@ Public Class frmKnowledgeExtraction
 
 				Dim dt2 As DateTime = DateTime.Now
 
-				progressBar1.Value = 100
+				progressBarMain.Value = 100
 
-				StatusLabel.Text = "Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & "."
+				Me.WriteToStatusBar("Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & ".", True, 0)
 
 				OpenButton()
 			End SyncLock
@@ -360,7 +377,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
@@ -399,7 +416,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
@@ -427,7 +444,7 @@ Public Class frmKnowledgeExtraction
 			Dim regex As New Regex("^*.txt$")
 			Dim ma As Match = regex.Match(path)
 			If ma.Success Then
-				PathTextBox.Text = path
+				TextBoxDocumentPath.Text = path
 				Dim encode As Encoding = Encoding.GetEncoding("GB2312")
 				MyData.TheDoc = File.ReadAllText(path, encode)
 				RichTextBoxText.Text = MyData.TheDoc
@@ -448,7 +465,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
@@ -468,7 +485,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
@@ -489,14 +506,14 @@ Public Class frmKnowledgeExtraction
 					End If
 				Next
 
-				Dim lrModelElement = Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(word), True)
+				Dim lrModelElement = Me.mrModel.GetModelObjectByName(FEStrings.MakeCapCamelCase(word), True)
 				If lrModelElement IsNot Nothing Then
 					'-------------------------------------------------------
 					'ORM Verbalisation
 					'-------------------------------------------------------
 					Dim lrToolboxForm As frmToolboxORMVerbalisation
 					lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-					If IsSomething(lrToolboxForm) Then
+					If lrToolboxForm IsNot Nothing Then
 						lrToolboxForm.zrModel = Me.mrModel
 						Call lrToolboxForm.verbaliseModelElement(lrModelElement)
 					End If
@@ -536,9 +553,17 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,,, ex)
 		End Try
 
+	End Sub
+
+	' This method changes the cursor for the entire form
+	Private Sub ChangeCursorForForm(cursor As Cursor)
+		Me.Cursor = cursor  ' Me refers to the form
+		For Each ctrl As Control In Me.Controls
+			ctrl.Cursor = cursor
+		Next
 	End Sub
 
 
@@ -547,6 +572,9 @@ Public Class frmKnowledgeExtraction
 			CloseButtons()
 
 			Try
+				'WaitCursor
+				Me.Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
+
 				Dim dt1 As DateTime = DateTime.Now
 
 				StatusLabel.Text = "Keyword extraction process is ongoing: 0%"
@@ -557,8 +585,8 @@ Public Class frmKnowledgeExtraction
 
 				For i As Integer = 0 To MyData.WordsFre.Length - 1
 					MyData.WordsFre(i).EntropyDifference_Normal()
-					progressBar1.Value = i * 100 \ MyData.WordsFre.Length
-					StatusLabel.Text = "Keyword extraction process is ongoing: " & progressBar1.Value & "%"
+					progressBarMain.Value = i * 100 \ MyData.WordsFre.Length
+					StatusLabel.Text = "Keyword extraction process is ongoing: " & progressBarMain.Value & "%"
 				Next
 
 				MyFun.QuickSort(MyData.WordsFre, 0, MyData.WordsFre.Length - 1)
@@ -571,13 +599,20 @@ Public Class frmKnowledgeExtraction
 						Exit For
 					End If
 				Next
+
 				Dim lvi As ListViewItem() = New ListViewItem(WordsNum - 1) {}
+				Dim lsWord As String
 				For i As Integer = 0 To WordsNum - 1
 					lvi(i) = New ListViewItem()
-					lvi(i).SubItems(0).Text = (i + 1).ToString()
+
+					lsWord = (i + 1).ToString()
+					lsWord = Me.Singularize(lsWord)
+					lsWord = lsWord.ToPascalCase
+
+					lvi(i).SubItems(0).Text = lsWord
 					lvi(i).SubItems.Add(MyData.WordsFre(i).Word.ToString())
 
-					If Me.mrModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
+					If Me.mrModel.GetModelObjectByName(FEStrings.MakeCapCamelCase(MyData.WordsFre(i).Word.ToString), True) IsNot Nothing Then
 						MyData.WordsFre(i).IsInModel = True
 						Dim loFont = New Font("Arial", 10, FontStyle.Bold)
 						lvi(i).SubItems(1).Font = loFont
@@ -591,15 +626,19 @@ Public Class frmKnowledgeExtraction
 
 				Dim dt2 As DateTime = DateTime.Now
 
-				progressBar1.Value = 100
+				progressBarMain.Value = 100
 
-				StatusLabel.Text = "Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & "."
+				Me.WriteToStatusBar("Keyword extraction has been completed. The extraction spend " & (dt2 - dt1).ToString() & ".", True, 0)
 
 				OpenButton()
+
 
 			Catch ex As Exception
 				OpenButton()
+			Finally
+				Me.Invoke(Sub() Me.Cursor = Cursors.Default)
 			End Try
+
 
 		End SyncLock
 	End Sub
@@ -639,17 +678,18 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
 	Private Sub KeywordExtractionNormalButton_Click(sender As Object, e As EventArgs) Handles KeywordExtractionNormalButton.Click
 
 		Try
-
-			Dim thread As New Thread(New ThreadStart(AddressOf DoWork_Normal))
-			thread.IsBackground = True
-			thread.Start()
+			With New WaitCursor
+				Dim thread As New Thread(New ThreadStart(AddressOf DoWork_Normal))
+				thread.IsBackground = True
+				thread.Start()
+			End With
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -657,7 +697,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -667,13 +707,32 @@ Public Class frmKnowledgeExtraction
 		Dim ofd As New OpenFileDialog()
 
 		Try
-			ofd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
+			ofd.Filter = "Text files (*.txt)|*.txt|PDF files (*.pdf)|*.pdf|All files (*.*)|*.*" 'ofd.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*"
 			If ofd.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-				PathTextBox.Text = ofd.FileName
-				Dim encode As Encoding = Encoding.GetEncoding("GB2312")
-				MyData.TheDoc = File.ReadAllText(ofd.FileName, encode)
-				RichTextBoxText.Text = MyData.TheDoc
+				TextBoxDocumentPath.Text = ofd.FileName
 
+				Dim encode As Encoding = Encoding.GetEncoding("GB2312")
+
+				Select Case System.IO.Path.GetExtension(TextBoxDocumentPath.Text)
+					Case Is = ".pdf"
+
+						Dim lsDocumentText As String = ""
+
+						Using reader As PdfReader = New PdfReader(TextBoxDocumentPath.Text)
+
+							For i As Integer = 1 To reader.NumberOfPages
+								lsDocumentText &= (PdfTextExtractor.GetTextFromPage(reader, i).ToString)
+							Next
+
+						End Using
+
+						MyData.TheDoc = lsDocumentText.Replace(vbNullChar, vbCrLf)
+					Case Else
+						MyData.TheDoc = File.ReadAllText(ofd.FileName, encode)
+
+				End Select
+
+				RichTextBoxText.Text = MyData.TheDoc
 				ResultListView.Items.Clear()
 				StandardizationButton.Enabled = True
 				RemoveStopButton.Enabled = True
@@ -691,7 +750,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -703,24 +762,54 @@ Public Class frmKnowledgeExtraction
 		Dim startIndex As Integer = 0
 
 		Try
-			Dim lsAllText As String = LCase(myRtb.Text)
-			While index < myRtb.TextLength
+			If myRtb.IsDisposed Then Exit Sub
+			'Needs to only highlight the visible text. Big documents can have over 500,000 items.
+			' Get the index of the first visible character using the extension method
+			Dim firstVisibleIndex As Integer = myRtb.GetFirstVisibleCharIndex()
 
-				index = lsAllText.IndexOf(LCase(word), startIndex)
-				If index >= 0 And index < myRtb.TextLength - word.Length Then
+			' Calculate the number of visible characters based on the control's size
+			Dim lastVisibleIndex As Integer = myRtb.GetLastVisibleCharIndex
+
+			If firstVisibleIndex >= lastVisibleIndex Then Exit Sub
+
+			' Ensure the lastVisibleIndex is within bounds
+			If lastVisibleIndex < 0 Then
+				lastVisibleIndex = myRtb.TextLength - 1
+			End If
+
+			If firstVisibleIndex = 0 And lastVisibleIndex = 0 Then Exit Sub
+
+			' Calculate the visible character count
+			Dim visibleCharacterCount As Integer = lastVisibleIndex - firstVisibleIndex + 1
+
+
+			' Ensure firstVisibleIndex and visibleChars are within valid bounds
+			If firstVisibleIndex < 0 Then firstVisibleIndex = 0
+			If firstVisibleIndex + visibleCharacterCount > myRtb.TextLength Then visibleCharacterCount = myRtb.TextLength - firstVisibleIndex
+
+			' Get the text within the visible portion
+			Dim visibleText As String = myRtb.Text.Substring(firstVisibleIndex, visibleCharacterCount)
+
+			While index < visibleText.Length
+
+				index = visibleText.LCase.IndexOf(LCase(word), index)
+
+				If index >= 0 And index < visibleText.Length - word.Length Then
 
 					If index >= 1 Then
-						If Not Char.IsWhiteSpace(lsAllText(index - 1)) Then
+						If Not Char.IsWhiteSpace(visibleText(index - 1)) Then
 							startIndex = index + word.Length
+							index = startIndex
 							Continue While
 						End If
-						If Not (Char.IsWhiteSpace(lsAllText(index + word.Length)) Or lsAllText(index + word.Length) = vbCrLf Or lsAllText(index + word.Length) = vbLf) Then
+						If Not (Char.IsWhiteSpace(visibleText(index + word.Length)) Or visibleText(index + word.Length) = vbCrLf Or visibleText(index + word.Length) = vbLf) Then
 							startIndex = index + word.Length
+							index = startIndex
 							Continue While
 						End If
 					End If
 
-					myRtb.[Select](index, word.Length)
+					myRtb.[Select](firstVisibleIndex + index, word.Length)
 					myRtb.SelectionColor = color
 #Region "Bold"
 					Dim currentFont As Font = myRtb.SelectionFont
@@ -734,52 +823,53 @@ Public Class frmKnowledgeExtraction
 
 					myRtb.SelectionFont = New Font(currentFont.FontFamily, currentFont.Size, newFontStyle)
 #End Region
-					startIndex = index + word.Length
+					index = index + word.Length
 				Else
 					Exit While
 				End If
 
 			End While
 
+			Exit Sub
 			index = 0
-			startIndex = 0
-			lsAllText = myRtb.Text
-			While index < myRtb.TextLength
-				index = lsAllText.IndexOf(word, startIndex)
-				If index >= 0 And index < myRtb.TextLength - word.Length Then
+			'			startIndex = 0
+			'			lsAllText = myRtb.Text
+			'			While index < myRtb.TextLength
+			'				index = lsAllText.IndexOf(word, startIndex)
+			'				If index >= 0 And index < myRtb.TextLength - word.Length Then
 
-					If index >= 1 Then
-						If Not Char.IsWhiteSpace(lsAllText(index - 1)) Then
-							startIndex = index + word.Length
-							Continue While
-						End If
-						If Not (Char.IsWhiteSpace(lsAllText(index + word.Length)) Or lsAllText(index + word.Length) = vbCrLf Or lsAllText(index + word.Length) = vbLf) Then
-							startIndex = index + word.Length
-							Continue While
-						End If
-					End If
+			'					If index >= 1 Then
+			'						If Not Char.IsWhiteSpace(lsAllText(index - 1)) Then
+			'							startIndex = index + word.Length
+			'							Continue While
+			'						End If
+			'						If Not (Char.IsWhiteSpace(lsAllText(index + word.Length)) Or lsAllText(index + word.Length) = vbCrLf Or lsAllText(index + word.Length) = vbLf) Then
+			'							startIndex = index + word.Length
+			'							Continue While
+			'						End If
+			'					End If
 
-					myRtb.[Select](index, word.Length)
-					myRtb.SelectionColor = color
-#Region "Bold"
-					Dim currentFont As Font = myRtb.SelectionFont
-					Dim newFontStyle As FontStyle
+			'					myRtb.[Select](index, word.Length)
+			'					myRtb.SelectionColor = color
+			'#Region "Bold"
+			'					Dim currentFont As Font = myRtb.SelectionFont
+			'					Dim newFontStyle As FontStyle
 
-					If currentFont.Bold Then
-						newFontStyle = currentFont.Style And Not FontStyle.Bold
-					Else
-						newFontStyle = currentFont.Style Or FontStyle.Bold
-					End If
+			'					If currentFont.Bold Then
+			'						newFontStyle = currentFont.Style And Not FontStyle.Bold
+			'					Else
+			'						newFontStyle = currentFont.Style Or FontStyle.Bold
+			'					End If
 
-					myRtb.SelectionFont = New Font(currentFont.FontFamily, currentFont.Size, newFontStyle)
-#End Region
+			'					myRtb.SelectionFont = New Font(currentFont.FontFamily, currentFont.Size, newFontStyle)
+			'#End Region
 
-					startIndex = index + word.Length
-				Else
-					Exit While
-				End If
+			'					startIndex = index + word.Length
+			'				Else
+			'					Exit While
+			'				End If
 
-			End While
+			'			End While
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -787,7 +877,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -805,7 +895,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -821,7 +911,7 @@ Public Class frmKnowledgeExtraction
 
 				Dim liIndex As Integer = Me.ResultListView.SelectedItems(0).Index
 				Dim lsValueTypeName As String = Me.ResultListView.SelectedItems(0).SubItems(1).Text
-				lsValueTypeName = Viev.Strings.MakeCapCamelCase(lsValueTypeName)
+				lsValueTypeName = FEStrings.MakeCapCamelCase(lsValueTypeName)
 
 				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
 				Dim liDataTypeLength As Integer = 50
@@ -830,7 +920,8 @@ Public Class frmKnowledgeExtraction
 				Dim lrValueType As FBM.ValueType
 				lrValueType = Me.mrModel.CreateValueType(lsValueTypeName, True, liDataType, liDataTypeLength, liDataTypePrecision, True)
 
-				MyData.WordsFre(liIndex).IsInModel = True
+				MyData.WordsFre(liIndex).IsInModel = True '20231107-VM-Removed. WordsFre as empty for some reason.
+
 				Dim loFont = New Font("Microsoft Sans Serif", 8.25, FontStyle.Bold)
 				Me.ResultListView.SelectedItems(0).Font = loFont
 				Me.ResultListView.SelectedItems(0).ForeColor = Color.RoyalBlue
@@ -841,7 +932,7 @@ Public Class frmKnowledgeExtraction
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
 				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
-				If IsSomething(lrToolboxForm) Then
+				If lrToolboxForm IsNot Nothing Then
 					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrValueType)
 				End If
@@ -854,7 +945,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -876,7 +967,7 @@ Public Class frmKnowledgeExtraction
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
 				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
-				If IsSomething(lrToolboxForm) Then
+				If lrToolboxForm IsNot Nothing Then
 					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrModelElement)
 				End If
@@ -888,7 +979,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -911,7 +1002,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -930,7 +1021,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -946,7 +1037,7 @@ Public Class frmKnowledgeExtraction
 
 				Dim liIndex As Integer = Me.ResultListView.SelectedItems(0).Index
 				Dim lsEntityTypeName As String = Me.ResultListView.SelectedItems(0).SubItems(1).Text
-				lsEntityTypeName = Viev.Strings.MakeCapCamelCase(lsEntityTypeName)
+				lsEntityTypeName = FEStrings.MakeCapCamelCase(lsEntityTypeName)
 
 				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
 				Dim liDataTypeLength As Integer = 50
@@ -968,7 +1059,8 @@ Public Class frmKnowledgeExtraction
 
 				End If
 
-				MyData.WordsFre(liIndex).IsInModel = True
+				'MyData.WordsFre(liIndex).IsInModel = True '20231107-VM-Removed. WordsFre as empty for some reason.
+
 				Dim loFont = New Font("Microsoft Sans Serif", 8.25, FontStyle.Bold)
 				Me.ResultListView.SelectedItems(0).Font = loFont
 				Me.ResultListView.SelectedItems(0).ForeColor = Color.RoyalBlue
@@ -979,7 +1071,7 @@ Public Class frmKnowledgeExtraction
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
 				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
-				If IsSomething(lrToolboxForm) Then
+				If lrToolboxForm IsNot Nothing Then
 					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrEntityType)
 				End If
@@ -992,7 +1084,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -1012,8 +1104,8 @@ Public Class frmKnowledgeExtraction
 					Exit Sub
 				End If
 
-				Dim lsEntityTypeName As String = Trim(Me.RichTextBoxText.SelectedText)
-				lsEntityTypeName = Viev.Strings.MakeCapCamelCase(lsEntityTypeName)
+				Dim lsEntityTypeName As String = Trim(Me.RichTextBoxText.SelectedText).Replace(vbLf, "")
+				lsEntityTypeName = FEStrings.MakeCapCamelCase(lsEntityTypeName)
 
 				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
 				Dim liDataTypeLength As Integer = 50
@@ -1043,7 +1135,7 @@ Public Class frmKnowledgeExtraction
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
 				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
-				If IsSomething(lrToolboxForm) Then
+				If lrToolboxForm IsNot Nothing Then
 					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrEntityType)
 				End If
@@ -1056,7 +1148,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -1079,7 +1171,7 @@ Public Class frmKnowledgeExtraction
 
 
 				Dim lsValueTypeName As String = Trim(Me.RichTextBoxText.SelectedText)
-				lsValueTypeName = Viev.Strings.MakeCapCamelCase(lsValueTypeName)
+				lsValueTypeName = FEStrings.MakeCapCamelCase(lsValueTypeName)
 
 				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
 				Dim liDataTypeLength As Integer = 50
@@ -1096,7 +1188,7 @@ Public Class frmKnowledgeExtraction
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
 				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
-				If IsSomething(lrToolboxForm) Then
+				If lrToolboxForm IsNot Nothing Then
 					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrValueType)
 				End If
@@ -1108,7 +1200,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -1148,7 +1240,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -1171,7 +1263,7 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -1194,6 +1286,20 @@ Public Class frmKnowledgeExtraction
 							Call Me.HighlightText(Me.RichTextBoxText, lsValueConstraint, Color.Maroon)
 						Next
 
+					Case Is = GetType(FBM.EntityType)
+
+						Dim lrEntityType As FBM.EntityType = arModelElement
+
+						Call Me.HighlightText(Me.RichTextBoxText, lrEntityType.Id, Color.RoyalBlue)
+
+						Dim loListViewItem() As ListViewItem = Me.ResultListView.Items.Find(lrEntityType.Id, False)
+						If loListViewItem.Count > 0 Then
+
+							Dim loFont = New Font("Arial", 10, FontStyle.Bold)
+							loListViewItem(0).SubItems(1).Font = loFont
+							loListViewItem(0).ForeColor = Color.RoyalBlue
+						End If
+
 				End Select
 			End If
 
@@ -1203,9 +1309,69 @@ Public Class frmKnowledgeExtraction
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
+	End Sub
+
+	Public Sub WriteToStatusBar(ByVal asMessage As String,
+									Optional ByVal abRefreshForm As Boolean = False,
+									Optional ByVal aiProgressPercent As Integer = 0,
+									Optional abAppendMessageOnly As Boolean = False)
+
+		Try
+			If abAppendMessageOnly Then
+				' Append message without triggering refresh
+				Me.StatusLabel.Text &= asMessage
+			Else
+				' Set message without triggering refresh
+				Me.StatusLabel.Text = asMessage
+			End If
+
+			Me.progressBarMain.Maximum = 100
+			Me.progressBarMain.Value = aiProgressPercent
+			If aiProgressPercent > 0 Then
+				Me.progressBarMain.Visible = True
+			Else
+				Me.progressBarMain.Visible = True
+			End If
+
+			If abRefreshForm Then
+				' Refresh the form only if needed
+				Me.Refresh()
+			End If
+
+			' Update the UI using BeginInvoke on the main UI thread
+			Me.BeginInvoke(Sub()
+							   Me.UpdateUI()
+						   End Sub)
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+	End Sub
+
+	Public Sub UpdateUI()
+
+		Try
+			Me.ToolStripStatusLabel.Invalidate()
+			Me.progressBarMain.Invalidate()
+
+			Me.Refresh()
+			Me.Invalidate()
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
 	End Sub
 
 	Public Function ExtractFactTypeReadings(text As String) As List(Of String)
@@ -1217,47 +1383,87 @@ Public Class frmKnowledgeExtraction
 			MyData.WordsFre = {}
 
 			' Create a new StanfordCoreNLP pipeline with the required annotators
-			Dim pipelineProps As New java.util.Properties()
-			pipelineProps.setProperty("annotators", "tokenize, ssplit, pos, lemma, depparse")
-			pipelineProps.setProperty("pos.model", "CoreNLP\models\english-caseless-left3words-distsim.tagger") ' Specify the path to the tagger properties file
-			pipelineProps.setProperty("depparse.model", "CoreNLP\models\parser\nndep\english_UD.gz")
+			Dim pipeline1Props As New java.util.Properties()
+			pipeline1Props.setProperty("annotators", "tokenize, ssplit, pos, lemma, depparse")
+			pipeline1Props.setProperty("pos.model", "CoreNLP\models\english-caseless-left3words-distsim.tagger") ' Specify the path to the tagger properties file
+			pipeline1Props.setProperty("depparse.model", "CoreNLP\models\parser\nndep\english_UD.gz")
+			'--------------------------------
 
+#Region "Pipiline 2 - Named Entity Extraction - Increases Boston install/setup size to 400MB"
+			'Dim pipeline2Props As New java.util.Properties
+			'pipeline2Props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, depparse, parse, dcoref")
+			'pipeline2Props.setProperty("pos.model", "CoreNLP\models\english-caseless-left3words-distsim.tagger")
+			'pipeline2Props.setProperty("depparse.model", "CoreNLP\models\parser\nndep\english_UD.gz")
+			'pipeline2Props.setProperty("ner.model", "CoreNLP\models\english.all.3class.caseless.distsim.crf.ser.gz")
+			'pipeline2Props.setProperty("sutime.binders", "0")
+			'pipeline2Props.setProperty("ner.useSUTime", "0")
+			'pipeline2Props.put("ner.applyFineGrained", "0")
+			'' Add the --add-modules flag to address Java module issues
+			'Dim commandLineArgs As String() = {"--add-modules", "java.se.ee"}
 
-			Dim pipeline As New StanfordCoreNLP(pipelineProps)
+			'Dim pipeline2 As StanfordCoreNLP
 
+			'Try
+			'	prApplication.WriteToStatusBar("Creating CoreNLP Pipeline 2", True)
+			'	pipeline2 = New StanfordCoreNLP(pipeline2Props)
+			'Catch ex As Exception
+			'	Throw New Exception(ex.Message)
+			'End Try
+
+			'Dim annotation2 As Annotation
+#End Region
+
+			' Initialize the StanfordCoreNLP pipeline
+			Dim pipeline1 As StanfordCoreNLP
+			Try
+				Me.WriteToStatusBar("Creating CoreNLP Pipeline 1", True, 5)
+				pipeline1 = New StanfordCoreNLP(pipeline1Props)
+			Catch ex As Exception
+				Throw New Exception(ex.Message)
+			End Try
+
+			Application.DoEvents()
 			' Create an Annotation object with the input text
-			Dim annotation As New Annotation(text)
+			Dim annotation1 As Annotation
+			Try
+				Me.WriteToStatusBar("Annotating Text", True, 10)
+				annotation1 = New Annotation(text)
+				' Process the annotation through the pipeline
+				pipeline1.annotate(annotation1)
+			Catch ex As Exception
+				Throw New Exception(ex.Message)
+			End Try
 
-			' Process the annotation through the pipeline
-			pipeline.annotate(annotation)
-
+			Application.DoEvents()
 			' Get the sentences from the annotation
-			Dim sentences As java.util.ArrayList = CType(annotation.get(GetType(CoreAnnotations.SentencesAnnotation)), java.util.ArrayList)
+			Dim sentences As java.util.ArrayList = CType(annotation1.get(GetType(CoreAnnotations.SentencesAnnotation)), java.util.ArrayList)
 
 			Dim lasFactTypeReading As New List(Of String)()
 
 			'================Noun Phrases revised=====================================
+			Me.WriteToStatusBar("Extracting Noun Phrases", True, 20)
+			Dim liInd = 0
 			For Each sentence As CoreMap In sentences
 
 				With New WaitCursor
 					Dim tokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
 					Dim numTokens As Integer = tokens.size()
 
-					Dim nounPhrase As StringBuilder = Nothing ' Variable to store the current noun phrase
-					Dim subject As String = Nothing ' Variable to store the subject
+					Dim lsbNounPhrase As StringBuilder = Nothing ' Variable to store the current noun phrase
+					Dim lsSubject As String = Nothing ' Variable to store the subject
 					Dim verb As String = Nothing ' Variable to store the verb
-					Dim [object] As String = Nothing ' Variable to store the object
+					Dim lsObject As String = Nothing ' Variable to store the object
 
 					For i As Integer = 0 To numTokens - 1
 						Dim token As CoreLabel = CType(tokens.get(i), CoreLabel)
 						Dim pos As String = token.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
 
 						If pos.StartsWith("NN") Then
-							If nounPhrase Is Nothing Then
-								nounPhrase = New StringBuilder()
+							If lsbNounPhrase Is Nothing Then
+								lsbNounPhrase = New StringBuilder()
 							End If
 
-							nounPhrase.Append(token.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
+							lsbNounPhrase.Append(token.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
 
 							' Check if the next token is a verb
 							If i + 1 < numTokens Then
@@ -1268,34 +1474,35 @@ Public Class frmKnowledgeExtraction
 									verb = nextToken.get(GetType(CoreAnnotations.TextAnnotation)).ToString()
 								End If
 							End If
-						ElseIf nounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(nounPhrase.ToString()) Then
+						ElseIf lsbNounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(lsbNounPhrase.ToString()) Then
 							' A noun phrase has been captured, save it as the subject
-							subject = nounPhrase.ToString().Trim()
-							nounPhrase = Nothing ' Reset nounPhrase for the next noun phrase
+							lsSubject = lsbNounPhrase.ToString().Trim()
+							lsbNounPhrase = Nothing ' Reset nounPhrase for the next noun phrase
 
 							' Find the object related to the subject
-							Dim objectNounPhrase As StringBuilder = Nothing ' Variable to store the current object noun phrase
+							Dim lsbObjectNounPhrase As StringBuilder = Nothing ' Variable to store the current object noun phrase
 
 							For j As Integer = i To numTokens - 1
-								Dim nextToken As CoreLabel = CType(tokens.get(j), CoreLabel)
-								Dim nextPos As String = nextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
+								Dim loNextToken As CoreLabel = CType(tokens.get(j), CoreLabel)
+								Dim lsNextPartOfSpeech As String = loNextToken.get(GetType(CoreAnnotations.PartOfSpeechAnnotation)).ToString()
 
-								If nextPos.StartsWith("NN") Then
-									If objectNounPhrase Is Nothing Then
-										objectNounPhrase = New StringBuilder()
+								If lsNextPartOfSpeech.StartsWith("NN") Then
+									If lsbObjectNounPhrase Is Nothing Then
+										lsbObjectNounPhrase = New StringBuilder()
 									End If
 
-									objectNounPhrase.Append(nextToken.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
-								ElseIf objectNounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(objectNounPhrase.ToString()) Then
+									lsbObjectNounPhrase.Append(loNextToken.get(GetType(CoreAnnotations.TextAnnotation))).Append(" ")
+
+								ElseIf lsbObjectNounPhrase IsNot Nothing AndAlso Not String.IsNullOrEmpty(lsbObjectNounPhrase.ToString()) Then
 									' A noun phrase has been captured, save it as the object
-									[object] = objectNounPhrase.ToString().Trim()
+									lsObject = lsbObjectNounPhrase.ToString().Trim()
 									Exit For
 								End If
 							Next
 
-							subject = Singularize(subject)
-							[object] = Singularize([object])
-							verb = ConjugateVerbWN(verb, subject)
+							lsSubject = Singularize(lsSubject)
+							lsObject = Singularize(lsObject)
+							verb = ConjugateVerbWN(verb, lsSubject)
 
 							'CodeSafe
 							If verb Is Nothing Then verb = "has"
@@ -1303,19 +1510,47 @@ Public Class frmKnowledgeExtraction
 							Dim lsSubjectKeyword As String = ""
 							Dim lsObjectKeyword As String = ""
 
-							lsSubjectKeyword = subject.ToPascalCase
+							lsSubjectKeyword = lsSubject.ToPascalCase
 
-							If Not String.IsNullOrEmpty([object]) Then
+							If Not String.IsNullOrEmpty(lsObject) Then
 								' Add the SVO triple with noun phrase object
-								lsObjectKeyword = [object].ToPascalCase
-								lasFactTypeReading.Add(subject.ToPascalCase & " " & verb & " " & lsObjectKeyword)
+								lsObjectKeyword = lsObject.ToPascalCase
+
+								Dim lsFactTypeReading As String = lsSubject.ToPascalCase & " " & verb & " " & lsObjectKeyword
+#Region "Common Noun, Pronoun, Instance"
+								'Try
+								'	annotation2 = New Annotation(lsFactTypeReading)
+								'	' Process the annotation through the pipeline
+								'	pipeline2.annotate(annotation2)
+								'Catch ex As Exception
+								'	Throw New Exception(ex.Message)
+								'End Try
+
+								'' Get the sentences from the annotation
+								'Dim laoFactTypeReadingSentences As java.util.ArrayList = CType(annotation2.get(GetType(CoreAnnotations.SentencesAnnotation)), java.util.ArrayList)
+
+								'For Each FactTypeReadingSentence As CoreMap In laoFactTypeReadingSentences
+								'	Dim laoFactTypeReadingTokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
+
+								'	'Named Entity Recognition
+								'	For Each loFactTypeReadingToken In laoFactTypeReadingTokens
+								'		Dim loAnnotation As Object = loFactTypeReadingToken.get(GetType(CoreAnnotations.NamedEntityTagAnnotation))
+								'		If loAnnotation IsNot Nothing Then
+								'			lsbObjectNounPhrase.Append(loAnnotation.ToString)
+								'		Else
+
+								'		End If
+								'	Next
+
+								'Next
+#End Region
+								lasFactTypeReading.Add(lsFactTypeReading)
 
 							Else
 								' No noun phrase found for the object, fallback to the singular word noun
 								lsObjectKeyword = tokens.get(i).get(GetType(CoreAnnotations.TextAnnotation)).ToString().ToPascalCase
-								lasFactTypeReading.Add(subject.ToPascalCase & " " & verb & " " & lsObjectKeyword)
+								lasFactTypeReading.Add(lsSubject.ToPascalCase & " " & verb & " " & lsObjectKeyword)
 							End If
-
 
 #Region "Add Keywords to list"
 							Dim words As String() = text.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
@@ -1399,14 +1634,24 @@ Public Class frmKnowledgeExtraction
 							lasKeywords.Add(lsObjectKeyword)
 #End Region
 						End If
-
+						Dim liPercent = i + 1 / numTokens
+						Me.progressBarMain.Value = If(liPercent < 1, 1, If(liPercent > 100, 100, liPercent))
 					Next
 				End With
+				If liInd Mod 100 = 0 Then
+					Me.WriteToStatusBar(".", True, liInd / sentences.size, True)
+					Application.DoEvents()
+				End If
+				Me.progressBarMain.Value = (Math.Min(1, liInd) / sentences.size) * 100
+				liInd += 1
 			Next            '=========================================
 
 
 
 			'============Noun Phrases===============================
+			liInd = 0
+			Me.WriteToStatusBar("Extracting Noun Phrases - 2nd Pass", True, 30)
+			Application.DoEvents()
 			For Each sentence As CoreMap In sentences
 				Dim tokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
 				Dim numTokens As Integer = tokens.size()
@@ -1442,15 +1687,25 @@ Public Class frmKnowledgeExtraction
 
 						' Add the SVO triple if both verb and object are present
 						If Not String.IsNullOrEmpty(verb) AndAlso Not String.IsNullOrEmpty([object]) Then
-							lasFactTypeReading.Add(subject & " - " & verb & " - " & [object])
+							lasFactTypeReading.Add(subject.ToPascalCaseWithSpaces & " " & verb & " " & [object].ToPascalCaseWithSpaces)
 						End If
 					End If
 				Next
+				If liInd Mod 200 = 0 Then
+					Me.WriteToStatusBar(".", True, 0, True)
+					Application.DoEvents()
+				End If
+
+				liInd += 1
+				Dim liPercent = liInd + 1 / sentences.size
+				Me.progressBarMain.Value = If(liPercent < 1, 1, If(liPercent > 100, 100, liPercent))
 			Next
 			'=============================================================================
 
 
-
+			liInd = 0
+			prApplication.WriteToStatusBar("Extracting more Fact Type Readings", True)
+			Application.DoEvents()
 			For Each sentence As CoreMap In sentences
 				Dim tokens As java.util.ArrayList = sentence.get(GetType(CoreAnnotations.TokensAnnotation))
 				Dim numTokens As Integer = tokens.size()
@@ -1484,14 +1739,24 @@ Public Class frmKnowledgeExtraction
 
 						' Add the SVO triple if both verb and object are present
 						If Not String.IsNullOrEmpty(verb) AndAlso Not String.IsNullOrEmpty([object]) Then
-							lasFactTypeReading.Add(subject & " - " & verb & " - " & [object])
+							lasFactTypeReading.Add(subject.ToPascalCaseWithSpaces & " - " & verb & " - " & [object].ToPascalCaseWithSpaces)
 						End If
 					End If
 				Next
+				If liInd Mod 200 = 0 Then
+					Me.WriteToStatusBar(".", True, 0, True)
+					Application.DoEvents()
+				End If
+				liInd += 1
+				Dim liPercent = liInd + 1 / sentences.size
+				Me.progressBarMain.Value = If(liPercent < 1, 1, If(liPercent > 100, 100, liPercent))
 			Next
 
 
 			' Extract Fact Type Readings from each sentence			
+			liInd = 0
+			Me.WriteToStatusBar("Extracting more Fact Type Readings - 2nd Pass", True)
+			Application.DoEvents()
 			For Each sentence As CoreMap In sentences
 				' Get the GrammaticalStructure from the sentence
 				Dim gs As GrammaticalStructure = CType(sentence.get(GetType(edu.stanford.nlp.trees.TypedDependency)), GrammaticalStructure)
@@ -1513,13 +1778,24 @@ Public Class frmKnowledgeExtraction
 					If governorPOS IsNot Nothing AndAlso dependentPOS IsNot Nothing AndAlso governorPOS.StartsWith("NN") AndAlso dependentPOS.StartsWith("VB") Then
 						Dim noun As String = FindNoun(dependency.gov().index(), typedDependencies)
 						If noun IsNot Nothing Then
-							Dim factTypeReading As String = $"{noun} {dependent} {governor}"
+							Dim factTypeReading As String = $"{noun.ToPascalCaseWithSpaces} {dependent} {governor.ToPascalCaseWithSpaces}"
 							lasFactTypeReading.Add(factTypeReading)
 						End If
 					End If
 				Next
 NextSentence:
+				If liInd Mod 200 = 0 Then
+					Me.WriteToStatusBar(".", True, 0, True)
+					Application.DoEvents()
+				End If
+				liInd += 1
+				Dim liPercent = liInd + 1 / sentences.size
+				Me.progressBarMain.Value = If(liPercent < 1, 1, If(liPercent > 100, 100, liPercent))
 			Next
+
+			lasFactTypeReading.Sort()
+
+			Me.WriteToStatusBar("", True, 0, True)
 
 			Return lasFactTypeReading
 
@@ -1529,7 +1805,7 @@ NextSentence:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
 			Return New List(Of String)
 		End Try
@@ -1583,7 +1859,7 @@ NextSentence:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
 			Return "Error"
 		End Try
@@ -1738,7 +2014,7 @@ NextSentence:
 
 	'			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 	'			lsMessage &= vbCrLf & vbCrLf & ex.Message
-	'			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+	'			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
 	'			Return New List(Of String)
 	'		End Try
@@ -1762,7 +2038,7 @@ NextSentence:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
 			Return Nothing
 		End Try
@@ -1780,6 +2056,8 @@ NextSentence:
 				Me.TabControl1.SelectedTab.Refresh()
 				Me.TabControl1.Refresh()
 
+				Me.ToolStripStatusLabel.Text = "Extracting Fact Types and Object Types using CoreNLP"
+
 				With New WaitCursor
 
 					Dim lasFactTypeReading = Me.ExtractFactTypeReadings(Me.RichTextBoxText.Text)
@@ -1787,6 +2065,10 @@ NextSentence:
 					Me.RichTextBoxResults.Text = String.Join(Environment.NewLine, lasFactTypeReading)
 					Me.TabPageResults.Show()
 				End With
+
+				Me.ToolStripStatusLabel.Text = ""
+				Me.StatusLabel.Text = "Finished"
+				Me.progressBarMain.Visible = False
 
 			End With
 
@@ -1796,7 +2078,7 @@ NextSentence:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -1849,7 +2131,7 @@ NextSentence:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
 
 			Return asWord
 		End Try
@@ -1881,7 +2163,7 @@ NextSentence:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
 
 			Return asVerb
 		End Try
@@ -1928,7 +2210,7 @@ NextSentence:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
 
 			Return asVerb
 		End Try
@@ -1952,7 +2234,7 @@ NextSentence:
 				Exit Sub
 			End If
 			If Trim(My.Settings.FactEngineOpenAIAPIKey) = "" Then
-				prApplication.ThrowErrorMessage("Set the OpenAI API Key in configuration", pcenumErrorType.Warning,, False,, True,, True)
+				prApplication.ThrowMessage("Set the OpenAI API Key in configuration", pcenumErrorType.Warning,, False,, True,, True)
 				Exit Sub
 			End If
 
@@ -1960,8 +2242,8 @@ NextSentence:
 			Me.RichTextBoxResults.Clear()
 
 			'Reset the Progress Bar
-			Me.ProgressBar.Value = 0
-			Me.ProgressBar.Visible = True
+			Me.ProgressBarAI.Value = 0
+			Me.ProgressBarAI.Visible = True
 
 			'Show the Abort button
 			Me.ButtonAbort.Visible = True
@@ -1969,6 +2251,7 @@ NextSentence:
 
 			Me.ButtonExecuteLLMGenerativeAI.Enabled = False
 
+			Me.TabControl1.SelectedTab = Me.TabPageResults
 
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -1976,7 +2259,7 @@ NextSentence:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 		Try
@@ -1991,12 +2274,13 @@ NextSentence:
 
 			Dim words As String() = lsDocumentText.ToString.Split(" "c)
 
-			Dim chunkSize As Integer = Math.Min(My.Settings.LLMChunkSize, CInt(Me.TextBoxChunkSize.Text))
+			Dim chunkSize As Integer = Math.Min(CInt(My.Settings.LLMChunkSize), CInt(Me.TextBoxChunkSize.Text))
 
 			Dim overlapSize As Integer = 100
 			Dim startIndex As Integer = 0
 
-			ToolStripStatusLabel.Text = "Processing search"
+			Me.StatusLabel.Text = "Processing text.."
+			Me.ToolStripStatusLabel.Text = "Processing AI knowledge extraction."
 
 			With New WaitCursor
 
@@ -2009,9 +2293,15 @@ NextSentence:
 					Me.ToolStripStatusLabelChunkCount.Text = "Chunk#: " & liChunkCounter
 
 					'Do something with the current 500-word chunk, such as write it to a file or process it in some way             
-					If mbAbort Then Exit While
+					If mbAbort Then
+						Me.StatusLabel.Text = "Aborted AI processing"
+						Me.WriteToStatusBar("", True, 0)
+						Exit While
+					End If
 
 					Try
+						Me.StatusLabel.Text &= ".."
+						Me.progressBarMain.Value = If(startIndex < 1, 1, If(startIndex / words.Count * 100 > 100, 100, startIndex / words.Count * 100))
 
 						Dim lsPrompt As String = ""
 
@@ -2045,9 +2335,9 @@ NextSentence:
 									End Try
 
 								Case Else
-									Dim lrCompletionResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsModifiedPrompt)
+									Dim lrCompletionResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsModifiedPrompt)
 									Try
-										lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
+										lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content 'Completions(0).Text
 									Catch
 										Me.RichTextBoxResults.AppendText(vbCrLf & "Error in AI API")
 										GoTo SkipSection
@@ -2056,46 +2346,48 @@ NextSentence:
 						End With
 						'=====================================================================================
 						Dim liIndex As Integer
-							Try
-								liIndex = Math.Max(lsGPT3ReturnString.IndexOf(vbCrLf), lsGPT3ReturnString.Length)
-							Catch ex As Exception
-								liIndex = lsGPT3ReturnString.Length
-							End Try
-
-							Dim loColor As Color = Color.Black
-
-							Dim start As Integer = Me.RichTextBoxResults.TextLength
-
-							If Not (lsGPT3ReturnString.Replace(vbLf, "").Replace(vbCrLf, "").Replace(Chr(24), "") = "I don't know.") And Not lsGPT3ReturnString.Contains("I don't know") Then
-								Me.RichTextBoxResults.AppendText(lsGPT3ReturnString.Substring(0, liIndex) & vbCrLf & "==========================" & vbCrLf)
-							End If
-
-							Dim li_end As Integer = Me.RichTextBoxResults.TextLength
-
-							' Textbox may transform chars, so (end-start) != text.Length
-							Me.RichTextBoxResults.Select(start, li_end - start)
-							Me.RichTextBoxResults.SelectionColor = loColor
-							Me.RichTextBoxResults.SelectionLength = 0 ' // clear                    
-
+						Try
+							liIndex = Math.Max(lsGPT3ReturnString.IndexOf(vbCrLf), lsGPT3ReturnString.Length)
 						Catch ex As Exception
-							Throw New Exception(ex.Message)
+							liIndex = lsGPT3ReturnString.Length
+						End Try
+
+						Dim loColor As Color = Color.Black
+
+						Dim start As Integer = Me.RichTextBoxResults.TextLength
+
+						If Not (lsGPT3ReturnString.Replace(vbLf, "").Replace(vbCrLf, "").Replace(Chr(24), "") = "I don't know.") And Not lsGPT3ReturnString.Contains("I don't know") Then
+							Me.RichTextBoxResults.AppendText(lsGPT3ReturnString.Substring(0, liIndex) & vbCrLf & "==========================" & vbCrLf)
+						End If
+
+						Dim li_end As Integer = Me.RichTextBoxResults.TextLength
+
+						' Textbox may transform chars, so (end-start) != text.Length
+						Me.RichTextBoxResults.Select(start, li_end - start)
+						Me.RichTextBoxResults.SelectionColor = loColor
+						Me.RichTextBoxResults.SelectionLength = 0 ' // clear                    
+
+					Catch ex As Exception
+						Throw New Exception(ex.Message)
 					End Try
 SkipSection:
 					'Move the start index forward by 400 words to create a 100-word overlap with the next chunk             
 					startIndex += chunkSize - overlapSize
 
 					If startIndex < words.Count Then
-						Me.ProgressBar.Value = (startIndex / words.Count) * 100
+						Me.ProgressBarAI.Value = (startIndex / words.Count) * 100
 					Else
-						Me.ProgressBar.Value = 100
+						Me.ProgressBarAI.Value = 100
 					End If
 
 					Application.DoEvents()
 
 					If Me.mbAbort Then
-						Me.ProgressBar.Value = 0
-						Me.ProgressBar.Visible = False
+						Me.ProgressBarAI.Value = 0
+						Me.ProgressBarAI.Visible = False
 						Me.ButtonAbort.Visible = False
+						Me.StatusLabel.Text = "Aborted processing"
+						Me.WriteToStatusBar("", True, 0)
 						Exit Sub
 					End If
 
@@ -2105,13 +2397,14 @@ SkipSection:
 			End With
 
 			'Hide the ProgressBar
-			Me.ProgressBar.Visible = False
+			Me.ProgressBarAI.Visible = False
 			'Hide the Abort button
 			Me.ButtonAbort.Visible = False
 
 			Me.ButtonExecuteLLMGenerativeAI.Enabled = True
 
-			ToolStripStatusLabel.Text = "Completed search successfully"
+			Me.StatusLabel.Text = "Completed search successfully"
+			Me.WriteToStatusBar("", True, 0, False)
 
 			Me.TabControl1.SelectedTab = Me.TabPageResults
 
@@ -2121,12 +2414,12 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
 			Me.ToolStripStatusLabel.Text = "An error occurred during the search process"
 		Finally
 			'Hide the ProgressBar
-			Me.ProgressBar.Visible = False
+			Me.ProgressBarAI.Visible = False
 			'Hide the Abort button
 			Me.ButtonAbort.Visible = False
 
@@ -2153,7 +2446,7 @@ SkipSection:
 					Dim lrToolboxForm As frmToolboxBrainBox = Nothing
 					lrToolboxForm = frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
 
-					If IsSomething(lrToolboxForm) Then
+					If lrToolboxForm IsNot Nothing Then
 						lrToolboxForm.TextBoxInput.Text = lsSelectedText
 					End If
 				End If
@@ -2165,7 +2458,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -2185,8 +2478,15 @@ SkipSection:
 					Dim lrToolboxForm As frmToolboxBrainBox = Nothing
 					lrToolboxForm = frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
 
-					If IsSomething(lrToolboxForm) Then
+					If lrToolboxForm IsNot Nothing Then
 						lrToolboxForm.TextBoxInput.Text = "NL: " & lsSelectedText
+						lrToolboxForm.Focus()
+						SendKeys.Send(" ")
+						lrToolboxForm.TextBoxInput.SelectionStart = lrToolboxForm.TextBoxInput.TextLength
+						lrToolboxForm.TextBoxInput.SelectionLength = 0
+						SendKeys.Send(" ")
+						lrToolboxForm.TextBoxInput.SelectionStart = lrToolboxForm.TextBoxInput.TextLength
+						lrToolboxForm.TextBoxInput.SelectionLength = 0
 					End If
 				End If
 			End With
@@ -2197,7 +2497,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -2218,7 +2518,7 @@ SkipSection:
 				End If
 
 				Dim lsEntityTypeName As String = Trim(Me.RichTextBoxResults.SelectedText)
-				lsEntityTypeName = Viev.Strings.MakeCapCamelCase(lsEntityTypeName)
+				lsEntityTypeName = FEStrings.MakeCapCamelCase(lsEntityTypeName)
 
 				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
 				Dim liDataTypeLength As Integer = 50
@@ -2248,7 +2548,7 @@ SkipSection:
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
 				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
-				If IsSomething(lrToolboxForm) Then
+				If lrToolboxForm IsNot Nothing Then
 					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrEntityType)
 				End If
@@ -2262,7 +2562,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2285,7 +2585,7 @@ SkipSection:
 
 
 				Dim lsValueTypeName As String = Trim(Me.RichTextBoxResults.SelectedText)
-				lsValueTypeName = Viev.Strings.MakeCapCamelCase(lsValueTypeName)
+				lsValueTypeName = FEStrings.MakeCapCamelCase(lsValueTypeName)
 
 				Dim liDataType As pcenumORMDataType = pcenumORMDataType.TextFixedLength
 				Dim liDataTypeLength As Integer = 50
@@ -2302,7 +2602,7 @@ SkipSection:
 				Dim lrToolboxForm As frmToolboxORMVerbalisation = Nothing
 				lrToolboxForm = frmMain.loadToolboxORMVerbalisationForm(Me.mrModel, Me.DockPanel.ActivePane)
 
-				If IsSomething(lrToolboxForm) Then
+				If lrToolboxForm IsNot Nothing Then
 					lrToolboxForm.zrModel = Me.mrModel
 					Call lrToolboxForm.verbaliseModelElement(lrValueType)
 				End If
@@ -2314,7 +2614,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2354,7 +2654,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2379,7 +2679,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 		End Try
 
 	End Sub
@@ -2390,37 +2690,57 @@ SkipSection:
 
 #Region "Highlight existing ModelElements"
 
-			For Each lrFactType In Me.mrModel.FactType
-				For Each lrFactTypeReading In lrFactType.FactTypeReading
-					Dim lsFactTypeReading As String = lrFactTypeReading.GetReadingText
-					Call Me.HighlightText(Me.RichTextBoxText, lsFactTypeReading, Color.Purple)
-					Call Me.HighlightText(Me.RichTextBoxResults, lsFactTypeReading, Color.Purple)
+			Dim visibleTabPage As TabPage = Nothing
+
+			For Each tabPage As TabPage In TabControl1.TabPages
+				If TabControl1.SelectedTab Is tabPage Then
+					' This tabPage is currently visible
+					visibleTabPage = tabPage
+					Exit For
+				End If
+			Next
+
+			Dim lrRichtextbox As RichTextBox = Nothing
+			If visibleTabPage.Name = Me.TabPageResults.Name Then
+				lrRichtextbox = RichTextBoxResults
+			ElseIf visibleTabPage.Name = Me.TabDocumentText.Name Then
+				lrRichtextbox = RichTextBoxText
+			Else
+				'CodeSafe
+				Exit Sub
+			End If
+
+			'CodeSafe
+			If lrRichtextbox Is Nothing Then Exit Sub
+
+			With New WaitCursor
+				For Each lrFactType In Me.mrModel.FactType.FindAll(Function(x) Not x.IsMDAModelElement)
+					For Each lrFactTypeReading In lrFactType.FactTypeReading
+						Dim lsFactTypeReading As String = lrFactTypeReading.GetReadingText
+						Call Me.HighlightText(lrRichtextbox, lsFactTypeReading, Color.Purple)
+					Next
 				Next
-			Next
 
-			For Each lrModelElement In Me.mrModel.getModelObjects.OrderBy(Function(x) x.Id)
-				Call Me.HighlightText(Me.RichTextBoxText, lrModelElement.Id, Color.RoyalBlue)
-				Call Me.HighlightText(Me.RichTextBoxResults, lrModelElement.Id, Color.RoyalBlue)
-			Next
+				For Each lrModelElement In Me.mrModel.getModelObjects.FindAll(Function(x) Not x.IsMDAModelElement).OrderBy(Function(x) x.Id)
+					Call Me.HighlightText(lrRichtextbox, lrModelElement.Id, Color.RoyalBlue)
+				Next
 
-			For Each lrModelElement In Me.mrModel.ValueType.OrderBy(Function(x) x.Id)
-				Call Me.HighlightText(Me.RichTextBoxText, lrModelElement.Id, Color.DarkGreen)
-				Call Me.HighlightText(Me.RichTextBoxResults, lrModelElement.Id, Color.DarkGreen)
-			Next
+				For Each lrModelElement In Me.mrModel.ValueType.FindAll(Function(x) Not x.IsMDAModelElement).OrderBy(Function(x) x.Id)
+					Call Me.HighlightText(lrRichtextbox, lrModelElement.Id, Color.DarkGreen)
+				Next
 
-			Dim lasValueConstraint = From ValueType In Me.mrModel.ValueType
-									 From ValueConstraint In ValueType.ValueConstraint
-									 Select ValueConstraint
+				Dim lasValueConstraint = From ValueType In Me.mrModel.ValueType.FindAll(Function(x) Not x.IsMDAModelElement)
+											 From ValueConstraint In ValueType.ValueConstraint
+											 Select ValueConstraint
 
-			For Each lsValueConstraint In lasValueConstraint
-				Call Me.HighlightText(Me.RichTextBoxText, lsValueConstraint, Color.Maroon)
-				Call Me.HighlightText(Me.RichTextBoxResults, lsValueConstraint, Color.Maroon)
-			Next
+					For Each lsValueConstraint In lasValueConstraint
+					Call Me.HighlightText(lrRichtextbox, lsValueConstraint, Color.Maroon)
+				Next
 
-			For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept).OrderBy(Function(x) x.Symbol)
-				Call Me.HighlightText(Me.RichTextBoxText, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
-				Call Me.HighlightText(Me.RichTextBoxResults, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
-			Next
+				'For Each lrModelDictionaryEntry In Me.mrModel.ModelDictionary.FindAll(Function(x) x.isGeneralConcept).OrderBy(Function(x) x.Symbol)
+				'	Call Me.HighlightText(lrRichtextbox, lrModelDictionaryEntry.Symbol, Color.DarkOrange)
+				'Next
+			End With
 #End Region
 		Catch ex As Exception
 			Dim lsMessage As String
@@ -2428,7 +2748,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2443,7 +2763,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2459,7 +2779,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2477,7 +2797,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2485,6 +2805,7 @@ SkipSection:
 	Private Sub RichTextBoxText_TextChanged(sender As Object, e As EventArgs) Handles RichTextBoxText.TextChanged
 
 		Try
+			Exit Sub
 			If Clipboard.ContainsText() Then
 				Dim clipboardText As String = Clipboard.GetText()
 				Dim richTextBoxText As String = Me.RichTextBoxText.Text
@@ -2521,7 +2842,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2536,7 +2857,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2561,7 +2882,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
@@ -2576,7 +2897,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2609,7 +2930,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2639,7 +2960,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 	End Sub
 
@@ -2672,7 +2993,7 @@ SkipSection:
 
 				lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 				lsMessage &= vbCrLf & vbCrLf & ex.Message
-				prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+				prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 			End Try
 
 		Catch ex As Exception
@@ -2681,7 +3002,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2711,7 +3032,7 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
@@ -2740,9 +3061,240 @@ SkipSection:
 
 			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
 			lsMessage &= vbCrLf & vbCrLf & ex.Message
-			prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 		End Try
 
 	End Sub
 
+	Private Sub ButtonMapModelElementsToDocument_Click(sender As Object, e As EventArgs) Handles ButtonMapModelElementsToDocument.Click
+
+		Try
+
+			If System.IO.Path.GetExtension(TextBoxDocumentPath.Text) = ".pdf" Then
+
+				With New WaitCursor
+
+					Dim lsDocumentText As String = ""
+
+					Using reader As PdfReader = New PdfReader(TextBoxDocumentPath.Text)
+
+						For liInd As Integer = 1 To reader.NumberOfPages
+
+							lsDocumentText = (PdfTextExtractor.GetTextFromPage(reader, liInd).ToString).LCase
+
+							For Each lrModelElement In Me.mrModel.getModelObjects.FindAll(Function(x) x.ConceptType = pcenumConceptType.ValueType Or x.ConceptType = pcenumConceptType.EntityType)
+
+								If lsDocumentText.Contains(lrModelElement.Id.LCase) Then
+
+									Dim lrFEKLObject As New FEKL.FEKL4JSONObject
+									prApplication.Brain.Model = Me.mrModel
+									Try
+
+										lrFEKLObject.FEKLStatement = lrModelElement.Id & " IS A CONCEPT"
+										lrFEKLObject.ObjectType = lrModelElement.Id
+										lrFEKLObject.DocumentLocation = Me.TextBoxDocumentPath.Text.Trim
+										lrFEKLObject.DocumentName = System.IO.Path.GetFileName(Me.TextBoxDocumentPath.Text)
+										lrFEKLObject.PageNumber = liInd
+										lrFEKLObject.LineNumber = 1
+										lrFEKLObject.SectionId = ""
+										lrFEKLObject.SectionName = ""
+										lrFEKLObject.ActualText = ""
+										lrFEKLObject.DocumentLocationJson = ""
+										lrFEKLObject.StartOffset = 0
+										lrFEKLObject.EndOffset = 0
+										lrFEKLObject.RequirementId = ""
+
+										prApplication.Brain.ProcessFBMInterfaceFEKLStatement(lrFEKLObject.FEKLStatement, lrFEKLObject)
+
+									Catch ex As Exception
+										Dim lsMessage As String
+										Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+										lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+										lsMessage &= vbCrLf & vbCrLf & ex.Message
+										prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+									End Try
+
+								End If
+
+								Me.progressBarMain.Value = 100 * liInd / reader.NumberOfPages
+								Me.progressBarMain.Refresh()
+								Me.progressBarMain.Invalidate()
+							Next
+						Next
+
+					End Using
+
+
+				End With
+
+			Else
+				Boston.ShowFlashCard("Reverse Document Lineage is only available for PDF documents at this stage", Color.LightGray)
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub CloseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CloseToolStripMenuItem.Click
+
+		Try
+			Me.Hide()
+			Me.Close()
+			Me.Dispose()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub mrModel_ModelElementAdded(ByRef arModelElement As FBM.ModelObject) Handles mrModel.ModelElementAdded
+
+		Try
+			If arModelElement IsNot Nothing Then
+				Select Case arModelElement.GetType
+					Case Is = GetType(FBM.ValueType)
+
+						Dim lrValueType As FBM.ValueType = arModelElement
+
+						Call Me.HighlightText(Me.RichTextBoxText, lrValueType.Id, Color.DarkGreen)
+
+						Dim lasValueConstraint = From ValueConstraint In lrValueType.ValueConstraint
+												 Select ValueConstraint
+
+						For Each lsValueConstraint In lasValueConstraint
+							Call Me.HighlightText(Me.RichTextBoxText, lsValueConstraint, Color.Maroon)
+						Next
+
+					Case Is = GetType(FBM.EntityType)
+
+						Dim lrEntityType As FBM.EntityType = arModelElement
+
+						Call Me.HighlightText(Me.RichTextBoxText, lrEntityType.Id, Color.RoyalBlue)
+
+				End Select
+
+				Dim loListViewItem() As ListViewItem = Me.ResultListView.Items.Find(arModelElement.Id, True)
+				If loListViewItem.Count > 0 Then
+					MyData.WordsFre(loListViewItem(0).Index).IsInModel = True
+					Dim loFont = New Font("Arial", 10, FontStyle.Bold)
+					loListViewItem(0).SubItems(1).Font = loFont
+					loListViewItem(0).ForeColor = Color.RoyalBlue
+				End If
+
+			End If
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub PlaceInVirtualAnalystToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PlaceInVirtualAnalystToolStripMenuItem.Click
+
+		Try
+			With New WaitCursor
+
+				If ResultListView.SelectedIndices IsNot Nothing AndAlso ResultListView.SelectedIndices.Count > 0 Then
+
+					Dim lsWord As String = ""
+					Dim c As ListView.SelectedIndexCollection = ResultListView.SelectedIndices
+					lsWord = ResultListView.Items(c(0)).SubItems(1).Text
+
+					'-------------------------------------------------------
+					'ORM Verbalisation
+					'-------------------------------------------------------
+					Dim lrToolboxForm As frmToolboxBrainBox = Nothing
+					lrToolboxForm = frmMain.loadToolboxRichmondBrainBox(Nothing, Me.DockPanel.ActivePane)
+
+					If lrToolboxForm IsNot Nothing Then
+						lrToolboxForm.TextBoxInput.Text = "NL: " & lsWord
+						lrToolboxForm.Focus()
+						SendKeys.Send(" ")
+						lrToolboxForm.TextBoxInput.SelectionStart = lrToolboxForm.TextBoxInput.TextLength
+						lrToolboxForm.TextBoxInput.SelectionLength = 0
+						SendKeys.Send(" ")
+						lrToolboxForm.TextBoxInput.SelectionStart = lrToolboxForm.TextBoxInput.TextLength
+						lrToolboxForm.TextBoxInput.SelectionLength = 0
+					End If
+				End If
+
+			End With
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+		End Try
+
+	End Sub
+
+	Private Sub ButtonViewDocument_Click(sender As Object, e As EventArgs) Handles ButtonViewDocument.Click
+
+		Try
+			'CodeSafe
+			If Me.TextBoxDocumentPath.Text.Trim = "" Or Not System.IO.File.Exists(Me.TextBoxDocumentPath.Text.Trim) Then
+				Boston.ShowFlashCard("Invalid document path.", Color.LightGray)
+				Exit Sub
+			End If
+
+			Dim lfrmDocumentViewer As New frmPDFDocumentViewer
+
+			lfrmDocumentViewer.msDocumentFilePath = Me.TextBoxDocumentPath.Text.Trim
+			lfrmDocumentViewer.miPageNumber = 0
+			lfrmDocumentViewer.msObjectTypeName = Nothing
+
+			Dim lfrmMain As frmMain = prApplication.MainForm
+
+			With New WaitCursor
+				lfrmDocumentViewer.Show(lfrmMain.DockPanel)
+			End With
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
+
+	Private Sub RichTextBoxText_VScroll(sender As Object, e As EventArgs) Handles RichTextBoxText.VScroll
+
+		Try
+			'Call Me.HighlightText()
+
+		Catch ex As Exception
+			Dim lsMessage As String
+			Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+			lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+			lsMessage &= vbCrLf & vbCrLf & ex.Message
+			prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+		End Try
+
+	End Sub
 End Class

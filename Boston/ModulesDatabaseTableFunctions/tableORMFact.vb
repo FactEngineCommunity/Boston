@@ -26,7 +26,7 @@ Namespace TableFact
                 Dim lsMessage As String
                 lsMessage = "Error: TableFact.AddFact"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 pdbConnection.RollbackTrans()
             End Try
@@ -67,7 +67,7 @@ Namespace TableFact
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
 
                 pdbConnection.RollbackTrans()
-                If Not abIgnoreErrors Then prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                If Not abIgnoreErrors Then prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -104,7 +104,7 @@ Namespace TableFact
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -209,7 +209,7 @@ Namespace TableFact
                 If lrFact IsNot Nothing Then
                     lsMessage.AppendDoubleLineBreak("Fact.Id: " & lrFact.Id)
                 End If
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 lRecordset.Close()
                 'GetFactsForFactType = Nothing
@@ -234,7 +234,7 @@ Namespace TableFact
                 Dim lsMessage As String
                 lsMessage = "Error: TableFact.UpdateFact"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

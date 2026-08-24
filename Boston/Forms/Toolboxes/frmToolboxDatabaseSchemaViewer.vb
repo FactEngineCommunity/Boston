@@ -15,7 +15,7 @@ Public Class frmToolboxDatabaseSchemaViewer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -27,6 +27,9 @@ Public Class frmToolboxDatabaseSchemaViewer
     Public Sub SetupForm()
 
         Try
+            Me.LabelPromptModel.Text = Me.mrModel.Name.Trim
+
+
             Call Me.LoadTableNames()
 
         Catch ex As Exception
@@ -35,7 +38,7 @@ Public Class frmToolboxDatabaseSchemaViewer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -48,7 +51,7 @@ Public Class frmToolboxDatabaseSchemaViewer
 
             If Me.mrModel.DatabaseConnection Is Nothing Then
                 If Not Me.mrModel.connectToDatabase() Then
-                    prApplication.ThrowErrorMessage("Couldn't connect to the database.", pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
+                    prApplication.ThrowMessage("Couldn't connect to the database.", pcenumErrorType.Warning, abThrowtoMSGBox:=True, abUseFlashCard:=True)
                 End If
             End If
 
@@ -57,6 +60,9 @@ Public Class frmToolboxDatabaseSchemaViewer
             For Each lrTable In larTable
                 Dim lrNode = Me.TreeViewSchema.Nodes(0).Nodes.Add(lrTable.Name)
 
+                lrNode = lrNode.Nodes.Add("Columns")
+
+                'Columns
                 For Each lrColumn In Me.mrModel.DatabaseConnection.getColumnsByTable(lrTable)
                     lrNode.Nodes.Add(lrColumn.Name & "    " & lrColumn.DataType.DataType & "     " & lrColumn.TemporaryData)
                 Next
@@ -78,7 +84,7 @@ Public Class frmToolboxDatabaseSchemaViewer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -95,7 +101,7 @@ Public Class frmToolboxDatabaseSchemaViewer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -111,7 +117,7 @@ Public Class frmToolboxDatabaseSchemaViewer
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

@@ -97,7 +97,7 @@ Namespace FBM.STM
                 End If
 
                 'CMML
-                Call Me.Model.Model.changeCMMLStateName(Me, lsOldStateName)
+                Call Me.Model.Model.updateCMMLStateName(Me, lsOldStateName)
 
                 RaiseEvent NameChanged(asNewName)
 
@@ -107,7 +107,7 @@ Namespace FBM.STM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

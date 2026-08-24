@@ -12,7 +12,7 @@ Namespace FBM
                        "<title>ORM2 Verbalization</title>" & vbCrLf &
                        "<style type=" & Chr(34) & "text/css" & Chr(34) & ">" & vbCrLf &
                        "body, table { font-family: Tahoma; font-size: 9pt; color: DarkGreen; font-weight: normal; }" & vbCrLf &
-                       "body { background-color: #F5F5F5; padding: 0em .1em; }" & vbCrLf &
+                       "body { background-color: #F6F6F6; padding: 0em .1em; }" & vbCrLf &
                        "FTR { padding: 9; }" & vbCrLf &
                        "table.hidden, tr.hidden, td.hidden { margin: 0em; padding: 0em; border-collapse: collapse;}" & vbCrLf &
                        "td.hidden { vertical-align: top; }" & vbCrLf &
@@ -59,6 +59,20 @@ Namespace FBM
             Me.HTW.RenderBeginTag(HtmlTextWriterTag.Span)
             Me.HTW.Write(asPredicateText)
             Me.HTW.RenderEndTag()
+
+        End Sub
+
+        Public Sub VerbaliseMetadataLineageDocument(arDataLineageDocument As DataLineage.Document)
+
+            If arDataLineageDocument IsNot Nothing Then
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Class, "objectType")
+                Me.HTW.AddAttribute(HtmlTextWriterAttribute.Href, "metadatalineagedocument:" & arDataLineageDocument.Location)
+                Me.HTW.RenderBeginTag(HtmlTextWriterTag.A)
+                Me.HTW.Write(arDataLineageDocument.Name)
+                Me.HTW.RenderEndTag()
+            Else
+                Me.HTW.Write("''")
+            End If
 
         End Sub
 

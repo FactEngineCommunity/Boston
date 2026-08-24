@@ -91,23 +91,25 @@ Public Class frmAutoComplete
             e.Graphics.DrawString(CurrentText, Me.ListBox.Font, New SolidBrush(ForeColor), e.Bounds, StringFormat.GenericDefault)
 
             Dim lrFEQLTokenType = CType(Me.ListBox.Items(e.Index), tComboboxItem)
-            Select Case lrFEQLTokenType.Tag.GetType
-                Case Is = GetType(FBM.FactTypeReading)
-                    'N/A at this stage.
-                Case Else
-                    If lrFEQLTokenType.Tag = FEQL.TokenType.PREDICATE Then
-                        Dim liStringWidth = e.Graphics.MeasureString(CurrentText, Me.ListBox.Font).Width
-                        Dim lrRectangle = New Rectangle(e.Bounds.X + liStringWidth + 2, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height)
-                        e.Graphics.DrawString(lrFEQLTokenType.ItemData, Me.ListBox.Font, New SolidBrush(Color.FromArgb(158, 158, 158)), lrRectangle, StringFormat.GenericDefault)
-                    End If
-            End Select
+            If lrFEQLTokenType.Tag IsNot Nothing Then
+                Select Case lrFEQLTokenType.Tag.GetType
+                    Case Is = GetType(FBM.FactTypeReading)
+                        'N/A at this stage.
+                    Case Else
+                        If lrFEQLTokenType.Tag = FEQL.TokenType.PREDICATE Then
+                            Dim liStringWidth = e.Graphics.MeasureString(CurrentText, Me.ListBox.Font).Width
+                            Dim lrRectangle = New Rectangle(e.Bounds.X + liStringWidth + 2, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height)
+                            e.Graphics.DrawString(lrFEQLTokenType.ItemData, Me.ListBox.Font, New SolidBrush(Color.FromArgb(158, 158, 158)), lrRectangle, StringFormat.GenericDefault)
+                        End If
+                End Select
+            End If
         Catch ex As Exception
             Dim lsMessage As String
-        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -195,7 +197,7 @@ Public Class frmAutoComplete
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -266,16 +268,18 @@ Public Class frmAutoComplete
                         '---------------------
                         'Don't remove spaces
                         '---------------------
+                        GoTo BackTrackingRemoveFromPosition '20231203-VM-For now.
                     ElseIf Me.ListBox.SelectedItem.ToString.Length = 1 Then
                         If Me.zoTextEditor.Text.Substring(Me.zoTextEditor.Text.Length - 1, 1) = Me.ListBox.SelectedItem.ToString Then
                             liRemoveFromPosition = Me.zoTextEditor.Text.Length - 1
                         End If
                     Else
+BackTrackingRemoveFromPosition:
                         For liInd = Me.ListBox.SelectedItem.ToString.Length - 1 To 0 Step -1
-                            lsSubString = Me.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)
-                            If Me.zoTextEditor.Text.LastIndexOf(Me.ListBox.SelectedItem.ToString.Substring(0, liInd + 1)) >= 0 Then
-                                If Me.zoTextEditor.Text.LastIndexOf(lsSubString) + lsSubString.Length = Me.zoTextEditor.Text.Length Then
-                                    liRemoveFromPosition = Me.zoTextEditor.Text.LastIndexOf(lsSubString)
+                            lsSubString = Me.ListBox.SelectedItem.ToString.Substring(0, liInd + 1).ToLower
+                            If Me.zoTextEditor.Text.ToLower.LastIndexOf(lsSubString) >= 0 Then
+                                If Me.zoTextEditor.Text.ToLower.LastIndexOf(lsSubString) + lsSubString.Length = Me.zoTextEditor.Text.Trim.Length Then
+                                    liRemoveFromPosition = Me.zoTextEditor.Text.ToLower.LastIndexOf(lsSubString)
                                     Exit For
                                 End If
                             End If
@@ -295,20 +299,38 @@ Public Class frmAutoComplete
 
                 Me.zoTextEditor.SelectionProtected = False
 
+#Region "TokenType"
+                Dim liTokenType As VAQL.TokenType = VAQL.TokenType.ADDITIONALVALUE
+
+                If Me.ListBox.SelectedItem.Tag IsNot Nothing Then
+                    liTokenType = Me.ListBox.SelectedItem.Tag
+                End If
+#End Region
+
                 '20201112-VM-Changing to insert at selected position
+                If Me.zoTextEditor.Text.Trim.Length > 5 AndAlso Not Me.zoTextEditor.Text.EndsWith(" ") Then
+                    Select Case liTokenType
+                        Case Is = FEQL.TokenType.IDENTIFIER
+                        Case Else
+                            Me.zoTextEditor.AppendText(" ")
+                    End Select
+                End If
 
                 If (Me.zoTextEditor.SelectionStart <> 0) And (Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length) Then
                     Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
                     Me.zoTextEditor.AppendText(lsSelectedItem)
+                    Me.zoTextEditor.Text = Me.zoTextEditor.Text.Replace("  ", " ")
                 ElseIf Me.zoTextEditor.SelectionStart = 0 Then
                     Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
                     Me.zoTextEditor.AppendText(lsSelectedItem)
+                    Me.zoTextEditor.Text = Me.zoTextEditor.Text.Replace("  ", " ")
                 Else
                     Me.zoTextEditor.SelectionLength = 0
                     Me.zoTextEditor.SelectedText = lsSelectedItem
                 End If
 
                 Me.zoTextEditor.SelectionColor = Me.zoTextEditor.ForeColor
+                Me.zoTextEditor.SelectionStart = Me.zoTextEditor.Text.Length
 
                 Me.Hide()
 
@@ -362,7 +384,7 @@ Public Class frmAutoComplete
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

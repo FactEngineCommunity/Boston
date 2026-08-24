@@ -23,6 +23,7 @@ Namespace TableValueType
                 lsSQLQuery &= " ," & arValueType.IsMDAModelElement
                 lsSQLQuery &= " ,'" & arValueType.GUID & "'"
                 lsSQLQuery &= " ," & arValueType.IsIndependent
+                lsSQLQuery &= " ,'" & arValueType.ObjectifyingFactTypeId.Trim & "'"
                 lsSQLQuery &= ")"
 
                 Call pdbConnection.Execute(lsSQLQuery)
@@ -33,7 +34,7 @@ Namespace TableValueType
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueType.AddValueType"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
 
@@ -171,6 +172,7 @@ Namespace TableValueType
                     arValueType.IsMDAModelElement = CBool(lREcordset("IsMDAModelElement").Value)
                     arValueType.GUID = lREcordset("GUID").Value
                     arValueType.IsIndependent = CBool(lREcordset("IsIndependent").Value)
+                    arValueType.ObjectifyingFactTypeId = lREcordset("ObjectifyingFactTypeId").Value
                     arValueType.isDirty = False
                 Else
                     Dim lsMessage As String = "Error: GetValueTypeDetailsById: No ValueType returned for ValueTypeId: " & arValueType.Id
@@ -187,7 +189,7 @@ Namespace TableValueType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return arValueType
             End Try
@@ -239,6 +241,7 @@ Namespace TableValueType
                         lrValueType.IsMDAModelElement = CBool(lREcordset("IsMDAModelElement").Value)
                         lrValueType.GUID = lREcordset("GUID").Value
                         lrValueType.IsIndependent = CBool(lREcordset("IsIndependent").Value)
+                        lrValueType.ObjectifyingFactTypeId = lREcordset("ObjectifyingFactTypeId").Value
                         lrValueType.isDirty = False
 
                         Call TableValueTypeValueConstraint.GetValueConstraintsByValueType(lrValueType)
@@ -290,7 +293,7 @@ Namespace TableValueType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -321,11 +324,15 @@ Namespace TableValueType
                     pdbConnection.CommitTrans()
                 End If
 
+                Call tableDataLineageItemProperty.ModifyKeyDataLineageItemProperty(arValueType.Model,
+                                                                                   arValueType.Id & " - Object Type",
+                                                                                   as_new_key & " - Object Type")
+
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: TableValueType.ModifyKey"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -343,6 +350,7 @@ Namespace TableValueType
                 lsSQLQuery &= "       , IsMDAModelElement = " & arValueType.IsMDAModelElement
                 lsSQLQuery &= "       , [GUID] = '" & arValueType.GUID & "'"
                 lsSQLQuery &= "       , IsIndependent = " & arValueType.IsIndependent
+                lsSQLQuery &= "       , ObjectifyingFactTypeId = " & arValueType.ObjectifyingFactTypeId
                 lsSQLQuery &= " WHERE ValueTypeId = '" & Trim(Replace(arValueType.Id, "'", "`")) & "'"
                 lsSQLQuery &= "   AND ModelId = '" & Trim(Replace(arValueType.Model.ModelId, "'", "`")) & "'"
 
@@ -357,7 +365,7 @@ Namespace TableValueType
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 pdbConnection.RollbackTrans()
             End Try

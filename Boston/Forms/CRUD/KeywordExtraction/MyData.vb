@@ -371,7 +371,12 @@ Class MyFun
 			Dim ha As New Hashtable()
 
 			'获取全部词
-			words = TheDoc.Split(" "C)
+			words = TheDoc.Split(" "c)
+
+			For i As Integer = 0 To words.Length - 1
+				words(i) = frmKnowledgeExtraction.Singularize(words(i))
+				words(i) = words(i).ToPascalCase()
+			Next
 
 			'统计词频
 			For Each wd As String In words

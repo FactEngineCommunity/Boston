@@ -50,7 +50,7 @@ Namespace TableFactTypeInstance
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -160,6 +160,7 @@ Namespace TableFactTypeInstance
                         lrFactTypeInstance.Page = arPage
                         lrFactTypeInstance.X = lREcordset("x").Value
                         lrFactTypeInstance.Y = lREcordset("y").Value
+                        lrFactTypeInstance.isDirty = False
                         lrFactTypeInstance.InstanceNumber = lREcordset("InstanceNumber").Value
                         '2022-01-28-VM-Moved to below...now get from FactType.
                         'lrFactTypeInstance.IsDerived = CBool(lREcordset("IsDerived").Value)
@@ -217,9 +218,9 @@ Namespace TableFactTypeInstance
                         If lrFactTypeInstance.IsObjectified Then
                             Dim lrObjectifyingEntityTypeInstance As FBM.EntityTypeInstance
 
-                            If IsSomething(lrFactTypeInstance.FactType.ObjectifyingEntityType) Then
+                            If lrFactTypeInstance.FactType.ObjectifyingEntityType IsNot Nothing Then
                                 lrObjectifyingEntityTypeInstance = arPage.EntityTypeInstance.Find(Function(x) x.Id = lrFactTypeInstance.FactType.ObjectifyingEntityType.Id And x.InstanceNumber = lrFactTypeInstance.InstanceNumber)
-                                If IsSomething(lrObjectifyingEntityTypeInstance) Then
+                                If lrObjectifyingEntityTypeInstance IsNot Nothing Then
                                     '---------------------------------------------
                                     'All okay. Found the EntityType on the Page.
                                     '---------------------------------------------
@@ -266,7 +267,7 @@ Namespace TableFactTypeInstance
                         For Each lrRole In lrFactTypeInstance.FactType.RoleGroup
                             lrRoleInstance = lrRole.CloneInstance(arPage, True, False, lrFactTypeInstance)
 
-                            'prApplication.ThrowErrorMessage("Loading Page:'" & arPage.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
+                            'prApplication.ThrowMessage("Loading Page:'" & arPage.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
                             '20220410-VM-Replace with passing lrFactTypeInstance to lrRole.CloneInstance (above)
                             'lrRoleInstance.FactType = lrFactTypeInstance
 
@@ -329,7 +330,7 @@ Namespace TableFactTypeInstance
                             arPage.RoleInstance.AddUnique(lrRoleInstance)
                             'End SyncLock
 
-                            'prApplication.ThrowErrorMessage("Successfully loaded Page:'" & lrFactTypeInstance.Page.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
+                            'prApplication.ThrowMessage("Successfully loaded Page:'" & lrFactTypeInstance.Page.Name & "' AND RoleInstance.Id:'" & lrRoleInstance.Id & "'", pcenumErrorType.Information)
                         Next
 
                         '----------------------------------------------
@@ -390,7 +391,7 @@ Namespace TableFactTypeInstance
             Catch ex As Exception
                 lsMessage = "Error: TableFactTypeInstance.lrFactTypeInstance"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -436,7 +437,7 @@ Namespace TableFactTypeInstance
                         '-----------------------------------------------------------------------------------
                         If lrFactTypeInstance IsNot Nothing Then
                             GetFactTypeInstancesByPage.Add(lrFactTypeInstance)
-                            'prApplication.ThrowErrorMessage("Successfully loaded (Page:'" & lrFactTypeInstance.Page.Name & "' AND FactTypeInstance.Id:'" & lrFactTypeInstance.Id & "')", pcenumErrorType.Information)
+                            'prApplication.ThrowMessage("Successfully loaded (Page:'" & lrFactTypeInstance.Page.Name & "' AND FactTypeInstance.Id:'" & lrFactTypeInstance.Id & "')", pcenumErrorType.Information)
                         End If
 
                         lREcordset.MoveNext()
@@ -483,7 +484,7 @@ Namespace TableFactTypeInstance
                 Dim lsMessage As String
                 lsMessage = "Error: GetFactTypeInstancesByPage:"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -508,7 +509,7 @@ Namespace TableFactTypeInstance
                 lsMessage = "Error: TableFactTypeInstance.ModifyKey"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "SQL: " & lsSQLQuery
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -537,7 +538,7 @@ Namespace TableFactTypeInstance
                 lsMessage = "Error: TableFactTypeInstance.UpdateFactTypeInstance"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
                 lsMessage &= vbCrLf & vbCrLf & "SQL: " & lsSQLQuery
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

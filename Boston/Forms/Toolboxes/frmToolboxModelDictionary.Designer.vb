@@ -46,6 +46,9 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripMenuItemMakeNewPageForThisModelElement = New System.Windows.Forms.ToolStripMenuItem()
         Me.PropertiesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemMakeMDAModelElement = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LineageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemCopyModelElement = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemEditEntity = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripStatusLabelPromptRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabelRealisationsCount = New System.Windows.Forms.ToolStripStatusLabel()
@@ -56,11 +59,14 @@ Partial Class frmToolboxModelDictionary
         Me.ContextMenuStripGeneralConcept = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ConvertToEntityTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConvertToValueTypeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.LineageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ContextMenuEntity = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ToolStripMenuItemAddEntityTable = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DynamicDataEntryFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox_Main.SuspendLayout()
         Me.ContextMenuStripMain.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.ContextMenuStripGeneralConcept.SuspendLayout()
+        Me.ContextMenuEntity.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox_Main
@@ -90,7 +96,8 @@ Partial Class frmToolboxModelDictionary
         '
         Me.SearchTextbox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.SearchTextbox.Location = New System.Drawing.Point(3, 71)
+        Me.SearchTextbox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.SearchTextbox.Location = New System.Drawing.Point(3, 77)
         Me.SearchTextbox.Name = "SearchTextbox"
         Me.SearchTextbox.Size = New System.Drawing.Size(357, 26)
         Me.SearchTextbox.TabIndex = 9
@@ -106,17 +113,20 @@ Partial Class frmToolboxModelDictionary
         '
         'ComboBoxView
         '
+        Me.ComboBoxView.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
         Me.ComboBoxView.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxView.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBoxView.FormattingEnabled = True
+        Me.ComboBoxView.ItemHeight = 20
         Me.ComboBoxView.Location = New System.Drawing.Point(70, 49)
         Me.ComboBoxView.Name = "ComboBoxView"
-        Me.ComboBoxView.Size = New System.Drawing.Size(269, 21)
+        Me.ComboBoxView.Size = New System.Drawing.Size(269, 26)
         Me.ComboBoxView.TabIndex = 7
         '
         'ButtonRefresh
         '
         Me.ButtonRefresh.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonRefresh.Image = Global.Boston.My.Resources.MenuImages.Refresh_16x16
+        Me.ButtonRefresh.Image = CType(resources.GetObject("ButtonRefresh.Image"), System.Drawing.Image)
         Me.ButtonRefresh.Location = New System.Drawing.Point(336, 25)
         Me.ButtonRefresh.Name = "ButtonRefresh"
         Me.ButtonRefresh.Size = New System.Drawing.Size(24, 23)
@@ -170,10 +180,10 @@ Partial Class frmToolboxModelDictionary
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.TreeView1.ImageIndex = 0
         Me.TreeView1.ImageList = Me.ImageList
-        Me.TreeView1.Location = New System.Drawing.Point(3, 98)
+        Me.TreeView1.Location = New System.Drawing.Point(3, 103)
         Me.TreeView1.Name = "TreeView1"
         Me.TreeView1.SelectedImageIndex = 0
-        Me.TreeView1.Size = New System.Drawing.Size(357, 352)
+        Me.TreeView1.Size = New System.Drawing.Size(357, 347)
         Me.TreeView1.TabIndex = 1
         '
         'ImageList
@@ -210,12 +220,16 @@ Partial Class frmToolboxModelDictionary
         Me.ImageList.Images.SetKeyName(27, "Attribute-PrimaryKey.png")
         Me.ImageList.Images.SetKeyName(28, "TaxonomyModel16x16.png")
         Me.ImageList.Images.SetKeyName(29, "Entity-B&W16x16.png")
+        Me.ImageList.Images.SetKeyName(30, "PGS16x16.png")
+        Me.ImageList.Images.SetKeyName(31, "ORM16x16.png")
+        Me.ImageList.Images.SetKeyName(32, "BPMN-ChoreographyDiagram-16x16.png")
+        Me.ImageList.Images.SetKeyName(33, "table16x16.png")
         '
         'ContextMenuStripMain
         '
-        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1, Me.ToolStripMenuItemMakeMDAModelElement, Me.LineageToolStripMenuItem})
+        Me.ContextMenuStripMain.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemViewOnPage, Me.ToolStripMenuItemViewInDiagramSpy, Me.ViewInGlossaryToolStripMenuItem, Me.ToolStripMenuItemRemoveFromModel, Me.ToolStripMenuItemMakeNewPageForThisModelElement, Me.PropertiesToolStripMenuItem1, Me.ToolStripMenuItemMakeMDAModelElement, Me.LineageToolStripMenuItem, Me.ToolStripMenuItemCopyModelElement, Me.ToolStripMenuItemEditEntity, Me.DynamicDataEntryFormToolStripMenuItem})
         Me.ContextMenuStripMain.Name = "ContextMenuStrip1"
-        Me.ContextMenuStripMain.Size = New System.Drawing.Size(281, 202)
+        Me.ContextMenuStripMain.Size = New System.Drawing.Size(281, 268)
         '
         'ToolStripMenuItemViewOnPage
         '
@@ -225,7 +239,7 @@ Partial Class frmToolboxModelDictionary
         '
         'ToolStripMenuItemViewInDiagramSpy
         '
-        Me.ToolStripMenuItemViewInDiagramSpy.Image = Global.Boston.My.Resources.MenuImages.Spyglass16x16
+        Me.ToolStripMenuItemViewInDiagramSpy.Image = CType(resources.GetObject("ToolStripMenuItemViewInDiagramSpy.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemViewInDiagramSpy.Name = "ToolStripMenuItemViewInDiagramSpy"
         Me.ToolStripMenuItemViewInDiagramSpy.Size = New System.Drawing.Size(280, 22)
         Me.ToolStripMenuItemViewInDiagramSpy.Text = "View in Diagram Spy"
@@ -238,7 +252,7 @@ Partial Class frmToolboxModelDictionary
         '
         'ToolStripMenuItemRemoveFromModel
         '
-        Me.ToolStripMenuItemRemoveFromModel.Image = Global.Boston.My.Resources.MenuImages.Remove16x16
+        Me.ToolStripMenuItemRemoveFromModel.Image = CType(resources.GetObject("ToolStripMenuItemRemoveFromModel.Image"), System.Drawing.Image)
         Me.ToolStripMenuItemRemoveFromModel.Name = "ToolStripMenuItemRemoveFromModel"
         Me.ToolStripMenuItemRemoveFromModel.Size = New System.Drawing.Size(280, 22)
         Me.ToolStripMenuItemRemoveFromModel.Text = "&Remove From Model"
@@ -251,7 +265,7 @@ Partial Class frmToolboxModelDictionary
         '
         'PropertiesToolStripMenuItem1
         '
-        Me.PropertiesToolStripMenuItem1.Image = Global.Boston.My.Resources.MenuImages.Properties216x16
+        Me.PropertiesToolStripMenuItem1.Image = CType(resources.GetObject("PropertiesToolStripMenuItem1.Image"), System.Drawing.Image)
         Me.PropertiesToolStripMenuItem1.Name = "PropertiesToolStripMenuItem1"
         Me.PropertiesToolStripMenuItem1.Size = New System.Drawing.Size(280, 22)
         Me.PropertiesToolStripMenuItem1.Text = "&Properties"
@@ -262,6 +276,25 @@ Partial Class frmToolboxModelDictionary
         Me.ToolStripMenuItemMakeMDAModelElement.Size = New System.Drawing.Size(280, 22)
         Me.ToolStripMenuItemMakeMDAModelElement.Text = "Make &MDA Model Element"
         Me.ToolStripMenuItemMakeMDAModelElement.Visible = False
+        '
+        'LineageToolStripMenuItem
+        '
+        Me.LineageToolStripMenuItem.Name = "LineageToolStripMenuItem"
+        Me.LineageToolStripMenuItem.Size = New System.Drawing.Size(280, 22)
+        Me.LineageToolStripMenuItem.Text = "&Lineage"
+        '
+        'ToolStripMenuItemCopyModelElement
+        '
+        Me.ToolStripMenuItemCopyModelElement.Name = "ToolStripMenuItemCopyModelElement"
+        Me.ToolStripMenuItemCopyModelElement.Size = New System.Drawing.Size(280, 22)
+        Me.ToolStripMenuItemCopyModelElement.Text = "&Copy"
+        '
+        'ToolStripMenuItemEditEntity
+        '
+        Me.ToolStripMenuItemEditEntity.Image = Global.Boston.My.Resources.Resources.table__pencil
+        Me.ToolStripMenuItemEditEntity.Name = "ToolStripMenuItemEditEntity"
+        Me.ToolStripMenuItemEditEntity.Size = New System.Drawing.Size(280, 22)
+        Me.ToolStripMenuItemEditEntity.Text = "Edit &Entity"
         '
         'StatusStrip1
         '
@@ -326,11 +359,23 @@ Partial Class frmToolboxModelDictionary
         Me.ConvertToValueTypeToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
         Me.ConvertToValueTypeToolStripMenuItem.Text = "convert to &Value Type"
         '
-        'LineageToolStripMenuItem
+        'ContextMenuEntity
         '
-        Me.LineageToolStripMenuItem.Name = "LineageToolStripMenuItem"
-        Me.LineageToolStripMenuItem.Size = New System.Drawing.Size(280, 22)
-        Me.LineageToolStripMenuItem.Text = "&Lineage"
+        Me.ContextMenuEntity.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemAddEntityTable})
+        Me.ContextMenuEntity.Name = "ContextMenuEntity"
+        Me.ContextMenuEntity.Size = New System.Drawing.Size(162, 26)
+        '
+        'ToolStripMenuItemAddEntityTable
+        '
+        Me.ToolStripMenuItemAddEntityTable.Name = "ToolStripMenuItemAddEntityTable"
+        Me.ToolStripMenuItemAddEntityTable.Size = New System.Drawing.Size(161, 22)
+        Me.ToolStripMenuItemAddEntityTable.Text = "Add Entity/Table"
+        '
+        'DynamicDataEntryFormToolStripMenuItem
+        '
+        Me.DynamicDataEntryFormToolStripMenuItem.Name = "DynamicDataEntryFormToolStripMenuItem"
+        Me.DynamicDataEntryFormToolStripMenuItem.Size = New System.Drawing.Size(280, 22)
+        Me.DynamicDataEntryFormToolStripMenuItem.Text = "Dynamic Data Entry Form"
         '
         'frmToolboxModelDictionary
         '
@@ -349,6 +394,7 @@ Partial Class frmToolboxModelDictionary
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
         Me.ContextMenuStripGeneralConcept.ResumeLayout(False)
+        Me.ContextMenuEntity.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -383,4 +429,9 @@ Partial Class frmToolboxModelDictionary
     Friend WithEvents ToolStripStatusLabelPromptModelElementCount As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabelModelElementCount As ToolStripStatusLabel
     Friend WithEvents LineageToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemCopyModelElement As ToolStripMenuItem
+    Friend WithEvents ContextMenuEntity As ContextMenuStrip
+    Friend WithEvents ToolStripMenuItemAddEntityTable As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemEditEntity As ToolStripMenuItem
+    Friend WithEvents DynamicDataEntryFormToolStripMenuItem As ToolStripMenuItem
 End Class

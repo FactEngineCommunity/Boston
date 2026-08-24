@@ -10,7 +10,7 @@ Public Class tEnterpriseEnterpriseView
     Implements IEquatable(Of tEnterpriseEnterpriseView)
 
     Public MenuType As pcenumMenuType
-    Public Tag As Object 'If Tree/Menu node represents an EnterpriseObject, then is the actual object or the key to retrieve the object.
+    Public WithEvents Tag As Object 'If Tree/Menu node represents an EnterpriseObject, then is the actual object or the key to retrieve the object.
 
     Public ModelId As String = Nothing
     Public PageId As String = Nothing
@@ -35,10 +35,10 @@ Public Class tEnterpriseEnterpriseView
     End Sub
 
     Sub New(ByVal aiMenuObjectType As pcenumMenuType,
-            Optional ByVal ao_object As Object = Nothing,
-            Optional ByVal as_ModelId As String = Nothing,
-            Optional ByVal aiLanguageId As pcenumLanguage = Nothing,
-            Optional ByVal ao_tree_node As TreeNode = Nothing,
+            Optional ByVal aoObject As Object = Nothing,
+            Optional ByVal asModelId As String = Nothing,
+            Optional ByVal aiLanguageId As pcenumLanguage = pcenumLanguage.ORMModel,
+            Optional ByVal aoTreeNode As TreeNode = Nothing,
             Optional ByVal as_PageId As String = Nothing
             )
         '----------------------------------------------------------------------------------
@@ -50,25 +50,35 @@ Public Class tEnterpriseEnterpriseView
         '----------------------------------------------------------------------------------
         Me.MenuType = aiMenuObjectType
 
-        If IsSomething(ao_object) Then
-            Me.Tag = ao_object
+        If aoObject IsNot Nothing Then
+            Me.Tag = aoObject
+
+            Select Case aoObject.GetType
+                Case Is = GetType(FBM.Model)
+                    AddHandler DirectCast(Tag, FBM.Model).NameChanged, AddressOf FBMModelNameChangedHandler
+            End Select
+
         End If
 
-        If IsSomething(as_ModelId) Then
-            Me.ModelId = as_ModelId
+        If asModelId IsNot Nothing Then
+            Me.ModelId = asModelId
         End If
 
-        If IsSomething(aiLanguageId) Then
-            Me.LanguageId = aiLanguageId
+        Me.LanguageId = aiLanguageId
+
+        If aoTreeNode IsNot Nothing Then
+            Me.TreeNode = aoTreeNode
         End If
 
-        If IsSomething(ao_tree_node) Then
-            Me.TreeNode = ao_tree_node
-        End If
-
-        If IsSomething(as_PageId) Then
+        If as_PageId IsNot Nothing Then
             Me.PageId = as_PageId
         End If
+
+    End Sub
+
+    Private Sub FBMModelNameChangedHandler(asNewName As String)
+
+        Me.TreeNode.Text = asNewName
 
     End Sub
 
@@ -89,7 +99,7 @@ Public Class tEnterpriseEnterpriseView
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Function

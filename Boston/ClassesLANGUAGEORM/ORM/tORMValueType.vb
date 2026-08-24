@@ -2,6 +2,7 @@ Imports System.ComponentModel
 Imports System.Collections.Specialized
 Imports System.Xml.Serialization
 Imports System.Reflection
+Imports System.Linq.Expressions
 
 
 Namespace FBM
@@ -131,6 +132,21 @@ Namespace FBM
             End Get
         End Property
 
+        <XmlIgnore>
+        Public ReadOnly Property DataTypeAsString
+            Get
+                If Me.DataType = pcenumORMDataType.DataTypeNotSet Then
+                    Return $"{Me.DataType.DescriptionAttr}"
+                ElseIf Me.DataTypeUsesLength And Not Me.DataTypeUsesPrecision Then
+                    Return $"{Me.DataType.DescriptionAttr}({Me.DataTypeLength})"
+                ElseIf Me.DataTypeUsesLength And Not DataTypeUsesPrecision Then
+                    Return $"{Me.DataType.DescriptionAttr}({Me.DataTypeLength},{Me.DataTypePrecision})"
+                Else
+                    Return $"{Me.DataType.DescriptionAttr}"
+                End If
+            End Get
+        End Property
+
         <NonSerialized()>
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
@@ -138,21 +154,21 @@ Namespace FBM
 
         <XmlIgnore()>
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
-        Public _ValueConstraintList As New Viev.Strings.StringCollection
+        Public _ValueConstraintList As New FEStrings.StringCollection
         <XmlIgnore()>
         <CategoryAttribute("Value Type"),
          Browsable(True),
          [ReadOnly](False),
          DescriptionAttribute("The List of Values that Objects of this Value Type may take."),
          Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
-        Public Property ValueConstraint() As Viev.Strings.StringCollection 'StringCollection 
+        Public Property ValueConstraint() As FEStrings.StringCollection 'StringCollection 
             '   DefaultValueAttribute(""), _
             '   BindableAttribute(True), _
             '   DesignOnly(False), _
             Get
                 Return Me._ValueConstraintList
             End Get
-            Set(ByVal Value As Viev.Strings.StringCollection)
+            Set(ByVal Value As FEStrings.StringCollection)
                 Me._ValueConstraintList = Value
                 '----------------------------------------------------
                 'Update the set of Concepts/Symbols/Values
@@ -211,10 +227,79 @@ Namespace FBM
             End Set
         End Property
 
+        ''' <summary>
+        ''' If the Value Type 'IsIndependent' (above), is the Id of the FactType that objectifies the Value Type.
+        ''' </summary>
+        <XmlIgnore>
+        Private Property _ObjectifyingFactTypeId As String = ""
+
+        ''' <summary>
+        ''' If the Value Type 'IsIndependent' (above), is the Id of the FactType that objectifies the Value Type.
+        ''' </summary>
+        <XmlAttribute>
+        Public Property ObjectifyingFactTypeId As String
+            Get
+                Return Me._ObjectifyingFactTypeId
+            End Get
+            Set(value As String)
+                Me._ObjectifyingFactTypeId = value
+            End Set
+        End Property
+
         <XmlIgnore()>
         Public ReadOnly Property HasModelError() As Boolean Implements iValidationErrorHandler.HasModelError
             Get
                 Return Me.ModelError.Count > 0
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' I.e. The DataType of the ValueType uses Length. E.g. TextFixedLength(100).
+        ''' </summary>
+        ''' <returns></returns>
+        <XmlIgnore()>
+        Public ReadOnly Property DataTypeUsesLength()
+            Get
+                Select Case Me.DataType
+                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                  pcenumORMDataType.NumericDecimal,
+                                  pcenumORMDataType.NumericMoney
+                        Return True
+                    Case Is = pcenumORMDataType.RawDataFixedLength,
+                                  pcenumORMDataType.RawDataLargeLength,
+                                  pcenumORMDataType.RawDataVariableLength,
+                                  pcenumORMDataType.TextFixedLength,
+                                  pcenumORMDataType.TextLargeLength,
+                                  pcenumORMDataType.TextVariableLength
+                        Return True
+                    Case Else
+                        Return False
+                End Select
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' I.e. The DataType of the ValueType uses Length. E.g. Money(10,2).
+        ''' </summary>
+        ''' <returns></returns>
+        <XmlIgnore()>
+        Public ReadOnly Property DataTypeUsesPrecision()
+            Get
+                Select Case Me.DataType
+                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision,
+                                  pcenumORMDataType.NumericDecimal,
+                                  pcenumORMDataType.NumericMoney
+                        Return True
+                    Case Is = pcenumORMDataType.RawDataFixedLength,
+                                  pcenumORMDataType.RawDataLargeLength,
+                                  pcenumORMDataType.RawDataVariableLength,
+                                  pcenumORMDataType.TextFixedLength,
+                                  pcenumORMDataType.TextLargeLength,
+                                  pcenumORMDataType.TextVariableLength
+                        Return False
+                    Case Else
+                        Return False
+                End Select
             End Get
         End Property
 
@@ -239,7 +324,7 @@ Namespace FBM
         <NonSerialized()>
         Public Shadows Event RemovedFromModel(ByVal abBroadcastInterfaceEvent As Boolean)
         <NonSerialized()>
-        Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.tSubtypeRelationship)
+        Public Shadows Event SubtypeRelationshipAdded(ByRef arSubtypeRelationship As FBM.SubtypeRelationship, ByVal abBroadcastInterfaceEvent As Boolean)
         <NonSerialized()>
         Public Shadows Event updated()
         <NonSerialized()>
@@ -261,7 +346,7 @@ Namespace FBM
             Me.Model = arModel
             Me.DataType = aiORMDataType
 
-            If IsSomething(asValueTypeName) Then
+            If asValueTypeName IsNot Nothing Then
                 Me.Name = asValueTypeName
             Else
                 Me.Name = "New Value Type"
@@ -382,7 +467,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrValueType
             End Try
@@ -450,7 +535,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -484,19 +569,19 @@ Namespace FBM
                                                             Optional ByVal asSubtypeRoleId As String = Nothing,
                                                             Optional ByVal asSupertypeRoleId As String = Nothing,
                                                             Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                                            Optional ByVal arUsingFactType As FBM.FactType = Nothing) As FBM.tSubtypeRelationship
+                                                            Optional ByVal arUsingFactType As FBM.FactType = Nothing) As FBM.SubtypeRelationship
 
             Try
 
-                Dim lrSubtypeRelationship As New FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationship As New FBM.SubtypeRelationship
 
                 lrSubtypeRelationship.Model = Me.Model
                 lrSubtypeRelationship.ModelElement = Me
                 lrSubtypeRelationship.parentModelElement = arParentModelElement
                 lrSubtypeRelationship.IsPrimarySubtypeRelationship = abIsPrimarySubtypeRelationship
 
-                Me.parentModelObjectList.Add(arParentModelElement)
-                arParentModelElement.childModelObjectList.Add(Me)
+                Me.parentModelObjectList.AddUnique(arParentModelElement)
+                arParentModelElement.childModelObjectList.AddUnique(Me)
 
                 '---------------------------------------------
                 'Create a FactType for the SubtypeConstraint
@@ -507,10 +592,10 @@ Namespace FBM
 
                 larModelObject.Add(Me)
                 If arParentModelElement.IsObjectifyingEntityType Then
-                    lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.ObjectifiedFactType.Id)
+                    lsFactTypeName = FEStrings.ProperSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.ObjectifiedFactType.Id)
                     larModelObject.Add(arParentModelElement.ObjectifiedFactType)
                 Else
-                    lsFactTypeName = Viev.Strings.RemoveWhiteSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.Name)
+                    lsFactTypeName = FEStrings.ProperSpace(Me.Name & "IsSubtypeOf" & arParentModelElement.Name)
                     larModelObject.Add(arParentModelElement)
                 End If
 
@@ -568,10 +653,15 @@ Namespace FBM
                         Call Me.Model.RDS.addTable(lrTable)
                     End If
                 Else
-                    Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
+                    Try
+                        Call Me.getCorrespondingRDSTable.triggerSubtypeRelationshipAdded()
+                    Catch ex As Exception
+
+                    End Try
+
                 End If
 
-                RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship)
+                RaiseEvent SubtypeRelationshipAdded(lrSubtypeRelationship, True)
 
                 Call Me.Model.MakeDirty()
 
@@ -583,7 +673,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -604,7 +694,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -629,6 +719,60 @@ Namespace FBM
             For Each lrRole In larRoles
                 Return True
             Next
+
+        End Function
+
+        Public Overrides Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False, Optional ByVal abUseEntityGrouping As Boolean = False) As String
+
+            Try
+                Dim lsReturnString As String
+
+                lsReturnString = Me.Id & " IS A VALUE TYPE " & Me.GetWRITTENASClause
+
+                Return lsReturnString & If(abDontAddNewLine, "", vbCrLf)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return ""
+            End Try
+
+        End Function
+
+        Public Function GetWRITTENASClause() As String
+
+            Try
+                Dim lsReturnString = "WRITTEN AS "
+
+                Select Case Me.DataType
+                    Case Is = pcenumORMDataType.TextVariableLength
+                        lsReturnString &= Me.DataType.ToString & "(" & If(Me.DataTypeLength = 0, "0", Me.DataTypeLength.ToString) & ")"
+                    Case Is = pcenumORMDataType.RawDataVariableLength,
+                              pcenumORMDataType.RawDataFixedLength,
+                              pcenumORMDataType.TextFixedLength
+                        lsReturnString &= Me.DataType.ToString & "(" & Me.DataTypeLength.ToString & ")"
+                    Case Is = pcenumORMDataType.NumericFloatCustomPrecision
+                        lsReturnString &= Me.DataType.ToString & "(" & Me.DataTypePrecision.ToString & ")"
+                    Case Is = pcenumORMDataType.TemporalDateAndTime
+                        lsReturnString &= Me.DataType.ToString.Replace("And", "")
+                    Case Is = pcenumORMDataType.NumericMoney
+                        lsReturnString &= DataTypeAttribute.Get(GetType(pcenumORMDataType), Me.DataType.ToString) & "(" & If(Me.DataTypeLength = 0, "0", Me.DataTypeLength.ToString) & ")"
+                    Case Is = pcenumORMDataType.DataTypeNotSet
+                        Return Me.Id & " IS A VALUE TYPE"
+                    Case Else
+                        lsReturnString &= Me.DataType.ToString.Replace("Numeric", "")
+                End Select
+
+                Return lsReturnString
+
+            Catch ex As Exception
+                Return "<Error>"
+            End Try
 
         End Function
 
@@ -678,18 +822,33 @@ Namespace FBM
         Public ReadOnly Property DBDataType() As String
             Get
                 Try
-                    If Me.Model.IsDatabaseSynchronised Then
-                        If Me.Model.DatabaseConnection Is Nothing Then
-                            Call Me.Model.connectToDatabase()
+                    'CodeSafe
+                    If Me.Model Is Nothing Then
+                        Return "<Error>"
+                    End If
+
+                    '20241030-VM-For now. If there is no set database, return the ORM DataType
+                    If Me.Model.TargetDatabaseType = pcenumDatabaseType.None Then
+                        Return Me.DataType.ToString
+                    Else
+                        If Me.Model.IsDatabaseSynchronised Then
+                            If Me.Model.DatabaseConnection Is Nothing Then
+                                Call Me.Model.connectToDatabase()
+                            End If
+                        End If
+
+                        Dim larDBDataType = From DatabaseDataType In Me.Model.RDS.DatabaseDataType
+                                            Where DatabaseDataType.BostonDataType = Me.DataType
+                                            Where Me.Model.TargetDatabaseType = DatabaseDataType.Database
+                                            Select DatabaseDataType
+
+                        If larDBDataType.Count = 0 Then
+                            Return "Nothing: Target Database probably not set."
+                        Else
+                            Return larDBDataType.First.DataType
                         End If
                     End If
 
-                    Dim larDBDataType = From DatabaseDataType In Me.Model.RDS.DatabaseDataType
-                                        Where DatabaseDataType.BostonDataType = Me.DataType
-                                        Where Me.Model.TargetDatabaseType = DatabaseDataType.Database
-                                        Select DatabaseDataType
-
-                    Return larDBDataType.First.DataType
                 Catch ex As Exception
                     Return "Error"
                 End Try
@@ -752,7 +911,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -825,7 +984,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -833,6 +992,11 @@ Namespace FBM
 
         End Function
 
+        ''' <summary>
+        ''' As called by ValueTypeInstance, RefreshShape.
+        ''' </summary>
+        ''' <param name="asOldValueConstraint"></param>
+        ''' <param name="asNewValueConstraint"></param>
         Public Sub ModifyValueConstraint(ByVal asOldValueConstraint As String, asNewValueConstraint As String)
 
             Try
@@ -849,7 +1013,7 @@ Namespace FBM
                     'VM-20180401-Not sure what this does.
                     'Dim lrConcept As New FBM.Concept(aoChangedPropertyItem.OldValue)
                     'lrConcept = Me.ValueType._ValueConstraint.Find(AddressOf lrConcept.Equals)
-                    'If IsSomething(lrConcept) Then
+                    'If lrConcept IsNot Nothing Then
                     '    lrConcept.Symbol = aoChangedPropertyItem.ChangedItem.Value.ToString
                     'End If
 
@@ -883,7 +1047,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -939,7 +1103,7 @@ Namespace FBM
 
                         If lsValueTypeId = Me.Id Then
                             Call lrPage.RemoveFromModel()
-                            If IsSomething(lrPage.Form) Then
+                            If lrPage.Form IsNot Nothing Then
                                 lrPage.Form.Close()
                             End If
                         End If
@@ -957,6 +1121,7 @@ Namespace FBM
                 '====================================================================================================
 
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)
+                MyBase.TriggerRemovedFromModel()
 
                 Return True
 
@@ -966,7 +1131,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -987,7 +1152,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1009,7 +1174,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1089,7 +1254,7 @@ Namespace FBM
                 '--------------------------------------------------------------
                 'Save any SubtypeRelationships associated with the ValueType
                 '-----------------------------------------
-                Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                Dim lrSubtypeRelationship As FBM.SubtypeRelationship
                 For Each lrSubtypeRelationship In Me.SubtypeRelationship
                     Call lrSubtypeRelationship.Save(abRapidSave)
                 Next
@@ -1105,26 +1270,20 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
         End Sub
 
-        Public Sub SetDataType(ByVal aiNewDataType As pcenumDataType,
-                               Optional ByVal aiDataTypeLength As Integer = Nothing,
-                               Optional ByVal aiDataTypePrecision As Integer = Nothing,
+        Public Sub SetDataType(ByVal aiNewDataType As pcenumORMDataType,
+                               Optional ByVal aiDataTypeLength As Integer = 0,
+                               Optional ByVal aiDataTypePrecision As Integer = 0,
                                Optional ByVal abBroadcastInterfaceEvent As Boolean = True)
 
             Me.DataType = aiNewDataType
-
-            If IsSomething(aiDataTypeLength) Then
-                Me.DataTypeLength = aiDataTypeLength
-            End If
-
-            If IsSomething(aiDataTypePrecision) Then
-                Me.DataTypePrecision = aiDataTypePrecision
-            End If
+            Me.DataTypeLength = aiDataTypeLength
+            Me.DataTypePrecision = aiDataTypePrecision
 
             RaiseEvent DataTypeChanged(aiNewDataType)
 
@@ -1152,7 +1311,7 @@ Namespace FBM
             Dim larColumn As Object
 
             'Database synchronisation
-            If Me.Model.IsDatabaseSynchronised Then
+            If Me.Model.IsDatabaseSynchronised And Not Me.Model.TargetDatabaseType = pcenumDatabaseType.None Then
 
                 larColumn = From Table In Me.Model.RDS.Table
                             From Column In Table.Column
@@ -1174,8 +1333,10 @@ Namespace FBM
                         Select Column
 
             For Each lrColumn In larColumn
-                Call lrColumn.TriggerDataTypeSet
+                Call lrColumn.TriggerDataTypeSet(Me.DataType)
             Next
+
+            Me.Model.MakeDirty(True, False, Nothing)
 
         End Sub
 
@@ -1210,7 +1371,8 @@ Namespace FBM
 
         Public Overrides Function SetName(ByVal asNewName As String,
                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
+                                          Optional ByVal abSuppressModelSave As Boolean = False,
+                                          Optional ByVal abSetDBNameAsNewName As Boolean = False) As Boolean
 
             '-----------------------------------------------------------------------------------------------------------------
             'The following explains the logic and philosophy of Boston.
@@ -1284,6 +1446,21 @@ Namespace FBM
                     '-------------------------------------------------------
                     Call TableValueTypeValueConstraint.ModifyKey(Me, asNewName)
 
+                    '------------------------
+                    'Concept Classification
+#Region "Concept Classification"
+                    Dim lrDataStore As New DataStore.Store
+                    Dim lsModelId As String = Me.Model.ModelId
+                    Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.ModelId = lsModelId And p.Concept = Me.Id
+
+                    Dim larConceptClassificationType = lrDataStore.Get(Of KnowledgeGraph.ConceptClassificationValue)(whereClause)
+
+                    For Each lrConceptClassificationType In larConceptClassificationType
+                        lrConceptClassificationType.Concept = asNewName
+                        lrDataStore.Update(Of KnowledgeGraph.ConceptClassificationValue)(lrConceptClassificationType, whereClause)
+                    Next
+#End Region
+
                     Me.Model.MakeDirty()
 
                     Call Me.RaiseEventNameChanged(lsOldName, asNewName) 'Needs to be before Updated so that the ConceptInstance in the database is modified/updated.
@@ -1322,7 +1499,7 @@ Namespace FBM
                             Call lrColumn.setName(lrColumn.Role.GetAttributeName)
                         Else
                             lsColumnName = Me.Id
-                            lsColumnName = Viev.Strings.MakeCapCamelCase(Viev.Strings.RemoveWhiteSpace(lsColumnName))
+                            lsColumnName = FEStrings.MakeCapCamelCase(FEStrings.ProperSpace(lsColumnName))
                             Call lrColumn.setName(lsColumnName)
                         End If
                     Next
@@ -1338,19 +1515,19 @@ Namespace FBM
                 Return False
 
             Catch iex As tInformationException
-                prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
+                prApplication.ThrowMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
                 Return False
             Catch ex As Exception
                 Dim lsMessage As String
                 lsMessage = "Error: tValueType.SetName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return False
             End Try
 
         End Function
 
-        Sub SetValueConstraint(ByVal arValueConstraint As Viev.Strings.StringCollection)
+        Sub SetValueConstraint(ByVal arValueConstraint As FEStrings.StringCollection)
 
             Me._ValueConstraintList = arValueConstraint
             '----------------------------------------------------
@@ -1403,6 +1580,34 @@ Namespace FBM
             Me.isDirty = True
             Me.Model.MakeDirty(False, False)
 
+            'RDS
+            If abNewIsIndependent = True Then
+                'Independant ValueTypes have a corresponding Table (with the Name of the ValueType) with one Column, the Name of the ValueType.
+                Dim lrTable = New RDS.Table(Me.Model.RDS, Me.Name, Me)
+                Call Me.Model.RDS.addTable(lrTable)
+
+                Dim lrFactType = Me.Model.CreateBinaryFactTypeBetweenModelElements(Me, Me, False, True, False, Nothing, True, Nothing, True, True, New List(Of String) From {"is", "is"}, pcenumBinaryRelationMultiplicityType.OneToOne)
+                lrFactType.RoleGroup(0).SetMandatory(True, True)
+
+                Me.ObjectifyingFactTypeId = lrFactType.Id
+                lrFactType.IsObjectifyingFactType = True
+
+                Dim lrColumn As New RDS.Column(lrTable, Me.Name, lrFactType.RoleGroup(0), lrFactType.RoleGroup(1), True)
+                Call lrTable.addColumn(lrColumn)
+
+                Dim lrIndex As New RDS.Index(lrTable, $"{Me.Id}_PK", "PK", pcenumODBCAscendingOrDescending.Ascending, True, True, False, New List(Of RDS.Column) From {lrColumn}, True, True)
+
+            Else
+                Dim lrTable = Me.Model.RDS.Table.Find(Function(x) x.Name = Me.Id)
+
+                Dim lrFactType = lrTable.Column(0).FactType
+                Call lrFactType.RemoveFromModel()
+
+                Me.ObjectifyingFactTypeId = ""
+
+                Call Me.Model.RDS.removeTable(lrTable)
+            End If
+
             RaiseEvent IsIndependentChanged(abNewIsIndependent)
 
         End Sub
@@ -1425,7 +1630,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1440,7 +1645,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

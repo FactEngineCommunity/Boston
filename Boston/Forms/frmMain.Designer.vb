@@ -58,7 +58,7 @@ Partial Class frmMain
         Me.PrintPreviewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.PrintToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemEdit = New System.Windows.Forms.ToolStripMenuItem()
-        Me.CopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemCopy = New System.Windows.Forms.ToolStripMenuItem()
         Me.PasteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemUndo = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemRedo = New System.Windows.Forms.ToolStripMenuItem()
@@ -77,11 +77,22 @@ Partial Class frmMain
         Me.ToolStripMenuItemKLTheoremWriter = New System.Windows.Forms.ToolStripMenuItem()
         Me.TestToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConceptClassificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.VirtualAnalystToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DescriptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.QueryEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ModelViewsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RelationalManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GraphSchemaManagerToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.StatusBarToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemDiagramSpy = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemUnifiedOntologyBrowser = New System.Windows.Forms.ToolStripMenuItem()
         Me.JupyterNotebookToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemChatOpenAI = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemDocumentSearch = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DocumentDatabaseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.MyTasksToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemBoston = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfigurationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator14 = New System.Windows.Forms.ToolStripSeparator()
@@ -121,21 +132,62 @@ Partial Class frmMain
         Me.ToolStripSeparator17 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemAddUnifiedOntology = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemEditUnifiedOntology = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemTestClientServer = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BroadcastMessageToUsersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowBroadcastEventMonitorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemOSM = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DeleteTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator18 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ImportExportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ExportTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ImportTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OpenAIFunctionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddOpenAIFunctionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditOpenAIFunctionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DeleteOpenAIFunctionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TheBoxToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TestNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DoNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemSuperuser = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ThrowTestErrorMessageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GenericTestFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemEnterprise = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EnterpriseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.mnuOption_AddEnterprise = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditEnterpriseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DeleteEnterpriseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem14 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem15 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem16 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem17 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemSubjectArea = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem18 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem19 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItem20 = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SolutionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddSolutionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditSolutionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DeleteSolutionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemApplication = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AddApplicationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EditApplicationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DeleteApplicationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator19 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ApplicationMenuEditorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ApplicationRunnerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripMenuItemTesting = New System.Windows.Forms.ToolStripMenuItem()
+        Me.TestSetManagerToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItemHelp = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutRichmondToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator13 = New System.Windows.Forms.ToolStripSeparator()
         Me.ToolStripMenuItemOpenLogFile = New System.Windows.Forms.ToolStripMenuItem()
         Me.EmailSupportvievcomToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemTestClientServer = New System.Windows.Forms.ToolStripMenuItem()
-        Me.BroadcastMessageToUsersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ShowBroadcastEventMonitorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ShowClientServerBroadcastTesterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.TestNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.DoNotificationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripMenuItemSuperuser = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ThrowTestErrorMessageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.GenericTestFormToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStrip_main = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton_Save = New System.Windows.Forms.ToolStripButton()
@@ -158,6 +210,8 @@ Partial Class frmMain
         Me.ToolStripStatusLabelUsername = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripProgressBar = New System.Windows.Forms.ToolStripProgressBar()
         Me.ToolStripStatusLabelClientServer = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabelPromptEvaluationTime = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabelPromptEvaluationTimeSeconds = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ContextMenuStrip_Project = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.SetProjectToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DockPanel = New WeifenLuo.WinFormsUI.Docking.DockPanel()
@@ -165,6 +219,8 @@ Partial Class frmMain
         Me.NotifyIcon = New System.Windows.Forms.NotifyIcon(Me.components)
         Me.TimerNotifications = New System.Windows.Forms.Timer(Me.components)
         Me.BackgroundWorkerStatusBar = New System.ComponentModel.BackgroundWorker()
+        Me.TimerGFSBackup = New System.Windows.Forms.Timer(Me.components)
+        Me.TimerDemo = New System.Windows.Forms.Timer(Me.components)
         Me.MenuStrip_main.SuspendLayout()
         Me.ToolStrip_main.SuspendLayout()
         Me.StatusBar_main.SuspendLayout()
@@ -173,7 +229,7 @@ Partial Class frmMain
         '
         'MenuStrip_main
         '
-        Me.MenuStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnu_Session, Me.ToolStripMenuItemPage, Me.ToolStripMenuItemEdit, Me.ToolStripMenuItemView, Me.ToolStripMenuItemBoston, Me.ToolStripMenuItemUser, Me.ToolStripMenuItemProject, Me.ToolStripMenuItemUnifiedOntology, Me.HelpToolStripMenuItem, Me.ToolStripMenuItemTestClientServer, Me.TestNotificationToolStripMenuItem, Me.ToolStripMenuItemSuperuser})
+        Me.MenuStrip_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnu_Session, Me.ToolStripMenuItemPage, Me.ToolStripMenuItemEdit, Me.ToolStripMenuItemView, Me.ToolStripMenuItemBoston, Me.ToolStripMenuItemUser, Me.ToolStripMenuItemProject, Me.ToolStripMenuItemUnifiedOntology, Me.ToolStripMenuItemTestClientServer, Me.ToolStripMenuItemOSM, Me.TestNotificationToolStripMenuItem, Me.ToolStripMenuItemSuperuser, Me.ToolStripMenuItemEnterprise, Me.ToolStripMenuItemApplication, Me.ToolStripMenuItemTesting, Me.HelpToolStripMenuItem})
         Me.MenuStrip_main.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip_main.Name = "MenuStrip_main"
         Me.MenuStrip_main.Padding = New System.Windows.Forms.Padding(4, 1, 0, 1)
@@ -291,17 +347,17 @@ Partial Class frmMain
         '
         'ToolStripMenuItemEdit
         '
-        Me.ToolStripMenuItemEdit.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToolStripMenuItem, Me.PasteToolStripMenuItem, Me.ToolStripMenuItemUndo, Me.ToolStripMenuItemRedo, Me.SelectAllToolStripMenuItem, Me.CopyAsImageToClipboardToolStripMenuItem})
+        Me.ToolStripMenuItemEdit.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemCopy, Me.PasteToolStripMenuItem, Me.ToolStripMenuItemUndo, Me.ToolStripMenuItemRedo, Me.SelectAllToolStripMenuItem, Me.CopyAsImageToClipboardToolStripMenuItem})
         Me.ToolStripMenuItemEdit.Name = "ToolStripMenuItemEdit"
         Me.ToolStripMenuItemEdit.Size = New System.Drawing.Size(39, 22)
         Me.ToolStripMenuItemEdit.Text = "&Edit"
         '
-        'CopyToolStripMenuItem
+        'ToolStripMenuItemCopy
         '
-        Me.CopyToolStripMenuItem.Image = CType(resources.GetObject("CopyToolStripMenuItem.Image"), System.Drawing.Image)
-        Me.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem"
-        Me.CopyToolStripMenuItem.Size = New System.Drawing.Size(221, 22)
-        Me.CopyToolStripMenuItem.Text = "&Copy"
+        Me.ToolStripMenuItemCopy.Image = CType(resources.GetObject("ToolStripMenuItemCopy.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItemCopy.Name = "ToolStripMenuItemCopy"
+        Me.ToolStripMenuItemCopy.Size = New System.Drawing.Size(221, 22)
+        Me.ToolStripMenuItemCopy.Text = "&Copy"
         '
         'PasteToolStripMenuItem
         '
@@ -345,7 +401,7 @@ Partial Class frmMain
         '
         'ToolStripMenuItemView
         '
-        Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.ToolStripMenuItemCodeGenerator, Me.ToolStripMenuItemFactEngine, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy, Me.ToolStripMenuItemUnifiedOntologyBrowser, Me.JupyterNotebookToolStripMenuItem})
+        Me.ToolStripMenuItemView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuItem_ShowEnterpriseTreeView, Me.ToolStripMenuItemCodeGenerator, Me.ToolStripMenuItemFactEngine, Me.ToolStripSeparator8, Me.ToolStripMenuItem11, Me.ToolboxesToolStripMenuItem, Me.ModelViewsToolStripMenuItem, Me.StatusBarToolStripMenuItem, Me.ToolStripSeparator1, Me.ToolStripMenuItemDiagramSpy, Me.ToolStripMenuItemUnifiedOntologyBrowser, Me.JupyterNotebookToolStripMenuItem, Me.ToolStripMenuItemChatOpenAI, Me.ToolStripMenuItemDocumentSearch, Me.DocumentDatabaseToolStripMenuItem, Me.MyTasksToolStripMenuItem})
         Me.ToolStripMenuItemView.Name = "ToolStripMenuItemView"
         Me.ToolStripMenuItemView.Size = New System.Drawing.Size(44, 22)
         Me.ToolStripMenuItemView.Text = "&View"
@@ -393,7 +449,7 @@ Partial Class frmMain
         '
         'ToolboxesToolStripMenuItem
         '
-        Me.ToolboxesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemToolbox, Me.ToolStripMenuItemDiagramOverview, Me.ToolStripMenuItemKLTheoremWriter, Me.TestToolStripMenuItem, Me.ConceptClassificationToolStripMenuItem})
+        Me.ToolboxesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemToolbox, Me.ToolStripMenuItemDiagramOverview, Me.ToolStripMenuItemKLTheoremWriter, Me.TestToolStripMenuItem, Me.ConceptClassificationToolStripMenuItem, Me.VirtualAnalystToolStripMenuItem, Me.DescriptionsToolStripMenuItem, Me.QueryEditorToolStripMenuItem})
         Me.ToolboxesToolStripMenuItem.Name = "ToolboxesToolStripMenuItem"
         Me.ToolboxesToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
         Me.ToolboxesToolStripMenuItem.Text = "Tool&boxes"
@@ -431,6 +487,44 @@ Partial Class frmMain
         Me.ConceptClassificationToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
         Me.ConceptClassificationToolStripMenuItem.Text = "&Concept Classification"
         '
+        'VirtualAnalystToolStripMenuItem
+        '
+        Me.VirtualAnalystToolStripMenuItem.Name = "VirtualAnalystToolStripMenuItem"
+        Me.VirtualAnalystToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.VirtualAnalystToolStripMenuItem.Text = "&Virtual Analyst"
+        '
+        'DescriptionsToolStripMenuItem
+        '
+        Me.DescriptionsToolStripMenuItem.Name = "DescriptionsToolStripMenuItem"
+        Me.DescriptionsToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.DescriptionsToolStripMenuItem.Text = "&Descriptions"
+        '
+        'QueryEditorToolStripMenuItem
+        '
+        Me.QueryEditorToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.TextEdit16x16
+        Me.QueryEditorToolStripMenuItem.Name = "QueryEditorToolStripMenuItem"
+        Me.QueryEditorToolStripMenuItem.Size = New System.Drawing.Size(192, 22)
+        Me.QueryEditorToolStripMenuItem.Text = "&Query Editor"
+        '
+        'ModelViewsToolStripMenuItem
+        '
+        Me.ModelViewsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RelationalManagerToolStripMenuItem, Me.GraphSchemaManagerToolStripMenuItem1})
+        Me.ModelViewsToolStripMenuItem.Name = "ModelViewsToolStripMenuItem"
+        Me.ModelViewsToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
+        Me.ModelViewsToolStripMenuItem.Text = "Model &Views"
+        '
+        'RelationalManagerToolStripMenuItem
+        '
+        Me.RelationalManagerToolStripMenuItem.Name = "RelationalManagerToolStripMenuItem"
+        Me.RelationalManagerToolStripMenuItem.Size = New System.Drawing.Size(201, 22)
+        Me.RelationalManagerToolStripMenuItem.Text = "&Relational Manager"
+        '
+        'GraphSchemaManagerToolStripMenuItem1
+        '
+        Me.GraphSchemaManagerToolStripMenuItem1.Name = "GraphSchemaManagerToolStripMenuItem1"
+        Me.GraphSchemaManagerToolStripMenuItem1.Size = New System.Drawing.Size(201, 22)
+        Me.GraphSchemaManagerToolStripMenuItem1.Text = "&Graph Schema Manager"
+        '
         'StatusBarToolStripMenuItem
         '
         Me.StatusBarToolStripMenuItem.Name = "StatusBarToolStripMenuItem"
@@ -461,6 +555,37 @@ Partial Class frmMain
         Me.JupyterNotebookToolStripMenuItem.Name = "JupyterNotebookToolStripMenuItem"
         Me.JupyterNotebookToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
         Me.JupyterNotebookToolStripMenuItem.Text = "Jupyter Notebook"
+        '
+        'ToolStripMenuItemChatOpenAI
+        '
+        Me.ToolStripMenuItemChatOpenAI.Name = "ToolStripMenuItemChatOpenAI"
+        Me.ToolStripMenuItemChatOpenAI.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemChatOpenAI.Text = "ORM and FEKL Expert"
+        '
+        'ToolStripMenuItemDocumentSearch
+        '
+        Me.ToolStripMenuItemDocumentSearch.Name = "ToolStripMenuItemDocumentSearch"
+        Me.ToolStripMenuItemDocumentSearch.Size = New System.Drawing.Size(210, 22)
+        Me.ToolStripMenuItemDocumentSearch.Text = "Document Search"
+        '
+        'DocumentDatabaseToolStripMenuItem
+        '
+        Me.DocumentDatabaseToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ManagerToolStripMenuItem})
+        Me.DocumentDatabaseToolStripMenuItem.Name = "DocumentDatabaseToolStripMenuItem"
+        Me.DocumentDatabaseToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
+        Me.DocumentDatabaseToolStripMenuItem.Text = "Document Database"
+        '
+        'ManagerToolStripMenuItem
+        '
+        Me.ManagerToolStripMenuItem.Name = "ManagerToolStripMenuItem"
+        Me.ManagerToolStripMenuItem.Size = New System.Drawing.Size(121, 22)
+        Me.ManagerToolStripMenuItem.Text = "Manager"
+        '
+        'MyTasksToolStripMenuItem
+        '
+        Me.MyTasksToolStripMenuItem.Name = "MyTasksToolStripMenuItem"
+        Me.MyTasksToolStripMenuItem.Size = New System.Drawing.Size(210, 22)
+        Me.MyTasksToolStripMenuItem.Text = "My &Tasks"
         '
         'ToolStripMenuItemBoston
         '
@@ -705,6 +830,334 @@ Partial Class frmMain
         Me.ToolStripMenuItemEditUnifiedOntology.Size = New System.Drawing.Size(210, 22)
         Me.ToolStripMenuItemEditUnifiedOntology.Text = "&Edit Unified Ontology"
         '
+        'ToolStripMenuItemTestClientServer
+        '
+        Me.ToolStripMenuItemTestClientServer.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BroadcastMessageToUsersToolStripMenuItem, Me.ShowBroadcastEventMonitorToolStripMenuItem, Me.ShowClientServerBroadcastTesterToolStripMenuItem})
+        Me.ToolStripMenuItemTestClientServer.Name = "ToolStripMenuItemTestClientServer"
+        Me.ToolStripMenuItemTestClientServer.Size = New System.Drawing.Size(85, 22)
+        Me.ToolStripMenuItemTestClientServer.Text = "Clie&nt Server"
+        '
+        'BroadcastMessageToUsersToolStripMenuItem
+        '
+        Me.BroadcastMessageToUsersToolStripMenuItem.Name = "BroadcastMessageToUsersToolStripMenuItem"
+        Me.BroadcastMessageToUsersToolStripMenuItem.Size = New System.Drawing.Size(261, 22)
+        Me.BroadcastMessageToUsersToolStripMenuItem.Text = "&Broadcast Message to Users"
+        '
+        'ShowBroadcastEventMonitorToolStripMenuItem
+        '
+        Me.ShowBroadcastEventMonitorToolStripMenuItem.Name = "ShowBroadcastEventMonitorToolStripMenuItem"
+        Me.ShowBroadcastEventMonitorToolStripMenuItem.Size = New System.Drawing.Size(261, 22)
+        Me.ShowBroadcastEventMonitorToolStripMenuItem.Text = "Show Broadcast Event Monitor"
+        '
+        'ShowClientServerBroadcastTesterToolStripMenuItem
+        '
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Name = "ShowClientServerBroadcastTesterToolStripMenuItem"
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Size = New System.Drawing.Size(261, 22)
+        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Text = "Show Client Server Broadcast Tester"
+        '
+        'ToolStripMenuItemOSM
+        '
+        Me.ToolStripMenuItemOSM.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TaskToolStripMenuItem, Me.OpenAIFunctionToolStripMenuItem, Me.ViewToolStripMenuItem})
+        Me.ToolStripMenuItemOSM.Name = "ToolStripMenuItemOSM"
+        Me.ToolStripMenuItemOSM.Size = New System.Drawing.Size(45, 22)
+        Me.ToolStripMenuItemOSM.Text = "&OSM"
+        '
+        'TaskToolStripMenuItem
+        '
+        Me.TaskToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddTaskToolStripMenuItem, Me.EditTaskToolStripMenuItem, Me.DeleteTaskToolStripMenuItem, Me.ToolStripSeparator18, Me.ImportExportToolStripMenuItem})
+        Me.TaskToolStripMenuItem.Name = "TaskToolStripMenuItem"
+        Me.TaskToolStripMenuItem.Size = New System.Drawing.Size(121, 22)
+        Me.TaskToolStripMenuItem.Text = "&Task"
+        '
+        'AddTaskToolStripMenuItem
+        '
+        Me.AddTaskToolStripMenuItem.Name = "AddTaskToolStripMenuItem"
+        Me.AddTaskToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.AddTaskToolStripMenuItem.Text = "&Add Task"
+        '
+        'EditTaskToolStripMenuItem
+        '
+        Me.EditTaskToolStripMenuItem.Name = "EditTaskToolStripMenuItem"
+        Me.EditTaskToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.EditTaskToolStripMenuItem.Text = "&Edit Task"
+        '
+        'DeleteTaskToolStripMenuItem
+        '
+        Me.DeleteTaskToolStripMenuItem.Name = "DeleteTaskToolStripMenuItem"
+        Me.DeleteTaskToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.DeleteTaskToolStripMenuItem.Text = "&Delete Task"
+        '
+        'ToolStripSeparator18
+        '
+        Me.ToolStripSeparator18.Name = "ToolStripSeparator18"
+        Me.ToolStripSeparator18.Size = New System.Drawing.Size(149, 6)
+        '
+        'ImportExportToolStripMenuItem
+        '
+        Me.ImportExportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExportTaskToolStripMenuItem, Me.ImportTaskToolStripMenuItem})
+        Me.ImportExportToolStripMenuItem.Name = "ImportExportToolStripMenuItem"
+        Me.ImportExportToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.ImportExportToolStripMenuItem.Text = "&Import | Export"
+        '
+        'ExportTaskToolStripMenuItem
+        '
+        Me.ExportTaskToolStripMenuItem.Name = "ExportTaskToolStripMenuItem"
+        Me.ExportTaskToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.ExportTaskToolStripMenuItem.Text = "&Export Task"
+        '
+        'ImportTaskToolStripMenuItem
+        '
+        Me.ImportTaskToolStripMenuItem.Name = "ImportTaskToolStripMenuItem"
+        Me.ImportTaskToolStripMenuItem.Size = New System.Drawing.Size(136, 22)
+        Me.ImportTaskToolStripMenuItem.Text = "&Import Task"
+        '
+        'OpenAIFunctionToolStripMenuItem
+        '
+        Me.OpenAIFunctionToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddOpenAIFunctionToolStripMenuItem, Me.EditOpenAIFunctionToolStripMenuItem, Me.DeleteOpenAIFunctionToolStripMenuItem})
+        Me.OpenAIFunctionToolStripMenuItem.Name = "OpenAIFunctionToolStripMenuItem"
+        Me.OpenAIFunctionToolStripMenuItem.Size = New System.Drawing.Size(121, 22)
+        Me.OpenAIFunctionToolStripMenuItem.Text = "Function"
+        '
+        'AddOpenAIFunctionToolStripMenuItem
+        '
+        Me.AddOpenAIFunctionToolStripMenuItem.Name = "AddOpenAIFunctionToolStripMenuItem"
+        Me.AddOpenAIFunctionToolStripMenuItem.Size = New System.Drawing.Size(157, 22)
+        Me.AddOpenAIFunctionToolStripMenuItem.Text = "&Add Function"
+        '
+        'EditOpenAIFunctionToolStripMenuItem
+        '
+        Me.EditOpenAIFunctionToolStripMenuItem.Name = "EditOpenAIFunctionToolStripMenuItem"
+        Me.EditOpenAIFunctionToolStripMenuItem.Size = New System.Drawing.Size(157, 22)
+        Me.EditOpenAIFunctionToolStripMenuItem.Text = "&Edit Function"
+        '
+        'DeleteOpenAIFunctionToolStripMenuItem
+        '
+        Me.DeleteOpenAIFunctionToolStripMenuItem.Name = "DeleteOpenAIFunctionToolStripMenuItem"
+        Me.DeleteOpenAIFunctionToolStripMenuItem.Size = New System.Drawing.Size(157, 22)
+        Me.DeleteOpenAIFunctionToolStripMenuItem.Text = "&Delete Function"
+        '
+        'ViewToolStripMenuItem
+        '
+        Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TheBoxToolStripMenuItem})
+        Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
+        Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(121, 22)
+        Me.ViewToolStripMenuItem.Text = "&View"
+        '
+        'TheBoxToolStripMenuItem
+        '
+        Me.TheBoxToolStripMenuItem.Name = "TheBoxToolStripMenuItem"
+        Me.TheBoxToolStripMenuItem.Size = New System.Drawing.Size(116, 22)
+        Me.TheBoxToolStripMenuItem.Text = "The &Box"
+        '
+        'TestNotificationToolStripMenuItem
+        '
+        Me.TestNotificationToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DoNotificationToolStripMenuItem})
+        Me.TestNotificationToolStripMenuItem.Name = "TestNotificationToolStripMenuItem"
+        Me.TestNotificationToolStripMenuItem.Size = New System.Drawing.Size(106, 22)
+        Me.TestNotificationToolStripMenuItem.Text = "Test Notification"
+        Me.TestNotificationToolStripMenuItem.Visible = False
+        '
+        'DoNotificationToolStripMenuItem
+        '
+        Me.DoNotificationToolStripMenuItem.Name = "DoNotificationToolStripMenuItem"
+        Me.DoNotificationToolStripMenuItem.Size = New System.Drawing.Size(155, 22)
+        Me.DoNotificationToolStripMenuItem.Text = "Do Notification"
+        '
+        'ToolStripMenuItemSuperuser
+        '
+        Me.ToolStripMenuItemSuperuser.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ThrowTestErrorMessageToolStripMenuItem, Me.GenericTestFormToolStripMenuItem})
+        Me.ToolStripMenuItemSuperuser.Name = "ToolStripMenuItemSuperuser"
+        Me.ToolStripMenuItemSuperuser.Size = New System.Drawing.Size(71, 22)
+        Me.ToolStripMenuItemSuperuser.Text = "Superuse&r"
+        Me.ToolStripMenuItemSuperuser.Visible = False
+        '
+        'ThrowTestErrorMessageToolStripMenuItem
+        '
+        Me.ThrowTestErrorMessageToolStripMenuItem.Name = "ThrowTestErrorMessageToolStripMenuItem"
+        Me.ThrowTestErrorMessageToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.ThrowTestErrorMessageToolStripMenuItem.Text = "Throw test &Error Message"
+        '
+        'GenericTestFormToolStripMenuItem
+        '
+        Me.GenericTestFormToolStripMenuItem.Name = "GenericTestFormToolStripMenuItem"
+        Me.GenericTestFormToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.GenericTestFormToolStripMenuItem.Text = "Generic Test Form"
+        '
+        'ToolStripMenuItemEnterprise
+        '
+        Me.ToolStripMenuItemEnterprise.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EnterpriseToolStripMenuItem, Me.ToolStripMenuItem14, Me.ToolStripMenuItemSubjectArea, Me.SolutionToolStripMenuItem})
+        Me.ToolStripMenuItemEnterprise.Name = "ToolStripMenuItemEnterprise"
+        Me.ToolStripMenuItemEnterprise.Size = New System.Drawing.Size(71, 22)
+        Me.ToolStripMenuItemEnterprise.Text = "&Enterprise"
+        '
+        'EnterpriseToolStripMenuItem
+        '
+        Me.EnterpriseToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOption_AddEnterprise, Me.EditEnterpriseToolStripMenuItem, Me.DeleteEnterpriseToolStripMenuItem})
+        Me.EnterpriseToolStripMenuItem.Name = "EnterpriseToolStripMenuItem"
+        Me.EnterpriseToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+        Me.EnterpriseToolStripMenuItem.Text = "&Enterprise"
+        '
+        'mnuOption_AddEnterprise
+        '
+        Me.mnuOption_AddEnterprise.Image = CType(resources.GetObject("mnuOption_AddEnterprise.Image"), System.Drawing.Image)
+        Me.mnuOption_AddEnterprise.Name = "mnuOption_AddEnterprise"
+        Me.mnuOption_AddEnterprise.Size = New System.Drawing.Size(162, 22)
+        Me.mnuOption_AddEnterprise.Text = "&Add Enterprise"
+        '
+        'EditEnterpriseToolStripMenuItem
+        '
+        Me.EditEnterpriseToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.edit16x16
+        Me.EditEnterpriseToolStripMenuItem.Name = "EditEnterpriseToolStripMenuItem"
+        Me.EditEnterpriseToolStripMenuItem.Size = New System.Drawing.Size(162, 22)
+        Me.EditEnterpriseToolStripMenuItem.Text = "&Edit Enterprise"
+        '
+        'DeleteEnterpriseToolStripMenuItem
+        '
+        Me.DeleteEnterpriseToolStripMenuItem.Image = CType(resources.GetObject("DeleteEnterpriseToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.DeleteEnterpriseToolStripMenuItem.Name = "DeleteEnterpriseToolStripMenuItem"
+        Me.DeleteEnterpriseToolStripMenuItem.Size = New System.Drawing.Size(162, 22)
+        Me.DeleteEnterpriseToolStripMenuItem.Text = "&Delete Enterprise"
+        '
+        'ToolStripMenuItem14
+        '
+        Me.ToolStripMenuItem14.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem15, Me.ToolStripMenuItem16, Me.ToolStripMenuItem17})
+        Me.ToolStripMenuItem14.Name = "ToolStripMenuItem14"
+        Me.ToolStripMenuItem14.Size = New System.Drawing.Size(142, 22)
+        Me.ToolStripMenuItem14.Text = "&Organisation"
+        '
+        'ToolStripMenuItem15
+        '
+        Me.ToolStripMenuItem15.Image = Global.Boston.My.Resources.Resources.Add16x16
+        Me.ToolStripMenuItem15.Name = "ToolStripMenuItem15"
+        Me.ToolStripMenuItem15.Size = New System.Drawing.Size(178, 22)
+        Me.ToolStripMenuItem15.Text = "&Add Organisation"
+        '
+        'ToolStripMenuItem16
+        '
+        Me.ToolStripMenuItem16.Image = Global.Boston.My.Resources.Resources.edit16x16
+        Me.ToolStripMenuItem16.Name = "ToolStripMenuItem16"
+        Me.ToolStripMenuItem16.Size = New System.Drawing.Size(178, 22)
+        Me.ToolStripMenuItem16.Text = "&Edit Organisation"
+        '
+        'ToolStripMenuItem17
+        '
+        Me.ToolStripMenuItem17.Image = Global.Boston.My.Resources.Resources.deleteround16x16
+        Me.ToolStripMenuItem17.Name = "ToolStripMenuItem17"
+        Me.ToolStripMenuItem17.Size = New System.Drawing.Size(178, 22)
+        Me.ToolStripMenuItem17.Text = "&Delete Organisation"
+        '
+        'ToolStripMenuItemSubjectArea
+        '
+        Me.ToolStripMenuItemSubjectArea.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItem18, Me.ToolStripMenuItem19, Me.ToolStripMenuItem20})
+        Me.ToolStripMenuItemSubjectArea.Name = "ToolStripMenuItemSubjectArea"
+        Me.ToolStripMenuItemSubjectArea.Size = New System.Drawing.Size(142, 22)
+        Me.ToolStripMenuItemSubjectArea.Text = "Subject &Area"
+        '
+        'ToolStripMenuItem18
+        '
+        Me.ToolStripMenuItem18.Image = CType(resources.GetObject("ToolStripMenuItem18.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItem18.Name = "ToolStripMenuItem18"
+        Me.ToolStripMenuItem18.Size = New System.Drawing.Size(176, 22)
+        Me.ToolStripMenuItem18.Text = "&Add Subject Area"
+        '
+        'ToolStripMenuItem19
+        '
+        Me.ToolStripMenuItem19.Image = Global.Boston.My.Resources.Resources.edit16x16
+        Me.ToolStripMenuItem19.Name = "ToolStripMenuItem19"
+        Me.ToolStripMenuItem19.Size = New System.Drawing.Size(176, 22)
+        Me.ToolStripMenuItem19.Text = "&Edit Subject Area"
+        '
+        'ToolStripMenuItem20
+        '
+        Me.ToolStripMenuItem20.Image = CType(resources.GetObject("ToolStripMenuItem20.Image"), System.Drawing.Image)
+        Me.ToolStripMenuItem20.Name = "ToolStripMenuItem20"
+        Me.ToolStripMenuItem20.Size = New System.Drawing.Size(176, 22)
+        Me.ToolStripMenuItem20.Text = "&Delete Subject Area"
+        '
+        'SolutionToolStripMenuItem
+        '
+        Me.SolutionToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddSolutionToolStripMenuItem, Me.EditSolutionToolStripMenuItem, Me.DeleteSolutionToolStripMenuItem})
+        Me.SolutionToolStripMenuItem.Name = "SolutionToolStripMenuItem"
+        Me.SolutionToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+        Me.SolutionToolStripMenuItem.Text = "&Solution"
+        '
+        'AddSolutionToolStripMenuItem
+        '
+        Me.AddSolutionToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.Add16x16
+        Me.AddSolutionToolStripMenuItem.Name = "AddSolutionToolStripMenuItem"
+        Me.AddSolutionToolStripMenuItem.Size = New System.Drawing.Size(154, 22)
+        Me.AddSolutionToolStripMenuItem.Text = "&Add Solution"
+        '
+        'EditSolutionToolStripMenuItem
+        '
+        Me.EditSolutionToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.edit16x16
+        Me.EditSolutionToolStripMenuItem.Name = "EditSolutionToolStripMenuItem"
+        Me.EditSolutionToolStripMenuItem.Size = New System.Drawing.Size(154, 22)
+        Me.EditSolutionToolStripMenuItem.Text = "&Edit Solution"
+        '
+        'DeleteSolutionToolStripMenuItem
+        '
+        Me.DeleteSolutionToolStripMenuItem.Image = Global.Boston.My.Resources.Resources.deleteround16x16
+        Me.DeleteSolutionToolStripMenuItem.Name = "DeleteSolutionToolStripMenuItem"
+        Me.DeleteSolutionToolStripMenuItem.Size = New System.Drawing.Size(154, 22)
+        Me.DeleteSolutionToolStripMenuItem.Text = "&Delete Solution"
+        '
+        'ToolStripMenuItemApplication
+        '
+        Me.ToolStripMenuItemApplication.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddApplicationToolStripMenuItem, Me.EditApplicationToolStripMenuItem, Me.DeleteApplicationToolStripMenuItem, Me.ToolStripSeparator19, Me.ApplicationMenuEditorToolStripMenuItem, Me.ApplicationRunnerToolStripMenuItem})
+        Me.ToolStripMenuItemApplication.Name = "ToolStripMenuItemApplication"
+        Me.ToolStripMenuItemApplication.Size = New System.Drawing.Size(80, 22)
+        Me.ToolStripMenuItemApplication.Text = "&Application"
+        '
+        'AddApplicationToolStripMenuItem
+        '
+        Me.AddApplicationToolStripMenuItem.Name = "AddApplicationToolStripMenuItem"
+        Me.AddApplicationToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.AddApplicationToolStripMenuItem.Text = "&Add Application"
+        '
+        'EditApplicationToolStripMenuItem
+        '
+        Me.EditApplicationToolStripMenuItem.Name = "EditApplicationToolStripMenuItem"
+        Me.EditApplicationToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.EditApplicationToolStripMenuItem.Text = "&Edit Application"
+        '
+        'DeleteApplicationToolStripMenuItem
+        '
+        Me.DeleteApplicationToolStripMenuItem.Name = "DeleteApplicationToolStripMenuItem"
+        Me.DeleteApplicationToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.DeleteApplicationToolStripMenuItem.Text = "&Delete Application"
+        '
+        'ToolStripSeparator19
+        '
+        Me.ToolStripSeparator19.Name = "ToolStripSeparator19"
+        Me.ToolStripSeparator19.Size = New System.Drawing.Size(200, 6)
+        '
+        'ApplicationMenuEditorToolStripMenuItem
+        '
+        Me.ApplicationMenuEditorToolStripMenuItem.Name = "ApplicationMenuEditorToolStripMenuItem"
+        Me.ApplicationMenuEditorToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.ApplicationMenuEditorToolStripMenuItem.Text = "Application &Menu Editor"
+        '
+        'ApplicationRunnerToolStripMenuItem
+        '
+        Me.ApplicationRunnerToolStripMenuItem.Name = "ApplicationRunnerToolStripMenuItem"
+        Me.ApplicationRunnerToolStripMenuItem.Size = New System.Drawing.Size(203, 22)
+        Me.ApplicationRunnerToolStripMenuItem.Text = "Application Runner"
+        '
+        'ToolStripMenuItemTesting
+        '
+        Me.ToolStripMenuItemTesting.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TestSetManagerToolStripMenuItem})
+        Me.ToolStripMenuItemTesting.Name = "ToolStripMenuItemTesting"
+        Me.ToolStripMenuItemTesting.Size = New System.Drawing.Size(114, 22)
+        Me.ToolStripMenuItemTesting.Text = "&Test Management"
+        '
+        'TestSetManagerToolStripMenuItem
+        '
+        Me.TestSetManagerToolStripMenuItem.Image = CType(resources.GetObject("TestSetManagerToolStripMenuItem.Image"), System.Drawing.Image)
+        Me.TestSetManagerToolStripMenuItem.Name = "TestSetManagerToolStripMenuItem"
+        Me.TestSetManagerToolStripMenuItem.Size = New System.Drawing.Size(145, 22)
+        Me.TestSetManagerToolStripMenuItem.Text = "&Test Manager"
+        '
         'HelpToolStripMenuItem
         '
         Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripMenuItemHelp, Me.AboutRichmondToolStripMenuItem, Me.ToolStripSeparator13, Me.ToolStripMenuItemOpenLogFile, Me.EmailSupportvievcomToolStripMenuItem})
@@ -745,65 +1198,6 @@ Partial Class frmMain
         Me.EmailSupportvievcomToolStripMenuItem.Name = "EmailSupportvievcomToolStripMenuItem"
         Me.EmailSupportvievcomToolStripMenuItem.Size = New System.Drawing.Size(226, 22)
         Me.EmailSupportvievcomToolStripMenuItem.Text = "&Email support@factengine.ai"
-        '
-        'ToolStripMenuItemTestClientServer
-        '
-        Me.ToolStripMenuItemTestClientServer.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BroadcastMessageToUsersToolStripMenuItem, Me.ShowBroadcastEventMonitorToolStripMenuItem, Me.ShowClientServerBroadcastTesterToolStripMenuItem})
-        Me.ToolStripMenuItemTestClientServer.Name = "ToolStripMenuItemTestClientServer"
-        Me.ToolStripMenuItemTestClientServer.Size = New System.Drawing.Size(85, 22)
-        Me.ToolStripMenuItemTestClientServer.Text = "Clie&nt Server"
-        '
-        'BroadcastMessageToUsersToolStripMenuItem
-        '
-        Me.BroadcastMessageToUsersToolStripMenuItem.Name = "BroadcastMessageToUsersToolStripMenuItem"
-        Me.BroadcastMessageToUsersToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
-        Me.BroadcastMessageToUsersToolStripMenuItem.Text = "&Broadcast Message to Users"
-        '
-        'ShowBroadcastEventMonitorToolStripMenuItem
-        '
-        Me.ShowBroadcastEventMonitorToolStripMenuItem.Name = "ShowBroadcastEventMonitorToolStripMenuItem"
-        Me.ShowBroadcastEventMonitorToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
-        Me.ShowBroadcastEventMonitorToolStripMenuItem.Text = "Show Broadcast Event Monitor"
-        '
-        'ShowClientServerBroadcastTesterToolStripMenuItem
-        '
-        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Name = "ShowClientServerBroadcastTesterToolStripMenuItem"
-        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Size = New System.Drawing.Size(260, 22)
-        Me.ShowClientServerBroadcastTesterToolStripMenuItem.Text = "Show Client Server Broadcast Tester"
-        '
-        'TestNotificationToolStripMenuItem
-        '
-        Me.TestNotificationToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DoNotificationToolStripMenuItem})
-        Me.TestNotificationToolStripMenuItem.Name = "TestNotificationToolStripMenuItem"
-        Me.TestNotificationToolStripMenuItem.Size = New System.Drawing.Size(105, 22)
-        Me.TestNotificationToolStripMenuItem.Text = "Test Notification"
-        Me.TestNotificationToolStripMenuItem.Visible = False
-        '
-        'DoNotificationToolStripMenuItem
-        '
-        Me.DoNotificationToolStripMenuItem.Name = "DoNotificationToolStripMenuItem"
-        Me.DoNotificationToolStripMenuItem.Size = New System.Drawing.Size(155, 22)
-        Me.DoNotificationToolStripMenuItem.Text = "Do Notification"
-        '
-        'ToolStripMenuItemSuperuser
-        '
-        Me.ToolStripMenuItemSuperuser.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ThrowTestErrorMessageToolStripMenuItem, Me.GenericTestFormToolStripMenuItem})
-        Me.ToolStripMenuItemSuperuser.Name = "ToolStripMenuItemSuperuser"
-        Me.ToolStripMenuItemSuperuser.Size = New System.Drawing.Size(71, 22)
-        Me.ToolStripMenuItemSuperuser.Text = "Superuse&r"
-        Me.ToolStripMenuItemSuperuser.Visible = False
-        '
-        'ThrowTestErrorMessageToolStripMenuItem
-        '
-        Me.ThrowTestErrorMessageToolStripMenuItem.Name = "ThrowTestErrorMessageToolStripMenuItem"
-        Me.ThrowTestErrorMessageToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
-        Me.ThrowTestErrorMessageToolStripMenuItem.Text = "Throw test &Error Message"
-        '
-        'GenericTestFormToolStripMenuItem
-        '
-        Me.GenericTestFormToolStripMenuItem.Name = "GenericTestFormToolStripMenuItem"
-        Me.GenericTestFormToolStripMenuItem.Size = New System.Drawing.Size(206, 22)
-        Me.GenericTestFormToolStripMenuItem.Text = "Generic Test Form"
         '
         'ToolStrip_main
         '
@@ -949,7 +1343,7 @@ Partial Class frmMain
         'StatusBar_main
         '
         Me.StatusBar_main.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.StatusBar_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StatusLabelGeneralStatus, Me.ToolStripStatusLabelUsername, Me.ToolStripProgressBar, Me.ToolStripStatusLabelClientServer})
+        Me.StatusBar_main.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StatusLabelGeneralStatus, Me.ToolStripStatusLabelUsername, Me.ToolStripProgressBar, Me.ToolStripStatusLabelClientServer, Me.ToolStripStatusLabelPromptEvaluationTime, Me.ToolStripStatusLabelPromptEvaluationTimeSeconds})
         Me.StatusBar_main.Location = New System.Drawing.Point(0, 543)
         Me.StatusBar_main.Name = "StatusBar_main"
         Me.StatusBar_main.Size = New System.Drawing.Size(1066, 24)
@@ -980,6 +1374,20 @@ Partial Class frmMain
         '
         Me.ToolStripStatusLabelClientServer.Name = "ToolStripStatusLabelClientServer"
         Me.ToolStripStatusLabelClientServer.Size = New System.Drawing.Size(0, 19)
+        '
+        'ToolStripStatusLabelPromptEvaluationTime
+        '
+        Me.ToolStripStatusLabelPromptEvaluationTime.Name = "ToolStripStatusLabelPromptEvaluationTime"
+        Me.ToolStripStatusLabelPromptEvaluationTime.Size = New System.Drawing.Size(95, 19)
+        Me.ToolStripStatusLabelPromptEvaluationTime.Text = "Evaluation Time:"
+        Me.ToolStripStatusLabelPromptEvaluationTime.Visible = False
+        '
+        'ToolStripStatusLabelPromptEvaluationTimeSeconds
+        '
+        Me.ToolStripStatusLabelPromptEvaluationTimeSeconds.Name = "ToolStripStatusLabelPromptEvaluationTimeSeconds"
+        Me.ToolStripStatusLabelPromptEvaluationTimeSeconds.Size = New System.Drawing.Size(18, 19)
+        Me.ToolStripStatusLabelPromptEvaluationTimeSeconds.Text = "0s"
+        Me.ToolStripStatusLabelPromptEvaluationTimeSeconds.Visible = False
         '
         'ContextMenuStrip_Project
         '
@@ -1018,6 +1426,14 @@ Partial Class frmMain
         'BackgroundWorkerStatusBar
         '
         Me.BackgroundWorkerStatusBar.WorkerReportsProgress = True
+        '
+        'TimerGFSBackup
+        '
+        Me.TimerGFSBackup.Interval = 20000
+        '
+        'TimerDemo
+        '
+        Me.TimerDemo.Interval = 10000
         '
         'frmMain
         '
@@ -1080,7 +1496,7 @@ Partial Class frmMain
     Friend WithEvents PrintToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemRecentNodes As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ToolStripSeparator11 As System.Windows.Forms.ToolStripSeparator
-    Friend WithEvents CopyToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemCopy As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents PasteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents HelpProvider As System.Windows.Forms.HelpProvider
     Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
@@ -1173,4 +1589,60 @@ Partial Class frmMain
     Friend WithEvents ConceptClassificationToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem3 As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator17 As ToolStripSeparator
+    Friend WithEvents VirtualAnalystToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents DescriptionsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemChatOpenAI As ToolStripMenuItem
+    Friend WithEvents TimerGFSBackup As Timer
+    Friend WithEvents ToolStripMenuItemOSM As ToolStripMenuItem
+    Friend WithEvents TaskToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddTaskToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents EditTaskToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents DeleteTaskToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents OpenAIFunctionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddOpenAIFunctionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents EditOpenAIFunctionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents DeleteOpenAIFunctionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ViewToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents TheBoxToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator18 As ToolStripSeparator
+    Friend WithEvents ImportExportToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ExportTaskToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ImportTaskToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemDocumentSearch As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemEnterprise As ToolStripMenuItem
+    Friend WithEvents EnterpriseToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents mnuOption_AddEnterprise As ToolStripMenuItem
+    Friend WithEvents EditEnterpriseToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents DeleteEnterpriseToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem14 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem15 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem16 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem17 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemSubjectArea As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem18 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem19 As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem20 As ToolStripMenuItem
+    Friend WithEvents DocumentDatabaseToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ManagerToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents TimerDemo As Timer
+    Friend WithEvents QueryEditorToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripStatusLabelPromptEvaluationTime As ToolStripStatusLabel
+    Friend WithEvents ToolStripStatusLabelPromptEvaluationTimeSeconds As ToolStripStatusLabel
+    Friend WithEvents ToolStripMenuItemApplication As ToolStripMenuItem
+    Friend WithEvents AddApplicationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents EditApplicationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator19 As ToolStripSeparator
+    Friend WithEvents ApplicationMenuEditorToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents DeleteApplicationToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ApplicationRunnerToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItemTesting As ToolStripMenuItem
+    Friend WithEvents TestSetManagerToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents MyTasksToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SolutionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AddSolutionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents EditSolutionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents DeleteSolutionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ModelViewsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents RelationalManagerToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents GraphSchemaManagerToolStripMenuItem1 As ToolStripMenuItem
 End Class

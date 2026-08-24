@@ -9,9 +9,14 @@ Public Class tGenericSelection
     Public WhereClause As String = ""  'The where clause (extension) to apply to the database to retrieve the values from which to select
     Public OrderByFields As String = "" 'The set of fields to order by
     Public IndexField As String = ""
-    Public TableName As String = ""    'The name of the table from which the values (for selection) are retrieved
+    Public TableName As String = ""    'The name of the table from which the values (for selection) are retrieved. E.g. DataStore
+    Public ObjectName As String = "" 'The name of the Object/Class type stored within the Table(Name). E.g. OpenAIFunction, Task
     Public FormTitle As String = ""    'The title to display in the GenericSelectFrm    
     Public FieldList As String = "" 'Comma separated field list (e.g. "Name, Username" where SelectField might be "FirstName + ' ' + LastName as Name, Username")
+    Public UseDataStore As Boolean = False
+    Public DataStoreType As Type
+    Public ComboBoxStyle As pcenumComboBoxStyle = pcenumComboBoxStyle.Simple
+    Public DatabaseConnection As FactEngine.DatabaseConnection = Nothing
 
     ''' <summary>
     ''' If the MultiColumn Combobox GenericSelect form is used, is the Column from which a return value is returned.

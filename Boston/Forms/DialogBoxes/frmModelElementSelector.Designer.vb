@@ -23,10 +23,10 @@ Partial Class frmModelElementSelector
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.GroupBox = New System.Windows.Forms.GroupBox()
-        Me.LabelPromptModel = New System.Windows.Forms.Label()
-        Me.ComboBoxModel = New System.Windows.Forms.ComboBox()
+        Me.ComboBoxModelElement = New System.Windows.Forms.ComboBox()
         Me.LabelPromptModelElement = New System.Windows.Forms.Label()
-        Me.ComboBox1 = New System.Windows.Forms.ComboBox()
+        Me.ComboBoxModel = New System.Windows.Forms.ComboBox()
+        Me.LabelPromptModel = New System.Windows.Forms.Label()
         Me.ButtonOkay = New System.Windows.Forms.Button()
         Me.ButtonCancel = New System.Windows.Forms.Button()
         Me.GroupBox.SuspendLayout()
@@ -37,7 +37,7 @@ Partial Class frmModelElementSelector
         Me.GroupBox.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox.Controls.Add(Me.ComboBox1)
+        Me.GroupBox.Controls.Add(Me.ComboBoxModelElement)
         Me.GroupBox.Controls.Add(Me.LabelPromptModelElement)
         Me.GroupBox.Controls.Add(Me.ComboBoxModel)
         Me.GroupBox.Controls.Add(Me.LabelPromptModel)
@@ -47,22 +47,14 @@ Partial Class frmModelElementSelector
         Me.GroupBox.TabIndex = 0
         Me.GroupBox.TabStop = False
         '
-        'LabelPromptModel
+        'ComboBoxModelElement
         '
-        Me.LabelPromptModel.AutoSize = True
-        Me.LabelPromptModel.Location = New System.Drawing.Point(58, 22)
-        Me.LabelPromptModel.Name = "LabelPromptModel"
-        Me.LabelPromptModel.Size = New System.Drawing.Size(39, 13)
-        Me.LabelPromptModel.TabIndex = 0
-        Me.LabelPromptModel.Text = "Model:"
-        '
-        'ComboBoxModel
-        '
-        Me.ComboBoxModel.FormattingEnabled = True
-        Me.ComboBoxModel.Location = New System.Drawing.Point(103, 19)
-        Me.ComboBoxModel.Name = "ComboBoxModel"
-        Me.ComboBoxModel.Size = New System.Drawing.Size(413, 21)
-        Me.ComboBoxModel.TabIndex = 1
+        Me.ComboBoxModelElement.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxModelElement.FormattingEnabled = True
+        Me.ComboBoxModelElement.Location = New System.Drawing.Point(103, 56)
+        Me.ComboBoxModelElement.Name = "ComboBoxModelElement"
+        Me.ComboBoxModelElement.Size = New System.Drawing.Size(613, 21)
+        Me.ComboBoxModelElement.TabIndex = 3
         '
         'LabelPromptModelElement
         '
@@ -73,13 +65,23 @@ Partial Class frmModelElementSelector
         Me.LabelPromptModelElement.TabIndex = 2
         Me.LabelPromptModelElement.Text = "ModelElement:"
         '
-        'ComboBox1
+        'ComboBoxModel
         '
-        Me.ComboBox1.FormattingEnabled = True
-        Me.ComboBox1.Location = New System.Drawing.Point(103, 56)
-        Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(613, 21)
-        Me.ComboBox1.TabIndex = 3
+        Me.ComboBoxModel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxModel.FormattingEnabled = True
+        Me.ComboBoxModel.Location = New System.Drawing.Point(103, 19)
+        Me.ComboBoxModel.Name = "ComboBoxModel"
+        Me.ComboBoxModel.Size = New System.Drawing.Size(413, 21)
+        Me.ComboBoxModel.TabIndex = 1
+        '
+        'LabelPromptModel
+        '
+        Me.LabelPromptModel.AutoSize = True
+        Me.LabelPromptModel.Location = New System.Drawing.Point(58, 22)
+        Me.LabelPromptModel.Name = "LabelPromptModel"
+        Me.LabelPromptModel.Size = New System.Drawing.Size(39, 13)
+        Me.LabelPromptModel.TabIndex = 0
+        Me.LabelPromptModel.Text = "Model:"
         '
         'ButtonOkay
         '
@@ -122,7 +124,7 @@ Partial Class frmModelElementSelector
     End Sub
 
     Friend WithEvents GroupBox As GroupBox
-    Friend WithEvents ComboBox1 As ComboBox
+    Friend WithEvents ComboBoxModelElement As ComboBox
     Friend WithEvents LabelPromptModelElement As Label
     Friend WithEvents ComboBoxModel As ComboBox
     Friend WithEvents LabelPromptModel As Label

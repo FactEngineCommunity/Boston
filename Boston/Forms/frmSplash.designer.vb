@@ -95,7 +95,7 @@ Partial Class frmSplash
         'time_close_form
         '
         Me.time_close_form.Enabled = True
-        Me.time_close_form.Interval = 5000
+        Me.time_close_form.Interval = 7000
         '
         'frmSplash
         '

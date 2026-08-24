@@ -4,11 +4,11 @@ Imports MindFusion.Diagramming
 Imports System.Runtime.InteropServices
 Imports System.ComponentModel
 Imports System.Text.RegularExpressions
-Imports OpenAI_API
-Imports OpenAI_API.Completions
-Imports OpenAI_API.Models
+Imports Azure.AI.OpenAI
+Imports Azure
 Imports System.Threading.Tasks
-
+Imports System.IO
+Imports System.Windows.Forms.DataVisualization.Charting
 Public Class frmFactEngine
 
     Public zrScanner As New FEQL.Scanner
@@ -31,7 +31,32 @@ Public Class frmFactEngine
 
     Private mrModel As FBM.Model
 
-    Dim mrOpenAIAPI As New OpenAI_API.OpenAIAPI(New APIAuthentication(My.Settings.FactEngineOpenAIAPIKey))
+#Region "OpenAI"
+    ' Replace 'YOUR_API_KEY' with your actual API key from OpenAI
+    Private apiKey As String = My.Settings.FactEngineOpenAIAPIKey 'Azure: "8e287a42bbf94dabadac71755d57b05b"
+
+    ' Set the API endpoint
+    Private apiUrl As String = "https://boston-openai.openai.azure.com/"
+
+    Private AzureKeyCredential As AzureKeyCredential
+
+    ' Create the client
+    Private mrOpenAIClient = New OpenAIClient(apiKey)  'Azure: New OpenAIClient(New Uri(apiUrl), New AzureKeyCredential(apiKey))
+
+    Private mrChatCompletionsOptions As New ChatCompletionsOptions() With {
+                .User = "Bot",
+                .MaxTokens = 4000,
+                .Functions = {},
+                .Temperature = Single.Parse("0.2")
+        }
+#End Region
+
+    Dim miActiveQueryLanguage As pcenumDatabaseQueryLanguage = pcenumDatabaseQueryLanguage.SQL
+
+
+    'Charting
+    ' Create a new Chart object
+    Dim mrChart As New Chart()
 
     <DllImport("user32.dll")>
     Private Shared Function GetKeyboardState(ByVal lpKeyState As Byte()) As Boolean
@@ -49,42 +74,66 @@ Public Class frmFactEngine
 
     Private Sub frmFactEngine_Load(sender As Object, e As EventArgs) Handles Me.Load
 
-        Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
-        Me.AutoComplete.Owner = Me
-        Me.AutoComplete.moBackgroundWorker = Me.BackgroundWorker
-
-        Me.TextBoxInput.AllowDrop = True
-
-        Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 0
-
-        Me.ToolStripMenuItemNaturalLanguage.Visible = My.Settings.FactEngineUseTransformations
-
-        '-------------------------------------------------------
-        'Setup the Text Highlighter
-        '----------------------------
-        Me.zrTextHighlighter = New FEQL.TextHighlighter(Me.TextBoxInput,
-                                                        Me.zrScanner,
-                                                        Me.zrParser)
-
-        Me.TextMarker = New FEQL.Controls.TextMarker(Me.TextBoxInput)
-
-        Call Me.displayModelName()
-        Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
-
-        If prApplication.WorkingModel IsNot Nothing Then
-            If prApplication.WorkingModel.RequiresConnectionString And Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
-                Me.ToolStripStatusLabelRequiresConnectionString.ForeColor = Color.Orange
-                Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
-            Else
-                Me.ToolStripStatusLabelRequiresConnectionString.Text = ""
-                Call Me.FEQLProcessor.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
+        Try
+            If apiKey <> "" Then
+                AzureKeyCredential = New AzureKeyCredential(apiKey)
             End If
-        End If
 
-        Me.ToolStripStatusLabelCurrentProduction.Text = "FactEngine Statement"
-        Me.ToolStripStatusLabelError.Text = ""
+            Me.KeyPreview = True
 
-        Call Me.SetupForm()
+            Me.ToolStripStatusLabelResults.Text = ""
+
+            'Charting - Add the Chart to the Form
+            Me.TabPageChart.Controls.Add(Me.mrChart)
+
+            Me.AutoComplete = New frmAutoComplete(Me.TextBoxInput)
+            Me.AutoComplete.Owner = Me
+            Me.AutoComplete.moBackgroundWorker = Me.BackgroundWorker
+
+            Me.TextBoxInput.AllowDrop = True
+
+            Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 0
+
+            Me.ToolStripMenuItemNaturalLanguage.Visible = My.Settings.FactEngineUseTransformations
+
+            'QueryTab/Box
+            Me.ToolStripStatusLabelLineNumber.Text = ""
+
+            '-------------------------------------------------------
+            'Setup the Text Highlighter
+            '----------------------------
+            Me.zrTextHighlighter = New FEQL.TextHighlighter(Me.TextBoxInput,
+                                                            Me.zrScanner,
+                                                            Me.zrParser, True)
+
+            Me.TextMarker = New FEQL.Controls.TextMarker(Me.TextBoxInput)
+
+            Call Me.displayModelName()
+            Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
+
+            If prApplication.WorkingModel IsNot Nothing Then
+                If prApplication.WorkingModel.RequiresConnectionString And Trim(prApplication.WorkingModel.TargetDatabaseConnectionString) = "" Then
+                    Me.ToolStripStatusLabelRequiresConnectionString.ForeColor = Color.Orange
+                    Me.ToolStripStatusLabelRequiresConnectionString.Text = "Model requires a database connection string"
+                Else
+                    Me.ToolStripStatusLabelRequiresConnectionString.Text = ""
+                    Call Me.FEQLProcessor.DatabaseManager.establishConnection(prApplication.WorkingModel.TargetDatabaseType, prApplication.WorkingModel.TargetDatabaseConnectionString)
+                End If
+            End If
+
+            Me.ToolStripStatusLabelCurrentProduction.Text = "FactEngine Statement"
+            Me.ToolStripStatusLabelError.Text = ""
+
+            Call Me.SetupForm()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -305,7 +354,7 @@ Public Class frmFactEngine
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -340,7 +389,7 @@ Public Class frmFactEngine
                 lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
             End If
         End If
-        If IsSomething(lrModelElement) Then
+        If lrModelElement IsNot Nothing Then
             Select Case lrModelElement.GetType
                 Case Is = GetType(FBM.FactType)
                     Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement))
@@ -354,7 +403,7 @@ Public Class frmFactEngine
             Dim larCharEnd() As Char = {")"}
             lsModelElementName = lsModelElementName.TrimStart(larCharBeginning).TrimEnd(larCharEnd)
             lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
-            If IsSomething(lrModelElement) Then
+            If lrModelElement IsNot Nothing Then
                 If lrModelElement.GetType = GetType(FBM.FactType) Then
                     Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement))
                 End If
@@ -449,7 +498,7 @@ Public Class frmFactEngine
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -549,7 +598,7 @@ Public Class frmFactEngine
                 'Verbalisation
                 Dim lrToolboxForm As frmToolboxORMVerbalisation
                 lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-                If IsSomething(lrToolboxForm) Then
+                If lrToolboxForm IsNot Nothing Then
                     lrToolboxForm.zrModel = prApplication.WorkingModel
                     Call lrToolboxForm.verbaliseModelElement(arModelElement)
                 End If
@@ -560,7 +609,7 @@ Public Class frmFactEngine
                 If lrPropertyGridForm IsNot Nothing Then
                     Dim loMiscFilterAttribute As Attribute = New System.ComponentModel.CategoryAttribute("Misc")
                     lrPropertyGridForm.PropertyGrid.HiddenAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {loMiscFilterAttribute})
-                    If IsSomething(lrPropertyGridForm) Then
+                    If lrPropertyGridForm IsNot Nothing Then
                         Dim lrModelElementInstance As FBM.ModelObject = Nothing
                         Dim lrPage As New FBM.Page
                         Select Case arModelElement.ConceptType
@@ -587,7 +636,7 @@ Public Class frmFactEngine
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -672,70 +721,72 @@ Public Class frmFactEngine
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="asNLQuery">May contain training data</param>
-    ''' <param name="asActualNLQuery">The actual NL query being processed.</param>
-    ''' <returns></returns>
-    Private Function GetGPT3Result(ByVal asNLQuery As String, Optional ByVal asActualNLQuery As String = "") As CompletionResult
+    '''' <summary>
+    '''' 
+    '''' </summary>
+    '''' <param name="asNLQuery">May contain training data</param>
+    '''' <param name="asActualNLQuery">The actual NL query being processed.</param>
+    '''' <returns></returns>
+    'Private Function GetGPT3Result(ByVal asNLQuery As String, Optional ByVal asActualNLQuery As String = "") As CompletionResult
 
-        Try
-            Dim liMaxTokens As Integer = Viev.Greater(80, CInt(asActualNLQuery.Split(" ").Length * 3.5))
+    '    Try
+    '        Dim liMaxTokens As Integer = Viev.Greater(80, CInt(asActualNLQuery.Split(" ").Length * 3.5))
 
-            Return Task.Run(Function() Me.mrOpenAIAPI.Completions.CreateCompletionAsync(
-                New CompletionRequest(asNLQuery, model:=Model.DavinciText, temperature:=0, max_tokens:=liMaxTokens)
-                )).Result
+    '        Return Task.Run(Function() Me.mrOpenAIAPI.Completions.CreateCompletionAsync(
+    '            New CompletionRequest(asNLQuery, model:=Model.DavinciText, temperature:=0, max_tokens:=liMaxTokens)
+    '            )).Result
 
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+    '    Catch ex As Exception
+    '        Dim lsMessage As String
+    '        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+    '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+    '        lsMessage &= vbCrLf & vbCrLf & ex.Message
+    '        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
-            Return New CompletionResult
-        End Try
+    '        Return New CompletionResult
+    '    End Try
 
-    End Function
+    'End Function
 
-    Private Function GetGPT3ChatResult(ByVal asNLQuery As String) As OpenAI_API.Chat.ChatResult
+    'Private Function GetGPT3ChatResult(ByVal asNLQuery As String) As OpenAI_API.Chat.ChatResult
 
-        Try
-            Dim _timeout As Integer = 5000 ' 5 seconds
-            Dim _cancellationTokenSource As New System.Threading.CancellationTokenSource
+    '    Try
+    '        Dim _timeout As Integer = 5000 ' 5 seconds
+    '        Dim _cancellationTokenSource As New System.Threading.CancellationTokenSource
 
-            'Return Task.Run(Function() Me.mrOpenAIAPI.Chat.CreateChatCompletionAsync(ByVal request As ChatRequest) As Task(Of ChatResult)
-            Return Task.Run(Function() Me.mrOpenAIAPI.Chat.CreateChatCompletionAsync(
-                            New OpenAI_API.Chat.ChatRequest() With {.Model = Model.ChatGPTTurbo,
-                                                                    .Temperature = 0.1,
-                                                                    .MaxTokens = 50,
-                                                                    .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asNLQuery)}})).Result
+    '        'Return Task.Run(Function() Me.mrOpenAIAPI.Chat.CreateChatCompletionAsync(ByVal request As ChatRequest) As Task(Of ChatResult)
+    '        Return Task.Run(Function() Me.mrOpenAIAPI.Chat.CreateChatCompletionAsync(
+    '                        New OpenAI_API.Chat.ChatRequest() With {.Model = Model.ChatGPTTurbo0301,
+    '                                                                .Temperature = 0.1,
+    '                                                                .MaxTokens = 50,
+    '                                                                .Messages = New OpenAI_API.Chat.ChatMessage() {New OpenAI_API.Chat.ChatMessage(OpenAI_API.Chat.ChatMessageRole.User, asNLQuery)}})).Result
 
-        Catch ex As Exception
-            Dim lsMessage As String
-            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+    '    Catch ex As Exception
+    '        Dim lsMessage As String
+    '        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
-            lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+    '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+    '        lsMessage &= vbCrLf & vbCrLf & ex.Message
+    '        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
-            Return Nothing
-        End Try
+    '        Return Nothing
+    '    End Try
 
-    End Function
+    'End Function
 
     Private Sub GO(Optional ByVal abUseNaturalLanguage As Boolean = False)
 
         Try
+            Dim lrRecordset As New ORMQL.Recordset
+
             With New WaitCursor
-                Dim lrRecordset As New ORMQL.Recordset
+
 
                 'If prApplication.WorkingModel.TargetDatabaseConnectionString = "" Then
                 '    Me.LabelError.ForeColor = Color.Orange
@@ -745,10 +796,11 @@ Public Class frmFactEngine
 
 #Region "Transformations"
                 'TextBoxNaturalLanguage
+                Dim lsNaturalLanguageQuery As String = ""
                 If My.Settings.FactEngineUseTransformations And abUseNaturalLanguage Then
 
                     'If abUseNaturalLanguage Then
-                    Dim lsNaturalLanguageQuery = Trim(Me.TextBoxNaturalLanguage.Text)
+                    lsNaturalLanguageQuery = Trim(Me.TextBoxNaturalLanguage.Text)
                     Me.TextBoxInput.Text = lsNaturalLanguageQuery
                     'End If
 
@@ -756,9 +808,9 @@ Public Class frmFactEngine
 
                     Try
                         If My.Settings.FactEngineUseGPT3 Then
-#Region "GPT3 Transforms"
-                            Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-                            Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(36, loTransformation)
+#Region "GPT Transforms"
+                            'Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                            Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(36) ', loTransformation
 
                             Dim lsGPT3TrainingExamplesFilePath = larTransformationTuples.Where(Function(x) x.ModelId = prApplication.WorkingModel.ModelId).Select(Function(x) x.GPT3TrainingFileLocation)(0)
 
@@ -766,13 +818,51 @@ Public Class frmFactEngine
 
                             Dim lsGPTTrainingExamples = System.IO.File.ReadAllText(lsGPT3TrainingExamplesFilePath)
 
-                            Dim lrCompletionResult = Me.GetGPT3Result(lsGPTTrainingExamples & "#" & lsNaturalLanguageQuery & vbCrLf, lsNaturalLanguageQuery)
-                            Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
+                            'Old at 202406127
+                            'Dim lrCompletionResult = Me.GetGPT3Result(lsGPTTrainingExamples & "#" & lsNaturalLanguageQuery & vbCrLf, lsNaturalLanguageQuery)
+                            'Dim lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
 
+
+                            'Was at 20240627
                             'Dim lrCompletionResult = Me.GetGPT3ChatResult(lsGPTTrainingExamples & "#" & lsNaturalLanguageQuery & vbCrLf)
                             'Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content
+                            Dim lsPrePrompt As String = ""
+                            Dim lsPostPrompt As String = ""
 
-                            Me.TextBoxInput.Text = lsGPT3ReturnString.Substring(0, Boston.returnIfTrue(lsGPT3ReturnString.IndexOf(vbCrLf) = -1, lsGPT3ReturnString.Length, lsGPT3ReturnString.IndexOf(vbCrLf)))
+                            lsPrePrompt = $"The current date and time is: {Now}"
+                            lsPrePrompt.AppendLine("Below are query by examples for FactEngine Query Language (FEQL) - Format is: Natural Language (prefixed by #) and under that the FEQL for the database we are working on:")
+
+                            Dim lsUserMessage = lsPrePrompt.AppendDoubleLineBreak(lsGPTTrainingExamples)
+
+                            lsPostPrompt = "The last line of this prompt, below, represents the actual user query."
+                            lsPostPrompt.AppendString("If it is a database query, return the FEQL query as instructed below, otherwise if it is a meta-data query answer the user question in natural language based on your insight of the data model based on the training data above (i.e. Not a FEQL query).")
+                            lsPostPrompt.AppendLine("Otherwise based on the training data, povide the FEQL query. Just return the FEQL query as a single line query...that's it (no embellishments). Nothing else.")
+
+                            lsUserMessage.AppendDoubleLineBreak(lsPostPrompt)
+
+                            lsUserMessage.AppendDoubleLineBreak("Actual user query is: ".AppendLine("#" & lsNaturalLanguageQuery))
+
+                            Dim lrUserMessage = New ChatMessage(ChatRole.User, lsUserMessage) 'I'd like to provide with comprehensive feedback on the recent technical interview for the Software Engineer role for Mr.X. Overall, the technical knowledge and problem-solving skills were evident, but the engagement during the interview is low. Mr.X displayed a solid grasp of fundamental concepts, particularly in areas such as data structures and algorithms. Mr.X's ability to break down complex problems into manageable steps and systematically approach solutions was impressive. Additionally, Mr.X's coding skills were commendable. Mr.X code was well-structured and readable, and Mr.X articulated his thought process clearly during the coding exercises. While the code was correct, there was room for optimization in terms of time or space complexity. Paying closer attention to edge cases and potential corner scenarios is crucial, as they can impact the completeness of a solution. In terms of communication, consider providing a bit more context before diving into code to enhance clarity. Mr.X did not ask clarifying questions to confirm the understanding. He missed to use descriptive variable names and adding comments, especially for complex logic, so the code readability was low. Candidate needs further evaluation to decide as a culture fit as per the company culture or not.")
+
+                            mrChatCompletionsOptions.Messages.Clear()
+                            mrChatCompletionsOptions.Messages.Add(lrUserMessage)
+                            mrChatCompletionsOptions.ChoiceCount = 1 '20240113-VM-Was 10, then 5....now reduced to 1. See KickStartTimer.
+                            mrChatCompletionsOptions.FrequencyPenalty = 0
+                            mrChatCompletionsOptions.Temperature = 1
+                            mrChatCompletionsOptions.MaxTokens = 2000
+
+                            Dim response As NullableResponse(Of ChatCompletions) = mrOpenAIClient.GetChatCompletions(My.Settings.FactEngineModelName, mrChatCompletionsOptions)
+                            'GetEnumDescription(pcenumOSMAIModelName.gpt_4_1106_preview)
+
+                            If response.Value?.Choices IsNot Nothing Then
+
+                                Dim lsGPT3ReturnString = response.Value?.Choices(0).Message.Content
+
+                                Me.TextBoxInput.Text = lsGPT3ReturnString.Substring(0, Boston.returnIfTrue(lsGPT3ReturnString.IndexOf(vbCrLf) = -1, lsGPT3ReturnString.Length, lsGPT3ReturnString.IndexOf(vbCrLf)))
+
+                            Else
+                                'Need some sort of error thrown herre
+                            End If
 #End Region
 
                         Else
@@ -807,8 +897,8 @@ NextModelElementFind:
                             Next
 #End Region
 
-                            Dim loTransformation As Object = New System.Dynamic.ExpandoObject
-                            Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35, loTransformation).OrderBy(Function(x) x.SequenceNr)
+                            'Dim loTransformation As Object = New System.Dynamic.ExpandoObject
+                            Dim larTransformationTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(35).OrderBy(Function(x) x.SequenceNr) ', loTransformation
 
 #Region "Check for Double_Word with underscore model element names"
                             Dim Words() As String = Me.TextBoxInput.Text.Split(" ")
@@ -837,13 +927,13 @@ NextModelElementFind:
                                         End If
                                     Next
                                     'Words(liInd) & "_" & Words(liInd + 1)
-                                    lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWordsUnderscore)
+                                    lsCamelConcatWords = FEStrings.MakeCapCamelCase(lsConcatWordsUnderscore)
                                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True)
                                     If lrModelElement IsNot Nothing Then
                                         Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lrModelElement.Id)
                                     End If
 
-                                    lsCamelConcatWords = Viev.Strings.MakeCapCamelCase(lsConcatWords)
+                                    lsCamelConcatWords = FEStrings.MakeCapCamelCase(lsConcatWords)
                                     If prApplication.WorkingModel.GetModelObjectByName(lsCamelConcatWords, True,,, True) IsNot Nothing Then
                                         Me.TextBoxInput.Text = Me.TextBoxInput.Text.Replace(lsConcatWords, lsCamelConcatWords)
                                     End If
@@ -881,14 +971,11 @@ NextWord:
                     Catch ex As Exception
                         Me.LabelError.BringToFront()
                         Me.LabelError.Text = "Woops. Error executing Transformations. Contact FactEngine support." & vbCrLf & vbCrLf & ex.Message
-                        Me.TabControl1.SelectedTab = Me.TabPageResults
+                        Me.TabControl.SelectedTab = Me.TabPageResults
                         Me.LabelError.ForeColor = Color.Orange
                         Exit Sub
                     End Try
                 End If
-
-
-
 
 #End Region
                 Me.LabelError.Text = ""
@@ -899,18 +986,50 @@ NextWord:
 
                 Dim lrFEQLTokenType As FEQL.TokenType = Nothing
                 Dim lrFEQLParseTree As FEQL.ParseTree = Nothing
-                lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsQuery, lrFEQLTokenType, lrFEQLParseTree)
+
+                'CodeSafe
+                If lsQuery.Trim = "" Then
+                    Me.LabelError.Text = "No query to process"
+                    Exit Sub
+                End If
+
+                '====================================================================
+                'Run the query
+#Region "Query Language"
+                Dim liQueryLanguageToUse As pcenumDatabaseQueryLanguage = Me.miActiveQueryLanguage
+                If Me.ToolStripMenuItemUseThisQueryLanguage.Checked Then
+                    'Nothing to do here. Use the ActiveQueryLanguage set in the Query tab.
+                Else
+                    liQueryLanguageToUse = prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
+                End If
+#End Region
+                '========================================================
+                'Run the FactEngine Query
+                '========================
+                Me.SetStatusLabelText("Running Query")
+                lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsQuery, lrFEQLTokenType, lrFEQLParseTree, liQueryLanguageToUse)
+
+                Me.TabPageResults.Tag = lrRecordset
+
+                'By default, record what happened:
+                lrRecordset.NaturalLanguageQuery = If(abUseNaturalLanguage, lsNaturalLanguageQuery, "None")
+                lrRecordset.FEQLQuery = lsQuery
 
                 '====================================================
                 If lrRecordset Is Nothing Then
+#Region "Recordset is Nothing?"
                     'Make sure the VirtualAnalyst is open
                     Call Me.loadVirtualAnalyst()
 
                     Me.LabelError.BringToFront()
-                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.TabControl.SelectedTab = Me.TabPageResults
 
                     'Pass the FEQL Statement to the Brain.
                     Select Case lrFEQLTokenType
+
+                        Case Is = FEQL.TokenType.CREATENODESTMT
+                            Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
+
                         Case Is = FEQL.TokenType.VALUETYPEISWRITTENASSTMT
                             Call prApplication.Brain.ProcessFEQLStatement(lsQuery)
                             Me.LabelError.Text = "See the Virtual Analyst toolbox for results/required actions."
@@ -935,17 +1054,29 @@ NextWord:
                             'Nothing at this stage
                     End Select
                     Exit Sub
+#End Region
                 End If
                 '=====================================================
 
                 If lrRecordset.Query IsNot Nothing Then
-                    Me.TextBoxQuery.Text = lrRecordset.Query
+
+                    If liQueryLanguageToUse <> prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage) Then
+
+                        Me.TabPageActualQuery.Show()
+                        Me.TextBoxActualQuery.Text = lrRecordset.Query
+                        Me.TextBoxQuery.Text = lrRecordset.IntermediateQuery
+                    Else
+                        Me.TextBoxQuery.Text = lrRecordset.Query
+                    End If
+
                 End If
 
-                If lrRecordset.ErrorString IsNot Nothing Then
+                If lrRecordset.ErrorString IsNot Nothing And Not Me.ToolStripMenuItemGenerateQueryOnly.Checked Then
+
+#Region "Error"
+                    Me.SetStatusLabelText("Error running Query")
                     Me.LabelError.BringToFront()
-                    Me.LabelError.Text = lrRecordset.ErrorString
-                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.TabControl.SelectedTab = Me.TabPageResults
                     Me.LabelError.ForeColor = Color.Orange
 
                     If lrRecordset.ApplicationException IsNot Nothing Then
@@ -977,9 +1108,14 @@ NextWord:
                                 Call prApplication.Brain.AskQuestionCreateFactTypeReading(lrSentence)
                                 Call prApplication.Brain.invokeTimeoutStart()
                             End If
+                            Me.LabelError.AppendText(lrRecordset.ErrorString)
+                        Else
+                            Me.LabelError.AppendText(lrRecordset.ErrorString)
                         End If
-
+                    Else
+                        Me.LabelError.AppendText(If(lrRecordset.IntermediateQuery Is Nothing, lrRecordset.ErrorString, lrRecordset.IntermediateQuery.AppendDoubleLineBreak(lrRecordset.ErrorString)))
                     End If
+#End Region
                 Else
                     Select Case lrRecordset.StatementType
                         Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
@@ -989,7 +1125,14 @@ NextWord:
                             Call Me.ShowModelElement(lrRecordset.ModelElement)
 
                         Case Else
+#Region "Query Results"
+                            If Me.ToolStripMenuItemGenerateQueryOnly.Checked Then
+                                Me.TabControl.SelectedTab = Me.TabPageQuery
+                                Me.Refresh()
+                                Exit Sub
+                            End If
 
+                            Me.SetStatusLabelText("Processing Results")
                             Me.LabelError.Text = ""
 
                             If lrRecordset.StatementType = FactEngine.pcenumFEQLStatementType.DIDStatement Then
@@ -1016,7 +1159,7 @@ NextWord:
                                 End If
 
                                 Dim liInd = 0
-                                For Each lsColumnName In lrRecordset.Columns
+                                For Each lsColumnName In lrRecordset.ColumnNames
                                     liInd += 1
                                     Me.LabelError.Text &= " " & lsColumnName & " "
                                     If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
@@ -1031,51 +1174,125 @@ NextWord:
                                 Me.GraphNodes.Clear()
                                 Me.Diagram.Nodes.Clear()
 
-                                For Each lrFact In lrRecordset.Facts
-                                    Me.LabelError.Text &= lrFact.EnumerateAsBracketedFact(True) & vbCrLf
+                                ' Create a new instance of StringBuilder
+                                Dim stringBuilder As New System.Text.StringBuilder()
+
+                                ' Use the StringBuilder to append text
+                                For Each lrFact As FBM.Fact In lrRecordset.Facts
+                                    If lrFact.GetType = GetType(ORMQL.PathFact) Then
+                                        stringBuilder.AppendLine("")
+                                        liInd = 0
+                                        For Each lrFactData As FBM.FactData In lrFact.Data
+                                            If liInd > 0 Then stringBuilder.Append(", ")
+                                            stringBuilder.Append(lrFactData.Role.Id)
+                                            liInd += 1
+                                        Next
+                                        stringBuilder.AppendLine(vbCrLf & "=======================================")
+                                    End If
+                                    stringBuilder.AppendLine(lrFact.EnumerateAsBracketedFact(True))
                                 Next
 
+                                ' Once all text has been appended, update the label's text in one operation
+                                Me.LabelError.Text = stringBuilder.ToString()
+
+                                If Not Me.SuspendGraphViewToolStripMenuItem.Checked Then
 #Region "GraphView"
-                                For Each lrFact In lrRecordset.Facts
 
-                                    Dim larTupleNode As New List(Of FactEngine.DisplayGraph.Node)
-                                    Dim liColumnInd = 0
-                                    Dim lrNodeColumn As RDS.Column
+#Region "Path Facts"
+                                    For Each lrPathFact As ORMQL.PathFact In lrRecordset.Facts.FindAll(Function(x) x.GetType = GetType(ORMQL.PathFact))
 
-                                    If lrRecordset.QueryGraph Is Nothing Then Exit For
+                                        Dim lrPathNode As FactEngine.DisplayGraph.Node = Nothing
+                                        Dim lrPreviousPathNode As FactEngine.DisplayGraph.Node
+                                        lrPreviousPathNode = Nothing
 
-                                    Dim larProjectionColumn = lrRecordset.QueryGraph.ProjectionColumn
+                                        liInd = 0
+                                        For Each lrTable In lrPathFact.QueryGraph.ProjectionColumn.Select(Function(x) x.Table).Distinct.ToList
 
-                                    'Set up color numbers
-                                    Dim liProjectionColumnInd = 0
-                                    Dim liProjectionColumnInd2 As Integer
-                                    For liProjectionColumnInd = 0 To larProjectionColumn.Count - 1
-                                        If liProjectionColumnInd = 0 Then
-                                            larProjectionColumn(0).ProjectionOrdinalPosition = 1
-                                        ElseIf larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition <> 0 Then
-                                            'Don't do anything because has already been set
-                                        Else
-                                            Dim liMax = (From ProjectionColumn In larProjectionColumn
-                                                         Select ProjectionColumn.ProjectionOrdinalPosition).Max
-                                            larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition = liMax + 1
-                                        End If
-                                        For liProjectionColumnInd2 = liProjectionColumnInd + 1 To larProjectionColumn.Count - 1
-                                            If larProjectionColumn(liProjectionColumnInd2).Table.Name = larProjectionColumn(liProjectionColumnInd).Table.Name Then
-                                                larProjectionColumn(liProjectionColumnInd2).ProjectionOrdinalPosition = larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition
+                                            For Each lrColumn In lrTable.Column.FindAll(Function(x) lrPathFact.QueryGraph.ProjectionColumn.Find(Function(c) c.Table.Name = lrTable.Name And c.Name = x.Name) IsNot Nothing)
+
+                                                Dim lrFactData = lrPathFact.Data(liInd)
+
+                                                larColumn = New List(Of RDS.Column)
+                                                Dim lrNodeColumn As New RDS.Column(lrTable, lrFactData.Data, Nothing, Nothing)
+                                                lrNodeColumn.TemporaryData = lrFactData.Data
+                                                larColumn.Add(lrNodeColumn)
+
+                                                lrPathNode = Me.GraphNodes.Find(Function(x) x.Name = lrTable.Name)
+
+                                                If lrPathNode Is Nothing Then
+                                                    lrPathNode = New FactEngine.DisplayGraph.Node(Me.Diagram,
+                                                                                          lrTable,
+                                                                                          larColumn,
+                                                                                          "PathNode",
+                                                                                          lrTable.Name,
+                                                                                          "",
+                                                                                          New List(Of FactEngine.DisplayGraph.Edge),
+                                                                                          Me.GraphDiagramView.CreateGraphics)
+                                                End If
+
+                                                If Not lrPathNode.DataItemsHaveBeenAdded Then
+                                                    lrPathNode.Data.Add(lrFactData.Data)
+                                                End If
+
+                                                If lrPreviousPathNode IsNot Nothing And Not lrPreviousPathNode Is lrPathNode Then
+                                                    Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrPreviousPathNode, lrPathNode)
+                                                    lrEdge.Predicate = ""
+                                                    lrPreviousPathNode.Edge.AddUnique(lrEdge)
+                                                End If
+
+                                                lrPreviousPathNode = lrPathNode
+
+                                                Me.GraphNodes.AddUnique(lrPathNode)
+
+                                                liInd += 1
+                                            Next
+                                            If lrPathNode IsNot Nothing Then
+                                                lrPathNode.DataItemsHaveBeenAdded = True
                                             End If
                                         Next
                                     Next
+#End Region
 
-                                    For Each lrRDSColumn In larProjectionColumn
+                                    For Each lrFact In lrRecordset.Facts.FindAll(Function(x) x.GetType = GetType(FBM.Fact))
 
-                                        Dim lrTempGraphNode = larTupleNode.Find(Function(x) x.Type = lrRDSColumn.GraphNodeType And
+                                        Dim larTupleNode As New List(Of FactEngine.DisplayGraph.Node)
+                                        Dim liColumnInd = 0
+                                        Dim lrNodeColumn As RDS.Column
+
+                                        If lrRecordset.QueryGraph Is Nothing Then Exit For
+
+                                        Dim larProjectionColumn = lrRecordset.QueryGraph.ProjectionColumn
+
+                                        'Set up color numbers
+                                        Dim liProjectionColumnInd = 0
+                                        Dim liProjectionColumnInd2 As Integer
+                                        For liProjectionColumnInd = 0 To larProjectionColumn.Count - 1
+                                            If liProjectionColumnInd = 0 Then
+                                                larProjectionColumn(0).ProjectionOrdinalPosition = 1
+                                            ElseIf larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition <> 0 Then
+                                                'Don't do anything because has already been set
+                                            Else
+                                                Dim liMax = (From ProjectionColumn In larProjectionColumn
+                                                             Select ProjectionColumn.ProjectionOrdinalPosition).Max
+                                                larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition = liMax + 1
+                                            End If
+                                            For liProjectionColumnInd2 = liProjectionColumnInd + 1 To larProjectionColumn.Count - 1
+                                                If larProjectionColumn(liProjectionColumnInd2).Table.Name = larProjectionColumn(liProjectionColumnInd).Table.Name Then
+                                                    larProjectionColumn(liProjectionColumnInd2).ProjectionOrdinalPosition = larProjectionColumn(liProjectionColumnInd).ProjectionOrdinalPosition
+                                                End If
+                                            Next
+                                        Next
+
+                                        For Each lrRDSColumn In larProjectionColumn
+
+                                            Dim lrTempGraphNode = larTupleNode.Find(Function(x) x.Type = lrRDSColumn.GraphNodeType And
                                                                                         x.Alias = lrRDSColumn.TemporaryAlias)
-                                        If lrTempGraphNode Is Nothing Then
-                                            larColumn = New List(Of RDS.Column)
-                                            lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
-                                            lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
-                                            larColumn.Add(lrNodeColumn)
-                                            Dim lrGraphNode = New FactEngine.DisplayGraph.Node(Me.Diagram,
+                                            If lrTempGraphNode Is Nothing Then
+                                                larColumn = New List(Of RDS.Column)
+                                                lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
+                                                lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
+                                                larColumn.Add(lrNodeColumn)
+                                                Dim lrGraphNode = New FactEngine.DisplayGraph.Node(Me.Diagram,
                                                                                 lrTable,
                                                                                 larColumn,
                                                                                 lrNodeColumn.GraphNodeType,
@@ -1083,125 +1300,189 @@ NextWord:
                                                                                 lrNodeColumn.TemporaryAlias,
                                                                                 New List(Of FactEngine.DisplayGraph.Edge)
                                                                                 )
-                                            lrGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
-                                            larTupleNode.AddUnique(lrGraphNode)
-                                        Else
-                                            lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
-                                            lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
-                                            lrTempGraphNode.Column.AddUnique(lrNodeColumn)
-                                            Dim lrQueryEdgeAssurityColumn = lrTempGraphNode.Column.Find(AddressOf lrNodeColumn.Equals)
-                                            If lrQueryEdgeAssurityColumn IsNot Nothing Then
-                                                lrQueryEdgeAssurityColumn.QueryEdge = lrNodeColumn.QueryEdge
+                                                lrGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
+                                                larTupleNode.AddUnique(lrGraphNode)
+                                            Else
+                                                lrNodeColumn = lrRDSColumn.Clone(Nothing, Nothing)
+                                                lrNodeColumn.TemporaryData = lrFact.Data(liColumnInd).Data
+                                                lrTempGraphNode.Column.AddUnique(lrNodeColumn)
+                                                Dim lrQueryEdgeAssurityColumn = lrTempGraphNode.Column.Find(AddressOf lrNodeColumn.Equals)
+                                                If lrQueryEdgeAssurityColumn IsNot Nothing Then
+                                                    lrQueryEdgeAssurityColumn.QueryEdge = lrNodeColumn.QueryEdge
+                                                End If
+
+                                                lrTempGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
+                                                larTupleNode.AddUnique(lrTempGraphNode)
                                             End If
 
-                                            lrTempGraphNode.OrdinalPosition = lrNodeColumn.ProjectionOrdinalPosition
-                                            larTupleNode.AddUnique(lrTempGraphNode)
-                                        End If
-
-                                        liColumnInd += 1
-                                    Next
-
-                                    For Each lrTupleNode In larTupleNode
-                                        lrTupleNode.Name = ""
-                                        For Each lrColumn In lrTupleNode.Column.FindAll(Function(x) x.IsPartOfUniqueIdentifier)
-                                            lrTupleNode.Name &= lrColumn.TemporaryData & " "
+                                            liColumnInd += 1
                                         Next
-                                        lrTupleNode.Name = Trim(lrTupleNode.Name)
-                                        Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
+
+                                        For Each lrTupleNode In larTupleNode
+                                            lrTupleNode.Name = ""
+                                            If lrTupleNode.Column.FindAll(Function(x) x.IsPartOfUniqueIdentifier).Count > 0 Then
+                                                For Each lrColumn In lrTupleNode.Column.FindAll(Function(x) x.IsPartOfUniqueIdentifier)
+                                                    lrTupleNode.Name &= lrColumn.TemporaryData & " "
+                                                Next
+                                            Else
+                                                For Each lrColumn In lrTupleNode.Column
+                                                    lrTupleNode.Type = lrColumn.GraphNodeType
+                                                    lrTupleNode.Name &= lrColumn.TemporaryData & " "
+                                                Next
+                                            End If
+                                            lrTupleNode.Name = Trim(lrTupleNode.Name)
+                                            Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
                                                                                            x.Name = lrTupleNode.Name)
-                                        If lrActualGraphNode Is Nothing Then
-                                            Me.GraphNodes.Add(lrTupleNode)
-                                        End If
-                                    Next
+                                            If lrActualGraphNode Is Nothing Then
+                                                Me.GraphNodes.Add(lrTupleNode)
+                                            End If
+                                        Next
 
-                                    liInd = 1
-                                    For Each lrTupleNode In larTupleNode.ToArray
+                                        liInd = 1
+                                        For Each lrTupleNode In larTupleNode.ToArray
 
-                                        Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
+                                            Dim lrActualGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrTupleNode.Type And
                                                                                                x.Name = lrTupleNode.Name)
 
-                                        'Edge/s based on the TupleNode Column's QueryEdge
-                                        If liInd > 1 And lrActualGraphNode.Column(0).QueryEdge IsNot Nothing Then
-                                            'Dim lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Name And
-                                            '                                                x.Alias = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Alias)
-                                            Dim lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrTupleNode.Column(0).QueryEdge.BaseNode.Name And
-                                                                                                x.Alias = lrTupleNode.Column(0).QueryEdge.BaseNode.Alias)
+                                            If lrActualGraphNode.Column(0).QueryEdge Is Nothing Then
+                                                For Each lrColumn In lrActualGraphNode.Column
+                                                    lrColumn.QueryEdge = lrRecordset.QueryGraph.Nodes.Find(Function(x) x.Name = lrColumn.Table.Name).QueryEdge
+                                                Next
+                                            End If
 
-                                            If lrBaseTupleNode IsNot Nothing Then
-                                                Dim lrBaseGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrBaseTupleNode.Type And
+                                            If lrTupleNode.Column(0).QueryEdge Is Nothing Then
+                                                For Each lrTupleNodeColumn In lrTupleNode.Column
+                                                    lrTupleNodeColumn.QueryEdge = lrRecordset.QueryGraph.Nodes.Find(Function(x) x.Name = lrTupleNodeColumn.Table.Name).QueryEdge
+                                                Next
+                                            End If
+
+                                            'Edge/s based on the TupleNode Column's QueryEdge
+                                            If liInd > 1 And lrActualGraphNode.Column(0).QueryEdge IsNot Nothing Then
+                                                'Dim lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Name And
+                                                '                                                x.Alias = lrActualGraphNode.Column(0).QueryEdge.BaseNode.Alias)
+                                                Dim lrBaseTupleNode As FactEngine.DisplayGraph.Node = Nothing
+                                                Try
+                                                    lrBaseTupleNode = larTupleNode.Find(Function(x) x.Type = lrTupleNode.Column(0).QueryEdge.BaseNode.Name And
+                                                                                                    x.Alias = lrTupleNode.Column(0).QueryEdge.BaseNode.Alias)
+                                                Catch ex As Exception
+                                                    Throw New Exception(ex.Message)
+                                                End Try
+
+
+                                                If lrBaseTupleNode IsNot Nothing Then
+                                                    Dim lrBaseGraphNode = Me.GraphNodes.Find(Function(x) x.Type = lrBaseTupleNode.Type And
                                                                                                      x.Name = lrBaseTupleNode.Name)
 
-                                                Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrBaseGraphNode, lrActualGraphNode)
-                                                lrEdge.Predicate = lrTupleNode.Column(0).QueryEdge.Predicate
+                                                    Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrBaseGraphNode, lrActualGraphNode)
+                                                    lrEdge.Predicate = lrTupleNode.Column(0).QueryEdge.Predicate
 
-                                                If lrBaseGraphNode Is Nothing Then
-                                                    Throw New Exception("frmFactEngine.GO: BaseGraphNode is Nothing.")
-                                                End If
+                                                    If lrBaseGraphNode Is Nothing Then
+                                                        Throw New Exception("frmFactEngine.GO: BaseGraphNode is Nothing.")
+                                                    End If
 
-                                                Dim larDuplicateEdge = From Edge In lrBaseGraphNode.Edge
-                                                                       Where Edge.BaseNode Is lrEdge.BaseNode
-                                                                       Where Edge.TargetNode Is lrEdge.TargetNode
-                                                                       Where Edge.QueryEdge Is lrEdge.QueryEdge
-                                                                       Select Edge
+                                                    Dim larDuplicateEdge = From Edge In lrBaseGraphNode.Edge
+                                                                           Where Edge.BaseNode Is lrEdge.BaseNode
+                                                                           Where Edge.TargetNode Is lrEdge.TargetNode
+                                                                           Where Edge.QueryEdge Is lrEdge.QueryEdge
+                                                                           Select Edge
 
-                                                If larDuplicateEdge.Count = 0 Then
-                                                    lrBaseGraphNode.Edge.Add(lrEdge)
+                                                    If larDuplicateEdge.Count = 0 Then
+                                                        lrBaseGraphNode.Edge.Add(lrEdge)
+                                                    End If
+                                                Else
+                                                    lrBaseTupleNode = lrTupleNode 'might need to use for extended graphs to Column from earlier Column.
+                                                    Dim lrQueryEdge As FactEngine.QueryEdge = lrBaseTupleNode.Column(0).QueryEdge
+
+                                                    Dim lrPreviousQueryEdge As FactEngine.QueryEdge = lrQueryEdge.GetPreviousQueryEdge
+                                                    Do While lrPreviousQueryEdge IsNot Nothing
+                                                        Dim lrTargetTupleNode = larTupleNode.Find(Function(x) x.Type = lrPreviousQueryEdge.BaseNode.Name)
+                                                        If lrTargetTupleNode IsNot Nothing Then
+#Region "Make the Edge"
+                                                            lrTargetTupleNode = Me.GraphNodes.Find(AddressOf lrTargetTupleNode.Equals)
+
+                                                            Me.GraphNodes.AddUnique(lrBaseTupleNode)
+                                                            lrBaseTupleNode = Me.GraphNodes.Find(AddressOf lrBaseTupleNode.Equals)
+
+                                                            Dim lrEdge As New FactEngine.DisplayGraph.Edge(lrBaseTupleNode, lrTargetTupleNode)
+                                                            lrEdge.Predicate = lrTupleNode.Column(0).QueryEdge.Predicate
+
+                                                            Dim larDuplicateEdge = From Node In GraphNodes
+                                                                                   From Edge In Node.Edge
+                                                                                   Where Edge.BaseNode Is lrEdge.BaseNode
+                                                                                   Where Edge.TargetNode Is lrEdge.TargetNode
+                                                                                   Where Edge.QueryEdge Is lrEdge.QueryEdge
+                                                                                   Select Edge
+
+                                                            If larDuplicateEdge.Count = 0 Then
+                                                                lrBaseTupleNode.Edge.Add(lrEdge)
+                                                            End If
+
+                                                            Me.GraphNodes.AddUnique(lrTargetTupleNode)
+#End Region
+                                                            Exit Do
+                                                        End If
+                                                        lrPreviousQueryEdge = lrPreviousQueryEdge.GetPreviousQueryEdge
+                                                    Loop
+                                                    'Throw New Exception("Error duplicating edge. Graph View. FactEngine.GO.")
                                                 End If
                                             Else
-                                                'Throw New Exception("Error duplicating edge. Graph View. FactEngine.GO.")
+                                                Me.GraphNodes.AddUnique(lrActualGraphNode)
                                             End If
-                                        End If
-                                        liInd += 1
+SkipEdgeAddition:
+                                            liInd += 1
+                                        Next
                                     Next
-                                Next
 
-                                For Each lrNode In Me.GraphNodes
-                                    Call lrNode.DisplayAndAssociate()
-                                Next
+                                    For Each lrNode In Me.GraphNodes
+                                        Call lrNode.DisplayAndAssociate()
+                                    Next
 
-                                Dim larEdge = From Node In Me.GraphNodes
-                                              From Edge In Node.Edge
-                                              Select Edge
+                                    Dim larEdge = From Node In Me.GraphNodes
+                                                  From Edge In Node.Edge
+                                                  Select Edge
 
-                                For Each lrEdge In larEdge
-
-                                    If lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing Then
-                                        Throw New Exception("frmFactEngine.GO: lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing")
-                                    End If
-                                    Dim lrPGSLink As New MindFusion.Diagramming.DiagramLink(Me.Diagram,
+                                    For Each lrEdge In larEdge
+#Region "Draw the edge"
+                                        If lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing Then
+                                            Continue For
+                                            Throw New Exception("frmFactEngine.GO: lrEdge.BaseNode.Shape Is Nothing Or lrEdge.TargetNode.Shape Is Nothing")
+                                        End If
+                                        Dim lrPGSLink As New MindFusion.Diagramming.DiagramLink(Me.Diagram,
                                                                                             lrEdge.BaseNode.Shape,
                                                                                             lrEdge.TargetNode.Shape)
 
-                                    lrPGSLink.Style = MindFusion.Diagramming.LinkStyle.Polyline
+                                        lrPGSLink.Style = MindFusion.Diagramming.LinkStyle.Polyline
 
-                                    lrPGSLink.SnapToNodeBorder = True
-                                    lrPGSLink.ShadowColor = Color.White
-                                    lrPGSLink.Brush = New MindFusion.Drawing.SolidBrush(Drawing.Color.DeepSkyBlue)
-                                    lrPGSLink.Pen.Color = Drawing.Color.DeepSkyBlue
-                                    lrPGSLink.Pen.Width = 0.2
-                                    'lrPGSLink.Text = Me.SentData(0)
-                                    lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
-                                    lrPGSLink.AutoRoute = False
-                                    lrPGSLink.Locked = True
-                                    lrPGSLink.HeadShapeSize = 3
+                                        lrPGSLink.SnapToNodeBorder = True
+                                        lrPGSLink.ShadowColor = Color.White
+                                        lrPGSLink.Brush = New MindFusion.Drawing.SolidBrush(Drawing.Color.DeepSkyBlue)
+                                        lrPGSLink.Pen.Color = Drawing.Color.DeepSkyBlue
+                                        lrPGSLink.Pen.Width = 0.2
+                                        'lrPGSLink.Text = Me.SentData(0)
+                                        lrPGSLink.HeadPen.Color = Drawing.Color.DeepSkyBlue
+                                        lrPGSLink.AutoRoute = False
+                                        lrPGSLink.Locked = True
+                                        lrPGSLink.HeadShapeSize = 3
 
-                                    Try
-                                        lrPGSLink.Text = lrEdge.Predicate 'argetNode.Column(0).QueryEdge.Predicate
-                                    Catch ex As Exception
-                                    End Try
+                                        Try
+                                            lrPGSLink.Text = lrEdge.Predicate 'argetNode.Column(0).QueryEdge.Predicate
+                                        Catch ex As Exception
+                                        End Try
 
-                                    'lrPGSLink.Tag = Me
-                                    'Me.Link = lrPGSLink                                
-                                    Me.Diagram.Links.Add(lrPGSLink)
-                                Next
-
-                                Call Me.autoLayout()
+                                        'lrPGSLink.Tag = Me
+                                        'Me.Link = lrPGSLink                                
+                                        Me.Diagram.Links.Add(lrPGSLink)
 #End Region
+                                    Next
 
-                            End If
+                                    Call Me.autoLayout()
+#End Region
+                                End If
+                                Me.SetStatusLabelText("Query Complete")
+                            End If 'Processing Results
+#End Region
                     End Select
                 End If
-
 
                 If Me.ToolStripMenuItemNaturalLanguageAnswers.Checked And Me.TextBoxInput.Text.Trim <> "" And lrRecordset.Facts.Count < 10 Then
 
@@ -1212,14 +1493,14 @@ NextWord:
                     lsPrompt.AppendDoubleLineBreak("Return only the natural language results without any narrative of anything else. If there is an error, show the error though.")
                     lsPrompt.AppendLine("If you are returning sets of data, put each result on a new line, and make dates easy for people to read. E.g. 1st May 2023.")
 
-                    Dim lrGPTResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsPrompt)
+                    'Dim lrGPTResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsPrompt)
 
-                    Me.LabelError.Text = lrGPTResult.Completions(0).Text.Trim
+                    'Me.LabelError.Text = lrGPTResult.Completions(0).Text.Trim
 
                 End If
-                If Me.TabControl1.SelectedTab.Name = Me.TabPageGraph.Name Then
+                If Me.TabControl.SelectedTab.Name = Me.TabPageGraph.Name Then
                 Else
-                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.TabControl.SelectedTab = Me.TabPageResults
                     Me.TabPageResults.Show()
                 End If
             End With
@@ -1227,17 +1508,85 @@ NextWord:
             Call Me.hideAutoComplete()
 
             If Me.ToolStripMenuItemDefaultToResultsTab.Checked Then
-                Me.TabControl1.SelectedTab = Me.TabPageResults
+                Me.TabControl.SelectedTab = Me.TabPageResults
             ElseIf Me.ToolStripMenuItemDefaultToQueryTab.Checked Then
-                Me.TabControl1.SelectedTab = Me.TabPageQuery
+                Me.TabControl.SelectedTab = Me.TabPageQuery
             Else
-                Me.TabControl1.SelectedTab = Me.TabPageResults
+                Me.TabControl.SelectedTab = Me.TabPageResults
             End If
 
             Me.zbTextBoxNaturalLanguageFocused = False
             Me.TextBoxInput.Focus()
             Me.TextBoxInput.Text &= " "
-            Me.zrTextHighlighter.HighlightText()
+            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+
+            If lrRecordset IsNot Nothing AndAlso Not lrRecordset.ErrorReturned Then
+
+                Dim lrParseTree = Me.zrParser.Parse(Me.TextBoxInput.Text & "  ")
+                If lrParseTree.Nodes.Count > 0 AndAlso Me.FEQLProcessor.ParseNodeContainsTokenType(lrParseTree.Nodes(0), FEQL.TokenType.CHARTTYPE) Then
+
+#Region "Chart Control"
+                    If lrRecordset.Facts(0).Data.Count > 1 Then
+                        Me.mrChart.Size = New Size(600, 300)
+
+                        ' Create a ChartArea to add to the Chart
+                        Dim chartArea As New ChartArea()
+                        Me.mrChart.ChartAreas.Clear()
+                        Me.mrChart.ChartAreas.Add(chartArea)
+
+                        ' Create a Series to add to the Chart
+                        Dim series As New Series()
+
+                        Dim lrNode As FEQL.ParseNode = FEQLParserMethods.GetFirstNodeWithTokenType(lrParseTree.Nodes(0), FEQL.TokenType.CHARTTYPE)
+
+                        If lrNode IsNot Nothing Then
+
+                            Dim liSeriesChartType As SeriesChartType
+
+                            Select Case lrNode.Nodes(0).Token.Type
+                                Case Is = FEQL.TokenType.KEYWDPIECHART
+                                    liSeriesChartType = SeriesChartType.Pie
+
+                                    With series
+                                        .Name = "Series1"
+                                        .ChartType = liSeriesChartType
+
+                                        For Each lrFact In lrRecordset.Facts
+                                            .Points.AddXY(lrFact.Data(0).Data, lrFact.Data(1).Data)
+                                        Next
+
+                                        ' Optional Pie-specific customization:
+                                        .IsValueShownAsLabel = True
+                                    End With
+
+                                Case Is = FEQL.TokenType.KEYWDLINECHART
+                                    liSeriesChartType = SeriesChartType.Line
+
+                                    With series
+                                        .Name = "Series1"
+                                        .ChartType = liSeriesChartType
+
+                                        For Each lrFact In lrRecordset.Facts
+                                            .Points.AddXY(lrFact.Data(0).Data, lrFact.Data(1).Data)
+                                        Next
+                                    End With
+
+                            End Select
+
+
+                            ' Add the Series to the Chart
+                            Me.mrChart.Series.Clear()
+                            Me.mrChart.Series.Add(series)
+
+                            Me.mrChart.BringToFront()
+                        End If
+                    End If
+#End Region
+
+                    Me.TabControl.SelectedTab = Me.TabPageChart
+                    Me.TabPageChart.Show()
+                End If
+            End If
 
         Catch ex As Exception
             Dim lsMessage As String
@@ -1245,7 +1594,24 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub SetStatusLabelText(ByVal asText As String)
+
+        Try
+            Me.ToolStripStatusLabelResults.Text = asText
+            Me.ToolStripStatusLabelResults.Invalidate()
+            Me.Refresh()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1263,10 +1629,23 @@ NextWord:
 
     Private Sub Application_WorkingModelChanged() Handles Application.WorkingModelChanged
 
+        Dim lsMessage As String
         Try
             Call Me.displayModelName()
 
             Me.mrModel = prApplication.WorkingModel
+
+            'Interlink / Semantic Layer
+            If Me.mrModel.HasUnloadedInterlinkModels Then
+
+                lsMessage = "There are unloaded Models interlinked with this model."
+                lsMessage.AppendDoubleLineBreak("FactEngine will load those models now unless you select [Cancel].")
+
+                If Not MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Cancel Then
+                    Call Me.mrModel.LoadInterlinkModels()
+                End If
+
+            End If
 
             Me.FEQLProcessor = New FEQL.Processor(prApplication.WorkingModel)
 
@@ -1299,24 +1678,28 @@ NextWord:
                 Select Case prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
                     Case Is = pcenumDatabaseQueryLanguage.SQL
                         Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 0
+                        Me.miActiveQueryLanguage = pcenumDatabaseQueryLanguage.SQL
                     Case Is = pcenumDatabaseQueryLanguage.TypeQL
                         Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 1
+                        Me.miActiveQueryLanguage = pcenumDatabaseQueryLanguage.TypeQL
                     Case Is = pcenumDatabaseQueryLanguage.Cypher
                         Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 2
+                        Me.miActiveQueryLanguage = pcenumDatabaseQueryLanguage.Cypher
                     Case Is = pcenumDatabaseQueryLanguage.openCypher
                         Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 3
+                        Me.miActiveQueryLanguage = pcenumDatabaseQueryLanguage.openCypher
                 End Select
             Catch ex As Exception
                 'Known to fail.
             End Try
 
         Catch ex As Exception
-                Dim lsMessage As String
+
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
-            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage = "Error:  " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1346,7 +1729,7 @@ NextWord:
             Select Case e.KeyData
                 Case Is = Keys.Control Or Keys.A
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "AND" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
+                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "And" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
                         Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(liIndex)
                         Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData)
                     End If
@@ -1355,7 +1738,7 @@ NextWord:
                     Exit Sub
                 Case Is = Keys.Control Or Keys.T
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "AND" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
+                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "And" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
                         Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(liIndex)
                         Me.TextBoxInput.Text &= "THAT " & Trim(lrComboboxItem.Text) & " A " & Trim(lrComboboxItem.ItemData)
                     End If
@@ -1366,7 +1749,7 @@ NextWord:
                     Exit Sub
                 Case Is = Keys.Control Or Keys.N
                     If Me.AutoComplete.ListBox.Items.Count > 0 Then
-                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "AND" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
+                        If Trim(Me.AutoComplete.ListBox.Items(0).Text) = "And" And Me.AutoComplete.ListBox.Items.Count > 1 Then liIndex = 1
                         Dim lrComboboxItem As tComboboxItem = Me.AutoComplete.ListBox.Items(liIndex)
                         Me.TextBoxInput.Text &= Trim(lrComboboxItem.Text) & " (" & Trim(lrComboboxItem.ItemData) & ":'"
                     End If
@@ -1442,7 +1825,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -1490,32 +1873,27 @@ NextWord:
                     Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
                 Case Is = Keys.A
                 Case Else
-                    Select Case e.KeyData
-                        Case Is = Keys.Left Or Keys.Shift
-                        Case Is = Keys.Right Or Keys.Shift
+                    Select Case True
+                        Case e.Modifiers = Keys.Shift AndAlso e.KeyCode = Keys.Left
+                        Case e.Modifiers = Keys.Shift AndAlso e.KeyCode = Keys.Right
+                        Case e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.A
+                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
+                            Me.TextBoxInput.SelectionLength = 0
+                            e.SuppressKeyPress = True
+                            e.Handled = True
+                            Call Me.setAutoCompletePosition()
 
-                        Case Is = Keys.ControlKey Or Keys.A
+                        Case e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.T
                             Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
                             Me.TextBoxInput.SelectionLength = 0
                             e.SuppressKeyPress = True
                             e.Handled = True
                             Call Me.setAutoCompletePosition()
-                        Case Is = Keys.ControlKey Or Keys.T
-                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
-                            Me.TextBoxInput.SelectionLength = 0
-                            e.SuppressKeyPress = True
-                            e.Handled = True
-                            Call Me.setAutoCompletePosition()
-                        Case Is = Keys.A Or Keys.Control
-                            Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
-                            Me.TextBoxInput.SelectionLength = 0
-                            e.SuppressKeyPress = True
-                            e.Handled = True
-                            Call Me.setAutoCompletePosition()
-                        Case Is = Keys.Back
-                            'Do nothing 
+
+                        Case e.KeyCode = Keys.Back
+                            ' Do nothing 
                         Case Else
-                            'Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
+                            ' Call Me.ProcessAutoComplete(New KeyEventArgs(e.KeyCode))
                     End Select
             End Select
 
@@ -1527,7 +1905,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1556,7 +1934,7 @@ NextWord:
             Dim larParseNode As New List(Of FEQL.ParseNode)
             Dim lrModelElement As FBM.ModelObject
 
-            If Me.TextBoxInput.Text.Length > 5 Then 'was 10            
+            If Me.TextBoxInput.Text.Length > 5 And Me.zrTextHighlighter.Tree.Nodes.Count > 0 Then
                 Me.TextMarker.Clear()
 
                 Call Me.GetMODELELEMENTParseNodes(Me.zrTextHighlighter.Tree.Nodes(0), larModelElementNameParseNode)
@@ -1628,9 +2006,9 @@ NextWord:
 
                     Dim lastWord As String = Me.TextBoxInput.Text.Split(" ").ToList.FindLast(Function(x) x.Length > 0)
                     If e.KeyCode = Keys.Space And Me.zrTextHighlighter.Tree.Optionals.Find(Function(x) x.ExpectedToken = FEQL.TokenType.MODELELEMENTNAME.ToString) IsNot Nothing Then
-                        If prApplication.WorkingModel.GetModelObjectByName(Viev.Strings.MakeCapCamelCase(lastWord)) IsNot Nothing Then
+                        If prApplication.WorkingModel.GetModelObjectByName(FEStrings.MakeCapCamelCase(lastWord)) IsNot Nothing Then
                             Me.TextBoxInput.Text = Trim(Me.TextBoxInput.Text).Remove(Trim(Me.TextBoxInput.Text).Length - lastWord.Length)
-                            Me.TextBoxInput.Text &= Viev.Strings.MakeCapCamelCase(lastWord)
+                            Me.TextBoxInput.Text &= FEStrings.MakeCapCamelCase(lastWord)
                             Me.TextBoxInput.SelectionStart = Me.TextBoxInput.Text.Length
                         End If
                     End If
@@ -1691,6 +2069,9 @@ NextWord:
             End If
 
             Dim laiExpectedToken As New List(Of FEQL.TokenType)
+            If Me.zrTextHighlighter.GetCurrentContext IsNot Nothing Then
+                laiExpectedToken.Add(Me.zrTextHighlighter.GetCurrentContext.Token.Type)
+            End If
             If Me.zrTextHighlighter.Tree.Errors.Count > 0 Then
                 If Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken <> "" Then
                     laiExpectedToken.Add(DirectCast([Enum].Parse(GetType(FEQL.TokenType), Me.zrTextHighlighter.Tree.Errors(0).ExpectedToken), FEQL.TokenType))
@@ -1717,6 +2098,18 @@ NextWord:
                 lrModelElement = prApplication.WorkingModel.GetModelObjectByName(Trim(lrLastModelElementNameParseNode.Token.Text))
 
                 Dim liCurrentContext As FEQL.TokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type
+
+                '============================================================================================
+                'Get Node (Token.Type) out of the way first
+                If {FEQL.TokenType.NODE, FEQL.TokenType.MODELELEMENT, FEQL.TokenType.MODELELEMENTNAME}.Contains(Me.zrTextHighlighter.GetCurrentContext.Token.Type) Then
+                    Dim larModelElement = From ModelElement In prApplication.WorkingModel.getModelObjects()
+                                          Where ModelElement.Id.StartsWith(lrLastModelElementNameParseNode.Token.Text)
+                                          Select ModelElement
+
+                    For Each lrModelElement In larModelElement
+                        Call Me.AddEnterpriseAwareItem(lrModelElement.Id, FEQL.TokenType.MODELELEMENTNAME,, lrModelElement.Id, True)
+                    Next
+                End If
 
                 If lrModelElement Is Nothing Then
                     'Nothing to do here
@@ -1809,7 +2202,7 @@ NextWord:
                                     If larPredicatePart.Count = 0 Then
                                         'nothing to do here
                                     Else
-                                        Me.AutoComplete.ListBox.Items.Clear()
+                                        'Me.AutoComplete.ListBox.Items.Clear()
                                         Dim lrPredicatePart = larPredicatePart.First
                                         If lrPredicatePart.FactTypeReading.PredicatePart.Count > 1 Then
                                             If Me.TextBoxInput.Text.Trim.Split(" ").Last <> lrPredicatePart.FactTypeReading.PredicatePart(1).Role.JoinedORMObject.Id Then
@@ -2014,7 +2407,13 @@ NextWord:
                 If (Me.zrTextHighlighter.GetCurrentContext.Token.Type = FEQL.TokenType.IDENTIFIER) Or
                         laiExpectedToken.Contains(FEQL.TokenType.IDENTIFIER) Then
 
-                    lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                    Dim lrTable = prApplication.WorkingModel.RDS.Table.Find(Function(x) x.Name = lrLastModelElementNameParseNode.Token.Text)
+
+                    If lrTable Is Nothing Then
+                        lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lrLastModelElementNameParseNode.Token.Text)
+                    Else
+                        lrModelElement = lrTable.FBMModelElement
+                    End If
 
                     If lrModelElement.ConceptType = pcenumConceptType.ValueType Then
 
@@ -2154,7 +2553,18 @@ NextWord:
                                     End Try
                                 Else
                                     If lrColumn IsNot Nothing Then
-                                        lsFEQLQuery &= " RETURN " & lrColumn.Table.Name & "." & lrColumn.Name
+                                        lsFEQLQuery &= " RETURN "
+                                        If lrColumn.Table.getFirstUniquenessConstraintColumns.Count = 0 Then
+                                            liInd = 0
+                                            For Each lrUCColumn In lrColumn.Table.getFirstUniquenessConstraintColumns
+                                                If liInd > 0 Then lsFEQLQuery &= ","
+                                                lsFEQLQuery &= " RETURN " & lrColumn.Table.Name & "." & lrColumn.Name
+                                                liInd += 1
+                                            Next
+                                        Else
+                                            lsFEQLQuery &= lrColumn.Table.Name & "." & lrColumn.Name
+                                        End If
+
                                     End If
                                 End If
                                 lsSQLQuery &= vbCrLf & " LIMIT 20"
@@ -2210,7 +2620,8 @@ NextWord:
                         Dim lrRecordset As ORMQL.Recordset
                         '===================================================================================
                         'FEQL
-                        lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsFEQLQuery, Nothing, Nothing)
+                        Dim liQueryLanguageToUse = prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
+                        lrRecordset = Me.FEQLProcessor.ProcessFEQLStatement(lsFEQLQuery, Nothing, Nothing, liQueryLanguageToUse)
 
                         '===================================================================================
                         'SQL
@@ -2232,7 +2643,7 @@ NextWord:
                                     End Select
                             End Select
 
-                            Call Me.AddEnterpriseAwareItem(lsString,,,, True)
+                            Call Me.AddEnterpriseAwareItem(lsString, FEQL.TokenType.IDENTIFIER,,, True)
                         Next
                     Catch ex As Exception
                         Me.LabelError.Text = ex.Message
@@ -2357,7 +2768,7 @@ NextWord:
                 End If
 
                 lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
-                If IsSomething(lsCurrentTokenType) And (Me.TextBoxInput.Text.Length > 0) Then
+                If lsCurrentTokenType IsNot Nothing And (Me.TextBoxInput.Text.Length > 0) Then
                     lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
                     Me.msPreviousProductionLookedFor = Me.ToolStripStatusLabelCurrentProduction.Text
                     If lsCurrentTokenType IsNot Nothing Then
@@ -2414,7 +2825,7 @@ NextWord:
                 End If
             Else
                 lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext
-                If IsSomething(lsCurrentTokenType) And (Me.TextBoxInput.Text.Length > 0) Then
+                If lsCurrentTokenType IsNot Nothing And (Me.TextBoxInput.Text.Length > 0) Then
                     lsCurrentTokenType = Me.zrTextHighlighter.GetCurrentContext.Token.Type.ToString
                     Me.ToolStripStatusLabelCurrentProduction.Text = lsCurrentTokenType
                     Select Case Me.zrTextHighlighter.GetCurrentContext.Token.Type
@@ -2542,7 +2953,7 @@ NextWord:
                     Dim lsModelElementName As String
                     lsModelElementName = Me.TextBoxInput.Text.Trim.Split(" ").Last
                     lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
-                    If IsSomething(lrModelElement) Then
+                    If lrModelElement IsNot Nothing Then
                         If lrModelElement.GetType = GetType(FBM.FactType) Then
                             Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement))
                         End If
@@ -2551,7 +2962,7 @@ NextWord:
                         Dim larCharEnd() As Char = {")"}
                         lsModelElementName = lsModelElementName.TrimStart(larCharBeginning).TrimEnd(larCharEnd)
                         lrModelElement = prApplication.WorkingModel.GetModelObjectByName(lsModelElementName)
-                        If IsSomething(lrModelElement) Then
+                        If lrModelElement IsNot Nothing Then
                             If lrModelElement.GetType = GetType(FBM.FactType) Then
                                 Call Me.AddPredicatePartsToEnterpriseAware(CType(lrModelElement, FBM.FactType).getPredicatePartsForModelObject(lrModelElement))
                             End If
@@ -2660,7 +3071,7 @@ NextWord:
     Private Sub setAutoCompletePosition()
         Dim lo_point As New Point(Me.TextBoxInput.GetPositionFromCharIndex(Me.TextBoxInput.SelectionStart))
         lo_point.X += Me.TextBoxInput.Bounds.X + 6
-        lo_point.Y += Me.TextBoxInput.Bounds.Y
+        lo_point.Y += Me.TextBoxInput.Bounds.Y + 32
         lo_point.Y += CInt(Me.TextBoxInput.Font.GetHeight()) + 6
         Me.AutoComplete.Location = PointToScreen(lo_point)
         Me.TextBoxInput.Focus()
@@ -2671,6 +3082,7 @@ NextWord:
         Try
             Me.ToolStripMenuItemAutoCapitalise.Checked = False
 
+            Me.ToolStripStatusLabelDefaultQueryLimit.Text = "Default LIMIT: " & My.Settings.FactEngineDefaultQueryResultLimit.ToString
 
             'Sql
             'TypeQL
@@ -2694,7 +3106,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -2795,6 +3207,10 @@ NextWord:
     End Sub
 
     Public Sub hideAutoComplete()
+
+        'CodeSafe
+        If Me.AutoComplete Is Nothing Then Exit Sub
+
         Me.AutoComplete.Hide()
         Me.LabelHelp.Text = ""
     End Sub
@@ -2806,12 +3222,35 @@ NextWord:
     Private Sub HideToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HideToolStripMenuItem.Click
         Me.ToolStripMenuItemHelpTips.Checked = False
         Me.LabelHelp.Visible = False
+
+        Me.TableLayoutPanel1.RowStyles(3).SizeType = SizeType.Absolute
+        Me.TableLayoutPanel1.RowStyles(3).Height = 0
+        Me.LabelHelp.Height = 1
+
+        Me.TableLayoutPanel1.RowStyles(2).SizeType = SizeType.Percent
+        Me.TableLayoutPanel1.RowStyles(2).Height = 90
+
     End Sub
 
     Private Sub ToolStripMenuItemHelpTips_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemHelpTips.Click
         Me.ToolStripMenuItemHelpTips.Checked = Not Me.ToolStripMenuItemHelpTips.Checked
 
         Me.LabelHelp.Visible = Me.ToolStripMenuItemHelpTips.Checked
+
+        If Me.ToolStripMenuItemHelpTips.Checked Then
+            Me.TableLayoutPanel1.RowStyles(3).SizeType = SizeType.Absolute
+            Me.TableLayoutPanel1.RowStyles(3).Height = 74
+            Me.LabelHelp.Height = 74
+        Else
+            Me.TableLayoutPanel1.RowStyles(3).SizeType = SizeType.Absolute
+            Me.TableLayoutPanel1.RowStyles(3).Height = 0
+            Me.LabelHelp.Height = 1
+        End If
+
+
+        Me.TableLayoutPanel1.RowStyles(2).SizeType = SizeType.Percent
+        Me.TableLayoutPanel1.RowStyles(2).Height = 90
+
     End Sub
 
     Private Sub ToolStripButtonQueryGO_Click(sender As Object, e As EventArgs) Handles ToolStripButtonQueryGO.Click
@@ -2823,15 +3262,57 @@ NextWord:
 
             Dim lbIsSQLDatabase = prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage) = pcenumDatabaseQueryLanguage.SQL
 
-            If {"Cypher", "openCypher"}.Contains(Me.ToolStripComboBoxQueryLanguage.Text) And lbIsSQLDatabase Then
+#Region "Determine Query Language"
 
-                Dim graphDef = New RDS.GraphProvider(prApplication.WorkingModel.RDS)
-                Dim lrParser = New openCypherTranspiler.openCypherParser.OpenCypherParser(Nothing)
-                Dim plan = openCypherTranspiler.LogicalPlanner.LogicalPlan.ProcessQueryTree(lrParser.Parse(lsQuery), graphDef, Nothing)
-                Dim sqlRender = New openCypherTranspiler.SQLRenderer.SQLRenderer(graphDef, Nothing)
-                lsQuery = sqlRender.RenderPlan(plan)
+            ' Lowercase the query to make the regex case-insensitive
+            Dim lowerQuery As String = lsQuery.ToLower()
 
-            End If
+            ' Regex to match key patterns of SQL, Cypher, and TypeQL
+            'Dim sqlPattern As String = "\b(select|from|where|join)\b"
+            'Dim cypherPattern As String = "\b(match|return|node)\b"
+            'Dim typeqlPattern As String = "\b(match|insert|define)\b"
+            ' SQL Pattern
+            Dim sqlPattern As String = "(?i)^\s*(SELECT|INSERT\s+INTO|UPDATE|DELETE\s+FROM|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE|TRUNCATE\s+TABLE|BEGIN\s+TRANSACTION|COMMIT|ROLLBACK)\b"
+
+            ' Cypher Pattern
+            Dim cypherPattern As String = "(?i)^\s*(MATCH|CREATE|MERGE|DELETE|SET|REMOVE|FOREACH|WITH|UNWIND|CALL|RETURN)\b"
+
+            ' TypeQL Pattern
+            Dim typeqlPattern As String = "(?i)^\s*(MATCH|INSERT|DELETE|DEFINE|UNDEFINE|GET)\b"
+
+            ' Determine the language
+            Dim queryLanguage As String = "Unknown"
+
+            Select Case True
+                Case Regex.IsMatch(lowerQuery, sqlPattern)
+                    queryLanguage = "SQL"
+                Case Regex.IsMatch(lowerQuery, cypherPattern)
+                    queryLanguage = "openCypher"
+                Case Regex.IsMatch(lowerQuery, typeqlPattern)
+                    queryLanguage = "TypeQL"
+            End Select
+
+            Me.ToolStripComboBoxQueryLanguage.Text = queryLanguage
+#End Region
+
+            Select Case prApplication.WorkingModel.TargetDatabaseType.GetAttributeValue(Of DefaultQueryLanguageAttribute, pcenumDatabaseQueryLanguage)
+                Case Is = pcenumDatabaseQueryLanguage.SQL
+                    If {"Cypher", "openCypher"}.Contains(Me.ToolStripComboBoxQueryLanguage.Text) And
+                        lbIsSQLDatabase Then
+
+                        Dim graphDef = New RDS.GraphProvider(prApplication.WorkingModel.RDS)
+                        Dim lrParser = New openCypherTranspiler.openCypherParser.OpenCypherParser(Nothing)
+                        Dim plan = openCypherTranspiler.LogicalPlanner.LogicalPlan.ProcessQueryTree(lrParser.Parse(lsQuery), graphDef, Nothing)
+                        Dim sqlRender = New openCypherTranspiler.SQLRenderer.SQLRenderer(graphDef, Nothing)
+                        lsQuery = sqlRender.RenderPlan(plan)
+
+                        If Not Me.TabControl.TabPages.Contains(Me.TabPageActualQuery) Then
+                            Me.TabControl.TabPages.Add(Me.TabPageActualQuery)
+                        End If
+                    Else
+                        Me.TabControl.TabPages.Remove(Me.TabPageActualQuery)
+                    End If
+            End Select
 
             With New WaitCursor
                 'Clear the Graph View because there is not enough information to create a graph.
@@ -2852,7 +3333,7 @@ NextWord:
                         prApplication.WorkingModel.connectToDatabase()
                     End If
                 Catch ex As Exception
-                    prApplication.ThrowErrorMessage("Oops. Check the database conection configuration for the Model you are trying to connect to.", pcenumErrorType.Warning,, False,, True,, False)
+                    prApplication.ThrowMessage("Oops. Check the database conection configuration for the Model you are trying to connect to.", pcenumErrorType.Warning,, False,, True,, False)
                     Exit Sub
                 End Try
 
@@ -2870,9 +3351,11 @@ NextWord:
 
                 lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsQuery)
 
+                Me.TabPageResults.Tag = lrRecordset
+
                 If lrRecordset.Query IsNot Nothing Then
-                    If Me.ToolStripComboBoxQueryLanguage.Text = "Cypher" Then
-                        Me.TextBoxQuery.Text.AppendDoubleLineBreak(lrRecordset.Query)
+                    If {"Cypher", "openCypher"}.Contains(Me.ToolStripComboBoxQueryLanguage.Text) Then
+                        Me.TextBoxActualQuery.Text = lrRecordset.Query
                     Else
                         Me.TextBoxQuery.Text = lrRecordset.Query
                     End If
@@ -2883,9 +3366,9 @@ NextWord:
                     Me.LabelError.Show()
                     Me.LabelError.BringToFront()
                     Me.LabelError.Text = lrRecordset.ErrorString
-                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.TabControl.SelectedTab = Me.TabPageResults
                 Else
-                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.TabControl.SelectedTab = Me.TabPageResults
                     Me.LabelError.Show()
                     Select Case lrRecordset.StatementType
                         Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
@@ -2902,7 +3385,7 @@ NextWord:
                                 Me.LabelError.Text = ""
 
                                 Dim liInd = 0
-                                For Each lsColumnName In lrRecordset.Columns
+                                For Each lsColumnName In lrRecordset.ColumnNames
                                     liInd += 1
                                     Me.LabelError.Text &= " " & lsColumnName & " "
                                     If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
@@ -2929,7 +3412,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            'prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            'prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             Me.LabelError.Text = lsMessage
             Me.TabPageResults.Show()
         End Try
@@ -2948,14 +3431,14 @@ NextWord:
 
     End Sub
 
-    Private Sub GraphView_MouseWheel(sender As Object, e As MouseEventArgs) Handles GraphView.MouseWheel
+    Private Sub GraphView_MouseWheel(sender As Object, e As MouseEventArgs) Handles GraphDiagramView.MouseWheel
 
         Select Case e.Delta
             Case Is = 0
             Case Is < 0
-                Me.GraphView.ZoomFactor = Viev.Greater(0, Me.GraphView.ZoomFactor - 5)
+                Me.GraphDiagramView.ZoomFactor = Viev.Greater(0, Me.GraphDiagramView.ZoomFactor - 5)
             Case Is > 0
-                Me.GraphView.ZoomFactor = Viev.Lesser(100, Me.GraphView.ZoomFactor + 5)
+                Me.GraphDiagramView.ZoomFactor = Viev.Lesser(100, Me.GraphDiagramView.ZoomFactor + 5)
         End Select
 
     End Sub
@@ -2970,7 +3453,7 @@ NextWord:
             Me.LabelError.Show()
             Me.LabelError.BringToFront()
             Me.LabelError.Text = ex.Message
-            Me.TabControl1.SelectedTab = Me.TabPageResults
+            Me.TabControl.SelectedTab = Me.TabPageResults
         End Try
 
 
@@ -3005,7 +3488,7 @@ NextWord:
 
         Dim lrPropertyGridForm As frmToolboxProperties
 
-        If IsSomething(prApplication.GetToolboxForm(frmToolboxProperties.Name)) Then
+        If prApplication.GetToolboxForm(frmToolboxProperties.Name) IsNot Nothing Then
             lrPropertyGridForm = prApplication.GetToolboxForm(frmToolboxProperties.Name)
             lrPropertyGridForm.PropertyGrid.HiddenAttributes = Nothing
             'If Me.Diagram.Selection.Items.Count > 0 Then
@@ -3144,7 +3627,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -3216,7 +3699,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3246,6 +3729,10 @@ NextWord:
                     lsQuery = Me.TextBoxQuery.SelectedText
                 End If
 
+                If prApplication.WorkingModel.TargetDatabaseType = pcenumDatabaseType.Neo4j Then
+                    Me.ToolStripComboBoxQueryLanguage.SelectedIndex = 2
+                End If
+
                 lrRecordset = Me.FEQLProcessor.DatabaseManager.GO(lsQuery)
 
 
@@ -3253,9 +3740,9 @@ NextWord:
                     Me.LabelError.Show()
                     Me.LabelError.BringToFront()
                     Me.LabelError.Text = lrRecordset.ErrorString
-                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.TabControl.SelectedTab = Me.TabPageResults
                 Else
-                    Me.TabControl1.SelectedTab = Me.TabPageResults
+                    Me.TabControl.SelectedTab = Me.TabPageResults
                     Me.LabelError.Show()
                     Select Case lrRecordset.StatementType
                         Case Is = FactEngine.pcenumFEQLStatementType.DESCRIBEStatement
@@ -3272,7 +3759,7 @@ NextWord:
                                 Me.LabelError.Text = ""
 
                                 Dim liInd = 0
-                                For Each lsColumnName In lrRecordset.Columns
+                                For Each lsColumnName In lrRecordset.ColumnNames
                                     liInd += 1
                                     Me.LabelError.Text &= " " & lsColumnName & " "
                                     If liInd < lrRecordset.Columns.Count Then Me.LabelError.Text &= ","
@@ -3296,7 +3783,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -3346,7 +3833,7 @@ NextWord:
 
     Private Sub ToolStripMenuItemNaturalLanguage_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItemNaturalLanguage.Click
 
-        Me.ToolStripMenuItemNaturalLanguage.Checked = Not Me.ToolStripMenuItemNaturalLanguage.Checked
+        'Me.ToolStripMenuItemNaturalLanguage.Checked = Not Me.ToolStripMenuItemNaturalLanguage.Checked
 
         Me.ToolStripNaturalLanguage.Visible = Me.ToolStripMenuItemNaturalLanguage.Checked
 
@@ -3374,7 +3861,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3390,7 +3877,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3405,7 +3892,7 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -3425,7 +3912,265 @@ NextWord:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
+
+    Private Sub ToolStripNaturalLanguage_Resize(sender As Object, e As EventArgs) Handles ToolStripNaturalLanguage.Resize
+
+        'Me.TextBoxNaturalLanguage.Width = Me.Width - 200
+        'Me.TextBoxNaturalLanguage.Invalidate()
+        'Me.ToolStripNaturalLanguage.Refresh()
+        'Me.ToolStripNaturalLanguage.Invalidate()
+
+    End Sub
+
+    Private Sub ExportAsCSVToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExportAsCSVToolStripMenuItem.Click
+
+        Try
+            'CodeSafe
+            If Me.TabPageResults.Tag Is Nothing Then Exit Sub
+
+            Dim lrRecordset As ORMQL.Recordset = Me.TabPageResults.Tag
+
+            If lrRecordset.ErrorReturned Then
+                Call Boston.ShowFlashCard("Can't export errored query results to CSV. Please fix the error and try again.", Color.LightGray)
+            Else
+                Call Me.ExportFactsToCSV(lrRecordset)
+            End If
+
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub ExportFactsToCSV(ByRef arRecordset As ORMQL.Recordset)
+
+        Try
+            Dim lsFolderLocation As String = ""
+            Dim lsFileName As String = ""
+            Dim lsFileLocationName As String = ""
+
+            If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
+                lsFolderLocation = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData
+                lsFileName = prApplication.User.Id & "-QueryData.csv"
+                lsFileLocationName = lsFolderLocation & "\" & lsFileName
+            Else
+                Dim saveFileDialog As New SaveFileDialog()
+                saveFileDialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*"
+                saveFileDialog.RestoreDirectory = True
+
+                If saveFileDialog.ShowDialog() = DialogResult.OK Then
+                    lsFileLocationName = saveFileDialog.FileName
+                Else
+                    Exit Sub
+                End If
+
+            End If
+
+            Try
+                ' Open the file stream
+                Using streamWriter As New StreamWriter(lsFileLocationName, False, System.Text.Encoding.UTF8)
+                    ' Iterate through each Fact in lrRecordset
+                    For Each lrFact As FBM.Fact In arRecordset.Facts
+                        ' Collect all Data strings for the current Fact
+                        Dim dataItems As List(Of String) = lrFact.Data.Select(Function(fd) fd.Data).ToList()
+
+                        ' Join the data strings into one comma-separated line
+                        Dim csvLine As String = String.Join(",", dataItems)
+
+                        ' Write the line to the CSV file
+                        streamWriter.WriteLine(csvLine)
+                    Next
+                End Using
+
+                If My.Settings.UseClientServer And My.Settings.UseVirtualUI Then
+                    prThinfinity.DownloadFile(lsFileLocationName)
+                End If
+
+                Boston.ShowFlashCard("CSV file created: " & System.IO.Path.GetFileName(lsFileLocationName), pcColorPastelGreen)
+
+            Catch ex As Exception
+                ' Handle the exception as required
+                MessageBox.Show("An error occurred while writing the file: " & ex.Message)
+            End Try
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub ToolStripNaturalLanguage_Layout(sender As Object, e As LayoutEventArgs) Handles ToolStripNaturalLanguage.Layout
+
+        Try
+            Dim totalItemWidth As Integer = ToolStripNaturalLanguage.Items.Cast(Of ToolStripItem)().Where(Function(item) Not item.Equals(Me.TextBoxNaturalLanguage)).Sum(Function(item) item.Width + item.Margin.Horizontal)
+
+            Me.TextBoxNaturalLanguage.Width = ToolStripNaturalLanguage.Width - totalItemWidth - Me.TextBoxNaturalLanguage.Margin.Horizontal - SystemInformation.VerticalScrollBarWidth
+            Me.TextBoxNaturalLanguage.Invalidate()
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub frmFactEngine_ClientSizeChanged(sender As Object, e As EventArgs) Handles Me.ClientSizeChanged
+
+        Try
+            ' Assuming ToolStripNaturalLanguage.Dock = DockStyle.Top or DockStyle.Bottom
+            Dim totalItemWidth As Integer = ToolStripNaturalLanguage.Items.Cast(Of ToolStripItem)().
+                Where(Function(item) Not item.Equals(Me.TextBoxNaturalLanguage)).
+                Sum(Function(item) item.Width + item.Margin.Horizontal)
+
+            ' Adjust the width based on the form's ClientSize
+            Me.TextBoxNaturalLanguage.Width = Me.ClientSize.Width - totalItemWidth -
+                                              Me.TextBoxNaturalLanguage.Margin.Horizontal -
+                                              If(ToolStripNaturalLanguage.Items.OfType(Of ToolStripOverflowButton)().Any(Function(item) item.Visible),
+                                              SystemInformation.HorizontalScrollBarHeight, 0)
+            Me.TextBoxNaturalLanguage.Invalidate()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+    End Sub
+
+    Private Sub ToolStripComboBoxQueryLanguage_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ToolStripComboBoxQueryLanguage.SelectedIndexChanged
+
+        Try
+            Select Case Me.ToolStripComboBoxQueryLanguage.Text.Trim
+                Case Is = "SQL"
+                    Me.miActiveQueryLanguage = pcenumDatabaseQueryLanguage.SQL
+                Case Is = "Cypher", "openCypher"
+                    Me.miActiveQueryLanguage = pcenumDatabaseQueryLanguage.Cypher
+                Case Is = "TypeQL"
+                    Me.miActiveQueryLanguage = pcenumDatabaseQueryLanguage.TypeQL
+                Case Else
+                    Me.miActiveQueryLanguage = pcenumDatabaseQueryLanguage.SQL
+            End Select
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextBoxQuery_TextChanged(sender As Object, e As EventArgs) Handles TextBoxQuery.TextChanged
+
+        Try
+            ' Get the current line number
+            Dim lineNumber As Integer = Me.TextBoxQuery.GetLineFromCharIndex(Me.TextBoxQuery.SelectionStart) + 1
+            ' Update the label with the current line number
+            Me.ToolStripStatusLabelLineNumber.Text = "Line: " & lineNumber.ToString()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextBoxQuery_Leave(sender As Object, e As EventArgs) Handles TextBoxQuery.Leave
+
+        Try
+            'Clear the Cursor LineNumber label text when the textbox loses focus
+            Me.ToolStripStatusLabelLineNumber.Text = ""
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextBoxQuery_Click(sender As Object, e As EventArgs) Handles TextBoxQuery.Click
+
+        Try
+            ' Get the current line number
+            Dim lineNumber As Integer = Me.TextBoxQuery.GetLineFromCharIndex(Me.TextBoxQuery.SelectionStart) + 1
+            ' Update the label with the current line number
+            Me.ToolStripStatusLabelLineNumber.Text = "Line: " & lineNumber.ToString()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub TextBoxQuery_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBoxQuery.KeyUp
+
+        Try
+            ' Get the current line number
+            Dim lineNumber As Integer = Me.TextBoxQuery.GetLineFromCharIndex(Me.TextBoxQuery.SelectionStart) + 1
+            ' Update the label with the current line number
+            Me.ToolStripStatusLabelLineNumber.Text = "Line: " & lineNumber.ToString()
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub frmFactEngine_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+
+        Try
+            If e.Control AndAlso e.KeyCode = Keys.L Then
+                Me.TextBoxNaturalLanguage.Focus()
+                e.Handled = True
+            End If
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
 End Class

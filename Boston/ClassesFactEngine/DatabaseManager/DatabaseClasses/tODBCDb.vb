@@ -120,7 +120,7 @@ Namespace FactEngine
 
             '    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             '    lsMessage &= vbCrLf & vbCrLf & ex.Message
-            '    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            '    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             'End Try
 
 
@@ -323,7 +323,7 @@ Namespace FactEngine
                 For Each lrColumn In lrDataSet.Tables(0).Columns
                     Dim lrRole = New FBM.Role(lrFactType, lrColumn.ToString, True, Nothing)
                     lrFactType.RoleGroup.AddUnique(lrRole)
-                    lrRecordset.Columns.Add(lrColumn.ToString)
+                    lrRecordset.ColumnNames.Add(lrColumn.ToString)
                 Next
 
                 For Each lrRow As DataRow In lrDataSet.Tables(0).Rows
@@ -367,6 +367,10 @@ Namespace FactEngine
         End Function
 
         Private Function iDatabaseConnection_GOAsync(asQuery As String) As Task(Of Recordset) Implements iDatabaseConnection.GOAsync
+            Throw New NotImplementedException()
+        End Function
+
+        Private Function iDatabaseConnection_GOAbstractionLayer(asQuery As String) As Recordset Implements iDatabaseConnection.GOAbstractionLayer
             Throw New NotImplementedException()
         End Function
     End Class

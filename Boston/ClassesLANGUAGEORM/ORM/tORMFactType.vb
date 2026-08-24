@@ -5,8 +5,37 @@ Imports System.Xml.Serialization
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
 Imports Newtonsoft.Json
+Imports System.Linq.Expressions
 
 Namespace FBM
+
+
+#Region "FactTypeComparer"
+    Public Class FactTypeComparer
+        Implements IEqualityComparer(Of FBM.FactType)
+
+        Public Function Equals(x As FBM.FactType, y As FBM.FactType) As Boolean Implements IEqualityComparer(Of FBM.FactType).Equals
+            If x Is Nothing AndAlso y Is Nothing Then
+                Return True
+            ElseIf x Is Nothing OrElse y Is Nothing Then
+                Return False
+            Else
+                Return x.Id = y.Id
+            End If
+        End Function
+
+        Public Shadows Function GetHashCode(obj As FBM.FactType) As Integer Implements IEqualityComparer(Of FBM.FactType).GetHashCode
+            If obj Is Nothing Then
+                Return 0
+            Else
+                Return obj.Id.GetHashCode()
+            End If
+        End Function
+    End Class
+#End Region
+
+
+
     <Serializable()>
     Public Class FactType
         Inherits FBM.ModelObject
@@ -54,6 +83,81 @@ Namespace FBM
                 _IsObjectified = Value
             End Set
         End Property
+
+        ''' <summary>
+        ''' True when is Objectifying Fact Type for a Value Type that Is Independent. E.g. When a Value Type, "Country Name", is a Table within the RDS view, with a single PK field, "Country Name".
+        ''' </summary>
+        ''' <returns></returns>
+        <XmlIgnore>
+        Public Property IsObjectifyingFactType As Boolean = False
+
+        <XmlAttribute>
+        Public ReadOnly Property IsEntity As Boolean
+            Get
+                If Me.Model IsNot Nothing AndAlso Me.Model.RDSCreated Then
+                    Return Me.getCorrespondingRDSTable(Nothing, True) IsNot Nothing
+                Else
+                    Return False
+                End If
+
+            End Get
+        End Property
+
+        <XmlIgnore>
+        Public ReadOnly Property RDSTable As RDS.Table
+            Get
+                If Me.Model IsNot Nothing AndAlso Me.Model.RDSCreated Then
+                    Return Me.getCorrespondingRDSTable(Nothing, True)
+                Else
+                    Return Nothing
+                End If
+
+            End Get
+        End Property
+
+
+#Region "Graph Specific - Source | Target"
+        <XmlIgnore>
+        Private _Source As String = Nothing 'E.g. Person for Person-LIKES->Film FactType
+
+        <XmlAttribute>
+        Public Property Source As String
+            Get
+                If Me.IsLinkFactType And Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject IsNot Nothing).Count >= 1 Then
+                    Return Me.RoleGroup(0).JoinedORMObject.Id
+                ElseIf Me.IsManyTo1BinaryFactType And Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject IsNot Nothing AndAlso x.JoinedORMObject.Id = Me.Id).Count = 0 Then
+                    Dim lrRole = Me.RoleGroup.Find(Function(x) x.HasInternalUniquenessConstraint)
+                    Return lrRole.JoinedORMObject.Id
+                Else
+                    Return Me._Source
+                End If
+            End Get
+            Set(value As String)
+                Me._Source = value
+            End Set
+        End Property
+
+        <XmlIgnore>
+        Private _Target As String = Nothing 'E.g. Film for Person-LIKES->Film FactType
+
+        <XmlAttribute>
+        Public Property Target As String
+            Get
+                If Me.IsLinkFactType And Me.RoleGroup.Count >= 1 AndAlso Me.RoleGroup(1).JoinedORMObject IsNot Nothing Then
+                    Return Me.RoleGroup(1).JoinedORMObject.Id
+                ElseIf Me.IsManyTo1BinaryFactType And Me.RoleGroup.FindAll(Function(x) x.JoinedORMObject IsNot Nothing AndAlso x.JoinedORMObject.Id = Me.Id).Count = 0 Then
+                    Dim lrRole = Me.RoleGroup.Find(Function(x) Not x.HasInternalUniquenessConstraint)
+                    Return lrRole.JoinedORMObject.Id
+                Else
+                    Return Me._Target
+                End If
+            End Get
+            Set(value As String)
+                Me._Target = value
+            End Set
+        End Property
+
+#End Region
 
         ''' <summary>
         ''' Only used for Simple Reference Schemes. Allows the FactType to be hidden.
@@ -106,6 +210,29 @@ Namespace FBM
         ''' <remarks></remarks>
         Public LinkFactTypeRole As FBM.Role
 
+        Public ReadOnly Property IsRDSRelation As Boolean
+            Get
+                If Me.Arity = 2 And
+                    (Me.RoleGroup.Select(Function(x) x.JoinsValueType IsNot Nothing).Count = 0 Or
+                    Me.RoleGroup.Select(Function(x) x.JoinsValueType IsNot Nothing AndAlso x.JoinsValueType.IsIndependent).Count > 0) And
+                    Me.IsManyTo1BinaryFactType Then
+                    Return True
+                End If
+                Return False
+            End Get
+        End Property
+
+        <JsonIgnore()>
+        Private _SubtypeRelationships As New List(Of XMLModel.SubtypeRelationship)
+        Public Property SubtypeRelationships() As List(Of XMLModel.SubtypeRelationship)
+            Get
+                Return Me._SubtypeRelationships
+            End Get
+            Set(ByVal value As List(Of XMLModel.SubtypeRelationship))
+                Me._SubtypeRelationships = value
+            End Set
+        End Property
+
         <JsonIgnore()>
         Public ReadOnly Property ModelObjects() As List(Of FBM.ModelObject)
             Get
@@ -122,6 +249,28 @@ Namespace FBM
 
         <XmlAttribute()>
         Public IsSubtypeRelationshipFactType As Boolean = False
+
+        <XmlIgnore()>
+        Public ReadOnly Property RepresentsSubtypeRelationship As FBM.SubtypeRelationship
+            Get
+                Try
+                    If Me.Model Is Nothing Then Return Nothing
+
+                    Dim larSubtypeRelationship = From ModelElement In Me.Model.ModelElements
+                                                 From SubtypeRelationship In ModelElement.SubtypeRelationship
+                                                 Where SubtypeRelationship.FactType.Id = Me.Id
+                                                 Select SubtypeRelationship
+
+                    If larSubtypeRelationship.Count > 0 Then
+                        Return larSubtypeRelationship.First
+                    Else
+                        Return Nothing
+                    End If
+                Catch ex As Exception
+                    Return Nothing
+                End Try
+            End Get
+        End Property
 
         ''' <summary>
         ''' True if the FactType is a relation between a Supertype and a ValueType such that values of the ValueType determine the state of Subtypes of the Supertype, else False.
@@ -312,6 +461,10 @@ Namespace FBM
             End Set
         End Property
 
+        ''' <summary>
+        ''' See also: DerivationRule, below.
+        ''' </summary>
+        ''' <returns></returns>
         <XmlAttribute()>
         <CategoryAttribute("Derivation"),
         Browsable(False),
@@ -326,6 +479,10 @@ Namespace FBM
             End Set
         End Property
 
+        ''' <summary>
+        ''' NORMA Style DerivationRule, as compliant with NORMA's .orm XML metamodel/file-format. Will be populated if FactType IsDerived and has DerivationText (above). 20250120-VM-TBA. Not complete yet.
+        ''' </summary>
+        Public DerivationRule As FBM.DerivationRule = Nothing
 
         Public Shadows Property ModelError() As System.Collections.Generic.List(Of ModelError) Implements iValidationErrorHandler.ModelError
             Get
@@ -399,6 +556,10 @@ Namespace FBM
         <NonSerialized()>
         Public Event ShowFactTypeNameChanged(ByVal abNewShowFactTypeName As Boolean, ByRef arPage As FBM.Page)
         <NonSerialized()>
+        Public Event SourceChanged(ByVal abNewSource As String)
+        <NonSerialized()>
+        Public Event TargetChanged(ByVal abNewTarget As String)
+        <NonSerialized()>
         Public Event ModelErrorsRemoved() Implements iValidationErrorHandler.ModelErrorsRemoved
 
         Public Sub New()
@@ -418,7 +579,7 @@ Namespace FBM
                 Me.Id = System.Guid.NewGuid.ToString()
             End If
 
-            If IsSomething(asFactTypeName) Then
+            If asFactTypeName IsNot Nothing Then
                 Me.Name = asFactTypeName
             End If
 
@@ -437,7 +598,7 @@ Namespace FBM
                     Me.Id = System.Guid.NewGuid.ToString()
                 End If
 
-                If IsSomething(asFactTypeName) Then
+                If asFactTypeName IsNot Nothing Then
                     Me.Name = asFactTypeName
                 End If
 
@@ -451,7 +612,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -472,7 +633,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -622,7 +783,7 @@ Namespace FBM
                             lrFactType.RoleGroup.Add(lrClonedRole)
 
                             If Not arModel.Role.Exists(AddressOf lrClonedRole.Equals) Then
-                                arModel.Role.Add(lrClonedRole)
+                                arModel.Role.AddUnique(lrClonedRole)
                             End If
                         Next
 
@@ -658,7 +819,7 @@ Namespace FBM
                 Dim lsMessage As String = ""
 
                 lsMessage = "Error: FBM.tFactType.Clone: " & vbCrLf & vbCrLf & ex.Message
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return lrFactType
             End Try
@@ -705,7 +866,7 @@ Namespace FBM
                 MsgBox(aoA.GetCountRolesJoiningFactTypes & vbCrLf & aoB.GetCountRolesJoiningFactTypes)
 
             Catch ex As Exception
-                prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -722,7 +883,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -764,7 +925,7 @@ Namespace FBM
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
 
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -788,7 +949,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -857,7 +1018,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -908,7 +1069,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return System.Guid.NewGuid.ToString
             End Try
@@ -996,10 +1157,11 @@ Namespace FBM
                     lrFactTypeInstance.FactTypeName.FactTypeInstance = lrFactTypeInstance
                     lrFactTypeInstance.FactTable.Model = arPage.Model
                     lrFactTypeInstance.FactTable.Page = arPage
-                    lrFactTypeInstance.FactTable.FactTypeInstance = New FBM.FactTypeInstance
                     lrFactTypeInstance.FactTable.FactTypeInstance = lrFactTypeInstance
                     lrFactTypeInstance.ShowFactTypeName = .ShowFactTypeName
                     lrFactTypeInstance.DBName = .DBName
+                    lrFactTypeInstance.Source = .Source
+                    lrFactTypeInstance.Target = .Target
                     lrFactTypeInstance.IsDerived = .IsDerived
                     lrFactTypeInstance.IsStored = .IsStored
                     lrFactTypeInstance.DerivationText = .DerivationText
@@ -1016,7 +1178,7 @@ Namespace FBM
                             lsMessage = lrFactTypeInstance.Id & " was listed as a Link Fact Type, but had no Link Fact Type Role."
                             lsMessage.AppendDoubleLineBreak("Do you want to flag the Fact Type for removal from the Model (recommended)?")
                             lsMessage.AppendDoubleLineBreak("Boston will change the Fact Type to a regular Fact Type if you don't, so you can decide whether to remove the Fact Type from Model from within the Model Dictionary toolbox.")
-                            If prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                            If prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True, MessageBoxButtons.YesNo) = DialogResult.Yes Then
                                 TableFactType.DeleteFactType(lrFactTypeInstance.FactType)
                             Else
                                 lrFactTypeInstance.IsLinkFactType = False
@@ -1093,7 +1255,7 @@ Namespace FBM
             Catch ex As Exception
                 lsMessage = "Error: tFactType.CloneInstance"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1131,7 +1293,7 @@ Namespace FBM
                 lsMessage &= vbCrLf & "Fact.Symbol: " & lrFact.Symbol
                 lsMessage &= vbCrLf & "FactData.Fact.Id:" & lrFactData.Fact.Id
                 lsMessage &= vbCrLf & "FactData.Role.Id:" & lrFactData.Role.Id
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Information)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Information)
             Next
 
             If Me.IsObjectified Then
@@ -1241,8 +1403,30 @@ Namespace FBM
                            Optional ByRef arPage As FBM.Page = Nothing)
 
             Dim lrFactData As FBM.FactData
+            Dim lsMessage As String
 
             Try
+                If My.Settings.FlagCMMLIntegrityErrors And Me.IsMDAModelElement Then
+
+                    Dim lrFactPredicate As New FBM.FactPredicate
+                    Dim lsFactData As String = ""
+                    For Each lrFactData In arFact.Data
+                        Dim lrRoleData = New FBM.FactData(New FBM.Role(Me, lrFactData.Role.Name, True), New FBM.Concept(lrFactData.Data))
+                        lrFactPredicate.data.Add(lrRoleData)
+                        lsFactData.AppendLine($"{lrFactData.Role.Name}: {lrFactData.Data}")
+                    Next
+
+                    If Me.Fact.FindAll(AddressOf lrFactPredicate.Equals).Count > 0 Then
+                        lsMessage = $"A Fact already exists in the FactType, {Me.Id}, for the data:".AppendLine(lsFactData)
+                        '20260822-VM-It is infrequent that this happens and we should not allow duplicates in MDAModelElement FactType->Facts.
+                        'The decision to Exit Sub (rather than message) is, at this stage, because of the lack of frequency/no-bug.
+                        'This can be reversed at any stage.
+                        Exit Sub
+                        'Throw New Exception(lsMessage) '20260822-VM-Put back in at any time that it becomes necessary.
+                    End If
+
+                End If
+
                 '-------------------------------------------------------------
                 'Make sure the Fact is in the ModelDictionary for the Model.
                 '-------------------------------------------------------------
@@ -1259,7 +1443,6 @@ Namespace FBM
                     End If
                 Next
 
-                Dim lrRole As FBM.Role
                 For Each lrRole In Me.RoleGroup
                     lrRole.Data.Add(arFact.GetFactDataByRoleId(lrRole.Id))
                 Next
@@ -1271,21 +1454,24 @@ Namespace FBM
                     '------------------------------------------------
                     'Code Safe: Instance data is not that important
                     '------------------------------------------------
-                    If IsSomething(Me.ObjectifyingEntityType) Then
+                    If Me.ObjectifyingEntityType IsNot Nothing Then
                         Me.ObjectifyingEntityType.Instance.Add(arFact.Id)
                     End If
                 End If
 
                 RaiseEvent FactTableUpdated(arFact, abAddToPages, arPage)
 
+                arFact.makeDirty()
 
                 Me.Model.MakeDirty(False, False)
 
+
             Catch ex As Exception
-                Dim lsMessage As String
-                lsMessage = "Error: FBM.FactType.AddFact"
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
             End Try
 
         End Sub
@@ -1297,6 +1483,19 @@ Namespace FBM
             Try
                 arFactTypeReading.isDirty = True
                 Me.FactTypeReading.Add(arFactTypeReading)
+
+                'Clear any 'Requires Fact Type Reading' errors
+#Region "Model Errors"
+                Dim larModelError = From ModelError In Me.ModelError
+                                    Where ModelError.ErrorId = pcenumModelErrors.FactTypeRequiresReadingError
+                                    Select ModelError
+
+                For Each lrModelError In larModelError.ToArray
+                    Me.Model.RemoveModelError(lrModelError)
+                    Me.ModelError.Remove(lrModelError)
+                Next
+#End Region
+
 
                 If abMakeModelDirty Then
                     Me.Model.MakeDirty()
@@ -1342,7 +1541,7 @@ Namespace FBM
 
                         Dim lrColumn = larColumn.First
 
-                        Call lrColumn.setName(Viev.Strings.MakeCapCamelCase(arFactTypeReading.PredicatePart(0).PredicatePartText, True))
+                        Call lrColumn.setName(FEStrings.MakeCapCamelCase(arFactTypeReading.PredicatePart(0).PredicatePartText, True))
                     End If
 
                 End If
@@ -1361,7 +1560,7 @@ Namespace FBM
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1388,7 +1587,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return True
             End Try
 
@@ -1433,7 +1632,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1464,7 +1663,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1491,14 +1690,14 @@ Namespace FBM
                         For Each lrRole In Me.RoleGroup
                             lsName &= lrRole.JoinedORMObject.Id
                         Next
-                        lsName = Viev.Strings.RemoveWhiteSpace(lsName)
+                        lsName = FEStrings.ProperSpace(lsName)
                     Case Is = 1
 OneFactTypeReading:
                         If lrFactTypeReading Is Nothing Then
                             lrFactTypeReading = Me.FactTypeReading(0)
                         End If
-                        lsName = Viev.Strings.MakeCapCamelCase(lrFactTypeReading.GetReadingText)
-                        lsName = Viev.Strings.RemoveWhiteSpace(lsName)
+                        lsName = FEStrings.MakeCapCamelCase(lrFactTypeReading.GetReadingText, True)
+                        'lsName = FEStrings.ProperSpace(lsName)
                         lsName = lsName.Replace("-", "")
 
                     Case Else
@@ -1507,8 +1706,8 @@ OneFactTypeReading:
                         End If
                         If lrFactTypeReading Is Nothing Then lrFactTypeReading = Me.FactTypeReading(0)
 
-                        lsName = Viev.Strings.MakeCapCamelCase(lrFactTypeReading.GetReadingText)
-                        lsName = Viev.Strings.RemoveWhiteSpace(lsName)
+                        lsName = FEStrings.MakeCapCamelCase(lrFactTypeReading.GetReadingText, True)
+                        'lsName = FEStrings.ProperSpace(lsName) '20240703-VM-Puts a white space between words for some reason. We don't want that I don't believe.
                         lsName = lsName.Replace("-", "")
 
                 End Select
@@ -1526,7 +1725,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Me.Id
             End Try
@@ -1588,7 +1787,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return larTable
             End Try
@@ -1629,7 +1828,7 @@ OneFactTypeReading:
                                 Me.Model.DeprecateRealisationsForDictionaryEntry(lrDictionaryEntry, pcenumConceptType.Value)
                             Next
 
-                            If IsSomething(Me.ObjectifyingEntityType) Then
+                            If Me.ObjectifyingEntityType IsNot Nothing Then
                                 Me.ObjectifyingEntityType.Instance.Remove(lrFact.Id)
                             End If
 
@@ -1657,15 +1856,16 @@ OneFactTypeReading:
                             Next
 
                         Next
+
                         Me.Model.MakeDirty(False, False)
                         'RaiseEvent Updated()
                     End If
                 Else
                     lrFact = Me.Fact.Find(AddressOf arFact.Equals)
 
-                    If IsSomething(lrFact) Then
+                    If lrFact IsNot Nothing Then
                         Me.Fact.Remove(lrFact)
-                        If IsSomething(Me.ObjectifyingEntityType) Then
+                        If Me.ObjectifyingEntityType IsNot Nothing Then
                             Me.ObjectifyingEntityType.Instance.Remove(lrFact.Id)
                         End If
                         Call lrFact.RemoveFromModel(, False, abDoDatabaseProcessing) 'Permanently deletes the Fact from the database.
@@ -1702,7 +1902,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -1713,11 +1913,11 @@ OneFactTypeReading:
 
             lrFact = Me.Fact.Find(AddressOf arFact.EqualsById)
 
-            If IsSomething(lrFact) Then
+            If lrFact IsNot Nothing Then
 
                 Me.Fact.Remove(lrFact)
 
-                If IsSomething(Me.ObjectifyingEntityType) Then
+                If Me.ObjectifyingEntityType IsNot Nothing Then
                     Me.ObjectifyingEntityType.Instance.Remove(lrFact.Id)
                 End If
 
@@ -1788,7 +1988,7 @@ OneFactTypeReading:
             '  (e.g. 'A Part is in a Bin in a Warehouse'.
             '-----------------------------------------------------------------------------------
             Try
-                If IsSomething(Me.FactTypeReading) Then
+                If Me.FactTypeReading IsNot Nothing Then
                     Dim lrFactTypeReading As New FBM.FactTypeReading(Me, Me.Id)
                     FindSuitableFactTypeReading = Me.FactTypeReading.Find(AddressOf lrFactTypeReading.MatchesByFactTypesRoles)
 
@@ -1807,7 +2007,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1834,13 +2034,21 @@ OneFactTypeReading:
                 Dim lrPredicatePart As FBM.PredicatePart
                 Dim lrRole As FBM.Role
 
+                'CodeSafe
+                If aarRole.Any(Function(x) x.FactType Is Nothing) Then
+                    lrRole = aarRole.Find(Function(x) x.FactType Is Nothing)
+                    prApplication.ThrowMessage("Role: " & lrRole.Id & ", in Model: " & lrRole.Model.Name & ", has FactType = Nothing.", pcenumErrorType.Warning)
+                    Return Nothing
+                End If
+
+
                 For Each lrRole In aarRole.FindAll(Function(x) x.FactType.Id = Me.Id)
                     lrPredicatePart = New FBM.PredicatePart(Me.Model, lrFactTypeReading)
                     lrPredicatePart.Role = lrRole
                     lrFactTypeReading.PredicatePart.Add(lrPredicatePart)
                 Next
 
-                If IsSomething(Me.FactTypeReading) Then
+                If Me.FactTypeReading IsNot Nothing Then
                     FindSuitableFactTypeReadingByRoles = Me.FactTypeReading.Find(AddressOf lrFactTypeReading.MatchesByRoles)
 
                     If (FindSuitableFactTypeReadingByRoles Is Nothing) And
@@ -1859,7 +2067,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -1975,7 +2183,7 @@ OneFactTypeReading:
             Catch ex As Exception
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -2060,7 +2268,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2096,7 +2304,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -2118,10 +2326,62 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return 0
             End Try
+
+        End Function
+
+        Public Function ConvertToRDSRelation() As RDS.Relation
+
+            Try
+                'CodeSafe
+                If Not Me.IsRDSRelation Then Throw New Exception("Fact Type, " & Me.Id & ", cannot be converted to a PGS Edge Type using this function, because it is not an approrprate RDS.Relation.")
+
+                Dim larModelElement = From Role In Me.RoleGroup
+                                      Where Role.JoinsValueType Is Nothing
+                                      Select Role.JoinedORMObject
+
+                Dim lrOriginTable = larModelElement(0).getCorrespondingRDSTable
+                Dim lrDestinationTable = larModelElement(1).getCorrespondingRDSTable
+
+                'CodeSafe
+                If lrOriginTable Is Nothing Then Throw New Exception($"There is no RDS.Table for the Model Element, {larModelElement(0)}.")
+                If lrDestinationTable Is Nothing Then Throw New Exception($"There is no RDS.Table for the Model Element, {larModelElement(1)}.")
+
+                Dim lrRDSRelation As New RDS.Relation(System.Guid.NewGuid.ToString,
+                                                           lrOriginTable,
+                                                           pcenumCMMLMultiplicity.Many,
+                                                           False,
+                                                           False,
+                                                           "Relates To",
+                                                           lrDestinationTable,
+                                                           pcenumCMMLMultiplicity.Many,
+                                                           False,
+                                                           "Relates To",
+                                                           Me
+                                                           )
+
+
+            Catch ex As Exception
+
+            End Try
+
+        End Function
+
+        Public Function CreateColumnName() As String
+
+            Select Case Me.Arity
+                Case Is = 1
+                    If Me.FactTypeReading.Count > 0 Then
+                        Return Me.FactTypeReading(0).GetReadingText.ToPascalCase.RemoveWhitespace
+                    Else
+                        Return "<Error>"
+                    End If
+                Case Else
+                    Return "<Error>"
+            End Select
 
         End Function
 
@@ -2169,7 +2429,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2220,7 +2480,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -2300,7 +2560,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2360,7 +2620,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2381,7 +2641,12 @@ OneFactTypeReading:
             Dim lasPredicatePart As New List(Of String)
 
             Try
-                For Each lrRole In Me.RoleGroup
+                Dim larFactType = Me.getLinkFactTypes
+
+                For Each lrRole In Me.RoleGroup.FindAll(Function(x) x.HasInternalUniquenessConstraint)
+
+                    If larFactType.Any(Function(x) x.LinkFactTypeRole.Id = lrRole.Id) = True Then Continue For 'LinkFactType already exists.
+
                     larModelObject.Clear()
                     larModelObject.Add(Me)
                     larModelObject.Add(lrRole.JoinedORMObject)
@@ -2429,7 +2694,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -2461,7 +2726,7 @@ OneFactTypeReading:
 
         End Function
 
-        Public Overloads Function IsUnaryFactType() As Integer
+        Public Overloads Function IsUnaryFactType() As Boolean
 
             '---------------------------------------------------
             'RETURNS true if the FactType is Unary
@@ -2519,7 +2784,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of FBM.FactType)
             End Try
@@ -2552,7 +2817,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of FBM.Role)
             End Try
@@ -2592,7 +2857,7 @@ OneFactTypeReading:
 
                 lsSentence = aarRole(0).JoinedORMObject.Id
                 For liInd = 1 To aarRole.Count
-                    lsSentence &= " has " & aarRole(liInd).JoinedORMObject.Id
+                    lsSentence &= " has " & aarRole(liInd - 1).JoinedORMObject.Id
                 Next
                 Dim lrSentence As New Language.Sentence(lsSentence)
 
@@ -2612,7 +2877,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return Nothing
             End Try
 
@@ -2642,7 +2907,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2729,23 +2994,34 @@ OneFactTypeReading:
             Catch ex As Exception
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
 
         End Function
 
-        Public Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False) As String
+        Public Overrides Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False, Optional ByVal abUseEntityGrouping As Boolean = False) As String
 
             Try
                 Dim lsReturnString As String = ""
 
                 If Me.FactTypeReading.Count = 0 Then Return "" & vbCrLf
 
-                If Me.IsObjectified Then
+                If Me.IsObjectified Or Me.IsEntity Then
 
                     lsReturnString = Me.Id & " IS WHERE " & Me.FactTypeReading(0).GetReadingText(True)
+
+                    If Me.RoleGroup(0).HasInternalUniquenessConstraint Then
+                        lsReturnString.AppendLine(Me.Id & " IS IDENTIFIED BY ITS")
+
+                        Dim liInd = 0
+                        For Each lrROle In Me.RoleGroup
+                            If liInd > 0 Then lsReturnString &= ","
+                            lsReturnString &= " " & lrROle.JoinedORMObject.Id
+                            liInd += 1
+                        Next
+                    End If
 
                 Else
                     Select Case Me.Arity
@@ -2755,8 +3031,10 @@ OneFactTypeReading:
                             If Me.Is1To1BinaryFactType And Me.FactTypeReading.Count >= 2 Then
                                 Dim lrFactTypeReading = Me.getFactTypeReadingByModelElementOrder(New List(Of ModelObject) From {Me.RoleGroup(0).JoinedORMObject, Me.RoleGroup(1).JoinedORMObject})
                                 If lrFactTypeReading IsNot Nothing Then lsReturnString = lrFactTypeReading.GetReadingText(True)
-                                lrFactTypeReading = Me.getFactTypeReadingByModelElementOrder(New List(Of ModelObject) From {Me.RoleGroup(1).JoinedORMObject, Me.RoleGroup(0).JoinedORMObject})
-                                If lrFactTypeReading IsNot Nothing Then lsReturnString &= vbCrLf & lrFactTypeReading.GetReadingText(True)
+                                If Not abUseEntityGrouping Then
+                                    lrFactTypeReading = Me.getFactTypeReadingByModelElementOrder(New List(Of ModelObject) From {Me.RoleGroup(1).JoinedORMObject, Me.RoleGroup(0).JoinedORMObject})
+                                    If lrFactTypeReading IsNot Nothing Then lsReturnString &= vbCrLf & lrFactTypeReading.GetReadingText(True)
+                                End If
                             Else
                                 lsReturnString = Me.FactTypeReading(0).GetReadingText(True)
                             End If
@@ -2766,15 +3044,22 @@ OneFactTypeReading:
                     End Select
                 End If
 
-                If Me.RoleGroup(0).HasInternalUniquenessConstraint Then
-                    lsReturnString.AppendLine(Me.Id & " IS IDENTIFIED BY ITS")
+                'If Corresponds to a Table.
+                If Me.IsEntity Then
 
-                    Dim liInd = 0
-                    For Each lrROle In Me.RoleGroup
-                        If liInd > 0 Then lsReturnString &= ","
-                        lsReturnString &= " " & lrROle.JoinsModelElementId
-                        liInd += 1
-                    Next
+                    If abUseEntityGrouping Then
+                        lsReturnString.AppendLine(" AND (")
+
+                        Dim lrTable As RDS.Table = Me.getCorrespondingRDSTable
+
+                        For Each lrColumn In lrTable.Column.FindAll(Function(x) x.ActiveRole.JoinsValueType IsNot Nothing And x.FactType IsNot Me)
+
+                            lsReturnString.AppendLine(vbTab & lrColumn.FactType.GenerateFEKLLine(True) & $" {lrColumn.ActiveRole.JoinsValueType.GetWRITTENASClause}")
+
+                        Next
+
+                        lsReturnString.AppendLine(" )" & vbCrLf)
+                    End If
                 End If
 
                 If Not abDontAddNewLine Then
@@ -2789,7 +3074,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return ""
             End Try
@@ -2836,7 +3121,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -2913,7 +3198,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return "Error generating CQL for Entity Type: " & Me.Id
             End Try
@@ -2968,7 +3253,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return ""
             End Try
@@ -2995,7 +3280,7 @@ OneFactTypeReading:
                                       And PredicatePart.RoleId = asRoleId
                                        Select PredicatePart
 
-                If IsSomething(larPredicatePart) Then
+                If larPredicatePart IsNot Nothing Then
                     For Each lrPredicatePart In larPredicatePart
                         Return lrPredicatePart
                         Exit Function
@@ -3010,7 +3295,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             End Try
 
@@ -3058,7 +3343,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -3092,7 +3377,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -3109,7 +3394,8 @@ OneFactTypeReading:
                 If larFactTypeReading.Count = 0 Then
                     If Me.IsManyTo1BinaryFactType Then
                         Dim larFactTypeReading2 = From FactTypeReading In Me.FactTypeReading
-                                                  Where FactTypeReading.PredicatePart(0).Role.HasInternalUniquenessConstraint
+                                                  From PredicatePart In FactTypeReading.PredicatePart
+                                                  Where PredicatePart.Role.HasInternalUniquenessConstraint
                                                   Select FactTypeReading
 
                         Return larFactTypeReading2.First
@@ -3127,7 +3413,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -3150,7 +3436,7 @@ OneFactTypeReading:
                 If lrRole IsNot Nothing Then
                     Return lrRole
                 Else
-                    prApplication.ThrowErrorMessage("No Role exists for RoleId: " & "'" & asRoleId & "', for FactType with FactTypeId: '" & Me.Id & "', in FactType.GetRoleById", pcenumErrorType.Critical, Nothing, True)
+                    prApplication.ThrowMessage("No Role exists for RoleId: " & "'" & asRoleId & "', for FactType with FactTypeId: '" & Me.Id & "', in FactType.GetRoleById", pcenumErrorType.Critical, Nothing, True)
                     Return Nothing
                 End If
 
@@ -3160,7 +3446,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -3210,7 +3496,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
 
@@ -3244,10 +3530,10 @@ OneFactTypeReading:
 
             lrClonedFactType.RoleGroup.Sort(AddressOf FBM.FactType.CompareRoleJoinedObjectIds)
 
-            lsSignature = Viev.Strings.RemoveWhiteSpace(Me.Id)
+            lsSignature = FEStrings.ProperSpace(Me.Id)
 
             For Each lrRole In Me.RoleGroup
-                lsSignature &= Viev.Strings.RemoveWhiteSpace(lrRole.JoinedORMObject.Id)
+                lsSignature &= FEStrings.ProperSpace(lrRole.JoinedORMObject.Id)
             Next
 
             Return lsSignature
@@ -3290,6 +3576,24 @@ OneFactTypeReading:
             Else
                 Return True
             End If
+
+        End Function
+
+        Public Function HasMultiPartRoleConstraint() As Boolean
+
+            Try
+                Return Me.HasTotalRoleConstraint Or Me.HasPartialButMultiRoleConstraint
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+
+                Return False
+            End Try
 
         End Function
 
@@ -3362,7 +3666,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -3421,7 +3725,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -3490,7 +3794,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -3512,6 +3816,47 @@ OneFactTypeReading:
             End If
 
         End Function
+
+        Function IsOneToManyByRoleOrder(ByRef aarRole As List(Of FBM.Role)) As Boolean
+
+            Try
+                If aarRole.Count <> 2 Then
+                    Return False
+                End If
+
+                If Not Me.IsManyTo1BinaryFactType Then
+                    Return False
+                End If
+
+                If Me.InternalUniquenessConstraint(0).RoleConstraintRole(0).Role.Id <> aarRole(1).Id Then
+                    Return False
+                End If
+
+                Dim lrFirstRole As FBM.Role = aarRole(0)
+
+                Dim larRolesInInternalUniquenessConstraints = From IUC In Me.InternalUniquenessConstraint
+                                                              From RCR In IUC.RoleConstraintRole
+                                                              Where RCR.Role.Id = lrFirstRole.Id
+                                                              Select RCR.Role
+
+                If larRolesInInternalUniquenessConstraints.Count <> 0 Then
+                    Return False
+                End If
+
+                Return True
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                Return False
+            End Try
+
+        End Function
+
 
         Function IsManyToOneByRoleOrder(ByRef aarRole As List(Of FBM.Role)) As Boolean
 
@@ -3547,7 +3892,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 Return False
             End Try
 
@@ -3583,7 +3928,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of FBM.FactType)
             End Try
@@ -3606,7 +3951,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
 
@@ -3735,7 +4080,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return Nothing
             End Try
@@ -3768,7 +4113,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New List(Of FBM.ModelObject)
             End Try
@@ -3866,7 +4211,7 @@ OneFactTypeReading:
                                         Where EntityType.Id = Role.JoinedORMObject.Id
                                         Select EntityType
 
-                    If IsSomething(larEntityType) Then
+                    If larEntityType IsNot Nothing Then
                         Dim lrEntityType As FBM.EntityType
                         For Each lrEntityType In larEntityType
                             If lrEntityType.ReferenceModeFactType Is Me Then
@@ -3877,7 +4222,7 @@ OneFactTypeReading:
                 End If
 
                 'LinkFactTypes
-                If Me.IsObjectified Then
+                If Me.IsObjectified Or Me.HasMultiPartRoleConstraint Then
                     Dim larLinkFactType = Me.getLinkFactTypes
 
                     For Each lrFactType In larLinkFactType.ToArray
@@ -3885,7 +4230,7 @@ OneFactTypeReading:
                     Next
 
                     'Objectifying EntityType
-                    Call Me.ObjectifyingEntityType.RemoveFromModel(True, , True)
+                    Call Me.ObjectifyingEntityType?.RemoveFromModel(True, , True)
                 End If
 
                 For liInd = 1 To Me.FactTypeReading.Count
@@ -3920,7 +4265,11 @@ OneFactTypeReading:
 
                 Me.Model.RemoveFactType(Me, abDoDatabaseProcessing)
 
+                Call Me.DeleteConceptClassifications()
+                Call Me.DeleteModelElementFlags()
+
                 RaiseEvent RemovedFromModel(abDoDatabaseProcessing)
+                MyBase.TriggerRemovedFromModel()
 
                 Return True
 
@@ -3930,7 +4279,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -3967,13 +4316,15 @@ OneFactTypeReading:
 
                 Call Me.Model.MakeDirty(True, abCheckForErrors)
 
+                If Me.Model.StoreAsXML Then Me.Model.Save()
+
             Catch ex As Exception
                 Dim lsMessage1 As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4004,7 +4355,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4028,7 +4379,7 @@ OneFactTypeReading:
                     Me.Model.AddEntityType(Me.ObjectifyingEntityType, True, True, Nothing)
                 Else
                     Me.ObjectifyingEntityType = arObjectifyingEntityType
-                    Me.ObjectifyingEntityType.SetIsObjectifyingEntityType(True)
+                    Me.ObjectifyingEntityType.SetIsObjectifyingEntityType(True, True, True)
                     Me.ObjectifyingEntityType.SetObjectifiedFactType(Me)
                 End If
 
@@ -4130,7 +4481,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4161,7 +4512,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4222,7 +4573,7 @@ OneFactTypeReading:
                     Me.ObjectifyingEntityType = Nothing
                 Catch ex As Exception
                     lsMessage = "Error trying to remove the Objectifying Entity Type for Objectified Fact Type, '" & Me.Id & "'."
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, Nothing, False, False, True)
                 End Try
 
 
@@ -4249,7 +4600,7 @@ OneFactTypeReading:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4262,7 +4613,9 @@ OneFactTypeReading:
         ''' <remarks></remarks>
         Sub RemoveRole(ByRef arRole As FBM.Role,
                        ByVal abRemoveFromDatabase As Boolean,
-                       ByVal abDoDatabaseProcessing As Boolean)
+                       ByVal abDoDatabaseProcessing As Boolean,
+                       Optional ByVal abDoRDSProcessing As Boolean = True,
+                       Optional ByVal abSuppressRemoveFromModel As Boolean = False)
 
             '--------------------------------
             'Remove any associated FactData
@@ -4296,7 +4649,8 @@ OneFactTypeReading:
                     If lrRoleConstraint.Role.Contains(arRole) Then
                         If lrRoleConstraint.RoleConstraintRole.Count = 1 Then
                             'Remove the whole RoleConstraint
-                            Call Me.Model.RemoveRoleConstraint(lrRoleConstraint, False, abDoDatabaseProcessing)
+                            lrRoleConstraint.RemoveFromModel(True, False)
+                            'Call Me.Model.RemoveRoleConstraint(lrRoleConstraint, False, abDoDatabaseProcessing) '20240622-VM-Was, but Not removeing RoleConstraintInstance
                         Else
                             Call lrRoleConstraint.RemoveRoleConstraintRoleByRole(arRole, abDoDatabaseProcessing)
                         End If
@@ -4328,7 +4682,9 @@ OneFactTypeReading:
 
                 '=================================================================
                 'RDS - Must be called before removing the Role from the FactType
-                Call Me.Model.removeColumnsIndexColumnsForRole(arRole)
+                If abDoRDSProcessing Then 'Defaults to True (Optional Argument)
+                    Call Me.Model.removeColumnsIndexColumnsForRole(arRole)
+                End If
 
                 Me.RoleGroup.Remove(arRole)
 
@@ -4356,7 +4712,8 @@ OneFactTypeReading:
                     'Special case: If the FactType has Arity two, and the other Role of the FactType is joined to a ValueType
                     '  then remove the whole FactType.
                     If Me.RoleGroup(0).JoinedORMObject IsNot Nothing Then
-                        If Me.RoleGroup(0).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                        If Not abSuppressRemoveFromModel And Me.RoleGroup(0).JoinedORMObject.ConceptType = pcenumConceptType.ValueType Then
+                            'NB Suppress if converting a ReferenceModeFactType to for an EntityType being converted to a ObjectifiedUnaryFactType (FCO-IM Object Type for an Entity Type with a ReferenceMode).
                             Call Me.RemoveFromModel(True, False, abDoDatabaseProcessing)
                         Else
                             If Me.InternalUniquenessConstraint.Count = 1 Then
@@ -4373,7 +4730,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4398,7 +4755,7 @@ OneFactTypeReading:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -4510,7 +4867,7 @@ CommitTransaction:
                         lsMessage = "Error: FBM.FactType.Save"
                         lsMessage &= vbCrLf & "FactTypeId: " & Me.Id
                         lsMessage &= vbCrLf & vbCrLf & arErr.Message
-                        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, arErr.StackTrace)
+                        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, arErr.StackTrace)
                     End Try
                 Next
 
@@ -4520,7 +4877,7 @@ CommitTransaction:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 
@@ -4534,7 +4891,7 @@ CommitTransaction:
                     Me.ObjectifyingEntityType.makeDirty()
                     Me.Model.MakeDirty(False, False)
                 Else
-                    prApplication.ThrowErrorMessage("Can't call this method for Fact Types that are not objectified.", pcenumErrorType.Warning, False, False, False, True)
+                    prApplication.ThrowMessage("Can't call this method for Fact Types that are not objectified.", pcenumErrorType.Warning, False, False, False, True)
                     Return False
                 End If
 
@@ -4546,7 +4903,7 @@ CommitTransaction:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -4574,7 +4931,7 @@ CommitTransaction:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -4608,7 +4965,7 @@ CommitTransaction:
                                             Where Column.ActiveRole Is Me.RoleGroup(0)
                                             Select Column).First
 
-                            lrColumn.setName(Viev.Strings.MakeCapCamelCase(arFactTypeReading.PredicatePart(0).PredicatePartText, True))
+                            lrColumn.setName(FEStrings.MakeCapCamelCase(arFactTypeReading.PredicatePart(0).PredicatePartText, True))
 
                         Catch ex As Exception
 
@@ -4673,7 +5030,7 @@ CommitTransaction:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
 
@@ -4753,7 +5110,8 @@ CommitTransaction:
 
         Public Overrides Function setName(ByVal asNewName As String,
                                           Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
-                                          Optional ByVal abSuppressModelSave As Boolean = False) As Boolean
+                                          Optional ByVal abSuppressModelSave As Boolean = False,
+                                          Optional ByVal abSetDBNameAsNewName As Boolean = False) As Boolean
 
             Dim lsMessage As String = ""
             '-----------------------------------------------------------------------------------------------------------
@@ -4804,6 +5162,18 @@ CommitTransaction:
                     '------------------------------------------------------
                     Call Me.SwitchConcept(New FBM.Concept(asNewName, True), pcenumConceptType.FactType)
 
+                    'CodeSafe
+                    'Table Names
+                    If Me.IsObjectified Or Me.HasPartialButMultiRoleConstraint Or Me.HasTotalRoleConstraint Then
+                        Dim lrTable = Me.getCorrespondingRDSTable
+                        Try
+                            Call lrTable.setName(asNewName)
+                        Catch ex As Exception
+                            'We tried
+                        End Try
+
+                    End If
+
                     '------------------------------------------------------------------------------------------
                     'Update the Model(database) immediately. There is no choice. The reason why
                     '  is because the (in-memory) key is changing, so the database must be updated to 
@@ -4814,6 +5184,19 @@ CommitTransaction:
                         lrDictionaryEntry.Save()
                         Call TableFactType.ModifyKey(Me, asNewName)
                     End If
+
+#Region "Concept Classification"
+                    Dim lrDataStore As New DataStore.Store
+                    Dim lsModelId As String = Me.Model.ModelId
+                    Dim whereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.ModelId = lsModelId And p.Concept = Me.Id
+
+                    Dim larConceptClassificationType = lrDataStore.Get(Of KnowledgeGraph.ConceptClassificationValue)(whereClause)
+
+                    For Each lrConceptClassificationType In larConceptClassificationType
+                        lrConceptClassificationType.Concept = asNewName
+                        lrDataStore.Update(Of KnowledgeGraph.ConceptClassificationValue)(lrConceptClassificationType, whereClause)
+                    Next
+#End Region
 
                     If My.Settings.UseClientServer And My.Settings.InitialiseClient And abBroadcastInterfaceEvent Then
                         Call prDuplexServiceClient.BroadcastToDuplexService(Viev.FBM.Interface.pcenumBroadcastType.ModelUpdateFactType, Me, Nothing)
@@ -4844,6 +5227,13 @@ CommitTransaction:
                             Me.Model.SaveModelDictionary()
                             lrRole.FactType.Save()
                         Next
+                    End If
+
+                    'Objectifying Entity Type. Put last so that no damage can be done.
+                    If Me.IsObjectified Or Me.HasPartialButMultiRoleConstraint Or Me.HasTotalRoleConstraint Then
+                        If Me.ObjectifyingEntityType IsNot Nothing Then
+                            Call Me.ObjectifyingEntityType.SetName(asNewName, True, abSuppressModelSave)
+                        End If
                     End If
 
                     Call Me.Model.TriggerEventModelElementModified(Me)
@@ -4886,12 +5276,12 @@ CommitTransaction:
 
                 Return True
             Catch iex As tInformationException
-                prApplication.ThrowErrorMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
+                prApplication.ThrowMessage(iex.Message, pcenumErrorType.Information, Nothing, False, False, True)
                 Return False
             Catch ex As Exception
                 lsMessage = "Error: tFactType.SetName"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -4906,6 +5296,28 @@ CommitTransaction:
             Call Me.Model.MakeDirty(False, False)
 
             RaiseEvent ShowFactTypeNameChanged(abNewShowFactTypeName, arPage)
+
+        End Sub
+
+        Public Sub SetSource(ByVal asNewSource As String)
+
+            Me._Source = asNewSource
+
+            Call Me.makeDirty()
+            Call Me.Model.MakeDirty(False, False)
+
+            RaiseEvent SourceChanged(asNewSource)
+
+        End Sub
+
+        Public Sub SetTarget(ByVal asNewTarget As String)
+
+            Me._Target = asNewTarget
+
+            Call Me.makeDirty()
+            Call Me.Model.MakeDirty(False, False)
+
+            RaiseEvent TargetChanged(asNewTarget)
 
         End Sub
 
@@ -4961,7 +5373,7 @@ CommitTransaction:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -5004,7 +5416,7 @@ CommitTransaction:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -5030,7 +5442,7 @@ CommitTransaction:
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -5058,7 +5470,7 @@ CommitTransaction:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -5075,7 +5487,7 @@ CommitTransaction:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Sub
 

@@ -2,6 +2,168 @@
 
 Namespace VAQL
 
+    Public Class INTERNALUNIQUENESSDETERMINERClause
+
+        Public Function GetBinaryFactTypeFrequencyDeterminer() As pcenumBinaryFactTypeFrequencyDeterminer
+
+            Try
+                If Me.KEYWDONE IsNot Nothing Then
+                    Return pcenumBinaryFactTypeFrequencyDeterminer.One
+                ElseIf Me.KEYWDATMOSTONE IsNot Nothing Then
+                    Return pcenumBinaryFactTypeFrequencyDeterminer.AtMostOne
+                ElseIf Me.KEYWDATLEASTONE IsNot Nothing Then
+                    Return pcenumBinaryFactTypeFrequencyDeterminer.AtLeastOne
+                ElseIf Me.KEYWDANYNUMBEROF IsNot Nothing Then
+                    Return pcenumBinaryFactTypeFrequencyDeterminer.AnyNumberOf
+                Else
+                    Return pcenumBinaryFactTypeFrequencyDeterminer.None
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Function
+
+        Private _KEYWDONE As String = Nothing
+        Public Property KEYWDONE As String
+            Get
+                Return Me._KEYWDONE
+            End Get
+            Set(value As String)
+                Me._KEYWDONE = value
+            End Set
+        End Property
+
+        Private _KEYWDATMOSTONE As String = Nothing
+        Public Property KEYWDATMOSTONE As String
+            Get
+                Return Me._KEYWDATMOSTONE
+            End Get
+            Set(value As String)
+                Me._KEYWDATMOSTONE = value
+            End Set
+        End Property
+
+        Private _KEYWDATLEASTONE As String = Nothing
+        Public Property KEYWDATLEASTONE As String
+            Get
+                Return Me._KEYWDATLEASTONE
+            End Get
+            Set(value As String)
+                Me._KEYWDATLEASTONE = value
+            End Set
+        End Property
+
+        Private _KEYWDANYNUMBEROF As String = Nothing
+        Public Property KEYWDANYNUMBEROF As String
+            Get
+                Return Me._KEYWDANYNUMBEROF
+            End Get
+            Set(value As String)
+                Me._KEYWDANYNUMBEROF = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class BINARYFACTTYPEREADINGClause
+
+        Private _FRONTREADINGTEXT As String = Nothing
+        Public Property FRONTREADINGTEXT As String
+            Get
+                Return Me._FRONTREADINGTEXT
+            End Get
+            Set(value As String)
+                Me._FRONTREADINGTEXT = value
+            End Set
+        End Property
+
+        Private _MODELELEMENT As New List(Of VAQL.ModelElementClause)
+        Public Property MODELELEMENT As List(Of VAQL.ModelElementClause)
+            Get
+                Return Me._MODELELEMENT
+            End Get
+            Set(value As List(Of VAQL.ModelElementClause))
+                Me._MODELELEMENT = value
+            End Set
+        End Property
+
+        Private _PREDICATECLAUSE As VAQL.PredicateClause
+        Public Property PREDICATECLAUSE As VAQL.PredicateClause
+            Get
+                Return Me._PREDICATECLAUSE
+            End Get
+            Set(value As VAQL.PredicateClause)
+                Me._PREDICATECLAUSE = value
+            End Set
+        End Property
+
+        Private _FOLLOWINGREADINGTEXT As String = Nothing
+        Public Property FOLLOWINGREADINGTEXT As String
+            Get
+                Return Me._FOLLOWINGREADINGTEXT
+            End Get
+            Set(value As String)
+                Me._FOLLOWINGREADINGTEXT = value
+            End Set
+        End Property
+
+        Private _INTERNALUNIQUENESSDETERMINER As INTERNALUNIQUENESSDETERMINERClause
+
+        Public Property INTERNALUNIQUENESSDETERMINER As INTERNALUNIQUENESSDETERMINERClause
+            Get
+                Return Me._INTERNALUNIQUENESSDETERMINER
+            End Get
+            Set(value As INTERNALUNIQUENESSDETERMINERClause)
+                Me._INTERNALUNIQUENESSDETERMINER = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _KEYWDWRITTENAS As String = Nothing
+        Public Property KEYWDWRITTENAS As String
+            Get
+                Return Me._KEYWDWRITTENAS
+            End Get
+            Set(value As String)
+                Me._KEYWDWRITTENAS = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _VALUETYPEWRITTENASCLAUSE As New VAQL.ValueTypeWrittenAsClause
+        Public Property VALUETYPEWRITTENASCLAUSE As VAQL.ValueTypeWrittenAsClause
+            Get
+                Return Me._VALUETYPEWRITTENASCLAUSE
+            End Get
+            Set(value As VAQL.ValueTypeWrittenAsClause)
+                Me._VALUETYPEWRITTENASCLAUSE = value
+            End Set
+        End Property
+
+    End Class
+
+    Public Class DualBinaryFactTypeReadingStatement
+
+        Private _BINARYFACTTYPEREADING As New List(Of BINARYFACTTYPEREADINGClause)
+
+        Public Property BINARYFACTTYPEREADING As List(Of BINARYFACTTYPEREADINGClause)
+            Get
+                Return Me._BINARYFACTTYPEREADING
+            End Get
+            Set(value As List(Of BINARYFACTTYPEREADINGClause))
+                Me._BINARYFACTTYPEREADING = value
+            End Set
+        End Property
+
+    End Class
+
     Public Class AddObjectTypesRelatedToObjectTypeOnPage
 
         Private _KEYWDADDOBJECTTYPESRELATEDTO As String
@@ -684,15 +846,37 @@ Namespace VAQL
             End Set
         End Property
 
-        Private _VALUECONSTRAINTVALUE As New List(Of String)
-        Public Property VALUECONSTRAINTVALUE As List(Of String)
+        Private _VALUESTRING As New List(Of String)
+        Public Property VALUESTRING As List(Of String)
             Get
-                Return Me._VALUECONSTRAINTVALUE
+                Return Me._VALUESTRING
             End Get
             Set(value As List(Of String))
-                Me._VALUECONSTRAINTVALUE = value
+                Me._VALUESTRING = value
             End Set
         End Property
+
+        Private _VALUE As New List(Of String)
+        Public Property VALUE As List(Of String)
+            Get
+                Return Me._VALUE
+            End Get
+            Set(value As List(Of String))
+                Me._VALUE = value
+            End Set
+        End Property
+
+        Public Function GetValues() As List(Of String)
+
+            Dim lasValue = New List(Of String)
+
+            lasValue.AddRange(Me.VALUE)
+
+            lasValue.AddRange(Me.VALUESTRING.Select(Function(s) s.Trim("'"c)).ToList())
+
+            Return lasValue
+
+        End Function
 
     End Class
 
@@ -729,6 +913,16 @@ Namespace VAQL
             End Set
         End Property
 
+        Private _DATATYPEPRECISIONANDSCALE As New VAQL.ClauseDataTypePrecisionAndScale
+        Public Property DATATYPEPRECISIONANDSCALE As VAQL.ClauseDataTypePrecisionAndScale
+            Get
+                Return Me._DATATYPEPRECISIONANDSCALE
+            End Get
+            Set(value As VAQL.ClauseDataTypePrecisionAndScale)
+                Me._DATATYPEPRECISIONANDSCALE = value
+            End Set
+        End Property
+
         Private _NUMBER As String
         Public Property NUMBER As String
             Get
@@ -740,6 +934,26 @@ Namespace VAQL
         End Property
 
     End Class
+
+    ''' <summary>
+    ''' NB Is only for NumericMoney at this stage. 20240714.
+    ''' </summary>
+    Public Class ClauseDataTypePrecisionAndScale
+
+        Public DATATYPE As String = "Money"
+
+        Private _NUMBER As New List(Of String) 'E.g. For Money(10,2)
+        Public Property NUMBER As List(Of String)
+            Get
+                Return Me._NUMBER
+            End Get
+            Set(value As List(Of String))
+                Me._NUMBER = value
+            End Set
+        End Property
+
+    End Class
+
 
     Public Class ValueTypeIsWrittenAsStatement
 
@@ -780,6 +994,16 @@ Namespace VAQL
             End Get
             Set(value As Object)
                 Me._DATATYPEPRECISION = value
+            End Set
+        End Property
+
+        Private _DATATYPEPRECISIONANDSCALE As New VAQL.ClauseDataTypePrecisionAndScale
+        Public Property DATATYPEPRECISIONANDSCALE As VAQL.ClauseDataTypePrecisionAndScale
+            Get
+                Return Me._DATATYPEPRECISIONANDSCALE
+            End Get
+            Set(value As VAQL.ClauseDataTypePrecisionAndScale)
+                Me._DATATYPEPRECISIONANDSCALE = value
             End Set
         End Property
 
@@ -913,7 +1137,9 @@ Namespace VAQL
 
         Public ADDOBJECTTYPETOPAGEStatement As New VAQL.AddObjectTypeToPageStatement
         Public ADDOBJECTTYPESRELATEDTOOBJECTTYPEONPAGEStatement As New VAQL.AddObjectTypesRelatedToObjectTypeOnPage
+        Public CREATENODEStatement As New VAQL.CREATENODEStatement
         Public CREATEPAGEStatement As New VAQL.CreatePageStatement
+        Public DUALBINARYFACTTYPEREADINGSTMT As New VAQL.DualBinaryFactTypeReadingStatement
         Public FACTStatement As New VAQL.FactStatement
         Public ISACONCEPTStatement As New VAQL.IsAConceptStatement
         Public ISANENTITYTYPEStatement As New VAQL.IsAnEntityTypeStatement
@@ -1098,11 +1324,17 @@ Namespace VAQL
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
 
+        ''' <summary>
+        ''' Gets the respective element of the ParseTree/Node.
+        '''   NB A ParseTree is a Node.
+        ''' </summary>
+        ''' <param name="ao_object">An instance/object of the visitor class representing the type of Node within the ParseTree/Node.</param>
+        ''' <param name="aoParseTreeNode">ParseTree/Node. A ParseTree is a Node.</param>
         Public Sub GetParseTreeTokensReflection(ByRef ao_object As Object, ByRef aoParseTreeNode As VAQL.ParseNode)
 
             '-------------------------------
@@ -1163,7 +1395,12 @@ Namespace VAQL
 
                     ElseIf lrType Is GetType(Object) Then
 
-                        piInstance.SetValue(ao_object, aoParseTreeNode)
+                        Try
+                            piInstance.SetValue(ao_object, aoParseTreeNode)
+                        Catch ex As Exception
+                            Call GetParseTreeTokensReflection(piInstance, loParseTreeNode)
+                        End Try
+
 
                     ElseIf lrType.Name = "List`1" Then
 
@@ -1191,7 +1428,7 @@ Namespace VAQL
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1279,7 +1516,7 @@ Namespace VAQL
         '        Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
         '        lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
         '        lsMessage &= vbCrLf & vbCrLf & ex.Message
-        '        prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+        '        prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         '    End Try
 
         'End Sub
@@ -1321,9 +1558,9 @@ Namespace VAQL
         End Function
 
 
-        Public Function ProcessVAQLStatement(ByVal as_ORMQL_statement As String,
-                                             ByRef aoTokenType As VAQL.TokenType,
-                                             ByRef aoParseTree As VAQL.ParseTree) As Object
+        Public Function EvaluateVAQLStatement(ByVal as_ORMQL_statement As String,
+                                              ByRef aoTokenType As VAQL.TokenType,
+                                              ByRef aoParseTree As VAQL.ParseTree) As Object
 
             Dim lrFact As New FBM.Fact
 
@@ -1346,8 +1583,13 @@ Namespace VAQL
                         aoParseTree = Me.Parsetree
 
                     ElseIf Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDCREATE) And
+                           Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.GRAPHNODE) Then
+                        aoTokenType = TokenType.CREATENODESTMT 'Create Graph Node
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDCREATE) And
                            Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDPAGE) Then
-                        aoTokenType = TokenType.CREATEPAGESTMT
+                        aoTokenType = TokenType.CREATEPAGESTMT 'Create Page
                         aoParseTree = Me.Parsetree
 
                     ElseIf Me.ParseNodeContainsTokenType(Me.Parsetree, TokenType.KEYWDHASLONGDESCRIPTION) Then
@@ -1356,6 +1598,10 @@ Namespace VAQL
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.VALUETYPEISWRITTENASCLAUSE) Then
                         aoTokenType = TokenType.VALUETYPEISWRITTENASCLAUSE
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.ISOBJECTIFIEDCLAUSE) Then
+                        aoTokenType = TokenType.ISOBJECTIFIEDCLAUSE
                         aoParseTree = Me.Parsetree
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.FACTSTMT) Then
@@ -1376,6 +1622,11 @@ Namespace VAQL
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE) Then
                         aoTokenType = TokenType.ENTITYTYPEISIDENTIFIEDBYITSCLAUSE
+                        aoParseTree = Me.Parsetree
+
+                    ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.BINARYFACTTYPEREADING) And
+                           Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.COMMA) Then
+                        aoTokenType = TokenType.DUALBINARYFACTTYPEREADINGSTMT
                         aoParseTree = Me.Parsetree
 
                     ElseIf Me.ParseTreeContainsTokenType(Me.Parsetree, TokenType.MODELELEMENTLEADINGSTMT) And
@@ -1434,7 +1685,7 @@ Namespace VAQL
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return False
             End Try

@@ -38,7 +38,7 @@ Public Class frmDiagrmUMLUseCase
             '-------------------------------------------
             'Process the page associated with the form.
             '-------------------------------------------
-            If IsSomething(Me.zrPage) Then
+            If Me.zrPage IsNot Nothing Then
                 If Me.zrPage.IsDirty Then
                     Select Case MsgBox("Changes have been made to the Page. Would you like to save those changes?", MsgBoxStyle.YesNoCancel)
                         Case Is = MsgBoxResult.Yes
@@ -80,7 +80,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -97,7 +97,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -122,7 +122,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -145,7 +145,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -153,8 +153,8 @@ Public Class frmDiagrmUMLUseCase
     Private Sub frm_UseCaseModel_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
         Try
-            If IsSomething(Me.zoTreeNode) Then
-                If IsSomething(frmMain.zfrmModelExplorer) Then
+            If Me.zoTreeNode IsNot Nothing Then
+                If frmMain.zfrmModelExplorer IsNot Nothing Then
                     frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
                 End If
 
@@ -163,7 +163,7 @@ Public Class frmDiagrmUMLUseCase
                 End If
             End If
 
-            If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
+            If frmMain.zfrm_KL_theorem_writer IsNot Nothing Then
                 frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
             End If
 
@@ -175,7 +175,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -220,7 +220,7 @@ Public Class frmDiagrmUMLUseCase
             lsMessage.AppendDoubleLineBreak(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)
             lsMessage.AppendDoubleLineBreak(Boston.GetConfigFileLocation)
 
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -343,7 +343,7 @@ Public Class frmDiagrmUMLUseCase
                         Case Is = "Process"
 
                             'CMML Model level
-                            Dim lsUniqueProcessText = Me.zrPage.Model.UML.CreateUniqueProcessText("New ProcessTest", 0)
+                            Dim lsUniqueProcessText = Me.zrPage.Model.UML.CreateUniqueProcessText("New Process", 0)
                             Dim lrCMMLProcess As New CMML.Process(Me.zrPage.Model.UML, System.Guid.NewGuid.ToString, lsUniqueProcessText)
                             Call Me.zrPage.Model.UML.addProcess(lrCMMLProcess)
 
@@ -380,7 +380,7 @@ Public Class frmDiagrmUMLUseCase
     '    loDroppedNode.ToolTip = "process"
     '    loDroppedNode.Visible = False
 
-    '    If IsSomething(lo_container_node) Then
+    '    If lo_container_node IsNot Nothing Then
     '        lo_container_node.Add(loDroppedNode)
     '    End If
 
@@ -671,7 +671,7 @@ Public Class frmDiagrmUMLUseCase
             Next
 #End Region
 
-            If IsSomething(Me.zrPage.UMLDiagram.PocessToProcessRelationFTI) Then
+            If Me.zrPage.UMLDiagram.PocessToProcessRelationFTI IsNot Nothing Then
                 For Each lrFactInstance In Me.zrPage.UMLDiagram.ActorToProcessParticipationRelationFTI.Fact
                     For Each lrFactDataInstance In lrFactInstance.Data
 
@@ -682,13 +682,21 @@ Public Class frmDiagrmUMLUseCase
             Me.Diagram.Invalidate()
             Me.zrPage.FormLoaded = True
 
+            '-------------------------------------------------------------------------------------------
+            'Save the Model because placing the model elements on the Page makes the Page/Model dirty.
+            If Me.zrPage.Model.IsDirty Then
+                Me.zrPage.Model.Save()
+                'CodeSafe
+                Me.zrPage.IsDirty = False
+            End If
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Me.zrPage.FormLoaded = False
         End Try
@@ -753,7 +761,7 @@ Public Class frmDiagrmUMLUseCase
         Dim loNode As MindFusion.Diagramming.DiagramNode
 
 
-        If IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        If Diagram.GetNodeAt(lo_point) IsNot Nothing Then
             loNode = Diagram.GetNodeAt(lo_point)
             If TypeOf loNode Is MindFusion.Diagramming.ShapeNode Then
                 loNode.Pen = New MindFusion.Drawing.Pen(Color.Brown)
@@ -854,7 +862,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -910,7 +918,7 @@ Public Class frmDiagrmUMLUseCase
             '-------------------------------------------------------
             Dim lrToolboxForm As frmToolboxORMVerbalisation
             lrToolboxForm = prApplication.GetToolboxForm(frmToolboxORMVerbalisation.Name)
-            If IsSomething(lrToolboxForm) Then
+            If lrToolboxForm IsNot Nothing Then
                 lrToolboxForm.zrModel = Me.zrPage.Model
                 Select Case e.Link.Tag.ConceptType
                 End Select
@@ -930,7 +938,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -961,7 +969,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1003,7 +1011,7 @@ Public Class frmDiagrmUMLUseCase
 
             lrShape = e.Node
 
-            If IsSomething(e.Node.Tag) Then
+            If e.Node.Tag IsNot Nothing Then
 
                 Select Case e.Node.Tag.ConceptType
                     Case Is = pcenumConceptType.Class,
@@ -1053,7 +1061,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1096,7 +1104,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1164,7 +1172,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1190,7 +1198,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1216,7 +1224,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1258,7 +1266,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1288,7 +1296,7 @@ Public Class frmDiagrmUMLUseCase
         '-------------------------------------------------------
         lo_point = Diagram.PixelToUnit(e.Location)
 
-        If IsSomething(Diagram.GetItemAt(lo_point, False)) Then
+        If Diagram.GetItemAt(lo_point, False) IsNot Nothing Then
             '----------------------------------------------
             'Mouse is over a DiagramItem
             '----------------------------------------------
@@ -1391,7 +1399,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1429,141 +1437,153 @@ Public Class frmDiagrmUMLUseCase
         Dim larPage_list As New List(Of FBM.Page)
         Dim lr_model As FBM.Model
         Dim lr_actor As New UCD.Actor
+        Dim lsMessage As String
 
+        Try
 
-        If Me.zrPage.SelectedObject.Count = 0 Then
-            Exit Sub
-        End If
+            If Me.zrPage.SelectedObject.Count = 0 Then
+                Exit Sub
+            End If
 
-        '-------------------------------------
-        'Check that selected object is Actor
-        '-------------------------------------
-        If lr_actor.GetType Is Me.zrPage.SelectedObject(0).GetType Then
-            '----------
-            'All good
-            '----------
-        Else
+            '-------------------------------------
+            'Check that selected object is Actor
+            '-------------------------------------
+            If lr_actor.GetType Is Me.zrPage.SelectedObject(0).GetType Then
+                '----------
+                'All good
+                '----------
+            Else
+                '--------------------------------------------------------
+                'Sometimes the MouseDown/NodeSelected gets it wrong
+                '  and this sub receives invocation before an Actor is 
+                '  properly selected. The user may try and click again.
+                '  If it's a bug, then this can be removed obviously.
+                '--------------------------------------------------------
+                Exit Sub
+            End If
+            lr_actor = Me.zrPage.SelectedObject(0)
+
+            lr_model = lr_actor.Model
+
+            '---------------------------------------------------------------------------------------------
+            'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
+            '  shape, and to/into another diagram starts at the MorphVector.
+            '---------------------------------------------------------------------------------------------
+            Me.MorphVector.Clear()
+            Dim lrMorphVector As New tMorphVector(lr_actor.X, lr_actor.Y, 0, 0, 40)
+            Me.MorphVector.Add(lrMorphVector)
+
             '--------------------------------------------------------
-            'Sometimes the MouseDown/NodeSelected gets it wrong
-            '  and this sub receives invocation before an Actor is 
-            '  properly selected. The user may try and click again.
-            '  If it's a bug, then this can be removed obviously.
+            'Load the UseCaseDiagrams that relate to the EntityType
+            '  as selectable menuOptions
             '--------------------------------------------------------
-            Exit Sub
-        End If
-        lr_actor = Me.zrPage.SelectedObject(0)
+#Region "Use Case Diagram Pages"
+            '--------------------------------------------------------------------------------------------------------
+            'The EntityType represents an Actor. i.e. Has a ParentEntityType of 'Actor' within the Core meta-schema
+            '--------------------------------------------------------------------------------------------------------
+            '---------------------------------------------------------------------
+            'Clear the list of UseCaseDiagrams that may relate to the EntityType
+            '---------------------------------------------------------------------
+            Me.MenuItemUseCaseDiagramActor.DropDownItems.Clear()
+            larPage_list = prApplication.CMML.getUseCaseDiagramPagesForActor(lr_actor)
 
-        lr_model = lr_actor.Model
-
-        '---------------------------------------------------------------------------------------------
-        'Set the initial MorphVector for the selected EntityType. Morphing the EntityType to another 
-        '  shape, and to/into another diagram starts at the MorphVector.
-        '---------------------------------------------------------------------------------------------
-        Me.MorphVector.Clear()
-        Dim lrMorphVector As New tMorphVector(lr_actor.X, lr_actor.Y, 0, 0, 40)
-        Me.MorphVector.Add(lrMorphVector)
-
-        '---------------------------------------------------------------------
-        'Clear the list of UseCaseDiagrams that may relate to the EntityType
-        '---------------------------------------------------------------------
-        Me.MenuItemUseCaseDiagramActor.DropDownItems.Clear()
-
-        '--------------------------------------------------------
-        'Load the UseCaseDiagrams that relate to the EntityType
-        '  as selectable menuOptions
-        '--------------------------------------------------------
-
-        '--------------------------------------------------------------------------------------------------------
-        'The EntityType represents an Actor. i.e. Has a ParentEntityType of 'Actor' within the Core meta-schema
-        '--------------------------------------------------------------------------------------------------------
-        larPage_list = prApplication.CMML.getUseCaseDiagramPagesForActor(lr_actor)
-
-        For Each lr_page In larPage_list
-            Dim loMenuOption As ToolStripItem
-            '---------------------------------------------------
-            'Add the Page(Name) to the MenuOption.DropDownItems
-            '---------------------------------------------------
-            loMenuOption = Me.MenuItemUseCaseDiagramActor.DropDownItems.Add(lr_page.Name)
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
+            For Each lr_page In larPage_list
+                Dim loMenuOption As ToolStripItem
+                '---------------------------------------------------
+                'Add the Page(Name) to the MenuOption.DropDownItems
+                '---------------------------------------------------
+                loMenuOption = Me.MenuItemUseCaseDiagramActor.DropDownItems.Add(lr_page.Name)
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
                                                                Nothing,
                                                                lr_page.Model.ModelId,
                                                                pcenumLanguage.UMLUseCaseDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
-            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-            AddHandler loMenuOption.Click, AddressOf Me.morph_to_UseCase_diagram
-        Next
+                loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                AddHandler loMenuOption.Click, AddressOf Me.morph_to_UseCase_diagram
+            Next
+#End Region
 
-        '--------------------------------------------------------------
-        'Clear the list of ORMDiagrams that may relate to the EntityType
-        '--------------------------------------------------------------
-        Me.ORMDiagramToolStripMenuItem.DropDownItems.Clear()
+            '--------------------------------------------------------
+            'Load the ORMDiagrams that relate to the Actor
+            '  as selectable menuOptions
+            '--------------------------------------------------------                        
+#Region "ORM Diagram Pages"
+            '--------------------------------------------------------------
+            'Clear the list of ORMDiagrams that may relate to the EntityType
+            '--------------------------------------------------------------
+            Me.ORMDiagramToolStripMenuItem.DropDownItems.Clear()
+            larPage_list = prApplication.CMML.getORMDiagramPagesForActor(lr_actor)
 
-        '--------------------------------------------------------
-        'Load the ORMDiagrams that relate to the Actor
-        '  as selectable menuOptions
-        '--------------------------------------------------------                        
-        larPage_list = prApplication.CMML.getORMDiagramPagesForActor(lr_actor)
+            For Each lr_page In larPage_list
+                Dim loMenuOption As ToolStripItem
 
-        For Each lr_page In larPage_list
-            Dim loMenuOption As ToolStripItem
-
-            '----------------------------------------------------------
-            'Try and find the Page within the EnterpriseView.TreeView
-            '  NB If 'Core' Pages are not shown for the model, 
-            '  they will not be in the TreeView and so a menuOption
-            '  is now added for those hidden Pages.
-            '----------------------------------------------------------
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
+                '----------------------------------------------------------
+                'Try and find the Page within the EnterpriseView.TreeView
+                '  NB If 'Core' Pages are not shown for the model, 
+                '  they will not be in the TreeView and so a menuOption
+                '  is now added for those hidden Pages.
+                '----------------------------------------------------------
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageORMModel,
                                                                Nothing,
                                                                lr_page.Model.ModelId,
                                                                pcenumLanguage.ORMModel,
                                                                Nothing,
                                                                lr_page.PageId)
 
-            lr_enterprise_view = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-            If IsSomething(lr_enterprise_view) Then
+                lrEnterpriseView = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                If lrEnterpriseView IsNot Nothing Then
+                    '---------------------------------------------------
+                    'Add the Page(Name) to the MenuOption.DropDownItems
+                    '---------------------------------------------------
+                    loMenuOption = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lr_page.Name)
+                    loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                    AddHandler loMenuOption.Click, AddressOf Me.morph_to_ORM_diagram
+                End If
+            Next
+#End Region
+
+            '--------------------------------------------------------
+            'Load the DataFlowDiagrams that relate to the EntityType
+            '  as selectable menuOptions
+            '--------------------------------------------------------
+#Region "Data Flow Diagram Pages"
+            '---------------------------------------------------------------------
+            'Clear the list of DataFlowDiagrams that may relate to the EntityType
+            '---------------------------------------------------------------------
+            Me.MenuOptionDataFlowDiagramActor.DropDownItems.Clear()
+
+            larPage_list = prApplication.CMML.getDataFlowDiagramPagesForActor(lr_actor)
+
+            For Each lr_page In larPage_list
+                Dim loMenuOption As ToolStripItem
                 '---------------------------------------------------
                 'Add the Page(Name) to the MenuOption.DropDownItems
                 '---------------------------------------------------
-                loMenuOption = Me.ORMDiagramToolStripMenuItem.DropDownItems.Add(lr_page.Name)
-                loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-                AddHandler loMenuOption.Click, AddressOf Me.morph_to_ORM_diagram
-            End If
-        Next
+                loMenuOption = Me.MenuOptionDataFlowDiagramActor.DropDownItems.Add(lr_page.Name)
 
-        '---------------------------------------------------------------------
-        'Clear the list of DataFlowDiagrams that may relate to the EntityType
-        '---------------------------------------------------------------------
-        Me.MenuOptionDataFlowDiagramActor.DropDownItems.Clear()
-
-        '--------------------------------------------------------
-        'Load the DataFlowDiagrams that relate to the EntityType
-        '  as selectable menuOptions
-        '--------------------------------------------------------
-        larPage_list = prApplication.CMML.getDataFlowDiagramPagesForActor(lr_actor)
-
-        For Each lr_page In larPage_list
-            Dim loMenuOption As ToolStripItem
-            '---------------------------------------------------
-            'Add the Page(Name) to the MenuOption.DropDownItems
-            '---------------------------------------------------
-            loMenuOption = Me.MenuOptionDataFlowDiagramActor.DropDownItems.Add(lr_page.Name)
-
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
                                                                Nothing,
                                                                lr_page.Model.ModelId,
                                                                pcenumLanguage.DataFlowDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
 
-            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
-            AddHandler loMenuOption.Click, AddressOf Me.morph_to_DataFlowDiagram
-        Next
+                loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
+                AddHandler loMenuOption.Click, AddressOf Me.morph_to_DataFlowDiagram
+            Next
+#End Region
 
+        Catch ex As Exception
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -1606,23 +1626,24 @@ Public Class frmDiagrmUMLUseCase
         End Select
 
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = item.Tag
-            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = item.Tag
+            frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
+            prApplication.WorkingPage = lrEnterpriseView.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the Process/Entity being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
             Dim lrFactDataInstance As New Object
 
-            lr_page = lr_enterprise_view.Tag
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
 
             Select Case liConceptType
                 Case Is = pcenumConceptType.Actor
-                    Dim lrEntityList = From FactType In lr_page.FactTypeInstance
+                    Dim lrEntityList = From FactType In lrPage.FactTypeInstance
                                        From Fact In FactType.Fact
                                        From RoleData In Fact.Data
                                        Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Actor.ToString _
@@ -1633,7 +1654,7 @@ Public Class frmDiagrmUMLUseCase
                         Exit For
                     Next
                 Case Is = pcenumConceptType.Process
-                    Dim lrEntityList = From FactType In lr_page.FactTypeInstance
+                    Dim lrEntityList = From FactType In lrPage.FactTypeInstance
                                        From Fact In FactType.Fact
                                        From RoleData In Fact.Data
                                        Where RoleData.Role.JoinedORMObject.Name = pcenumCMML.Process.ToString _
@@ -1683,16 +1704,18 @@ Public Class frmDiagrmUMLUseCase
 
             Dim lrShapeNode As ShapeNode
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
-                Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                lr_enterprise_view = item.Tag
-                prApplication.WorkingPage = lr_enterprise_view.Tag
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = item.Tag
+                prApplication.WorkingPage = lrEnterpriseView.Tag
 
                 '------------------------------------------------------------------
                 'Get the X,Y co-ordinates of the Actor/EntityType being morphed
                 '------------------------------------------------------------------
-                Dim lrPage As New FBM.Page(lr_enterprise_view.Tag.Model)
-                lrPage = lr_enterprise_view.Tag
+                Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+                lrPage = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
+
                 Dim lrEntityTypeInstanceList = From EntityTypeInstance In lrPage.EntityTypeInstance
                                                Where EntityTypeInstance.Id = lrActor.Data
                                                Select New FBM.EntityTypeInstance(lrPage.Model,
@@ -1757,9 +1780,9 @@ Public Class frmDiagrmUMLUseCase
                 Me.MorphStepTimer.Enabled = True
 
                 Me.MorphVector(0).EndPoint = New Point(lrEntityTypeInstance.X, lrEntityTypeInstance.Y)
-                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+                Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
 
-                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
                 Me.MorphStepTimer.Start()
                 Me.MorphTimer.Start()
 
@@ -1770,7 +1793,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -1803,24 +1826,25 @@ Public Class frmDiagrmUMLUseCase
         Me.DiagramHidden.Invalidate()
 
 
-        If IsSomething(frmMain.zfrmModelExplorer) Then
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = item.Tag
+        If frmMain.zfrmModelExplorer IsNot Nothing Then
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = item.Tag
 
-            prApplication.WorkingPage = lr_enterprise_view.Tag
+            prApplication.WorkingPage = lrEnterpriseView.Tag
 
             '------------------------------------------------------------------
             'Get the X,Y co-ordinates of the ValueType being morphed
             '------------------------------------------------------------------
-            Dim lr_page As New FBM.Page(lr_enterprise_view.Tag.Model)
-            lr_page = lr_enterprise_view.Tag
+            Dim lrPage As New FBM.Page(lrEnterpriseView.Tag.Model)
+            lrPage = lrEnterpriseView.Tag
+            If Not lrPage.Loaded Then Call lrPage.Load(False)
 
             Me.MorphTimer.Enabled = True
             Me.MorphStepTimer.Enabled = True
             Dim lrMorphVector = New tMorphVector(Me.zrPage.SelectedObject(0).Shape.Bounds.X, Me.zrPage.SelectedObject(0).Shape.Bounds.Y, 5, 5, 40)
             lrMorphVector.Shape = lrShapeNode
             Me.MorphVector.Add(lrMorphVector)
-            Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+            Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
             Me.MorphStepTimer.Start()
             Me.MorphTimer.Start()
 
@@ -1856,22 +1880,23 @@ Public Class frmDiagrmUMLUseCase
 
             Me.DiagramHidden.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
-                Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                lr_enterprise_view = item.Tag
-                frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-                prApplication.WorkingPage = lr_enterprise_view.Tag
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = item.Tag
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
+                prApplication.WorkingPage = lrEnterpriseView.Tag
 
                 '------------------------------------------------------------------
                 'Get the X,Y co-ordinates of the Actor/EntityType being morphed
                 '------------------------------------------------------------------
-                Dim lr_page As FBM.Page = lr_enterprise_view.Tag
+                Dim lrPage As FBM.Page = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
 
                 Dim larFactDataInstance = From Page In Me.zrPage.Model.Page
                                           From FactTypeInstance In Page.FactTypeInstance
                                           From FactInstance In FactTypeInstance.Fact
                                           From FactDataInstance In FactInstance.Data
-                                          Where Page.Name = lr_page.Name
+                                          Where Page.Name = lrPage.Name
                                           Where FactTypeInstance.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString
                                           Where FactDataInstance.Role.Name = "Element"
                                           Where FactDataInstance.Concept.Symbol = Me.zrPage.SelectedObject(0).Name
@@ -1883,12 +1908,12 @@ Public Class frmDiagrmUMLUseCase
                 Me.MorphVector(0).EndPoint = New Point(lrActor.X, lrActor.Y)
                 Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
                 Me.MorphVector(0).EndSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
-                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+                Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
                 Me.MorphVector(0).TargetImage = Me.zrPage.SelectedObject(0).Shape.Image
                 Me.MorphTimer.Enabled = True
                 Me.MorphStepTimer.Enabled = True
 
-                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
                 Me.MorphStepTimer.Start()
                 Me.MorphTimer.Start()
 
@@ -1900,7 +1925,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Call Me.HiddenDiagramView.SendToBack()
 
@@ -1935,22 +1960,23 @@ Public Class frmDiagrmUMLUseCase
 
             Me.DiagramHidden.Invalidate()
 
-            If IsSomething(frmMain.zfrmModelExplorer) Then
-                Dim lr_enterprise_view As tEnterpriseEnterpriseView
-                lr_enterprise_view = item.Tag
-                frmMain.zfrmModelExplorer.TreeView.SelectedNode = lr_enterprise_view.TreeNode
-                prApplication.WorkingPage = lr_enterprise_view.Tag
+            If frmMain.zfrmModelExplorer IsNot Nothing Then
+                Dim lrEnterpriseView As tEnterpriseEnterpriseView
+                lrEnterpriseView = item.Tag
+                frmMain.zfrmModelExplorer.TreeView.SelectedNode = lrEnterpriseView.TreeNode
+                prApplication.WorkingPage = lrEnterpriseView.Tag
 
                 '------------------------------------------------------------------
                 'Get the X,Y co-ordinates of the Actor/EntityType being morphed
                 '------------------------------------------------------------------
-                Dim lr_page As FBM.Page = lr_enterprise_view.Tag
+                Dim lrPage As FBM.Page = lrEnterpriseView.Tag
+                If Not lrPage.Loaded Then Call lrPage.Load(False)
 
                 Dim lrFactDataInstance = From Page In Me.zrPage.Model.Page
                                          From FactTypeInstance In Page.FactTypeInstance
                                          From FactInstance In FactTypeInstance.Fact
                                          From FactDataInstance In FactInstance.Data
-                                         Where Page.Name = lr_page.Name
+                                         Where Page.Name = lrPage.Name
                                          Where FactTypeInstance.Id = pcenumCMMLRelations.CoreElementHasElementType.ToString
                                          Where FactDataInstance.Role.Name = "Element"
                                          Where FactDataInstance.Concept.Symbol = Me.zrPage.SelectedObject(0).Id
@@ -1963,7 +1989,7 @@ Public Class frmDiagrmUMLUseCase
                 Me.MorphVector(0).EndPoint = New Point(lrProcess.X, lrProcess.Y)
                 Me.MorphVector(0).StartSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
                 Me.MorphVector(0).EndSize = New Rectangle(0, 0, Me.zrPage.SelectedObject(0).Shape.Bounds.Width, Me.zrPage.SelectedObject(0).Shape.Bounds.Height)
-                Me.MorphVector(0).EnterpriseTreeView = lr_enterprise_view
+                Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView
                 Me.MorphVector(0).TargetShape = pcenumTargetMorphShape.Circle
                 Me.MorphVector(0).TargetText = lrStartProcess.Text
 
@@ -1977,7 +2003,7 @@ Public Class frmDiagrmUMLUseCase
                 Me.MorphTimer.Enabled = True
                 Me.MorphStepTimer.Enabled = True
 
-                Me.MorphStepTimer.Tag = lr_enterprise_view.TreeNode
+                Me.MorphStepTimer.Tag = lrEnterpriseView.TreeNode
                 Me.MorphStepTimer.Start()
                 Me.MorphTimer.Start()
 
@@ -1989,7 +2015,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
             Call Me.HiddenDiagramView.SendToBack()
 
@@ -2069,7 +2095,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
         End Try
 
@@ -2079,17 +2105,17 @@ Public Class frmDiagrmUMLUseCase
     Private Sub frm_UseCaseModel_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.GotFocus
 
         Try
-            If IsSomething(Me.zoTreeNode) Then
-                If IsSomething(frmMain.zfrmModelExplorer) Then
+            If Me.zoTreeNode IsNot Nothing Then
+                If frmMain.zfrmModelExplorer IsNot Nothing Then
                     frmMain.zfrmModelExplorer.TreeView.SelectedNode = Me.zoTreeNode
                 End If
             End If
 
-            If IsSomething(frmMain.zfrm_KL_theorem_writer) Then
+            If frmMain.zfrm_KL_theorem_writer IsNot Nothing Then
                 frmMain.zfrm_KL_theorem_writer.zrPage = Me.zrPage
             End If
 
-            If IsSomething(Me.zrPage) Then
+            If Me.zrPage IsNot Nothing Then
                 Me.zrPage.SelectedObject.Clear()
             End If
 
@@ -2101,7 +2127,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2117,7 +2143,7 @@ Public Class frmDiagrmUMLUseCase
                 Dim lsPageName As String = "UCD-New Use Case Diagram Page"
                 If loToolStripItem.Tag IsNot Nothing Then
                     lsPageName = "UML-UCD-" & CType(loToolStripItem.Tag, UCD.Process).Text
-                    lsPageName = Viev.Strings.MakeCapCamelCase(lsPageName.Substring(0, lsPageName.Length))
+                    lsPageName = FEStrings.MakeCapCamelCase(lsPageName.Substring(0, lsPageName.Length))
                 End If
                 lsPageName = Me.zrPage.Model.CreateUniquePageName(lsPageName, 0)
 
@@ -2174,7 +2200,7 @@ Public Class frmDiagrmUMLUseCase
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End With
 
@@ -2257,14 +2283,14 @@ Public Class frmDiagrmUMLUseCase
             'Add the Page(Name) to the MenuOption.DropDownItems
             '----------------------------------------------------
             loMenuOption = Me.ToolStripMenuItemUseCaseDiagramProcess.DropDownItems.Add(lr_page.Name)
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageUMLUseCaseDiagram,
                                                                Nothing,
                                                                lr_page.Model.ModelId,
                                                                pcenumLanguage.UMLUseCaseDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
-            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
             AddHandler loMenuOption.Click, AddressOf Me.morphToUseCaseDiagram_Process
         Next
 
@@ -2287,14 +2313,14 @@ Public Class frmDiagrmUMLUseCase
             'Add the Page(Name) to the MenuOption.DropDownItems
             '----------------------------------------------------
             loMenuOption = Me.DFDToolStripMenuItem.DropDownItems.Add(lr_page.Name)
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageDataFlowDiagram,
                                                                Nothing,
                                                                lr_page.Model.ModelId,
                                                                pcenumLanguage.DataFlowDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
-            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
             AddHandler loMenuOption.Click, AddressOf Me.morph_to_DataFlowDiagram
         Next
 #End Region
@@ -2310,15 +2336,15 @@ Public Class frmDiagrmUMLUseCase
             'Add the Page(Name) to the MenuOption.DropDownItems
             '----------------------------------------------------
             loMenuOption = Me.ToolStripMenuItemStateTransitionDiagram.DropDownItems.Add(lr_page.Name)
-            Dim lr_enterprise_view As tEnterpriseEnterpriseView
-            lr_enterprise_view = New tEnterpriseEnterpriseView(pcenumMenuType.pageSTD,
+            Dim lrEnterpriseView As tEnterpriseEnterpriseView
+            lrEnterpriseView = New tEnterpriseEnterpriseView(pcenumMenuType.pageSTD,
                                                                Nothing,
                                                                lr_page.Model.ModelId,
                                                                pcenumLanguage.StateTransitionDiagram,
                                                                Nothing,
                                                                lr_page.PageId)
 
-            loMenuOption.Tag = prPageNodes.Find(AddressOf lr_enterprise_view.Equals)
+            loMenuOption.Tag = prPageNodes.Find(AddressOf lrEnterpriseView.Equals)
             AddHandler loMenuOption.Click, AddressOf Me.morph_to_StateTransitionDiagram
         Next
 #End Region
@@ -2353,7 +2379,7 @@ Public Class frmDiagrmUMLUseCase
                 Me.DiagramView.ContextMenuStrip = ContextMenuStrip_ProcessLink
 
 
-            ElseIf IsSomething(loNode) Then
+            ElseIf loNode IsNot Nothing Then
                 loNode = Diagram.GetNodeAt(lo_point)
                 Me.zrPage.SelectedObject.AddUnique(loNode.Tag)
                 Select Case loNode.GetType
@@ -2371,7 +2397,7 @@ Public Class frmDiagrmUMLUseCase
                 '---------------------------------------------------        
                 Me.zrPage.SelectedObject.Clear()
 
-                If IsSomething(lrPropertyGridForm) Then
+                If lrPropertyGridForm IsNot Nothing Then
 
                     Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
                     lrPropertyGridForm.PropertyGrid.BrowsableAttributes = New System.ComponentModel.AttributeCollection(New System.Attribute() {myfilterattribute})
@@ -2387,8 +2413,8 @@ Public Class frmDiagrmUMLUseCase
             End If
 
 #Region "Propery Grid"
-            If IsSomething(lrPropertyGridForm) Then
-                If IsSomething(loLink) Then
+            If lrPropertyGridForm IsNot Nothing Then
+                If loLink IsNot Nothing Then
                     Select Case loLink.Tag.GetType
                         Case Is = GetType(UCD.ProcessProcessRelation)
                             Dim lrProcessProcessRelation As UCD.ProcessProcessRelation
@@ -2403,7 +2429,7 @@ Public Class frmDiagrmUMLUseCase
                             lrPropertyGridForm.PropertyGrid.SelectedObject = lrProcessProcessRelation
                     End Select
 
-                ElseIf IsSomething(loNode) Then
+                ElseIf loNode IsNot Nothing Then
 
                     Dim lrModelObject As FBM.ModelObject
                     lrModelObject = loNode.Tag
@@ -2443,7 +2469,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -2481,7 +2507,7 @@ Public Class frmDiagrmUMLUseCase
 
         Try
 
-            If IsSomething(e.Node) Then
+            If e.Node IsNot Nothing Then
                 Select Case e.Node.Tag.ConceptType
                     Case Is = pcenumConceptType.Actor
                         Dim lrActor As UCD.Actor = e.Node.Tag
@@ -2495,7 +2521,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2552,7 +2578,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2580,7 +2606,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2612,7 +2638,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
 
@@ -2643,7 +2669,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -2685,7 +2711,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2726,7 +2752,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2778,7 +2804,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2831,7 +2857,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -2864,7 +2890,7 @@ Public Class frmDiagrmUMLUseCase
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

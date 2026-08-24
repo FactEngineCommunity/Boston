@@ -18,16 +18,16 @@ Namespace TableEntityType
                 lsSQLQuery &= " ,'" & Trim(arEntityType.Model.ModelId) & "'"
                 lsSQLQuery &= " ,'" & Trim(arEntityType.Id) & "'"
                 lsSQLQuery &= " ,'" & Trim(Replace(arEntityType.Name, "'", "`")) & "'"
-                If IsSomething(arEntityType.ReferenceModeValueType) Then
+                If arEntityType.ReferenceModeValueType IsNot Nothing Then
                     lsSQLQuery &= " ,'" & Trim(arEntityType.ReferenceModeValueType.Id) & "'"
                 Else
                     lsSQLQuery &= " ,''"
                 End If
                 lsSQLQuery &= " ,'" & Trim(arEntityType.ReferenceMode) & "'"
-                If IsSomething(arEntityType.ReferenceModeRoleConstraint) Then
+                If arEntityType.ReferenceModeRoleConstraint IsNot Nothing Then
                     lsSQLQuery &= " ,'" & Trim(arEntityType.ReferenceModeRoleConstraint.Id) & "'"
                 Else
-                    lsSQLQuery &= " ,''"
+                    lsSQLQuery &= " ,NULL"
                 End If
                 lsSQLQuery &= "," & arEntityType.IsMDAModelElement                
                 lsSQLQuery &= "," & arEntityType.IsPersonal
@@ -45,7 +45,7 @@ Namespace TableEntityType
                 Dim lsMessage As String
                 lsMessage = "Error: TableEntityType.AddEntityType"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -101,7 +101,7 @@ Namespace TableEntityType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -145,7 +145,7 @@ Namespace TableEntityType
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -262,6 +262,11 @@ Namespace TableEntityType
                     'Concept Classification
                     arEntityType.GetConceptClassifications()
 
+                    'ModelElementFlags
+                    arEntityType.GetModelElementFlags()
+
+                    arEntityType.GetInterlinks()
+
                     arEntityType.isDirty = False
                 Else
                     MsgBox("Error: GetEntityTypeDetailsById: No Entity Type returned for EntityTypeId: " & arEntityType.Id)
@@ -275,7 +280,7 @@ Namespace TableEntityType
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return arEntityType
             End Try
@@ -353,6 +358,11 @@ Namespace TableEntityType
                         'Concept Classification
                         lrEntityType.GetConceptClassifications()
 
+                        'ModelElementFlags
+                        lrEntityType.GetModelElementFlags()
+
+                        lrEntityType.GetInterlinks()
+
                         getEntityTypesByModel.Add(lrEntityType)
                         lREcordset.MoveNext()
                     End While
@@ -366,7 +376,7 @@ Namespace TableEntityType
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -446,13 +456,19 @@ Namespace TableEntityType
                 pdbConnection.Execute(lsSQLQuery)
                 pdbConnection.CommitTrans()
 
+                Call tableDataLineageItemProperty.ModifyKeyDataLineageItemProperty(arEntityType.Model,
+                                                                                   arEntityType.Id & " - Object Type",
+                                                                                   asNewKey & " - Object Type")
+
+                Call TableModel.ModifyKey(arEntityType, asNewKey)
+
             Catch ex As Exception
                 Dim lsMessage As String
                 Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -464,7 +480,7 @@ Namespace TableEntityType
             Try
                 lsSQLQuery = " UPDATE MetaModelEntityType"
                 lsSQLQuery &= "   SET EntityTypeName = '" & Trim(Replace(arEntityType.Name, "'", "`")) & "'"
-                If IsSomething(arEntityType.ReferenceModeValueType) Then
+                If arEntityType.ReferenceModeValueType IsNot Nothing Then
                     lsSQLQuery &= "       ,ValueTypeId = '" & Viev.NullVal(arEntityType.ReferenceModeValueType.Id, "") & "'"
                 Else
                     lsSQLQuery &= "       ,ValueTypeId = ''"
@@ -489,7 +505,9 @@ Namespace TableEntityType
                 Dim lsMessage As String
                 lsMessage = "Error: TableEntityType.UpdateEntityType"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                pdbConnection.RollbackTrans
             End Try
 
         End Sub

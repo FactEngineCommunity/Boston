@@ -5,6 +5,9 @@ Imports System.Reflection
 Imports System.Configuration
 Imports System.Data.SQLite
 Imports System.ComponentModel
+Imports System.Runtime.InteropServices
+Imports LiteDB
+Imports sun.swing
 
 Public Class frmCRUDModel
 
@@ -35,6 +38,7 @@ Public Class frmCRUDModel
             Me.LabelCoreVersion.Text = Me.zrModel.CoreVersionNumber
 
             Call Me.LoadDatabaseTypes()
+            Call Me.LoadDerivationSyntaxTypes()
 
             Me.TextBoxDatabaseConnectionString.Text = Me.zrModel.TargetDatabaseConnectionString
             Me.CheckBoxIsDatabaseSynchronised.Checked = Me.zrModel.IsDatabaseSynchronised
@@ -50,6 +54,8 @@ Public Class frmCRUDModel
             Me.TextBoxWarehouseName.Text = Me.zrModel.Warehouse
             Me.TextBoxRoleName.Text = Me.zrModel.DatabaseRole
             Me.TextBoxPort.Text = Me.zrModel.Port
+
+            Me.ComboBoxDerivationSyntaxType.SelectedValue = CInt(Me.zrModel.DerivationSyntaxType)
 
             RemoveHandler Me.CheckBoxSaveToXML.CheckedChanged, AddressOf CheckBoxSaveToXML_CheckedChanged
             Me.CheckBoxSaveToXML.Checked = Me.zrModel.StoreAsXML
@@ -83,6 +89,9 @@ Public Class frmCRUDModel
             Me.CheckBoxAutomaticallyCreateReferenceMode.Checked = Me.zrModel.AutomaticallyCreateReferenceMode
             Me.TextBoxDefaultReferenceMode.Text = Trim(Me.zrModel.DefaultReferenceMode)
             Me.CheckBoxHideOtherwiseForeignKeyColumns.Checked = Me.zrModel.HideOtherwiseForeignKeyColumns
+            Me.CheckBoxHideReferenceModesByDefault.Checked = Me.zrModel.HideReferenceModesByDefault
+
+            Call Me.loadProjectsForModel(Me.zrModel)
 
 
         Catch ex As Exception
@@ -91,7 +100,65 @@ Public Class frmCRUDModel
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
+
+    Private Sub LoadDerivationSyntaxTypes()
+
+        Try
+            ' Retrieve all enum values as an array
+            Dim syntaxTypes = [Enum].GetValues(GetType(pcenumDerivationSyntaxType)) _
+                                    .Cast(Of pcenumDerivationSyntaxType)() _
+                                    .Select(Function(x) New With {
+                                        .Value = CInt(x),
+                                        .Text = x.ToString()
+                                    }).ToList()
+
+            ' Bind to the ComboBox
+            ComboBoxDerivationSyntaxType.DataSource = syntaxTypes
+            ComboBoxDerivationSyntaxType.DisplayMember = "Text"
+            ComboBoxDerivationSyntaxType.ValueMember = "Value"
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex, False)
+        End Try
+
+    End Sub
+
+
+
+    Private Sub loadProjectsForModel(ByRef arModel As FBM.Model)
+
+        Try
+            Dim larProject As List(Of ClientServer.Project) = tableClientServerProjectModelShare.getProjectsForModel(arModel)
+
+            For Each lrProject In larProject
+                Dim lrComboboxItem As New tComboboxItem(lrProject.Id, lrProject.Name & " (shared)", lrProject)
+                Call Me.ListBoxProjects.Items.Add(lrComboboxItem)
+            Next
+
+            larProject = TableModel.getProjectsForModel(arModel)
+
+            For Each lrProject In larProject
+                Dim lrComboboxItem As New tComboboxItem(lrProject.Id, lrProject.Name & " (assigned to this Project)", lrProject)
+                Call Me.ListBoxProjects.Items.Add(lrComboboxItem)
+            Next
+
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -109,6 +176,82 @@ Public Class frmCRUDModel
 
             Me.zrModel.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag
             Me.zrModel.TargetDatabaseConnectionString = Trim(Me.TextBoxDatabaseConnectionString.Text)
+
+            'Model Name Change if necessary
+            Select Case Me.zrModel.TargetDatabaseType
+                Case Is = pcenumDatabaseType.SQLite
+                    If Me.zrModel.connectToDatabase = True Then
+
+                        'Get the name of the database and create a new model name.
+                        Dim lsModelNameNew = Me.zrModel.DatabaseConnection.GetDatabaseName(Me.zrModel.TargetDatabaseConnectionString)
+                        lsModelNameNew = Me.zrModel.CreateUniqueModelName(lsModelNameNew, 0)
+
+                        Call Me.zrModel.SetName(lsModelNameNew)
+
+                        'Parse the connection string
+                        'Get the file path
+                        Dim loConnectionStringBuilder As New SQLiteConnectionStringBuilder(Me.zrModel.TargetDatabaseConnectionString)
+                        Dim lsFilePath As String = loConnectionStringBuilder.DataSource
+
+                        Dim loFileInfo As New FileInfo(lsFilePath)
+                        Dim liFileSize As Long = loFileInfo.Length ' Size in bytes
+
+                        If liFileSize > 0 And Me.zrModel.IsEmpty Then
+
+                            If MsgBox("The Model is new/empty. Reverse engineer this database into the Model?", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+                                'SQLite database has a schema
+#Region "Reverse Engineer the database"
+
+                                Me.TabControl1.SelectedTab = Me.TabPageReverseEngineering
+                                Me.ButtonReverseEngineerDatabase.Enabled = False
+
+                                With New WaitCursor
+
+                                    Me.ProgressBarReverseEngineering.Visible = True
+
+                                    Me.RichTextBoxREMessages.Clear()
+                                    Me.ProgressBarReverseEngineering.Value = 0
+
+                                    If Not Me.TestConnection Then
+                                        Call Me.AddREMessage("- Failed to connect to database. Have you set the Database Type and its Connection String?")
+                                        Exit Sub
+                                    End If
+
+                                    Me.zrModel.RDS.TargetDatabaseType = Me.ComboBoxDatabaseType.SelectedItem.Tag 'DirectCast(System.[Enum].Parse(GetType(pcenumDatabaseType), Me.ComboBoxDatabaseType.SelectedItem), pcenumDatabaseType)
+
+                                    Dim lrReverseEngineer As New ODBCDatabaseReverseEngineer(Me.zrModel,
+                                                                             Trim(Me.TextBoxDatabaseConnectionString.Text),
+                                                                             True,
+                                                                             Me.BackgroundWorker,
+                                                                             Me.CheckBoxReverseEngineeringShowExtraInformation.Checked)
+
+                                    Call Me.AddREMessage("- Reverse engineering started.")
+                                    Dim lsErrorMessage As String = ""
+                                    If Not lrReverseEngineer.ReverseEngineerDatabase(lsErrorMessage) Then
+                                        Me.ErrorProvider.SetError(Me.ButtonReverseEngineerDatabase, lsErrorMessage)
+                                        Call Me.AddREMessage("- Failed.", Color.Red, True)
+                                    Else
+                                        Call Me.AddREMessage("- Finished reverse engineering the database.")
+                                        Call Me.AddREMessage("- Saving the model.")
+                                        Call Me.zrModel.MakeDirty(False, False)
+                                        Call Me.zrModel.Save()
+                                        Me.zrModel.Loaded = True
+                                        Call prApplication.TriggerModelLoaded(Me.zrModel, Nothing)
+                                        Call Me.AddREMessage("- Complete.", Color.Green, True)
+                                    End If
+
+                                    Me.ButtonReverseEngineerDatabase.Enabled = False
+                                End With
+
+                                Me.ProgressBarReverseEngineering.Visible = False
+#End Region
+                            End If
+                        End If
+
+                    End If
+
+            End Select 'DatabaseType
+
             Me.zrModel.IsDatabaseSynchronised = Me.CheckBoxIsDatabaseSynchronised.Checked
 
             Me.zrModel.Server = Trim(Me.TextBoxServerName.Text)
@@ -164,6 +307,27 @@ Public Class frmCRUDModel
             Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
 #End Region
 
+            'HideReferenceModesByDefault
+#Region "HideReferenceModesByDefault"
+            Me.zrModel.HideReferenceModesByDefault = Me.CheckBoxHideReferenceModesByDefault.Checked
+
+            loSetting = New With {.ModelId = Me.zrModel.ModelId, .SettingName = "HideReferenceModesByDefault", .Setting = Me.CheckBoxHideReferenceModesByDefault.Checked.ToString}
+            larKeyFields = {}
+            larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})
+            larKeyFields.Add(New With {.FieldId = 2, .FieldName = "SettingName", .Value = "HideReferenceModesByDefault"})
+            Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
+#End Region
+
+            'DerivationSyntaxType
+#Region "DerivationSyntaxType"
+            Me.zrModel.DerivationSyntaxType = CType(ComboBoxDerivationSyntaxType.SelectedValue, pcenumDerivationSyntaxType)
+
+            loSetting = New With {.ModelId = Me.zrModel.ModelId, .SettingName = "DerivationSyntaxType", .Setting = Me.zrModel.DerivationSyntaxType.ToString}
+            larKeyFields = {}
+            larKeyFields.Add(New With {.FieldId = 1, .FieldName = "ModelId", .Value = Me.zrModel.ModelId})
+            larKeyFields.Add(New With {.FieldId = 2, .FieldName = "SettingName", .Value = "DerivationSyntaxType"})
+            Call TableReferenceTable.UpSert(39, loSetting, larKeyFields)
+#End Region
             '================================================================================================
 
             Try
@@ -200,6 +364,9 @@ Public Class frmCRUDModel
                             Case Is = pcenumDatabaseType.None
                                 Me.zrModel.TreeNode.ImageIndex = 1
                                 Me.zrModel.TreeNode.SelectedImageIndex = 1
+                            Case Is = pcenumDatabaseType.FactEngineSemanticLayer
+                                Me.zrModel.TreeNode.ImageIndex = 27
+                                Me.zrModel.TreeNode.SelectedImageIndex = 27
                         End Select
                     End If
                 End If
@@ -207,6 +374,8 @@ Public Class frmCRUDModel
             End Try
 
             Me.zrModel.Save()
+
+            Call prApplication.TriggerModelSaved(Me.zrModel)
 
             Me.Hide()
             Me.Close()
@@ -223,35 +392,60 @@ Public Class frmCRUDModel
 
     Sub LoadDatabaseTypes()
 
-        Dim loWorkingClass As New Object
+        'Dim loWorkingClass As New Object
         Dim larDatabaseType As New List(Of Object)
         Dim liReferenceTableId As Integer = 0
         Dim liInd As Integer = 0
         Dim liNewIndex As Integer = 0
 
         Try
-
-            Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.None, pcenumDatabaseType.None.ToString, pcenumDatabaseType.None))
-            Me.ComboBoxDatabaseType.SelectedIndex = 0
+            'Only have SQLite for Boston4SQLite
+            Select Case prApplication.SoftwareCategory
+                Case Is = pcenumSoftwareCategory.Boston4SQLite
+                Case Else
+                    Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.None, pcenumDatabaseType.None.ToString, pcenumDatabaseType.None))
+                    Me.ComboBoxDatabaseType.SelectedIndex = 0
+            End Select
 
             If pdbConnection.State <> 0 Then
                 liReferenceTableId = TableReferenceTable.GetReferenceTableIdByName("DatabaseType")
-                larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId, loWorkingClass)
+                larDatabaseType = TableReferenceFieldValue.GetReferenceFieldValueTuples(liReferenceTableId) ', loWorkingClass
 
                 For liInd = 1 To larDatabaseType.Count
                     Dim liDatabaseType = CType([Enum].Parse(GetType(pcenumDatabaseType), Viev.NullVal(larDatabaseType(liInd - 1).DatabaseType, pcenumDatabaseType.None)), pcenumDatabaseType)
                     Dim lrComboboxItem As New tComboboxItem(larDatabaseType(liInd - 1).DatabaseType, larDatabaseType(liInd - 1).DatabaseType, liDatabaseType)
-                    liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
+                    Select Case prApplication.SoftwareCategory
+                        Case Is = pcenumSoftwareCategory.Student, pcenumSoftwareCategory.Boston4SQLite
+                            Select Case liDatabaseType
+                                Case Is = pcenumDatabaseType.SQLite
+                                    liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
+                                    Me.ComboBoxDatabaseType.SelectedIndex = 0
+                                Case Else
+                                    'Sorry, not supported.
+                            End Select
+                        Case Else
+                            liNewIndex = Me.ComboBoxDatabaseType.Items.Add(lrComboboxItem)
+                    End Select
+
                     If larDatabaseType(liInd - 1).DatabaseType = Trim(Me.zrModel.TargetDatabaseType.ToString) Then
                         Me.ComboBoxDatabaseType.SelectedIndex = liNewIndex
                     End If
                 Next
             Else
-                Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.SQLite, pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.None))
-                Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.MSJet, pcenumDatabaseType.MSJet.ToString, pcenumDatabaseType.None))
-                Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.SQLServer, pcenumDatabaseType.SQLServer.ToString, pcenumDatabaseType.None))
-                Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.Neo4j, pcenumDatabaseType.Neo4j.ToString, pcenumDatabaseType.None))
+                Select Case prApplication.SoftwareCategory
+                    Case Is = pcenumSoftwareCategory.Student, pcenumSoftwareCategory.Boston4SQLite
+                        Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.SQLite, pcenumDatabaseType.SQLite.ToString, pcenumDatabaseType.None))
+                    Case Else
+                        Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.MSJet, pcenumDatabaseType.MSJet.ToString, pcenumDatabaseType.None))
+                        Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.SQLServer, pcenumDatabaseType.SQLServer.ToString, pcenumDatabaseType.None))
+                        Me.ComboBoxDatabaseType.Items.Add(New tComboboxItem(pcenumDatabaseType.Neo4j, pcenumDatabaseType.Neo4j.ToString, pcenumDatabaseType.None))
+                End Select
+
                 Me.ComboBoxDatabaseType.SelectedIndex = Me.ComboBoxDatabaseType.FindString(Me.zrModel.TargetDatabaseType.ToString)
+            End If
+
+            If Me.zrModel.TargetDatabaseType = pcenumDatabaseType.SQLite And prApplication.SoftwareCategory = pcenumSoftwareCategory.Boston4SQLite Then
+                Me.ComboBoxDatabaseType.Enabled = False
             End If
 
         Catch ex As Exception
@@ -260,7 +454,7 @@ Public Class frmCRUDModel
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -323,7 +517,7 @@ Public Class frmCRUDModel
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace,,,,,, ex)
 
             Return False
         End Try
@@ -521,12 +715,15 @@ ConnectionFailed:
                         Me.LabelOpenSuccessfull.ForeColor = Color.Green
                         Me.LabelOpenSuccessfull.Text = "Success"
                         Me.LabelOpenSuccessfull.Visible = True
+
+                    Case Is = pcenumDatabaseType.FactEngineSemanticLayer
+                        Boston.ShowFlashCard("Not currently implemented", Color.LightGray, 2500, 10)
+
                     Case Else
 
                         Me.LabelOpenSuccessfull.ForeColor = Color.Red
                         Me.LabelOpenSuccessfull.Text = "Unknown database type, '" & prApplication.WorkingModel.TargetDatabaseType.ToString & "'."
                         Me.LabelOpenSuccessfull.Visible = True
-
                 End Select
             End With
 
@@ -562,7 +759,7 @@ ConnectionFailed:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -580,7 +777,7 @@ ConnectionFailed:
 
             '------------------------------------------------------------------------------------------
             'Check to see that Reverse Engineering is supported for the datatabase type of the model.
-            Dim larSupportedDatabases = {pcenumDatabaseType.SQLite, pcenumDatabaseType.Snowflake, pcenumDatabaseType.TypeDB, pcenumDatabaseType.KuzuDB}
+            Dim larSupportedDatabases = {pcenumDatabaseType.SQLite, pcenumDatabaseType.Snowflake, pcenumDatabaseType.TypeDB, pcenumDatabaseType.KuzuDB, pcenumDatabaseType.PostgreSQL}
 
             If Not larSupportedDatabases.Contains(Me.zrModel.TargetDatabaseType) Then
                 MsgBox("The database type of this model is not supported. Please contact support.")
@@ -631,7 +828,7 @@ ConnectionFailed:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -810,6 +1007,9 @@ ConnectionFailed:
                                 Case Is = pcenumDatabaseType.EdgeDB
                                     Me.zrModel.TreeNode.ImageIndex = 23
                                     Me.zrModel.TreeNode.SelectedImageIndex = 23
+                                Case Is = pcenumDatabaseType.FactEngineSemanticLayer
+                                    Me.zrModel.TreeNode.ImageIndex = 27
+                                    Me.zrModel.TreeNode.SelectedImageIndex = 27
                                 Case Is = pcenumDatabaseType.None
                                     Me.zrModel.TreeNode.ImageIndex = 1
                                     Me.zrModel.TreeNode.SelectedImageIndex = 1
@@ -820,6 +1020,8 @@ ConnectionFailed:
                 End Try
 
                 Me.zrModel.Save()
+
+                Call prApplication.TriggerModelSaved(Me.zrModel)
 
             End If
             Me.ButtonApply.Enabled = False
@@ -888,7 +1090,6 @@ ConnectionFailed:
                     Next
 
                     With New WaitCursor
-                        Call Me.zrModel.SaveToXMLDocument()
                         Me.zrModel.SetStoreAsXML(True, True)
                     End With
                 Else
@@ -901,10 +1102,13 @@ ConnectionFailed:
                 lsMessage = "Are you sure you want to store the Model within the Boston database?"
                 If MsgBox(lsMessage, MsgBoxStyle.YesNoCancel) = MsgBoxResult.Yes Then
                     With New WaitCursor
-                        Me.zrModel.StoreAsXML = False
                         Try
                             Call Database.CompactAndRepairDatabase()
                             Call Me.zrModel.RapidEmpty(True)
+                            For Each lrPage In Me.zrModel.Page
+                                Call lrPage.Load(False)
+                            Next
+                            Me.zrModel.StoreAsXML = False
                             Call Me.zrModel.Save(True, True, True) '20220907-VM-Was Save(True,False).
                         Catch ex As Exception
                             lsMessage = "Couldn't successfully save the Model to the Boston database. The Model will remain stored as XML."
@@ -929,7 +1133,7 @@ CouldntSaveToBostonDatabase:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -959,7 +1163,7 @@ CouldntSaveToBostonDatabase:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -980,9 +1184,24 @@ CouldntSaveToBostonDatabase:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
+    Private Sub zrModel_StoreAsXMLChanged(abStoreAsXML As Boolean) Handles zrModel.StoreAsXMLChanged
+
+        Try
+            Me.CheckBoxSaveToXML.Checked = abStoreAsXML
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
+
+    End Sub
 End Class

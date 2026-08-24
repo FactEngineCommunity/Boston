@@ -30,7 +30,7 @@ Namespace FBM
             Me.Page = arValueTypeInstance.Page
             Me.ValueType = arValueTypeInstance
 
-            If IsSomething(arEntityTypeInstance) Then
+            If arEntityTypeInstance IsNot Nothing Then
                 Me.EntityType = arEntityTypeInstance
             End If
 
@@ -55,7 +55,7 @@ Namespace FBM
                 StringSize = Me.Page.Diagram.MeasureString("{" & Trim(lsEnumeratedValueConstraint) & "}", Me.Page.Diagram.Font, 1000, System.Drawing.StringFormat.GenericDefault)
             End If
 
-            If IsSomething(Me.EntityType) Then
+            If Me.EntityType IsNot Nothing Then
                 loValueConstraintShapeNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.EntityType.Shape.Bounds.X, Me.EntityType.Shape.Bounds.Y - (StringSize.Height * 2), StringSize.Width, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
             Else
                 loValueConstraintShapeNode = Me.Page.Diagram.Factory.CreateShapeNode(Me.ValueType.Shape.Bounds.X, Me.ValueType.Shape.Bounds.Y - (StringSize.Height * 2), StringSize.Width, StringSize.Height, MindFusion.Diagramming.Shapes.Rectangle)
@@ -79,8 +79,8 @@ Namespace FBM
             '--------------------------------------------------------------------------------------------------
             'Attach the ValueConstraintInstance ShapeNode to the EntityType or ValueType to which it belongs.
             '--------------------------------------------------------------------------------------------------
-            If IsSomething(Me.EntityType) Then
-                If IsSomething(Me.EntityType.Shape) Then
+            If Me.EntityType IsNot Nothing Then
+                If Me.EntityType.Shape IsNot Nothing Then
                     loValueConstraintShapeNode.AttachTo(Me.EntityType.Shape, AttachToNode.TopLeft)
                 End If
             Else
@@ -108,7 +108,7 @@ Namespace FBM
 
                 lo_Diagram = Me.Shape.Parent
 
-                If IsSomething(lo_Diagram) Then
+                If lo_Diagram IsNot Nothing Then
                     '-------------
                     'Go forward
                     '-------------
@@ -161,7 +161,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

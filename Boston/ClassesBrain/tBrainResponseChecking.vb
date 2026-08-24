@@ -26,7 +26,7 @@ Partial Public Class tBrain
                             Call Me.CurrentQuestionAnswered()
                             Call Me.send_data("Okay")
 
-                        Case Is = "at most one", "one"
+                        Case Is = "at most one", "one", "at least one", "any number of", "one to one" 'See LCase above.
 
                             '---------------------------------------------------------------
                             'Step out of the Brain and work on the WorkingModel/WorkingPage
@@ -231,7 +231,7 @@ Partial Public Class tBrain
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

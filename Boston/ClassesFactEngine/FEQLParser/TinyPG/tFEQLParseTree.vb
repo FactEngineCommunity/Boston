@@ -8,6 +8,8 @@ Imports System.Xml.Serialization
 
 
 Namespace FEQL
+
+
 #Region "ParseTree"
     <Serializable()>
     Public Class ParseErrors
@@ -103,7 +105,24 @@ Namespace FEQL
         End Sub
 
         Public Sub New(ByVal message As String, ByVal code As Integer, ByVal node As ParseNode)
-            Me.New(message, code, 0, node.Token.StartPos, node.Token.StartPos, node.Token.Length)
+            If node Is Nothing Then
+                m_message = message
+                m_code = code
+                m_line = 0
+                m_col = 0
+                m_pos = 0
+                m_length = 0
+                m_expected_token = ""
+            Else
+                m_message = message
+                m_code = code
+                m_line = 0
+                m_col = node.Token.StartPos
+                m_pos = node.Token.EndPos
+                m_length = node.Token.Length
+                m_expected_token = ""
+            End If
+
         End Sub
 
         Public Function Clone() As Object Implements ICloneable.Clone
@@ -342,6 +361,9 @@ Namespace FEQL
             Dim Value As Object = Nothing
 
             Select Case Token.Type
+                Case TokenType.CHARTTYPE
+                    Value = EvalCHARTTYPE(tree, paramlist)
+                    Exit Select
                 Case TokenType.COMPARITOR
                     Value = EvalCOMPARITOR(tree, paramlist)
                     Exit Select
@@ -360,8 +382,47 @@ Namespace FEQL
                 Case TokenType.RESERVEDWORD
                     Value = EvalRESERVEDWORD(tree, paramlist)
                     Exit Select
+                Case TokenType.TEMPORALDEIXIS
+                    Value = EvalTEMPORALDEIXIS(tree, paramlist)
+                    Exit Select
                 Case TokenType.RETURNFUNCTION
                     Value = EvalRETURNFUNCTION(tree, paramlist)
+                    Exit Select
+                Case TokenType.FUNCTIONPARAMETER
+                    Value = EvalFUNCTIONPARAMETER(tree, paramlist)
+                    Exit Select
+                Case TokenType.FUNCTIONPARAMETERLIST
+                    Value = EvalFUNCTIONPARAMETERLIST(tree, paramlist)
+                    Exit Select
+                Case TokenType.FUNCTIONNAME
+                    Value = EvalFUNCTIONNAME(tree, paramlist)
+                    Exit Select
+                Case TokenType.FUNCTIONCALL
+                    Value = EvalFUNCTIONCALL(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSON
+                    Value = EvalJSON(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONNODE
+                    Value = EvalJSONNODE(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONBOOLEAN
+                    Value = EvalJSONBOOLEAN(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONPRIMITIVE
+                    Value = EvalJSONPRIMITIVE(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONCONTAINER
+                    Value = EvalJSONCONTAINER(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONARRAY
+                    Value = EvalJSONARRAY(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONOBJECT
+                    Value = EvalJSONOBJECT(tree, paramlist)
+                    Exit Select
+                Case TokenType.JSONMEMBER
+                    Value = EvalJSONMEMBER(tree, paramlist)
                     Exit Select
                 Case TokenType.ADDITIONALMODELELEMENT
                     Value = EvalADDITIONALMODELELEMENT(tree, paramlist)
@@ -383,6 +444,9 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.ASCLAUSE
                     Value = EvalASCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.BETWEENCLAUSE
+                    Value = EvalBETWEENCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.BRACKTEDCOLMNLIST
                     Value = EvalBRACKTEDCOLMNLIST(tree, paramlist)
@@ -435,11 +499,17 @@ Namespace FEQL
                 Case TokenType.FACTTYPESIMPLEPREDICATE
                     Value = EvalFACTTYPESIMPLEPREDICATE(tree, paramlist)
                     Exit Select
+                Case TokenType.FUNCTIONPARAMETERCOLUMN
+                    Value = EvalFUNCTIONPARAMETERCOLUMN(tree, paramlist)
+                    Exit Select
                 Case TokenType.INSERTCOLUMNLIST
                     Value = EvalINSERTCOLUMNLIST(tree, paramlist)
                     Exit Select
                 Case TokenType.ISAVALUETYPECLAUSE
                     Value = EvalISAVALUETYPECLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.LIMITCLAUSE
+                    Value = EvalLIMITCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.MATCHPREDICATE
                     Value = EvalMATCHPREDICATE(tree, paramlist)
@@ -461,6 +531,9 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.MODELMODELELEMENT
                     Value = EvalMODELMODELELEMENT(tree, paramlist)
+                    Exit Select
+                Case TokenType.NEXTCLAUSE
+                    Value = EvalNEXTCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.NODESTMT
                     Value = EvalNODESTMT(tree, paramlist)
@@ -530,6 +603,12 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.SETCLAUSE
                     Value = EvalSETCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.SHORTESTPATHCLAUSE
+                    Value = EvalSHORTESTPATHCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.THISCLAUSE
+                    Value = EvalTHISCLAUSE(tree, paramlist)
                     Exit Select
                 Case TokenType.VALUELIST
                     Value = EvalVALUELIST(tree, paramlist)
@@ -611,6 +690,15 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.CREATESTMT
                     Value = EvalCREATESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.CREATENODESTMT
+                    Value = EvalCREATENODESTMT(tree, paramlist)
+                    Exit Select
+                Case TokenType.GRAPHNODE
+                    Value = EvalGRAPHNODE(tree, paramlist)
+                    Exit Select
+                Case TokenType.CREATETABLEINSTANCESTMT
+                    Value = EvalCREATETABLEINSTANCESTMT(tree, paramlist)
                     Exit Select
                 Case TokenType.CREATEVALUETYPESTMT
                     Value = EvalCREATEVALUETYPESTMT(tree, paramlist)
@@ -716,6 +804,9 @@ Namespace FEQL
                     Exit Select
                 Case TokenType.HAVINGCLAUSE
                     Value = EvalHAVINGCLAUSE(tree, paramlist)
+                    Exit Select
+                Case TokenType.HAVINGCONDITION
+                    Value = EvalHAVINGCONDITION(tree, paramlist)
                     Exit Select
                 Case TokenType.INDIVIDUALIDENTIFIER
                     Value = EvalINDIVIDUALIDENTIFIER(tree, paramlist)
@@ -844,7 +935,11 @@ Namespace FEQL
             Return lrParseNode
         End Function
 
-                Protected Overridable Function EvalCOMPARITOR(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+                Protected Overridable Function EvalCHARTTYPE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCOMPARITOR(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -868,7 +963,59 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalTEMPORALDEIXIS(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalRETURNFUNCTION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFUNCTIONPARAMETER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFUNCTIONPARAMETERLIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFUNCTIONNAME(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalFUNCTIONCALL(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSON(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONNODE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONBOOLEAN(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONPRIMITIVE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONCONTAINER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONARRAY(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONOBJECT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalJSONMEMBER(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -897,6 +1044,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalASCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalBETWEENCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -968,11 +1119,19 @@ Namespace FEQL
             Throw New NotImplementedException()
         End Function
 
+        Protected Overridable Function EvalFUNCTIONPARAMETERCOLUMN(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
         Protected Overridable Function EvalINSERTCOLUMNLIST(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
         Protected Overridable Function EvalISAVALUETYPECLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalLIMITCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -1001,6 +1160,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalMODELMODELELEMENT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalNEXTCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -1093,6 +1256,14 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalSETCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalSHORTESTPATHCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalTHISCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -1201,6 +1372,18 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalCREATESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCREATENODESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalGRAPHNODE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalCREATETABLEINSTANCESTMT(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 
@@ -1341,6 +1524,10 @@ Namespace FEQL
         End Function
 
         Protected Overridable Function EvalHAVINGCLAUSE(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
+            Throw New NotImplementedException()
+        End Function
+
+        Protected Overridable Function EvalHAVINGCONDITION(ByVal tree As ParseTree, ByVal ParamArray paramlist As Object()) As Object
             Throw New NotImplementedException()
         End Function
 

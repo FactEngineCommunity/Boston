@@ -119,7 +119,7 @@
 
     Private Sub RadioButtonManyToOne_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RadioButtonManyToOne.CheckedChanged
 
-        If IsSomething(Me.zrModelObject) Then
+        If Me.zrModelObject IsNot Nothing Then
             Call Me.UpdateVerbalisationReading()
             Call Me.zrFactType.CreateManyToOneInternalUniquenessConstraint(Me.zrModelObject)
         End If
@@ -162,7 +162,7 @@
     Private Sub ComboBoxAttribute_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles ComboBoxAttribute.KeyUp
 
         Me.zrValueType.SetName(Me.ComboBoxAttribute.Text)
-        Me.zrFactType.SetName(Viev.Strings.RemoveWhiteSpace(Me.zrModelObject.Name & Me.ComboBoxAttribute.Text))
+        Me.zrFactType.setName(FEStrings.ProperSpace(Me.zrModelObject.Name & Me.ComboBoxAttribute.Text))
         Call Me.PopulateTermList()
 
     End Sub
@@ -175,7 +175,7 @@
 
     Private Sub frm_orm_reading_editor_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
 
-        If IsSomething(frmMain) Then
+        If frmMain IsNot Nothing Then
             frmMain.zfrm_orm_reading_editor = Nothing
         End If
 

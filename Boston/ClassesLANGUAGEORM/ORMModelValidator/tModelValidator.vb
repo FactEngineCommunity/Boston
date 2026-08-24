@@ -16,11 +16,13 @@ Namespace Validation
         ''' <remarks></remarks>
         Public ErrorChecker As New List(Of Validation.ErrorChecker)
 
-        Public Sub New(ByRef arModel As FBM.Model)
+        Public Sub New(ByRef arModel As FBM.Model,
+                       Optional ByVal abValidateDatabaseMappingErrors As Boolean = False,
+                       Optional ByVal abValidateRelationalModelErrors As Boolean = False)
 
             Me.Model = arModel
 
-            Call Me.AddErrorCheckers()
+            Call Me.AddErrorCheckers(abValidateDatabaseMappingErrors, abValidateRelationalModelErrors)
 
         End Sub
 
@@ -39,7 +41,8 @@ Namespace Validation
         ''' Creates the initial list of ErrorChecker objects
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub AddErrorCheckers()
+        Public Sub AddErrorCheckers(Optional ByVal abValidateDatabaseMappingErrors As Boolean = False,
+                                    Optional ByVal abValidateRelationalModelErrors As Boolean = False)
 
             Try
                 If Me.Model Is Nothing Then
@@ -81,8 +84,17 @@ Namespace Validation
                 'Me.AddErrorChecker(New Validation.ModelElementAppearsOnNoPageError(Me.Model)) '130
                 Me.AddErrorChecker(New Validation.ErrorCheckerPopulationHasNULLValueError(Me.Model)) '131
 
-                If My.Settings.ModelErrorCheckingValidateRDSColumnsAgainstDatabaseColumns Then
+                If My.Settings.ModelErrorCheckingValidateRDSColumnsAgainstDatabaseColumns Or abValidateDatabaseMappingErrors Then
                     Me.AddErrorChecker(New Validation.ErrorCheckerCMMLModelError(Me.Model)) '140
+                End If
+
+                If abValidateDatabaseMappingErrors Then
+                    Me.AddErrorChecker(New Validation.ErrorCheckerRDSTablesNotInDatabase(Me.Model)) '141
+                End If
+
+                If abValidateRelationalModelErrors Then
+                    Me.AddErrorChecker(New Validation.ErrorCheckerRDSRelationsWithMismatchedOriginAndDestinationColumnCount(Me.Model)) '200
+                    Me.AddErrorChecker(New Validation.ErrorCheckerRDSTableWithSimpleReferenceSchemeButMultiplePrimaryKeyColumns(Me.Model)) '201
                 End If
 
             Catch ex As Exception
@@ -91,7 +103,7 @@ Namespace Validation
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -104,7 +116,7 @@ Namespace Validation
 
                 Call Me.Model.ClearModelErrors()
 
-                For Each lrErrorChecker In Me.ErrorChecker
+                For Each lrErrorChecker In Me.ErrorChecker 'Loaded in Me.New when Validator is created.
                     Call lrErrorChecker.CheckForErrors()
                 Next
 
@@ -116,7 +128,7 @@ Namespace Validation
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

@@ -1,8 +1,13 @@
 ﻿Imports Boston.ORMQL
 Imports System.Data.SQLite
-Imports System.Reflection
 Imports System.Threading.Tasks
 Imports System.Text.RegularExpressions
+Imports System.Diagnostics
+Imports System.Runtime.InteropServices
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+Imports System.Reflection
+Imports Boston.FactEngine.DatabaseConnection
 
 Namespace FactEngine
 
@@ -24,16 +29,22 @@ Namespace FactEngine
             End Set
         End Property
 
+        ' Stopwatch for profiling
+        Private stopwatch As New Stopwatch()
+
         ''' <summary>
         ''' Parameterless Constructor
         ''' </summary>
         Public Sub New()
+            Call Me.RegisterCustomFunctions()
         End Sub
 
         Public Sub New(ByRef arFBMModel As FBM.Model,
                        ByVal asDatabaseConnectionString As String,
                        ByVal aiDefaultQueryLimit As Integer,
                        Optional ByVal abCreatingNewDatabase As Boolean = False)
+
+            Call Me.New 'Registers Custom (vb.net) functions.
 
             Me.FBMModel = arFBMModel
             Me.DatabaseConnectionString = asDatabaseConnectionString
@@ -47,8 +58,14 @@ Namespace FactEngine
                 If lrSQLiteConnection Is Nothing Then Throw New Exception("Failed to create SQLiteConnection")
 
                 Me.Connected = True 'Connections can actually be made for each Query. Keep open for Boston. E.g. When SQLite is the database type for Boston itself.
-                Me._Connection = lrSQLiteConnection
+                Me._Connection = Nothing '20231029-VM-Was lrSQLiteConnection
+
+                lrSQLiteConnection.Close()
+
+                'Call Me.GONonQuery("PRAGMA foreign_keys = ON;") '20231029-Test without
+
                 Me.State = 1
+
             Catch ex As Exception
                 Me.Connected = False
                 Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
@@ -65,7 +82,10 @@ Namespace FactEngine
             Dim lsSQLCommand As String
 
             Try
-                lsSQLCommand = "ALTER TABLE [" & arColumn.Table.Name & "]"
+                Dim lsSQL = "PRAGMA foreign_keys=OFF"
+                Me.GONonQuery(lsSQL)
+
+                lsSQLCommand = "ALTER TABLE [" & arColumn.Table.DBName & "]"
                 lsSQLCommand &= " ADD COLUMN "
                 lsSQLCommand &= Me.generateSQLColumnDefinition(arColumn)
 
@@ -80,6 +100,9 @@ Namespace FactEngine
                 If lrRecordset.ErrorReturned Then
                     MsgBox(lrRecordset.ErrorString)
                 End If
+
+                lsSQL = "PRAGMA foreign_keys=ON"
+                Me.GONonQuery(lsSQL)
 
             Catch ex As Exception
 
@@ -115,10 +138,10 @@ Namespace FactEngine
 
 #Region "Special Indexes"
                             'When an Index in SQLite has a Column that may be NULL, need to add another special index.                            
-                            Dim larIndexWithNullableColumn = From Index In lrIndex.Table.Index
-                                                             From Column In Index.Column
-                                                             Where Not Column.IsMandatory
-                                                             Select Index
+                            Dim larIndexWithNullableColumn = (From Index In lrIndex.Table.Index
+                                                              From Column In Index.Column
+                                                              Where Not Column.IsMandatory
+                                                              Select Index).Distinct
 
                             Dim liInd = 1
                             For Each lrIndex In larIndexWithNullableColumn
@@ -143,12 +166,12 @@ Namespace FactEngine
                                 lsSQLCommand &= " WHERE "
                                 For Each lrColumn In lrIndex.Column.FindAll(Function(x) Not x.IsMandatory)
                                     If liInd2 > 0 Then
-                                        lsSQLCommand &= ", "
+                                        lsSQLCommand &= " AND "
                                     End If
                                     lsSQLCommand &= lrColumn.Name
+                                    lsSQLCommand &= " IS NULL"
                                     liInd2 += 1
                                 Next
-                                lsSQLCommand &= " IS NULL"
                                 cmd.CommandText = lsSQLCommand
                                 cmd.ExecuteNonQuery()
                                 liInd += 1
@@ -181,10 +204,116 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
+
+        ''' <summary>
+        ''' Appends a String data type Column with a string, with a line break before hand if required.
+        ''' </summary>
+        ''' <param name="arColumn"></param>
+        ''' <param name="asAppendString"></param>
+        ''' <param name="jsonWhereString">JSON that has the Key/Value pairs for the WHERE clause</param>
+        ''' <param name="abWithLineBreak"></param>
+        Public Overrides Function AppendStringColumn(ByVal asTableName As String,
+                                                     ByVal asColumnName As String,
+                                                     ByVal asAppendString As String,
+                                                     ByVal jsonWhereString As String,
+                                                     Optional ByVal abWithLineBreak As Boolean = False) As Boolean
+
+            Try
+                Dim lsSQLQuery As String = ""
+                Dim lsNewlinePart As String = "'\n' || "
+
+                If Not abWithLineBreak Then
+                    lsNewlinePart = ""
+                End If
+
+#Region "TableName | WHERE CLAUSE etc"
+                ' Parse the JSON string
+                Dim jsonObject As JObject = JObject.Parse(jsonWhereString)
+
+                ' Determine the table name and columns/values
+                Dim tableName As String = Nothing
+                Dim columns As New List(Of String)
+                Dim values As New List(Of String)
+                Dim parameters As New List(Of SQLiteParameter)
+
+                Dim lrTable As RDS.Table = Nothing
+
+                lrTable = Me.FBMModel.RDS.Table.Find(Function(x) x.DBName = asTableName)
+                If lrTable Is Nothing Then
+                    Return False
+                End If
+
+                ' Assuming there's only one table name key in the JSON
+
+
+                For Each column As KeyValuePair(Of String, JToken) In jsonObject
+
+                    Dim lrColumn As RDS.Column = lrTable.Column.Find(Function(x) x.DBName = column.Key)
+
+                    If lrColumn IsNot Nothing Then
+                        columns.Add(column.Key)
+                        Dim lsColumnValue As String = "<Error>"
+                        Select Case lrColumn.getMetamodelDataType
+                            'Case Is = pcenumORMDataType.AutoUUID
+                            '    lsColumnValue = System.Guid.NewGuid.ToString
+                            Case Else
+                                lsColumnValue = column.Value.ToString
+                        End Select
+                        values.Add(Me.DataTypeWrapper(lrColumn.getMetamodelDataType) & lsColumnValue & Me.DataTypeWrapper(lrColumn.getMetamodelDataType))
+                    End If
+                Next
+
+                ' Construct the query
+                lsSQLQuery = "UPDATE " & asTableName
+                asAppendString = asAppendString.Replace("'", "''")
+                lsSQLQuery &= " SET " & asColumnName & " = " & asColumnName & " || " & lsNewlinePart & "'" & asAppendString & "'"
+
+
+                Dim lrRecordset = Me.GONonQuery(lsSQLQuery)
+
+                Dim lsWhereClause = " WHERE "
+
+                Dim liInd = 0
+                Dim liInd2 = 0
+                For Each lrColumn In lrTable.getPrimaryKeyColumns
+                    liInd = columns.IndexOf(lrColumn.DBName)
+                    If liInd2 > 0 Then lsWhereClause.AppendString(" AND ")
+                    lsWhereClause.AppendLine(columns(liInd) & " = " & values(liInd))
+                    columns.RemoveAt(liInd)
+                    values.RemoveAt(liInd)
+                    liInd2 += 1
+                Next
+
+                liInd = 0
+                For Each lsColumnName In columns
+                    If liInd > 0 Then lsSQLQuery &= ","
+                    lsSQLQuery.AppendLine(columns(liInd) & " = " & values(liInd))
+                    liInd += 1
+                Next
+
+                lsSQLQuery.AppendLine(lsWhereClause)
+
+                lrRecordset = Me.GONonQuery(lsSQLQuery)
+
+                Return lrRecordset.ErrorReturned
+#End Region
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
+
+        End Function
 
         ''' <summary>
         ''' Adds the given Relation/ForeignKey to the database. Relation holds relative Tables.
@@ -236,14 +365,18 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
         Public Shadows Function BeginTrans() As SQLiteTransaction
             Try
-                Dim transaction = Me._Connection.BeginTransaction
-                _activeTransactions.Add(transaction)
+                Return Nothing '20231029-VM-Trying this.
+                Dim transaction As SQLiteTransaction = Nothing
+                If Me._Connection IsNot Nothing Then
+                    transaction = Me._Connection.BeginTransaction
+                    _activeTransactions.Add(transaction)
+                End If
                 Return transaction
             Catch ex As Exception
                 Dim lsMessage As String
@@ -251,7 +384,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True, ex)
 
                 Return Nothing
             End Try
@@ -259,12 +392,15 @@ Namespace FactEngine
         End Function
 
         Public Shadows Function BeginTransaction() As SQLiteTransaction
+            Return Nothing '20231029-VM-Trying without.
             Return Me.BeginTrans
         End Function
 
         Public Overrides Sub Close()
             Try
-                Me._Connection.Close()
+                If Me._Connection IsNot Nothing Then
+                    Me._Connection.Close()
+                End If
                 Me._Connection = Nothing
                 Me.State = 0
             Catch ex As Exception
@@ -273,7 +409,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -297,9 +433,19 @@ Namespace FactEngine
                 Me.GONonQuery(lsSQL)
 
                 Dim lrColumn As RDS.Column = arColumn
-                Dim lasColumnNames = From Column In lrColumn.Table.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
+                Dim lasColumnNamesFinal As New List(Of String)
+
+                Dim lasColumnNames = (From Column In arColumn.Table.Column
+                                      Select $"[{Column.DBName}]").ToList
+
+                For Each lsColumnName In lasColumnNames.ToArray
+                    If Not Me.getColumnsByTable(arColumn.Table).Select(Function(x) $"[{x.DBName}]").Contains(lsColumnName) Then
+                        lsColumnName = "NULL"
+                    End If
+                    lasColumnNamesFinal.Add(lsColumnName)
+                Next
+
+                Dim lsColumnList = String.Join(",", lasColumnNamesFinal.Select(Function(col) col))
 
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
                 Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
@@ -307,13 +453,13 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arColumn.Table, arColumn.Table.DBName & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO [" & arColumn.Table.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "INSERT INTO [" & arColumn.Table.DBName & "_temp] SELECT " & lsColumnList & " FROM [" & arColumn.Table.DBName & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "DROP TABLE [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "DROP TABLE [" & arColumn.Table.DBName & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE [" & arColumn.Table.Name & "_temp] RENAME TO [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "ALTER TABLE [" & arColumn.Table.DBName & "_temp] RENAME TO [" & arColumn.Table.DBName & "]"
                             cmd.ExecuteNonQuery()
                         End Using
 
@@ -334,9 +480,31 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
+
+        ''' <summary>
+        ''' Returns True if a Column with the given name exists in the database for the Column's Table, else returns False.
+        ''' </summary>
+        ''' <param name="asTableName">The Table testing for</param>
+        ''' <param name="asColumnName">The Column testing for</param>
+        ''' <returns></returns>
+        Public Overrides Function ColumnExists(ByVal asTableName As String, ByVal asColumnName As String) As Boolean
+
+            Try
+                Return Me.getColumnsByTable(New RDS.Table(Nothing, asTableName, Nothing)).FindAll(Function(x) x.Name = asColumnName).Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Function
 
         ''' <summary>
         ''' Sets whether the specified Column is mandatory or not, in the database.
@@ -352,9 +520,19 @@ Namespace FactEngine
                 Me.GONonQuery(lsSQL)
 
                 Dim lrColumn As RDS.Column = arColumn
-                Dim lasColumnNames = From Column In lrColumn.Table.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
+                Dim lasColumnNamesFinal As New List(Of String)
+
+                Dim lasColumnNames = (From Column In arColumn.Table.Column
+                                      Select $"[{Column.DBName}]").ToList
+
+                For Each lsColumnName In lasColumnNames.ToArray
+                    If Not Me.getColumnsByTable(arColumn.Table).Select(Function(x) $"[{x.DBName}]").Contains(lsColumnName) Then
+                        lsColumnName = "NULL"
+                    End If
+                    lasColumnNamesFinal.Add(lsColumnName)
+                Next
+
+                Dim lsColumnList = String.Join(",", lasColumnNamesFinal)
 
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
                 Using tr As SQLiteTransaction = lrSQLiteConnection.BeginTransaction()
@@ -362,13 +540,13 @@ Namespace FactEngine
                     Try
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             cmd.Transaction = tr
-                            cmd.CommandText = Me.generateCREATETABLEStatement(arColumn.Table, arColumn.Table.Name & "_temp") ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
+                            cmd.CommandText = Me.generateCREATETABLEStatement(arColumn.Table, arColumn.Table.DBName & "_temp", Not arColumn.IsMandatory) ''"CREATE TEMPORARY TABLE " & arColumn.Table.Name & "_backup (" & lsColumnDefinitions & ")"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "INSERT INTO [" & arColumn.Table.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "INSERT INTO [" & arColumn.Table.DBName & "_temp] SELECT " & lsColumnList & " FROM [" & arColumn.Table.DBName & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "DROP TABLE [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "DROP TABLE [" & arColumn.Table.DBName & "]"
                             cmd.ExecuteNonQuery()
-                            cmd.CommandText = "ALTER TABLE [" & arColumn.Table.Name & "_temp] RENAME TO [" & arColumn.Table.Name & "]"
+                            cmd.CommandText = "ALTER TABLE [" & arColumn.Table.DBName & "_temp] RENAME TO [" & arColumn.Table.DBName & "]"
                             cmd.ExecuteNonQuery()
                         End Using
 
@@ -389,7 +567,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -397,6 +575,7 @@ Namespace FactEngine
         Public Overrides Sub CommitTrans()
 
             Try
+                Exit Sub '20231029-VM-Testing without.
                 If _activeTransactions.Count = 0 Then
                     Throw New InvalidOperationException("There are no active transactions to commit.")
                 End If
@@ -410,7 +589,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning,, False,, True,, True, ex)
             End Try
 
         End Sub
@@ -455,12 +634,101 @@ Namespace FactEngine
 
         End Sub
 
+        Public Overrides Function CreateTableInstance(ByVal jsonString As String, ByRef asErrorMessage As String) As Boolean
+
+            Try
+
+                ' Parse the JSON string
+                Dim jsonObject As JObject = JObject.Parse(jsonString)
+
+                ' Determine the table name and columns/values
+                Dim tableName As String = Nothing
+                Dim columns As New List(Of String)
+                Dim values As New List(Of String)
+                Dim parameters As New List(Of SQLiteParameter)
+
+                ' Assuming there's only one table name key in the JSON
+                Dim lrTable As RDS.Table = Nothing
+                For Each prop As KeyValuePair(Of String, JToken) In jsonObject
+                    tableName = "[" & prop.Key & "]"
+
+                    lrTable = Me.FBMModel.RDS.Table.Find(Function(x) x.DBName = prop.Key)
+                    If lrTable Is Nothing Then
+                        Return False
+                    End If
+
+                    Dim columnData As JObject = prop.Value
+
+                    For Each column As KeyValuePair(Of String, JToken) In columnData
+
+                        Dim lrColumn As RDS.Column = lrTable.Column.Find(Function(x) x.DBName = column.Key)
+
+                        If lrColumn IsNot Nothing Then
+                            columns.Add(column.Key)
+                            Dim lsColumnValue As String = "<Error>"
+                            Select Case lrColumn.getMetamodelDataType
+                                'Case Is = pcenumORMDataType.AutoUUID
+                                '    lsColumnValue = System.Guid.NewGuid.ToString
+                                Case Else
+                                    lsColumnValue = column.Value.ToString
+                            End Select
+                            values.Add(Me.DataTypeWrapper(lrColumn.getMetamodelDataType) & lsColumnValue & Me.DataTypeWrapper(lrColumn.getMetamodelDataType))
+                        End If
+                    Next
+                Next
+
+                ' Construct the query
+                Dim lsQuery As String = $"INSERT INTO {tableName} ({String.Join(", ", columns)}) VALUES ({String.Join(", ", values)})"
+
+                Dim lrRecordset = Me.GONonQuery(lsQuery)
+
+                If lrRecordset.ErrorReturned Then
+                    asErrorMessage = lrRecordset.ErrorString
+                End If
+
+                If lrRecordset.ErrorReturned Then
+                    If {"UNIQUE constraint failed", "NOT NULL constraint failed"}.Any(Function(substring) lrRecordset.ErrorString.Contains(substring)) Then
+                        lsQuery = $"UPDATE {tableName} SET " '({String.Join(", ", columns)}) VALUES ({String.Join(", ", values)})"                        
+                        Dim lsWhereClause = " WHERE "
+                        Dim liInd = 0
+                        For Each lrColumn In lrTable.getPrimaryKeyColumns
+                            liInd = columns.IndexOf(lrColumn.DBName)
+                            lsWhereClause.AppendLine(columns(liInd) & " = " & values(liInd))
+                            columns.RemoveAt(liInd)
+                            values.RemoveAt(liInd)
+                        Next
+                        liInd = 0
+                        For Each lsColumnName In columns
+                            If liInd > 0 Then lsQuery &= ","
+                            lsQuery.AppendLine(columns(liInd) & " = " & values(liInd))
+                            liInd += 1
+                        Next
+                        lsQuery.AppendLine(lsWhereClause)
+                        lrRecordset = Me.GONonQuery(lsQuery)
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
+
+        End Function
+
         Public Overrides Function DataTypeWrapper(ByVal aiDataType As pcenumORMDataType) As String
             Try
                 Select Case aiDataType
                     Case Is = pcenumORMDataType.TextFixedLength,
                               pcenumORMDataType.TextLargeLength,
-                              pcenumORMDataType.TextVariableLength
+                              pcenumORMDataType.TextVariableLength,
+                              pcenumORMDataType.AutoUUID
                         Return "'"
                     Case Is = pcenumORMDataType.TemporalDate,
                               pcenumORMDataType.TemporalDateAndTime
@@ -475,7 +743,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, True)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, ex.StackTrace, True, False, True)
 
                 Return ""
             End Try
@@ -484,6 +752,65 @@ Namespace FactEngine
 
         Public Overrides Function DateTimeFormat() As String
             Return "yyyy-MM-dd HH:mm:ss"
+        End Function
+
+        ''' <summary>
+        ''' Deletes a Table Instance (Row in a Table) given JSON in the format: {"Order" : {"Order_Id":123, "Customer_Id":456}}
+        ''' </summary>
+        ''' <param name="jsonString"></param>
+        Public Overrides Function DeleteTableInstance(ByVal jsonString As String) As Boolean
+
+            Try
+                ' Parse the JSON string
+                Dim jsonObject As JObject = JObject.Parse(jsonString)
+
+                ' Determine the table name and columns/values
+                Dim tableName As String = Nothing
+                Dim columns As New List(Of String)
+                Dim values As New List(Of String)
+                Dim parameters As New List(Of SQLiteParameter)
+
+                ' Parse the JSON string
+                ' Determine the table name
+                Dim lrTable As RDS.Table = Nothing
+                Dim whereConditions As New List(Of String)
+
+                For Each prop As KeyValuePair(Of String, JToken) In jsonObject
+                    tableName = "[" & prop.Key & "]"
+                    lrTable = Me.FBMModel.RDS.Table.Find(Function(x) x.DBName = prop.Key)
+                    If lrTable Is Nothing Then
+                        Return False
+                    End If
+
+                    ' Construct the WHERE clause                    
+                    Dim columnData As JObject = prop.Value
+
+                    For Each column As KeyValuePair(Of String, JToken) In columnData
+                        Dim columnName As String = column.Key
+                        Dim columnValue As String = column.Value.ToString()
+                        Dim lrColumn As RDS.Column = lrTable.Column.Find(Function(x) x.DBName = columnName)
+                        If lrColumn IsNot Nothing Then
+                            columnValue = $"{Me.DataTypeWrapper(lrColumn.getMetamodelDataType)}{columnValue}{Me.DataTypeWrapper(lrColumn.getMetamodelDataType)}"
+                            Dim condition As String = $"{columnName} = {columnValue}"
+                            whereConditions.Add(condition)
+                        End If
+                    Next
+                Next
+
+                ' Construct the query
+                Dim lsQuery As String = $"DELETE FROM {tableName} WHERE {String.Join(" AND ", whereConditions)}"
+
+                Dim lrRecordset = Me.GONonQuery(lsQuery)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
         End Function
 
         Public Overloads Function Execute(ByVal asQuery As String, Optional ByVal abIgnoreErrors As Boolean = False) As Recordset
@@ -497,7 +824,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
         End Function
 
@@ -507,9 +834,35 @@ Namespace FactEngine
 
             Try
 
-                Dim lsPattern As String = "yyyy-MM-dd"
+                'Dim lsPattern As String = "yyyy-MM-dd"
 
-                Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
+                'Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
+
+                Dim lsPattern As String = "yyyy-MM-dd"
+                Dim datePatterns() As String = {
+                            "dd/MM/yyyy",
+                            "M/d/yyyy h:mm:ss tt",
+                            "M/d/yyyy h:mm tt",
+                            "M/d/yyyy HH:mm:ss",
+                            "M/d/yyyy",
+                            "MM/dd/yyyy",
+                            "yyyy-MM-dd",
+                            "yyyy/MM/dd"
+                }
+
+                Dim parsedDate As DateTime
+
+                ' Attempt to parse the date string using the array of patterns
+                For Each pattern In datePatterns
+                    If DateTime.TryParseExact(asOriginalDate, pattern, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, parsedDate) Then
+                        Return parsedDate.ToString(lsPattern)
+                    End If
+                Next
+
+                ' If no pattern matched and error handling is not ignored
+                If Not abIgnoreError Then
+                    Throw New FormatException("Date format not recognized.")
+                End If
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -517,7 +870,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return ""
             End Try
@@ -533,7 +886,12 @@ Namespace FactEngine
 
                 Dim lsPattern As String = "yyyy-MM-dd HH:mm:ss"
 
-                Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
+                Try
+                    Return Convert.ToDateTime(asOriginalDate, System.Threading.Thread.CurrentThread.CurrentUICulture).ToString(lsPattern)
+                Catch ex As Exception
+                    Return ""
+                End Try
+
 
             Catch ex As Exception
                 Dim lsMessage As String
@@ -541,21 +899,33 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return ""
             End Try
 
         End Function
 
-        Public Overrides Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column) As String
+        Public Overrides Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column,
+                                                              Optional abIgnoreColumnISNOTNULL As Boolean = False) As String
             Try
 
                 Dim lsSQLColumnDefinition As String
                 Dim lrColumn As RDS.Column = arColumn
 
+                'CodeSafe
+#Region "Code Safe: Mandatory Role Constraint"
+                If Not (arColumn.IsMandatory = arColumn.Role.Mandatory) Then
+                    'Default to the Column
+                    If Not arColumn.Table.FBMModelElement Is arColumn.Role.FactType Then
+                        arColumn.Role.Mandatory = arColumn.IsMandatory
+                        arColumn.Role.makeDirty()
+                    End If
+                End If
+#End Region
 
-                lsSQLColumnDefinition = arColumn.Name
+
+                lsSQLColumnDefinition = $"[{arColumn.DBName}]"
 
                 If arColumn.ActiveRole.FactType.RoleGroup.Count = 1 Then
                     lsSQLColumnDefinition &= " INTEGER"
@@ -574,10 +944,10 @@ Namespace FactEngine
                     Dim larOutgoingRelation = arColumn.Relation.FindAll(Function(x) x.OriginTable Is lrColumn.Table)
                     If larOutgoingRelation.Count > 0 Then
                         If larOutgoingRelation(0).OriginColumns.Count = 1 Then
-                            lsSQLColumnDefinition &= " REFERENCES [" & larOutgoingRelation(0).DestinationTable.Name & "]"
+                            lsSQLColumnDefinition &= " REFERENCES [" & larOutgoingRelation(0).DestinationTable.DBName & "]"
                         End If
-                        If arColumn.Role.Mandatory Then lsSQLColumnDefinition &= " NOT NULL"
-                    ElseIf arColumn.Role.Mandatory Then
+                        If arColumn.Role.Mandatory And Not abIgnoreColumnISNOTNULL Then lsSQLColumnDefinition &= " NOT NULL"
+                    ElseIf arColumn.Role.Mandatory And Not abIgnoreColumnISNOTNULL Then
                         lsSQLColumnDefinition &= " NOT NULL"
                     End If
 
@@ -591,7 +961,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -605,13 +975,14 @@ Namespace FactEngine
         ''' <param name="asTableName">Optional table name for the table in the CREATE statement.</param>
         ''' <returns></returns>
         Public Overrides Function generateCREATETABLEStatement(ByRef arTable As RDS.Table,
-                                                                  Optional asTableName As String = Nothing) As String
+                                                               Optional asTableName As String = Nothing,
+                                                               Optional abIgnoreColumnISNOTNULL As Boolean = False) As String
 
             Try
                 Dim lsSQLCommand As String = ""
 
                 If asTableName Is Nothing Then
-                    lsSQLCommand = "CREATE TABLE [" & arTable.Name & "]"
+                    lsSQLCommand = "CREATE TABLE [" & arTable.DBName & "]"
                 Else
                     lsSQLCommand = "CREATE TABLE [" & asTableName & "]"
                 End If
@@ -620,7 +991,7 @@ Namespace FactEngine
                 Dim liInd = 0
                 For Each lrColumn In arTable.Column
                     If liInd > 0 Then lsSQLCommand &= ","
-                    lsSQLCommand &= Me.generateSQLColumnDefinition(lrColumn) & vbCrLf
+                    lsSQLCommand &= Me.generateSQLColumnDefinition(lrColumn, abIgnoreColumnISNOTNULL) & vbCrLf
                     liInd += 1
                 Next
                 'Primary Key
@@ -629,7 +1000,7 @@ Namespace FactEngine
                     liInd = 0
                     For Each lrColumn In arTable.getPrimaryKeyColumns
                         If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= "[" & lrColumn.Name & "]"
+                        lsSQLCommand &= "[" & lrColumn.DBName & "]"
                         liInd += 1
                     Next
                     lsSQLCommand &= ")"
@@ -654,23 +1025,41 @@ Namespace FactEngine
                 End If
                 'Foreign Keys
                 For Each lrRelation In arTable.getOutgoingRelations '.FindAll(Function(x) x.OriginColumns.Count > 1)
+
+                    'CodeSafe: Make sure OriginColumns count = DestinationColumns count
+#Region "CodeSafe"
+                    If lrRelation.OriginColumns.Count <> lrRelation.DestinationColumns.Count Then
+                        Call lrRelation.Model.Model.FixErrors(New List(Of pcenumModelFixType) From {pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount},
+                                                              lrRelation)
+                    End If
+#End Region
+
                     lsSQLCommand &= ", FOREIGN KEY ("
                     liInd = 0
                     For Each lrColumn In lrRelation.OriginColumns
                         If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= "[" & lrColumn.Name & "]"
+                        lsSQLCommand &= "[" & lrColumn.DBName & "]"
                         liInd += 1
                     Next
-                    lsSQLCommand &= ") REFERENCES [" & lrRelation.DestinationTable.Name & "] ("
+                    lsSQLCommand &= ") REFERENCES [" & lrRelation.DestinationTable.DBName & "] ("
                     liInd = 0
                     For Each lrColumn In lrRelation.OriginColumns
                         If liInd > 0 Then lsSQLCommand &= ","
-                        lsSQLCommand &= "[" & lrColumn.getReferencedColumn.Name & "]"
+                        lsSQLCommand &= "[" & lrColumn.getReferencedColumn.DBName & "]"
                         liInd += 1
                     Next
+
+                    'Graph Label for Relational Knowledge Graph/Graph Database procesing/queries
+                    Dim lsGraphLabel = ""
+                    Try
+                        lsGraphLabel = lrRelation.ResponsibleFactType.PropertyGraphLabel
+                    Catch ex As Exception
+                        'No loss
+                    End Try
+
                     lsSQLCommand &= ")"
                     lsSQLCommand &= " ON DELETE CASCADE ON UPDATE CASCADE"
-                    lsSQLCommand &= " /* { Label:""" & lrRelation.ResponsibleFactType.DBName & """} */" & vbCrLf
+                    lsSQLCommand &= " /* { Label:""" & lsGraphLabel & """} */" & vbCrLf
                     lsSQLCommand &= vbCrLf
                 Next
                 lsSQLCommand &= ")"
@@ -682,7 +1071,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return ""
             End Try
@@ -784,7 +1173,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & arTable.Name & ":" & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message & ex.StackTrace
-                'prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                'prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 'Return New List(Of RDS.Relation)
                 Throw New Exception(lsMessage)
@@ -828,14 +1217,14 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Column)
             End Try
 
         End Function
 
-        Public Overrides Sub getDatabaseTypes()
+        Public Overrides Sub getDatabaseDataTypes()
 
             Try
                 Dim lsPath = Boston.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
@@ -850,10 +1239,29 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
+
+        Public Overrides Function GetDatabaseName(connectionString As String) As String
+            ' Split the connection string to find the "Data Source" part
+            Dim parts As String() = connectionString.Split(";"c)
+
+            For Each part As String In parts
+                If part.Trim().StartsWith("Data Source=", StringComparison.OrdinalIgnoreCase) Then
+                    ' Extract the database file path
+                    Dim dataSource As String = part.Substring(12).Trim()
+                    ' Get the file name without the path and extension
+                    Dim dbName As String = System.IO.Path.GetFileNameWithoutExtension(dataSource)
+                    Return dbName
+                End If
+            Next
+
+            ' If no "Data Source" is found, return an empty string or handle it accordingly
+            Return String.Empty
+
+        End Function
 
         Public Overrides Function getBostonDataTypeByDatabaseDataType(ByVal asDatabaseDataType As String) As pcenumORMDataType
 
@@ -882,7 +1290,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return pcenumORMDataType.TextVariableLength
             End Try
@@ -995,7 +1403,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Index)
             End Try
@@ -1078,10 +1486,60 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Index)
             End Try
+        End Function
+
+        Public Overrides Function GetNodeDetails(ByVal asTableName As String, ByVal aasIdentiferList As List(Of String), ByVal abUseUniqueIndex As Boolean) As List(Of KeyValuePair)
+
+            Dim larKeyValuePair As New List(Of KeyValuePair)
+
+            Try
+                Dim lsSQLQuery As String = ""
+
+                If abUseUniqueIndex Then
+
+                    lsSQLQuery = "SELECT *"
+                    lsSQLQuery.AppendLine("FROM " & asTableName)
+                    lsSQLQuery.AppendLine("WHERE ")
+
+                    Dim lrIndex As RDS.Index = Me.getIndexesByTable(New RDS.Table(Nothing, asTableName, Nothing)).Find(Function(x) x.Unique)
+
+                    Dim liInd = 0
+                    For Each lrColumn In lrIndex.Column
+                        If liInd > 0 Then lsSQLQuery &= vbCrLf & "AND "
+                        lsSQLQuery.AppendString(lrColumn.Name & aasIdentiferList(liInd))
+                        liInd += 1
+                    Next
+
+                    Dim lrRecordset As ORMQL.Recordset
+
+                    lrRecordset = Me.GO(lsSQLQuery)
+
+                    For Each lsColumnName In lrRecordset.ColumnNames
+                        Dim lrKeyValuePair As New KeyValuePair(lsColumnName, lrRecordset(lsColumnName).Data)
+                        larKeyValuePair.Add(lrKeyValuePair)
+                    Next
+
+                Else
+                    'Use PrimaryKey
+                End If
+
+                Return larKeyValuePair
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return New List(Of KeyValuePair)
+            End Try
+
         End Function
 
         Public Overrides Function getRelationsByTable(ByRef arTable As RDS.Table) As List(Of RDS.Relation)
@@ -1096,9 +1554,29 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Relation)
+            End Try
+
+        End Function
+
+        Public Overrides Function getTableRowCount(ByRef arTable As RDS.Table) As Integer
+
+            Try
+                Dim lsSQLQuery As String = "SELECT COUNT(*) AS RowCount FROM " & arTable.DatabaseName
+
+                Dim lrRecordset = Me.GO(lsSQLQuery)
+
+                Return lrRecordset("RowCount").Data
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Function
@@ -1139,7 +1617,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Table)
             End Try
@@ -1153,12 +1631,30 @@ Namespace FactEngine
             Dim lrRecordset As New ORMQL.Recordset
 
             Try
+                'CodeSafe: ExecuteNonQuery if not a SELECT statement.
+                Dim firstWord As String = asQuery.Trim().Split(" "c)(0).ToUpper()
+
+                Select Case firstWord
+                    Case "SELECT"
+                        'Nothing to do here
+                    Case "INSERT", "UPDATE", "DELETE", "CREATE", "DROP", "ALTER", "PRAGMA"
+                        Call Me.GONonQuery(asQuery)
+                    Case "BEGIN", "COMMIT", "ROLLBACK"
+                        Call Me.GONonQuery(asQuery)
+                    Case Else
+                        'Handle unknown or unsupported commands
+                End Select
+
+
                 lrRecordset.Query = asQuery
 
                 '==========================================================
                 'Populate the lrRecordset with results from the database
                 'Boston.WriteToStatusBar("Connecting To database.", True)
                 Dim lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+
+                lrSQLiteConnection.EnableExtensions(True)
+                lrSQLiteConnection.LoadExtension("SQLite.Interop.dll", "sqlite3_fts5_init") ' "sqlite3_json_init")
 
                 If lrSQLiteConnection Is Nothing Then
                     Throw New Exception("SQLite Adaptor: Could not create SQLite database connection to execute the query.")
@@ -1187,7 +1683,7 @@ Namespace FactEngine
                     lsColumnName = lrFactType.CreateUniqueRoleName(lrSQLiteDataReader.GetName(liFieldInd), 0)
                     Dim lrRole = New FBM.Role(lrFactType, lsColumnName, True, Nothing)
                     lrFactType.RoleGroup.AddUnique(lrRole)
-                    lrRecordset.Columns.Add(lsColumnName)
+                    lrRecordset.ColumnNames.Add(lsColumnName)
                 Next
 
                 While lrSQLiteDataReader.Read()
@@ -1244,9 +1740,12 @@ Namespace FactEngine
                 lrRecordset.Facts = larFact
                 lrRecordset.Reset()
 
-                If Me.Connection Is Nothing Then
-                    lrSQLiteConnection.Close()
-                End If
+
+                'If Me.Connection Is Nothing Then 'Was screwing up saving/committing to the db file
+                lrSQLiteConnection.Close()
+                'End If
+
+
 
                 'Run the SQL against the database
                 Return lrRecordset
@@ -1260,44 +1759,140 @@ Namespace FactEngine
         Public Overrides Function GONonQuery(ByVal asSQLQuery As String) As Recordset Implements iDatabaseConnection.GONonQuery
 
             Dim result As Integer = -1
-
             Dim lrRecordset As New ORMQL.Recordset
+
+            Dim lrSQLiteConnection As Data.SQLite.SQLiteConnection = Nothing
+            Dim transaction As System.Data.SQLite.SQLiteTransaction = Nothing
 
             Try
                 lrRecordset.Query = asSQLQuery
 
-                Dim lrSQLiteConnection As Data.SQLite.SQLiteConnection = Me.Connection
+                lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
 
-                If Me.Connection Is Nothing Then
-                    lrSQLiteConnection = Database.CreateConnection(Me.DatabaseConnectionString)
+                If lrSQLiteConnection.State <> ConnectionState.Open Then
+                    lrSQLiteConnection.Open()
                 End If
 
                 If lrSQLiteConnection Is Nothing Then
                     Throw New Exception("SQLite Adaptor: Could not create SQLite database connection to execute the query.")
                 End If
 
+                Dim liIterationSequenceNr = 1
 
-                Using cmd As New System.Data.SQLite.SQLiteCommand(lrSQLiteConnection)
-                    cmd.CommandText = asSQLQuery
+                ' Enable foreign key constraints
+                Using pragmaCommand As SQLiteCommand = New System.Data.SQLite.SQLiteCommand(lrSQLiteConnection)
+                    pragmaCommand.CommandText = "PRAGMA foreign_keys = ON;"
+                    pragmaCommand.ExecuteNonQuery()
+                End Using
+
+
+ExecuteTheQuery:
+                Using cmd As SQLiteCommand = New System.Data.SQLite.SQLiteCommand(lrSQLiteConnection)
+                    ' Set PRAGMA foreign_keys = ON within the transaction
+                    cmd.CommandText = asSQLQuery '20231202-VM-Was "PRAGMA foreign_keys = ON;" & asSQLQuery
                     cmd.Prepare()
 
                     Try
                         result = cmd.ExecuteNonQuery()
                     Catch SQLiteException As System.Data.SQLite.SQLiteException
-                        Throw New Exception(SQLiteException.Message)
+#Region "SQLite Exception"
+                        If SQLiteException.Message.Contains("FOREIGN KEY constraint failed") Then
+                            'Not using Transactions with SQLite because will have the _Connection always open, which stops subsequent writes,
+                            '  and too difficult, at this stage, to rewrite Boston to maintain Transaction state.
+                            Try
+                                Using pragmaCommand As SQLiteCommand = New System.Data.SQLite.SQLiteCommand(lrSQLiteConnection)
+                                    pragmaCommand.CommandText = "PRAGMA foreign_keys = OFF;"
+                                    pragmaCommand.ExecuteNonQuery()
+                                End Using
+
+                                GoTo ExecuteTheQuery
+                            Catch SQLiteException2 As System.Data.SQLite.SQLiteException
+                                Throw New Exception(SQLiteException2.Message)
+                            End Try
+                        Else
+                            Throw New Exception(SQLiteException.Message)
+                        End If
+#End Region
                     End Try
                 End Using
 
-                If Me.Connection Is Nothing Then
-                    lrSQLiteConnection.Close()
-                End If
+                Using pragmaCommand As SQLiteCommand = New System.Data.SQLite.SQLiteCommand(lrSQLiteConnection)
+                    pragmaCommand.CommandText = "PRAGMA foreign_keys = ON;"
+                    pragmaCommand.ExecuteNonQuery()
+
+#Region "Integrity Check"
+                    Dim lsFKIntegrityResultFail As String = ""
+                    Using command As New SQLiteCommand("PRAGMA foreign_key_check;", lrSQLiteConnection)
+                        Using reader As SQLiteDataReader = command.ExecuteReader()
+                            If Not reader.HasRows Then
+                                lsFKIntegrityResultFail = "No foreign key violations found."
+                            Else
+                                '20250214-Was returning rows unrelated to query.
+                                'While reader.Read()
+                                '    lsFKIntegrityResultFail &= $"Table: {reader.GetString(0)}, Row ID: {reader.GetInt64(1)}, Parent Table: {reader.GetString(2)}, Foreign Key Index: {reader.GetInt32(3)}" & vbNewLine
+                                'End While
+
+                                'Throw New Exception(lsFKIntegrityResultFail)
+                            End If
+                        End Using
+                    End Using
+                    ' Verify that foreign keys are enabled
+                    pragmaCommand.CommandText = "PRAGMA foreign_keys;"
+                    Dim loPragmaResult As Object = pragmaCommand.ExecuteScalar()
+
+                    If loPragmaResult = 0 Then
+#Region "Foreign Keys not turned on"
+                        pragmaCommand.CommandText = "PRAGMA integrity_check;"
+                        loPragmaResult = pragmaCommand.ExecuteScalar()
+
+                        If loPragmaResult <> "ok" Then
+                            Throw New Exception(loPragmaResult)
+                        End If
+
+                        'pragmaCommand.CommandText = "PRAGMA foreign_key_list('Booking');"
+                        'loPragmaResult = pragmaCommand.ExecuteScalar()
+                        Using command As New SQLiteCommand("PRAGMA foreign_key_check;", lrSQLiteConnection)
+                            Using reader As SQLiteDataReader = command.ExecuteReader()
+                                If Not reader.HasRows Then
+                                    lsFKIntegrityResultFail = "No foreign key violations found."
+                                Else
+                                    While reader.Read()
+                                        lsFKIntegrityResultFail &= $"Table: {reader.GetString(0)}, Row ID: {reader.GetInt64(1)}, Parent Table: {reader.GetString(2)}, Foreign Key Index: {reader.GetInt32(3)}" & vbNewLine
+                                    End While
+                                End If
+                            End Using
+                        End Using
+#End Region
+                        Throw New Exception("Failed to enable foreign key constraints.".AppendDoubleLineBreak(lsFKIntegrityResultFail))
+                    End If
+#End Region
+                End Using
+
 
                 Return lrRecordset
 
             Catch ex As Exception
+                ' Roll back the transaction if an exception occurs
+                If transaction IsNot Nothing Then
+                    transaction.Rollback()
+                End If
+
                 lrRecordset.ErrorString = ex.Message
+
+                If My.Settings.DebugMode = "Debug" Then
+                    Call prApplication.ThrowMessage(ex.Message.AppendDoubleLineBreak(asSQLQuery), pcenumErrorType.Critical, ex.StackTrace, False, False, True, , True, ex, False)
+                    Call Me.RollbackTrans()
+                End If
+
                 Return lrRecordset
+
+            Finally
+                ' Close the connection
+                If lrSQLiteConnection IsNot Nothing Then
+                    lrSQLiteConnection.Close()
+                End If
             End Try
+
 
         End Function
 
@@ -1339,6 +1934,10 @@ Namespace FactEngine
                             For Each lrIndex In larIndexWithNullableColumn
                                 Dim lsSQLCommand As String = ""
 
+                                Dim larMandatoryColumn = lrIndex.Column.FindAll(Function(x) x.IsMandatory)
+                                'CodeSafe
+                                If larMandatoryColumn.Count = 0 Then GoTo NextIndexWithNullableColum
+
                                 cmd.CommandText = "DROP INDEX uc_" & arIndex.Table.Name & "special" & liInd.ToString
                                 Try
                                     cmd.ExecuteNonQuery()
@@ -1356,7 +1955,7 @@ Namespace FactEngine
                                 lsSQLCommand &= ")" & vbCrLf
                                 liInd2 = 0
                                 lsSQLCommand &= " WHERE "
-                                For Each lrColumn In lrIndex.Column.FindAll(Function(x) Not x.IsMandatory)
+                                For Each lrColumn In larMandatoryColumn
                                     If liInd2 > 0 Then
                                         lsSQLCommand &= ", "
                                     End If
@@ -1367,6 +1966,7 @@ Namespace FactEngine
                                 cmd.CommandText = lsSQLCommand
                                 cmd.ExecuteNonQuery()
                                 liInd += 1
+NextIndexWithNullableColum:
                             Next
 #End Region
 
@@ -1395,7 +1995,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1450,7 +2050,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1478,8 +2078,8 @@ Namespace FactEngine
                     Throw New Exception("Could not connect to the database. Check the Model Configuration's Connection String.")
                 End Try
 
-                Me.Connection.EnableExtensions(True)
-                Me.Connection.LoadExtension("SQLite.Interop.dll", "sqlite3_json_init")
+                'Me.Connection.EnableExtensions(True)
+                'Me.Connection.LoadExtension("SQLite.Interop.dll", "sqlite3_fts5_init") ' "sqlite3_json_init")
 
                 Return True
 
@@ -1489,7 +2089,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -1626,9 +2226,21 @@ Namespace FactEngine
 
                 Dim lsSQL As String
 
-                Dim lasColumnNames = From Column In arTable.Column
-                                     Select Column.Name
-                Dim lsColumnList = String.Join(",", lasColumnNames)
+                'CodeSafe
+                arTable.Column = arTable.Column.OrderBy(Function(x) x.OrdinalPosition).ToList
+
+                Dim lasColumnNames = (From Column In arTable.Column
+                                      Select $"[{Column.DBName}]").ToList
+
+                Dim lasColumnNamesFinal As New List(Of String)
+                For Each lsColumnName In lasColumnNames.ToArray
+                    If Not Me.getColumnsByTable(arTable).Select(Function(x) $"[{x.DBName}]").Contains(lsColumnName) Then
+                        lsColumnName = "NULL"
+                    End If
+                    lasColumnNamesFinal.Add(lsColumnName)
+                Next
+
+                Dim lsColumnList = String.Join(",", lasColumnNamesFinal)
 
                 lsSQL = "PRAGMA foreign_keys=OFF"
                 Me.GONonQuery(lsSQL)
@@ -1641,16 +2253,19 @@ Namespace FactEngine
                         Using cmd As SQLiteCommand = lrSQLiteConnection.CreateCommand()
                             Try
                                 cmd.Transaction = tr
-                                cmd.CommandText = Me.generateCREATETABLEStatement(arTable, arTable.Name & "_temp")
+                                cmd.CommandText = "DROP TABLE IF EXISTS [" & arTable.DBName & "_temp]" 'Temp Table. Drop.
                                 cmd.ExecuteNonQuery()
-                                cmd.CommandText = "INSERT INTO [" & arTable.Name & "_temp] SELECT " & lsColumnList & " FROM [" & arTable.Name & "]"
+                                cmd.CommandText = Me.generateCREATETABLEStatement(arTable, arTable.DBName & "_temp")
                                 cmd.ExecuteNonQuery()
-                                cmd.CommandText = "DROP TABLE [" & arTable.Name & "]"
+                                cmd.CommandText = $"INSERT INTO [{arTable.DBName}_temp] SELECT {lsColumnList} FROM [{arTable.DBName}]"
                                 cmd.ExecuteNonQuery()
-                                cmd.CommandText = "ALTER TABLE [" & arTable.Name & "_temp] RENAME TO [" & arTable.Name & "]"
+                                cmd.CommandText = "DROP TABLE [" & arTable.DBName & "]"
+                                cmd.ExecuteNonQuery()
+                                cmd.CommandText = "ALTER TABLE [" & arTable.DBName & "_temp] RENAME TO [" & arTable.DBName & "]"
                                 cmd.ExecuteNonQuery()
                             Catch ex As Exception
-                                cmd.CommandText = Me.generateCREATETABLEStatement(arTable, arTable.Name)
+                                Boston.ShowFlashCard(ex.Message, Color.Salmon, 4000)
+                                cmd.CommandText = Me.generateCREATETABLEStatement(arTable, arTable.DBName)
                                 cmd.ExecuteNonQuery()
                             End Try
 
@@ -1673,8 +2288,17 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
+        End Sub
+
+        ''' <summary>
+        ''' Register a custom function with database
+        ''' </summary>
+        Public Overrides Sub RegisterCustomFunctions()
+
+            ' Register the custom function using the provided delegate
+            SQLiteFunction.RegisterFunction(GetType(VectorDB.HammingDistanceFunction))
         End Sub
 
         ''' <summary>
@@ -1727,7 +2351,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -1748,7 +2372,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1772,7 +2396,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1796,7 +2420,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1819,7 +2443,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub
@@ -1850,7 +2474,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -1885,13 +2509,94 @@ Namespace FactEngine
                 liInd += 1
             Next
 
-            Dim lrRecordset = Me.GO(lsSQLQuery)
+            Dim lrRecordset = Me.GONonQuery(lsSQLQuery)
 
             Return lrRecordset
 
         End Function
 
+        Public Overrides Function UpdateTableInstance(ByVal jsonString As String) As Boolean
+
+            Try
+
+                ' Parse the JSON string
+                Dim jsonObject As JObject = JObject.Parse(jsonString)
+
+                ' Determine the table name and columns/values
+                Dim tableName As String = Nothing
+                Dim columns As New List(Of String)
+                Dim values As New List(Of String)
+                Dim parameters As New List(Of SQLiteParameter)
+
+                ' Assuming there's only one table name key in the JSON
+                Dim lrTable As RDS.Table = Nothing
+                For Each prop As KeyValuePair(Of String, JToken) In jsonObject
+                    tableName = "[" & prop.Key & "]"
+
+                    lrTable = Me.FBMModel.RDS.Table.Find(Function(x) x.DBName = prop.Key)
+                    If lrTable Is Nothing Then
+                        Return False
+                    End If
+
+                    Dim columnData As JObject = prop.Value
+
+                    For Each column As KeyValuePair(Of String, JToken) In columnData
+
+                        Dim lrColumn As RDS.Column = lrTable.Column.Find(Function(x) x.DBName = column.Key)
+
+                        If lrColumn IsNot Nothing Then
+                            columns.Add(column.Key)
+                            Dim lsColumnValue As String = "<Error>"
+                            Select Case lrColumn.getMetamodelDataType
+                                'Case Is = pcenumORMDataType.AutoUUID
+                                '    lsColumnValue = System.Guid.NewGuid.ToString
+                                Case Else
+                                    lsColumnValue = column.Value.ToString
+                            End Select
+                            values.Add(Me.DataTypeWrapper(lrColumn.getMetamodelDataType) & lsColumnValue & Me.DataTypeWrapper(lrColumn.getMetamodelDataType))
+                        End If
+                    Next
+                Next
+
+                Dim lsQuery As String
+
+                lsQuery = $"UPDATE {tableName} SET " '({String.Join(", ", columns)}) VALUES ({String.Join(", ", values)})"                        
+                Dim lsWhereClause = " WHERE "
+                Dim liInd = 0
+                For Each lrColumn In lrTable.getPrimaryKeyColumns
+                    liInd = columns.IndexOf(lrColumn.DBName)
+                    lsWhereClause.AppendLine(columns(liInd) & " = " & values(liInd))
+                    columns.RemoveAt(liInd)
+                    values.RemoveAt(liInd)
+                Next
+                liInd = 0
+                For Each lsColumnName In columns
+                    If liInd > 0 Then lsQuery &= ","
+                    lsQuery.AppendLine(columns(liInd) & " = " & values(liInd))
+                    liInd += 1
+                Next
+                lsQuery.AppendLine(lsWhereClause)
+                Dim lrRecordset = Me.GONonQuery(lsQuery)
+
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+            End Try
+
+        End Function
+
         Private Function iDatabaseConnection_GOAsync(asQuery As String) As Task(Of Recordset) Implements iDatabaseConnection.GOAsync
+            Throw New NotImplementedException()
+        End Function
+
+        Private Function iDatabaseConnection_GOAbstractionLayer(asQuery As String) As Recordset Implements iDatabaseConnection.GOAbstractionLayer
             Throw New NotImplementedException()
         End Function
     End Class

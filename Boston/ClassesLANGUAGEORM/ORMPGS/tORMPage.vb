@@ -5,6 +5,45 @@ Namespace FBM
 
     Partial Public Class Page
 
+        Public Sub addCMMLPGSNodeTypeToPage(ByRef arPGSNode As PGS.Node, ByRef arPage As FBM.Page)
+
+            Try
+                Dim lsSQLQuery As String
+
+                lsSQLQuery = " SELECT *"
+                lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                lsSQLQuery &= " WHERE Element = '" & arPGSNode.Name & "'"
+
+                Dim lrORMRecordset = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                If Not lrORMRecordset.eof Then
+
+                    lsSQLQuery = " SELECT *"
+                    lsSQLQuery &= "  FROM " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                    lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+                    lsSQLQuery &= " WHERE Element = '" & arPGSNode.Name & "'"
+
+                    Dim lrORMRecordset1 = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
+
+                    If lrORMRecordset1.EOF Then
+
+                        lsSQLQuery = "ADD FACT '" & lrORMRecordset.CurrentFact.Id & "'"
+                        lsSQLQuery &= " TO " & pcenumCMMLRelations.CoreElementHasElementType.ToString
+                        lsSQLQuery &= " ON PAGE '" & Me.Name & "'"
+
+                    End If
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
         Public Function CreateEntityRelationshipDiagramFromPropertyGraphSchema(ByRef aoBackgroundWorker As BackgroundWorker) As FBM.Page
 
             Try
@@ -123,7 +162,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -252,7 +291,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -404,7 +443,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -551,7 +590,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -579,7 +618,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -628,7 +667,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return lrERDEntity
             End Try
@@ -670,16 +709,23 @@ Namespace FBM
                 lrFactInstance = Me.Model.ORMQL.ProcessORMQLStatement(lsSQLQuery)
 
                 lrNode = lrFactInstance.GetFactDataInstanceByRoleName(pcenumCMML.Element.ToString).ClonePGSNodeType(Me)
-DisplayAnyway:
+
+                If abDisplayAnyway Then GoTo DisplayAnyway
+
+                Return lrNode  '2025-03-28-VM- Displaying too many links for PGS Relationship Node
                 '===================================================================================================================
+DisplayAnyway:
                 lrNode.RDSTable = arTable 'IMPORTANT: Leave this at this point in the code.
-                Call Me.DropExistingPGSNodeAtPoint(lrNode, aoPointF)
+
+                '20251102-VM-Removed and all seemed fine without it. Phantom links otherwise. See below also commented out.
+                'Call Me.DropExistingPGSNodeAtPoint(lrNode, aoPointF)
 
                 If lrNode.RDSTable.isPGSRelation And lrNode.RDSTable.Arity < 3 Then
                     'Need to load the relation for the joined Nodes, not the PGSRelation.
                     'E.g. If 'Person likes Person WITH Rating'...then need to load that relation
 
-                    Call Me.loadRelationsForPGSNode(lrNode, False)
+                    '20251102-VM-Removed and all seemed fine without it. Phantom links otherwise. See above.
+                    'Call Me.loadRelationsForPGSNode(lrNode, False)
 
                     Dim lrFactType As FBM.FactType = lrNode.RDSTable.FBMModelElement
 
@@ -687,6 +733,15 @@ DisplayAnyway:
 
                     Dim lrRDSRelation = Me.Model.RDS.Relation.Find(Function(x) x.OriginTable.Name = lrNode.Name And
                                                                                larDestinationModelObjects.Select(Function(y) y.Id).ToList.Contains(x.DestinationTable.Name))
+
+                    'CodeSafe - Create the RDS.Relation in certain circumstances. E.g. When the Node is for a FactType and the FactType is of the tight type. E.g. When is a RDS.Relation.
+                    If lrRDSRelation Is Nothing And TypeOf lrNode.FBMModelElement Is FBM.FactType Then
+                        Dim lrRelationFactType = CType(lrNode.FBMModelElement, FBM.FactType)
+                        If lrRelationFactType.IsCandidatePGSRelationshipNode Then
+                            lrRDSRelation = lrRelationFactType.ConvertToRDSRelation
+                            Me.Model.RDS.addRelation(lrRDSRelation)
+                        End If
+                    End If
 
                     Dim lbAllFound As Boolean = True
                     For Each lrModelObject In larDestinationModelObjects
@@ -698,13 +753,19 @@ DisplayAnyway:
                     If lbAllFound Then
                         If lrNode.RDSTable.isPGSRelation Then
                             Call Me.DisplayPGSRelationNodeLink(lrNode, lrRDSRelation)
-                            lrNode.Shape.Visible = False
-                            For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
-                                lrEdge.Visible = False
-                            Next
+                            If lrNode.Shape IsNot Nothing Then
+                                lrNode.Shape.Visible = False
+                                For Each lrEdge As MindFusion.Diagramming.DiagramLink In lrNode.Shape.OutgoingLinks
+                                    lrEdge.Visible = False
+                                Next
+                            End If
                         End If
                     End If
                 Else
+                    lrNode.X = aoPointF.X
+                    lrNode.Y = aoPointF.Y
+                    Call lrNode.DisplayAndAssociate()
+                    Me.ERDiagram.Entity.AddUnique(lrNode)
                     Call Me.loadRelationsForPGSNode(lrNode, False)
                     Call Me.loadPropertyRelationsForPGSNode(lrNode, False)
                 End If
@@ -719,7 +780,7 @@ DisplayAnyway:
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try

@@ -4,6 +4,7 @@ Namespace UML
     Public Class ProcessProcessRelation
         Inherits FBM.FactInstance
         Implements FBM.iPageObject
+        Implements IEquatable(Of UML.ProcessProcessRelation)
 
         Public UMLModel As UML.Model
 
@@ -41,6 +42,10 @@ Namespace UML
 
         End Sub
 
+        Public Shadows Function Equals(other As ProcessProcessRelation) As Boolean Implements IEquatable(Of ProcessProcessRelation).Equals
+            Return (Me.Process1.Id = other.Process1.Id) And (Me.Process2.Id = other.Process2.Id)
+        End Function
+
         Public Shadows Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
                                                   Optional ByVal abCheckForErrors As Boolean = True,
                                                   Optional ByVal abDoDatabaseProcessing As Boolean = True,
@@ -57,7 +62,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -74,7 +79,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -95,7 +100,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -111,7 +116,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

@@ -84,9 +84,9 @@
         Public Function getAndOr(Optional abDefault As String = Nothing) As String
 
             If Me._KEYWDAND IsNot Nothing Then
-                Return "AND"
+                Return " AND "
             ElseIf Me._KEYWDOR IsNot Nothing Then
-                Return "OR"
+                Return " OR "
             Else
                 'CodeSafe
                 Return abDefault
@@ -243,6 +243,16 @@
             End Get
             Set(value As RECURSIVECLAUSE)
                 Me._RECURSIVECLAUSE = value
+            End Set
+        End Property
+
+        Private _SHORTESTPATHCLAUSE As SHORTESTPATHCLAUSE = Nothing
+        Public Property SHORTESTPATHCLAUSE As SHORTESTPATHCLAUSE
+            Get
+                Return Me._SHORTESTPATHCLAUSE
+            End Get
+            Set(value As SHORTESTPATHCLAUSE)
+                Me._SHORTESTPATHCLAUSE = value
             End Set
         End Property
 

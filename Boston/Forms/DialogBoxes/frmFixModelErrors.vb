@@ -39,9 +39,9 @@ Public Class frmFixModelErrors
                                                                   "Remove FactTypeInstances From Page Where FactTypeIntance Has RoleInstance That JoinsNothing.",
                                                                   pcenumModelFixType.RemoveFactTypeInstancesFromPageWhereFactTypeIntanceHasRoleInstanceThatJoinsNothing))
 
-            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RelationsInvalidActiveRoleOnOriginColumns,
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsInvalidActiveRoleOnOriginColumns,
                                                                   "RDS Relations. Invalid ActiveRole On OriginColumns.",
-                                                                  pcenumModelFixType.RelationsInvalidActiveRoleOnOriginColumns))
+                                                                  pcenumModelFixType.RDSRelationsInvalidActiveRoleOnOriginColumns))
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.ColumnsWhereActiveRoleIsNothingTryAndFix,
                                                                   "RDS Columns Where ActiveRole Is Nothing. TryAndFix.",
@@ -59,6 +59,10 @@ Public Class frmFixModelErrors
                                                                   "RDS Column. Ordinal Positions. Reset Where Out Of Synchronous Order.",
                                                                   pcenumModelFixType.ColumnOrdinalPositionsResetWhereOutOfSynchronousOrder))
 
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory,
+                                                                  "RDS Columns That Should Be Mandatory. Make Mandatory.",
+                                                                  pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory))
+
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesWithMissingBooleanColumns,
                                                                   "RDS Tables With Missing Boolean Columns.",
                                                                   pcenumModelFixType.RDSTablesWithMissingBooleanColumns))
@@ -67,9 +71,9 @@ Public Class frmFixModelErrors
                                                                   "RDS Tables With No Columns. Remove Those Tables.",
                                                                   pcenumModelFixType.RDSTablesWithNoColumnsRemoveThoseTables))
 
-            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory,
-                                                                  "RDS Columns That Should Be Mandatory. Make Mandatory.",
-                                                                  pcenumModelFixType.RDSColumnsThatShouldBeMandatoryMakeMandatory))
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesWithSimpleReferenceSchemeAndMultiplePrimaryKeyColumns,
+                                                                  "RDS Tables with Simple Reference Scheme but multiple Primary Key Columns.",
+                                                                  pcenumModelFixType.RDSTablesWithSimpleReferenceSchemeAndMultiplePrimaryKeyColumns))
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSTablesWhereColumnAppearsTwiceForSameFactType,
                                                                   "RDS Tables Where The Same Column Appears Twice For The Same Fact Type, Role, and Active Role. FixThat.",
@@ -91,6 +95,10 @@ Public Class frmFixModelErrors
                                                                   "RDS Relations That Have No Origin Columns. Remove Relation.",
                                                                   pcenumModelFixType.RDSRelationsThatHaveNoOriginColumnsRemoveRelation))
 
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsThatHaveWrongResponsibleFactType,
+                                                                  "RDS Relations That Have Wrong ResponsibleFactType.",
+                                                                  pcenumModelFixType.RDSRelationsThatHaveWrongResponsibleFactType))
+
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa,
                                                                   "RDS Relations that have an origin table but no destination table, and vice versa. Remove from Model.",
                                                                   pcenumModelFixType.RDSRelationsThatHaveOriginTableButNoDestinationTableAndViceVersa))
@@ -98,6 +106,14 @@ Public Class frmFixModelErrors
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount,
                                                                   "RDS Relations, where Origin Column count <> Destination Column count.",
                                                                   pcenumModelFixType.RDSRelationsWhereOriginColumnCountNotEqualDestinationColumnCount))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsWhereOriginColumnHasWrongTable,
+                                                                  "RDS Relations, where Origin Column has wrong Table.",
+                                                                  pcenumModelFixType.RDSRelationsWhereOriginColumnHasWrongTable))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RDSRelationsWhereMultiplicityCardinalitiesDoNotMatchResponsibleFactTypeInternalUniquenessConstraints,
+                                                                  "RDS Relations, where Multiplicity Cardinalities do not match ResponsibleFactType InternalUniquenessConstraints.",
+                                                                  pcenumModelFixType.RDSRelationsWhereMultiplicityCardinalitiesDoNotMatchResponsibleFactTypeInternalUniquenessConstraints))
 
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.RolesWithoutJoinedORMObject,
                                                                   "Roles Without JoinedORMObject. Remove from Model.",
@@ -107,13 +123,18 @@ Public Class frmFixModelErrors
             Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.SubtypeRelationshipWithNoFactType,
                                                                   "Subtype Relationships with no Fact Type, fix.",
                                                                   pcenumModelFixType.SubtypeRelationshipWithNoFactType))
+
+            Me.CheckedListBoxFixTypes.Items.Add(New tComboboxItem(pcenumModelFixType.AddCoreModel,
+                                                                  "Add Core Model.",
+                                                                  pcenumModelFixType.AddCoreModel))
+
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -146,7 +167,7 @@ Public Class frmFixModelErrors
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

@@ -259,8 +259,8 @@ Namespace TinyPG
             End If
             '=============================
 
-        ' undo/redo
-        If e.KeyValue = 89 AndAlso e.Control Then
+            ' undo/redo
+            If e.KeyValue = 89 AndAlso e.Control Then
             Redo()
             ' CTRL-Y
         End If
@@ -310,15 +310,15 @@ Namespace TinyPG
         Return node
     End Function
 
-    Private Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
+        Public Function FindNode(ByVal node As ParseNode, ByVal posstart As Integer) As ParseNode
 
-	    If node Is Nothing Then
+            If node Is Nothing Then
                 Return Nothing
             End If
 
             If node.Nodes.Count > 0 Then
-                If node.Nodes.Count > 1 And _
-                       node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
+                If node.Nodes.Count > 1 And
+                   node.Nodes(node.Nodes.Count - 1).Token.Type = TokenType._UNDETERMINED_ Then
                     Return FindNode(node.Nodes(node.Nodes.Count - 2), 0)
                 ElseIf node.Nodes(node.Nodes.Count - 1).Nodes.Count > 0 Then
                     Return FindNode(node.Nodes(node.Nodes.Count - 1), 0)
@@ -329,31 +329,34 @@ Namespace TinyPG
                 Return node
             End If
 
-    End Function
+        End Function
 
-    ''' <summary>
-    ''' use HighlighText to start the text highlight process from the caller's thread.
-    ''' this method is not used internally. 
-    ''' </summary>
-    Public Sub HighlightText()
-        SyncLock treelock
-            textChanged = True
-            currentText = Textbox.Text
-        End SyncLock
-    End Sub
+        ''' <summary>
+        ''' use HighlighText to start the text highlight process from the caller's thread.
+        ''' this method is not used internally. 
+        ''' </summary>
+        Public Sub HighlightText()
 
-    Private Sub HighlightTextInternal()
+            SyncLock treelock
+                textChanged = True
+                currentText = Textbox.Text
+            End SyncLock
+
+        End Sub
+
+        Private Sub HighlightTextInternal()
         ' highlight the text (used internally only)
         Lock()
 
         Dim hscroll As Integer = HScrollPos
         Dim vscroll As Integer = VScrollPos
 
-        Dim selstart As Integer = Textbox.SelectionStart
+            Dim selstart As Integer = Textbox.SelectionStart
 
-        HighlighTextCore()
+            HighlighTextCore()
 
-        Textbox.[Select](selstart, 0)
+
+                Textbox.[Select](selstart, 0)
 
         HScrollPos = hscroll
         VScrollPos = vscroll
@@ -437,20 +440,22 @@ Namespace TinyPG
                 Continue While
             End If
 
-            _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
+                _tree = DirectCast(Parser.Parse(_currenttext), ParseTree)
 
-            SyncLock treelock
-                If textChanged Then
-                    Continue While
-                Else
-                    ' assign new tree
-                    Tree = _tree
+                SyncLock treelock
+                    If textChanged Then
+                        Continue While
+                    Else
+                        ' assign new tree
+                        Tree = _tree
+                    End If
+                End SyncLock
+
+
+                If _tree.Errors.Count = 0 Then
+                    Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
                 End If
-            End SyncLock
-
-
-            Textbox.Invoke(New MethodInvoker(AddressOf HighlightTextInternal))
-        End While
+            End While
     End Sub
 
 
@@ -512,7 +517,7 @@ Namespace TinyPG
 
     ' define the color palette to be used here
     Private Sub AddRtfHeader(ByVal sb As StringBuilder)
-        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red153\green76\blue55;\red53\green0\blue0;\red76\green153\blue0;\red153\green0\blue153;\red153\green76\blue0;\red153\green76\blue0;}\viewkind4\uc1\pard\lang1033\f0\fs20")
+        sb.Insert(0, "{\rtf1\ansi\deff0{\fonttbl{\f0\fnil\fcharset0 Tahoma;}}{\colortbl;\red153\green76\blue0;\red53\green0\blue0;\red76\green153\blue0;\red153\green0\blue153;\red153\green76\blue0;\red153\green76\blue0;}\viewkind4\uc1\pard\lang1033\f0\fs20")
     End Sub
 
     Private Sub AddRtfEnd(ByVal sb As StringBuilder)

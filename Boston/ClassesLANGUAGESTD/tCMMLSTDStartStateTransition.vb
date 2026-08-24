@@ -113,7 +113,7 @@ Namespace STD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -170,7 +170,7 @@ Namespace STD
                 '---------------------------------------------------------
                 'Set the values in the underlying Model.StateTransition
                 '------------------------------------------------
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "EventName"
                             Call Me.STMStartStateTransition.setEventName(Me.EventName)
@@ -183,7 +183,7 @@ Namespace STD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -193,7 +193,7 @@ Namespace STD
 
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
 
-            If IsSomething(Me.Link) Then
+            If Me.Link IsNot Nothing Then
                 If Me.Link.Selected Then
                     Me.Link.Pen.Color = Color.Blue
                 Else

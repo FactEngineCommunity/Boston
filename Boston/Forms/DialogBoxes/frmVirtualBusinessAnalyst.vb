@@ -34,7 +34,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -50,7 +50,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -95,7 +95,9 @@ Public Class frmVirtualBusinessAnalyst
 
                 Dim lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content  'lrCompletionResult.Completions(0).Text
 
-                Me.TextBoxResponse.Text.AppendDoubleLineBreak("--------------" & vbCrLf & vbCrLf & lsGPT3ReturnString.Replace(vbLf, vbCrLf))
+                Me.TextBoxResponse.Text.AppendDoubleLineBreak("--------------")
+                Me.TextBoxResponse.Text.AppendDoubleLineBreak("Some questions to consider about the model...")
+                Me.TextBoxResponse.Text.AppendDoubleLineBreak(lsGPT3ReturnString.Replace(vbLf, vbCrLf))
 
                 ' Scroll to the end (caret position)
                 Me.TextBoxResponse.SelectionStart = Me.TextBoxResponse.Text.Length
@@ -110,7 +112,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -126,7 +128,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -143,7 +145,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -173,16 +175,17 @@ Public Class frmVirtualBusinessAnalyst
                         End If
 #End Region
                     lsPrompt.AppendLine("Please don't make up anything. Be strict and professional about your response.")
-                    lsPrompt.AppendLine("Limit your response explicitly to the text provided to you hear about the model.")
+                    lsPrompt.AppendLine("Limit your response explicitly to the subject matter provided to you here about the model.")
 
                     lsPrompt.AppendDoubleLineBreak("IMPORTANT: If the above does not look like a question or instruction about the model, just say 'I only really talk about the " & Me.mrModel.Name & " Model.'")
 
                         lsPrompt.AppendDoubleLineBreak("Here's what I want from you: " & vbCrLf & Me.TextBoxPrompt.Text.Trim)
 
                     Try
+                        'lrCompletionResult = Boston.GetGPT3Result(Me.mrOpenAIAPI, lsPrompt)
+                        'lsGPT3ReturnString = lrCompletionResult.Completions(0).Text
 
-                        lrCompletionResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, lsPrompt)
-
+                        lrCompletionResult = Boston.GetGPTChatResponse(Me.mrOpenAIAPI, LTrim(RTrim(lsPrompt)))
                         lsGPT3ReturnString = lrCompletionResult.Choices(0).Message.Content  'lrCompletionResult.Completions(0).Text
 
                     Catch ex As Exception
@@ -208,7 +211,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -231,7 +234,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -258,7 +261,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -277,7 +280,7 @@ Public Class frmVirtualBusinessAnalyst
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

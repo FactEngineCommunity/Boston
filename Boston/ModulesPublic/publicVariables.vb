@@ -6,6 +6,16 @@ Public Module publicVariables
     'Public pdbConnection As New ADODB.Connection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
     'Public pdb_OLEDB_connection As New OleDb.OleDbConnection 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
 
+    Public Enum ThemeType
+        Light
+        Blue
+        Dark
+        Nature
+    End Enum
+
+    'Themeing. Light|Dark etc
+    Public piGlobalTheme As ThemeType = ThemeType.Blue
+
     Public pdbConnection As Object ' New FactEngine.SQLiteConnection(Nothing, "", 1000, False)
     Public pdb_OLEDB_connection As Object 'New FactEngine.SQLiteConnection(Nothing, "", 1000, False) '2023-For Now. Will Fail for SQLite databases when doing database upgrades.
 

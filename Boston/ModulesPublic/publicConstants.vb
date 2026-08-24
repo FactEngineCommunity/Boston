@@ -22,6 +22,8 @@ Public Module publicConstants
     Public Const pcOpenDynamic As Integer = 2
     Public Const pc_cmd_table As Integer = 2
 
+    Public pcColorPastelGreen As Color = Color.FromArgb(208, 231, 210)
+
     ''' <summary>
     ''' FactEngine uses this to set the Color of each Node based on its OrdinalPostion in the ProjectedColumns/Nodes
     ''' </summary>
@@ -37,6 +39,13 @@ Public Module publicConstants
     Public Enum pcenumSoftwareCategory
         Student
         Professional
+        Boston4SQLite
+    End Enum
+
+    Public Enum pcenumFormEditMode
+        Standard
+        SaveOnly
+        NoOkayCancelButtons
     End Enum
 
     ''' <summary>
@@ -47,9 +56,26 @@ Public Module publicConstants
         ExportCSVData
     End Enum
 
+    Public Enum pcenumAutoLayoutMethod
+        Anneal
+        LayeredLayout
+        Orthoganal
+        Spring
+        Tree
+    End Enum
+
+    Public Enum pcenumBinaryFactTypeFrequencyDeterminer
+        None
+        One
+        AtMostOne
+        AtLeastOne
+        AnyNumberOf
+    End Enum
+
     Public Enum pcenumRDSColumnType
         StandardRDSColumn
         ReturnFunctionColumn 'As used in Functions returned as a Column in a SQL Query etc.
+        FunctionCall 'E.g. DATEDIFF
     End Enum
 
     Public Enum pcenumTargetMorphShape
@@ -106,6 +132,8 @@ Public Module publicConstants
         TypeQL
         EdgeQL
         openCypher
+        RelationalAIQL
+        SPARQL
     End Enum
 
 
@@ -142,6 +170,12 @@ Public Module publicConstants
         KuzuDB = 113
         <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.EdgeQL)>
         EdgeDB = 114
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SQL)>
+        FactEngineSemanticLayer = 115
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.SPARQL)>
+        RDF = 116
+        <DefaultQueryLanguage(pcenumDatabaseQueryLanguage.openCypher)>
+        ISOGQL = 117
     End Enum
 
     Public Enum pcenumDebugMode
@@ -165,6 +199,7 @@ Public Module publicConstants
     End Enum
 
     Public Enum pcenumFollowingThatOrSome
+        Ignore 'For when want to ignore using this altogether in generation of text
         That
         Some
         Either
@@ -191,8 +226,9 @@ Public Module publicConstants
         Between
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumConceptType
+        None
         [Class] 'Represents a Class in a UML Class Diagram
         Comment
         Actor 'Represents an Actor in a UML Use Case Diagram
@@ -252,7 +288,7 @@ Public Module publicConstants
         StartStateTransition
         State
         StateTransition
-        StrategicGoal        
+        StrategicGoal
         SubjectArea
         SubtypeRelationship
         'SubtypeLink
@@ -280,8 +316,16 @@ Public Module publicConstants
         OtherShapeObject
     End Enum
 
+    ''' <summary>
+    ''' Stores the ReferenceTableIds of Reference Tables in the ReferenceTable table in the Boston database.
+    ''' </summary>
     Public Enum pcenumReferenceTable
-        ConceptClassification = 40
+        ConceptClassification = 400
+    End Enum
+
+    Public Enum pcenumModelElementFlagType
+        IsReferenceTable = 1
+        IsLookupTable = 2
     End Enum
 
     Public Enum pcenumReferenceMode
@@ -426,6 +470,8 @@ Public Module publicConstants
         <Description(".attribute")> DotLowercaseAttribute
         <Description(".Option")> DotUppercaseOption
         <Description(".option")> DotLowercaseOption
+        <Description(".Title")> DotUppercaseTitle
+        <Description(".Level")> DotUppercaseLevel
     End Enum
 
     Public Enum pcenumValueTypeCandidates
@@ -443,8 +489,9 @@ Public Module publicConstants
         CardinalityConstraint
         EqualityConstraint
         ExclusionConstraint
-        ExclusiveORConstraint        
+        ExclusiveORConstraint
         ExternalUniquenessConstraint
+        ExternalFrequencyConstraint
         FrequencyConstraint
         InclusiveORConstraint
         InternalUniquenessConstraint
@@ -511,9 +558,20 @@ Public Module publicConstants
         DeonticPurelyReflexive
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Enum pcenumMenuType
+        menuEnterprise
+        menuSolutions
+        menuSolution
         menuBoston
+        menuDatabase
+        menuDatabases
+        menuDatabaseColumns
+        menuDatabaseColumn
+        menuDatabaseIndexes
+        menuDatabaseIndex
+        menuDatabaseTable
+        menuXSD
         modelORMModel
         pageBPMNCollaborationDiagram
         pageBPMNConversationDiagram

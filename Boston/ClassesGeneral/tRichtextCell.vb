@@ -59,7 +59,7 @@ Public Class class_richtext_cell
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             MyBase.Dispose(disposing)
-            If IsSomething(Me.FTRHighlighter) Then
+            If Me.FTRHighlighter IsNot Nothing Then
                 Call Me.FTRHighlighter.Dispose()
                 Me.Scanner = Nothing
                 Me.Parser = Nothing
@@ -71,7 +71,7 @@ Public Class class_richtext_cell
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 

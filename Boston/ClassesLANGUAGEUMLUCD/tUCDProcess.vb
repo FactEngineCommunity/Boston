@@ -135,7 +135,7 @@ Namespace UCD
                 Return aoA.SequenceNr - aoB.SequenceNr
 
             Catch ex As Exception
-                prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -157,6 +157,7 @@ Namespace UCD
                 loDroppedNode.Tag = New FBM.EntityTypeInstance 'loDroppedNode.Tag = New Object
                 loDroppedNode.Tag = Me
                 loDroppedNode.Obstacle = True
+                loDroppedNode.Image = Nothing
                 Me.Shape = loDroppedNode
 
                 Select Case Me.Page.Language
@@ -185,7 +186,11 @@ Namespace UCD
                         loDroppedNode.Resize(20, 15)
                 End Select
 
-                If IsSomething(aoContainerNode) Then
+                'CodeSafe
+                loDroppedNode.Image = Nothing
+                loDroppedNode.Shape.Image = Nothing
+
+                If aoContainerNode IsNot Nothing Then
                     aoContainerNode.Add(loDroppedNode)
                 End If
 
@@ -195,7 +200,7 @@ Namespace UCD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -269,7 +274,7 @@ Namespace UCD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -281,7 +286,7 @@ Namespace UCD
             Dim lsMessage As String = ""
 
             Try
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "Text"
 
@@ -312,7 +317,7 @@ Namespace UCD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -330,7 +335,7 @@ Namespace UCD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -352,7 +357,7 @@ Namespace UCD
                     Me.Shape.Resize(60, 60)
             End Select
 
-            If IsSomething(aoContainerNode) Then
+            If aoContainerNode IsNot Nothing Then
                 aoContainerNode.AutoShrink = True
                 aoContainerNode.Resize(Viev.Greater(Me.Shape.Bounds.Width + 20, aoContainerNode.Bounds.Width), Viev.Greater(Me.Shape.Bounds.Height + 20, aoContainerNode.Bounds.Height))
             End If
@@ -368,7 +373,7 @@ Namespace UCD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -380,11 +385,11 @@ Namespace UCD
             '---------------------------------------------------------------------
             Try
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.Shape) Then
+                    If Me.Shape IsNot Nothing Then
                         If Me.Shape.Text <> "" Then
                             '---------------------------------------------------------------------------------
                             'Is the type of EntityTypeInstance that 
@@ -405,7 +410,7 @@ Namespace UCD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -424,7 +429,7 @@ Namespace UCD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -437,7 +442,7 @@ Namespace UCD
         Public Overloads Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
 
             Try
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     If Me.Shape.Selected Then
                         Me.Shape.Pen.Color = Color.Blue
                     Else
@@ -451,7 +456,7 @@ Namespace UCD
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -467,7 +472,7 @@ Namespace UCD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -485,7 +490,7 @@ Namespace UCD
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

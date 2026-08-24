@@ -1,6 +1,7 @@
 Imports MindFusion.Diagramming
 Imports System.Reflection
 Imports System.IO
+Imports org.w3c.dom
 
 Public Class frmToolbox
 
@@ -16,24 +17,35 @@ Public Class frmToolbox
 
     Private Sub frmToolbox_Enter(sender As Object, e As EventArgs) Handles Me.Enter
 
-        If My.Settings.UseClientServer Then
-            If prApplication.User.CanAlterOnProject(prApplication.WorkingProject) = False Then
-                '-------------------------------------
-                'Display the FlashCard to show that the User has logged in
-                Me.ShapeListBox.Enabled = False
+        Try
+
+            If My.Settings.UseClientServer Then
+                If prApplication.User.CanAlterOnProject(prApplication.WorkingProject) = False Then
+                    '-------------------------------------
+                    'Display the FlashCard to show that the User has logged in
+                    Me.ShapeListBox.Enabled = False
+                Else
+                    Me.ShapeListBox.Enabled = True
+                End If
             Else
                 Me.ShapeListBox.Enabled = True
             End If
-        Else
-            Me.ShapeListBox.Enabled = True
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning, abUseFlashCard:=True)
+        End Try
 
     End Sub
 
 
     Private Sub frm_toolbox_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
 
-        'If IsSomething(frmMain.zfrm_toolbox) Then
+        'If frmMain.zfrm_toolbox IsNot Nothing Then
         '    frmMain.zfrm_toolbox = Nothing
         'End If
         prApplication.RightToolboxForms.RemoveAll(AddressOf Me.EqualsByName)
@@ -50,7 +62,7 @@ Public Class frmToolbox
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -72,7 +84,7 @@ Public Class frmToolbox
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -107,6 +119,8 @@ Public Class frmToolbox
 
             Select Case aiLanguage
                 Case Is = pcenumLanguage.ORMModel
+                    Me.ShapeListBox.DrawMode = DrawMode.Normal
+
                     loShapeLibrary = ShapeLibrary.LoadFrom(My.Settings.ORMShapeLibrary)
 
                     Me.ShapeListBox.Shapes = loShapeLibrary.Shapes
@@ -142,15 +156,40 @@ Public Class frmToolbox
                                 loShape.Image = My.Resources.ORMShapes.ModelNote
                         End Select
                     Next
-            End Select
+                Case Is = pcenumLanguage.FlowChart
 
+                    Me.ShapeListBox.DrawMode = DrawMode.Normal
+                    Me.ShapeListBox.ShapeFillColor = Color.White
+                    Dim loObject = Me.ShapeListBox.Shapes(0)
+
+                    Dim lasShapeFilter As String()
+
+                    lasShapeFilter = {MindFusion.Diagramming.Shapes.Process.Id,
+                                      Shapes.Alternative.Id,
+                                      Shapes.Collate.Id,
+                                      Shapes.Database.Id,
+                                      Shapes.DDelay.Id,
+                                      Shapes.ManualOperation.Id,
+                                      Shapes.Input.Id,
+                                      Shapes.Document.Id,
+                                      Shapes.Merge.Id,
+                                      Shapes.OffpageReference.Id,
+                                      Shapes.Decision.Id}
+
+
+                    Me.ShapeListBox.ShapeFilter = lasShapeFilter
+
+                    Me.ShapeListBox.Refresh()
+                Case Else
+                    Me.ShapeListBox.DrawMode = DrawMode.Normal
+            End Select
         Catch ex As Exception
             Dim lsMessage As String
             Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

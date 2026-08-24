@@ -17,7 +17,7 @@ Public Class tErrorLogger
     Public Sub New()
 
         Try
-            ErrorLogFilePath = My.Computer.FileSystem.SpecialDirectories.AllUsersApplicationData & "\Errors\"
+            ErrorLogFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Application.CompanyName, Application.ProductName) & "\Errors\"
 
             If Not System.IO.Directory.Exists(ErrorLogFilePath) Then
                 System.IO.Directory.CreateDirectory(ErrorLogFilePath)
@@ -91,6 +91,7 @@ Public Class tErrorLogger
                         s1.Write(vbCrLf & LongString)
                         s1.Close()
                         fs1.Close()
+
                     End SyncLock
 
                 Case Is = pcenumDebugMode.NoLogging.ToString
@@ -99,6 +100,7 @@ Public Class tErrorLogger
                     '------------
             End Select
 
+#Region "Old Code: Remove after 2025/01/01 if not missed."
             'Public Sub Logit(ByVal Message As String, Optional ByVal AddToSystemApplicationLog As Boolean = False)
             '    Static LogLines As New List(Of String)
             '    If LogLines.Count = 0 Then
@@ -143,6 +145,7 @@ Public Class tErrorLogger
             '    End Try
 
             'End Sub
+#End Region
 
         Catch ex As Exception
             Dim lsMessage As String

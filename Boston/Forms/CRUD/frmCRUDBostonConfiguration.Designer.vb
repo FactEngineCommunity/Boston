@@ -34,10 +34,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.LabelConfigurationFileLocation = New System.Windows.Forms.Label()
         Me.LabelUserConfigurationFileLocation = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.CheckBoxStartVirtualAnalystInQuietMode = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxVirtualAnalystDisplayBriana = New System.Windows.Forms.CheckBox()
-        Me.ButtonImportLanguageRules = New System.Windows.Forms.Button()
         Me.GroupBoxDatabase = New System.Windows.Forms.GroupBox()
         Me.CheckBoxStoreAndUseBinarySerialisations = New System.Windows.Forms.CheckBox()
         Me.CheckBoxUseThreadingDatabaseLoad = New System.Windows.Forms.CheckBox()
@@ -53,12 +49,41 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxThrowInformationDebugMessagesToScreen = New System.Windows.Forms.CheckBox()
         Me.ComboBoxDebugMode = New System.Windows.Forms.ComboBox()
         Me.LabelPrompt_StrategyTerm = New System.Windows.Forms.Label()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.TextBoxAssemblyAIAPKey = New System.Windows.Forms.TextBox()
+        Me.LabelPromptAssemblyAIAPKey = New System.Windows.Forms.Label()
+        Me.CheckBoxBrainConfirmActionsWithUser = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxStartVirtualAnalystInQuietMode = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxVirtualAnalystDisplayBriana = New System.Windows.Forms.CheckBox()
+        Me.ButtonImportLanguageRules = New System.Windows.Forms.Button()
         Me.DialogOpenFile = New System.Windows.Forms.OpenFileDialog()
         Me.DialogFolderBrowser = New System.Windows.Forms.FolderBrowserDialog()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
+        Me.TabPage5 = New System.Windows.Forms.TabPage()
+        Me.GroupBoxBoston = New System.Windows.Forms.GroupBox()
+        Me.LabelPromptBostonDetails = New System.Windows.Forms.Label()
+        Me.LabelPromptTheme = New System.Windows.Forms.Label()
+        Me.ComboBoxThemeType = New System.Windows.Forms.ComboBox()
+        Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether = New System.Windows.Forms.CheckBox()
+        Me.GroupBoxBackup = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxPerformGrandfatherFatherSonBackups = New System.Windows.Forms.CheckBox()
+        Me.ButtonRefreshMenuOptions = New System.Windows.Forms.Button()
+        Me.ButtonCheckForUpdatesNow = New System.Windows.Forms.Button()
+        Me.GroupBoxConfiguration = New System.Windows.Forms.GroupBox()
+        Me.ButtonImportConfigurationTableItems = New System.Windows.Forms.Button()
+        Me.GroupBoxImportExport = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxExportSuppressMDAModelElements = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxAutomaticallyReportErrorEvents = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxAutomaticallyCheckForUpdates = New System.Windows.Forms.CheckBox()
+        Me.ButtonReplaceCoreMetamodel = New System.Windows.Forms.Button()
+        Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.LabelPromptInitialiseClient = New System.Windows.Forms.Label()
+        Me.LabelPromptEnableRemoteUI = New System.Windows.Forms.Label()
+        Me.LabelPromptEnableClient = New System.Windows.Forms.Label()
         Me.TextBoxBostonServerPortNumber = New System.Windows.Forms.TextBox()
         Me.LabelPromptBostonServerPortNumber = New System.Windows.Forms.Label()
         Me.CheckBoxClientServerInitialiseClient = New System.Windows.Forms.CheckBox()
@@ -68,6 +93,10 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxEnableClientServer = New System.Windows.Forms.CheckBox()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.GroupBoxFactEngine = New System.Windows.Forms.GroupBox()
+        Me.ComboBoxFactEngineModel = New System.Windows.Forms.ComboBox()
+        Me.LabelPromptFactEngineModel = New System.Windows.Forms.Label()
+        Me.ComboBoxFactEngineModelCompany = New System.Windows.Forms.ComboBox()
+        Me.LabelPromptFactEngineModelCompany = New System.Windows.Forms.Label()
         Me.TextBoxFactEngineOpenAIAPIKey = New System.Windows.Forms.TextBox()
         Me.LabelPromptFactEngineOpenAIAPIKey = New System.Windows.Forms.Label()
         Me.CheckBoxFactEngineUseGPT3 = New System.Windows.Forms.CheckBox()
@@ -90,19 +119,10 @@ Partial Class frmCRUDBostonConfiguration
         Me.LabelPromptReverseEngineeringDefaultReferenceMode = New System.Windows.Forms.Label()
         Me.TextBoxReverseEngineeringDefaultReferenceMode = New System.Windows.Forms.TextBox()
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames = New System.Windows.Forms.CheckBox()
-        Me.TabPage5 = New System.Windows.Forms.TabPage()
-        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
-        Me.GroupBoxConfiguration = New System.Windows.Forms.GroupBox()
-        Me.ButtonImportConfigurationTableItems = New System.Windows.Forms.Button()
-        Me.GroupBoxImportExport = New System.Windows.Forms.GroupBox()
-        Me.CheckBoxExportSuppressMDAModelElements = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxAutomaticallyReportErrorEvents = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxAutomaticallyCheckForUpdates = New System.Windows.Forms.CheckBox()
-        Me.ButtonReplaceCoreMetamodel = New System.Windows.Forms.Button()
-        Me.CheckBoxDiagramSpyShowLinkFactTypes = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxSuperuserMode = New System.Windows.Forms.CheckBox()
         Me.TabPage7 = New System.Windows.Forms.TabPage()
         Me.GroupBoxModelling = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxSaveNewModelsAsXML = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet = New System.Windows.Forms.CheckBox()
         Me.CheckBoxModelllingUseThreadingLoadingXMLPage = New System.Windows.Forms.CheckBox()
         Me.ComboBoxDefaultGeneralConceptConversion = New System.Windows.Forms.ComboBox()
         Me.LabelPromptNLAPIConvertsGeneralConceptsTo = New System.Windows.Forms.Label()
@@ -112,16 +132,24 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage8 = New System.Windows.Forms.TabPage()
         Me.GroupBoxCodeGeneration = New System.Windows.Forms.GroupBox()
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames = New System.Windows.Forms.CheckBox()
+        Me.TabPageVirtualAssistant = New System.Windows.Forms.TabPage()
+        Me.GroupBoxVitualAssistant = New System.Windows.Forms.GroupBox()
         Me.ErrorProvider = New System.Windows.Forms.ErrorProvider(Me.components)
-        Me.CheckBoxHideReferenceModeOnReferenceModeSet = New System.Windows.Forms.CheckBox()
+        Me.LabelPromptCultureInfo = New System.Windows.Forms.Label()
+        Me.ComboBoxCultureInfo = New System.Windows.Forms.ComboBox()
         Me.GroupBox_main.SuspendLayout()
         Me.GroupBoxAutoComplete.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
         Me.GroupBoxDatabase.SuspendLayout()
         Me.GroupBoxDebugging.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
+        Me.TabPage5.SuspendLayout()
+        Me.GroupBoxBoston.SuspendLayout()
+        Me.GroupBoxBackup.SuspendLayout()
+        Me.GroupBoxConfiguration.SuspendLayout()
+        Me.GroupBoxImportExport.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -131,14 +159,12 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxERDiagrams.SuspendLayout()
         Me.TabPage6.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
-        Me.TabPage5.SuspendLayout()
-        Me.GroupBox4.SuspendLayout()
-        Me.GroupBoxConfiguration.SuspendLayout()
-        Me.GroupBoxImportExport.SuspendLayout()
         Me.TabPage7.SuspendLayout()
         Me.GroupBoxModelling.SuspendLayout()
         Me.TabPage8.SuspendLayout()
         Me.GroupBoxCodeGeneration.SuspendLayout()
+        Me.TabPageVirtualAssistant.SuspendLayout()
+        Me.GroupBoxVitualAssistant.SuspendLayout()
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -164,7 +190,6 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.GroupBox_main.Controls.Add(Me.GroupBoxAutoComplete)
         Me.GroupBox_main.Controls.Add(Me.GroupBox2)
-        Me.GroupBox_main.Controls.Add(Me.GroupBox1)
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDatabase)
         Me.GroupBox_main.Controls.Add(Me.GroupBoxDebugging)
         Me.GroupBox_main.Location = New System.Drawing.Point(6, 6)
@@ -197,7 +222,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.GroupBox2.Controls.Add(Me.TableLayoutPanel1)
         Me.GroupBox2.Controls.Add(Me.Label1)
-        Me.GroupBox2.Location = New System.Drawing.Point(17, 414)
+        Me.GroupBox2.Location = New System.Drawing.Point(17, 294)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(556, 128)
         Me.GroupBox2.TabIndex = 14
@@ -259,47 +284,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.Label1.Size = New System.Drawing.Size(135, 13)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Configuration File Location:"
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Controls.Add(Me.CheckBoxStartVirtualAnalystInQuietMode)
-        Me.GroupBox1.Controls.Add(Me.CheckBoxVirtualAnalystDisplayBriana)
-        Me.GroupBox1.Controls.Add(Me.ButtonImportLanguageRules)
-        Me.GroupBox1.Location = New System.Drawing.Point(17, 294)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(443, 114)
-        Me.GroupBox1.TabIndex = 13
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Virtual Analyst:"
-        '
-        'CheckBoxStartVirtualAnalystInQuietMode
-        '
-        Me.CheckBoxStartVirtualAnalystInQuietMode.AutoSize = True
-        Me.CheckBoxStartVirtualAnalystInQuietMode.Location = New System.Drawing.Point(25, 45)
-        Me.CheckBoxStartVirtualAnalystInQuietMode.Name = "CheckBoxStartVirtualAnalystInQuietMode"
-        Me.CheckBoxStartVirtualAnalystInQuietMode.Size = New System.Drawing.Size(204, 17)
-        Me.CheckBoxStartVirtualAnalystInQuietMode.TabIndex = 2
-        Me.CheckBoxStartVirtualAnalystInQuietMode.Text = "Start the Virtual Analyst in &Quiet Mode"
-        Me.CheckBoxStartVirtualAnalystInQuietMode.UseVisualStyleBackColor = True
-        '
-        'CheckBoxVirtualAnalystDisplayBriana
-        '
-        Me.CheckBoxVirtualAnalystDisplayBriana.AutoSize = True
-        Me.CheckBoxVirtualAnalystDisplayBriana.Location = New System.Drawing.Point(25, 22)
-        Me.CheckBoxVirtualAnalystDisplayBriana.Name = "CheckBoxVirtualAnalystDisplayBriana"
-        Me.CheckBoxVirtualAnalystDisplayBriana.Size = New System.Drawing.Size(180, 17)
-        Me.CheckBoxVirtualAnalystDisplayBriana.TabIndex = 1
-        Me.CheckBoxVirtualAnalystDisplayBriana.Text = "Display &Briana the Virtual Analyst"
-        Me.CheckBoxVirtualAnalystDisplayBriana.UseVisualStyleBackColor = True
-        '
-        'ButtonImportLanguageRules
-        '
-        Me.ButtonImportLanguageRules.Location = New System.Drawing.Point(25, 73)
-        Me.ButtonImportLanguageRules.Name = "ButtonImportLanguageRules"
-        Me.ButtonImportLanguageRules.Size = New System.Drawing.Size(131, 23)
-        Me.ButtonImportLanguageRules.TabIndex = 0
-        Me.ButtonImportLanguageRules.Text = "&Import Language Rules"
-        Me.ButtonImportLanguageRules.UseVisualStyleBackColor = True
         '
         'GroupBoxDatabase
         '
@@ -460,25 +444,306 @@ Partial Class frmCRUDBostonConfiguration
         Me.LabelPrompt_StrategyTerm.TabIndex = 12
         Me.LabelPrompt_StrategyTerm.Text = " Mode :"
         '
+        'GroupBox1
+        '
+        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.Controls.Add(Me.TextBoxAssemblyAIAPKey)
+        Me.GroupBox1.Controls.Add(Me.LabelPromptAssemblyAIAPKey)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxBrainConfirmActionsWithUser)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxStartVirtualAnalystInQuietMode)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxVirtualAnalystDisplayBriana)
+        Me.GroupBox1.Controls.Add(Me.ButtonImportLanguageRules)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 19)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(559, 198)
+        Me.GroupBox1.TabIndex = 13
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Virtual Analyst:"
+        '
+        'TextBoxAssemblyAIAPKey
+        '
+        Me.TextBoxAssemblyAIAPKey.Location = New System.Drawing.Point(140, 146)
+        Me.TextBoxAssemblyAIAPKey.Name = "TextBoxAssemblyAIAPKey"
+        Me.TextBoxAssemblyAIAPKey.Size = New System.Drawing.Size(317, 20)
+        Me.TextBoxAssemblyAIAPKey.TabIndex = 14
+        '
+        'LabelPromptAssemblyAIAPKey
+        '
+        Me.LabelPromptAssemblyAIAPKey.AutoSize = True
+        Me.LabelPromptAssemblyAIAPKey.Location = New System.Drawing.Point(26, 149)
+        Me.LabelPromptAssemblyAIAPKey.Name = "LabelPromptAssemblyAIAPKey"
+        Me.LabelPromptAssemblyAIAPKey.Size = New System.Drawing.Size(108, 13)
+        Me.LabelPromptAssemblyAIAPKey.TabIndex = 13
+        Me.LabelPromptAssemblyAIAPKey.Text = "Assembly.AI API Key:"
+        '
+        'CheckBoxBrainConfirmActionsWithUser
+        '
+        Me.CheckBoxBrainConfirmActionsWithUser.AutoSize = True
+        Me.CheckBoxBrainConfirmActionsWithUser.Location = New System.Drawing.Point(25, 112)
+        Me.CheckBoxBrainConfirmActionsWithUser.Name = "CheckBoxBrainConfirmActionsWithUser"
+        Me.CheckBoxBrainConfirmActionsWithUser.Size = New System.Drawing.Size(145, 17)
+        Me.CheckBoxBrainConfirmActionsWithUser.TabIndex = 3
+        Me.CheckBoxBrainConfirmActionsWithUser.Text = "&Confirm actions with User"
+        Me.CheckBoxBrainConfirmActionsWithUser.UseVisualStyleBackColor = True
+        '
+        'CheckBoxStartVirtualAnalystInQuietMode
+        '
+        Me.CheckBoxStartVirtualAnalystInQuietMode.AutoSize = True
+        Me.CheckBoxStartVirtualAnalystInQuietMode.Location = New System.Drawing.Point(25, 45)
+        Me.CheckBoxStartVirtualAnalystInQuietMode.Name = "CheckBoxStartVirtualAnalystInQuietMode"
+        Me.CheckBoxStartVirtualAnalystInQuietMode.Size = New System.Drawing.Size(204, 17)
+        Me.CheckBoxStartVirtualAnalystInQuietMode.TabIndex = 2
+        Me.CheckBoxStartVirtualAnalystInQuietMode.Text = "Start the Virtual Analyst in &Quiet Mode"
+        Me.CheckBoxStartVirtualAnalystInQuietMode.UseVisualStyleBackColor = True
+        '
+        'CheckBoxVirtualAnalystDisplayBriana
+        '
+        Me.CheckBoxVirtualAnalystDisplayBriana.AutoSize = True
+        Me.CheckBoxVirtualAnalystDisplayBriana.Location = New System.Drawing.Point(25, 22)
+        Me.CheckBoxVirtualAnalystDisplayBriana.Name = "CheckBoxVirtualAnalystDisplayBriana"
+        Me.CheckBoxVirtualAnalystDisplayBriana.Size = New System.Drawing.Size(180, 17)
+        Me.CheckBoxVirtualAnalystDisplayBriana.TabIndex = 1
+        Me.CheckBoxVirtualAnalystDisplayBriana.Text = "Display &Briana the Virtual Analyst"
+        Me.CheckBoxVirtualAnalystDisplayBriana.UseVisualStyleBackColor = True
+        '
+        'ButtonImportLanguageRules
+        '
+        Me.ButtonImportLanguageRules.Location = New System.Drawing.Point(25, 73)
+        Me.ButtonImportLanguageRules.Name = "ButtonImportLanguageRules"
+        Me.ButtonImportLanguageRules.Size = New System.Drawing.Size(131, 23)
+        Me.ButtonImportLanguageRules.TabIndex = 0
+        Me.ButtonImportLanguageRules.Text = "&Import Language Rules"
+        Me.ButtonImportLanguageRules.UseVisualStyleBackColor = True
+        '
         'DialogOpenFile
         '
         Me.DialogOpenFile.FileName = "OpenFileDialog1"
         '
         'TabControl1
         '
+        Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Controls.Add(Me.TabPage1)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage6)
-        Me.TabControl1.Controls.Add(Me.TabPage5)
         Me.TabControl1.Controls.Add(Me.TabPage7)
         Me.TabControl1.Controls.Add(Me.TabPage8)
+        Me.TabControl1.Controls.Add(Me.TabPageVirtualAssistant)
         Me.TabControl1.Location = New System.Drawing.Point(12, 11)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
         Me.TabControl1.Size = New System.Drawing.Size(614, 661)
         Me.TabControl1.TabIndex = 9
+        '
+        'TabPage5
+        '
+        Me.TabPage5.Controls.Add(Me.GroupBoxBoston)
+        Me.TabPage5.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage5.Margin = New System.Windows.Forms.Padding(2)
+        Me.TabPage5.Name = "TabPage5"
+        Me.TabPage5.Size = New System.Drawing.Size(606, 635)
+        Me.TabPage5.TabIndex = 4
+        Me.TabPage5.Text = "Boston"
+        Me.TabPage5.UseVisualStyleBackColor = True
+        '
+        'GroupBoxBoston
+        '
+        Me.GroupBoxBoston.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxBoston.AutoSize = True
+        Me.GroupBoxBoston.Controls.Add(Me.LabelPromptBostonDetails)
+        Me.GroupBoxBoston.Controls.Add(Me.LabelPromptTheme)
+        Me.GroupBoxBoston.Controls.Add(Me.ComboBoxThemeType)
+        Me.GroupBoxBoston.Controls.Add(Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether)
+        Me.GroupBoxBoston.Controls.Add(Me.GroupBoxBackup)
+        Me.GroupBoxBoston.Controls.Add(Me.ButtonRefreshMenuOptions)
+        Me.GroupBoxBoston.Controls.Add(Me.ButtonCheckForUpdatesNow)
+        Me.GroupBoxBoston.Controls.Add(Me.GroupBoxConfiguration)
+        Me.GroupBoxBoston.Controls.Add(Me.GroupBoxImportExport)
+        Me.GroupBoxBoston.Controls.Add(Me.CheckBoxAutomaticallyReportErrorEvents)
+        Me.GroupBoxBoston.Controls.Add(Me.CheckBoxAutomaticallyCheckForUpdates)
+        Me.GroupBoxBoston.Controls.Add(Me.ButtonReplaceCoreMetamodel)
+        Me.GroupBoxBoston.Controls.Add(Me.CheckBoxDiagramSpyShowLinkFactTypes)
+        Me.GroupBoxBoston.Controls.Add(Me.CheckBoxSuperuserMode)
+        Me.GroupBoxBoston.Location = New System.Drawing.Point(10, 9)
+        Me.GroupBoxBoston.Margin = New System.Windows.Forms.Padding(2)
+        Me.GroupBoxBoston.Name = "GroupBoxBoston"
+        Me.GroupBoxBoston.Padding = New System.Windows.Forms.Padding(2)
+        Me.GroupBoxBoston.Size = New System.Drawing.Size(583, 484)
+        Me.GroupBoxBoston.TabIndex = 0
+        Me.GroupBoxBoston.TabStop = False
+        '
+        'LabelPromptBostonDetails
+        '
+        Me.LabelPromptBostonDetails.AutoSize = True
+        Me.LabelPromptBostonDetails.Location = New System.Drawing.Point(16, 394)
+        Me.LabelPromptBostonDetails.Name = "LabelPromptBostonDetails"
+        Me.LabelPromptBostonDetails.Size = New System.Drawing.Size(39, 13)
+        Me.LabelPromptBostonDetails.TabIndex = 13
+        Me.LabelPromptBostonDetails.Text = "Label2"
+        '
+        'LabelPromptTheme
+        '
+        Me.LabelPromptTheme.AutoSize = True
+        Me.LabelPromptTheme.Location = New System.Drawing.Point(16, 352)
+        Me.LabelPromptTheme.Name = "LabelPromptTheme"
+        Me.LabelPromptTheme.Size = New System.Drawing.Size(43, 13)
+        Me.LabelPromptTheme.TabIndex = 12
+        Me.LabelPromptTheme.Text = "Theme:"
+        '
+        'ComboBoxThemeType
+        '
+        Me.ComboBoxThemeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxThemeType.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ComboBoxThemeType.FormattingEnabled = True
+        Me.ComboBoxThemeType.Location = New System.Drawing.Point(65, 349)
+        Me.ComboBoxThemeType.Name = "ComboBoxThemeType"
+        Me.ComboBoxThemeType.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBoxThemeType.TabIndex = 11
+        '
+        'CheckBoxOptOutOfAutomatedErrorReportingAltogether
+        '
+        Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.AutoSize = True
+        Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.Location = New System.Drawing.Point(47, 64)
+        Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.Name = "CheckBoxOptOutOfAutomatedErrorReportingAltogether"
+        Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.Size = New System.Drawing.Size(256, 17)
+        Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.TabIndex = 10
+        Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.Text = "Opt-Out Of Automated Error Reporting Altogether"
+        Me.CheckBoxOptOutOfAutomatedErrorReportingAltogether.UseVisualStyleBackColor = True
+        '
+        'GroupBoxBackup
+        '
+        Me.GroupBoxBackup.Controls.Add(Me.CheckBoxPerformGrandfatherFatherSonBackups)
+        Me.GroupBoxBackup.Location = New System.Drawing.Point(13, 296)
+        Me.GroupBoxBackup.Name = "GroupBoxBackup"
+        Me.GroupBoxBackup.Size = New System.Drawing.Size(558, 47)
+        Me.GroupBoxBackup.TabIndex = 9
+        Me.GroupBoxBackup.TabStop = False
+        Me.GroupBoxBackup.Text = "Backup:"
+        '
+        'CheckBoxPerformGrandfatherFatherSonBackups
+        '
+        Me.CheckBoxPerformGrandfatherFatherSonBackups.AutoSize = True
+        Me.CheckBoxPerformGrandfatherFatherSonBackups.Location = New System.Drawing.Point(6, 19)
+        Me.CheckBoxPerformGrandfatherFatherSonBackups.Name = "CheckBoxPerformGrandfatherFatherSonBackups"
+        Me.CheckBoxPerformGrandfatherFatherSonBackups.Size = New System.Drawing.Size(227, 17)
+        Me.CheckBoxPerformGrandfatherFatherSonBackups.TabIndex = 0
+        Me.CheckBoxPerformGrandfatherFatherSonBackups.Text = "Perform Grandfather, Father, Son Backups"
+        Me.CheckBoxPerformGrandfatherFatherSonBackups.UseVisualStyleBackColor = True
+        '
+        'ButtonRefreshMenuOptions
+        '
+        Me.ButtonRefreshMenuOptions.Location = New System.Drawing.Point(321, 119)
+        Me.ButtonRefreshMenuOptions.Name = "ButtonRefreshMenuOptions"
+        Me.ButtonRefreshMenuOptions.Size = New System.Drawing.Size(113, 23)
+        Me.ButtonRefreshMenuOptions.TabIndex = 8
+        Me.ButtonRefreshMenuOptions.Text = "Refresh &Menu Items"
+        Me.ButtonRefreshMenuOptions.UseVisualStyleBackColor = True
+        Me.ButtonRefreshMenuOptions.Visible = False
+        '
+        'ButtonCheckForUpdatesNow
+        '
+        Me.ButtonCheckForUpdatesNow.Location = New System.Drawing.Point(195, 14)
+        Me.ButtonCheckForUpdatesNow.Name = "ButtonCheckForUpdatesNow"
+        Me.ButtonCheckForUpdatesNow.Size = New System.Drawing.Size(128, 23)
+        Me.ButtonCheckForUpdatesNow.TabIndex = 7
+        Me.ButtonCheckForUpdatesNow.Text = "&Check for updates now"
+        Me.ButtonCheckForUpdatesNow.UseVisualStyleBackColor = True
+        Me.ButtonCheckForUpdatesNow.Visible = False
+        '
+        'GroupBoxConfiguration
+        '
+        Me.GroupBoxConfiguration.Controls.Add(Me.ButtonImportConfigurationTableItems)
+        Me.GroupBoxConfiguration.Location = New System.Drawing.Point(12, 230)
+        Me.GroupBoxConfiguration.Name = "GroupBoxConfiguration"
+        Me.GroupBoxConfiguration.Size = New System.Drawing.Size(559, 60)
+        Me.GroupBoxConfiguration.TabIndex = 6
+        Me.GroupBoxConfiguration.TabStop = False
+        Me.GroupBoxConfiguration.Text = "Configuration Items / Reference Tables"
+        '
+        'ButtonImportConfigurationTableItems
+        '
+        Me.ButtonImportConfigurationTableItems.Location = New System.Drawing.Point(6, 24)
+        Me.ButtonImportConfigurationTableItems.Name = "ButtonImportConfigurationTableItems"
+        Me.ButtonImportConfigurationTableItems.Size = New System.Drawing.Size(224, 23)
+        Me.ButtonImportConfigurationTableItems.TabIndex = 0
+        Me.ButtonImportConfigurationTableItems.Text = "&Import Configuration/Reference Table Items"
+        Me.ButtonImportConfigurationTableItems.UseVisualStyleBackColor = True
+        '
+        'GroupBoxImportExport
+        '
+        Me.GroupBoxImportExport.Controls.Add(Me.CheckBoxExportSuppressMDAModelElements)
+        Me.GroupBoxImportExport.Location = New System.Drawing.Point(12, 155)
+        Me.GroupBoxImportExport.Name = "GroupBoxImportExport"
+        Me.GroupBoxImportExport.Size = New System.Drawing.Size(559, 70)
+        Me.GroupBoxImportExport.TabIndex = 5
+        Me.GroupBoxImportExport.TabStop = False
+        Me.GroupBoxImportExport.Text = "Import/Export"
+        '
+        'CheckBoxExportSuppressMDAModelElements
+        '
+        Me.CheckBoxExportSuppressMDAModelElements.AutoSize = True
+        Me.CheckBoxExportSuppressMDAModelElements.Location = New System.Drawing.Point(6, 28)
+        Me.CheckBoxExportSuppressMDAModelElements.Name = "CheckBoxExportSuppressMDAModelElements"
+        Me.CheckBoxExportSuppressMDAModelElements.Size = New System.Drawing.Size(331, 17)
+        Me.CheckBoxExportSuppressMDAModelElements.TabIndex = 0
+        Me.CheckBoxExportSuppressMDAModelElements.Text = "Fact Based model (.fbm) Export - Suppress MDA Model Elements"
+        Me.CheckBoxExportSuppressMDAModelElements.UseVisualStyleBackColor = True
+        '
+        'CheckBoxAutomaticallyReportErrorEvents
+        '
+        Me.CheckBoxAutomaticallyReportErrorEvents.AutoSize = True
+        Me.CheckBoxAutomaticallyReportErrorEvents.Location = New System.Drawing.Point(12, 41)
+        Me.CheckBoxAutomaticallyReportErrorEvents.Name = "CheckBoxAutomaticallyReportErrorEvents"
+        Me.CheckBoxAutomaticallyReportErrorEvents.Size = New System.Drawing.Size(246, 17)
+        Me.CheckBoxAutomaticallyReportErrorEvents.TabIndex = 4
+        Me.CheckBoxAutomaticallyReportErrorEvents.Text = "Automatically report error events to FactEngine"
+        Me.CheckBoxAutomaticallyReportErrorEvents.UseVisualStyleBackColor = True
+        '
+        'CheckBoxAutomaticallyCheckForUpdates
+        '
+        Me.CheckBoxAutomaticallyCheckForUpdates.AutoSize = True
+        Me.CheckBoxAutomaticallyCheckForUpdates.Location = New System.Drawing.Point(12, 18)
+        Me.CheckBoxAutomaticallyCheckForUpdates.Name = "CheckBoxAutomaticallyCheckForUpdates"
+        Me.CheckBoxAutomaticallyCheckForUpdates.Size = New System.Drawing.Size(177, 17)
+        Me.CheckBoxAutomaticallyCheckForUpdates.TabIndex = 3
+        Me.CheckBoxAutomaticallyCheckForUpdates.Text = "Automatically check for updates"
+        Me.CheckBoxAutomaticallyCheckForUpdates.UseVisualStyleBackColor = True
+        '
+        'ButtonReplaceCoreMetamodel
+        '
+        Me.ButtonReplaceCoreMetamodel.Location = New System.Drawing.Point(377, 12)
+        Me.ButtonReplaceCoreMetamodel.Name = "ButtonReplaceCoreMetamodel"
+        Me.ButtonReplaceCoreMetamodel.Size = New System.Drawing.Size(149, 23)
+        Me.ButtonReplaceCoreMetamodel.TabIndex = 2
+        Me.ButtonReplaceCoreMetamodel.Text = "Replace Core Metamodel"
+        Me.ButtonReplaceCoreMetamodel.UseVisualStyleBackColor = True
+        Me.ButtonReplaceCoreMetamodel.Visible = False
+        '
+        'CheckBoxDiagramSpyShowLinkFactTypes
+        '
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.AutoSize = True
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Location = New System.Drawing.Point(12, 91)
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Name = "CheckBoxDiagramSpyShowLinkFactTypes"
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Size = New System.Drawing.Size(201, 17)
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.TabIndex = 1
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.Text = "Diagram Spy - Show Link Fact Types"
+        Me.CheckBoxDiagramSpyShowLinkFactTypes.UseVisualStyleBackColor = True
+        '
+        'CheckBoxSuperuserMode
+        '
+        Me.CheckBoxSuperuserMode.AutoSize = True
+        Me.CheckBoxSuperuserMode.Enabled = False
+        Me.CheckBoxSuperuserMode.Location = New System.Drawing.Point(12, 123)
+        Me.CheckBoxSuperuserMode.Margin = New System.Windows.Forms.Padding(2)
+        Me.CheckBoxSuperuserMode.Name = "CheckBoxSuperuserMode"
+        Me.CheckBoxSuperuserMode.Size = New System.Drawing.Size(304, 17)
+        Me.CheckBoxSuperuserMode.TabIndex = 0
+        Me.CheckBoxSuperuserMode.Text = "Superuser Mode (used rarely and on advice of FactEngine)"
+        Me.CheckBoxSuperuserMode.UseVisualStyleBackColor = True
         '
         'TabPage1
         '
@@ -504,6 +769,9 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.LabelPromptInitialiseClient)
+        Me.GroupBox3.Controls.Add(Me.LabelPromptEnableRemoteUI)
+        Me.GroupBox3.Controls.Add(Me.LabelPromptEnableClient)
         Me.GroupBox3.Controls.Add(Me.TextBoxBostonServerPortNumber)
         Me.GroupBox3.Controls.Add(Me.LabelPromptBostonServerPortNumber)
         Me.GroupBox3.Controls.Add(Me.CheckBoxClientServerInitialiseClient)
@@ -516,6 +784,36 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox3.Size = New System.Drawing.Size(594, 193)
         Me.GroupBox3.TabIndex = 0
         Me.GroupBox3.TabStop = False
+        '
+        'LabelPromptInitialiseClient
+        '
+        Me.LabelPromptInitialiseClient.AutoSize = True
+        Me.LabelPromptInitialiseClient.ForeColor = System.Drawing.Color.DarkGray
+        Me.LabelPromptInitialiseClient.Location = New System.Drawing.Point(166, 112)
+        Me.LabelPromptInitialiseClient.Name = "LabelPromptInitialiseClient"
+        Me.LabelPromptInitialiseClient.Size = New System.Drawing.Size(144, 13)
+        Me.LabelPromptInitialiseClient.TabIndex = 9
+        Me.LabelPromptInitialiseClient.Text = "To connect to Boston Server"
+        '
+        'LabelPromptEnableRemoteUI
+        '
+        Me.LabelPromptEnableRemoteUI.AutoSize = True
+        Me.LabelPromptEnableRemoteUI.ForeColor = System.Drawing.Color.DarkGray
+        Me.LabelPromptEnableRemoteUI.Location = New System.Drawing.Point(166, 89)
+        Me.LabelPromptEnableRemoteUI.Name = "LabelPromptEnableRemoteUI"
+        Me.LabelPromptEnableRemoteUI.Size = New System.Drawing.Size(181, 13)
+        Me.LabelPromptEnableRemoteUI.TabIndex = 8
+        Me.LabelPromptEnableRemoteUI.Text = "If using virtualisation through browser"
+        '
+        'LabelPromptEnableClient
+        '
+        Me.LabelPromptEnableClient.AutoSize = True
+        Me.LabelPromptEnableClient.ForeColor = System.Drawing.Color.DarkGray
+        Me.LabelPromptEnableClient.Location = New System.Drawing.Point(166, 20)
+        Me.LabelPromptEnableClient.Name = "LabelPromptEnableClient"
+        Me.LabelPromptEnableClient.Size = New System.Drawing.Size(323, 13)
+        Me.LabelPromptEnableClient.TabIndex = 7
+        Me.LabelPromptEnableClient.Text = "Enables Users, Groups, Projects, Functions, Roles and Permissions"
         '
         'TextBoxBostonServerPortNumber
         '
@@ -550,7 +848,7 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxClientServerRequireLoginAtStartup.AutoSize = True
         Me.CheckBoxClientServerRequireLoginAtStartup.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.CheckBoxClientServerRequireLoginAtStartup.Enabled = False
-        Me.CheckBoxClientServerRequireLoginAtStartup.Location = New System.Drawing.Point(22, 88)
+        Me.CheckBoxClientServerRequireLoginAtStartup.Location = New System.Drawing.Point(22, 42)
         Me.CheckBoxClientServerRequireLoginAtStartup.Name = "CheckBoxClientServerRequireLoginAtStartup"
         Me.CheckBoxClientServerRequireLoginAtStartup.Size = New System.Drawing.Size(138, 17)
         Me.CheckBoxClientServerRequireLoginAtStartup.TabIndex = 3
@@ -561,7 +859,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.CheckBoxUseRemoteUI.AutoSize = True
         Me.CheckBoxUseRemoteUI.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBoxUseRemoteUI.Location = New System.Drawing.Point(58, 65)
+        Me.CheckBoxUseRemoteUI.Location = New System.Drawing.Point(58, 88)
         Me.CheckBoxUseRemoteUI.Name = "CheckBoxUseRemoteUI"
         Me.CheckBoxUseRemoteUI.Size = New System.Drawing.Size(102, 17)
         Me.CheckBoxUseRemoteUI.TabIndex = 2
@@ -572,7 +870,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         Me.CheckBoxLoggingOutEndsSession.AutoSize = True
         Me.CheckBoxLoggingOutEndsSession.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.CheckBoxLoggingOutEndsSession.Location = New System.Drawing.Point(6, 42)
+        Me.CheckBoxLoggingOutEndsSession.Location = New System.Drawing.Point(6, 65)
         Me.CheckBoxLoggingOutEndsSession.Name = "CheckBoxLoggingOutEndsSession"
         Me.CheckBoxLoggingOutEndsSession.Size = New System.Drawing.Size(154, 17)
         Me.CheckBoxLoggingOutEndsSession.TabIndex = 1
@@ -605,6 +903,12 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxFactEngine.Controls.Add(Me.ComboBoxCultureInfo)
+        Me.GroupBoxFactEngine.Controls.Add(Me.LabelPromptCultureInfo)
+        Me.GroupBoxFactEngine.Controls.Add(Me.ComboBoxFactEngineModel)
+        Me.GroupBoxFactEngine.Controls.Add(Me.LabelPromptFactEngineModel)
+        Me.GroupBoxFactEngine.Controls.Add(Me.ComboBoxFactEngineModelCompany)
+        Me.GroupBoxFactEngine.Controls.Add(Me.LabelPromptFactEngineModelCompany)
         Me.GroupBoxFactEngine.Controls.Add(Me.TextBoxFactEngineOpenAIAPIKey)
         Me.GroupBoxFactEngine.Controls.Add(Me.LabelPromptFactEngineOpenAIAPIKey)
         Me.GroupBoxFactEngine.Controls.Add(Me.CheckBoxFactEngineUseGPT3)
@@ -624,30 +928,64 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxFactEngine.TabIndex = 0
         Me.GroupBoxFactEngine.TabStop = False
         '
+        'ComboBoxFactEngineModel
+        '
+        Me.ComboBoxFactEngineModel.FormattingEnabled = True
+        Me.ComboBoxFactEngineModel.Location = New System.Drawing.Point(107, 277)
+        Me.ComboBoxFactEngineModel.Name = "ComboBoxFactEngineModel"
+        Me.ComboBoxFactEngineModel.Size = New System.Drawing.Size(202, 21)
+        Me.ComboBoxFactEngineModel.TabIndex = 16
+        '
+        'LabelPromptFactEngineModel
+        '
+        Me.LabelPromptFactEngineModel.AutoSize = True
+        Me.LabelPromptFactEngineModel.Location = New System.Drawing.Point(16, 280)
+        Me.LabelPromptFactEngineModel.Name = "LabelPromptFactEngineModel"
+        Me.LabelPromptFactEngineModel.Size = New System.Drawing.Size(39, 13)
+        Me.LabelPromptFactEngineModel.TabIndex = 15
+        Me.LabelPromptFactEngineModel.Text = "Model:"
+        '
+        'ComboBoxFactEngineModelCompany
+        '
+        Me.ComboBoxFactEngineModelCompany.FormattingEnabled = True
+        Me.ComboBoxFactEngineModelCompany.Location = New System.Drawing.Point(107, 250)
+        Me.ComboBoxFactEngineModelCompany.Name = "ComboBoxFactEngineModelCompany"
+        Me.ComboBoxFactEngineModelCompany.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBoxFactEngineModelCompany.TabIndex = 14
+        '
+        'LabelPromptFactEngineModelCompany
+        '
+        Me.LabelPromptFactEngineModelCompany.AutoSize = True
+        Me.LabelPromptFactEngineModelCompany.Location = New System.Drawing.Point(16, 253)
+        Me.LabelPromptFactEngineModelCompany.Name = "LabelPromptFactEngineModelCompany"
+        Me.LabelPromptFactEngineModelCompany.Size = New System.Drawing.Size(86, 13)
+        Me.LabelPromptFactEngineModelCompany.TabIndex = 13
+        Me.LabelPromptFactEngineModelCompany.Text = "Model Company:"
+        '
         'TextBoxFactEngineOpenAIAPIKey
         '
-        Me.TextBoxFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(104, 248)
+        Me.TextBoxFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(107, 306)
         Me.TextBoxFactEngineOpenAIAPIKey.Name = "TextBoxFactEngineOpenAIAPIKey"
-        Me.TextBoxFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(295, 20)
+        Me.TextBoxFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(454, 20)
         Me.TextBoxFactEngineOpenAIAPIKey.TabIndex = 12
         '
         'LabelPromptFactEngineOpenAIAPIKey
         '
         Me.LabelPromptFactEngineOpenAIAPIKey.AutoSize = True
-        Me.LabelPromptFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(19, 251)
+        Me.LabelPromptFactEngineOpenAIAPIKey.Location = New System.Drawing.Point(16, 309)
         Me.LabelPromptFactEngineOpenAIAPIKey.Name = "LabelPromptFactEngineOpenAIAPIKey"
-        Me.LabelPromptFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(87, 13)
+        Me.LabelPromptFactEngineOpenAIAPIKey.Size = New System.Drawing.Size(80, 13)
         Me.LabelPromptFactEngineOpenAIAPIKey.TabIndex = 11
-        Me.LabelPromptFactEngineOpenAIAPIKey.Text = "OpenAI API Key:"
+        Me.LabelPromptFactEngineOpenAIAPIKey.Text = "Model API Key:"
         '
         'CheckBoxFactEngineUseGPT3
         '
         Me.CheckBoxFactEngineUseGPT3.AutoSize = True
         Me.CheckBoxFactEngineUseGPT3.Location = New System.Drawing.Point(19, 227)
         Me.CheckBoxFactEngineUseGPT3.Name = "CheckBoxFactEngineUseGPT3"
-        Me.CheckBoxFactEngineUseGPT3.Size = New System.Drawing.Size(225, 17)
+        Me.CheckBoxFactEngineUseGPT3.Size = New System.Drawing.Size(226, 17)
         Me.CheckBoxFactEngineUseGPT3.TabIndex = 10
-        Me.CheckBoxFactEngineUseGPT3.Text = "Use GPT3 for NL-2-FEQL Transformations"
+        Me.CheckBoxFactEngineUseGPT3.Text = "Use Model for NL-2-FEQL Transformations"
         Me.CheckBoxFactEngineUseGPT3.UseVisualStyleBackColor = True
         '
         'CheckBoxFactEngineUseTransformations
@@ -842,129 +1180,6 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.Text = "Keep database column names (e.g. case)"
         Me.CheckBoxReverseEngineeringKeepDatabaseColumnNames.UseVisualStyleBackColor = True
         '
-        'TabPage5
-        '
-        Me.TabPage5.Controls.Add(Me.GroupBox4)
-        Me.TabPage5.Location = New System.Drawing.Point(4, 22)
-        Me.TabPage5.Margin = New System.Windows.Forms.Padding(2)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(606, 635)
-        Me.TabPage5.TabIndex = 4
-        Me.TabPage5.Text = "Boston"
-        Me.TabPage5.UseVisualStyleBackColor = True
-        '
-        'GroupBox4
-        '
-        Me.GroupBox4.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox4.AutoSize = True
-        Me.GroupBox4.Controls.Add(Me.GroupBoxConfiguration)
-        Me.GroupBox4.Controls.Add(Me.GroupBoxImportExport)
-        Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyReportErrorEvents)
-        Me.GroupBox4.Controls.Add(Me.CheckBoxAutomaticallyCheckForUpdates)
-        Me.GroupBox4.Controls.Add(Me.ButtonReplaceCoreMetamodel)
-        Me.GroupBox4.Controls.Add(Me.CheckBoxDiagramSpyShowLinkFactTypes)
-        Me.GroupBox4.Controls.Add(Me.CheckBoxSuperuserMode)
-        Me.GroupBox4.Location = New System.Drawing.Point(10, 9)
-        Me.GroupBox4.Margin = New System.Windows.Forms.Padding(2)
-        Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox4.Size = New System.Drawing.Size(583, 484)
-        Me.GroupBox4.TabIndex = 0
-        Me.GroupBox4.TabStop = False
-        '
-        'GroupBoxConfiguration
-        '
-        Me.GroupBoxConfiguration.Controls.Add(Me.ButtonImportConfigurationTableItems)
-        Me.GroupBoxConfiguration.Location = New System.Drawing.Point(12, 230)
-        Me.GroupBoxConfiguration.Name = "GroupBoxConfiguration"
-        Me.GroupBoxConfiguration.Size = New System.Drawing.Size(559, 60)
-        Me.GroupBoxConfiguration.TabIndex = 6
-        Me.GroupBoxConfiguration.TabStop = False
-        Me.GroupBoxConfiguration.Text = "Configuration Items / Reference Tables"
-        '
-        'ButtonImportConfigurationTableItems
-        '
-        Me.ButtonImportConfigurationTableItems.Location = New System.Drawing.Point(6, 24)
-        Me.ButtonImportConfigurationTableItems.Name = "ButtonImportConfigurationTableItems"
-        Me.ButtonImportConfigurationTableItems.Size = New System.Drawing.Size(224, 23)
-        Me.ButtonImportConfigurationTableItems.TabIndex = 0
-        Me.ButtonImportConfigurationTableItems.Text = "&Import Configuration/Reference Table Items"
-        Me.ButtonImportConfigurationTableItems.UseVisualStyleBackColor = True
-        '
-        'GroupBoxImportExport
-        '
-        Me.GroupBoxImportExport.Controls.Add(Me.CheckBoxExportSuppressMDAModelElements)
-        Me.GroupBoxImportExport.Location = New System.Drawing.Point(12, 155)
-        Me.GroupBoxImportExport.Name = "GroupBoxImportExport"
-        Me.GroupBoxImportExport.Size = New System.Drawing.Size(559, 70)
-        Me.GroupBoxImportExport.TabIndex = 5
-        Me.GroupBoxImportExport.TabStop = False
-        Me.GroupBoxImportExport.Text = "Import/Export"
-        '
-        'CheckBoxExportSuppressMDAModelElements
-        '
-        Me.CheckBoxExportSuppressMDAModelElements.AutoSize = True
-        Me.CheckBoxExportSuppressMDAModelElements.Location = New System.Drawing.Point(6, 28)
-        Me.CheckBoxExportSuppressMDAModelElements.Name = "CheckBoxExportSuppressMDAModelElements"
-        Me.CheckBoxExportSuppressMDAModelElements.Size = New System.Drawing.Size(331, 17)
-        Me.CheckBoxExportSuppressMDAModelElements.TabIndex = 0
-        Me.CheckBoxExportSuppressMDAModelElements.Text = "Fact Based model (.fbm) Export - Suppress MDA Model Elements"
-        Me.CheckBoxExportSuppressMDAModelElements.UseVisualStyleBackColor = True
-        '
-        'CheckBoxAutomaticallyReportErrorEvents
-        '
-        Me.CheckBoxAutomaticallyReportErrorEvents.AutoSize = True
-        Me.CheckBoxAutomaticallyReportErrorEvents.Location = New System.Drawing.Point(12, 41)
-        Me.CheckBoxAutomaticallyReportErrorEvents.Name = "CheckBoxAutomaticallyReportErrorEvents"
-        Me.CheckBoxAutomaticallyReportErrorEvents.Size = New System.Drawing.Size(246, 17)
-        Me.CheckBoxAutomaticallyReportErrorEvents.TabIndex = 4
-        Me.CheckBoxAutomaticallyReportErrorEvents.Text = "Automatically report error events to FactEngine"
-        Me.CheckBoxAutomaticallyReportErrorEvents.UseVisualStyleBackColor = True
-        '
-        'CheckBoxAutomaticallyCheckForUpdates
-        '
-        Me.CheckBoxAutomaticallyCheckForUpdates.AutoSize = True
-        Me.CheckBoxAutomaticallyCheckForUpdates.Location = New System.Drawing.Point(12, 18)
-        Me.CheckBoxAutomaticallyCheckForUpdates.Name = "CheckBoxAutomaticallyCheckForUpdates"
-        Me.CheckBoxAutomaticallyCheckForUpdates.Size = New System.Drawing.Size(177, 17)
-        Me.CheckBoxAutomaticallyCheckForUpdates.TabIndex = 3
-        Me.CheckBoxAutomaticallyCheckForUpdates.Text = "Automatically check for updates"
-        Me.CheckBoxAutomaticallyCheckForUpdates.UseVisualStyleBackColor = True
-        '
-        'ButtonReplaceCoreMetamodel
-        '
-        Me.ButtonReplaceCoreMetamodel.Location = New System.Drawing.Point(377, 12)
-        Me.ButtonReplaceCoreMetamodel.Name = "ButtonReplaceCoreMetamodel"
-        Me.ButtonReplaceCoreMetamodel.Size = New System.Drawing.Size(149, 23)
-        Me.ButtonReplaceCoreMetamodel.TabIndex = 2
-        Me.ButtonReplaceCoreMetamodel.Text = "Replace Core Metamodel"
-        Me.ButtonReplaceCoreMetamodel.UseVisualStyleBackColor = True
-        Me.ButtonReplaceCoreMetamodel.Visible = False
-        '
-        'CheckBoxDiagramSpyShowLinkFactTypes
-        '
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.AutoSize = True
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Location = New System.Drawing.Point(12, 80)
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Name = "CheckBoxDiagramSpyShowLinkFactTypes"
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Size = New System.Drawing.Size(201, 17)
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.TabIndex = 1
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.Text = "Diagram Spy - Show Link Fact Types"
-        Me.CheckBoxDiagramSpyShowLinkFactTypes.UseVisualStyleBackColor = True
-        '
-        'CheckBoxSuperuserMode
-        '
-        Me.CheckBoxSuperuserMode.AutoSize = True
-        Me.CheckBoxSuperuserMode.Enabled = False
-        Me.CheckBoxSuperuserMode.Location = New System.Drawing.Point(12, 123)
-        Me.CheckBoxSuperuserMode.Margin = New System.Windows.Forms.Padding(2)
-        Me.CheckBoxSuperuserMode.Name = "CheckBoxSuperuserMode"
-        Me.CheckBoxSuperuserMode.Size = New System.Drawing.Size(304, 17)
-        Me.CheckBoxSuperuserMode.TabIndex = 0
-        Me.CheckBoxSuperuserMode.Text = "Superuser Mode (used rarely and on advice of FactEngine)"
-        Me.CheckBoxSuperuserMode.UseVisualStyleBackColor = True
-        '
         'TabPage7
         '
         Me.TabPage7.Controls.Add(Me.GroupBoxModelling)
@@ -977,6 +1192,7 @@ Partial Class frmCRUDBostonConfiguration
         '
         'GroupBoxModelling
         '
+        Me.GroupBoxModelling.Controls.Add(Me.CheckBoxSaveNewModelsAsXML)
         Me.GroupBoxModelling.Controls.Add(Me.CheckBoxHideReferenceModeOnReferenceModeSet)
         Me.GroupBoxModelling.Controls.Add(Me.CheckBoxModelllingUseThreadingLoadingXMLPage)
         Me.GroupBoxModelling.Controls.Add(Me.ComboBoxDefaultGeneralConceptConversion)
@@ -990,6 +1206,26 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBoxModelling.Size = New System.Drawing.Size(606, 635)
         Me.GroupBoxModelling.TabIndex = 0
         Me.GroupBoxModelling.TabStop = False
+        '
+        'CheckBoxSaveNewModelsAsXML
+        '
+        Me.CheckBoxSaveNewModelsAsXML.AutoSize = True
+        Me.CheckBoxSaveNewModelsAsXML.Location = New System.Drawing.Point(18, 189)
+        Me.CheckBoxSaveNewModelsAsXML.Name = "CheckBoxSaveNewModelsAsXML"
+        Me.CheckBoxSaveNewModelsAsXML.Size = New System.Drawing.Size(152, 17)
+        Me.CheckBoxSaveNewModelsAsXML.TabIndex = 7
+        Me.CheckBoxSaveNewModelsAsXML.Text = "Save New Models as &XML"
+        Me.CheckBoxSaveNewModelsAsXML.UseVisualStyleBackColor = True
+        '
+        'CheckBoxHideReferenceModeOnReferenceModeSet
+        '
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.AutoSize = True
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Location = New System.Drawing.Point(18, 155)
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Name = "CheckBoxHideReferenceModeOnReferenceModeSet"
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Size = New System.Drawing.Size(180, 17)
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.TabIndex = 6
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Text = "Hide Reference Mode on setting"
+        Me.CheckBoxHideReferenceModeOnReferenceModeSet.UseVisualStyleBackColor = True
         '
         'CheckBoxModelllingUseThreadingLoadingXMLPage
         '
@@ -1075,19 +1311,49 @@ Partial Class frmCRUDBostonConfiguration
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.Text = "Use square brackets around table names"
         Me.CheckBoxCodeGenerationUseSquareBracketsTableNames.UseVisualStyleBackColor = True
         '
+        'TabPageVirtualAssistant
+        '
+        Me.TabPageVirtualAssistant.Controls.Add(Me.GroupBoxVitualAssistant)
+        Me.TabPageVirtualAssistant.Location = New System.Drawing.Point(4, 22)
+        Me.TabPageVirtualAssistant.Name = "TabPageVirtualAssistant"
+        Me.TabPageVirtualAssistant.Size = New System.Drawing.Size(606, 635)
+        Me.TabPageVirtualAssistant.TabIndex = 8
+        Me.TabPageVirtualAssistant.Text = "Virtual Assistant"
+        Me.TabPageVirtualAssistant.UseVisualStyleBackColor = True
+        '
+        'GroupBoxVitualAssistant
+        '
+        Me.GroupBoxVitualAssistant.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBoxVitualAssistant.Controls.Add(Me.GroupBox1)
+        Me.GroupBoxVitualAssistant.Location = New System.Drawing.Point(12, 6)
+        Me.GroupBoxVitualAssistant.Name = "GroupBoxVitualAssistant"
+        Me.GroupBoxVitualAssistant.Size = New System.Drawing.Size(580, 615)
+        Me.GroupBoxVitualAssistant.TabIndex = 14
+        Me.GroupBoxVitualAssistant.TabStop = False
+        '
         'ErrorProvider
         '
         Me.ErrorProvider.ContainerControl = Me
         '
-        'CheckBoxHideReferenceModeOnReferenceModeSet
+        'LabelPromptCultureInfo
         '
-        Me.CheckBoxHideReferenceModeOnReferenceModeSet.AutoSize = True
-        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Location = New System.Drawing.Point(18, 155)
-        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Name = "CheckBoxHideReferenceModeOnReferenceModeSet"
-        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Size = New System.Drawing.Size(180, 17)
-        Me.CheckBoxHideReferenceModeOnReferenceModeSet.TabIndex = 6
-        Me.CheckBoxHideReferenceModeOnReferenceModeSet.Text = "Hide Reference Mode on setting"
-        Me.CheckBoxHideReferenceModeOnReferenceModeSet.UseVisualStyleBackColor = True
+        Me.LabelPromptCultureInfo.AutoSize = True
+        Me.LabelPromptCultureInfo.Location = New System.Drawing.Point(16, 342)
+        Me.LabelPromptCultureInfo.Name = "LabelPromptCultureInfo"
+        Me.LabelPromptCultureInfo.Size = New System.Drawing.Size(64, 13)
+        Me.LabelPromptCultureInfo.TabIndex = 17
+        Me.LabelPromptCultureInfo.Text = "Culture Info:"
+        '
+        'ComboBoxCultureInfo
+        '
+        Me.ComboBoxCultureInfo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxCultureInfo.FormattingEnabled = True
+        Me.ComboBoxCultureInfo.Location = New System.Drawing.Point(83, 339)
+        Me.ComboBoxCultureInfo.Name = "ComboBoxCultureInfo"
+        Me.ComboBoxCultureInfo.Size = New System.Drawing.Size(65, 21)
+        Me.ComboBoxCultureInfo.TabIndex = 18
         '
         'frmCRUDBostonConfiguration
         '
@@ -1108,13 +1374,22 @@ Partial Class frmCRUDBostonConfiguration
         Me.GroupBox2.PerformLayout()
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.TableLayoutPanel1.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
         Me.GroupBoxDatabase.ResumeLayout(False)
         Me.GroupBoxDatabase.PerformLayout()
         Me.GroupBoxDebugging.ResumeLayout(False)
         Me.GroupBoxDebugging.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.TabControl1.ResumeLayout(False)
+        Me.TabPage5.ResumeLayout(False)
+        Me.TabPage5.PerformLayout()
+        Me.GroupBoxBoston.ResumeLayout(False)
+        Me.GroupBoxBoston.PerformLayout()
+        Me.GroupBoxBackup.ResumeLayout(False)
+        Me.GroupBoxBackup.PerformLayout()
+        Me.GroupBoxConfiguration.ResumeLayout(False)
+        Me.GroupBoxImportExport.ResumeLayout(False)
+        Me.GroupBoxImportExport.PerformLayout()
         Me.TabPage1.ResumeLayout(False)
         Me.TabPage2.ResumeLayout(False)
         Me.GroupBox3.ResumeLayout(False)
@@ -1128,19 +1403,14 @@ Partial Class frmCRUDBostonConfiguration
         Me.TabPage6.ResumeLayout(False)
         Me.GroupBox5.ResumeLayout(False)
         Me.GroupBox5.PerformLayout()
-        Me.TabPage5.ResumeLayout(False)
-        Me.TabPage5.PerformLayout()
-        Me.GroupBox4.ResumeLayout(False)
-        Me.GroupBox4.PerformLayout()
-        Me.GroupBoxConfiguration.ResumeLayout(False)
-        Me.GroupBoxImportExport.ResumeLayout(False)
-        Me.GroupBoxImportExport.PerformLayout()
         Me.TabPage7.ResumeLayout(False)
         Me.GroupBoxModelling.ResumeLayout(False)
         Me.GroupBoxModelling.PerformLayout()
         Me.TabPage8.ResumeLayout(False)
         Me.GroupBoxCodeGeneration.ResumeLayout(False)
         Me.GroupBoxCodeGeneration.PerformLayout()
+        Me.TabPageVirtualAssistant.ResumeLayout(False)
+        Me.GroupBoxVitualAssistant.ResumeLayout(False)
         CType(Me.ErrorProvider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
@@ -1187,7 +1457,7 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxHideUnknownPredicates As CheckBox
     Friend WithEvents CheckBoxFactEngineUseReferenceModeOnlyForSimpleReferenceSchemes As CheckBox
     Friend WithEvents TabPage5 As TabPage
-    Friend WithEvents GroupBox4 As GroupBox
+    Friend WithEvents GroupBoxBoston As GroupBox
     Friend WithEvents CheckBoxSuperuserMode As CheckBox
     Friend WithEvents ComboBoxFactEngineUserDateTimeFormat As ComboBox
     Friend WithEvents ComboBoxFactEngineUserDateFormat As ComboBox
@@ -1236,4 +1506,27 @@ Partial Class frmCRUDBostonConfiguration
     Friend WithEvents CheckBoxUseThreadingDatabaseLoad As CheckBox
     Friend WithEvents CheckBoxStoreAndUseBinarySerialisations As CheckBox
     Friend WithEvents CheckBoxHideReferenceModeOnReferenceModeSet As CheckBox
+    Friend WithEvents ButtonCheckForUpdatesNow As Button
+    Friend WithEvents ButtonRefreshMenuOptions As Button
+    Friend WithEvents GroupBoxBackup As GroupBox
+    Friend WithEvents CheckBoxPerformGrandfatherFatherSonBackups As CheckBox
+    Friend WithEvents CheckBoxOptOutOfAutomatedErrorReportingAltogether As CheckBox
+    Friend WithEvents CheckBoxBrainConfirmActionsWithUser As CheckBox
+    Friend WithEvents TabPageVirtualAssistant As TabPage
+    Friend WithEvents GroupBoxVitualAssistant As GroupBox
+    Friend WithEvents CheckBoxSaveNewModelsAsXML As CheckBox
+    Friend WithEvents TextBoxAssemblyAIAPKey As TextBox
+    Friend WithEvents LabelPromptAssemblyAIAPKey As Label
+    Friend WithEvents LabelPromptInitialiseClient As Label
+    Friend WithEvents LabelPromptEnableRemoteUI As Label
+    Friend WithEvents LabelPromptEnableClient As Label
+    Friend WithEvents LabelPromptTheme As Label
+    Friend WithEvents ComboBoxThemeType As ComboBox
+    Friend WithEvents LabelPromptBostonDetails As Label
+    Friend WithEvents ComboBoxFactEngineModel As ComboBox
+    Friend WithEvents LabelPromptFactEngineModel As Label
+    Friend WithEvents ComboBoxFactEngineModelCompany As ComboBox
+    Friend WithEvents LabelPromptFactEngineModelCompany As Label
+    Friend WithEvents LabelPromptCultureInfo As Label
+    Friend WithEvents ComboBoxCultureInfo As ComboBox
 End Class

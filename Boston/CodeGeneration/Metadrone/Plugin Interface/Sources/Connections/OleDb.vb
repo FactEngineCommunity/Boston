@@ -1,4 +1,6 @@
-﻿Namespace PluginInterface.Sources
+﻿Imports Boston.FBM
+
+Namespace PluginInterface.Sources
 
     Friend Class OleDb
         Implements IConnection
@@ -26,16 +28,6 @@
             End Get
             Set(ByVal value As String)
                 Me.mName = value
-            End Set
-        End Property
-
-        Public _BostonModel As FBM.Model
-        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
-            Get
-                Return Me._BostonModel
-            End Get
-            Set(value As FBM.Model)
-                Me._BostonModel = value
             End Set
         End Property
 
@@ -106,6 +98,15 @@
             Get
                 Return Me.mIgnoreTableNames
             End Get
+        End Property
+
+        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As FBM.Model)
+                Throw New NotImplementedException()
+            End Set
         End Property
 
         Public Sub TestConnection() Implements IConnection.TestConnection

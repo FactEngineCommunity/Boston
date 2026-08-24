@@ -25,6 +25,8 @@ Partial Class frmCRUDEditReferenceTable
         Me.components = New System.ComponentModel.Container()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.AdvancedDataGridView = New ADGV.AdvancedDataGridView()
+        Me.ContextMenuStripDataGrid = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.ClearFiltersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ButtonDeleteReferenceTable = New System.Windows.Forms.Button()
         Me.ButtonExportConfigurationItems = New System.Windows.Forms.Button()
         Me.Button_delete = New System.Windows.Forms.Button()
@@ -32,8 +34,6 @@ Partial Class frmCRUDEditReferenceTable
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.button_save = New System.Windows.Forms.Button()
         Me.LabelPrompt_ConfigurationItem = New System.Windows.Forms.Label()
-        Me.ContextMenuStripDataGrid = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.ClearFiltersToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox1.SuspendLayout()
         CType(Me.AdvancedDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ContextMenuStripDataGrid.SuspendLayout()
@@ -41,6 +41,9 @@ Partial Class frmCRUDEditReferenceTable
         '
         'GroupBox1
         '
+        Me.GroupBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.AdvancedDataGridView)
         Me.GroupBox1.Controls.Add(Me.ButtonDeleteReferenceTable)
         Me.GroupBox1.Controls.Add(Me.ButtonExportConfigurationItems)
@@ -51,25 +54,42 @@ Partial Class frmCRUDEditReferenceTable
         Me.GroupBox1.Controls.Add(Me.LabelPrompt_ConfigurationItem)
         Me.GroupBox1.Location = New System.Drawing.Point(9, 3)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(569, 328)
+        Me.GroupBox1.Size = New System.Drawing.Size(568, 277)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         '
         'AdvancedDataGridView
         '
+        Me.AdvancedDataGridView.AllowUserToAddRows = False
+        Me.AdvancedDataGridView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AdvancedDataGridView.AutoGenerateContextFilters = True
         Me.AdvancedDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.AdvancedDataGridView.ContextMenuStrip = Me.ContextMenuStripDataGrid
         Me.AdvancedDataGridView.DateWithTime = False
         Me.AdvancedDataGridView.Location = New System.Drawing.Point(17, 51)
         Me.AdvancedDataGridView.Name = "AdvancedDataGridView"
-        Me.AdvancedDataGridView.Size = New System.Drawing.Size(530, 233)
+        Me.AdvancedDataGridView.Size = New System.Drawing.Size(534, 187)
         Me.AdvancedDataGridView.TabIndex = 8
         Me.AdvancedDataGridView.TimeFilter = False
         '
+        'ContextMenuStripDataGrid
+        '
+        Me.ContextMenuStripDataGrid.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ClearFiltersToolStripMenuItem})
+        Me.ContextMenuStripDataGrid.Name = "ContextMenuStripDataGrid"
+        Me.ContextMenuStripDataGrid.Size = New System.Drawing.Size(136, 26)
+        '
+        'ClearFiltersToolStripMenuItem
+        '
+        Me.ClearFiltersToolStripMenuItem.Name = "ClearFiltersToolStripMenuItem"
+        Me.ClearFiltersToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
+        Me.ClearFiltersToolStripMenuItem.Text = "&Clear Filters"
+        '
         'ButtonDeleteReferenceTable
         '
-        Me.ButtonDeleteReferenceTable.Location = New System.Drawing.Point(408, 290)
+        Me.ButtonDeleteReferenceTable.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonDeleteReferenceTable.Location = New System.Drawing.Point(408, 244)
         Me.ButtonDeleteReferenceTable.Name = "ButtonDeleteReferenceTable"
         Me.ButtonDeleteReferenceTable.Size = New System.Drawing.Size(139, 23)
         Me.ButtonDeleteReferenceTable.TabIndex = 7
@@ -78,7 +98,8 @@ Partial Class frmCRUDEditReferenceTable
         '
         'ButtonExportConfigurationItems
         '
-        Me.ButtonExportConfigurationItems.Location = New System.Drawing.Point(257, 291)
+        Me.ButtonExportConfigurationItems.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonExportConfigurationItems.Location = New System.Drawing.Point(257, 245)
         Me.ButtonExportConfigurationItems.Name = "ButtonExportConfigurationItems"
         Me.ButtonExportConfigurationItems.Size = New System.Drawing.Size(145, 23)
         Me.ButtonExportConfigurationItems.TabIndex = 6
@@ -87,8 +108,9 @@ Partial Class frmCRUDEditReferenceTable
         '
         'Button_delete
         '
+        Me.Button_delete.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Button_delete.Enabled = False
-        Me.Button_delete.Location = New System.Drawing.Point(176, 290)
+        Me.Button_delete.Location = New System.Drawing.Point(176, 244)
         Me.Button_delete.Name = "Button_delete"
         Me.Button_delete.Size = New System.Drawing.Size(75, 24)
         Me.Button_delete.TabIndex = 5
@@ -97,7 +119,8 @@ Partial Class frmCRUDEditReferenceTable
         '
         'Button_add_new
         '
-        Me.Button_add_new.Location = New System.Drawing.Point(95, 290)
+        Me.Button_add_new.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.Button_add_new.Location = New System.Drawing.Point(95, 244)
         Me.Button_add_new.Name = "Button_add_new"
         Me.Button_add_new.Size = New System.Drawing.Size(75, 24)
         Me.Button_add_new.TabIndex = 4
@@ -115,7 +138,8 @@ Partial Class frmCRUDEditReferenceTable
         '
         'button_save
         '
-        Me.button_save.Location = New System.Drawing.Point(19, 290)
+        Me.button_save.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.button_save.Location = New System.Drawing.Point(19, 244)
         Me.button_save.Name = "button_save"
         Me.button_save.Size = New System.Drawing.Size(70, 24)
         Me.button_save.TabIndex = 2
@@ -131,23 +155,11 @@ Partial Class frmCRUDEditReferenceTable
         Me.LabelPrompt_ConfigurationItem.TabIndex = 1
         Me.LabelPrompt_ConfigurationItem.Text = "Configuration Item :"
         '
-        'ContextMenuStripDataGrid
-        '
-        Me.ContextMenuStripDataGrid.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ClearFiltersToolStripMenuItem})
-        Me.ContextMenuStripDataGrid.Name = "ContextMenuStripDataGrid"
-        Me.ContextMenuStripDataGrid.Size = New System.Drawing.Size(181, 48)
-        '
-        'ClearFiltersToolStripMenuItem
-        '
-        Me.ClearFiltersToolStripMenuItem.Name = "ClearFiltersToolStripMenuItem"
-        Me.ClearFiltersToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
-        Me.ClearFiltersToolStripMenuItem.Text = "&Clear Filters"
-        '
         'frmCRUDEditReferenceTable
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(675, 343)
+        Me.ClientSize = New System.Drawing.Size(587, 288)
         Me.Controls.Add(Me.GroupBox1)
         Me.Name = "frmCRUDEditReferenceTable"
         Me.ShowIcon = False

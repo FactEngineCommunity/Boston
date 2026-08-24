@@ -13,9 +13,9 @@ Public Module tableORMPredicatePart
             lsSQLQuery &= "," & pdbConnection.DateWrap(Now.ToString("yyyy/MM/dd HH:mm:ss"))
             lsSQLQuery &= " ,'" & Trim(arPredicatePart.Model.ModelId) & "'"
             lsSQLQuery &= " ,'" & Trim(arPredicatePart.FactTypeReading.Id) & "'"
-            lsSQLQuery &= " ," & arPredicatePart.SequenceNr            
+            lsSQLQuery &= " ," & arPredicatePart.SequenceNr
             'lsSQLQuery &= " ,'" & Trim(arPredicatePart.ObjectType1.Symbol) & "'"
-            'If IsSomething(arPredicatePart.ObjectType2) Then
+            'If arPredicatePart.ObjectType2 IsNot Nothing Then
             '    '----------------------------------
             '    'FactType with more than one Role
             '    '----------------------------------
@@ -39,7 +39,7 @@ Public Module tableORMPredicatePart
             Dim lsMessage As String
             lsMessage = "Error: TablePredicatePart.AddPredicatePart"
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -75,7 +75,7 @@ Public Module tableORMPredicatePart
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -98,7 +98,7 @@ Public Module tableORMPredicatePart
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -121,7 +121,7 @@ Public Module tableORMPredicatePart
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -178,7 +178,7 @@ Public Module tableORMPredicatePart
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Function
@@ -204,7 +204,7 @@ Public Module tableORMPredicatePart
             Dim lsMessage As String
             lsMessage = "Error: TablePredicatePart.UpdatePredicatePart"
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

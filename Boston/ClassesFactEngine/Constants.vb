@@ -1,10 +1,21 @@
 ﻿Namespace FactEngine
     Public Module Constants
 
+        Public Enum pcenumDayOfTheWeek
+            Monday
+            Tuesday
+            Wednesday
+            Thursday
+            Friday
+            Saturday
+            Sunday
+        End Enum
+
         Public Enum pcenumWhichClauseType
             None = 0
             WhichPredicateNodePropertyIdentification = 1 '      E.g. WHICH has (emailAddress:'hamish.bentley@qut.com.au)
-            IsPredicateNodePropertyIdentification '    1 also   E.g. IS in (Semester:'1')  'NB Possibly not required, because IS will be in the Predicate
+            IsPredicateNodePropertyIdentification = 17 '1 also  E.g. IS in (Semester:'1')  'NB Possibly not required, because IS will be in the Predicate
+            IsNodePropertyIdentificationPredicate = 18 '1 aslo  E.g. BaseNode = Headnode (full query): (Pizza Name:'Margherita') has WHICH Topping
             PredicateWHICHModelElement = 2 '                    E.g. occupies WHICH Room
             AndThatPredicateThatModelElement = 3 '              E.g. AND THAT Faculty has THAT School
             AndThatModelElementPredicateThatModelElement = 4 '  E.g. AND THAT School is in THAT Faculty
@@ -23,6 +34,7 @@
             AndThatValueComparitor = 133 '                      E.g. AND THAT Quantity > UnitsInStock
             BooleanPredicate = 14 '                             E.g. Protein is ensyme
             ThatModelElementPredicate = 15 '                    E.g. THAT James Dean played in (as in "SHOW ME Movies THAT James Dean played in")
+            ShortestPath = 16 '                                 E.g. WHICH Person [SHORTEST PATH] Cinema
 
             '?? below
             'AndThatModelElementPredicateWhichModelElement '    E.g. AND THAT Faculty has WHICH School. Currently unused.Checked.

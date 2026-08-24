@@ -18,23 +18,6 @@ Public Class frmCRUDEditReferenceTable
     Dim zls_field_list As New List(Of Object)
     Dim msSortOrder As String = "Ascending"
 
-    Private Sub frm_edit_reference_table_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-
-        Dim ls_message As String = ""
-        If Me.zb_grid_data_dirty Then
-            ls_message = "Do you want to save the changes to the Configuration Data?"
-            ls_message &= vbCrLf & vbCrLf
-            ls_message &= "Press [Ok] to save changes, or [Cancel] to close this form without saving changes."
-
-            If MsgBox(ls_message, MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
-                Call save_data_grid_items()
-            End If
-        End If
-
-        Me.ComboBox1.Items.Clear()
-        Me.AdvancedDataGridView.DataSource = Nothing
-
-    End Sub
 
     Private Sub frm_edit_reference_table_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
@@ -50,7 +33,6 @@ Public Class frmCRUDEditReferenceTable
 
     Sub load_reference_tables()
 
-        Dim liInd As Integer = 0
         Dim lo_reference_table As ReferenceTable
         Dim lsSQLQuery As String = ""
         Dim lREcordset As New RecordsetProxy
@@ -68,11 +50,10 @@ Public Class frmCRUDEditReferenceTable
 
             If Not lREcordset.EOF Then
                 While Not lREcordset.EOF
-                    liInd += 1
                     lo_reference_table = New ReferenceTable
                     lo_reference_table.ReferenceTableId = lREcordset("reference_table_id").Value
                     lo_reference_table.name = lREcordset("reference_table_name").Value
-                    Me.ComboBox1.Items.Add(New tComboboxItem(liInd, lREcordset("reference_table_name").Value, lo_reference_table))
+                    Me.ComboBox1.Items.Add(New tComboboxItem(lo_reference_table.ReferenceTableId, lo_reference_table.Name, lo_reference_table))
                     lREcordset.MoveNext()
                 End While
             End If
@@ -84,8 +65,26 @@ Public Class frmCRUDEditReferenceTable
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
+
+    End Sub
+
+    Private Sub frm_edit_reference_table_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+
+        Dim ls_message As String = ""
+        If Me.zb_grid_data_dirty Then
+            ls_message = "Do you want to save the changes to the Configuration Data?"
+            ls_message &= vbCrLf & vbCrLf
+            ls_message &= "Press [Ok] to save changes, or [Cancel] to close this form without saving changes."
+
+            If MsgBox(ls_message, MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
+                Call Save_data_grid_items()
+            End If
+        End If
+
+        Me.ComboBox1.Items.Clear()
+        Me.AdvancedDataGridView.DataSource = Nothing
 
     End Sub
 
@@ -96,16 +95,44 @@ Public Class frmCRUDEditReferenceTable
             'Get the list of Tuples as a List(Of Object)
             '--------------------------------------------
             If aarReferenceTableTuples Is Nothing Then
-                zlo_display_list = TableReferenceFieldValue.GetReferenceFieldValueTuples(ComboBox1.SelectedItem.tag.ReferenceTableId, Me.zo_working_class, mrReferenceTable)
+                zlo_display_list = TableReferenceFieldValue.GetReferenceFieldValueTuples(ComboBox1.SelectedItem.tag.ReferenceTableId, mrReferenceTable) ', Me.zo_working_class
             Else
                 zlo_display_list = aarReferenceTableTuples
             End If
+
+            Dim table As New DataTable()
+            ' If it's the first time, you need to create the columns.
+            Dim firstItem As Boolean = True
+
+            ' Iterate through the list of ExpandoObjects
+            For Each expando As IDictionary(Of String, Object) In zlo_display_list
+                ' Create a new row for each ExpandoObject.
+                Dim row As DataRow = table.NewRow()
+
+                ' Iterate through the KeyValuePair in each ExpandoObject.
+                For Each kvp As KeyValuePair(Of String, Object) In expando
+                    ' If it's the first item, add columns to the DataTable.
+                    If firstItem Then
+                        ' We check if the value is not null to get the type; otherwise, we assume 'Object'.
+                        table.Columns.Add(kvp.Key, If(kvp.Value?.GetType(), GetType(Object)))
+                    End If
+
+                    ' Add the value to the row.
+                    row(kvp.Key) = kvp.Value
+                Next
+
+                ' Add the row to the DataTable.
+                table.Rows.Add(row)
+
+                ' Set firstItem to False after the first iteration.
+                firstItem = False
+            Next
 
             '---------------------------------
             'Bind the tuples to the DataGrid
             '---------------------------------       
             AdvancedDataGridView.DataSource = Nothing
-            AdvancedDataGridView.DataSource = zlo_display_list 'lrObjectList ' New DefensiveDatasource(zlo_display_list, Nothing)
+            AdvancedDataGridView.DataSource = table '20231109-VM-Was zlo_display_list 'lrObjectList ' New DefensiveDatasource(zlo_display_list, Nothing)
 
             cManager = CType(AdvancedDataGridView.BindingContext(zlo_display_list), CurrencyManager)
 
@@ -123,7 +150,7 @@ Public Class frmCRUDEditReferenceTable
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -133,36 +160,77 @@ Public Class frmCRUDEditReferenceTable
 
         Dim loObject As New Object
 
-        loObject = zo_working_class.clone
-        loObject.row_id = System.Guid.NewGuid.ToString
+        Try
+            loObject = TableReferenceTable.GetReferenceTableTupleObject(ComboBox1.SelectedItem.tag.ReferenceTableId)
 
-        If zlo_display_list.Count = 0 Then
-            zlo_display_list = New List(Of Object)
-        End If
+            '20231109-VM-Was loObject = zo_working_class.clone
+            loObject.RowId = System.Guid.NewGuid.ToString
 
-        zlo_display_list.Add(loObject)
+            If zlo_display_list.Count = 0 Then
+                zlo_display_list = New List(Of Object)
+            End If
 
-        '---------------------------------
-        'Bind the tuples to the DataGrid
-        '---------------------------------               
-        AdvancedDataGridView.DataSource = Nothing
-        AdvancedDataGridView.DataSource = zlo_display_list
-        cManager = CType(AdvancedDataGridView.BindingContext(zlo_display_list), CurrencyManager)
+            zlo_display_list.Add(loObject)
 
-        Me.AdvancedDataGridView.Columns(0).Visible = False
+#Region "Data Source"
+            Dim table As New DataTable()
+            ' If it's the first time, you need to create the columns.
+            Dim firstItem As Boolean = True
 
-        '-----------------------------------
-        'Clear the values in the new tuple
-        '-----------------------------------
-        Dim lo_row As DataGridViewRow
-        Dim liInd As Integer = 1
+            ' Iterate through the list of ExpandoObjects
+            For Each expando As IDictionary(Of String, Object) In zlo_display_list
+                ' Create a new row for each ExpandoObject.
+                Dim row As DataRow = table.NewRow()
 
-        lo_row = Me.AdvancedDataGridView.Rows.Item(Me.AdvancedDataGridView.Rows.Count - 1)
+                ' Iterate through the KeyValuePair in each ExpandoObject.
+                For Each kvp As KeyValuePair(Of String, Object) In expando
+                    ' If it's the first item, add columns to the DataTable.
+                    If firstItem Then
+                        ' We check if the value is not null to get the type; otherwise, we assume 'Object'.
+                        table.Columns.Add(kvp.Key, If(kvp.Value?.GetType(), GetType(Object)))
+                    End If
 
-        For liInd = 1 To lo_row.Cells.Count - 1
-            lo_row.Cells.Item(liInd).Value = ""
-        Next
+                    ' Add the value to the row.
+                    row(kvp.Key) = kvp.Value
+                Next
 
+                ' Add the row to the DataTable.
+                table.Rows.Add(row)
+
+                ' Set firstItem to False after the first iteration.
+                firstItem = False
+            Next
+#End Region
+
+            '---------------------------------
+            'Bind the tuples to the DataGrid
+            '---------------------------------               
+            AdvancedDataGridView.DataSource = Nothing
+            AdvancedDataGridView.DataSource = table '20231109-VM-Was zlo_display_list
+            cManager = CType(AdvancedDataGridView.BindingContext(zlo_display_list), CurrencyManager)
+
+            Me.AdvancedDataGridView.Columns(0).Visible = False
+
+            '-----------------------------------
+            'Clear the values in the new tuple
+            '-----------------------------------
+            Dim lo_row As DataGridViewRow
+            Dim liInd As Integer = 1
+
+            lo_row = Me.AdvancedDataGridView.Rows.Item(Me.AdvancedDataGridView.Rows.Count - 1)
+
+            For liInd = 1 To lo_row.Cells.Count - 1
+                lo_row.Cells.Item(liInd).Value = ""
+            Next
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
     End Sub
 
     Function TupleToListOfString(ByVal aoTuple As tTuple) As Object
@@ -184,51 +252,63 @@ Public Class frmCRUDEditReferenceTable
         Dim ls_message As String
         Dim li_selected_row_count As Integer = 0
 
-        If IsSomething(AdvancedDataGridView.CurrentRow.DataBoundItem) Then
+        Try
+            If AdvancedDataGridView.CurrentRow.DataBoundItem IsNot Nothing Then
 
-            loObject = AdvancedDataGridView.CurrentRow.DataBoundItem.clone
+                loObject = zlo_display_list(AdvancedDataGridView.SelectedRows(0).Index) '20231109-VM-Was AdvancedDataGridView.CurrentRow.DataBoundItem.clone
 
-            li_selected_row_count = Me.AdvancedDataGridView.SelectedRows.Count
-            If li_selected_row_count = 0 Then li_selected_row_count = 1
-            '-------------------------------------------------------------
-            'Delete the respective ReferenceFieldValue tuples within the 
-            '  ReferenceFieldValue table in the database.
-            '-------------------------------------------------------------
-            If li_selected_row_count > 1 Then
-                ls_message = "Please select one row at a time for deletion."
-                MsgBox(ls_message)
-                Exit Sub
-            End If
+                li_selected_row_count = Me.AdvancedDataGridView.SelectedRows.Count
+                If li_selected_row_count = 0 Then li_selected_row_count = 1
+                '-------------------------------------------------------------
+                'Delete the respective ReferenceFieldValue tuples within the 
+                '  ReferenceFieldValue table in the database.
+                '-------------------------------------------------------------
+                If li_selected_row_count > 1 Then
+                    ls_message = "Please select one row at a time for deletion."
+                    MsgBox(ls_message)
+                    Exit Sub
+                End If
 
-            ls_message = "You are about to delete " & CStr(li_selected_row_count) & " row/s. This operation is permanent and cannot be undone."
-            ls_message &= vbCrLf & vbCrLf
-            ls_message &= "Select OK to confirm that you want to delete these rows, or [Cancel] if you do not wish to delete the rows."
+                ls_message = "You are about to delete " & CStr(li_selected_row_count) & " row/s. This operation is permanent and cannot be undone."
+                ls_message &= vbCrLf & vbCrLf
+                ls_message &= "Select OK to confirm that you want to delete these rows, or [Cancel] if you do not wish to delete the rows."
 
-            If MsgBox(ls_message, MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then
-                Exit Sub
-            End If
+                If MsgBox(ls_message, MsgBoxStyle.OkCancel) = MsgBoxResult.Cancel Then
+                    Exit Sub
+                End If
 
-            For Each lo_row In Me.AdvancedDataGridView.SelectedRows
-                loObject = lo_row.DataBoundItem
-                prReferenceFieldValue = New tReferenceFieldValue
-                prReferenceFieldValue.RowId = loObject.row_id
+                For Each lo_row In Me.AdvancedDataGridView.SelectedRows
+                    '20231109-VM-Was loObject = lo_row.DataBoundItem
+                    prReferenceFieldValue = New tReferenceFieldValue
+                    prReferenceFieldValue.RowId = DirectCast(lo_row.DataBoundItem, DataRowView).Row.Item(0) '20231109-VM-Was loObject.RowId
 
-                For liInd = 1 To lo_row.Cells.Count - 1
-                    prReferenceFieldValue.Data = lo_row.Cells.Item(liInd).Value
-                    prReferenceFieldValue.ReferenceFieldId = liInd
-                    prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.ReferenceTableId
-                    prReferenceFieldValue.delete()
+                    For liInd = 1 To lo_row.Cells.Count - 1
+                        prReferenceFieldValue.Data = lo_row.Cells.Item(liInd).Value
+                        prReferenceFieldValue.ReferenceFieldId = liInd
+                        prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.ReferenceTableId
+                        prReferenceFieldValue.delete()
+                    Next
                 Next
-            Next
 
-            zlo_display_list.Remove(AdvancedDataGridView.CurrentRow.DataBoundItem)
-            Me.AdvancedDataGridView.DataSource = Nothing
-            Me.AdvancedDataGridView.DataSource = zlo_display_list
+                zlo_display_list.Remove(AdvancedDataGridView.CurrentRow.DataBoundItem)
+                Me.AdvancedDataGridView.DataSource = Nothing
+                Me.AdvancedDataGridView.DataSource = zlo_display_list
 
-            If Me.AdvancedDataGridView.RowCount > 0 Then
-                Me.AdvancedDataGridView.Columns(0).Visible = False
+                If Me.AdvancedDataGridView.RowCount > 0 Then
+                    Me.AdvancedDataGridView.Columns(0).Visible = False
+                End If
+
+                Call Me.populate_data_grid_for_selected_reference_table()
             End If
-        End If
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -262,21 +342,31 @@ Public Class frmCRUDEditReferenceTable
         Dim ls_attribute_value As String = ""
         Dim liInd As Integer = 1
 
-        For Each lo_row In Me.AdvancedDataGridView.Rows
+        Try
+            For Each lo_row In Me.AdvancedDataGridView.Rows
 
-            loObject = lo_row.DataBoundItem
-            prReferenceFieldValue = New tReferenceFieldValue
-            prReferenceFieldValue.RowId = loObject.row_id
+                loObject = DirectCast(lo_row.DataBoundItem, DataRowView) '20231109-VM-lo_row.DataBoundItem
+                prReferenceFieldValue = New tReferenceFieldValue
+                prReferenceFieldValue.RowId = NullVal(loObject.Row.Item(0), System.Guid.NewGuid.ToString) '20231109-VM-Was .RowId
 
-            For liInd = 1 To lo_row.Cells.Count - 1
-                prReferenceFieldValue.Data = CStr(lo_row.Cells.Item(liInd).Value).Replace("'", "''")
-                prReferenceFieldValue.ReferenceFieldId = liInd
-                prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.ReferenceTableId
-                prReferenceFieldValue.Save()
+                For liInd = 1 To lo_row.Cells.Count - 1
+                    prReferenceFieldValue.Data = CStr(lo_row.Cells.Item(liInd).Value).Replace("'", "''")
+                    prReferenceFieldValue.ReferenceFieldId = liInd
+                    prReferenceFieldValue.ReferenceTableId = ComboBox1.SelectedItem.tag.ReferenceTableId
+                    prReferenceFieldValue.Save()
+                Next
             Next
-        Next
 
-        Me.zb_grid_data_dirty = False
+            Me.zb_grid_data_dirty = False
+
+        Catch ex As Exception
+            Dim lsMessage As String
+            Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+            lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+            lsMessage &= vbCrLf & vbCrLf & ex.Message
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+        End Try
 
     End Sub
 
@@ -334,7 +424,7 @@ Public Class frmCRUDEditReferenceTable
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -360,7 +450,7 @@ Public Class frmCRUDEditReferenceTable
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -414,8 +504,8 @@ Public Class frmCRUDEditReferenceTable
                 larExpandoFields.Add(New With {.FieldName = fieldName, .Value = inComponent, .IsINComparitor = True})
             Next
 
-            Dim loSetting As Object = New System.Dynamic.ExpandoObject 'Dummy
-            Dim larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(Me.mrReferenceTable.ReferenceTableId, loSetting,, larExpandoFields)
+            'Dim loSetting As Object = New System.Dynamic.ExpandoObject 'Dummy
+            Dim larSettingTuples = TableReferenceFieldValue.GetReferenceFieldValueTuples(Me.mrReferenceTable.ReferenceTableId,, larExpandoFields) ' loSetting,
 
             Call Me.populate_data_grid_for_selected_reference_table(larSettingTuples)
 
@@ -425,7 +515,7 @@ Public Class frmCRUDEditReferenceTable
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -458,13 +548,22 @@ Public Class frmCRUDEditReferenceTable
 
                     ' Sort the data in the List using LINQ
                     If msSortOrder = "Ascending" Then
-                        zlo_display_list = zlo_display_list.OrderBy(Function(obj) obj.GetType().GetProperty(columnName).GetValue(obj, Nothing)).ToList()
+                        'zlo_display_list = zlo_display_list.OrderBy(Function(obj) obj.GetType().GetProperty(columnName).GetValue(obj, Nothing)).ToList()
+                        zlo_display_list = zlo_display_list.OrderBy(Function(obj)
+                                                                        Dim dict As IDictionary(Of String, Object) = CType(obj, IDictionary(Of String, Object))
+                                                                        Return If(dict.ContainsKey(columnName), dict(columnName), Nothing)
+                                                                    End Function).ToList()
                     Else
-                        zlo_display_list = zlo_display_list.OrderByDescending(Function(obj) obj.GetType().GetProperty(columnName).GetValue(obj, Nothing)).ToList()
+                        'zlo_display_list = zlo_display_list.OrderByDescending(Function(obj) obj.GetType().GetProperty(columnName).GetValue(obj, Nothing)).ToList()
+                        zlo_display_list = zlo_display_list.OrderByDescending(Function(obj)
+                                                                                  Dim dict As IDictionary(Of String, Object) = CType(obj, IDictionary(Of String, Object))
+                                                                                  Return If(dict.ContainsKey(columnName), dict(columnName), Nothing)
+                                                                              End Function).ToList
                     End If
 
                     ' Re-bind the sorted List to the DataGridView
-                    Me.AdvancedDataGridView.DataSource = zlo_display_list
+                    'Me.AdvancedDataGridView.DataSource = zlo_display_list
+                    Call Me.populate_data_grid_for_selected_reference_table(zlo_display_list)
                 End If
 
             End If
@@ -475,7 +574,7 @@ Public Class frmCRUDEditReferenceTable
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -491,7 +590,7 @@ Public Class frmCRUDEditReferenceTable
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub

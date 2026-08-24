@@ -80,15 +80,15 @@ Namespace XMLModel15
                     lrXMLEntityType.LongDescription = lrEntityType.LongDescription
                     lrXMLEntityType.ShortDescription = lrEntityType.ShortDescription
 
-                    If IsSomething(lrEntityType.ReferenceModeRoleConstraint) Then
+                    If lrEntityType.ReferenceModeRoleConstraint IsNot Nothing Then
                         lrXMLEntityType.ReferenceSchemeRoleConstraintId = lrEntityType.ReferenceModeRoleConstraint.Id
                     End If
 
-                    If IsSomething(lrEntityType.ReferenceModeValueType) Then
+                    If lrEntityType.ReferenceModeValueType IsNot Nothing Then
                         lrXMLEntityType.ReferenceModeValueTypeId = lrEntityType.ReferenceModeValueType.Id
                     End If
 
-                    Dim lrSubtypeRelationship As FBM.tSubtypeRelationship
+                    Dim lrSubtypeRelationship As FBM.SubtypeRelationship
                     Dim lrXMLSubtypeRelationship As XMLModel15.SubtypeRelationship
 
                     For Each lrSubtypeRelationship In lrEntityType.SubtypeRelationship
@@ -120,7 +120,7 @@ Namespace XMLModel15
                     lrXMLFactType.IsObjectified = lrFactType.IsObjectified
                     lrXMLFactType.IsPreferredReferenceSchemeFT = lrFactType.IsPreferredReferenceMode
                     lrXMLFactType.IsSubtypeRelationshipFactType = lrFactType.IsSubtypeRelationshipFactType
-                    If IsSomething(lrFactType.ObjectifyingEntityType) Then
+                    If lrFactType.ObjectifyingEntityType IsNot Nothing Then
                         lrXMLFactType.ObjectifyingEntityTypeId = lrFactType.ObjectifyingEntityType.Id
                     End If
                     lrXMLFactType.IsDerived = lrFactType.IsDerived
@@ -147,7 +147,7 @@ Namespace XMLModel15
                         lrXMLRole.SequenceNr = lrRole.SequenceNr
                         lrXMLRole.Mandatory = lrRole.Mandatory
 
-                        If IsSomething(lrRole.JoinedORMObject) Then
+                        If lrRole.JoinedORMObject IsNot Nothing Then
                             lrXMLRole.JoinedObjectTypeId = lrRole.JoinedORMObject.Id
                         End If
 
@@ -481,7 +481,7 @@ Namespace XMLModel15
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -616,9 +616,9 @@ Namespace XMLModel15
                     lrRole.JoinedORMObject = New FBM.ModelObject
                     lrRole.JoinedORMObject.Id = lrXMLRole(0).JoinedObjectTypeId
 
-                    If IsSomething(lrModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
+                    If lrModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals) IsNot Nothing Then
                         lrRole.JoinedORMObject = lrModel.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                    ElseIf IsSomething(lrModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
+                    ElseIf lrModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals) IsNot Nothing Then
                         lrRole.JoinedORMObject = lrModel.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                     Else
                         lrRole.JoinedORMObject = lrModel.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
@@ -649,7 +649,7 @@ Namespace XMLModel15
                     lrEntityType.parentModelObjectList.Add(lrParentEntityType)
                     lrParentEntityType.childModelObjectList.Add(lrEntityType)
 
-                    Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship(lrEntityType, lrParentEntityType, lrFactType)
+                    Dim lrSubtypeConstraint As New FBM.SubtypeRelationship(lrEntityType, lrParentEntityType, lrFactType)
                     lrEntityType.SubtypeRelationship.Add(lrSubtypeConstraint)
                 Next
 
@@ -738,7 +738,7 @@ Namespace XMLModel15
                     Next
 
                     If lrRoleConstraint.RoleConstraintRole.Count = 0 Then
-                        prApplication.ThrowErrorMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
+                        prApplication.ThrowMessage("No RoleConstraintRoles found for RoleConstraint.Id: " & lrRoleConstraint.Id, pcenumErrorType.Information)
                     Else
                         lrFactType = lrRoleConstraint.Role(0).FactType
                         lrFactType = lrModel.FactType.Find(AddressOf lrFactType.Equals)
@@ -818,11 +818,11 @@ Namespace XMLModel15
                     Else
                         lrModelNote.JoinedObjectType = New FBM.ModelObject
                         lrModelNote.JoinedObjectType.Id = lrXMLModelNote.JoinedObjectTypeId
-                        If IsSomething(lrModel.EntityType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
+                        If lrModel.EntityType.Find(AddressOf lrModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                             lrModelNote.JoinedObjectType = lrModel.EntityType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
-                        ElseIf IsSomething(lrModel.ValueType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
+                        ElseIf lrModel.ValueType.Find(AddressOf lrModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                             lrModelNote.JoinedObjectType = lrModel.ValueType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
-                        ElseIf IsSomething(lrModel.FactType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)) Then
+                        ElseIf lrModel.FactType.Find(AddressOf lrModelNote.JoinedObjectType.Equals) IsNot Nothing Then
                             lrModelNote.JoinedObjectType = lrModel.FactType.Find(AddressOf lrModelNote.JoinedObjectType.Equals)
                         End If
                     End If
@@ -856,7 +856,7 @@ Namespace XMLModel15
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -975,7 +975,7 @@ Namespace XMLModel15
                         Dim lrFactDataInstance As FBM.FactDataInstance
                         For Each lrFact In lrFactType.Fact
 
-                            If IsSomething(lrXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact)) Then
+                            If lrXMLPage.ConceptInstance.Find(Function(x) x.Symbol = lrFact.Id And x.ConceptType = pcenumConceptType.Fact) IsNot Nothing Then
                                 '----------------------------------
                                 'The Fact is included on the Page
                                 '----------------------------------
@@ -1042,7 +1042,7 @@ Namespace XMLModel15
                         lrParentEntityTypeInstance.Id = lrFactType.RoleGroup(1).JoinedORMObject.Id
                         lrParentEntityTypeInstance = lrPage.EntityTypeInstance.Find(AddressOf lrParentEntityTypeInstance.Equals)
 
-                        Dim lrSubtypeConstraint As New FBM.tSubtypeRelationship
+                        Dim lrSubtypeConstraint As New FBM.SubtypeRelationship
                         lrSubtypeConstraint.ModelElement = lrEntityTypeInstance.EntityType
                         lrSubtypeConstraint.parentModelElement = lrParentEntityTypeInstance.EntityType
 
@@ -1080,7 +1080,7 @@ Namespace XMLModel15
 
                         lrRoleConstraintInstance.Id = lrConceptInstance.Symbol
 
-                        If IsSomething(lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals)) Then
+                        If lrPage.RoleConstraintInstance.Find(AddressOf lrRoleConstraintInstance.Equals) IsNot Nothing Then
                             '-------------------------------------------------------------------
                             'The RoleConstraintInstance has already been added to the Page.
                             '  FactType.CloneInstance adds RoleConstraintInstances to the Page
@@ -1133,7 +1133,7 @@ Namespace XMLModel15
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1198,7 +1198,7 @@ Namespace XMLModel15
                     'If the FactType of the Fact is Objectified, add the Fact.Id as an instance of the ObjectifyingEntityType
                     '----------------------------------------------------------------------------------------------------------
                     If arFactType.IsObjectified Then
-                        If IsSomething(arFactType.ObjectifyingEntityType) Then
+                        If arFactType.ObjectifyingEntityType IsNot Nothing Then
                             arFactType.ObjectifyingEntityType.Instance.Add(lrFact.Id)
                         End If
                     End If
@@ -1213,7 +1213,7 @@ Namespace XMLModel15
                 lsMessage2 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage2 &= vbCrLf & vbCrLf & ex.Message
                 lsMessage2 &= vbCrLf & vbCrLf & "Loading Facts for FactType: '" & arFactType.Id & "'"
-                prApplication.ThrowErrorMessage(lsMessage2, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage2, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1258,7 +1258,7 @@ Namespace XMLModel15
                 arFactType.ObjectifyingEntityType.ObjectifiedFactType = New FBM.FactType
                 arFactType.ObjectifyingEntityType.ObjectifiedFactType = arFactType
 
-                If IsSomething(arFactType.ObjectifyingEntityType) Then
+                If arFactType.ObjectifyingEntityType IsNot Nothing Then
                     '---------------------------------------------
                     'Okay, have found the ObjectifyingEntityType
                     '---------------------------------------------
@@ -1286,9 +1286,9 @@ Namespace XMLModel15
                 lrRole.JoinedORMObject = New FBM.ModelObject
                 lrRole.JoinedORMObject.Id = lrXMLRole.JoinedObjectTypeId
 
-                If IsSomething(arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
+                If arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals) IsNot Nothing Then
                     lrRole.JoinedORMObject = arFactType.Model.EntityType.Find(AddressOf lrRole.JoinedORMObject.Equals)
-                ElseIf IsSomething(arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)) Then
+                ElseIf arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals) IsNot Nothing Then
                     lrRole.JoinedORMObject = arFactType.Model.ValueType.Find(AddressOf lrRole.JoinedORMObject.Equals)
                 Else
                     lrRole.JoinedORMObject = arFactType.Model.FactType.Find(AddressOf lrRole.JoinedORMObject.Equals)
@@ -1371,7 +1371,7 @@ Namespace XMLModel15
                         lrFactTypeReading.PredicatePart.Add(lrPredicatePart)
                     Next
 
-                    If Not IsSomething(lrFactTypeReading.PredicatePart) Then
+                    If Not lrFactTypeReading.PredicatePart IsNot Nothing Then
                         lsMessage = "Error: TableFactTypeReading.GetFactTypeReadingsForFactType: "
                         lsMessage &= vbCrLf & "No PredicateParts found for:"
                         lsMessage &= vbCrLf & "FactType.Id: '" & arFactType.Id & "'"
@@ -1388,7 +1388,7 @@ Namespace XMLModel15
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function

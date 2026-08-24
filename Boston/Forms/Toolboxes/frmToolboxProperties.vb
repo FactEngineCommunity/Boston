@@ -27,7 +27,7 @@ Public Class frmToolboxProperties
     Private Sub propertyGrid_CollectionFormClosed(ByVal sender As Object, ByVal e As FormClosedEventArgs)
 
         Try
-            If IsSomething(PropertyGrid.SelectedObject) Then
+            If PropertyGrid.SelectedObject IsNot Nothing Then
                 Dim lrPropertyGridForm As frmToolboxProperties
                 lrPropertyGridForm = prApplication.GetToolboxForm(Me.Name)
                 If (Me.zrSelectedObject IsNot Nothing) And (lrPropertyGridForm IsNot Nothing) Then
@@ -45,14 +45,14 @@ Public Class frmToolboxProperties
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
 
     Private Sub propertyGrid_CollectionItemChanged(ByVal sender As Object, ByVal e As PropertyValueChangedEventArgs)
 
-        If IsSomething(PropertyGrid.SelectedObject) Then
+        If PropertyGrid.SelectedObject IsNot Nothing Then
             Dim lrPropertyGridForm As frmToolboxProperties
             lrPropertyGridForm = prApplication.GetToolboxForm(Me.Name)
             If (Me.zrSelectedObject IsNot Nothing) And (lrPropertyGridForm IsNot Nothing) Then
@@ -74,6 +74,7 @@ Public Class frmToolboxProperties
 
             If arObject IsNot Nothing Then
                 Me.PropertyGrid.SelectedObject = arObject
+                Me.zrSelectedObject = arObject
             ElseIf Me.zrSelectedObject IsNot Nothing Then
                 'Dim lrTempObject As Object = Me.zrSelectedObject
                 Me.PropertyGrid.SelectedObject = Me.PropertyGrid.SelectedObject
@@ -87,7 +88,7 @@ Public Class frmToolboxProperties
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 
@@ -111,7 +112,7 @@ Public Class frmToolboxProperties
 
     Private Sub PropertyGrid_Leave(ByVal sender As Object, ByVal e As System.EventArgs) Handles PropertyGrid.Leave
 
-        If IsSomething(PropertyGrid.SelectedObject) Then
+        If PropertyGrid.SelectedObject IsNot Nothing Then
             Select Case PropertyGrid.SelectedObject.GetType.ToString
                 Case Is = pcenumConceptType.Model.ToString
                     '----------------
@@ -138,7 +139,7 @@ Public Class frmToolboxProperties
             Dim lsMessage As String
             lsMessage = "Error: frmToolboxProperties.PropertyGrid_PropertyValueChanged: "
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
 
     End Sub
@@ -158,7 +159,7 @@ Public Class frmToolboxProperties
                     Dim lsMessage As String
                     lsMessage = "Error: frmToolboxProperties.SelectedGridItemChanged"
                     lsMessage &= vbCrLf & vbCrLf & ex.Message
-                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
                 End Try
         End Select
 

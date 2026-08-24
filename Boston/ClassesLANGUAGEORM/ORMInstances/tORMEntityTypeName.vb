@@ -69,7 +69,7 @@ Namespace FBM
         End Sub
 
         Public Sub SetAppropriateColour() Implements iPageObject.SetAppropriateColour
-            If IsSomething(Me.Shape) Then
+            If Me.Shape IsNot Nothing Then
                 Me.Shape.Pen.Color = Color.White
             End If
         End Sub

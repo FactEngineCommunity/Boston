@@ -1,4 +1,14 @@
-﻿Namespace FactEngine
+﻿Imports System.Reflection
+
+Namespace FactEngine
+
+    ''' <summary>
+    ''' A QueryGraph is a set of QueryEdges. NB A QueryGraph in the FactEngine sense is a contiguous set of QueryEdges because (controlled) natural language is linear,
+    '''   rather than tree like. When the QueryGraph (formed from a natural language query) is analised, an effective tree|AST is formed when creating the 
+    '''   resultant SQL|Cypher|TypeQL query etc.
+    '''   - A BaseNode may not actually be the BaseNode to which the predicate relates, but is rather/merely the noun before the predicate, as in natural language.
+    '''   - The actual BaseNode is resolved on analysis of the QueryGraph.
+    ''' </summary>
     Public Class QueryGraph
 
         Public Model As FBM.Model
@@ -136,6 +146,7 @@
                                              Optional ByVal arDerivedModelElement As FBM.ModelObject = Nothing) As List(Of RDS.Column)
 
             Dim larColumn As New List(Of RDS.Column)
+            Dim lsMessage As String = ""
 
             Try
 #Region "Head Node"
@@ -143,8 +154,16 @@
 #Region "RETURNCLAUSE"
                     For Each lrReturnColumn In arWhichSelectStatement.RETURNCLAUSE.RETURNCOLUMN
 
-                        If lrReturnColumn.MODELELEMENTNAME IsNot Nothing And lrReturnColumn.KEYWDCOUNTSTAR Is Nothing And lrReturnColumn.COUNTCLAUSE Is Nothing And lrReturnColumn.RETURNFUNCTION Is Nothing Then
+                        If lrReturnColumn.FUNCTIONCALL IsNot Nothing Then
+                            Dim lrFunctionColumn As New RDS.Column(New RDS.Table(Me.Model.RDS, "DummyTable", Nothing), "ReturnFunction", Nothing, Nothing, False, System.Guid.NewGuid.ToString)
+                            lrFunctionColumn.ColumnType = pcenumRDSColumnType.FunctionCall
+                            lrFunctionColumn.TemporaryData = lrReturnColumn.FUNCTIONCALL.GetFunctionCallString(Me.Model.TargetDatabaseType)
+                            lrFunctionColumn.AsName = lrReturnColumn.ASCLAUSE.COLUMNNAMESTR
+                            lrFunctionColumn.NodeModifierFunction = lrReturnColumn.GetNodeModifierFunction
+                            larColumn.Add(lrFunctionColumn)
+                        ElseIf lrReturnColumn.MODELELEMENTNAME IsNot Nothing And lrReturnColumn.KEYWDCOUNTSTAR Is Nothing And lrReturnColumn.COUNTCLAUSE Is Nothing And lrReturnColumn.RETURNFUNCTION Is Nothing Then
 #Region "ModelElementName"
+
                             If lrReturnColumn.COLUMNNAMESTR Is Nothing Then
 #Region "ColumnNameStr is Nothing"
                                 'Check if user forgot to put TableName as in Cinema.CinemaName
@@ -166,32 +185,39 @@
                                 End Try
                                 Dim lrTempColumn As RDS.Column = Nothing
                                 Dim lrModelElement As FBM.ModelObject = Me.Model.GetModelObjectByName(lrReturnColumn.MODELELEMENTNAME, True)
+
                                 If lrModelElement IsNot Nothing Then
-                                    Try
-                                        Select Case lrModelElement.GetType
-                                            Case Is = GetType(FBM.ValueType)
-                                                GoTo MoveForward
-                                            Case Is = GetType(FBM.EntityType),
-                                                          GetType(FBM.FactType)
-                                                For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
-                                                    lrTempColumn = lrColumn.Clone(Nothing, Nothing)
-                                                    lrTempColumn.IsDistinct = arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing
-                                                    larColumn.Add(lrTempColumn)
-                                                Next
-                                                GoTo MoveForward
-                                            Case Else
-                                                Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
-                                        End Select
-                                    Catch ex As Exception
-                                        Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
-                                    End Try
+                                    If lrReturnColumn.RETURNMODELELEMENT IsNot Nothing AndAlso lrReturnColumn.RETURNMODELELEMENT.STAR IsNot Nothing AndAlso lrReturnColumn.RETURNMODELELEMENT.PERIOD.Count = 1 Then
+                                        'E.g. Customer.*
+                                        GoTo ModelElementDotStar
+                                    Else
+                                        Try
+                                            Select Case lrModelElement.GetType
+                                                Case Is = GetType(FBM.ValueType)
+                                                    GoTo MoveForward
+                                                Case Is = GetType(FBM.EntityType),
+                                                              GetType(FBM.FactType)
+                                                    For Each lrColumn In lrModelElement.getCorrespondingRDSTable.getFirstUniquenessConstraintColumns
+                                                        lrTempColumn = lrColumn.Clone(Nothing, Nothing)
+                                                        lrTempColumn.IsDistinct = arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing
+                                                        larColumn.Add(lrTempColumn)
+                                                    Next
+                                                    GoTo MoveForward
+                                                Case Else
+                                                    Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
+                                            End Select
+                                        Catch ex As Exception
+                                            Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
+                                        End Try
+                                    End If
                                 End If
 
                                 'Must be * (as in Lecturer.*)
+ModelElementDotStar:
                                 Try
                                     Dim lrTable As RDS.Table = Me.Model.RDS.Table.Find(Function(x) x.Name = lrReturnColumn.MODELELEMENTNAME)
                                     For Each lrColumn In lrTable.Column
-                                        larColumn.Add(lrColumn.Clone(Nothing, Nothing))
+                                        larColumn.Add(lrColumn.Clone(Nothing, Nothing,,,, True))
                                     Next
                                 Catch ex As Exception
                                     Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & ".*, not found. Check your RETURN clause.")
@@ -200,22 +226,38 @@
                             Else
 #Region "Standard Table.ColumnName"
                                 Dim larReturnColumn = From Table In Me.Model.RDS.Table
+                                                      Where Table.Name.Trim = lrReturnColumn.MODELELEMENTNAME.Trim '20251029-VM-Was DBName. Failed on northwind.db where Order table has DBName, Orders.
                                                       From Column In Table.Column
-                                                      Where Table.Name = lrReturnColumn.MODELELEMENTNAME
-                                                      Where Column.Name = lrReturnColumn.COLUMNNAMESTR
+                                                      Where Column.DBName.Trim = lrReturnColumn.COLUMNNAMESTR.Trim
                                                       Select Column
 
                                 Try
-                                    Dim lrColumn As RDS.Column = larReturnColumn.First.Clone(Nothing, Nothing)
-                                    lrColumn.NodeModifierFunction = lrReturnColumn.GetNodeModifierFunction
-                                    lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
-                                    If lrReturnColumn.ASCLAUSE IsNot Nothing Then
-                                        lrColumn.AsName = lrReturnColumn.ASCLAUSE.COLUMNNAMESTR
+                                    Dim lrColumn As RDS.Column
+
+                                    If larReturnColumn.Count = 0 Then
+                                        Throw New Exception($"Table, {lrReturnColumn.MODELELEMENTNAME} , or Column, {lrReturnColumn.COLUMNNAMESTR} , does not exist.")
+                                    Else
+                                        lrColumn = larReturnColumn.First.Clone(Nothing, Nothing)
+                                        lrColumn.NodeModifierFunction = lrReturnColumn.GetNodeModifierFunction
+                                        lrColumn.TemporaryAlias = lrReturnColumn.MODELELEMENTSUFFIX
+                                        lrColumn.IsDistinct = arWhichSelectStatement.RETURNCLAUSE.KEYWDDISTINCT IsNot Nothing
+                                        lrColumn.GraphNodeType = lrColumn.Table.Name
+                                        If lrReturnColumn.ASCLAUSE IsNot Nothing Then
+                                            lrColumn.AsName = lrReturnColumn.ASCLAUSE.COLUMNNAMESTR
+                                        End If
                                     End If
 
                                     larColumn.Add(lrColumn)
                                 Catch ex As Exception
-                                    Throw New Exception("Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
+#Region "Debug information"
+                                    lsMessage = "Error in getProjectionColumns"
+                                    lsMessage.AppendLine("getProjectionColumns: Column, " & lrReturnColumn.MODELELEMENTNAME & "." & lrReturnColumn.COLUMNNAMESTR & ", not found. Check your RETURN clause.")
+                                    lsMessage.AppendDoubleLineBreak(ex.Message)
+                                    lsMessage.AppendLine("Table.Name: " & lrReturnColumn.MODELELEMENTNAME)
+                                    lsMessage.AppendLine("Column.Name: " & lrReturnColumn.COLUMNNAMESTR)
+#End Region
+
+                                    Throw New ApplicationException(lsMessage)
                                 End Try
 #End Region
                             End If
@@ -290,7 +332,12 @@ MoveForward:
                                 For Each lrRole In lrDerivedFactType.RoleGroup
                                     Select Case lrRole.JoinedORMObject.GetType
                                         Case Is = GetType(FBM.ValueType)
-                                            Dim lrVTColumn As New RDS.Column(arDerivedModelElement.getCorrespondingRDSTable, lrRole.JoinedORMObject.Id, lrRole, lrRole, False)
+                                            Dim lrVTColumn As New RDS.Column
+                                            If arDerivedModelElement.IsObjectified Then
+                                                lrVTColumn = New RDS.Column(arDerivedModelElement.getCorrespondingRDSTable, lrRole.JoinedORMObject.Id, lrRole, lrRole, False)
+                                            Else
+                                                lrVTColumn = New RDS.Column(New RDS.Table(Me.Model.RDS, arDerivedModelElement.Id, Nothing), lrRole.JoinedORMObject.Id, lrRole, lrRole, False)
+                                            End If
                                             lrVTColumn = lrVTColumn.Clone(Nothing, Nothing)
                                             larColumn.Add(lrVTColumn)
                                         Case Else
@@ -303,7 +350,11 @@ MoveForward:
                                             Else
                                                 For Each lrColumn In lrRole.JoinedORMObject.getCorrespondingRDSTable.getPrimaryKeyColumns
                                                     lrProjectionColumn = lrColumn.Clone(Nothing, Nothing)
-                                                    lrProjectionColumn.AsName = arDerivedModelElement.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                                    If arDerivedModelElement.IsObjectified Then
+                                                        lrProjectionColumn.AsName = arDerivedModelElement.getCorrespondingRDSTable.Column.Find(Function(x) x.ActiveRole Is lrColumn.ActiveRole).Name
+                                                    Else
+                                                        lrProjectionColumn.AsName = lrColumn.Name
+                                                    End If
                                                     larColumn.Add(lrProjectionColumn)
                                                 Next
                                             End If
@@ -324,6 +375,11 @@ MoveForward:
                     'Head Column/s
                     Dim larHeadColumn As New List(Of RDS.Column)
 
+                    If Me.HeadNode.HasIdentifier And Not My.Settings.FactEngineReturnNodePropertyIdentificationColumns Then
+                        GoTo AddlarHeadColumn
+                    End If
+
+#Region "HeadNode"
                     Select Case Me.HeadNode.FBMModelObject.ConceptType
                         Case Is = pcenumConceptType.ValueType
                             Dim lrVTColumn As RDS.Column
@@ -335,11 +391,18 @@ MoveForward:
                                 lrVTColumn = (From Column In Me.QueryEdges(0).FBMFactType.getCorrespondingRDSTable.Column
                                               Where Column.Role Is Me.QueryEdges(0).FBMPredicatePart.Role
                                               Select Column).First
+                            ElseIf Me.QueryEdges(0).FBMFactType.IsObjectified AndAlso Me.QueryEdges(0).FBMFactType.HasMultiPartRoleConstraint Then
+
+                                For Each lrColumn In Me.QueryEdges(0).FBMFactType.getCorrespondingRDSTable.getPrimaryKeyColumns
+                                    larHeadColumn.Add(lrColumn)
+                                Next
+                                GoTo AddlarHeadColumn
                             Else
                                 lrVTColumn = (From Column In Me.QueryEdges(0).TargetNode.FBMModelObject.getCorrespondingRDSTable.Column
                                               Where Column.Role Is Me.QueryEdges(0).FBMFactType.RoleGroup(0)
                                               Where Column.ActiveRole Is Me.QueryEdges(0).FBMFactType.RoleGroup(1)
                                               Select Column).First
+
                             End If
 
 
@@ -368,14 +431,28 @@ MoveForward:
                                 larHeadColumn.Add(lrTempColumn)
                             Next
                     End Select
+#End Region
 
+AddlarHeadColumn:
                     larColumn.AddRange(larHeadColumn.ToList)
 #End Region
+
                     Dim liRoleInd As Integer
                     'Edge Column/s
                     Dim lrQueryEdge As FactEngine.QueryEdge
                     Dim lrRole As FBM.Role = Nothing
                     For Each lrQueryEdge In Me.getProjectQueryEdges()
+                        Select Case lrQueryEdge.WhichClauseType
+                            Case Is = pcenumWhichClauseType.UnkownPredicateWhichModelElement,
+                                      pcenumWhichClauseType.ThatPredicateWhichModelElement
+                                If lrQueryEdge.WhichClause.KEYWDWHICH Is Nothing Then
+                                    GoTo SkipQueryEdge
+                                End If
+                            Case Is = pcenumWhichClauseType.PredicateWHICHModelElement
+                                If lrQueryEdge.WhichClause.KEYWDWHICH Is Nothing Then
+                                    GoTo SkipQueryEdge
+                                End If
+                        End Select
                         If (lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType Or lrQueryEdge.FBMFactType.Is1To1BinaryFactType) And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.InternalUniquenessConstraint(0).Role(0).JoinedORMObject.Id Then
                             '20210724-VM-Was the below, which is wrong.
                             'If lrQueryEdge.FBMFactType.IsBinaryFactType And lrQueryEdge.BaseNode.RelativeFBMModelObject.Id = lrQueryEdge.FBMFactType.RoleGroup(0).JoinedORMObject.Id Then
@@ -425,6 +502,8 @@ MoveForward:
                                     lrTempColumn = lrColumn.Clone(Nothing, Nothing)
                                 ElseIf lrRole.FactType.IsLinkFactType Then
                                     lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.Id Is lrRole.FactType.LinkFactTypeRole.Id)
+                                ElseIf lrQueryEdge.FBMFactType.HasMultiPartRoleConstraint Then
+                                    lrColumn = lrQueryEdge.FBMFactType.getCorrespondingRDSTable.Column.Find(Function(x) x.Role Is lrRole)
                                 Else
                                     lrColumn = lrQueryEdge.BaseNode.FBMModelObject.getCorrespondingRDSTable.Column.Find(Function(x) x.Role.FactType Is lrQueryEdge.FBMFactType)
                                     If lrQueryEdge.FBMFactType.IsManyTo1BinaryFactType And lrQueryEdge.FBMFactType.IsDerived And Not lrQueryEdge.FBMFactType.IsObjectified Then
@@ -485,6 +564,7 @@ MoveForward:
                                     larColumn.AddUnique(lrTempColumn)
                                 Next
                         End Select
+SkipQueryEdge:
                         lrRole = Nothing
                     Next
 
@@ -522,57 +602,71 @@ MoveForward:
 
         Public Sub checkNodeAliases()
 
-            Dim larBaseNodes As New List(Of FactEngine.QueryNode)
-            Dim larQueryNode As New List(Of FactEngine.QueryNode)
+            Try
 
-            Dim larBaseNode = From QueryEdge In Me.QueryEdges
-                              Select QueryEdge.BaseNode
+                Dim larBaseNodes As New List(Of FactEngine.QueryNode)
+                Dim larQueryNode As New List(Of FactEngine.QueryNode)
 
-            larBaseNodes.AddRange(larBaseNode.ToList)
+                Dim larBaseNode = From QueryEdge In Me.QueryEdges
+                                  Select QueryEdge.BaseNode
 
-            Dim larWhichTargetNodes = From QueryEdge In Me.QueryEdges
-                                      Where QueryEdge.WhichClause.KEYWDWHICH IsNot Nothing
-                                      Select QueryEdge.TargetNode
+                larBaseNodes.AddRange(larBaseNode.ToList)
 
-            larBaseNodes.AddRange(larWhichTargetNodes.ToList)
+                Dim larWhichTargetNodes = From QueryEdge In Me.QueryEdges
+                                          Where QueryEdge.WhichClause.KEYWDWHICH IsNot Nothing
+                                          Select QueryEdge.TargetNode
 
-            Dim larPropertyNodeTargets = From QueryEdge In Me.QueryEdges
-                                         Where QueryEdge.WhichClause.NODEPROPERTYIDENTIFICATION IsNot Nothing
-                                         Select QueryEdge.TargetNode
+                larBaseNodes.AddRange(larWhichTargetNodes.ToList)
 
-            larBaseNodes.AddRange(larPropertyNodeTargets)
+                Dim larPropertyNodeTargets = From QueryEdge In Me.QueryEdges
+                                             Where QueryEdge.WhichClause.NODEPROPERTYIDENTIFICATION IsNot Nothing
+                                             Select QueryEdge.TargetNode
 
-            Dim larAANTargetNodes = From QueryEdge In Me.QueryEdges
-                                    Where QueryEdge.WhichClause.KEYWDA IsNot Nothing Or QueryEdge.WhichClause.KEYWDAN IsNot Nothing
-                                    Select QueryEdge.TargetNode
+                larBaseNodes.AddRange(larPropertyNodeTargets)
 
-            larBaseNodes.AddRange(larAANTargetNodes)
+                Dim larAANTargetNodes = From QueryEdge In Me.QueryEdges
+                                        Where QueryEdge.WhichClause.KEYWDA IsNot Nothing Or QueryEdge.WhichClause.KEYWDAN IsNot Nothing
+                                        Select QueryEdge.TargetNode
 
-            'Implied BaseNodes
-            For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.IsPartialFactTypeMatch)
-                Dim lrNewQueryNode As New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge, False)
-                larBaseNodes.Add(lrNewQueryNode)
-            Next
+                larBaseNodes.AddRange(larAANTargetNodes)
+
+                'Implied BaseNodes
+                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) x.IsPartialFactTypeMatch)
+                    Dim lrNewQueryNode As New FactEngine.QueryNode(lrQueryEdge.FBMFactType, lrQueryEdge, False)
+                    larBaseNodes.AddUnique(lrNewQueryNode)
+                Next
 
 
-            For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not larBaseNodes.Contains(x.TargetNode))
+                For Each lrQueryEdge In Me.QueryEdges.FindAll(Function(x) Not larBaseNodes.Contains(x.TargetNode))
 
-                Select Case lrQueryEdge.WhichClauseType
-                    Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement,
-                              FactEngine.pcenumWhichClauseType.AndThatPredicateThatModelElement
-
-                        Throw New Exception("Model Element, '" & lrQueryEdge.TargetNode.Name & " " & lrQueryEdge.TargetNode.Alias & "', is not referenced in the query.")
-                    Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateModelElement
-                        If lrQueryEdge.WhichClause.KEYWDTHAT.Count = 2 Then
-                            Throw New Exception("Model Element, '" & lrQueryEdge.TargetNode.Name & " " & lrQueryEdge.TargetNode.Alias & "', is not referenced in the query.")
-                        ElseIf lrQueryEdge.WhichClause.KEYWDTHAT.Count = 1 Then
-                            If lrQueryEdge.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
-                                lrQueryEdge.WhichClause.NODEPROPERTYIDENTIFICATION Is Nothing Then
+                    Select Case lrQueryEdge.WhichClauseType
+                        Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateThatModelElement,
+                                  FactEngine.pcenumWhichClauseType.AndThatPredicateThatModelElement
+                            If Not lrQueryEdge.TargetNode.FBMModelObject.GetType = GetType(FBM.ValueType) Then
                                 Throw New Exception("Model Element, '" & lrQueryEdge.TargetNode.Name & " " & lrQueryEdge.TargetNode.Alias & "', is not referenced in the query.")
                             End If
-                        End If
-                End Select
-            Next
+                        Case Is = FactEngine.pcenumWhichClauseType.AndThatModelElementPredicateModelElement
+                            If lrQueryEdge.WhichClause.KEYWDTHAT.Count = 2 Then
+                                Throw New Exception("Model Element, '" & lrQueryEdge.TargetNode.Name & " " & lrQueryEdge.TargetNode.Alias & "', is not referenced in the query.")
+                            ElseIf lrQueryEdge.WhichClause.KEYWDTHAT.Count = 1 Then
+                                If lrQueryEdge.TargetNode.FBMModelObject.ConceptType <> pcenumConceptType.ValueType And
+                                    lrQueryEdge.WhichClause.NODEPROPERTYIDENTIFICATION Is Nothing Then
+                                    'Throw New Exception("Model Element, '" & lrQueryEdge.TargetNode.Name & " " & lrQueryEdge.TargetNode.Alias & "', is not referenced in the query.")
+                                    '20240501-VM-Not necessarily true. E.g. last QueryEdge in "Person is uncle of Person IS WHERE Person 1 is sibling of Person 2 THAT is parent of Person 3 AND Person 1 is male
+                                    'Person 3 is referenced but is the second argument in Person is uncle of Person
+                                End If
+                            End If
+                    End Select
+                Next
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message.AppendDoubleLineBreak(ex.StackTrace)
+                Throw New Exception(lsMessage)
+            End Try
 
         End Sub
 
@@ -592,10 +686,12 @@ MoveForward:
 
             Dim larQuerEdgeWithFBMFactType = Me.QueryEdges.FindAll(Function(x) x.FBMFactType IsNot Nothing)
             Dim larRDSTableQueryEdge = larQuerEdgeWithFBMFactType.FindAll(Function(x) x.FBMFactType.isRDSTable)
+            Dim lrPreviousQueryEdgeFactType As FBM.FactType = Nothing
 
             Dim liInd2 As Integer
             For liInd = 0 To larRDSTableQueryEdge.Count - 1
                 If larRDSTableQueryEdge.Count - 1 > 0 And (liInd + 1) <= larRDSTableQueryEdge.Count - 1 Then
+                    lrPreviousQueryEdgeFactType = larRDSTableQueryEdge(liInd).FBMFactType '20230830-Added. May be buggy. See 'Do nothing' below.
                     For liInd2 = liInd + 1 To larRDSTableQueryEdge.Count - 1
                         If larRDSTableQueryEdge(liInd2).FBMFactType Is larRDSTableQueryEdge(liInd).FBMFactType Then
                             If larRDSTableQueryEdge(liInd2).Alias Is Nothing Then
@@ -604,6 +700,9 @@ MoveForward:
                                        larRDSTableQueryEdge(liInd2).GetPreviousQueryEdge.FBMFactType Is larRDSTableQueryEdge(liInd2).FBMFactType And
                                        larRDSTableQueryEdge(liInd2).GetPreviousQueryEdge.FBMPredicatePart IsNot larRDSTableQueryEdge(liInd2).FBMPredicatePart Then
                                         larRDSTableQueryEdge(liInd2).Alias = larRDSTableQueryEdge(liInd2).GetPreviousQueryEdge.Alias
+                                    ElseIf larRDSTableQueryEdge(liInd2).FBMFactType Is lrPreviousQueryEdgeFactType Then
+                                        'Do nothing. As in "WHICH Session is on (DateTime.YEAR:'2023') AND is on (DateTime.MONTH:'01')"
+                                        '20230830-Added above Do Nothing. May be buggy.
                                     Else
                                         Dim lrTemplQueryEdge = Me.QueryEdges.Find(Function(x) x.Id = larRDSTableQueryEdge(liInd2).Id)
                                         lrTemplQueryEdge.Alias = (liInd + 1).ToString

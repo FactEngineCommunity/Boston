@@ -155,7 +155,7 @@
                     '-------------------------------------------------------
                     Dim lsActualModelElementName As String = ""
 
-                    If IsSomething(arModel) Then
+                    If arModel IsNot Nothing Then
                         Dim lrValueType As New FBM.ValueType(arModel, pcenumLanguage.ORMModel, lrWordQualification.Word, True)
                         Dim lrNoun As New Language.LanguageWordSenseWeighting(pcenumWordSense.Noun)
                         If arModel.ValueType.Contains(lrValueType) Then
@@ -169,7 +169,7 @@
                         End If
                     End If
 
-                    If IsSomething(arModel) Then
+                    If arModel IsNot Nothing Then
                         Dim lrEntityType As New FBM.EntityType(arModel, pcenumLanguage.ORMModel, lrWordQualification.Word, Nothing, True)
                         Dim lrNoun As New Language.LanguageWordSenseWeighting(pcenumWordSense.Noun)
                         If arModel.EntityType.Contains(lrEntityType) Then
@@ -195,6 +195,11 @@
             Dim liInd3 As Integer = 0
             Dim lrLanguagePhrase As Language.LanguagePhrase
             Dim lrTokenSequence As Language.LanguagePhraseTokenSequence
+
+            'LazyLoading
+            If prApplication.Language.LanguagePhrase.Count = 0 Then
+                prApplication.Language.LanguagePhrase = Language.TableLanguagePhrase.GetLanguagePhrasesByLanguage
+            End If
 
             For liInd = 0 To arSentence.WordListQualification.Count - 1
 
@@ -296,7 +301,7 @@
                 lrWordResolved = New Language.WordResolved(lrWord.Word, lrWordSense)
 
                 If lrWordResolved.Sense = pcenumWordSense.Noun Then
-                    lrWordResolved.Word = Viev.Strings.MakeCapCamelCase(lrWordResolved.Word)
+                    lrWordResolved.Word = FEStrings.MakeCapCamelCase(lrWordResolved.Word)
                 End If
 
                 arSentence.WordListResolved.Add(lrWordResolved)

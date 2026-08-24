@@ -22,7 +22,7 @@ Public Module tableUnifiedOntologyModel
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -57,12 +57,13 @@ Public Module tableUnifiedOntologyModel
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Function
 
-    Public Function getModelsForUnifiedOntology(ByRef arUnifiedOntology As Ontology.UnifiedOntology) As List(Of FBM.Model)
+    Public Function getModelsForUnifiedOntology(ByRef arUnifiedOntology As Ontology.UnifiedOntology,
+                                                ByVal abUseApplicationLevelModelIfCan As Boolean) As List(Of FBM.Model)
 
         Dim lsMessage As String
         Dim lsSQLQuery As String = ""
@@ -85,9 +86,21 @@ Public Module tableUnifiedOntologyModel
                 While Not lREcordset.EOF
                     lrModel = New FBM.Model
                     lrModel.ModelId = lREcordset("ModelId").Value
+
+                    If abUseApplicationLevelModelIfCan Then
+                        Dim lrTempModel As FBM.Model = prApplication.Models.Find(Function(x) x.ModelId = lrModel.ModelId)
+                        If lrTempModel IsNot Nothing Then
+                            lrModel = lrTempModel
+                        End If
+                    End If
+
                     Call TableModel.GetModelDetails(lrModel)
-                    larModel.Add(lrModel)
+                    larModel.AddUnique(lrModel)
                     arUnifiedOntology.Model.Add(lrModel)
+
+                    If lrModel.StoreAsXML Then
+                        Call lrModel.Load(False)
+                    End If
 
                     'Get the Pages for the Model (but don't load the Pages)
                     TablePage.GetPagesByModel(lrModel, False)
@@ -105,7 +118,7 @@ Public Module tableUnifiedOntologyModel
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
             Return larModel
         End Try
@@ -138,7 +151,7 @@ Public Module tableUnifiedOntologyModel
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Function
@@ -161,7 +174,7 @@ Public Module tableUnifiedOntologyModel
 
             lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

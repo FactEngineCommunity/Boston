@@ -83,7 +83,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return False
             End Try
@@ -163,7 +163,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -218,7 +218,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -278,7 +278,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -333,7 +333,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -397,7 +397,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
 
                 Return New ORMQL.Recordset
             End Try
@@ -428,14 +428,15 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return ""
             End Try
 
         End Function
 
-        Public Overrides Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column) As String
+        Public Overrides Function generateSQLColumnDefinition(ByRef arColumn As RDS.Column,
+                                                              Optional abIgnoreColumnISNOTNULL As Boolean = False) As String
             Try
 
                 Dim lsSQLColumnDefinition As String
@@ -472,7 +473,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return Nothing
             End Try
@@ -486,7 +487,8 @@ Namespace FactEngine
         ''' <param name="asTableName">Optional table name for the table in the CREATE statement.</param>
         ''' <returns></returns>
         Public Overrides Function generateCREATETABLEStatement(ByRef arTable As RDS.Table,
-                                                                  Optional asTableName As String = Nothing) As String
+                                                               Optional asTableName As String = Nothing,
+                                                               Optional abIgnoreColumnISNOTNULL As Boolean = False) As String
 
             Try
                 Dim lsSQLCommand As String
@@ -557,7 +559,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return ""
             End Try
@@ -591,6 +593,9 @@ Namespace FactEngine
                         AND ccu.table_schema = tc.table_schema
                     WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='" & arTable.Name & "'"
 
+                lsSQL &= " AND tc.table_schema = 'public'
+					       ORDER BY foreign_table_name"
+
                 lrRecordset = Me.GO(lsSQL)
 
                 Dim lrRelation As RDS.Relation = Nothing
@@ -611,43 +616,43 @@ Namespace FactEngine
                     ''on_update  ('NO ACTION')
                     ''on_delete
                     ''match
-                    'lrDestinationTable = Me.FBMModel.RDS.getTableByName(lrRecordset("table").Data)
+                    lrDestinationTable = Me.FBMModel.RDS.getTableByName(lrRecordset("foreign_table_name").Data)
 
-                    'While Not lrRecordset.EOF
+                    While Not lrRecordset.EOF
 
-                    '    lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRecordset("from").Data)
-                    '    lrDestinationColumn = lrDestinationTable.Column.Find(Function(x) x.Name = lrRecordset("to").Data)
+                        lrOriginColumn = arTable.Column.Find(Function(x) x.Name = lrRecordset("column_name").Data)
+                        lrDestinationColumn = lrDestinationTable.Column.Find(Function(x) x.Name = lrRecordset("foreign_column_name").Data)
 
-                    '    If Not lasToTableNames.Contains(lrRecordset("table").Data) Then
-                    '        lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
-                    '                              arTable,
-                    '                              pcenumCMMLMultiplicity.Many,
-                    '                              True,
-                    '                              lrOriginColumn.isPartOfPrimaryKey,
-                    '                              "involves",
-                    '                              lrDestinationTable,
-                    '                              pcenumCMMLMultiplicity.One,
-                    '                              lrDestinationColumn.IsMandatory,
-                    '                              "is involed in",
-                    '                              Nothing)
-                    '        larRelation.Add(lrRelation)
-                    '    End If
+                        If Not lasToTableNames.Contains(lrRecordset("foreign_table_name").Data) Then
+                            lrRelation = New RDS.Relation(System.Guid.NewGuid.ToString,
+                                                  arTable,
+                                                  pcenumCMMLMultiplicity.Many,
+                                                  True,
+                                                  lrOriginColumn.isPartOfPrimaryKey,
+                                                  "involves",
+                                                  lrDestinationTable,
+                                                  pcenumCMMLMultiplicity.One,
+                                                  lrDestinationColumn.IsMandatory,
+                                                  "is involed in",
+                                                  Nothing)
+                            larRelation.Add(lrRelation)
+                        End If
 
-                    '    lrOriginColumn.Relation.Add(lrRelation)
-                    '    lrRelation.OriginColumns.Add(lrOriginColumn)
-                    '    lrRelation.DestinationColumns.Add(lrDestinationColumn)
+                        lrOriginColumn.Relation.Add(lrRelation)
+                        lrRelation.OriginColumns.Add(lrOriginColumn)
+                        lrRelation.DestinationColumns.Add(lrDestinationColumn)
 
-                    '    lrRecordset.MoveNext()
+                        lrRecordset.MoveNext()
 
-                    '    If Not lrRecordset.EOF Then
-                    '        If lrRecordset("table").Data <> lrDestinationTable.Name Then
-                    '            lasToTableNames.AddUnique(lrDestinationTable.Name)
-                    '            lrRecordset.CurrentFactIndex -= 1
-                    '            Exit While
-                    '        End If
-                    '    End If
+                        If Not lrRecordset.EOF Then
+                            If lrRecordset("foreign_table_name").Data <> lrDestinationTable.Name Then
+                                lasToTableNames.AddUnique(lrDestinationTable.Name)
+                                lrRecordset.CurrentFactIndex -= 1
+                                Exit While
+                            End If
+                        End If
 
-                    'End While
+                    End While
 
                     lrRecordset.MoveNext()
                 End While
@@ -660,7 +665,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Relation)
             End Try
@@ -685,7 +690,10 @@ Namespace FactEngine
                                               interval_precision,
                                               maximum_cardinality,
                                               is_generated,
-                                              is_updatable FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = '" & arTable.Name & "'"
+                                              is_updatable 
+                                              FROM INFORMATION_SCHEMA.COLUMNS
+                                              WHERE TABLE_SCHEMA = 'public'
+                                              AND TABLE_NAME = '" & arTable.Name & "'"
                 Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
 
                 Dim lsColumnName As String
@@ -731,14 +739,14 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Column)
             End Try
 
         End Function
 
-        Public Overrides Sub getDatabaseTypes()
+        Public Overrides Sub getDatabaseDataTypes()
 
             Try
                 Dim lsPath = Boston.MyPath & "\database\databasedatatypes\bostondatabasedatattypes.csv"
@@ -753,7 +761,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -785,7 +793,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return pcenumORMDataType.TextVariableLength
             End Try
@@ -901,7 +909,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Index)
             End Try
@@ -983,7 +991,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Index)
             End Try
@@ -1001,7 +1009,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Relation)
             End Try
@@ -1016,10 +1024,10 @@ Namespace FactEngine
 
             Dim larTable As New List(Of RDS.Table)
             Try
-                Dim lsSQL As String = "SELECT table_name
-                                         FROM information_schema.tables
-                                        WHERE table_schema='public'
-                                          AND table_type='BASE TABLE'"
+                Dim lsSQL As String = "SELECT tablename
+                                        FROM pg_catalog.pg_tables
+                                        WHERE schemaname != 'pg_catalog' AND 
+                                            schemaname != 'information_schema';"
 
                 Dim lrRecordset As ORMQL.Recordset = Me.GO(lsSQL)
 
@@ -1028,7 +1036,7 @@ Namespace FactEngine
 
                 While Not lrRecordset.EOF
 
-                    lsTableName = lrRecordset("table_name").Data
+                    lsTableName = lrRecordset("tablename").Data
                     lrTable = New RDS.Table(Me.FBMModel.RDS, lsTableName, Nothing)
 
                     larTable.Add(lrTable)
@@ -1044,7 +1052,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return New List(Of RDS.Table)
             End Try
@@ -1084,7 +1092,7 @@ Namespace FactEngine
                     Dim lrRole = New FBM.Role(lrFactType, System.Guid.NewGuid.ToString, False, Nothing)
                     lrRole.Name = reader.GetName(liColumn)
                     lrFactType.RoleGroup.AddUnique(lrRole)
-                    lrRecordset.Columns.Add(reader.GetName(liColumn))
+                    lrRecordset.ColumnNames.Add(reader.GetName(liColumn))
                 Next
 
                 While reader.Read
@@ -1231,7 +1239,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1286,7 +1294,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1331,7 +1339,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -1385,7 +1393,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -1406,7 +1414,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1430,7 +1438,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1454,7 +1462,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -1485,7 +1493,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -1525,6 +1533,10 @@ Namespace FactEngine
 
 
         Private Function iDatabaseConnection_GOAsync(asQuery As String) As Task(Of Recordset) Implements iDatabaseConnection.GOAsync
+            Throw New NotImplementedException()
+        End Function
+
+        Private Function iDatabaseConnection_GOAbstractionLayer(asQuery As String) As Recordset Implements iDatabaseConnection.GOAbstractionLayer
             Throw New NotImplementedException()
         End Function
     End Class

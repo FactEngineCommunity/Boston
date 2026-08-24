@@ -57,7 +57,7 @@ Namespace FTR
             Patterns.Add(TokenType.PREDICATESPACE, regex)
             Tokens.Add(TokenType.PREDICATESPACE)
 
-            regex = new Regex("[a-z]+\-", RegexOptions.Compiled)
+            regex = new Regex("[a-z\s\-]+\-", RegexOptions.Compiled)
             Patterns.Add(TokenType.PREBOUNDREADINGTEXT, regex)
             Tokens.Add(TokenType.PREBOUNDREADINGTEXT)
 
@@ -221,10 +221,8 @@ Namespace FTR
         WHITESPACE  = 19
     End Enum
 
-    <Serializable()>
+    <Serializable()> _
     Public Class Token 
-        Implements ICloneable
-
         Private m_startPos As Integer
         Private m_endPos As Integer
         Private m_text As String
@@ -285,7 +283,7 @@ Namespace FTR
             End Set
         End Property
 
-        <XmlAttribute()>
+        <XmlAttribute()> _
         Public Type As TokenType
 
         Public Sub New()
@@ -317,29 +315,6 @@ Namespace FTR
                 Return Type.ToString()
             End If
         End Function
-
-        Public Function Clone() As Object Implements ICloneable.Clone
-            Dim lrToken As New Token
-            Dim lrSkippedToken As Token
-            With Me
-                lrToken.m_startPos = .m_startPos
-                lrToken.m_endPos = .m_endPos
-                lrToken.m_text = .m_text
-                lrToken.m_value = .m_value
-                lrToken.Type = .Type
-
-                ' contains all prior skipped symbols
-                If .m_skipped IsNot Nothing Then
-                    lrToken.m_skipped = New List(Of Token)
-                    For Each lrSkippedToken In .m_skipped
-                        lrToken.m_skipped.Add(lrSkippedToken.Clone)
-                    Next
-                End If
-            End With
-
-            Return lrToken
-        End Function
-
     End Class
 #End Region
 End Namespace

@@ -13,7 +13,7 @@ Public Class ORMPopupToolSelector
     Public Node As MindFusion.Diagramming.WinForms.ControlNode
     Public AttachedToNode As MindFusion.Diagramming.ShapeNode
 
-    Private Delegate Sub MyDelegate(ByRef arPage As FBM.Page, ByRef asInstructionType As String)
+    Private Delegate Sub MyDelegate(ByRef arPage As FBM.Page, ByRef asInstructionType As String, ByVal arPoint As Point)
 
     Private Sub BPMNPopupToolSelector_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -28,6 +28,8 @@ Public Class ORMPopupToolSelector
             Select Case Me.Type
                 Case Is = pcenumConceptType.EntityType
                     Call Me.SetupForEntityType()
+                Case Is = pcenumConceptType.None
+                    Call Me.SetupForEntityType(2)
                 Case Is = pcenumConceptType.FactType
                     Call Me.SetupForFactType()
             End Select
@@ -42,16 +44,16 @@ Public Class ORMPopupToolSelector
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
     End Sub
 
-    Private Sub SetupForEntityType()
+    Private Sub SetupForEntityType(Optional ByVal aiButtonCount As Integer = 3)
 
         Try
             Dim liRow, liCol As Integer
 
-            For liInd = 1 To 3
+            For liInd = 1 To aiButtonCount
 
                 liRow = Math.Truncate(liInd / 3.1)
                 liCol = Boston.returnIfTrue((liInd Mod 3) - 1 < 0, 3, (liInd Mod 3) - 1)
@@ -93,7 +95,7 @@ SkipButton:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -108,7 +110,7 @@ SkipButton:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -153,14 +155,14 @@ SkipButton:
 
             '                    lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             '                    lsMessage &= vbCrLf & vbCrLf & ex.Message
-            '                    prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            '                    prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             '                End Try
             '#End Region
             '            Else
             Me.moDiagram.Nodes.Remove(Me.Node)
 
             Dim delegate1 As MyDelegate = New MyDelegate(AddressOf frmDiagramORM.ProcessPopupToolSelector)
-            delegate1(Me.mrPage, Me.Result)
+            delegate1(Me.mrPage, Me.Result, CType(sender, Button).Parent.Parent.Location)
             'End If
 
         Catch ex As Exception
@@ -169,7 +171,7 @@ SkipButton:
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

@@ -55,7 +55,7 @@ Public Class frmToolboxKLTheoremWriter
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Function
@@ -64,7 +64,7 @@ Public Class frmToolboxKLTheoremWriter
 
         Me.TextBox1.Height = Me.Height - Me.TextBox1.Top
 
-        If IsSomething(prApplication.WorkingPage) Then
+        If prApplication.WorkingPage IsNot Nothing Then
             Me.ButtonAnalyseCurrentPage.Enabled = True
             Me.zrPage = prApplication.WorkingPage
         Else
@@ -119,7 +119,7 @@ Public Class frmToolboxKLTheoremWriter
 
             Me.TextBox1.Text = ""
 
-            If Not IsSomething(Me.zrPage) Then
+            If Not Me.zrPage IsNot Nothing Then
                 MsgBox("Page not set")
                 Exit Sub
             End If
@@ -264,7 +264,7 @@ Public Class frmToolboxKLTheoremWriter
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub
@@ -295,7 +295,7 @@ Public Class frmToolboxKLTheoremWriter
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
         End Try
 
     End Sub

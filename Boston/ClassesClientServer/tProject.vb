@@ -1,4 +1,5 @@
-﻿Imports System.Xml.Serialization
+﻿Imports System.ComponentModel
+Imports System.Xml.Serialization
 
 Namespace ClientServer
 
@@ -25,6 +26,17 @@ Namespace ClientServer
         End Property
 
         Public CreatedByUser As ClientServer.User
+
+        Private _Requirement As New BindingList(Of TestManagement.ProjectRequirement)
+
+        Public Property Requirement As BindingList(Of TestManagement.ProjectRequirement)
+            Get
+                Return Me._Requirement
+            End Get
+            Set(value As BindingList(Of TestManagement.ProjectRequirement))
+                Me._Requirement = value
+            End Set
+        End Property
 
         ''' <summary>
         ''' Parameterless New for Serialisation

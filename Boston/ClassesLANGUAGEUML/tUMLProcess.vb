@@ -8,6 +8,7 @@ Namespace UML
     Public Class Process
         Inherits FBM.FactDataInstance
         Implements FBM.iPageObject
+        Implements IEquatable(Of UML.Process)
 
         <XmlAttribute()>
         Public Shadows ConceptType As pcenumConceptType = pcenumConceptType.Process
@@ -143,7 +144,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrProcess
@@ -181,13 +182,16 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Return lrProcess
 
         End Function
 
+        Public Shadows Function Equals(other As Process) As Boolean Implements IEquatable(Of Process).Equals
+            Return Me.Id = other.Id
+        End Function
 
 
         Public Shadows Function EqualsByName(ByVal other As UML.Process) As Boolean
@@ -212,7 +216,7 @@ Namespace UML
                 Return aoA.SequenceNr - aoB.SequenceNr
 
             Catch ex As Exception
-                prApplication.ThrowErrorMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(ex.Message, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -261,7 +265,7 @@ Namespace UML
                         loDroppedNode.Resize(20, 15)
                 End Select
 
-                If IsSomething(aoContainerNode) Then
+                If aoContainerNode IsNot Nothing Then
                     aoContainerNode.Add(loDroppedNode)
                 End If
 
@@ -271,7 +275,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -299,7 +303,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
             Try
@@ -315,7 +319,7 @@ Namespace UML
             Dim lsMessage As String = ""
 
             Try
-                If IsSomething(aoChangedPropertyItem) Then
+                If aoChangedPropertyItem IsNot Nothing Then
                     Select Case aoChangedPropertyItem.ChangedItem.PropertyDescriptor.Name
                         Case Is = "Text"
 
@@ -338,7 +342,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -357,7 +361,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -379,7 +383,7 @@ Namespace UML
                     Me.Shape.Resize(60, 60)
             End Select
 
-            If IsSomething(aoContainerNode) Then
+            If aoContainerNode IsNot Nothing Then
                 aoContainerNode.AutoShrink = True
                 aoContainerNode.Resize(Viev.Greater(Me.Shape.Bounds.Width + 20, aoContainerNode.Bounds.Width), Viev.Greater(Me.Shape.Bounds.Height + 20, aoContainerNode.Bounds.Height))
             End If
@@ -395,7 +399,7 @@ Namespace UML
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -407,11 +411,11 @@ Namespace UML
             '---------------------------------------------------------------------
             Try
 
-                If IsSomething(Me.Page.Diagram) Then
+                If Me.Page.Diagram IsNot Nothing Then
                     '------------------
                     'Diagram is set.
                     '------------------
-                    If IsSomething(Me.Shape) Then
+                    If Me.Shape IsNot Nothing Then
                         If Me.Shape.Text <> "" Then
                             '---------------------------------------------------------------------------------
                             'Is the type of EntityTypeInstance that 
@@ -432,7 +436,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -451,7 +455,7 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -464,7 +468,7 @@ Namespace UML
         Public Overloads Sub SetAppropriateColour() Implements FBM.iPageObject.SetAppropriateColour
 
             Try
-                If IsSomething(Me.Shape) Then
+                If Me.Shape IsNot Nothing Then
                     If Me.Shape.Selected Then
                         Me.Shape.Pen.Color = Color.Blue
                     Else
@@ -478,7 +482,7 @@ Namespace UML
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -496,10 +500,11 @@ Namespace UML
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
+
     End Class
 
 End Namespace

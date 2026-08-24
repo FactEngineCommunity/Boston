@@ -125,8 +125,19 @@ Namespace Boston
             Next
         End Sub
 
+        Public Sub RemoveNode(ByRef arCTreeNode As cTreeNode)
+
+            Me.Nodes(0).Nodes.Remove(arCTreeNode)
+
+        End Sub
+
         Public Sub ForceSelectedNode(ByRef arNode As cTreeNode)
-            MyBase.SelectedNode = arNode
+            Try
+                MyBase.SelectedNode = TryCast(arNode, TreeNode)
+            Catch ex As Exception
+                'We tried.
+            End Try
+
         End Sub
 
 #End Region

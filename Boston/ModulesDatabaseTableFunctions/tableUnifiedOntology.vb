@@ -22,7 +22,7 @@ Namespace TableUnifiedOntology
                 Dim lsMessage As String
                 lsMessage = "Error: TableUnifiedOntology.AddUnifiedOntology"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Sub
 
@@ -88,7 +88,8 @@ Namespace TableUnifiedOntology
 
         End Function
 
-        Sub GetUnifiedOntologyDetails(ByRef arUnifiedOntology As Ontology.UnifiedOntology)
+        Sub GetUnifiedOntologyDetails(ByRef arUnifiedOntology As Ontology.UnifiedOntology,
+                                      ByVal abUseApplicationLevelModelIfCan As Boolean)
 
             Dim lsSQLQuery As String = ""
             Dim lREcordset As New RecordsetProxy
@@ -108,12 +109,15 @@ Namespace TableUnifiedOntology
                     arUnifiedOntology.Name = lREcordset("UnifiedOntologyName").Value
                     arUnifiedOntology.ImageFileLocationName = lREcordset("ImageFileLocationName").Value
 
-                    Call tableUnifiedOntologyModel.getModelsForUnifiedOntology(arUnifiedOntology)
+                    Call tableUnifiedOntologyModel.getModelsForUnifiedOntology(arUnifiedOntology, abUseApplicationLevelModelIfCan)
 
                     For Each lrModel In arUnifiedOntology.Model
-                        TableModelDictionary.GetDictionaryEntriesByModel(lrModel, True)
+                        If lrModel.ModelDictionary.Count = 0 Then
+                            TableModelDictionary.GetDictionaryEntriesByModel(lrModel, True)
+                        End If
                     Next
 
+#Region "Unknown code. Remove after 20240601 if not missed."
                     'Using myConnection As New System.Data.OleDb.OleDbConnection(My.Settings.DatabaseConnectionString)
                     '    Dim SQL As String = "SELECT [Image] FROM [UnifiedOntology] WHERE Id = '" & Trim(arUnifiedOntology.Id) & "'"
                     '    Using myCommand As New System.Data.OleDb.OleDbCommand(SQL, myConnection)
@@ -142,6 +146,7 @@ Namespace TableUnifiedOntology
                     '    End Using
                     '    myConnection.Close()
                     'End Using
+#End Region
                 Else
                     Dim lsMessage As String = "Error: GetUnifiedOntologyDetails: No UnifiedOntology returned for UnifiedOntologyName: " & arUnifiedOntology.Name
                     Throw New Exception(lsMessage)
@@ -155,7 +160,7 @@ Namespace TableUnifiedOntology
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -202,7 +207,7 @@ Namespace TableUnifiedOntology
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Function
@@ -234,7 +239,7 @@ Namespace TableUnifiedOntology
 
                 lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage1 &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, False, False, True)
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Warning, ex.StackTrace, False, False, True)
 
                 pdbConnection.RollbackTrans()
 

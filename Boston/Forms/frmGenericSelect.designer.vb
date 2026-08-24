@@ -48,11 +48,12 @@ Partial Class frmGenericSelect
         'combobox_selection
         '
         Me.combobox_selection.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.combobox_selection.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.combobox_selection.ForeColor = System.Drawing.Color.Black
         Me.combobox_selection.FormattingEnabled = True
-        Me.combobox_selection.Location = New System.Drawing.Point(17, 26)
+        Me.combobox_selection.Location = New System.Drawing.Point(17, 23)
         Me.combobox_selection.Name = "combobox_selection"
-        Me.combobox_selection.Size = New System.Drawing.Size(274, 21)
+        Me.combobox_selection.Size = New System.Drawing.Size(274, 24)
         Me.combobox_selection.TabIndex = 0
         '
         'ButtonOK

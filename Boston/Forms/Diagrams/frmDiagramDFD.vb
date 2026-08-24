@@ -26,8 +26,8 @@ Public Class frmDiagramDFD
 
     Private Sub frm_DataFlowDiagram_Enter(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Enter
 
-        If IsSomething(Me.zrPage) Then
-            If IsSomething(frmMain.zfrm_model_dictionary) Then
+        If Me.zrPage IsNot Nothing Then
+            If frmMain.zfrm_model_dictionary IsNot Nothing Then
                 Call frmMain.zfrm_model_dictionary.LoadToolboxModelDictionary(Me.zrPage.Language)
             End If
         End If
@@ -43,7 +43,7 @@ Public Class frmDiagramDFD
         '-------------------------------------------
         'Process the page associated with the form.
         '-------------------------------------------
-        If IsSomething(Me.zrPage) Then
+        If Me.zrPage IsNot Nothing Then
             If Me.zrPage.IsDirty Then
                 Select Case MsgBox("Changes have been made to the Page, '" & Me.zrPage.Name & "'. Would you like to save those changes?", MsgBoxStyle.YesNoCancel)
                     Case Is = MsgBoxResult.Yes
@@ -411,7 +411,7 @@ Public Class frmDiagramDFD
         Dim lrToolboxForm As frmToolbox
         lrToolboxForm = prRichmondApplication.GetToolboxForm(frmToolbox.Name)
 
-        If IsSomething(lrToolboxForm) Then
+        If lrToolboxForm IsNot Nothing Then
             lrToolboxForm.ShapeListBox.Shapes = lsl_shape_library.Shapes
 
             For Each lo_shape In lrToolboxForm.ShapeListBox.Shapes
@@ -649,10 +649,10 @@ Public Class frmDiagramDFD
 
         lo_point = Me.DiagramView.ClientToDoc(e.Location)
 
-        If IsSomething(Diagram.GetLinkAt(lo_point, 1)) Then
+        If Diagram.GetLinkAt(lo_point, 1) IsNot Nothing Then
             '    Diagram.GetLinkAt(lo_point, 1).Selected = True
             '    Exit Sub
-        ElseIf IsSomething(Diagram.GetNodeAt(lo_point)) Then
+        ElseIf Diagram.GetNodeAt(lo_point) IsNot Nothing Then
 
             '    Dim lrModelObject As FBM.ModelObject
             '    lrModelObject = Diagram.GetNodeAt(lo_point).Tag
@@ -684,7 +684,7 @@ Public Class frmDiagramDFD
             '    Dim lrPropertyGridForm As frmToolboxProperties
 
             '    lrPropertyGridForm = prRichmondApplication.GetToolboxForm(frmToolboxProperties.Name)
-            '    If IsSomething(lrPropertyGridForm) Then
+            '    If lrPropertyGridForm IsNot Nothing Then
 
             '        Dim myfilterattribute As Attribute = New System.ComponentModel.CategoryAttribute("Page")
             '        ' And you pass it to the PropertyGrid,
@@ -733,7 +733,7 @@ Public Class frmDiagramDFD
         Dim lr_shape_node As ShapeNode
 
 
-        If IsSomething(frmMain.zfrm_enterprise_tree_viewer) Then
+        If frmMain.zfrm_enterprise_tree_viewer IsNot Nothing Then
             Dim lrEnterpriseView As tEnterpriseEnterpriseView
             lrEnterpriseView = item.Tag
             Me.MorphVector(0).EnterpriseTreeView = lrEnterpriseView

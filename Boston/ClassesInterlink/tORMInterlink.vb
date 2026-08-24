@@ -1,16 +1,20 @@
 ﻿Imports System.Reflection
 Imports Newtonsoft.Json
 Imports System.ComponentModel
+Imports System.Xml.Serialization
 
 Namespace Interlink
 
     ''' <summary>
     ''' An Interlink enables a Model to target other Models (databases) for Querying, and API call functions.
     ''' </summary>
+    <Serializable>
     Public Class Interlink
 
+        <XmlIgnore>
         <JsonIgnore()>
         Private _ModelId As String = Nothing
+        <XmlAttribute>
         Public Property ModelId As String
             Get
                 If Me.Model IsNot Nothing Then
@@ -26,19 +30,24 @@ Namespace Interlink
             End Set
         End Property
 
+        <XmlIgnore>
         <JsonIgnore()>
         Public Model As FBM.Model 'The Model that owns the Inerlink
 
+        <XmlIgnore>
         <JsonIgnore()>
         Private _TargetModelId As String = Nothing
+        <XmlAttribute>
         Public Property TargetModelId As String
             Get
-                If Me.TargetModel Is Nothing Then
-                    Return "<Error: There is no Target Model>"
-                ElseIf Me.TargetModel IsNot Nothing Then
+                If Me.TargetModel IsNot Nothing Then
                     Return Me.TargetModel.ModelId
-                Else
+                ElseIf Me._TargetModelId IsNot Nothing Then
                     Return Me._TargetModelId
+                ElseIf Me.TargetModel Is Nothing Then
+                    Return "<Error: There is no Target Model>"
+                Else
+                    Return "<Error: There is no Target Model>"
                 End If
             End Get
             Set(value As String)
@@ -46,11 +55,14 @@ Namespace Interlink
             End Set
         End Property
 
+        <XmlIgnore>
         <JsonIgnore()>
         Public TargetModel As FBM.Model 'The Model targetted by the Model Element
 
+        <XmlIgnore>
         <JsonIgnore()>
         Private _ModelElementId As String = Nothing
+        <XmlAttribute>
         Public Property ModelElementId As String
             Get
                 If Me.ModelElement IsNot Nothing Then
@@ -66,19 +78,24 @@ Namespace Interlink
             End Set
         End Property
 
+        <XmlIgnore>
         <JsonIgnore()>
         Public ModelElement As FBM.ModelObject 'The Model Element that is Interlinked with an Element within the TargetModel
 
+        <XmlIgnore>
         <JsonIgnore()>
         Private _TargetModelElementId As String = Nothing
+        <XmlAttribute>
         Public Property TargetModelElementId As String
             Get
-                If Me.TargetModelElement Is Nothing Then
-                    Return "<Error: Model Element is Nothing>"
-                ElseIf Me.TargetModelElement IsNot Nothing Then
+                If Me.TargetModelElement IsNot Nothing Then
                     Return Me.TargetModelElement.Id
-                Else
+                ElseIf Me._TargetModelElementId IsNot Nothing Then
                     Return Me._TargetModelElementId
+                ElseIf Me.TargetModelElement Is Nothing Then
+                    Return "<Error: Model Element is Nothing>"
+                Else
+                    Return "<Error: Model Element is Nothing>"
                 End If
             End Get
             Set(value As String)
@@ -86,11 +103,14 @@ Namespace Interlink
             End Set
         End Property
 
+        <XmlIgnore>
         <JsonIgnore()>
         Public TargetModelElement As FBM.ModelObject 'The Target Model Elment within the Target Model that the Interlink is for.
 
+        <XmlIgnore>
         <JsonIgnore()>
         Private _IsInError As Boolean = False
+        <XmlIgnore>
         Public Property IsInError As Boolean
             Get
                 Return Model Is Nothing Or
@@ -103,8 +123,10 @@ Namespace Interlink
             End Set
         End Property
 
+        <XmlIgnore>
         <JsonIgnore()>
         Private _IsPrimaryInterlink As Boolean = False
+        <XmlAttribute>
         Public Property IsPrimaryInterlink As Boolean
             Get
                 Return Me._IsPrimaryInterlink
@@ -132,7 +154,7 @@ Namespace Interlink
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
             End Try
 
         End Sub

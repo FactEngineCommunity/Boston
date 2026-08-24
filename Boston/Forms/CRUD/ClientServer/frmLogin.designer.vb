@@ -101,7 +101,7 @@ Partial Class frmLogin
         '
         Me.AcceptButton = Me.button_okay
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
-        Me.ClientSize = New System.Drawing.Size(406, 103)
+        Me.ClientSize = New System.Drawing.Size(408, 103)
         Me.ControlBox = False
         Me.Controls.Add(Me.button_cancel)
         Me.Controls.Add(Me.button_okay)

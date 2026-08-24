@@ -1,4 +1,6 @@
-﻿Namespace PluginInterface.Sources
+﻿Imports Boston.FBM
+
+Namespace PluginInterface.Sources
 
     Friend Class Access
         Implements IConnection
@@ -21,16 +23,6 @@
             Me.mName = Name
             Me.ConnStr = ConnectionString
         End Sub
-
-        Public _BostonModel As FBM.Model
-        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
-            Get
-                Return Me._BostonModel
-            End Get
-            Set(value As FBM.Model)
-                Me._BostonModel = value
-            End Set
-        End Property
 
         Friend Function GetQuery(ByVal Query As QueryEnum) As String
             Select Case Query
@@ -119,6 +111,15 @@
             Get
                 Return Me.mIgnoreTableNames
             End Get
+        End Property
+
+        Public Property BostonModel As FBM.Model Implements IConnection.BostonModel
+            Get
+                Throw New NotImplementedException()
+            End Get
+            Set(value As FBM.Model)
+                Throw New NotImplementedException()
+            End Set
         End Property
 
         Public Sub TestConnection() Implements IConnection.TestConnection

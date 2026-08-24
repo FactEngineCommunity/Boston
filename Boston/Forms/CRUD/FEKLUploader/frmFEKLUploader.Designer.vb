@@ -42,6 +42,7 @@ Partial Class frmFEKLUploader
         Me.ExportErrorerFEKLStatementsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ButtonOpenFEKLJSONFile = New System.Windows.Forms.Button()
         Me.TabPageFEKL = New System.Windows.Forms.TabPage()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.ButtonFEKLStartStop = New System.Windows.Forms.Button()
         Me.RichTextBoxFEKLDocument = New System.Windows.Forms.RichTextBox()
@@ -50,6 +51,10 @@ Partial Class frmFEKLUploader
         Me.LabelPromptErrorMessage = New System.Windows.Forms.Label()
         Me.LabelErrorType = New System.Windows.Forms.Label()
         Me.LabelPromptErrorType = New System.Windows.Forms.Label()
+        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+        Me.ImportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RDFOWLttlTurtleFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.GenerateModelsFEKLToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TabPageDDL2FEKL = New System.Windows.Forms.TabPage()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
@@ -73,7 +78,8 @@ Partial Class frmFEKLUploader
         Me.LabelPromptModelName = New System.Windows.Forms.Label()
         Me.ButtonClose = New System.Windows.Forms.Button()
         Me.TimerHighlighting = New System.Windows.Forms.Timer(Me.components)
-        Me.Button1 = New System.Windows.Forms.Button()
+        Me.MenuStrip2 = New System.Windows.Forms.MenuStrip()
+        Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GroupBox.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPageFEKLJSON.SuspendLayout()
@@ -82,11 +88,13 @@ Partial Class frmFEKLUploader
         Me.ContextMenuStripGrid.SuspendLayout()
         Me.TabPageFEKL.SuspendLayout()
         Me.Panel2.SuspendLayout()
+        Me.MenuStrip1.SuspendLayout()
         Me.TabPageDDL2FEKL.SuspendLayout()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         Me.TabPageDefaults.SuspendLayout()
         Me.GroupBoxDefaults.SuspendLayout()
+        Me.MenuStrip2.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox
@@ -97,9 +105,9 @@ Partial Class frmFEKLUploader
         Me.GroupBox.Controls.Add(Me.TabControl1)
         Me.GroupBox.Controls.Add(Me.LabelModelName)
         Me.GroupBox.Controls.Add(Me.LabelPromptModelName)
-        Me.GroupBox.Location = New System.Drawing.Point(12, 12)
+        Me.GroupBox.Location = New System.Drawing.Point(12, 27)
         Me.GroupBox.Name = "GroupBox"
-        Me.GroupBox.Size = New System.Drawing.Size(680, 440)
+        Me.GroupBox.Size = New System.Drawing.Size(770, 466)
         Me.GroupBox.TabIndex = 0
         Me.GroupBox.TabStop = False
         '
@@ -115,7 +123,7 @@ Partial Class frmFEKLUploader
         Me.TabControl1.Location = New System.Drawing.Point(6, 49)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(665, 381)
+        Me.TabControl1.Size = New System.Drawing.Size(755, 407)
         Me.TabControl1.TabIndex = 10
         '
         'TabPageFEKLJSON
@@ -132,7 +140,7 @@ Partial Class frmFEKLUploader
         Me.TabPageFEKLJSON.Controls.Add(Me.ButtonOpenFEKLJSONFile)
         Me.TabPageFEKLJSON.Location = New System.Drawing.Point(4, 22)
         Me.TabPageFEKLJSON.Name = "TabPageFEKLJSON"
-        Me.TabPageFEKLJSON.Size = New System.Drawing.Size(657, 355)
+        Me.TabPageFEKLJSON.Size = New System.Drawing.Size(653, 357)
         Me.TabPageFEKLJSON.TabIndex = 2
         Me.TabPageFEKLJSON.Text = "FEKL JSON"
         Me.TabPageFEKLJSON.UseVisualStyleBackColor = True
@@ -141,7 +149,7 @@ Partial Class frmFEKLUploader
         '
         Me.CheckBoxFlagDuplicates.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.CheckBoxFlagDuplicates.AutoSize = True
-        Me.CheckBoxFlagDuplicates.Location = New System.Drawing.Point(530, 71)
+        Me.CheckBoxFlagDuplicates.Location = New System.Drawing.Point(526, 71)
         Me.CheckBoxFlagDuplicates.Name = "CheckBoxFlagDuplicates"
         Me.CheckBoxFlagDuplicates.Size = New System.Drawing.Size(99, 17)
         Me.CheckBoxFlagDuplicates.TabIndex = 16
@@ -155,7 +163,7 @@ Partial Class frmFEKLUploader
         Me.Panel1.Controls.Add(Me.ButtonStopContinueProcessing)
         Me.Panel1.Location = New System.Drawing.Point(201, 15)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(328, 25)
+        Me.Panel1.Size = New System.Drawing.Size(324, 25)
         Me.Panel1.TabIndex = 15
         '
         'ButtonStopContinueProcessing
@@ -177,7 +185,7 @@ Partial Class frmFEKLUploader
         'LabelFEKLJSONErrorString
         '
         Me.LabelFEKLJSONErrorString.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.LabelFEKLJSONErrorString.Location = New System.Drawing.Point(102, 313)
+        Me.LabelFEKLJSONErrorString.Location = New System.Drawing.Point(102, 315)
         Me.LabelFEKLJSONErrorString.Name = "LabelFEKLJSONErrorString"
         Me.LabelFEKLJSONErrorString.Size = New System.Drawing.Size(393, 36)
         Me.LabelFEKLJSONErrorString.TabIndex = 13
@@ -187,7 +195,7 @@ Partial Class frmFEKLUploader
         '
         Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(17, 313)
+        Me.Label2.Location = New System.Drawing.Point(17, 315)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(78, 13)
         Me.Label2.TabIndex = 12
@@ -197,7 +205,7 @@ Partial Class frmFEKLUploader
         '
         Me.LabelFEKLJSONErrorType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.LabelFEKLJSONErrorType.AutoSize = True
-        Me.LabelFEKLJSONErrorType.Location = New System.Drawing.Point(82, 290)
+        Me.LabelFEKLJSONErrorType.Location = New System.Drawing.Point(82, 292)
         Me.LabelFEKLJSONErrorType.Name = "LabelFEKLJSONErrorType"
         Me.LabelFEKLJSONErrorType.Size = New System.Drawing.Size(27, 13)
         Me.LabelFEKLJSONErrorType.TabIndex = 11
@@ -207,7 +215,7 @@ Partial Class frmFEKLUploader
         '
         Me.Label4.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(17, 290)
+        Me.Label4.Location = New System.Drawing.Point(17, 292)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(59, 13)
         Me.Label4.TabIndex = 10
@@ -220,7 +228,7 @@ Partial Class frmFEKLUploader
         Me.LabelFEKLJSON.ForeColor = System.Drawing.Color.SkyBlue
         Me.LabelFEKLJSON.Location = New System.Drawing.Point(90, 49)
         Me.LabelFEKLJSON.Name = "LabelFEKLJSON"
-        Me.LabelFEKLJSON.Size = New System.Drawing.Size(217, 16)
+        Me.LabelFEKLJSON.Size = New System.Drawing.Size(216, 16)
         Me.LabelFEKLJSON.TabIndex = 6
         Me.LabelFEKLJSON.Text = "<Filename - No File Selected>"
         '
@@ -230,7 +238,7 @@ Partial Class frmFEKLUploader
         Me.LabelPromptFEKLJSONFileName.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LabelPromptFEKLJSONFileName.Location = New System.Drawing.Point(17, 49)
         Me.LabelPromptFEKLJSONFileName.Name = "LabelPromptFEKLJSONFileName"
-        Me.LabelPromptFEKLJSONFileName.Size = New System.Drawing.Size(67, 16)
+        Me.LabelPromptFEKLJSONFileName.Size = New System.Drawing.Size(66, 16)
         Me.LabelPromptFEKLJSONFileName.TabIndex = 5
         Me.LabelPromptFEKLJSONFileName.Text = "Filename:"
         '
@@ -243,7 +251,7 @@ Partial Class frmFEKLUploader
         Me.DataGridViewFEKLStatements.ContextMenuStrip = Me.ContextMenuStripGrid
         Me.DataGridViewFEKLStatements.Location = New System.Drawing.Point(17, 94)
         Me.DataGridViewFEKLStatements.Name = "DataGridViewFEKLStatements"
-        Me.DataGridViewFEKLStatements.Size = New System.Drawing.Size(622, 182)
+        Me.DataGridViewFEKLStatements.Size = New System.Drawing.Size(618, 184)
         Me.DataGridViewFEKLStatements.TabIndex = 4
         '
         'ContextMenuStripGrid
@@ -283,22 +291,33 @@ Partial Class frmFEKLUploader
         Me.TabPageFEKL.Controls.Add(Me.LabelPromptErrorMessage)
         Me.TabPageFEKL.Controls.Add(Me.LabelErrorType)
         Me.TabPageFEKL.Controls.Add(Me.LabelPromptErrorType)
+        Me.TabPageFEKL.Controls.Add(Me.MenuStrip1)
         Me.TabPageFEKL.Location = New System.Drawing.Point(4, 22)
         Me.TabPageFEKL.Name = "TabPageFEKL"
         Me.TabPageFEKL.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageFEKL.Size = New System.Drawing.Size(657, 355)
+        Me.TabPageFEKL.Size = New System.Drawing.Size(747, 381)
         Me.TabPageFEKL.TabIndex = 0
         Me.TabPageFEKL.Text = "FEKL"
         Me.TabPageFEKL.UseVisualStyleBackColor = True
+        '
+        'Button1
+        '
+        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
+        Me.Button1.Location = New System.Drawing.Point(693, 31)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(25, 23)
+        Me.Button1.TabIndex = 48
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'Panel2
         '
         Me.Panel2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Panel2.Controls.Add(Me.ButtonFEKLStartStop)
-        Me.Panel2.Location = New System.Drawing.Point(253, 15)
+        Me.Panel2.Location = New System.Drawing.Point(251, 31)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(301, 25)
+        Me.Panel2.Size = New System.Drawing.Size(395, 25)
         Me.Panel2.TabIndex = 16
         '
         'ButtonFEKLStartStop
@@ -321,16 +340,16 @@ Partial Class frmFEKLUploader
         Me.RichTextBoxFEKLDocument.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.RichTextBoxFEKLDocument.Location = New System.Drawing.Point(3, 60)
+        Me.RichTextBoxFEKLDocument.Location = New System.Drawing.Point(3, 79)
         Me.RichTextBoxFEKLDocument.Name = "RichTextBoxFEKLDocument"
-        Me.RichTextBoxFEKLDocument.Size = New System.Drawing.Size(621, 220)
+        Me.RichTextBoxFEKLDocument.Size = New System.Drawing.Size(715, 225)
         Me.RichTextBoxFEKLDocument.TabIndex = 5
         Me.RichTextBoxFEKLDocument.Text = ""
         '
         'LabelErrorMessage
         '
         Me.LabelErrorMessage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.LabelErrorMessage.Location = New System.Drawing.Point(86, 301)
+        Me.LabelErrorMessage.Location = New System.Drawing.Point(86, 325)
         Me.LabelErrorMessage.Name = "LabelErrorMessage"
         Me.LabelErrorMessage.Size = New System.Drawing.Size(393, 36)
         Me.LabelErrorMessage.TabIndex = 9
@@ -338,7 +357,7 @@ Partial Class frmFEKLUploader
         '
         'ButtonOpenFEKLFile
         '
-        Me.ButtonOpenFEKLFile.Location = New System.Drawing.Point(17, 15)
+        Me.ButtonOpenFEKLFile.Location = New System.Drawing.Point(17, 31)
         Me.ButtonOpenFEKLFile.Name = "ButtonOpenFEKLFile"
         Me.ButtonOpenFEKLFile.Size = New System.Drawing.Size(95, 23)
         Me.ButtonOpenFEKLFile.TabIndex = 0
@@ -349,7 +368,7 @@ Partial Class frmFEKLUploader
         '
         Me.LabelPromptErrorMessage.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.LabelPromptErrorMessage.AutoSize = True
-        Me.LabelPromptErrorMessage.Location = New System.Drawing.Point(2, 301)
+        Me.LabelPromptErrorMessage.Location = New System.Drawing.Point(2, 325)
         Me.LabelPromptErrorMessage.Name = "LabelPromptErrorMessage"
         Me.LabelPromptErrorMessage.Size = New System.Drawing.Size(78, 13)
         Me.LabelPromptErrorMessage.TabIndex = 8
@@ -359,7 +378,7 @@ Partial Class frmFEKLUploader
         '
         Me.LabelErrorType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.LabelErrorType.AutoSize = True
-        Me.LabelErrorType.Location = New System.Drawing.Point(70, 283)
+        Me.LabelErrorType.Location = New System.Drawing.Point(70, 307)
         Me.LabelErrorType.Name = "LabelErrorType"
         Me.LabelErrorType.Size = New System.Drawing.Size(27, 13)
         Me.LabelErrorType.TabIndex = 7
@@ -369,11 +388,39 @@ Partial Class frmFEKLUploader
         '
         Me.LabelPromptErrorType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.LabelPromptErrorType.AutoSize = True
-        Me.LabelPromptErrorType.Location = New System.Drawing.Point(5, 283)
+        Me.LabelPromptErrorType.Location = New System.Drawing.Point(5, 307)
         Me.LabelPromptErrorType.Name = "LabelPromptErrorType"
         Me.LabelPromptErrorType.Size = New System.Drawing.Size(59, 13)
         Me.LabelPromptErrorType.TabIndex = 6
         Me.LabelPromptErrorType.Text = "Error Type:"
+        '
+        'MenuStrip1
+        '
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ImportToolStripMenuItem, Me.GenerateModelsFEKLToolStripMenuItem})
+        Me.MenuStrip1.Location = New System.Drawing.Point(3, 3)
+        Me.MenuStrip1.Name = "MenuStrip1"
+        Me.MenuStrip1.Size = New System.Drawing.Size(741, 24)
+        Me.MenuStrip1.TabIndex = 49
+        Me.MenuStrip1.Text = "MenuStrip1"
+        '
+        'ImportToolStripMenuItem
+        '
+        Me.ImportToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RDFOWLttlTurtleFileToolStripMenuItem})
+        Me.ImportToolStripMenuItem.Name = "ImportToolStripMenuItem"
+        Me.ImportToolStripMenuItem.Size = New System.Drawing.Size(55, 20)
+        Me.ImportToolStripMenuItem.Text = "&Import"
+        '
+        'RDFOWLttlTurtleFileToolStripMenuItem
+        '
+        Me.RDFOWLttlTurtleFileToolStripMenuItem.Name = "RDFOWLttlTurtleFileToolStripMenuItem"
+        Me.RDFOWLttlTurtleFileToolStripMenuItem.Size = New System.Drawing.Size(198, 22)
+        Me.RDFOWLttlTurtleFileToolStripMenuItem.Text = "RDF/OWL .ttl Turtle File"
+        '
+        'GenerateModelsFEKLToolStripMenuItem
+        '
+        Me.GenerateModelsFEKLToolStripMenuItem.Name = "GenerateModelsFEKLToolStripMenuItem"
+        Me.GenerateModelsFEKLToolStripMenuItem.Size = New System.Drawing.Size(94, 20)
+        Me.GenerateModelsFEKLToolStripMenuItem.Text = "&Generate FEKL"
         '
         'TabPageDDL2FEKL
         '
@@ -381,7 +428,7 @@ Partial Class frmFEKLUploader
         Me.TabPageDDL2FEKL.Location = New System.Drawing.Point(4, 22)
         Me.TabPageDDL2FEKL.Name = "TabPageDDL2FEKL"
         Me.TabPageDDL2FEKL.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPageDDL2FEKL.Size = New System.Drawing.Size(657, 355)
+        Me.TabPageDDL2FEKL.Size = New System.Drawing.Size(653, 357)
         Me.TabPageDDL2FEKL.TabIndex = 1
         Me.TabPageDDL2FEKL.Text = "DDL-2-FEKL"
         Me.TabPageDDL2FEKL.UseVisualStyleBackColor = True
@@ -399,7 +446,7 @@ Partial Class frmFEKLUploader
         Me.TableLayoutPanel1.RowCount = 2
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 9.090909!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 90.90909!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(651, 349)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(647, 351)
         Me.TableLayoutPanel1.TabIndex = 1
         '
         'ToolStrip1
@@ -407,7 +454,7 @@ Partial Class frmFEKLUploader
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButtonDDLExtractFEKL, Me.ToolStripLabelPromptDatabaseType, Me.ToolStripComboBoxDatabaseType})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(651, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(647, 25)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -417,13 +464,13 @@ Partial Class frmFEKLUploader
         Me.ToolStripButtonDDLExtractFEKL.Image = CType(resources.GetObject("ToolStripButtonDDLExtractFEKL.Image"), System.Drawing.Image)
         Me.ToolStripButtonDDLExtractFEKL.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButtonDDLExtractFEKL.Name = "ToolStripButtonDDLExtractFEKL"
-        Me.ToolStripButtonDDLExtractFEKL.Size = New System.Drawing.Size(75, 22)
+        Me.ToolStripButtonDDLExtractFEKL.Size = New System.Drawing.Size(74, 22)
         Me.ToolStripButtonDDLExtractFEKL.Text = "&Extract FEKL"
         '
         'ToolStripLabelPromptDatabaseType
         '
         Me.ToolStripLabelPromptDatabaseType.Name = "ToolStripLabelPromptDatabaseType"
-        Me.ToolStripLabelPromptDatabaseType.Size = New System.Drawing.Size(85, 22)
+        Me.ToolStripLabelPromptDatabaseType.Size = New System.Drawing.Size(86, 22)
         Me.ToolStripLabelPromptDatabaseType.Text = "Database Type:"
         '
         'ToolStripComboBoxDatabaseType
@@ -437,7 +484,7 @@ Partial Class frmFEKLUploader
         Me.TextBoxDDL.Location = New System.Drawing.Point(3, 34)
         Me.TextBoxDDL.Multiline = True
         Me.TextBoxDDL.Name = "TextBoxDDL"
-        Me.TextBoxDDL.Size = New System.Drawing.Size(645, 312)
+        Me.TextBoxDDL.Size = New System.Drawing.Size(641, 314)
         Me.TextBoxDDL.TabIndex = 0
         '
         'TabPageDefaults
@@ -445,7 +492,7 @@ Partial Class frmFEKLUploader
         Me.TabPageDefaults.Controls.Add(Me.GroupBoxDefaults)
         Me.TabPageDefaults.Location = New System.Drawing.Point(4, 22)
         Me.TabPageDefaults.Name = "TabPageDefaults"
-        Me.TabPageDefaults.Size = New System.Drawing.Size(657, 355)
+        Me.TabPageDefaults.Size = New System.Drawing.Size(653, 357)
         Me.TabPageDefaults.TabIndex = 3
         Me.TabPageDefaults.Text = "Defaults"
         Me.TabPageDefaults.UseVisualStyleBackColor = True
@@ -573,7 +620,7 @@ Partial Class frmFEKLUploader
         'ButtonClose
         '
         Me.ButtonClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonClose.Location = New System.Drawing.Point(702, 22)
+        Me.ButtonClose.Location = New System.Drawing.Point(792, 22)
         Me.ButtonClose.Name = "ButtonClose"
         Me.ButtonClose.Size = New System.Drawing.Size(73, 23)
         Me.ButtonClose.TabIndex = 1
@@ -585,23 +632,30 @@ Partial Class frmFEKLUploader
         Me.TimerHighlighting.Enabled = True
         Me.TimerHighlighting.Interval = 2000
         '
-        'Button1
+        'MenuStrip2
         '
-        Me.Button1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Image = Global.Boston.My.Resources.Resources.Refresh_16x16
-        Me.Button1.Location = New System.Drawing.Point(599, 31)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(25, 23)
-        Me.Button1.TabIndex = 48
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.MenuStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CloseToolStripMenuItem})
+        Me.MenuStrip2.Location = New System.Drawing.Point(0, 0)
+        Me.MenuStrip2.Name = "MenuStrip2"
+        Me.MenuStrip2.Size = New System.Drawing.Size(877, 24)
+        Me.MenuStrip2.TabIndex = 2
+        Me.MenuStrip2.Text = "MenuStrip2"
+        '
+        'CloseToolStripMenuItem
+        '
+        Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
+        Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(48, 20)
+        Me.CloseToolStripMenuItem.Text = "&Close"
         '
         'frmFEKLUploader
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(787, 454)
+        Me.ClientSize = New System.Drawing.Size(877, 505)
+        Me.Controls.Add(Me.MenuStrip2)
         Me.Controls.Add(Me.ButtonClose)
         Me.Controls.Add(Me.GroupBox)
+        Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmFEKLUploader"
         Me.Text = "FEKL Uploader"
         Me.GroupBox.ResumeLayout(False)
@@ -617,6 +671,8 @@ Partial Class frmFEKLUploader
         Me.TabPageFEKL.PerformLayout()
         Me.Panel2.ResumeLayout(False)
         Me.Panel2.PerformLayout()
+        Me.MenuStrip1.ResumeLayout(False)
+        Me.MenuStrip1.PerformLayout()
         Me.TabPageDDL2FEKL.ResumeLayout(False)
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.TableLayoutPanel1.PerformLayout()
@@ -625,7 +681,10 @@ Partial Class frmFEKLUploader
         Me.TabPageDefaults.ResumeLayout(False)
         Me.GroupBoxDefaults.ResumeLayout(False)
         Me.GroupBoxDefaults.PerformLayout()
+        Me.MenuStrip2.ResumeLayout(False)
+        Me.MenuStrip2.PerformLayout()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -679,4 +738,10 @@ Partial Class frmFEKLUploader
     Friend WithEvents LabelPromptDefaultDocumentName As Label
     Friend WithEvents TimerHighlighting As Timer
     Friend WithEvents Button1 As Button
+    Friend WithEvents MenuStrip1 As MenuStrip
+    Friend WithEvents ImportToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents RDFOWLttlTurtleFileToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents MenuStrip2 As MenuStrip
+    Friend WithEvents CloseToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents GenerateModelsFEKLToolStripMenuItem As ToolStripMenuItem
 End Class

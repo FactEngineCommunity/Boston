@@ -54,7 +54,7 @@
                 Dim lsMessage As String
                 lsMessage = "Error: TableRoleConstraintInstance.GetRoleConstraintInstanceCountForPage"
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return 0
             End Try
@@ -127,7 +127,7 @@
                                     lrRoleConstraintInstance = lrRoleConstraintInstance.CloneRingConstraintInstance(arPage)
                             End Select
 
-                            If Not IsSomething(lrRoleConstraintInstance.RoleConstraint) Then
+                            If Not lrRoleConstraintInstance.RoleConstraint IsNot Nothing Then
                                 lsMessage = "No RoleConstraint found for RoleConstraint.Id = '" & lrRoleConstraintInstance.Id & "'"
                                 Throw New Exception(lsMessage)
                             End If
@@ -171,11 +171,11 @@
                                     End If
                                 End If
 
-                                If IsSomething(lrRoleInstance) Then
+                                If lrRoleInstance IsNot Nothing Then
                                     lrRoleInstance.RoleConstraint.Add(lrRoleConstraintInstance)
                                     lrRoleConstraintInstance.Role.Add(lrRoleInstance)
                                     If lrRoleConstraintInstance.RoleConstraint.RoleConstraintType = pcenumRoleConstraintType.InternalUniquenessConstraint Then
-                                        If Not IsSomething(lrRoleInstance.FactType.InternalUniquenessConstraint.Find(AddressOf lrRoleConstraintInstance.RoleConstraint.Equals)) Then
+                                        If Not lrRoleInstance.FactType.InternalUniquenessConstraint.Find(AddressOf lrRoleConstraintInstance.RoleConstraint.Equals) IsNot Nothing Then
                                             '----------------------------------------------------------------------------
                                             'Add the RoleConstraintInstance to the set of InternalUniquenessConstraints 
                                             '  for the FactTypeInstance
@@ -225,7 +225,7 @@
                 lsMessage &= vbCrLf & vbCrLf & "Page.Id: '" & arPage.PageId & "'"
                 lsMessage &= vbCrLf & "Page.Name: '" & arPage.Name & "'"
                 lsMessage &= vbCrLf & "RoleConstraint.Id: '" & lrRoleConstraintInstance.Id & "'"
-                Call prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
         End Function
 

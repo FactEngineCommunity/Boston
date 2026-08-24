@@ -93,10 +93,11 @@ Namespace FBM
 
             loRoleName.TextColor = Color.Blue
             loRoleName.Transparent = True
+
             If Me.RoleInstance.FactType.isPreferredReferenceMode Then
                 loRoleName.Visible = False
             Else
-                loRoleName.Visible = True
+                loRoleName.Visible = Not Me.Name.Trim = ""
             End If
 
             loRoleName.ZTop()
@@ -219,7 +220,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub
@@ -266,7 +267,7 @@ Namespace FBM
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
             End Try
 
         End Sub

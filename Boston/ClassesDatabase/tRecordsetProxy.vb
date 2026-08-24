@@ -1,7 +1,5 @@
 ﻿Imports System.Reflection
 Imports ADODB
-Imports LinFu.DynamicProxy
-Imports Microsoft.VisualBasic.Compatibility.VB6
 
 <Microsoft.VisualBasic.ComClass()>
 Public Class RecordsetProxy
@@ -138,7 +136,12 @@ Public Class RecordsetProxy
     End Sub
 
     Public Sub Close() Implements _Recordset.Close
-        Call Me._innerRecordset.Close
+        Try
+            Call Me._innerRecordset.Close
+        Catch ex As Exception
+            'We tried. Would possibly happen if already closed.
+        End Try
+
     End Sub
 
     Public Sub Delete(Optional AffectRecords As AffectEnum = AffectEnum.adAffectCurrent) Implements _Recordset.Delete
@@ -179,7 +182,7 @@ Public Class RecordsetProxy
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
             lsMessage.AppendDoubleLineBreak(Source.ToString)
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 

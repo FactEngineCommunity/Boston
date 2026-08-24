@@ -21,7 +21,7 @@ Public Class frmDiagramOverview
     Private Sub ButtonRefresh_Click(sender As Object, e As EventArgs) Handles ButtonRefresh.Click
 
         Try
-            If IsSomething(prApplication.WorkingPage) Then
+            If prApplication.WorkingPage IsNot Nothing Then
                 Select Case prApplication.WorkingPage.Language
                     Case Is = pcenumLanguage.ORMModel,
                               pcenumLanguage.EntityRelationshipDiagram,
@@ -36,7 +36,7 @@ Public Class frmDiagramOverview
 
             lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
             lsMessage &= vbCrLf & vbCrLf & ex.Message
-            prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
         End Try
     End Sub
 End Class

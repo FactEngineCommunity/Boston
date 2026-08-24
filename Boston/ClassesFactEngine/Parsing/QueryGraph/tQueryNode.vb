@@ -4,6 +4,7 @@ Namespace FactEngine
     Public Class QueryNode
         Inherits tQueryFormulaToken 'Because a QueryNode may be part of the formula for a QueryEdge. QueryNode is used as a FormulaToken because it contains a RelativeFBMModelObject to get the Table/NodeType of a Column/Property.
         Implements IEquatable(Of FactEngine.QueryNode)
+        Implements ICloneable
 
         Public PreboundText As String = Nothing
         Public PostboundText As String = Nothing
@@ -25,13 +26,40 @@ Namespace FactEngine
             End Get
         End Property
 
-        Public IdentifierList As New List(Of String)
-
         Public ReadOnly Property RDSTable As RDS.Table
             Get
                 Return Me.RelativeFBMModelObject.getCorrespondingRDSTable
             End Get
         End Property
+
+        Private _IdentifierList As New List(Of String)
+        Public Property IdentifierList As List(Of String)
+            Get
+                If Me.QueryEdge IsNot Nothing Then
+                    If Me.IsTargetNode Then
+                        Return Me.QueryEdge.TargetNodeIdentifierList
+                    Else
+                        Return Me.QueryEdge.BaseNodeIdentifierList
+                    End If
+
+                Else
+                    Return Me._IdentifierList
+                End If
+            End Get
+            Set(value As List(Of String))
+                If Me.QueryEdge IsNot Nothing Then
+                    If Me.IsTargetNode Then
+                        Me.QueryEdge.TargetNodeIdentifierList = value
+                    Else
+                        Me.QueryEdge.BaseNodeIdentifierList = value
+                    End If
+                Else
+                    Me._IdentifierList = value
+                End If
+            End Set
+        End Property
+
+
 
         Public ReadOnly Property DBVariableName As String
             Get
@@ -45,7 +73,55 @@ Namespace FactEngine
             End Get
         End Property
 
-        Public HasIdentifier As Boolean = False
+        Private _HasIdentifier As Boolean = False
+        Public Property HasIdentifier As Boolean
+            Get
+                If Not _HasIdentifier Then
+                    Return Me.IdentifierList.Count > 0
+                Else
+                    Return _HasIdentifier
+                End If
+            End Get
+            Set(value As Boolean)
+                Me._HasIdentifier = value
+            End Set
+        End Property
+
+        Private _BETWEENCLAUSE As FEQL.BETWEENClause = Nothing
+        Public Property BETWEENCLAUSE As FEQL.BETWEENClause
+            Get
+                Return Me._BETWEENCLAUSE
+            End Get
+            Set(value As FEQL.BETWEENClause)
+                Me._BETWEENCLAUSE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' E.g. WHICH DateTime.NEXT('Wednesday') has (Film:'Rocky') THAT showing at (Cinema:'Rialto') 
+        ''' </summary>
+        Private _NEXTCLAUSE As FEQL.NEXTClause = Nothing
+        Public Property NEXTCLAUSE As FEQL.NEXTClause
+            Get
+                Return Me._NEXTCLAUSE
+            End Get
+            Set(value As FEQL.NEXTClause)
+                Me._NEXTCLAUSE = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' E.g. WHICH DateTime.THIS('Wednesday') has (Film:'Rocky') THAT showing at (Cinema:'Rialto') 
+        ''' </summary>
+        Private _THISCLAUSE As FEQL.THISClause = Nothing
+        Public Property THISCLAUSE As FEQL.THISClause
+            Get
+                Return Me._THISCLAUSE
+            End Get
+            Set(value As FEQL.THISClause)
+                Me._THISCLAUSE = value
+            End Set
+        End Property
 
         Public [Alias] As String = Nothing
 
@@ -90,6 +166,8 @@ Namespace FactEngine
             Get
                 If Me._RelativeFBMModelObject IsNot Nothing Then
                     Return Me._RelativeFBMModelObject
+                ElseIf Me.QueryEdge IsNot Nothing AndAlso Me.QueryEdge.FBMFactType.getCorrespondingRDSTable(Nothing, True) IsNot Nothing And Me.FBMModelObject.GetType = GetType(FBM.ValueType) Then
+                    Return Me.QueryEdge.FBMFactType
                 ElseIf Me.FBMModelObject.IsAbsorbed Then
                     Return Me.FBMModelObject.GetTopmostNonAbsorbedSupertype
                 Else
@@ -149,6 +227,27 @@ Namespace FactEngine
             Me.Comparitor = aiComparitor
         End Sub
 
+        Public Function Clone() As Object Implements ICloneable.Clone
+
+            Dim lrQueryNode As New FactEngine.QueryNode(Nothing)
+            Try
+                With Me
+                    lrQueryNode.FBMModelObject = .FBMModelObject
+                End With
+
+                Return lrQueryNode
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Function
+
         Public Shadows Function Equals(other As QueryNode) As Boolean Implements IEquatable(Of QueryNode).Equals
 
             Return Me.FBMModelObject.Id = other.FBMModelObject.Id And NullVal(Me.Alias, "") = NullVal(other.Alias, "")
@@ -167,9 +266,9 @@ Namespace FactEngine
                         Return " = "
                     Case Is = FEQL.pcenumFEQLComparitor.LikeComparitor
 
-                        If prApplication.WorkingModel.DatabaseConnection IsNot Nothing Then
+                        If Me.FBMModelObject.Model.DatabaseConnection IsNot Nothing Then
 
-                            Select Case prApplication.WorkingModel.TargetDatabaseType
+                            Select Case Me.FBMModelObject.Model.TargetDatabaseType
                                 Case Is = pcenumDatabaseType.Neo4j,
                                           pcenumDatabaseType.KuzuDB
                                     Return " =~ "
@@ -246,7 +345,7 @@ Namespace FactEngine
 
                 lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
                 lsMessage &= vbCrLf & vbCrLf & ex.Message
-                prApplication.ThrowErrorMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
 
                 Return False
             End Try
