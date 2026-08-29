@@ -1,0 +1,125 @@
+﻿ORM2
+└─ core:ORMModel
+   └─ core:Facts
+      ├─ core:Fact | core:SubtypeFact | core:ImpliedFact
+      │  ├─ @id
+      │  ├─ @_Name                               (name of the Fact Type)
+      │  ├─ core:FactRoles                       (signature of the Fact Type)
+      │  │  └─ core:Role (0..n)
+      │  │     ├─ @id                            (Role id)
+      │  │     ├─ @SequenceNr                    (role position)
+      │  │     └─ core:RolePlayer
+      │  │        └─ @ref                        (ObjectType id: EntityType / ValueType / FactType-as-object)
+      │  │
+      │  └─ core:DerivationRule                  (present only for derived Fact Types)
+      │     └─ core:FactTypeDerivationPath
+      │        ├─ @id
+      │        ├─ @_Name                         (often repeats / describes the rule)
+      │        │
+      │        ├─ core:PathComponents
+      │        │  └─ core:RolePath               (the derivation query plan / AST root)
+      │        │     ├─ @id
+      │        │     ├─ @SplitCombinationOperator    (often "And")
+      │        │     │
+      │        │     ├─ core:RootObjectType
+      │        │     │  ├─ @id
+      │        │     │  ├─ @ref                  (starting ObjectType id)
+      │        │     │  └─ @IsNegated            (optional)
+      │        │     │
+      │        │     ├─ core:PathedRoles
+      │        │     │  └─ core:PathedRole (0..k)
+      │        │     │     ├─ @id
+      │        │     │     ├─ @ref               (Role id in some Fact Type)
+      │        │     │     ├─ @Purpose           (join intent / grouping hint, e.g. PostInnerJoin, SameFactType)
+      │        │     │     └─ @IsNegated         (optional; important for negated branches)
+      │        │     │
+      │        │     ├─ core:SubPaths            (parallel / branched traversals)
+      │        │     │  └─ core:SubPath (0..m)
+      │        │     │     ├─ @id
+      │        │     │     ├─ core:RootObjectType        (optional; introduces a new logical root / alias)
+      │        │     │     │  ├─ @id
+      │        │     │     │  ├─ @ref
+      │        │     │     │  └─ @IsNegated
+      │        │     │     └─ core:PathedRoles
+      │        │     │        └─ core:PathedRole (0..k)
+      │        │     │           ├─ @id
+      │        │     │           ├─ @ref
+      │        │     │           ├─ @Purpose
+      │        │     │           └─ @IsNegated
+      │        │     │
+      │        │     ├─ core:ObjectUnifiers      (explicit variable identity / join-equality declarations)
+      │        │     │  └─ core:ObjectUnifier (0..u)
+      │        │     │     ├─ @id
+      │        │     │     ├─ core:PathedRole (0..n)
+      │        │     │     │  └─ @ref           (PathedRole id)
+      │        │     │     └─ core:PathRoot (0..n)
+      │        │     │        └─ @ref           (RootObjectType id)
+      │        │     │
+      │        │     ├─ core:CalculatedValues    (named intermediate expressions)
+      │        │     │  └─ core:CalculatedValue (0..p)
+      │        │     │     ├─ @id
+      │        │     │     ├─ core:Function
+      │        │     │     │  └─ @ref           (operator / function id)
+      │        │     │     ├─ core:AggregationContext    (optional)
+      │        │     │     │  └─ core:PathRoot
+      │        │     │     │     └─ @ref
+      │        │     │     └─ core:Inputs
+      │        │     │        └─ core:Input (0..n)
+      │        │     │           ├─ @id
+      │        │     │           ├─ core:Parameter
+      │        │     │           │  └─ @ref
+      │        │     │           └─ core:Source
+      │        │     │              ├─ core:PathedRole
+      │        │     │              │  └─ @ref
+      │        │     │              ├─ core:CalculatedValue
+      │        │     │              │  └─ @ref
+      │        │     │              └─ core:Constant
+      │        │     │                 ├─ @id
+      │        │     │                 └─ core:Value
+      │        │     │
+      │        │     └─ core:Conditions          (boolean predicates over the current bindings)
+      │        │        ├─ core:And | core:Or | core:Not
+      │        │        ├─ core:Equals | core:NotEquals
+      │        │        ├─ core:GreaterThan | core:GreaterThanOrEqual
+      │        │        ├─ core:LessThan | core:LessThanOrEqual
+      │        │        └─ core:CalculatedCondition
+      │        │           └─ @ref               (CalculatedValue id used as a boolean/filter condition)
+      │        │
+      │        └─ core:DerivationProjections
+      │           └─ core:DerivationProjection (0..q)
+      │              ├─ @id
+      │              ├─ @ref                    (often points at RolePath/@id)
+      │              └─ core:RoleProjection (0..n)
+      │                 ├─ @id
+      │                 ├─ @ref                 (derived Fact Type Role id being populated)
+      │                 └─ core:DerivationSource
+      │                    ├─ core:PathRoot
+      │                    │  └─ @ref
+      │                    ├─ core:PathedRole
+      │                    │  └─ @ref
+      │                    └─ core:CalculatedValue
+      │                       └─ @ref
+      │
+      └─ (other facts...)
+```
+
+Derivation interpretation note
+------------------------------
+A NORMA derivation is best understood as a small query AST.
+
+- Fact Type Readings behave like joins expressed in natural language.
+- RootObjectType and SubPath.RootObjectType introduce variable scopes / aliases.
+- PathedRoles define traversal steps across Fact Types.
+- ObjectUnifiers declare that different path occurrences denote the same logical object.
+- CalculatedValues define intermediate expressions.
+- Conditions filter the bound tuples, including CalculatedCondition refs.
+- DerivationProjections map internal bindings back to the roles of the derived Fact Type.
+
+So, conceptually, a derivation is much closer to:
+    FROM / JOIN / WHERE / projected outputs
+than to flat prose.
+
+That is why renderer correctness depends on preserving the derivation AST,
+not merely storing DerivationText.
+```
+

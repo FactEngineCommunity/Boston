@@ -1,0 +1,136 @@
+//
+// TinyPG grammar for English-verbalised ORM derivations.
+//
+
+<% @TinyPG Namespace="ORMDerivation" Language="vb" %>
+<% @TextHighlighter Generate="true" %>
+
+EOF -> @"^$";
+
+// Derivation punctuation.
+[Color(155, 145, 170)] DERIVATION_MARKER -> @"\*";
+[Color(155, 145, 170)] FULL_STOP -> @"\.";
+[Color(155, 145, 170)] COMMA_SEPARATOR -> @",";
+[Color(155, 145, 170)] OPEN_PARENTHESIS -> @"\(";
+[Color(155, 145, 170)] CLOSE_PARENTHESIS -> @"\)";
+
+// Logical connective keywords -- muted lavender.
+[Color(146, 126, 186)] KEYWD_IF_AND_ONLY_IF -> @"if\s+and\s+only\s+if\b";
+[Color(146, 126, 186)] KEYWD_WHERE_NEGATED -> @"where\s+it\s+is\s+not\s+(?:true|the\s+case)\s+that\b";
+[Color(146, 126, 186)] KEYWD_NEGATED -> @"it\s+is\s+not\s+(?:true|the\s+case)\s+that\b";
+[Color(146, 126, 186)] KEYWD_WHERE -> @"where\b(?!\s+it\s+is\s+not\s+(?:true|the\s+case)\s+that\b)";
+[Color(146, 126, 186)] KEYWD_AND -> @"and\b";
+[Color(146, 126, 186)] KEYWD_OR -> @"or\b";
+
+// Quantifier and reference keywords -- muted cornflower blue.
+[Color(102, 149, 190)] KEYWD_SOME -> @"some\b";
+[Color(102, 149, 190)] KEYWD_EACH -> @"(?i:each)\b";
+[Color(102, 149, 190)] KEYWD_NO -> @"no\b";
+[Color(102, 149, 190)] KEYWD_THAT -> @"that\b";
+
+// Special verbalisation phrases -- muted mint.
+[Color(104, 163, 137)] KEYWD_POSSIBLE_VALUES_OF -> @"the\s+possible\s+values?\s+of\b";
+[Color(104, 163, 137)] KEYWD_BY_DEFINITION -> @"by\s+definition\b";
+[Color(104, 163, 137)] KEYWD_AT_LEAST -> @"at\s+least\b";
+[Color(104, 163, 137)] KEYWD_AT_MOST -> @"at\s+most\b";
+
+// Functions, operators, and values -- muted apricot and rose.
+[Color(197, 139, 91)] FUNCTION_NAME -> @"[A-Za-z][A-Za-z0-9]*(?=\s*\()";
+[Color(190, 114, 139)] COMPARISON_OPERATOR -> @"(?:<>|>=|<=|=|>|<)";
+[Color(190, 114, 139)] ARITHMETIC_OPERATOR -> @"(?:\+|-|\*|/)";
+[Color(190, 114, 139)] NUMBER_LITERAL -> @"[0-9]+(?:\.[0-9]+)?";
+[Color(190, 114, 139)] TEXT_LITERAL -> @"(?:""[^""]*""|'[^']*')";
+
+// Fact Type Reading components -- muted green and plum, following the
+// existing Fact Type Reading grammar's uppercase/lowercase distinction.
+[Color(91, 151, 119)] MODEL_ELEMENT_NAME -> @"(?!Each\b)[A-Z](?:[A-Za-z0-9_#?$@!%]*[A-Za-z_#?$@!%])?(?:[ _][A-Z](?:[A-Za-z0-9_#?$@!%]*[A-Za-z_#?$@!%])?)*";
+[Color(202, 158, 96)] MODEL_ELEMENT_ALIAS_NUMBER -> @"[0-9]+\b";
+[Color(157, 111, 157)] PREDICATE_WORD -> @"(?!(?:if|where|and|or|some|each|no|that)\b)(?!it\s+is\s+not\s+(?:true|the\s+case)\s+that\b)(?!the\s+possible\s+values\s+of\b)(?!by\s+definition\b)(?!at\s+(?:least|most)\b)(?![A-Za-z][A-Za-z0-9]*\s*\()[a-z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*";
+
+[Skip] WHITESPACE -> @"\s+";
+
+// Complete derivations.
+DERIVATION ->
+    DERIVATION_MARKER
+    DERIVATION_SENTENCE
+    FULL_STOP;
+
+DERIVATION_SENTENCE ->
+      DEFINITION_DERIVATION
+    | BICONDITIONAL_DERIVATION;
+
+DEFINITION_DERIVATION ->
+    KEYWD_EACH
+    DERIVATION_EXPRESSION;
+
+BICONDITIONAL_DERIVATION ->
+    DERIVATION_HEAD_READING
+    KEYWD_IF_AND_ONLY_IF
+    DERIVATION_EXPRESSION;
+
+DERIVATION_HEAD_READING ->
+    MODEL_ELEMENT_REFERENCE
+    FACT_TYPE_PATH_COMPONENT*;
+
+MODEL_ELEMENT_REFERENCE ->
+    MODEL_ELEMENT_NAME
+    MODEL_ELEMENT_ALIAS_NUMBER?;
+
+// Logical structure. Indentation in NORMA's English verbalisation is
+// presentation only; these productions preserve its explicit connectives.
+DERIVATION_EXPRESSION ->
+    DERIVATION_CLAUSE
+    (LOGICAL_CONNECTIVE DERIVATION_CLAUSE)*;
+
+LOGICAL_CONNECTIVE ->
+      KEYWD_WHERE_NEGATED
+    | KEYWD_WHERE
+    | KEYWD_AND
+    | KEYWD_OR;
+
+DERIVATION_CLAUSE ->
+    KEYWD_NEGATED?
+    FACT_TYPE_PATH;
+
+// Fact Type Reading surface syntax. This intentionally recognises the English
+// verbalisation only; mapping the resulting components to an AST comes later.
+FACT_TYPE_PATH ->
+    FACT_TYPE_PATH_COMPONENT+;
+
+FACT_TYPE_PATH_COMPONENT ->
+      KEYWD_SOME
+    | KEYWD_EACH
+    | KEYWD_NO
+    | KEYWD_THAT
+    | KEYWD_POSSIBLE_VALUES_OF
+    | KEYWD_BY_DEFINITION
+    | KEYWD_AT_LEAST
+    | KEYWD_AT_MOST
+    | FUNCTION_CALL
+    | PARENTHESISED_DERIVATION_EXPRESSION
+    | COMPARISON_OPERATOR
+    | ARITHMETIC_OPERATOR
+    | NUMBER_LITERAL
+    | TEXT_LITERAL
+    | COMMA_SEPARATOR
+    | MODEL_ELEMENT_REFERENCE
+    | PREDICATE_WORD;
+
+FUNCTION_CALL ->
+    FUNCTION_NAME
+    OPEN_PARENTHESIS
+    FUNCTION_ARGUMENT_LIST?
+    CLOSE_PARENTHESIS;
+
+FUNCTION_ARGUMENT_LIST ->
+    DERIVATION_EXPRESSION
+    (COMMA_SEPARATOR DERIVATION_EXPRESSION)*;
+
+PARENTHESISED_DERIVATION_EXPRESSION ->
+    OPEN_PARENTHESIS
+    DERIVATION_EXPRESSION
+    CLOSE_PARENTHESIS;
+
+Start ->
+    DERIVATION
+    EOF;

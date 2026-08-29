@@ -1,0 +1,21 @@
+Steps
+=====
+1. For each of the following files, append the prefix "tORMDerivation"
+
+	Parser.vb		becomes tORMDerivationParser.vb
+	ParseTree.vb		becomes tORMDerivationParseTree.vb
+	Scanner.vb		becomes tORMDerivationScanner.vb
+	TextHighlighter.vb	becomes tORMDerivationTextHighlighter.vb
+
+2. Move the three files (above) to \Boston\ClassesORM\ORMDerivations\ORMDerivationParser\TinyPG
+	(write over existing files)
+
+3. If Boston is open in Visual Studio do the following:
+
+	Click [Yes to All] to the message box reading: "This file has been modified outside the source editor. Do you want to reload it?"
+
+4. Remove the unused variables that appear in the ErrorList of the Project (for completeness)
+
+
+
+

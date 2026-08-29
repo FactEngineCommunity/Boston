@@ -1,0 +1,87 @@
+﻿'==========================================================
+'  NORMA / ORM2 - Minimal object model for derivation extraction
+'
+'  PURPOSE
+'  -------
+'  NORMA (the ORM2 tool) stores derivations as a *small query plan* embedded in the .orm XML.
+'  Boston wants to import those derivations and turn them into:
+'
+'     (a) internal derivation structures, and
+'     (b) human-readable derivation text that reads like ORM Fact Type Readings.
+'
+'  This file is deliberately "minimal" and "forgiving":
+'    - We deserialize the derivation tree reliably.
+'    - We preserve complex expression nodes (CalculatedValues / Conditions) as raw XML first.
+'    - We document the intent and relationships so anyone can maintain the importer.
+'
+'  BIG PICTURE
+'  -----------
+'  A derived Fact Type in NORMA has:
+'
+'     FactType
+'       -> DerivationRule
+'            -> FactTypeDerivationPath
+'                 -> PathComponents
+'                      -> RolePath
+'                           -> RootObjectType
+'                           -> SubPaths (each SubPath is a FactType traversal)
+'                           -> CalculatedValues (named intermediate values; sometimes "Position", etc.)
+'                           -> Conditions (constraints over CalculatedValues, Roles, Functions, constants)
+'                 -> DerivationProjections (which values are projected back to the derived Fact's roles)
+'
+'  HOW BOSTON GENERATES THE ENGLISH
+'  -------------------------------
+'  Boston already owns Fact Types and Fact Type Readings (FBM.FactType / FBM.FactTypeReading).
+'  Each SubPath gives a sequence of PathedRole refs (Role ids), which identify:
+'
+'     - which FactType is traversed (role.FactType),
+'     - which role order to use, so we can call:
+'
+'           FactType.getFactTypeReadingByRoleSequence(rolesInOrder)
+'
+'  and render the reading in natural language using:
+'
+'     FrontText, PreBoundText, PredicatePartText, PostBoundText, FollowingText
+'
+'  Example (rendered from a FactTypeReading):
+'
+'     "sometimes big-Person lives in City-area alone"
+'
+'       FrontText        = "sometimes"
+'       PreBoundText     = "big-"
+'       Role(0)          = Person
+'       PredicatePartText= "lives in"
+'       Role(1)          = City
+'       PostBoundText    = "-area"
+'       FollowingText    = "alone"
+'
+'  Example (derivation rule text we aim to generate):
+'
+'     *Person lives in Country if and only if
+'       that Person lives in some City
+'       and that City is in that Country.
+'
+'  Notes:
+'    - The "that/some" language is not stored in NORMA; Boston adds it while binding variables.
+'    - Conditions and function calls become trailing "where ..." or embedded NOT(...) as needed.
+'
+'==========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
