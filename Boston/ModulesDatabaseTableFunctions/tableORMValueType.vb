@@ -241,7 +241,7 @@ Namespace TableValueType
                         lrValueType.IsMDAModelElement = CBool(lREcordset("IsMDAModelElement").Value)
                         lrValueType.GUID = lREcordset("GUID").Value
                         lrValueType.IsIndependent = CBool(lREcordset("IsIndependent").Value)
-                        lrValueType.ObjectifyingFactTypeId = lREcordset("ObjectifyingFactTypeId").Value
+                        lrValueType.ObjectifyingFactTypeId = Trim(Viev.NullVal(lREcordset("ObjectifyingFactTypeId").Value, ""))
                         lrValueType.isDirty = False
 
                         Call TableValueTypeValueConstraint.GetValueConstraintsByValueType(lrValueType)
