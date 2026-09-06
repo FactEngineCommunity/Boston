@@ -1,0 +1,47 @@
+﻿Compression Key:
+
+A: Action
+S: Status (Options are NS: NotStarted, CP: Completed)
+An: Annotation
+St: Steps
+G: Greet
+R: Receive
+I: IF
+C: Close
+COL: Collect
+CN: Confirm
+T: TAKE
+CHK: Check
+P: PROCESS
+->: GOTO
+O: Order
+D: Delivery
+CC: Credit Card
+
+Compressed Structure:
+
+{
+"1": {"A":"G G_Customer","S":"NS","An":"Initial greeting."},
+"2": {"A":"R_Response","S":"NS","An":"Listens to response."},
+"3": {"A":"I response='O' ->30 ELSE ->4","S":"NS","An":"Order check."},
+"4": {"A":"C_Conversation","S":"NS","An":"End if no order."},
+"30": {"A":"COL_O_Details","S":"NS","An":"Order details","St":{"31":{"A":"ASK_Type","S":"NS"},"32":{"A":"ASK_Size","S":"NS"},"33":{"A":"ASK_Extras","S":"NS"}}},
+"40": {"A":"CN_O_Quantity","S":"NS","An":"Order quantity."},
+"50": {"A":"CN_Pickup/D","S":"NS","An":"Pickup or D."},
+"60": {"A":"I Pickup THEN ->90","S":"NS","An":"If Pickup."},
+"70": {"A":"COL_D_Address","S":"NS","An":"D address","St":{"71":{"A":"ASK_Street","S":"NS"},"72":{"A":"ASK_Number","S":"NS"},"73":{"A":"ASK_Suburb","S":"NS"}}},
+"80": {"A":"CN_D_Suburb","S":"NS","An":"Suburb confirmation."},
+"90": {"A":"T_Payment Details","S":"NS","An":"Payment method."},
+"100": {"A":"I Paying_Cash THEN ->210 ELSE ->110","S":"NS","An":"Cash or CC."},
+"110": {"A":"CHK_Previous_O from Cust","S":"NS","An":"Previous order."},
+"111": {"A":"IF NOT Previous_O > 112 ELSE -> 150 ","S":"NS","An":""},
+"112": {"A":"Get CC from DB IF previous_O","S":"NS","An":"Existing."},
+"112": {"A":"Get CC Type and CC # from customer","S":"NS","An":""},
+"150": {"A":"ASK_Confirmation_Code","S":"NS","An":"CCV code."},
+"160": {"A":"I Not_Valid THEN Cash_OR_CLOSE","S":"NS","An":"Invalid CC."},
+"170": {"A":"CN_Entire_O","S":"NS","An":"Confirm order."},
+"180": {"A":"I Confirmed THEN P_CC ELSE ->190","S":"NS","An":"Process payment."},
+"190": {"A":"I Successful THEN CN_Time ELSE Cash_OR_CLOSE","S":"NS","An":"Confirm time."},
+"210": {"A":"Commit to DB","S":"NS","An":"DB steps","St":{"211":{"A":"Get Contact_Name","S":"NS"},"212":{"A":"Create Order_Row","S":"NS"},"213":{"A":"FOR EACH Pizza","S":"NS","St":{"214":{"A":"Create OrderItem_Row","S":"NS"}}},"215":{"A":"GetOrderTotalPrice","S":"NS"},"216":{"A":"UPSERT Missing_Items","S":"NS"},"218":{"A":"Communicate Total","S":"NS"}}},
+"310": {"A":"Complete & Thank","S":"NS","An":"Final step."}
+}

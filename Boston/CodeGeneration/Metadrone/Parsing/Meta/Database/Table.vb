@@ -110,6 +110,9 @@ Namespace Parser.Meta.Database
                         'Add Outgoing Relations            
                         For Each lrRelation In aarSchemaRow(SchemaRowIdx).Relation
 
+                            'CodeSafe
+                            If lrRelation.OriginColumns.Count <> lrRelation.DestinationColumns.Count Then Continue For
+
                             Try
                                 Dim lsReferencedTableName As String = ""
                                 Dim lsDestinationColumnName As String = ""
@@ -183,6 +186,9 @@ Namespace Parser.Meta.Database
 
                         'Add Incoming Relations            
                         For Each lrRelation In aarSchemaRow(SchemaRowIdx).IncomingRelation
+
+                            'CodeSafe
+                            If lrRelation.OriginColumns.Count <> lrRelation.DestinationColumns.Count Then Continue For
 
                             Try
                                 Dim lsReferencedTableName As String = ""

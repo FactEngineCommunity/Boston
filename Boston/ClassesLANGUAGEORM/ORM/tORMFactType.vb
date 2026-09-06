@@ -3058,6 +3058,18 @@ OneFactTypeReading:
 
                         Next
 
+                        'Link Fact Types, if Table is ObjectifiedFactType.
+                        If lrTable.FBMModelElement.GetType = GetType(FBM.FactType) Then
+                            'Objectified Fact Type
+
+                            Dim lrFactType As FBM.FactType = lrTable.FBMModelElement
+
+                            For Each lrLinkFactType In lrFactType.getLinkFactTypes
+                                lsReturnString.AppendLine(vbTab & lrLinkFactType.GenerateFEKLLine(True))
+                            Next
+
+                        End If
+
                         lsReturnString.AppendLine(" )" & vbCrLf)
                     End If
                 End If

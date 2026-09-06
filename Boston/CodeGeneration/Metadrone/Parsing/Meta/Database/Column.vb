@@ -55,29 +55,39 @@ Namespace Parser.Meta.Database
             For Each lrRelation In SchemaRow.Relation
 
                 Try
+                    'CodeSafe
+                    If lrRelation.OriginColumns.Count <> lrRelation.DestinationColumns.Count Then Continue For
+
                     If lrRelation.OriginColumns.FindAll(Function(x) x.Name = Me.Value).Count > 0 Then
                         Dim liIndex As Integer = lrRelation.OriginColumns.IndexOf(lrRelation.OriginColumns.Find(Function(x) x.Name = Me.Value))
                         'For Each lrDestinationColumn In lrRelation.DestinationColumns '20221202-VM-Was
-                        Dim lrDestinationColumn = lrRelation.DestinationColumns(liIndex)
+
+                        Dim lrDestinationColumn As RDS.Column = Nothing
+                        Try
+                            lrDestinationColumn = lrRelation.DestinationColumns(liIndex)
+                        Catch ex As Exception
+                            Throw New Exception($"Destination Colmn, with index, {liIndex} , in Relation not found.")
+                        End Try
+
                         Dim lsReferencedTableName As String = ""
-                            Dim lsOriginRoleName As String = ""
-                            Dim lsDestinationRoleName As String = ""
+                        Dim lsOriginRoleName As String = ""
+                        Dim lsDestinationRoleName As String = ""
 
-                            Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) ' SchemaRow.ColumnId)
+                        Dim lrOriginColumn As RDS.Column = lrRelation.OriginColumns.Find(Function(x) x.ActiveRole.Id = lrDestinationColumn.ActiveRole.Id) ' SchemaRow.ColumnId)
 
-                            If lrOriginColumn Is Nothing Then Continue For
+                        If lrOriginColumn Is Nothing Then Continue For
 
-                            lsOriginRoleName = lrOriginColumn.Role.Name
+                        lsOriginRoleName = lrOriginColumn.Role.Name
 
-                            Dim lsDestinationColumnName As String = ""
-                            If lrRelation.DestinationColumns.Count = 1 Then
-                                lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
-                                lsDestinationRoleName = lrRelation.DestinationColumns(0).Role.Name
-                            Else
-                                'Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
-                                lsDestinationColumnName = lrDestinationColumn.Name
-                                lsDestinationRoleName = lrDestinationColumn.Role.Name
-                            End If
+                        Dim lsDestinationColumnName As String = ""
+                        If lrRelation.DestinationColumns.Count = 1 Then
+                            lsDestinationColumnName = lrRelation.DestinationColumns(0).Name
+                            lsDestinationRoleName = lrRelation.DestinationColumns(0).Role.Name
+                        Else
+                            'Dim lrDestinationColumn As RDS.Column = lrRelation.DestinationColumns.Find(Function(x) x.ActiveRole.Id = lrOriginColumn.ActiveRole.Id)
+                            lsDestinationColumnName = lrDestinationColumn.Name
+                            lsDestinationRoleName = lrDestinationColumn.Role.Name
+                        End If
 
                         Me.Relations.Add(New Relation(lrRelation.Id,
                                                       Me.Owner.GetAttributeValue("Value", Nothing, False, False),
@@ -94,7 +104,7 @@ Namespace Parser.Meta.Database
                         'Next
                     End If
                 Catch ex As Exception
-                    Throw New Exception("Error setting Relation In Column.New")
+                    Throw New Exception($"Error setting Relation In Column.New: {DirectCast(Me.Owner, Table).Value}.{Me.Value}. {ex.Message}")
                 End Try
             Next
 
