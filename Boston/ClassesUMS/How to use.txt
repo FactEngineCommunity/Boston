@@ -1,0 +1,13 @@
+' Load
+Dim schema = UmsSchemaSerializer.LoadFromFile("schema.yaml")
+
+' Inspect a property
+Dim prop = schema(0).Properties(1)  ' Cinema.Name
+Console.WriteLine(prop.Name)        ' "Name"
+Console.WriteLine(prop.Alias)       ' "Cinema Name"
+Console.WriteLine(prop.DataType)    ' DataType.TextFixedLength
+Console.WriteLine(prop.Length)      ' 100
+Console.WriteLine(prop.Constraints(0)) ' Constraint.NotNull
+
+' Round-trip save
+UmsSchemaSerializer.SaveToFile(schema, "schema_out.yaml")
