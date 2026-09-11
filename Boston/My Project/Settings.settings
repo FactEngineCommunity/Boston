@@ -294,7 +294,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="SaveNewModelsAsXML" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="OSMShowOSMMenu" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

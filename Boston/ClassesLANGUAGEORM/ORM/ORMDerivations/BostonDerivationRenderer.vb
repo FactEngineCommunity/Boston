@@ -104,6 +104,13 @@ Public Module BostonDerivationRenderer
         Public Property ContextObject As FBM.ModelObject
         Public Property SplitOperator As String = "and"
         Public Property SubPlans As New List(Of RoleStringPlan)
+        Public Property GroupedSplit As SplitGroupPlan
+    End Class
+
+    Private Class SplitGroupPlan
+        Public Property OperatorName As String = "and"
+        Public Property Branch As RoleStringPlan
+        Public Property Members As New List(Of SplitGroupPlan)
     End Class
 
     Public Function RenderDerivationEnglish(ByVal arModel As FBM.Model,
@@ -477,6 +484,22 @@ Public Module BostonDerivationRenderer
             lrRolePathPlan.LeadTransitionPlan =
                 BuildProjectedRootTransitionPlan(arContext, lrRolePathPlan)
 
+            If String.Equals(lrRolePath.SplitCombinationOperator, "Xor",
+                             StringComparison.OrdinalIgnoreCase) Then
+                lrRolePathPlan.GroupedSplit = New SplitGroupPlan With {.OperatorName = "xor"}
+                If lrRolePath.SubPath IsNot Nothing Then
+                    For Each lrSubPath As FBM.RoleSubPath In lrRolePath.SubPath
+                        If lrSubPath Is Nothing Then Continue For
+                        lrRolePathPlan.GroupedSplit.Members.Add(
+                            BuildSplitGroup(arContext, lrSubPath,
+                                            lrRolePathPlan.ContextBindingKey,
+                                            lrRolePathPlan.ContextObject))
+                    Next
+                End If
+                larRolePathPlans.Add(lrRolePathPlan)
+                Continue For
+            End If
+
             If lrRolePath.SubPath IsNot Nothing Then
                 For Each lrSubPath As FBM.RoleSubPath In lrRolePath.SubPath
                     AddSubPathPlans(arContext,
@@ -490,6 +513,39 @@ Public Module BostonDerivationRenderer
         Next
 
         Return larRolePathPlans
+    End Function
+
+    Private Function BuildSplitGroup(
+        ByVal arContext As RenderContext,
+        ByVal arSubPath As FBM.RoleSubPath,
+        ByVal asContextKey As String,
+        ByVal arContextObject As FBM.ModelObject) As SplitGroupPlan
+
+        Dim lrGroup As New SplitGroupPlan
+        If arSubPath.PathedRole IsNot Nothing AndAlso arSubPath.PathedRole.Count > 0 Then
+            lrGroup.Branch = BuildSubPathRolePlan(arContext, arSubPath, True)
+            BindNestedSubPlansToContext(arContext,
+                New List(Of RoleStringPlan) From {lrGroup.Branch}, asContextKey, arContextObject)
+            Return lrGroup
+        End If
+
+        lrGroup.OperatorName = If(String.IsNullOrWhiteSpace(arSubPath.SplitCombinationOperator),
+                                  "and", arSubPath.SplitCombinationOperator.ToLowerInvariant())
+        If arSubPath.RootObjectType IsNot Nothing Then
+            ' A rooted group needs explicit root-scope rendering; do not flatten it.
+            lrGroup.Branch = New RoleStringPlan
+            lrGroup.Branch.Occurrences.Add(New FactOccurrence With {
+                .ErrorText = "[ERROR: Rooted logical group is not yet supported in XOR rendering.]"})
+            Return lrGroup
+        End If
+        If arSubPath.SubPath IsNot Nothing Then
+            For Each lrChild As FBM.RoleSubPath In arSubPath.SubPath
+                If lrChild IsNot Nothing Then
+                    lrGroup.Members.Add(BuildSplitGroup(arContext, lrChild, asContextKey, arContextObject))
+                End If
+            Next
+        End If
+        Return lrGroup
     End Function
 
     Private Sub AddSubPathPlans(ByVal arContext As RenderContext,
@@ -785,31 +841,23 @@ Public Module BostonDerivationRenderer
         If Not SameModelObject(lrMainEntryObject,
                                lrRoot.BostonModelElement) Then Return Nothing
 
-        ' Keep this type label separate from the canonical projected-variable
-        ' key. The head role and PathRoot denote the same logical value, but
-        ' NORMA verbalises both compatible types (for example,
-        ' CanonicalDataValue is some DataValue).
+        ' The projection already identifies the typed PathRoot represented by
+        ' this transition. Reuse that binding instead of creating a second
+        ' alias candidate for the same referent. Keep the head's type distinct.
         Dim lsTypedRootKey As String =
-            ProjectionTypeKey(lrRolePath.Id,
-                              lrRoleProjection.Ref)
+            RootKey(lrRoot.id)
         Dim lrTransitionPlan As RoleStringPlan =
             BuildTransitionPlan(arContext,
                                 HeadRoleKey(lrRoleProjection.Ref),
                                 lrDerivedRole.JoinedORMObject,
                                 lsTypedRootKey,
-                                lrRoot.BostonModelElement)
+                                lrRoot.BostonModelElement,
+                                abRegisterCompatibleVariable:=False)
 
         ' Do not broaden behavior for unresolved or ambiguous type changes.
         ' Existing rendering remains unchanged unless Boston has one definite
         ' subtype Fact Type Reading for this projection boundary.
         If Not HasSuccessfulTransition(lrTransitionPlan) Then Return Nothing
-
-        EnsureKey(arContext, lsTypedRootKey)
-        If Not arContext.DisplayNameByKey.ContainsKey(lsTypedRootKey) Then
-            arContext.DisplayNameByKey(lsTypedRootKey) =
-                RootObjectTypeName(lrRoot)
-            arContext.SyntheticKeysInOrder.Add(lsTypedRootKey)
-        End If
 
         Return lrTransitionPlan
     End Function
@@ -972,7 +1020,8 @@ Public Module BostonDerivationRenderer
         ByVal asFromBindingKey As String,
         ByVal arFromObject As FBM.ModelObject,
         ByVal asToBindingKey As String,
-        ByVal arToObject As FBM.ModelObject) As RoleStringPlan
+        ByVal arToObject As FBM.ModelObject,
+        Optional ByVal abRegisterCompatibleVariable As Boolean = True) As RoleStringPlan
 
         Dim lrPlan As New RoleStringPlan
         Dim lrSelectedFactType As FBM.FactType = Nothing
@@ -1066,10 +1115,15 @@ Public Module BostonDerivationRenderer
             Return lrPlan
         End If
 
-        RegisterCompatibleVariable(arContext,
-                                   asFromBindingKey,
-                                   asToBindingKey,
-                                   arToObject)
+        ' Projected-root transitions reuse bindings already registered by
+        ' RegisterProjections. Re-registering through the shared head could
+        ' merge separate alternative roots of the same type.
+        If abRegisterCompatibleVariable Then
+            RegisterCompatibleVariable(arContext,
+                                       asFromBindingKey,
+                                       asToBindingKey,
+                                       arToObject)
+        End If
 
         Dim lrOccurrence As New FactOccurrence With {
             .FactType = lrSelectedFactType,
@@ -1547,6 +1601,19 @@ Public Module BostonDerivationRenderer
                     lrFirstOccurrence.EntryBindingKey,
                     lrEntryObject)
 
+                ' This explicit root-to-entry join denotes one referent when
+                ' both Boston Object Type Ids match, even if objectification
+                ' supplies different CLR objects. Do not merge any other role
+                ' merely because it has the same Object Type.
+                If Not String.IsNullOrWhiteSpace(lrEntryObject.Id) AndAlso
+                   String.Equals(arPlan.Root.BostonModelElement.Id,
+                                 lrEntryObject.Id,
+                                 StringComparison.OrdinalIgnoreCase) Then
+                    UnionKeys(arContext,
+                              lsRootKey,
+                              lrFirstOccurrence.EntryBindingKey)
+                End If
+
             ElseIf SameModelObject(
                 arPlan.Root.BostonModelElement,
                 lrEntryObject) Then
@@ -1596,6 +1663,38 @@ Public Module BostonDerivationRenderer
                    lrEntryObject IsNot Nothing AndAlso
                    Not SameModelObject(lrPreviousExitObject,
                                        lrEntryObject) Then
+
+                    ' When both readings follow the path boundary, verbalise the
+                    ' implicit subtype Fact Type between them. Its exit is the
+                    ' next predicate's entry, not the end of that predicate.
+                    ' Keep reversed readings and negated occurrences on their
+                    ' established restriction path below.
+                    If Not lrPrevious.IsNegated AndAlso
+                       Not lrCurrent.IsNegated AndAlso
+                       lrPrevious.TrailingTransitionPlan Is Nothing AndAlso
+                       String.Equals(
+                           CanonicalKey(arContext, lrPrevious.BindingKeys.Last()),
+                           CanonicalKey(arContext, lrPrevious.ExitBindingKey),
+                           StringComparison.OrdinalIgnoreCase) AndAlso
+                       String.Equals(
+                           CanonicalKey(arContext, lrCurrent.BindingKeys(0)),
+                           CanonicalKey(arContext, lrCurrent.EntryBindingKey),
+                           StringComparison.OrdinalIgnoreCase) Then
+
+                        Dim lrForwardTransition As RoleStringPlan =
+                            BuildTransitionPlan(arContext,
+                                                lrPrevious.ExitBindingKey,
+                                                lrPreviousExitObject,
+                                                lrCurrent.EntryBindingKey,
+                                                lrEntryObject)
+
+                        If HasSuccessfulTransition(lrForwardTransition) Then
+                            arPlan.Occurrences.InsertRange(
+                                arPlan.Occurrences.IndexOf(lrCurrent),
+                                lrForwardTransition.Occurrences)
+                            Continue For
+                        End If
+                    End If
 
                     ' The RolePath can cross a subtype boundary without listing
                     ' the subtype Fact Type's Roles. If the next FTR is oriented
@@ -1902,8 +2001,11 @@ Public Module BostonDerivationRenderer
                                 ByRef asConditions As String) As String
         If aarPlans Is Nothing OrElse aarPlans.Count = 0 Then Return ""
 
+        ' NORMA InitializeRolePaths combines separate lead paths with OrSplit.
+        ' SplitOperator belongs to the branches within an individual path.
+        ' Selecting "or" also isolates mentions between these alternatives.
         Dim lsOperator As String =
-            aarPlans(0).SplitOperator
+            If(aarPlans.Count > 1, "or", aarPlans(0).SplitOperator)
 
         Dim lsetInitial As New HashSet(Of String)(arContext.HeadBindingKeys, StringComparer.OrdinalIgnoreCase)
         Dim lsetShared As New HashSet(Of String)(lsetInitial, StringComparer.OrdinalIgnoreCase)
@@ -2008,6 +2110,17 @@ Public Module BostonDerivationRenderer
             End If
         End If
 
+        If arPlan.GroupedSplit IsNot Nothing Then
+            Dim lsGroupedConditions As String = ""
+            Dim lsGroup As String = RenderSplitGroup(arContext, arPlan.GroupedSplit,
+                                                     aMentionedKeys, lsGroupedConditions)
+            If lsGroup <> "" Then
+                If lrBuilder.Length > 0 Then lrBuilder.Append(HtmlBreak & "where ")
+                lrBuilder.Append(lsGroup)
+            End If
+            Return lrBuilder.ToString().Trim()
+        End If
+
         If arPlan.SubPlans Is Nothing OrElse arPlan.SubPlans.Count = 0 Then
             If lrBuilder.Length = 0 AndAlso
                Not Object.ReferenceEquals(arPlan.RolePath, arContext.RolePath) Then
@@ -2078,6 +2191,56 @@ Public Module BostonDerivationRenderer
         Return lrBuilder.ToString().Trim()
     End Function
 
+    Private Function RenderSplitGroup(
+        ByVal arContext As RenderContext,
+        ByVal arGroup As SplitGroupPlan,
+        ByVal aMentionedKeys As HashSet(Of String),
+        ByRef asConditions As String,
+        Optional ByVal asPreviousEntryKey As String = "") As String
+
+        If arGroup.Branch IsNot Nothing Then
+            Dim lsEntry As String = CanonicalKey(arContext, PlanEntryBindingKey(arGroup.Branch))
+            Dim lbCollapse As Boolean = asPreviousEntryKey <> "" AndAlso
+                String.Equals(asPreviousEntryKey, lsEntry, StringComparison.OrdinalIgnoreCase) AndAlso
+                arGroup.Branch.ContextTransitionPlan Is Nothing
+            Return RenderRoleStringBranch(arContext, arGroup.Branch, aMentionedKeys,
+                                           lbCollapse, asConditions)
+        End If
+
+        If arGroup.OperatorName <> "and" AndAlso arGroup.OperatorName <> "or" AndAlso
+           arGroup.OperatorName <> "xor" Then
+            Return "[ERROR: Unsupported logical group operator '" & CleanError(arGroup.OperatorName) & "'.]"
+        End If
+
+        Dim larText As New List(Of String)
+        Dim lsPreviousEntry As String = ""
+        For Each lrMember As SplitGroupPlan In arGroup.Members
+            Dim lsetMentions As HashSet(Of String) =
+                If(arGroup.OperatorName = "and", aMentionedKeys,
+                   New HashSet(Of String)(aMentionedKeys, StringComparer.OrdinalIgnoreCase))
+            Dim lsMemberConditions As String = ""
+            Dim lsText As String = RenderSplitGroup(arContext, lrMember, lsetMentions,
+                                                    lsMemberConditions, lsPreviousEntry)
+            If lsText <> "" AndAlso arGroup.OperatorName <> "xor" AndAlso
+               lrMember.Branch Is Nothing AndAlso lrMember.Members.Count > 1 AndAlso
+               lrMember.OperatorName <> arGroup.OperatorName Then
+                lsText = "(" & lsText & ")"
+            End If
+            If lsText <> "" Then larText.Add(lsText)
+            lsPreviousEntry = ""
+            If arGroup.OperatorName = "and" AndAlso lrMember.Branch IsNot Nothing Then
+                lsPreviousEntry = CanonicalKey(arContext, PlanEntryBindingKey(lrMember.Branch))
+            End If
+        Next
+        If larText.Count = 0 Then Return ""
+        If arGroup.OperatorName = "xor" Then
+            ' NORMA XorLead/Tail/NestedListOpen and ListSeparator snippets.
+            Return "exactly one of the following is <em>true:</em>" & HtmlBreak &
+                   String.Join(";" & HtmlBreak, larText)
+        End If
+        Return String.Join(HtmlBreak & arGroup.OperatorName & " ", larText)
+    End Function
+
     Private Function RenderRoleStringBranch(
         ByVal arContext As RenderContext,
         ByVal arPlan As RoleStringPlan,
@@ -2087,6 +2250,17 @@ Public Module BostonDerivationRenderer
         Optional ByVal abCollapseContextTransition As Boolean = False) As String
 
         If arPlan Is Nothing Then Return ""
+
+        ' The explicit "it is not true that (...)" wrapper starts a new
+        ' clause: its subject cannot be elided against the surrounding branch.
+        ' A transition inside that wrapper may still feed the main predicate.
+        If arPlan.NegatesEntireBranch Then
+            abCollapseLeadRole = False
+            abCollapseContextTransition = False
+        End If
+
+        Dim lsNegatedExitKey As String =
+            BranchNegativeExistentialKey(arContext, arPlan, aMentionedKeys)
 
         Dim lrBuilder As New StringBuilder
         Dim lsBranchTransition As String = ""
@@ -2143,7 +2317,9 @@ Public Module BostonDerivationRenderer
                              arPlan,
                              lsetBranchMentions,
                              lbCollapseMain,
-                             asConditions)
+                             asConditions,
+                             False,
+                             lsNegatedExitKey)
 
         If lsBranchTransition <> "" Then
             lrBuilder.Append(lsBranchTransition)
@@ -2223,7 +2399,8 @@ Public Module BostonDerivationRenderer
         Dim lsResult As String =
             lrBuilder.ToString().Trim()
 
-        If arPlan.NegatesEntireBranch AndAlso lsResult <> "" Then
+        If arPlan.NegatesEntireBranch AndAlso lsNegatedExitKey = "" AndAlso
+           lsResult <> "" Then
             lsResult = "it is not true that (" & lsResult & ")"
         End If
 
@@ -2235,7 +2412,8 @@ Public Module BostonDerivationRenderer
                                       ByVal aMentionedKeys As HashSet(Of String),
                                       ByVal abCollapseLeadRole As Boolean,
                                       ByRef asConditions As String,
-                                      Optional ByVal abPreserveCollapsedLeadConnector As Boolean = False) As String
+                                      Optional ByVal abPreserveCollapsedLeadConnector As Boolean = False,
+                                      Optional ByVal asNegatedLeadExitKey As String = "") As String
         Dim lrBuilder As New StringBuilder
         Dim lsPreviousExitKey As String = ""
         Dim lbInNegatedChain As Boolean = False
@@ -2251,9 +2429,11 @@ Public Module BostonDerivationRenderer
             End If
 
             Dim lsNegativeQuantifierKey As String =
-                NegativeQuantifierBindingKey(arContext,
+                If(lbFirstRenderedOccurrence AndAlso asNegatedLeadExitKey <> "",
+                   asNegatedLeadExitKey,
+                   NegativeQuantifierBindingKey(arContext,
                                              lrOccurrence,
-                                             aMentionedKeys)
+                                             aMentionedKeys))
 
             Dim lbEmitsNegatedWhere As Boolean =
                 lrOccurrence.IsNegated AndAlso
@@ -2341,6 +2521,57 @@ Public Module BostonDerivationRenderer
         Return lsResult
     End Function
 
+    Private Function BranchNegativeExistentialKey(
+        ByVal arContext As RenderContext,
+        ByVal arPlan As RoleStringPlan,
+        ByVal aMentionedKeys As HashSet(Of String)) As String
+
+        ' NORMA: a binary at the start of a negated chain can quantify its
+        ' unintroduced opposite role with "no" (ResolveDynamicNegatedExitRole).
+        ' This renderer has no pairing-use-phase tracker. Keep explicit negation
+        ' for correlated type pairings, transitions, and split child scopes.
+        If Not arPlan.NegatesEntireBranch OrElse arPlan.NegatedRootExists OrElse
+           arPlan.ContextTransitionPlan IsNot Nothing OrElse
+           arPlan.ChildPlans.Count <> 0 OrElse arPlan.Occurrences.Count = 0 Then Return ""
+
+        Dim lrFirst As FactOccurrence = arPlan.Occurrences(0)
+        If lrFirst Is Nothing OrElse lrFirst.ErrorText <> "" OrElse
+           lrFirst.FactType Is Nothing OrElse lrFirst.FactType.RoleGroup.Count <> 2 OrElse
+           lrFirst.BindingKeys.Count <> 2 OrElse lrFirst.Roles.Count <> 2 OrElse
+           lrFirst.PathBindingKeys.Count <> 2 Then Return ""
+
+        Dim lsEntry As String = CanonicalKey(arContext, lrFirst.EntryBindingKey)
+        Dim lsExit As String = CanonicalKey(arContext, lrFirst.ExitBindingKey)
+        If lsEntry = "" OrElse lsExit = "" OrElse lsEntry = lsExit OrElse
+           Not aMentionedKeys.Contains(lsEntry) OrElse
+           aMentionedKeys.Contains(lsExit) OrElse
+           arContext.HeadBindingKeys.Contains(lsExit) Then Return ""
+
+        Dim loRoot As Object = CorrelationRootForKey(arContext, lrFirst.EntryBindingKey)
+        Dim larPartners As List(Of String) = Nothing
+        If loRoot IsNot Nothing AndAlso
+           arContext.VariableKeysByCorrelationRootInOrder.TryGetValue(loRoot, larPartners) AndAlso
+           larPartners.Any(Function(x) Not String.Equals(
+               CanonicalKey(arContext, x), lsEntry, StringComparison.OrdinalIgnoreCase)) Then Return ""
+
+        ' Keep the remainder attached as a continuous restriction on the new
+        ' variable. Do not inline across an independently rooted restriction.
+        For liIndex As Integer = 0 To arPlan.Occurrences.Count - 1
+            Dim lrOccurrence As FactOccurrence = arPlan.Occurrences(liIndex)
+            If lrOccurrence Is Nothing OrElse lrOccurrence.ErrorText <> "" OrElse
+               lrOccurrence.IsNegated OrElse lrOccurrence.RestrictsPreviousFactType OrElse
+               lrOccurrence.TrailingTransitionPlan IsNot Nothing Then Return ""
+            If liIndex > 0 AndAlso
+               (lrOccurrence.BindingKeys.Count = 0 OrElse
+                Not String.Equals(
+                    CanonicalKey(arContext, arPlan.Occurrences(liIndex - 1).ExitBindingKey),
+                    CanonicalKey(arContext, lrOccurrence.BindingKeys(0)),
+                    StringComparison.OrdinalIgnoreCase)) Then Return ""
+        Next
+
+        Return lsExit
+    End Function
+
     Private Function NegativeQuantifierBindingKey(
         ByVal arContext As RenderContext,
         ByVal arOccurrence As FactOccurrence,
@@ -2401,19 +2632,15 @@ Public Module BostonDerivationRenderer
                 lrPathedRole.ValueRestriction.
                     PathedRoleConditionValueConstraint.ValueRange
 
-            If larRanges.Count <> 1 Then
+            If larRanges.Count = 0 Then
                 larRestrictions.Add(
                     "[ERROR: Unsupported PathedRole value restriction with " &
                     larRanges.Count.ToString() & " ranges.]")
                 Continue For
             End If
 
-            Dim lrRange As FBM.PathedRoleValueRange =
-                larRanges(0)
-            If lrRange Is Nothing OrElse
-               Not String.Equals(lrRange.MinValue,
-                                 lrRange.MaxValue,
-                                 StringComparison.Ordinal) Then
+            If larRanges.Any(Function(x) x Is Nothing OrElse
+                Not String.Equals(x.MinValue, x.MaxValue, StringComparison.Ordinal)) Then
                 larRestrictions.Add(
                     "[ERROR: Unsupported non-single-value PathedRole restriction.]")
                 Continue For
@@ -2429,10 +2656,12 @@ Public Module BostonDerivationRenderer
                                  arOccurrence.PathBindingKeys(liIndex)),
                     lrRole)
 
+            Dim lsValues As String = String.Join(", ",
+                larRanges.Select(Function(x) FormatRestrictedValue(lrRole, x)))
             larRestrictions.Add(
-                "the possible value of that " & lsName &
-                " is " & FormatRestrictedValue(lrRole,
-                                                lrRange))
+                If(larRanges.Count = 1,
+                   "the possible value of that " & lsName & " is ",
+                   "the possible values of that " & lsName & " are ") & lsValues)
         Next
 
         Return String.Join(" and ", larRestrictions)
