@@ -1,11 +1,205 @@
-Imports System
+﻿Imports System
 Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Text
 
 Public Module BostonDerivationRenderer
 
-    Private Const HtmlBreak As String = "<br/>"
+    Private ReadOnly LineBreak As DerivationText = DerivationText.Piece(vbCrLf, OutputStyle.LineBreak)
+
+    ' Output fragments retain semantic runs while the existing renderer composes
+    ' clauses. No rendered text is parsed to recover object identity or styling.
+    Private Enum OutputStyle
+        Quantifier
+        QuantifierLight
+        Predicate
+        ModelObject
+        Value
+        LineBreak
+        Emphasis
+        [Error]
+    End Enum
+
+    Private NotInheritable Class OutputRun
+        Public Text As String
+        Public Style As OutputStyle
+        Public ModelObject As FBM.ModelObject
+        Public AliasText As String
+    End Class
+
+    Private NotInheritable Class DerivationText
+        Private ReadOnly Runs As New List(Of OutputRun)
+        Private ReadOnly PlainText As New StringBuilder
+
+        Public ReadOnly Property Text As String
+            Get
+                Return PlainText.ToString()
+            End Get
+        End Property
+
+        Public ReadOnly Property Length As Integer
+            Get
+                Return PlainText.Length
+            End Get
+        End Property
+
+        Public Sub Append(ByVal arText As DerivationText)
+            If arText Is Nothing Then Exit Sub
+            Runs.AddRange(arText.Runs)
+            PlainText.Append(arText.Text)
+        End Sub
+
+        Public Shared Function Piece(ByVal asText As String,
+                                     Optional ByVal aeStyle As OutputStyle = OutputStyle.Quantifier,
+                                     Optional ByVal arObject As FBM.ModelObject = Nothing,
+                                     Optional ByVal asAlias As String = Nothing) As DerivationText
+            Dim lrResult As New DerivationText
+            If Not String.IsNullOrEmpty(asText) Then
+                lrResult.Runs.Add(New OutputRun With {
+                    .Text = asText, .Style = aeStyle,
+                    .ModelObject = arObject, .AliasText = asAlias})
+                lrResult.PlainText.Append(asText)
+            End If
+            Return lrResult
+        End Function
+
+        ' Plain literals in the renderer are logical connectors/punctuation.
+        ' Predicates, model objects and values are explicitly typed at source.
+        Public Shared Widening Operator CType(ByVal asText As String) As DerivationText
+            Return Piece(asText)
+        End Operator
+
+        Public Shared Operator &(ByVal arLeft As DerivationText,
+                                 ByVal arRight As DerivationText) As DerivationText
+            Dim lrResult As New DerivationText
+            lrResult.Append(arLeft)
+            lrResult.Append(arRight)
+            Return lrResult
+        End Operator
+
+        Public Shared Operator =(ByVal arLeft As DerivationText, ByVal asRight As String) As Boolean
+            Return String.Equals(If(arLeft Is Nothing, "", arLeft.Text), asRight, StringComparison.Ordinal)
+        End Operator
+
+        Public Shared Operator <>(ByVal arLeft As DerivationText, ByVal asRight As String) As Boolean
+            Return Not (arLeft = asRight)
+        End Operator
+
+        Public Function Trim() As DerivationText
+            Dim lsText As String = Text
+            Dim liStart As Integer = lsText.Length - lsText.TrimStart().Length
+            Return Slice(liStart, lsText.Trim().Length)
+        End Function
+
+        Public Function Substring(ByVal aiStart As Integer) As DerivationText
+            Return Slice(aiStart, Length - aiStart)
+        End Function
+
+        Private Function Slice(ByVal aiStart As Integer, ByVal aiLength As Integer) As DerivationText
+            Dim lrResult As New DerivationText
+            Dim liPosition As Integer = 0
+            For Each lrRun As OutputRun In Runs
+                Dim liStart As Integer = Math.Max(aiStart - liPosition, 0)
+                Dim liEnd As Integer = Math.Min(aiStart + aiLength - liPosition, lrRun.Text.Length)
+                If liEnd > liStart Then
+                    lrResult.Append(Piece(lrRun.Text.Substring(liStart, liEnd - liStart),
+                        lrRun.Style, lrRun.ModelObject, lrRun.AliasText))
+                End If
+                liPosition += lrRun.Text.Length
+            Next
+            Return lrResult
+        End Function
+
+        Public Shared Function Join(ByVal arSeparator As DerivationText,
+                                    ByVal aarText As IEnumerable(Of DerivationText)) As DerivationText
+            Dim lrResult As New DerivationText
+            Dim lbFirst As Boolean = True
+            For Each lrText As DerivationText In aarText
+                If Not lbFirst Then lrResult.Append(arSeparator)
+                lrResult.Append(lrText)
+                lbFirst = False
+            Next
+            Return lrResult
+        End Function
+
+        Public Function Complete(ByVal arVerbaliser As FBM.ORMVerbailser) As String
+            If arVerbaliser IsNot Nothing Then
+                ' A new verbaliser is a headerless fragment. Never Reset either
+                ' it or the caller's verbaliser, which already contains toolbox text.
+                Dim lrFragment As New FBM.ORMVerbailser
+                For Each lrRun As OutputRun In Runs
+                    AppendVerbalisation(lrFragment, lrRun)
+                Next
+                arVerbaliser.HTW.Write(lrFragment.Verbalise())
+            End If
+            Return Text
+        End Function
+    End Class
+
+    ' The only HTML emission point. All text is encoded here because the
+    ' verbaliser's string methods use HtmlTextWriter.Write, not WriteEncodedText.
+    Private Sub AppendVerbalisation(ByVal arVerbaliser As FBM.ORMVerbailser,
+                                    ByVal arRun As OutputRun)
+        Dim lsEncoded As String = System.Web.HttpUtility.HtmlEncode(arRun.Text)
+        Select Case arRun.Style
+            Case OutputStyle.LineBreak
+                arVerbaliser.HTW.WriteBreak()
+            Case OutputStyle.Predicate
+                arVerbaliser.VerbalisePredicateText(lsEncoded)
+            Case OutputStyle.QuantifierLight
+                arVerbaliser.VerbaliseQuantifierLight(lsEncoded)
+            Case OutputStyle.Value
+                arVerbaliser.VerbaliseValue(lsEncoded)
+            Case OutputStyle.Error
+                arVerbaliser.VerbaliseError(lsEncoded)
+            Case OutputStyle.Emphasis
+                arVerbaliser.HTW.RenderBeginTag(System.Web.UI.HtmlTextWriterTag.Em)
+                arVerbaliser.VerbaliseQuantifier(lsEncoded)
+                arVerbaliser.HTW.RenderEndTag()
+            Case OutputStyle.ModelObject
+                If arRun.ModelObject IsNot Nothing AndAlso
+                   System.Web.HttpUtility.HtmlEncode(arRun.ModelObject.Id) = arRun.ModelObject.Id AndAlso
+                   String.Equals(arRun.Text,
+                       arRun.ModelObject.Id & If(arRun.AliasText Is Nothing, "", " " & arRun.AliasText),
+                       StringComparison.Ordinal) Then
+                    arVerbaliser.VerbaliseModelObject(arRun.ModelObject, arRun.AliasText)
+                Else
+                    ' Preserve literal IDs containing HTML characters without
+                    ' modifying the model object passed to the shared verbaliser.
+                    arVerbaliser.HTW.AddAttribute(System.Web.UI.HtmlTextWriterAttribute.Class, "objectType")
+                    If arRun.ModelObject IsNot Nothing Then
+                        arVerbaliser.HTW.AddAttribute(System.Web.UI.HtmlTextWriterAttribute.Href,
+                            "elementid:" & arRun.ModelObject.Id)
+                    End If
+                    arVerbaliser.HTW.RenderBeginTag(System.Web.UI.HtmlTextWriterTag.A)
+                    Dim lsName As String = arRun.Text
+                    If arRun.AliasText IsNot Nothing Then
+                        lsName = lsName.Substring(0, lsName.Length - arRun.AliasText.Length - 1)
+                    End If
+                    arVerbaliser.HTW.WriteEncodedText(lsName)
+                    arVerbaliser.HTW.RenderEndTag()
+                    If arRun.AliasText IsNot Nothing Then arVerbaliser.VerbaliseSubscript(arRun.AliasText)
+                End If
+            Case Else
+                arVerbaliser.VerbaliseQuantifier(lsEncoded)
+        End Select
+    End Sub
+
+    Private Function PredicateText(ByVal asText As String) As DerivationText
+        Return DerivationText.Piece(asText, OutputStyle.Predicate)
+    End Function
+
+    Private Function ValueText(ByVal asText As String) As DerivationText
+        Return DerivationText.Piece(asText, OutputStyle.Value)
+    End Function
+
+
+    Private Function ObjectText(ByVal asName As String,
+                                ByVal arObject As FBM.ModelObject,
+                                Optional ByVal asAlias As String = Nothing) As DerivationText
+        Return DerivationText.Piece(asName & If(asAlias Is Nothing, "", " " & asAlias),
+            OutputStyle.ModelObject, arObject, asAlias)
+    End Function
 
     Private NotInheritable Class ModelObjectReferenceComparer
         Implements IEqualityComparer(Of FBM.ModelObject)
@@ -80,6 +274,9 @@ Public Module BostonDerivationRenderer
         Public Property IsNegated As Boolean
         Public Property RestrictsPreviousFactType As Boolean
         Public Property TrailingTransitionPlan As RoleStringPlan
+        ' Render-only NORMA identity correlation, not a model Fact Type reading.
+        Public Property IdentityFromObject As FBM.ModelObject
+        Public Property IdentityToObject As FBM.ModelObject
     End Class
 
     Private Class RoleStringPlan
@@ -87,10 +284,10 @@ Public Module BostonDerivationRenderer
         Public Property Occurrences As New List(Of FactOccurrence)
         Public Property StartsRolePath As Boolean
         Public Property ContextTransitionPlan As RoleStringPlan
-        Public Property SkipParentContextBinding As Boolean
         Public Property BranchJoinOperator As String = ""
         Public Property ChildSplitOperator As String = "and"
         Public Property ChildPlans As New List(Of RoleStringPlan)
+        Public Property GroupedChildren As SplitGroupPlan
         Public Property NegatesEntireBranch As Boolean
         Public Property NegatedRootExists As Boolean
     End Class
@@ -114,10 +311,11 @@ Public Module BostonDerivationRenderer
     End Class
 
     Public Function RenderDerivationEnglish(ByVal arModel As FBM.Model,
-                                            ByVal arDerivedFactType As FBM.FactType) As String
+                                            ByVal arDerivedFactType As FBM.FactType,
+                                            Optional ByRef arVerbaliser As FBM.ORMVerbailser = Nothing) As String
 
-        If arModel Is Nothing Then Return "[ERROR: No Boston model was supplied.]"
-        If arDerivedFactType Is Nothing Then Return "[ERROR: No derived Fact Type was supplied.]"
+        If arModel Is Nothing Then Return DerivationText.Piece("[ERROR: No Boston model was supplied.]", OutputStyle.Error).Complete(arVerbaliser)
+        If arDerivedFactType Is Nothing Then Return DerivationText.Piece("[ERROR: No derived Fact Type was supplied.]", OutputStyle.Error).Complete(arVerbaliser)
 
         If arDerivedFactType.DerivationRule Is Nothing OrElse
            arDerivedFactType.DerivationRule.FactTypeDerivationPath Is Nothing OrElse
@@ -125,7 +323,7 @@ Public Module BostonDerivationRenderer
            arDerivedFactType.DerivationRule.FactTypeDerivationPath.PathComponents.RolePaths Is Nothing OrElse
            Not arDerivedFactType.DerivationRule.FactTypeDerivationPath.PathComponents.RolePaths.
                Any(Function(x) x IsNot Nothing) Then
-            Return RenderUndevelopedFactType(arDerivedFactType)
+            Return RenderUndevelopedFactType(arDerivedFactType).Complete(arVerbaliser)
         End If
 
         Try
@@ -135,33 +333,34 @@ Public Module BostonDerivationRenderer
             EstablishHeadBindings(lrContext)
             PrepareDisplayNames(lrContext)
 
-            Dim lsHead As String = RenderHead(lrContext)
-            Dim lsConditions As String = RenderConditions(lrContext)
-            Dim lsBody As String = RenderBody(lrContext, larPlans, lsConditions)
+            Dim lrHead As DerivationText = RenderHead(lrContext)
+            Dim lrConditions As DerivationText =
+                If(larPlans.Count = 1, RenderConditions(lrContext, lrContext.RolePath), "")
+            Dim lrBody As DerivationText = RenderBody(lrContext, larPlans, lrConditions)
 
-            Dim lrResult As New StringBuilder
-            lrResult.Append("*")
-            lrResult.Append(lsHead)
+            Dim lrResult As New DerivationText
+            lrResult.Append(DerivationText.Piece("*", OutputStyle.QuantifierLight))
+            lrResult.Append(lrHead)
 
-            If lsBody <> "" OrElse lsConditions <> "" Then
+            If lrBody <> "" OrElse lrConditions <> "" Then
                 lrResult.Append(" if and only if")
-                lrResult.Append(HtmlBreak)
+                lrResult.Append(LineBreak)
 
-                If lsBody <> "" Then lrResult.Append(lsBody)
-                If lsConditions <> "" Then
-                    If lsBody <> "" Then lrResult.Append(HtmlBreak)
+                If lrBody <> "" Then lrResult.Append(lrBody)
+                If lrConditions <> "" Then
+                    If lrBody <> "" Then lrResult.Append(LineBreak)
                     lrResult.Append("where ")
-                    lrResult.Append(lsConditions)
+                    lrResult.Append(lrConditions)
                 End If
             End If
 
-            Dim lsResult As String = lrResult.ToString().Trim()
-            If Not lsResult.EndsWith(".", StringComparison.Ordinal) Then lsResult &= "."
-            Return lsResult
+            Dim lrComplete As DerivationText = lrResult.Trim()
+            If Not lrComplete.Text.EndsWith(".", StringComparison.Ordinal) Then lrComplete &= "."
+            Return lrComplete.Complete(arVerbaliser)
 
         Catch ex As Exception
-            Return "*[ERROR: Derivation verbalisation failed for '" &
-                   SafeFactTypeName(arDerivedFactType) & "': " & CleanError(ex.Message) & "]."
+            Return DerivationText.Piece("*[ERROR: Derivation verbalisation failed for '" &
+                   SafeFactTypeName(arDerivedFactType) & "': " & CleanError(ex.Message) & "].", OutputStyle.Error).Complete(arVerbaliser)
         End Try
 
     End Function
@@ -467,7 +666,8 @@ Public Module BostonDerivationRenderer
                 lrRolePathPlan.MainPlan =
                     BuildRoleStringPlan(arContext,
                                         lrRolePath.RootObjectType,
-                                        lrRolePath.PathedRole)
+                                        lrRolePath.PathedRole,
+                                        lrRolePath.SubPath)
                 lrRolePathPlan.MainPlan.StartsRolePath = True
                 lrRolePathPlan.ContextBindingKey =
                     PlanExitBindingKey(lrRolePathPlan.MainPlan)
@@ -484,18 +684,11 @@ Public Module BostonDerivationRenderer
             lrRolePathPlan.LeadTransitionPlan =
                 BuildProjectedRootTransitionPlan(arContext, lrRolePathPlan)
 
-            If String.Equals(lrRolePath.SplitCombinationOperator, "Xor",
-                             StringComparison.OrdinalIgnoreCase) Then
-                lrRolePathPlan.GroupedSplit = New SplitGroupPlan With {.OperatorName = "xor"}
-                If lrRolePath.SubPath IsNot Nothing Then
-                    For Each lrSubPath As FBM.RoleSubPath In lrRolePath.SubPath
-                        If lrSubPath Is Nothing Then Continue For
-                        lrRolePathPlan.GroupedSplit.Members.Add(
-                            BuildSplitGroup(arContext, lrSubPath,
-                                            lrRolePathPlan.ContextBindingKey,
-                                            lrRolePathPlan.ContextObject))
-                    Next
-                End If
+            If RequiresSplitGroup(lrRolePath.SplitCombinationOperator, lrRolePath.SubPath) Then
+                lrRolePathPlan.GroupedSplit =
+                    BuildSplitGroupMembers(arContext, lrRolePath.SplitCombinationOperator,
+                                           lrRolePath.SubPath, lrRolePathPlan.ContextBindingKey,
+                                           lrRolePathPlan.ContextObject, True)
                 larRolePathPlans.Add(lrRolePathPlan)
                 Continue For
             End If
@@ -515,37 +708,58 @@ Public Module BostonDerivationRenderer
         Return larRolePathPlans
     End Function
 
+    Private Function RequiresSplitGroup(ByVal asOperator As String,
+                                        ByVal aarSubPaths As List(Of FBM.RoleSubPath)) As Boolean
+        Return String.Equals(asOperator, "Xor", StringComparison.OrdinalIgnoreCase) OrElse
+            (aarSubPaths IsNot Nothing AndAlso aarSubPaths.Any(
+                Function(x) x IsNot Nothing AndAlso
+                    (x.PathedRole Is Nothing OrElse x.PathedRole.Count = 0) AndAlso
+                    x.SubPath IsNot Nothing AndAlso x.SubPath.Count > 0))
+    End Function
+
+    Private Function BuildSplitGroupMembers(
+        ByVal arContext As RenderContext,
+        ByVal asOperator As String,
+        ByVal aarSubPaths As List(Of FBM.RoleSubPath),
+        ByVal asContextKey As String,
+        ByVal arContextObject As FBM.ModelObject,
+        ByVal abTopLevelSubPath As Boolean) As SplitGroupPlan
+
+        Dim lrGroup As New SplitGroupPlan With {
+            .OperatorName = If(String.IsNullOrWhiteSpace(asOperator), "and", asOperator.ToLowerInvariant())
+        }
+        If aarSubPaths IsNot Nothing Then
+            For Each lrChild As FBM.RoleSubPath In aarSubPaths
+                If lrChild IsNot Nothing Then
+                    lrGroup.Members.Add(BuildSplitGroup(arContext, lrChild, asContextKey,
+                                                       arContextObject, abTopLevelSubPath))
+                End If
+            Next
+        End If
+        Return lrGroup
+    End Function
+
     Private Function BuildSplitGroup(
         ByVal arContext As RenderContext,
         ByVal arSubPath As FBM.RoleSubPath,
         ByVal asContextKey As String,
-        ByVal arContextObject As FBM.ModelObject) As SplitGroupPlan
+        ByVal arContextObject As FBM.ModelObject,
+        ByVal abTopLevelSubPath As Boolean) As SplitGroupPlan
 
         Dim lrGroup As New SplitGroupPlan
-        If arSubPath.PathedRole IsNot Nothing AndAlso arSubPath.PathedRole.Count > 0 Then
-            lrGroup.Branch = BuildSubPathRolePlan(arContext, arSubPath, True)
+        If arSubPath.RootObjectType IsNot Nothing OrElse
+           (arSubPath.PathedRole IsNot Nothing AndAlso arSubPath.PathedRole.Count > 0) Then
+            lrGroup.Branch = BuildSubPathRolePlan(arContext, arSubPath, abTopLevelSubPath)
             BindNestedSubPlansToContext(arContext,
                 New List(Of RoleStringPlan) From {lrGroup.Branch}, asContextKey, arContextObject)
             Return lrGroup
         End If
 
-        lrGroup.OperatorName = If(String.IsNullOrWhiteSpace(arSubPath.SplitCombinationOperator),
-                                  "and", arSubPath.SplitCombinationOperator.ToLowerInvariant())
-        If arSubPath.RootObjectType IsNot Nothing Then
-            ' A rooted group needs explicit root-scope rendering; do not flatten it.
-            lrGroup.Branch = New RoleStringPlan
-            lrGroup.Branch.Occurrences.Add(New FactOccurrence With {
-                .ErrorText = "[ERROR: Rooted logical group is not yet supported in XOR rendering.]"})
-            Return lrGroup
-        End If
-        If arSubPath.SubPath IsNot Nothing Then
-            For Each lrChild As FBM.RoleSubPath In arSubPath.SubPath
-                If lrChild IsNot Nothing Then
-                    lrGroup.Members.Add(BuildSplitGroup(arContext, lrChild, asContextKey, arContextObject))
-                End If
-            Next
-        End If
-        Return lrGroup
+        ' A grouping node retains its operator and inherits the same context
+        ' for its members. It does not consume a role or change the path exit.
+        Return BuildSplitGroupMembers(arContext, arSubPath.SplitCombinationOperator,
+                                      arSubPath.SubPath, asContextKey, arContextObject,
+                                      abTopLevelSubPath)
     End Function
 
     Private Sub AddSubPathPlans(ByVal arContext As RenderContext,
@@ -553,8 +767,8 @@ Public Module BostonDerivationRenderer
                                 ByVal arSubPath As FBM.RoleSubPath)
         If arSubPath Is Nothing Then Exit Sub
 
-        If arSubPath.PathedRole IsNot Nothing AndAlso
-           arSubPath.PathedRole.Count > 0 Then
+        If arSubPath.RootObjectType IsNot Nothing OrElse
+           (arSubPath.PathedRole IsNot Nothing AndAlso arSubPath.PathedRole.Count > 0) Then
             arRolePathPlan.SubPlans.Add(
                 BuildSubPathRolePlan(arContext,
                                      arSubPath,
@@ -562,41 +776,7 @@ Public Module BostonDerivationRenderer
             Exit Sub
         End If
 
-        If arSubPath.SubPath Is Nothing OrElse
-           arSubPath.SubPath.Count = 0 Then Exit Sub
-
-        ' An empty SubPath with children is a logical branch group. Bind its
-        ' children together before adding them to the surrounding RolePath so
-        ' the shared type transition is rendered only on the first child.
-        Dim larGroupPlans As New List(Of RoleStringPlan)
-
-        For Each lrChildSubPath As FBM.RoleSubPath In arSubPath.SubPath
-            CollectSubPathRolePlans(arContext,
-                                    lrChildSubPath,
-                                    larGroupPlans)
-        Next
-
-        If larGroupPlans.Count = 0 Then Exit Sub
-
-        Dim lsGroupOperator As String =
-            If(String.Equals(arSubPath.SplitCombinationOperator,
-                             "Or",
-                             StringComparison.OrdinalIgnoreCase),
-               "or",
-               "and")
-
-        For liIndex As Integer = 0 To larGroupPlans.Count - 1
-            larGroupPlans(liIndex).SkipParentContextBinding = True
-            If liIndex > 0 Then
-                larGroupPlans(liIndex).BranchJoinOperator = lsGroupOperator
-            End If
-        Next
-
-        BindNestedSubPlansToContext(arContext,
-                                    larGroupPlans,
-                                    arRolePathPlan.ContextBindingKey,
-                                    arRolePathPlan.ContextObject)
-        arRolePathPlan.SubPlans.AddRange(larGroupPlans)
+        ' Nonempty logical groups are handled by BuildSplitGroupMembers.
     End Sub
 
     Private Function BuildSubPathRolePlan(
@@ -607,7 +787,8 @@ Public Module BostonDerivationRenderer
         Dim lrPlan As RoleStringPlan =
             BuildRoleStringPlan(arContext,
                                 arSubPath.RootObjectType,
-                                arSubPath.PathedRole)
+                                If(arSubPath.PathedRole, New List(Of FBM.PathedRole)),
+                                arSubPath.SubPath)
 
         lrPlan.ChildSplitOperator =
             If(String.Equals(arSubPath.SplitCombinationOperator,
@@ -638,28 +819,34 @@ Public Module BostonDerivationRenderer
             lrPlan.Occurrences(0).IsNegated = False
         End If
 
-        If lrPlan.NegatedRootExists Then
-            ' A negated RootObjectType introduces "no X exists"; it is not an
-            ' implicit transition from the surrounding RolePath context.
-            lrPlan.SkipParentContextBinding = True
-        End If
-
         If arSubPath.SubPath IsNot Nothing AndAlso
            arSubPath.SubPath.Count > 0 Then
+
+            If RequiresSplitGroup(arSubPath.SplitCombinationOperator, arSubPath.SubPath) OrElse
+               arSubPath.PathedRole Is Nothing OrElse arSubPath.PathedRole.Count = 0 Then
+                Dim lsContextKey As String = PlanExitBindingKey(lrPlan)
+                Dim lrContextObject As FBM.ModelObject = Nothing
+                If arSubPath.PathedRole IsNot Nothing AndAlso arSubPath.PathedRole.Count > 0 Then
+                    lrContextObject = PathedRolePlayer(arContext, arSubPath.PathedRole.Last())
+                ElseIf lrPlan.Root IsNot Nothing Then
+                    lsContextKey = RootKey(lrPlan.Root.id)
+                    lrContextObject = lrPlan.Root.BostonModelElement
+                End If
+                lrPlan.GroupedChildren = BuildSplitGroupMembers(arContext,
+                    arSubPath.SplitCombinationOperator, arSubPath.SubPath,
+                    lsContextKey, lrContextObject, False)
+                Return lrPlan
+            End If
 
             For Each lrChildSubPath As FBM.RoleSubPath In arSubPath.SubPath
                 If lrChildSubPath Is Nothing Then Continue For
 
-                If lrChildSubPath.PathedRole IsNot Nothing AndAlso
-                   lrChildSubPath.PathedRole.Count > 0 Then
+                If lrChildSubPath.RootObjectType IsNot Nothing OrElse
+                   (lrChildSubPath.PathedRole IsNot Nothing AndAlso lrChildSubPath.PathedRole.Count > 0) Then
                     lrPlan.ChildPlans.Add(
                         BuildSubPathRolePlan(arContext,
                                              lrChildSubPath,
                                              False))
-                Else
-                    CollectSubPathRolePlans(arContext,
-                                            lrChildSubPath,
-                                            lrPlan.ChildPlans)
                 End If
             Next
 
@@ -682,31 +869,6 @@ Public Module BostonDerivationRenderer
         Return lrPlan
     End Function
 
-    Private Sub CollectSubPathRolePlans(
-        ByVal arContext As RenderContext,
-        ByVal arSubPath As FBM.RoleSubPath,
-        ByVal aarPlans As List(Of RoleStringPlan))
-
-        If arSubPath Is Nothing Then Exit Sub
-
-        If arSubPath.PathedRole IsNot Nothing AndAlso
-           arSubPath.PathedRole.Count > 0 Then
-            aarPlans.Add(
-                BuildRoleStringPlan(arContext,
-                                    arSubPath.RootObjectType,
-                                    arSubPath.PathedRole))
-            Exit Sub
-        End If
-
-        If arSubPath.SubPath IsNot Nothing Then
-            For Each lrChildSubPath As FBM.RoleSubPath In arSubPath.SubPath
-                CollectSubPathRolePlans(arContext,
-                                        lrChildSubPath,
-                                        aarPlans)
-            Next
-        End If
-    End Sub
-
     Private Sub BindNestedSubPlansToContext(
         ByVal arContext As RenderContext,
         ByVal aarPlans As List(Of RoleStringPlan),
@@ -724,6 +886,7 @@ Public Module BostonDerivationRenderer
         Dim lbCommonEntryObject As Boolean = True
 
         For Each lrPlan As RoleStringPlan In aarPlans
+            If lrPlan.Root IsNot Nothing Then Continue For
             Dim lsEntryKey As String = PlanEntryBindingKey(lrPlan)
             Dim lrEntryObject As FBM.ModelObject = PlanEntryObject(lrPlan)
             If lsEntryKey = "" OrElse lrEntryObject Is Nothing Then Continue For
@@ -864,13 +1027,33 @@ Public Module BostonDerivationRenderer
 
     Private Function BuildRoleStringPlan(ByVal arContext As RenderContext,
                                          ByVal arRoot As FBM.RootObjectType,
-                                         ByVal aarPathedRoles As List(Of FBM.PathedRole)) As RoleStringPlan
+                                         ByVal aarPathedRoles As List(Of FBM.PathedRole),
+                                         Optional ByVal aarSubPaths As List(Of FBM.RoleSubPath) = Nothing) As RoleStringPlan
 
-        Dim lrPlan As New RoleStringPlan With {.Root = arRoot}
+        ' NORMA GetCorrelationRoot stops at an explicit path root and uses
+        ' its ObjectUnifier (if any), rather than the enclosing path's exit.
+        ' ApplyPathContinuity below already binds this root to its entry role.
+        Dim lrPlan As New RoleStringPlan With {
+            .Root = arRoot,
+            .StartsRolePath = arRoot IsNot Nothing AndAlso Not arRoot.IsNegated
+        }
         Dim lrCurrent As FactOccurrence = Nothing
 
-        For Each lrPathedRole As FBM.PathedRole In aarPathedRoles
+        For liPathedRole As Integer = 0 To aarPathedRoles.Count - 1
+            Dim lrPathedRole As FBM.PathedRole = aarPathedRoles(liPathedRole)
             Dim lrRole As FBM.Role = ResolvePathedRole(arContext, lrPathedRole)
+            If lrPathedRole IsNot Nothing AndAlso
+               Not String.Equals(lrPathedRole.Purpose, "SameFactType",
+                                 StringComparison.OrdinalIgnoreCase) Then
+                ' NORMA ResolvePathedEntryRoleFactType resolves an original role
+                ' to its implied fact before allocating an occurrence or variables.
+                Dim lrFollowing As FBM.PathedRole =
+                    NextSameFactTypePathedRole(aarPathedRoles, liPathedRole + 1, aarSubPaths)
+                Dim lrFollowingRole As FBM.Role = ResolvePathedRole(arContext, lrFollowing)
+                If lrFollowingRole IsNot Nothing Then
+                    lrRole = ResolveRoleProxyInLinkFactType(lrFollowingRole.FactType, lrRole)
+                End If
+            End If
             lrRole = ResolveSameFactTypeLinkRole(lrCurrent,
                                                  lrPathedRole,
                                                  lrRole)
@@ -921,7 +1104,7 @@ Public Module BostonDerivationRenderer
         Dim lbCommonEntryObject As Boolean = True
 
         For Each lrSubPlan As RoleStringPlan In arRolePathPlan.SubPlans
-            If lrSubPlan.SkipParentContextBinding Then Continue For
+            If lrSubPlan.Root IsNot Nothing Then Continue For
 
             Dim lsEntryKey As String = PlanEntryBindingKey(lrSubPlan)
             Dim lrEntryObject As FBM.ModelObject = PlanEntryObject(lrSubPlan)
@@ -943,7 +1126,8 @@ Public Module BostonDerivationRenderer
         ' RolePath context. Hoisting one shared transition ahead of separately
         ' negated sibling branches changes the logical scope and produces
         ' fragments such as "that is some ObjectType that it is not true...".
-        If larEntryPlans.Any(
+        If arRolePathPlan.SubPlans.Any(Function(x) x.Root IsNot Nothing) OrElse
+           larEntryPlans.Any(
             Function(x) x IsNot Nothing AndAlso
                         (x.NegatesEntireBranch OrElse
                          x.NegatedRootExists)) Then
@@ -1100,6 +1284,25 @@ Public Module BostonDerivationRenderer
             Next
         End If
 
+        If liMatchingReadings = 0 AndAlso larRelationships.Count = 0 AndAlso
+           (HasAncestor(arFromObject, arToObject) OrElse HasAncestor(arToObject, arFromObject)) Then
+            ' The explicit RolePath join supplies the identity binding. Ancestry
+            ' validates its endpoint types; intermediate ancestors are not variables.
+            If abRegisterCompatibleVariable Then
+                RegisterCompatibleVariable(arContext, asFromBindingKey, asToBindingKey, arToObject)
+            End If
+            Dim lrIdentity As New FactOccurrence With {
+                .IdentityFromObject = arFromObject,
+                .IdentityToObject = arToObject,
+                .EntryBindingKey = asFromBindingKey,
+                .ExitBindingKey = asToBindingKey
+            }
+            lrIdentity.BindingKeys.Add(asFromBindingKey)
+            lrIdentity.BindingKeys.Add(asToBindingKey)
+            lrPlan.Occurrences.Add(lrIdentity)
+            Return lrPlan
+        End If
+
         If liMatchingReadings <> 1 Then
             Dim lsProblem As String =
                 If(liMatchingReadings = 0,
@@ -1137,6 +1340,34 @@ Public Module BostonDerivationRenderer
         lrPlan.Occurrences.Add(lrOccurrence)
 
         Return lrPlan
+    End Function
+
+    Private Function HasAncestor(ByVal arDescendant As FBM.ModelObject,
+                                 ByVal arAncestor As FBM.ModelObject) As Boolean
+        If arDescendant Is Nothing OrElse arAncestor Is Nothing OrElse
+           String.IsNullOrWhiteSpace(arDescendant.Id) OrElse
+           String.IsNullOrWhiteSpace(arAncestor.Id) OrElse
+           SameModelObject(arDescendant, arAncestor) Then Return False
+
+        Dim lsetVisited As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+        Dim larPending As New Queue(Of FBM.ModelObject)
+        lsetVisited.Add(arDescendant.Id)
+        larPending.Enqueue(arDescendant)
+        While larPending.Count > 0
+            Dim lrCurrent As FBM.ModelObject = larPending.Dequeue()
+            If lrCurrent.SubtypeRelationship Is Nothing Then Continue While
+            For Each lrRelationship In lrCurrent.SubtypeRelationship
+                If lrRelationship Is Nothing OrElse
+                   Not SameModelObject(lrRelationship.ModelElement, lrCurrent) Then Continue For
+                Dim lrParent As FBM.ModelObject = lrRelationship.parentModelElement
+                If lrParent Is Nothing OrElse String.IsNullOrWhiteSpace(lrParent.Id) Then Continue For
+                If SameModelObject(lrParent, arAncestor) Then Return True
+                ' All parents participate, including non-primary inheritance.
+                ' Diamond paths and cycles must not cause repeated traversal.
+                If lsetVisited.Add(lrParent.Id) Then larPending.Enqueue(lrParent)
+            Next
+        End While
+        Return False
     End Function
 
     Private Sub RegisterCompatibleVariable(
@@ -1274,7 +1505,8 @@ Public Module BostonDerivationRenderer
                                              ByVal arNextRole As FBM.Role,
                                              ByVal arNextPathedRole As FBM.PathedRole) As Boolean
         If arCurrent Is Nothing OrElse arCurrent.FactType Is Nothing Then Return True
-        If Not Object.ReferenceEquals(arCurrent.FactType, arNextRole.FactType) Then Return True
+        If Not String.Equals(arCurrent.FactType.Id, arNextRole.FactType.Id,
+                             StringComparison.OrdinalIgnoreCase) Then Return True
 
         ' Role.FactType is authoritative. Purpose is used only to distinguish a
         ' repeated occurrence of the same FactType from continuation within it.
@@ -1740,6 +1972,9 @@ Public Module BostonDerivationRenderer
     Private Function OccurrencePathEntryObject(
         ByVal arOccurrence As FactOccurrence) As FBM.ModelObject
 
+        If arOccurrence IsNot Nothing AndAlso arOccurrence.IdentityFromObject IsNot Nothing Then
+            Return arOccurrence.IdentityFromObject
+        End If
         If arOccurrence Is Nothing OrElse arOccurrence.Roles Is Nothing OrElse
            arOccurrence.Roles.Count = 0 OrElse
            arOccurrence.Roles(0) Is Nothing Then Return Nothing
@@ -1750,6 +1985,9 @@ Public Module BostonDerivationRenderer
     Private Function OccurrencePathExitObject(
         ByVal arOccurrence As FactOccurrence) As FBM.ModelObject
 
+        If arOccurrence IsNot Nothing AndAlso arOccurrence.IdentityToObject IsNot Nothing Then
+            Return arOccurrence.IdentityToObject
+        End If
         If arOccurrence Is Nothing OrElse arOccurrence.Roles Is Nothing OrElse
            arOccurrence.Roles.Count = 0 OrElse
            arOccurrence.Roles(arOccurrence.Roles.Count - 1) Is Nothing Then
@@ -1773,7 +2011,8 @@ Public Module BostonDerivationRenderer
 
             For liBinding As Integer =
                 Math.Min(lrOccurrence.BindingKeys.Count,
-                         SafePredicateParts(lrOccurrence.Reading).Count) - 1 To 0 Step -1
+                         If(lrOccurrence.IdentityFromObject IsNot Nothing, 2,
+                            SafePredicateParts(lrOccurrence.Reading).Count)) - 1 To 0 Step -1
 
                 If SameModelObject(OccurrenceBindingObject(lrOccurrence,
                                                            liBinding),
@@ -1790,6 +2029,11 @@ Public Module BostonDerivationRenderer
         ByVal arOccurrence As FactOccurrence,
         ByVal aiBindingIndex As Integer) As FBM.ModelObject
 
+        If arOccurrence IsNot Nothing AndAlso arOccurrence.IdentityFromObject IsNot Nothing Then
+            If aiBindingIndex = 0 Then Return arOccurrence.IdentityFromObject
+            If aiBindingIndex = 1 Then Return arOccurrence.IdentityToObject
+            Return Nothing
+        End If
         If arOccurrence Is Nothing OrElse arOccurrence.Reading Is Nothing Then
             Return Nothing
         End If
@@ -1960,45 +2204,45 @@ Public Module BostonDerivationRenderer
         End If
     End Sub
 
-    Private Function RenderHead(ByVal arContext As RenderContext) As String
+    Private Function RenderHead(ByVal arContext As RenderContext) As DerivationText
         Dim lrReading As FBM.FactTypeReading = PreferredReading(arContext.DerivedFactType)
         If lrReading Is Nothing Then
             Return "[ERROR: No Fact Type Reading exists for derived Fact Type '" &
                    SafeFactTypeName(arContext.DerivedFactType) & "']"
         End If
 
-        Dim lrBuilder As New StringBuilder
-        AppendRaw(lrBuilder, lrReading.FrontText)
+        Dim lrBuilder As New DerivationText
+        AppendRaw(lrBuilder, PredicateText(lrReading.FrontText))
 
         For Each lrPart As FBM.PredicatePart In SafePredicateParts(lrReading)
             If lrPart Is Nothing OrElse lrPart.Role Is Nothing Then
                 AppendWord(lrBuilder, "[ERROR: Head reading contains a Predicate Part without a Role.]")
             Else
-                Dim lsRolePlayerName As String = RolePlayerName(lrPart.Role)
+                Dim lrRolePlayerName As DerivationText = ObjectText(RolePlayerName(lrPart.Role), lrPart.Role.JoinedORMObject)
                 Dim lrSource As FBM.DerivationSource = Nothing
 
                 If arContext.HeadSourceByRoleId.TryGetValue(lrPart.Role.Id, lrSource) Then
                     Dim lsBindingKey As String = HeadRoleKey(lrPart.Role.Id)
                     If lsBindingKey <> "" Then
-                        lsRolePlayerName =
+                        lrRolePlayerName =
                             DisplayName(arContext,
                                         CanonicalKey(arContext, lsBindingKey),
                                         lrPart.Role)
                     End If
                 End If
 
-                AppendWord(lrBuilder, BoundRolePlayer(lrPart, lsRolePlayerName))
+                AppendWord(lrBuilder, BoundRolePlayer(lrPart, lrRolePlayerName))
             End If
-            AppendWord(lrBuilder, lrPart.PredicatePartText)
+            AppendWord(lrBuilder, PredicateText(lrPart.PredicatePartText))
         Next
 
-        AppendWord(lrBuilder, lrReading.FollowingText)
-        Return lrBuilder.ToString().Trim()
+        AppendWord(lrBuilder, PredicateText(lrReading.FollowingText))
+        Return lrBuilder.Trim()
     End Function
 
     Private Function RenderBody(ByVal arContext As RenderContext,
                                 ByVal aarPlans As List(Of RolePathPlan),
-                                ByRef asConditions As String) As String
+                                ByRef arConditions As DerivationText) As DerivationText
         If aarPlans Is Nothing OrElse aarPlans.Count = 0 Then Return ""
 
         ' NORMA InitializeRolePaths combines separate lead paths with OrSplit.
@@ -2009,7 +2253,7 @@ Public Module BostonDerivationRenderer
 
         Dim lsetInitial As New HashSet(Of String)(arContext.HeadBindingKeys, StringComparer.OrdinalIgnoreCase)
         Dim lsetShared As New HashSet(Of String)(lsetInitial, StringComparer.OrdinalIgnoreCase)
-        Dim larRendered As New List(Of String)
+        Dim larRendered As New List(Of DerivationText)
 
         For liPlan As Integer = 0 To aarPlans.Count - 1
             Dim lrPlan As RolePathPlan = aarPlans(liPlan)
@@ -2020,105 +2264,118 @@ Public Module BostonDerivationRenderer
                 lsetMentions = lsetShared
             End If
 
-            Dim lsLocalConditions As String = ""
-            If liPlan > 0 Then
-                lsLocalConditions =
-                    RenderExplicitConditions(arContext,
-                                             lrPlan.RolePath)
+            Dim lrLocalConditions As DerivationText = ""
+            If aarPlans.Count > 1 Then
+                lrLocalConditions =
+                    RenderConditions(arContext, lrPlan.RolePath, False)
             End If
 
-            Dim lsRendered As String
-            If lsLocalConditions <> "" Then
-                lsRendered =
+            Dim lrRendered As DerivationText
+            If lrLocalConditions <> "" Then
+                lrRendered =
                     RenderRolePathPlan(arContext,
                                        lrPlan,
                                        lsetMentions,
-                                       lsLocalConditions)
-                If lsLocalConditions <> "" Then
-                    lsRendered &= HtmlBreak &
+                                       lrLocalConditions)
+                If lrLocalConditions <> "" Then
+                    lrRendered &= LineBreak &
                                   "where " &
-                                  lsLocalConditions
+                                  lrLocalConditions
                 End If
             Else
-                lsRendered =
+                lrRendered =
                     RenderRolePathPlan(arContext,
                                        lrPlan,
                                        lsetMentions,
-                                       asConditions)
+                                       arConditions)
             End If
-            If lsRendered <> "" Then larRendered.Add(lsRendered)
+            If aarPlans.Count > 1 Then
+                ' A projected result belongs after its complete alternative,
+                ' outside any nested negation that consumed local conditions.
+                Dim lrProjected As DerivationText = DerivationText.Join(" and ",
+                    RenderProjectedCalculations(arContext, lrPlan.RolePath))
+                If lrProjected <> "" Then
+                    If lrRendered <> "" Then lrRendered &= LineBreak
+                    lrRendered &= "where " & lrProjected
+                End If
+            End If
+            If lrRendered <> "" Then larRendered.Add(lrRendered)
         Next
 
-        Return String.Join(HtmlBreak & lsOperator & " ", larRendered)
+        Return DerivationText.Join(LineBreak & lsOperator & " ", larRendered)
     End Function
 
     Private Function RenderRolePathPlan(
         ByVal arContext As RenderContext,
         ByVal arPlan As RolePathPlan,
         ByVal aMentionedKeys As HashSet(Of String),
-        ByRef asConditions As String) As String
+        ByRef arConditions As DerivationText) As DerivationText
 
         If arPlan Is Nothing Then Return ""
 
-        Dim lrBuilder As New StringBuilder
+        Dim lrBuilder As New DerivationText
 
         Dim lbHasLeadTransition As Boolean =
             HasSuccessfulTransition(arPlan.LeadTransitionPlan)
-        Dim lsLeadTransition As String = ""
+        Dim lrLeadTransition As DerivationText = ""
 
         If lbHasLeadTransition Then
-            lsLeadTransition =
+            lrLeadTransition =
                 RenderRoleString(arContext,
                                  arPlan.LeadTransitionPlan,
                                  aMentionedKeys,
                                  False,
-                                 asConditions)
-            If lsLeadTransition <> "" Then
-                lrBuilder.Append(lsLeadTransition)
+                                 arConditions)
+            If lrLeadTransition <> "" Then
+                lrBuilder.Append(lrLeadTransition)
             End If
         End If
 
         If arPlan.MainPlan IsNot Nothing Then
-            Dim lsMainPlan As String =
+            Dim lrMainPlan As DerivationText =
                 RenderRoleString(arContext,
                                  arPlan.MainPlan,
                                  aMentionedKeys,
                                  lbHasLeadTransition,
-                                 asConditions)
-            If lsMainPlan <> "" Then
-                If lsLeadTransition <> "" Then lrBuilder.Append(" that ")
-                lrBuilder.Append(lsMainPlan)
+                                 arConditions)
+            If lrMainPlan <> "" Then
+                If lrLeadTransition <> "" Then lrBuilder.Append(" that ")
+                lrBuilder.Append(lrMainPlan)
             End If
         End If
 
         If arPlan.TransitionPlan IsNot Nothing AndAlso
            arPlan.TransitionPlan.Occurrences.Count > 0 Then
 
-            Dim lsTransition As String =
+            Dim lrTransition As DerivationText =
                 RenderRoleString(arContext,
                                  arPlan.TransitionPlan,
                                  aMentionedKeys,
                                  True,
-                                 asConditions)
-            If lsTransition <> "" Then
+                                 arConditions)
+            If lrTransition <> "" Then
                 If Not arPlan.TransitionPlan.Occurrences.Any(
                     Function(x) x IsNot Nothing AndAlso x.ErrorText <> "") Then
-                    lsTransition = "that " & lsTransition
+                    lrTransition = "that " & lrTransition
                 End If
                 If lrBuilder.Length > 0 Then lrBuilder.Append(" ")
-                lrBuilder.Append(lsTransition)
+                lrBuilder.Append(lrTransition)
             End If
         End If
 
         If arPlan.GroupedSplit IsNot Nothing Then
-            Dim lsGroupedConditions As String = ""
-            Dim lsGroup As String = RenderSplitGroup(arContext, arPlan.GroupedSplit,
-                                                     aMentionedKeys, lsGroupedConditions)
-            If lsGroup <> "" Then
-                If lrBuilder.Length > 0 Then lrBuilder.Append(HtmlBreak & "where ")
-                lrBuilder.Append(lsGroup)
+            Dim lrGroupedConditions As DerivationText = ""
+            Dim lbContinueMain As Boolean =
+                CanBackReferenceGroupTail(arContext, arPlan.MainPlan, arPlan.GroupedSplit)
+            Dim lrGroup As DerivationText = RenderSplitGroup(arContext, arPlan.GroupedSplit,
+                aMentionedKeys, lrGroupedConditions, If(lbContinueMain, arPlan.MainPlan, Nothing))
+            If lrGroup <> "" Then
+                If lrBuilder.Length > 0 Then
+                    lrBuilder.Append(If(lbContinueMain, " ", LineBreak & "where "))
+                End If
+                lrBuilder.Append(lrGroup)
             End If
-            Return lrBuilder.ToString().Trim()
+            Return lrBuilder.Trim()
         End If
 
         If arPlan.SubPlans Is Nothing OrElse arPlan.SubPlans.Count = 0 Then
@@ -2126,12 +2383,15 @@ Public Module BostonDerivationRenderer
                Not Object.ReferenceEquals(arPlan.RolePath, arContext.RolePath) Then
                 Return RenderExplicitConditions(arContext, arPlan.RolePath)
             End If
-            Return lrBuilder.ToString().Trim()
+            Return lrBuilder.Trim()
         End If
 
-        Dim larRenderedSubPlans As New List(Of String)
+        Dim larRenderedSubPlans As New List(Of DerivationText)
         Dim larRenderedSubPlanOperators As New List(Of String)
         Dim lsetShared As HashSet(Of String) = aMentionedKeys
+        Dim lbJoinsMainTail As Boolean =
+            arPlan.TransitionPlan Is Nothing AndAlso
+            CanBackReferencePlanTail(arContext, arPlan.MainPlan, arPlan.SubPlans(0))
 
         For liSubPlan As Integer = 0 To arPlan.SubPlans.Count - 1
             Dim lrSubPlan As RoleStringPlan = arPlan.SubPlans(liSubPlan)
@@ -2145,42 +2405,48 @@ Public Module BostonDerivationRenderer
                 lsetMentions = lsetShared
             End If
 
+            Dim lsJoinOperator As String =
+                If(String.IsNullOrWhiteSpace(lrSubPlan.BranchJoinOperator),
+                   arPlan.SplitOperator, lrSubPlan.BranchJoinOperator)
+            Dim lbExplicitConjunctionSubject As Boolean =
+                liSubPlan > 0 AndAlso
+                String.Equals(lsJoinOperator, "and", StringComparison.OrdinalIgnoreCase)
             Dim lbCollapseLeadRole As Boolean =
                 arPlan.TransitionPlan IsNot Nothing OrElse
                 lrSubPlan.ContextTransitionPlan IsNot Nothing OrElse
-                liSubPlan > 0
+                liSubPlan > 0 OrElse
+                (liSubPlan = 0 AndAlso lbJoinsMainTail)
+            If lbExplicitConjunctionSubject Then lbCollapseLeadRole = False
+            If lrSubPlan.Root IsNot Nothing Then lbCollapseLeadRole = False
 
-            Dim lsRendered As String =
+            Dim lrRendered As DerivationText =
                 RenderRoleStringBranch(arContext,
                                        lrSubPlan,
                                        lsetMentions,
                                        lbCollapseLeadRole,
-                                       asConditions)
+                                       arConditions)
 
-            If lsRendered <> "" Then
+            If lrRendered <> "" Then
                 If liSubPlan = 0 AndAlso
-                   arPlan.TransitionPlan IsNot Nothing Then
-                    lsRendered = "that " & lsRendered
+                   (arPlan.TransitionPlan IsNot Nothing OrElse lbJoinsMainTail) Then
+                    lrRendered = "that " & lrRendered
                 End If
-                larRenderedSubPlans.Add(lsRendered)
-                larRenderedSubPlanOperators.Add(
-                    If(String.IsNullOrWhiteSpace(lrSubPlan.BranchJoinOperator),
-                       arPlan.SplitOperator,
-                       lrSubPlan.BranchJoinOperator))
+                larRenderedSubPlans.Add(lrRendered)
+                larRenderedSubPlanOperators.Add(lsJoinOperator)
             End If
         Next
 
         If larRenderedSubPlans.Count > 0 Then
             If lrBuilder.Length > 0 Then
-                If arPlan.TransitionPlan IsNot Nothing Then
+                If arPlan.TransitionPlan IsNot Nothing OrElse lbJoinsMainTail Then
                     lrBuilder.Append(" ")
                 Else
-                    lrBuilder.Append(HtmlBreak)
+                    lrBuilder.Append(LineBreak)
                 End If
             End If
             For liIndex As Integer = 0 To larRenderedSubPlans.Count - 1
                 If liIndex > 0 Then
-                    lrBuilder.Append(HtmlBreak)
+                    lrBuilder.Append(LineBreak)
                     lrBuilder.Append(larRenderedSubPlanOperators(liIndex))
                     lrBuilder.Append(" ")
                 End If
@@ -2188,23 +2454,78 @@ Public Module BostonDerivationRenderer
             Next
         End If
 
-        Return lrBuilder.ToString().Trim()
+        Return lrBuilder.Trim()
+    End Function
+
+    Private Function CanBackReferencePlanTail(
+        ByVal arContext As RenderContext,
+        ByVal arPrevious As RoleStringPlan,
+        ByVal arNext As RoleStringPlan) As Boolean
+
+        ' Back-reference the preceding reading's trailing variable, not merely
+        ' an Object Type of the same name or the logical exit of a restriction.
+        If arPrevious Is Nothing OrElse arNext Is Nothing OrElse
+           arNext.Root IsNot Nothing OrElse
+           arPrevious.Occurrences.Count = 0 OrElse arNext.Occurrences.Count = 0 OrElse
+           arPrevious.ChildPlans.Count > 0 OrElse arPrevious.NegatesEntireBranch OrElse
+           arPrevious.NegatedRootExists OrElse arNext.NegatesEntireBranch OrElse
+           arNext.NegatedRootExists OrElse arNext.ContextTransitionPlan IsNot Nothing OrElse
+           arPrevious.Occurrences.Any(Function(x) x Is Nothing OrElse x.ErrorText <> "" OrElse x.IsNegated) Then
+            Return False
+        End If
+
+        Dim lrTail As FactOccurrence = arPrevious.Occurrences.Last()
+        Dim lrLead As FactOccurrence = arNext.Occurrences(0)
+        If lrLead Is Nothing OrElse lrLead.ErrorText <> "" OrElse lrLead.IsNegated OrElse
+           lrLead.RestrictsPreviousFactType OrElse lrLead.Reading Is Nothing OrElse
+           lrTail.Reading Is Nothing OrElse lrTail.TrailingTransitionPlan IsNot Nothing OrElse
+           lrTail.BindingKeys.Count = 0 OrElse lrLead.BindingKeys.Count = 0 OrElse
+           Not String.IsNullOrWhiteSpace(lrLead.Reading.FrontText) OrElse
+           Not String.IsNullOrWhiteSpace(lrTail.Reading.FollowingText) OrElse
+           RenderOccurrenceValueRestrictions(arContext, lrTail) <> "" Then Return False
+
+        Dim larTailParts As List(Of FBM.PredicatePart) = SafePredicateParts(lrTail.Reading)
+        Dim larLeadParts As List(Of FBM.PredicatePart) = SafePredicateParts(lrLead.Reading)
+        If larTailParts.Count = 0 OrElse larTailParts.Last() Is Nothing OrElse
+           larLeadParts.Count = 0 OrElse larLeadParts(0) Is Nothing OrElse
+           Not String.IsNullOrWhiteSpace(larTailParts.Last().PredicatePartText) OrElse
+           Not String.IsNullOrWhiteSpace(larTailParts.Last().PostBoundText) OrElse
+           Not String.IsNullOrWhiteSpace(larLeadParts(0).PreBoundText) OrElse
+           Not String.IsNullOrWhiteSpace(larLeadParts(0).PostBoundText) Then Return False
+
+        Dim lsTailKey As String = CanonicalKey(arContext, lrTail.BindingKeys.Last())
+        Return lsTailKey <> "" AndAlso
+            String.Equals(lsTailKey, CanonicalKey(arContext, lrTail.ExitBindingKey),
+                          StringComparison.OrdinalIgnoreCase) AndAlso
+            String.Equals(lsTailKey, CanonicalKey(arContext, lrLead.BindingKeys(0)),
+                          StringComparison.OrdinalIgnoreCase)
+    End Function
+
+    Private Function CanBackReferenceGroupTail(
+        ByVal arContext As RenderContext,
+        ByVal arPrevious As RoleStringPlan,
+        ByVal arGroup As SplitGroupPlan) As Boolean
+
+        If arPrevious Is Nothing OrElse arGroup Is Nothing Then Return False
+        If arGroup.Branch IsNot Nothing Then
+            Return CanBackReferencePlanTail(arContext, arPrevious, arGroup.Branch)
+        End If
+        If arGroup.OperatorName <> "and" OrElse arGroup.Members.Count = 0 Then Return False
+        Return CanBackReferenceGroupTail(arContext, arPrevious, arGroup.Members(0))
     End Function
 
     Private Function RenderSplitGroup(
         ByVal arContext As RenderContext,
         ByVal arGroup As SplitGroupPlan,
         ByVal aMentionedKeys As HashSet(Of String),
-        ByRef asConditions As String,
-        Optional ByVal asPreviousEntryKey As String = "") As String
+        ByRef arConditions As DerivationText,
+        Optional ByVal arPreviousPlan As RoleStringPlan = Nothing) As DerivationText
 
         If arGroup.Branch IsNot Nothing Then
-            Dim lsEntry As String = CanonicalKey(arContext, PlanEntryBindingKey(arGroup.Branch))
-            Dim lbCollapse As Boolean = asPreviousEntryKey <> "" AndAlso
-                String.Equals(asPreviousEntryKey, lsEntry, StringComparison.OrdinalIgnoreCase) AndAlso
-                arGroup.Branch.ContextTransitionPlan Is Nothing
-            Return RenderRoleStringBranch(arContext, arGroup.Branch, aMentionedKeys,
-                                           lbCollapse, asConditions)
+            Dim lbCollapse As Boolean = CanBackReferencePlanTail(arContext, arPreviousPlan, arGroup.Branch)
+            Dim lrBranch As DerivationText = RenderRoleStringBranch(arContext, arGroup.Branch,
+                aMentionedKeys, lbCollapse, arConditions)
+            Return If(lbCollapse AndAlso lrBranch <> "", "that " & lrBranch, lrBranch)
         End If
 
         If arGroup.OperatorName <> "and" AndAlso arGroup.OperatorName <> "or" AndAlso
@@ -2212,33 +2533,32 @@ Public Module BostonDerivationRenderer
             Return "[ERROR: Unsupported logical group operator '" & CleanError(arGroup.OperatorName) & "'.]"
         End If
 
-        Dim larText As New List(Of String)
-        Dim lsPreviousEntry As String = ""
-        For Each lrMember As SplitGroupPlan In arGroup.Members
+        Dim larText As New List(Of DerivationText)
+        For liMember As Integer = 0 To arGroup.Members.Count - 1
+            Dim lrMember As SplitGroupPlan = arGroup.Members(liMember)
             Dim lsetMentions As HashSet(Of String) =
                 If(arGroup.OperatorName = "and", aMentionedKeys,
                    New HashSet(Of String)(aMentionedKeys, StringComparer.OrdinalIgnoreCase))
-            Dim lsMemberConditions As String = ""
-            Dim lsText As String = RenderSplitGroup(arContext, lrMember, lsetMentions,
-                                                    lsMemberConditions, lsPreviousEntry)
-            If lsText <> "" AndAlso arGroup.OperatorName <> "xor" AndAlso
+            Dim lrMemberConditions As DerivationText = ""
+            Dim lrText As DerivationText = RenderSplitGroup(arContext, lrMember, lsetMentions,
+                lrMemberConditions, If(liMember = 0 AndAlso arGroup.OperatorName = "and", arPreviousPlan, Nothing))
+            If lrMemberConditions <> "" Then lrText &= LineBreak & "where " & lrMemberConditions
+            If lrText <> "" AndAlso arGroup.OperatorName <> "xor" AndAlso
                lrMember.Branch Is Nothing AndAlso lrMember.Members.Count > 1 AndAlso
                lrMember.OperatorName <> arGroup.OperatorName Then
-                lsText = "(" & lsText & ")"
+                lrText = "(" & lrText & ")"
             End If
-            If lsText <> "" Then larText.Add(lsText)
-            lsPreviousEntry = ""
-            If arGroup.OperatorName = "and" AndAlso lrMember.Branch IsNot Nothing Then
-                lsPreviousEntry = CanonicalKey(arContext, PlanEntryBindingKey(lrMember.Branch))
-            End If
+            If lrText <> "" Then larText.Add(lrText)
+            ' Conjunction siblings retain explicit bound subjects. Only the
+            ' first member may continue a preceding reading's trailing variable.
         Next
         If larText.Count = 0 Then Return ""
         If arGroup.OperatorName = "xor" Then
             ' NORMA XorLead/Tail/NestedListOpen and ListSeparator snippets.
-            Return "exactly one of the following is <em>true:</em>" & HtmlBreak &
-                   String.Join(";" & HtmlBreak, larText)
+            Return "exactly one of the following is " & DerivationText.Piece("true:", OutputStyle.Emphasis) & LineBreak &
+                   DerivationText.Join(";" & LineBreak, larText)
         End If
-        Return String.Join(HtmlBreak & arGroup.OperatorName & " ", larText)
+        Return DerivationText.Join(LineBreak & arGroup.OperatorName & " ", larText)
     End Function
 
     Private Function RenderRoleStringBranch(
@@ -2246,8 +2566,8 @@ Public Module BostonDerivationRenderer
         ByVal arPlan As RoleStringPlan,
         ByVal aMentionedKeys As HashSet(Of String),
         ByVal abCollapseLeadRole As Boolean,
-        ByRef asConditions As String,
-        Optional ByVal abCollapseContextTransition As Boolean = False) As String
+        ByRef arConditions As DerivationText,
+        Optional ByVal abCollapseContextTransition As Boolean = False) As DerivationText
 
         If arPlan Is Nothing Then Return ""
 
@@ -2262,8 +2582,8 @@ Public Module BostonDerivationRenderer
         Dim lsNegatedExitKey As String =
             BranchNegativeExistentialKey(arContext, arPlan, aMentionedKeys)
 
-        Dim lrBuilder As New StringBuilder
-        Dim lsBranchTransition As String = ""
+        Dim lrBuilder As New DerivationText
+        Dim lrBranchTransition As DerivationText = ""
         Dim lsetBranchMentions As HashSet(Of String) =
             If(arPlan.NegatesEntireBranch OrElse
                arPlan.NegatedRootExists,
@@ -2275,12 +2595,12 @@ Public Module BostonDerivationRenderer
         If Not arPlan.NegatedRootExists AndAlso
            arPlan.ContextTransitionPlan IsNot Nothing AndAlso
            arPlan.ContextTransitionPlan.Occurrences.Count > 0 Then
-            lsBranchTransition =
+            lrBranchTransition =
                 RenderRoleString(arContext,
                                  arPlan.ContextTransitionPlan,
                                  lsetBranchMentions,
                                  abCollapseContextTransition,
-                                 asConditions,
+                                 arConditions,
                                  abCollapseContextTransition)
         End If
 
@@ -2291,39 +2611,39 @@ Public Module BostonDerivationRenderer
             Dim lsRootKey As String =
                 CanonicalKey(arContext,
                              RootKey(arPlan.Root.id))
-            Dim lsRootName As String =
+            Dim lrRootName As DerivationText =
                 DisplayName(arContext,
                             lsRootKey,
                             Nothing)
-            If lsRootName = "" Then
-                lsRootName = RootObjectTypeName(arPlan.Root)
+            If lrRootName = "" Then
+                lrRootName = ObjectText(RootObjectTypeName(arPlan.Root), arPlan.Root.BostonModelElement)
             End If
 
             lsetBranchMentions.Add(lsRootKey)
             lrBuilder.Append("no ")
-            lrBuilder.Append(lsRootName)
+            lrBuilder.Append(lrRootName)
             lrBuilder.Append(" exists")
-            lrBuilder.Append(HtmlBreak)
+            lrBuilder.Append(LineBreak)
             lrBuilder.Append("where ")
         End If
 
         Dim lbCollapseMain As Boolean =
             Not arPlan.NegatedRootExists AndAlso
             (abCollapseLeadRole OrElse
-             lsBranchTransition <> "")
+             lrBranchTransition <> "")
 
-        Dim lsMain As String =
+        Dim lrMain As DerivationText =
             RenderRoleString(arContext,
                              arPlan,
                              lsetBranchMentions,
                              lbCollapseMain,
-                             asConditions,
+                             arConditions,
                              False,
                              lsNegatedExitKey)
 
-        If lsBranchTransition <> "" Then
-            lrBuilder.Append(lsBranchTransition)
-            If lsMain <> "" Then
+        If lrBranchTransition <> "" Then
+            lrBuilder.Append(lrBranchTransition)
+            If lrMain <> "" Then
                 If Not arPlan.ContextTransitionPlan.Occurrences.Any(
                     Function(x) x IsNot Nothing AndAlso x.ErrorText <> "") Then
                     lrBuilder.Append(" that ")
@@ -2332,7 +2652,27 @@ Public Module BostonDerivationRenderer
                 End If
             End If
         End If
-        If lsMain <> "" Then lrBuilder.Append(lsMain)
+        If lrMain <> "" Then lrBuilder.Append(lrMain)
+
+        If arPlan.GroupedChildren IsNot Nothing Then
+            Dim lbContinueMain As Boolean = lrMain <> "" AndAlso
+                CanBackReferenceGroupTail(arContext, arPlan, arPlan.GroupedChildren)
+            Dim lrGroupConditions As DerivationText = ""
+            Dim lrChildren As DerivationText = RenderSplitGroup(arContext, arPlan.GroupedChildren,
+                lsetBranchMentions, lrGroupConditions, If(lbContinueMain, arPlan, Nothing))
+            If lrChildren <> "" Then
+                If lrBuilder.Length > 0 AndAlso Not arPlan.NegatedRootExists Then
+                    lrBuilder.Append(If(lbContinueMain, " ", LineBreak & "where "))
+                End If
+                ' Make a nested alternative's boundary explicit. Do not let its
+                ' final Or escape the role-bearing branch that introduces it.
+                If arPlan.GroupedChildren.OperatorName = "or" AndAlso
+                   arPlan.GroupedChildren.Members.Count > 1 AndAlso lrMain <> "" Then
+                    lrChildren = "(" & lrChildren & ")"
+                End If
+                lrBuilder.Append(lrChildren)
+            End If
+        End If
 
         If arPlan.ChildPlans IsNot Nothing AndAlso
            arPlan.ChildPlans.Count > 0 Then
@@ -2349,11 +2689,12 @@ Public Module BostonDerivationRenderer
                                  PlanEntryBindingKey(lrChild))
 
                 Dim lbCollapseChildLead As Boolean =
-                    lrChild.ContextTransitionPlan IsNot Nothing OrElse
+                    lrChild.Root Is Nothing AndAlso
+                    (lrChild.ContextTransitionPlan IsNot Nothing OrElse
                     (lsPreviousExitKey <> "" AndAlso
                      String.Equals(lsPreviousExitKey,
                                    lsChildEntryKey,
-                                   StringComparison.OrdinalIgnoreCase))
+                                   StringComparison.OrdinalIgnoreCase)))
 
                 Dim lbCollapseChildContextTransition As Boolean =
                     lrChild.ContextTransitionPlan IsNot Nothing AndAlso
@@ -2366,16 +2707,16 @@ Public Module BostonDerivationRenderer
                                 lrChild.ContextTransitionPlan)),
                         StringComparison.OrdinalIgnoreCase)
 
-                Dim lsChild As String =
+                Dim lrRenderedChild As DerivationText =
                     RenderRoleStringBranch(arContext,
                                            lrChild,
                                            lsetBranchMentions,
                                            lbCollapseChildLead,
-                                           asConditions,
+                                           arConditions,
                                            lbCollapseChildContextTransition)
 
-                If lsChild <> "" Then
-                    lrBuilder.Append(HtmlBreak)
+                If lrRenderedChild <> "" Then
+                    lrBuilder.Append(LineBreak)
                     If liChild > 0 Then
                         lrBuilder.Append(
                             If(String.IsNullOrWhiteSpace(
@@ -2387,7 +2728,7 @@ Public Module BostonDerivationRenderer
                        lrChild.ContextTransitionPlan Is Nothing Then
                         lrBuilder.Append("that ")
                     End If
-                    lrBuilder.Append(lsChild)
+                    lrBuilder.Append(lrRenderedChild)
                 End If
 
                 lsPreviousExitKey =
@@ -2396,25 +2737,25 @@ Public Module BostonDerivationRenderer
             Next
         End If
 
-        Dim lsResult As String =
-            lrBuilder.ToString().Trim()
+        Dim lrResult As DerivationText =
+            lrBuilder.Trim()
 
         If arPlan.NegatesEntireBranch AndAlso lsNegatedExitKey = "" AndAlso
-           lsResult <> "" Then
-            lsResult = "it is not true that (" & lsResult & ")"
+           lrResult <> "" Then
+            lrResult = "it is not true that (" & lrResult & ")"
         End If
 
-        Return lsResult
+        Return lrResult
     End Function
 
     Private Function RenderRoleString(ByVal arContext As RenderContext,
                                       ByVal arPlan As RoleStringPlan,
                                       ByVal aMentionedKeys As HashSet(Of String),
                                       ByVal abCollapseLeadRole As Boolean,
-                                      ByRef asConditions As String,
+                                      ByRef arConditions As DerivationText,
                                       Optional ByVal abPreserveCollapsedLeadConnector As Boolean = False,
-                                      Optional ByVal asNegatedLeadExitKey As String = "") As String
-        Dim lrBuilder As New StringBuilder
+                                      Optional ByVal asNegatedLeadExitKey As String = "") As DerivationText
+        Dim lrBuilder As New DerivationText
         Dim lsPreviousExitKey As String = ""
         Dim lbInNegatedChain As Boolean = False
         Dim lbFirstRenderedOccurrence As Boolean = True
@@ -2443,13 +2784,13 @@ Public Module BostonDerivationRenderer
             If Not lbFirstRenderedOccurrence AndAlso
                lrOccurrence.RestrictsPreviousFactType AndAlso
                Not lbEmitsNegatedWhere Then
-                If lrBuilder.Length > 0 Then lrBuilder.Append(HtmlBreak)
+                If lrBuilder.Length > 0 Then lrBuilder.Append(LineBreak)
                 lrBuilder.Append("where ")
                 lsPreviousExitKey = ""
             End If
 
             If lbEmitsNegatedWhere Then
-                If lrBuilder.Length > 0 Then lrBuilder.Append(HtmlBreak)
+                If lrBuilder.Length > 0 Then lrBuilder.Append(LineBreak)
                 lrBuilder.Append("where it is not true that (")
                 lbInNegatedChain = True
                 lsPreviousExitKey = ""
@@ -2475,23 +2816,23 @@ Public Module BostonDerivationRenderer
                                             lbFirstRenderedOccurrence AndAlso
                                             arPlan.StartsRolePath))
 
-            Dim lsValueRestrictions As String =
+            Dim lrValueRestrictions As DerivationText =
                 RenderOccurrenceValueRestrictions(arContext,
                                                   lrOccurrence)
-            If lsValueRestrictions <> "" Then
+            If lrValueRestrictions <> "" Then
                 AppendWord(lrBuilder,
-                           "where " & lsValueRestrictions)
+                           "where " & lrValueRestrictions)
             End If
 
             If HasSuccessfulTransition(lrOccurrence.TrailingTransitionPlan) Then
-                Dim lsTransition As String =
+                Dim lrTransition As DerivationText =
                     RenderRoleString(arContext,
                                      lrOccurrence.TrailingTransitionPlan,
                                      aMentionedKeys,
                                      True,
-                                     asConditions)
-                If lsTransition <> "" Then
-                    AppendWord(lrBuilder, "that " & lsTransition)
+                                     arConditions)
+                If lrTransition <> "" Then
+                    AppendWord(lrBuilder, "that " & lrTransition)
                 End If
             End If
 
@@ -2503,22 +2844,22 @@ Public Module BostonDerivationRenderer
         Next
 
         If lbInNegatedChain Then
-            If asConditions <> "" Then
-                lrBuilder.Append(HtmlBreak)
+            If arConditions <> "" Then
+                lrBuilder.Append(LineBreak)
                 lrBuilder.Append("where ")
-                lrBuilder.Append(asConditions)
-                asConditions = ""
+                lrBuilder.Append(arConditions)
+                arConditions = ""
             End If
             lrBuilder.Append(")")
         End If
 
-        Dim lsResult As String = lrBuilder.ToString().Trim()
+        Dim lrResult As DerivationText = lrBuilder.Trim()
         If abCollapseLeadRole AndAlso
            Not abPreserveCollapsedLeadConnector AndAlso
-           lsResult.StartsWith("that ", StringComparison.OrdinalIgnoreCase) Then
-            lsResult = lsResult.Substring(5)
+           lrResult.Text.StartsWith("that ", StringComparison.OrdinalIgnoreCase) Then
+            lrResult = lrResult.Substring(5)
         End If
-        Return lsResult
+        Return lrResult
     End Function
 
     Private Function BranchNegativeExistentialKey(
@@ -2532,7 +2873,8 @@ Public Module BostonDerivationRenderer
         ' for correlated type pairings, transitions, and split child scopes.
         If Not arPlan.NegatesEntireBranch OrElse arPlan.NegatedRootExists OrElse
            arPlan.ContextTransitionPlan IsNot Nothing OrElse
-           arPlan.ChildPlans.Count <> 0 OrElse arPlan.Occurrences.Count = 0 Then Return ""
+           arPlan.ChildPlans.Count <> 0 OrElse arPlan.GroupedChildren IsNot Nothing OrElse
+           arPlan.Occurrences.Count = 0 Then Return ""
 
         Dim lrFirst As FactOccurrence = arPlan.Occurrences(0)
         If lrFirst Is Nothing OrElse lrFirst.ErrorText <> "" OrElse
@@ -2607,13 +2949,13 @@ Public Module BostonDerivationRenderer
 
     Private Function RenderOccurrenceValueRestrictions(
         ByVal arContext As RenderContext,
-        ByVal arOccurrence As FactOccurrence) As String
+        ByVal arOccurrence As FactOccurrence) As DerivationText
 
         If arOccurrence Is Nothing OrElse
            arOccurrence.PathedRoles Is Nothing OrElse
            arOccurrence.PathBindingKeys Is Nothing Then Return ""
 
-        Dim larRestrictions As New List(Of String)
+        Dim larRestrictions As New List(Of DerivationText)
 
         For liIndex As Integer = 0 To Math.Min(arOccurrence.PathedRoles.Count, arOccurrence.PathBindingKeys.Count) - 1
 
@@ -2639,46 +2981,77 @@ Public Module BostonDerivationRenderer
                 Continue For
             End If
 
-            If larRanges.Any(Function(x) x Is Nothing OrElse
-                Not String.Equals(x.MinValue, x.MaxValue, StringComparison.Ordinal)) Then
+            If larRanges.Any(Function(x) x Is Nothing) Then
                 larRestrictions.Add(
-                    "[ERROR: Unsupported non-single-value PathedRole restriction.]")
+                    "[ERROR: Missing PathedRole value range.]")
                 Continue For
             End If
 
             Dim lrRole As FBM.Role =
                 ResolvePathedRole(arContext,
                                   lrPathedRole)
-            Dim lsName As String =
+            Dim lrName As DerivationText =
                 DisplayName(
                     arContext,
                     CanonicalKey(arContext,
                                  arOccurrence.PathBindingKeys(liIndex)),
                     lrRole)
 
-            Dim lsValues As String = String.Join(", ",
-                larRanges.Select(Function(x) FormatRestrictedValue(lrRole, x)))
+            Dim lrValues As DerivationText = DerivationText.Join(", ",
+                larRanges.Select(Function(x) FormatRestrictedRange(lrRole, x)))
             larRestrictions.Add(
-                If(larRanges.Count = 1,
-                   "the possible value of that " & lsName & " is ",
-                   "the possible values of that " & lsName & " are ") & lsValues)
+                If(larRanges.Count = 1 AndAlso
+                   String.Equals(larRanges(0).MinValue, larRanges(0).MaxValue, StringComparison.Ordinal),
+                   "the possible value of that " & lrName & " is ",
+                   "the possible values of that " & lrName & " are ") & lrValues)
         Next
 
-        Return String.Join(" and ", larRestrictions)
+        Return DerivationText.Join(" and ", larRestrictions)
+    End Function
+
+    Private Function FormatRestrictedRange(
+        ByVal arRole As FBM.Role,
+        ByVal arRange As FBM.PathedRoleValueRange) As DerivationText
+
+        If String.Equals(arRange.MinValue, arRange.MaxValue, StringComparison.Ordinal) Then
+            Return FormatRestrictedValue(arRole, arRange)
+        End If
+
+        ' NORMA treats NotSet as closed; an absent endpoint is unbounded.
+        ' Reuse the established value formatter for each endpoint.
+        Dim lrMinimum As DerivationText = ""
+        Dim lrMaximum As DerivationText = ""
+        If Not String.IsNullOrEmpty(arRange.MinValue) Then
+            lrMinimum = If(String.Equals(arRange.MinInclusion, "Open", StringComparison.OrdinalIgnoreCase),
+                           "above ", "at least ") &
+                FormatRestrictedValue(arRole, New FBM.PathedRoleValueRange With {
+                    .MinValue = arRange.MinValue, .MaxValue = arRange.MinValue,
+                    .InvariantMinValue = arRange.InvariantMinValue, .InvariantMaxValue = arRange.InvariantMinValue})
+        End If
+        If Not String.IsNullOrEmpty(arRange.MaxValue) Then
+            lrMaximum = If(String.Equals(arRange.MaxInclusion, "Open", StringComparison.OrdinalIgnoreCase),
+                           "below ", "at most ") &
+                FormatRestrictedValue(arRole, New FBM.PathedRoleValueRange With {
+                    .MinValue = arRange.MaxValue, .MaxValue = arRange.MaxValue,
+                    .InvariantMinValue = arRange.InvariantMaxValue, .InvariantMaxValue = arRange.InvariantMaxValue})
+        End If
+        If lrMinimum = "" Then Return lrMaximum
+        If lrMaximum = "" Then Return lrMinimum
+        Return lrMinimum & " to " & lrMaximum
     End Function
 
     Private Function FormatRestrictedValue(
         ByVal arRole As FBM.Role,
-        ByVal arRange As FBM.PathedRoleValueRange) As String
+        ByVal arRange As FBM.PathedRoleValueRange) As DerivationText
 
-        If arRange Is Nothing Then Return "''"
+        If arRange Is Nothing Then Return ValueText("''")
 
         If Not String.IsNullOrWhiteSpace(
             arRange.InvariantMinValue) AndAlso
            String.Equals(arRange.InvariantMinValue,
                          arRange.InvariantMaxValue,
                          StringComparison.Ordinal) Then
-            Return arRange.InvariantMinValue
+            Return ValueText(arRange.InvariantMinValue)
         End If
 
         Dim lsValue As String =
@@ -2688,7 +3061,7 @@ Public Module BostonDerivationRenderer
            TypeOf arRole.JoinedORMObject Is FBM.ValueType AndAlso
            DirectCast(arRole.JoinedORMObject,
                       FBM.ValueType).DataTypeIsNumeric Then
-            Return lsValue
+            Return ValueText(lsValue)
         End If
 
         If arRole IsNot Nothing AndAlso
@@ -2698,11 +3071,11 @@ Public Module BostonDerivationRenderer
                            FBM.EntityType)
             If lrEntityType.ReferenceModeValueType IsNot Nothing AndAlso
                lrEntityType.ReferenceModeValueType.DataTypeIsNumeric Then
-                Return lsValue
+                Return ValueText(lsValue)
             End If
         End If
 
-        Return "'" & lsValue.Replace("'", "''") & "'"
+        Return ValueText("'" & lsValue.Replace("'", "''") & "'")
     End Function
 
     Private Function CanCollapsePlanLead(ByVal arContext As RenderContext,
@@ -2734,7 +3107,25 @@ Public Module BostonDerivationRenderer
                                           ByVal aMentionedKeys As HashSet(Of String),
                                           ByVal abCollapseFirstRole As Boolean,
                                           Optional ByVal asNegativeQuantifierKey As String = "",
-                                          Optional ByVal abBasicLeadRole As Boolean = False) As String
+                                          Optional ByVal abBasicLeadRole As Boolean = False) As DerivationText
+        If arOccurrence.IdentityFromObject IsNot Nothing Then
+            Dim lsFromKey As String = CanonicalKey(arContext, arOccurrence.EntryBindingKey)
+            Dim lsToKey As String = CanonicalKey(arContext, arOccurrence.ExitBindingKey)
+            Dim lrFromName As DerivationText = DisplayName(arContext, lsFromKey, Nothing)
+            Dim lrToName As DerivationText = DisplayName(arContext, lsToKey, Nothing)
+            If lrFromName = "" Then lrFromName = ObjectText(arOccurrence.IdentityFromObject.Id, arOccurrence.IdentityFromObject)
+            If lrToName = "" Then lrToName = ObjectText(arOccurrence.IdentityToObject.Id, arOccurrence.IdentityToObject)
+
+            ' NORMA PartnerVariables/ImpersonalLeadIdentityCorrelation: render
+            ' the two joined endpoint variables, not the inheritance proof path.
+            Dim lrFrom As DerivationText = If(abCollapseFirstRole, "that",
+                If(aMentionedKeys.Contains(lsFromKey), "that ", "some ") & lrFromName)
+            Dim lrTo As DerivationText = If(aMentionedKeys.Contains(lsToKey), "that ", "some ") & lrToName
+            aMentionedKeys.Add(lsFromKey)
+            aMentionedKeys.Add(lsToKey)
+            Return lrFrom & PredicateText(" is ") & lrTo
+        End If
+
         Dim larParts As List(Of FBM.PredicatePart) = SafePredicateParts(arOccurrence.Reading)
         If larParts.Count = 0 Then
             Return "[ERROR: Fact Type Reading for '" &
@@ -2742,7 +3133,7 @@ Public Module BostonDerivationRenderer
                    "' has no Predicate Parts.]"
         End If
 
-        Dim lrBuilder As New StringBuilder
+        Dim lrBuilder As New DerivationText
         Dim lsetOccurrenceKeys As New HashSet(Of String)(
             StringComparer.OrdinalIgnoreCase)
         For Each lsBindingKey As String In arOccurrence.BindingKeys
@@ -2755,7 +3146,7 @@ Public Module BostonDerivationRenderer
             End If
         Next
 
-        AppendRaw(lrBuilder, arOccurrence.Reading.FrontText)
+        AppendRaw(lrBuilder, PredicateText(arOccurrence.Reading.FrontText))
 
         For liIndex As Integer = 0 To larParts.Count - 1
             Dim lrPart As FBM.PredicatePart = larParts(liIndex)
@@ -2781,11 +3172,11 @@ Public Module BostonDerivationRenderer
                                              liIndex = 0))
             End If
 
-            If lrPart IsNot Nothing Then AppendWord(lrBuilder, lrPart.PredicatePartText)
+            If lrPart IsNot Nothing Then AppendWord(lrBuilder, PredicateText(lrPart.PredicatePartText))
         Next
 
-        AppendWord(lrBuilder, arOccurrence.Reading.FollowingText)
-        Return lrBuilder.ToString().Trim()
+        AppendWord(lrBuilder, PredicateText(arOccurrence.Reading.FollowingText))
+        Return lrBuilder.Trim()
     End Function
 
     Private Function RenderRoleMention(ByVal arContext As RenderContext,
@@ -2794,25 +3185,25 @@ Public Module BostonDerivationRenderer
                                        ByVal aMentionedKeys As HashSet(Of String),
                                        Optional ByVal asNegativeQuantifierKey As String = "",
                                        Optional ByVal aOccurrenceKeys As HashSet(Of String) = Nothing,
-                                       Optional ByVal abBasicLeadRole As Boolean = False) As String
+                                       Optional ByVal abBasicLeadRole As Boolean = False) As DerivationText
         If arPart Is Nothing OrElse arPart.Role Is Nothing Then
             Return "[ERROR: Predicate Part has no Role.]"
         End If
 
         Dim lsCanonical As String = CanonicalKey(arContext, asBindingKey)
-        Dim lsName As String = DisplayName(arContext, lsCanonical, arPart.Role)
-        Dim lsBarePhrase As String = BoundRolePlayer(arPart, lsName)
+        Dim lrName As DerivationText = DisplayName(arContext, lsCanonical, arPart.Role)
+        Dim lrBarePhrase As DerivationText = BoundRolePlayer(arPart, lrName)
 
         If asNegativeQuantifierKey <> "" AndAlso
            String.Equals(lsCanonical,
                          asNegativeQuantifierKey,
                          StringComparison.OrdinalIgnoreCase) Then
             If lsCanonical <> "" Then aMentionedKeys.Add(lsCanonical)
-            Return "no " & lsBarePhrase
+            Return "no " & lrBarePhrase
         End If
 
         If lsCanonical <> "" AndAlso aMentionedKeys.Contains(lsCanonical) Then
-            Return "that " & lsBarePhrase
+            Return "that " & lrBarePhrase
         End If
 
         Dim lsPartnerKey As String =
@@ -2824,11 +3215,11 @@ Public Module BostonDerivationRenderer
         If lsCanonical <> "" Then aMentionedKeys.Add(lsCanonical)
 
         If lsPartnerKey <> "" Then
-            Dim lsPartnerName As String =
+            Dim lrPartnerName As DerivationText =
                 DisplayName(arContext,
                             lsPartnerKey,
                             Nothing)
-            If lsPartnerName <> "" Then
+            If lrPartnerName <> "" Then
                 If abBasicLeadRole Then
                     Dim lsLeadConnector As String = "that"
                     If TypeOf arPart.Role.JoinedORMObject Is FBM.EntityType AndAlso
@@ -2837,8 +3228,8 @@ Public Module BostonDerivationRenderer
                         lsLeadConnector = "who"
                     End If
 
-                    Return "that " & lsPartnerName &
-                           " is some " & lsBarePhrase &
+                    Return "that " & lrPartnerName &
+                           " is some " & lrBarePhrase &
                            " " & lsLeadConnector
                 End If
 
@@ -2849,13 +3240,13 @@ Public Module BostonDerivationRenderer
                     lsIdentityConnector = " who is that "
                 End If
 
-                Return "some " & lsBarePhrase &
+                Return "some " & lrBarePhrase &
                        lsIdentityConnector &
-                       lsPartnerName
+                       lrPartnerName
             End If
         End If
 
-        Return "some " & lsBarePhrase
+        Return "some " & lrBarePhrase
     End Function
 
     Private Function CorrelatedPartnerKey(
@@ -2962,103 +3353,118 @@ Public Module BostonDerivationRenderer
         Return lsCandidateCanonical
     End Function
 
-    Private Function RenderConditions(ByVal arContext As RenderContext) As String
-        Dim larConditions As New List(Of String)
+    Private Function RenderConditions(ByVal arContext As RenderContext,
+                                      ByVal arRolePath As FBM.RolePath,
+                                      Optional ByVal abIncludeProjectedCalculations As Boolean = True) As DerivationText
+        Dim larConditions As New List(Of DerivationText)
 
-        Dim lsExplicitConditions As String =
-            RenderExplicitConditions(arContext, arContext.RolePath)
-        If lsExplicitConditions <> "" Then larConditions.Add(lsExplicitConditions)
+        Dim lrExplicitConditions As DerivationText =
+            RenderExplicitConditions(arContext, arRolePath)
+        If lrExplicitConditions <> "" Then larConditions.Add(lrExplicitConditions)
 
         If larConditions.Count = 0 Then
-            larConditions.AddRange(RenderUnprojectedBooleanCalculations(arContext))
+            larConditions.AddRange(RenderUnprojectedBooleanCalculations(arContext, arRolePath))
         End If
 
-        larConditions.AddRange(RenderProjectedCalculations(arContext))
+        If abIncludeProjectedCalculations Then
+            larConditions.AddRange(RenderProjectedCalculations(arContext, arRolePath))
+        End If
 
-        Return String.Join(" and ",
+        Return DerivationText.Join(" and ",
                            larConditions.
-                               Where(Function(x) Not String.IsNullOrWhiteSpace(x)).
-                               Distinct(StringComparer.OrdinalIgnoreCase))
+                               Where(Function(x) Not String.IsNullOrWhiteSpace(x.Text)).
+                               GroupBy(Function(x) x.Text, StringComparer.OrdinalIgnoreCase).Select(Function(x) x.First()))
     End Function
 
     Private Function RenderExplicitConditions(ByVal arContext As RenderContext,
-                                              ByVal arRolePath As FBM.RolePath) As String
+                                              ByVal arRolePath As FBM.RolePath) As DerivationText
         If arRolePath Is Nothing OrElse
            arRolePath.Conditions Is Nothing OrElse
            arRolePath.Conditions.Items Is Nothing Then Return ""
 
-        Dim larConditions As New List(Of String)
+        Dim larConditions As New List(Of DerivationText)
 
         For Each lrCondition As FBM.ConditionNode In arRolePath.Conditions.Items
-            Dim lsCondition As String =
+            Dim lrRenderedCondition As DerivationText =
                 RenderConditionNode(arContext,
                                     lrCondition,
                                     New HashSet(Of String)(StringComparer.OrdinalIgnoreCase))
-            If lsCondition <> "" Then larConditions.Add(lsCondition)
+            If lrRenderedCondition <> "" Then larConditions.Add(lrRenderedCondition)
         Next
 
-        Return String.Join(" and ",
+        Return DerivationText.Join(" and ",
                            larConditions.
-                               Where(Function(x) Not String.IsNullOrWhiteSpace(x)).
-                               Distinct(StringComparer.OrdinalIgnoreCase))
+                               Where(Function(x) Not String.IsNullOrWhiteSpace(x.Text)).
+                               GroupBy(Function(x) x.Text, StringComparer.OrdinalIgnoreCase).Select(Function(x) x.First()))
     End Function
 
     Private Function RenderProjectedCalculations(
-        ByVal arContext As RenderContext) As List(Of String)
+        ByVal arContext As RenderContext,
+        ByVal arRolePath As FBM.RolePath) As List(Of DerivationText)
 
-        Dim larProjections As New List(Of String)
+        Dim larProjections As New List(Of DerivationText)
 
-        For Each lrPair As KeyValuePair(Of String, FBM.DerivationSource) In
-            arContext.HeadSourceByRoleId
+        If arRolePath Is Nothing OrElse arContext.DerivationPath.Projection Is Nothing Then Return larProjections
 
-            Dim lrSource As FBM.DerivationSource = lrPair.Value
-            If lrSource Is Nothing OrElse lrSource.CalculatedValue Is Nothing OrElse
-               String.IsNullOrWhiteSpace(lrSource.CalculatedValue.Ref) Then Continue For
+        ' A derived role can have a different source in each alternative path.
+        ' Do not use the single-source head lookup to render path projections.
+        For Each lrProjection As FBM.DerivationProjection In arContext.DerivationPath.Projection
+            If lrProjection Is Nothing OrElse lrProjection.RoleProjection Is Nothing OrElse
+               Not String.Equals(lrProjection.Ref, arRolePath.Id, StringComparison.OrdinalIgnoreCase) Then Continue For
+            For Each lrRoleProjection As FBM.RoleProjection In lrProjection.RoleProjection
+                If lrRoleProjection Is Nothing Then Continue For
 
-            Dim lrDerivedRole As FBM.Role =
-                ResolveRoleInFactType(arContext.DerivedFactType, lrPair.Key)
-            If lrDerivedRole Is Nothing Then
-                larProjections.Add("[ERROR: Projected derived Role '" &
-                                   CleanError(lrPair.Key) & "' was not found.]")
-                Continue For
-            End If
+                Dim lrSource As FBM.DerivationSource = lrRoleProjection.DerivationSource
+                If lrSource Is Nothing OrElse lrSource.CalculatedValue Is Nothing OrElse
+                   String.IsNullOrWhiteSpace(lrSource.CalculatedValue.Ref) Then Continue For
 
-            Dim lsExpression As String =
-                RenderCalculatedValue(
-                    arContext,
-                    lrSource.CalculatedValue.Ref,
-                    New HashSet(Of String)(StringComparer.OrdinalIgnoreCase))
+                Dim lrDerivedRole As FBM.Role =
+                    ResolveRoleInFactType(arContext.DerivedFactType, lrRoleProjection.Ref)
+                If lrDerivedRole Is Nothing Then
+                    larProjections.Add("[ERROR: Projected derived Role '" &
+                                       CleanError(lrRoleProjection.Ref) & "' was not found.]")
+                    Continue For
+                End If
 
-            larProjections.Add(RolePlayerName(lrDerivedRole) & " = " & lsExpression)
+                Dim lrExpression As DerivationText =
+                    RenderCalculatedValue(
+                        arContext,
+                        lrSource.CalculatedValue.Ref,
+                        New HashSet(Of String)(StringComparer.OrdinalIgnoreCase))
+
+                larProjections.Add(DisplayName(arContext,
+                    CanonicalKey(arContext, HeadRoleKey(lrRoleProjection.Ref)), lrDerivedRole) & " = " & lrExpression)
+            Next
         Next
 
         Return larProjections
     End Function
 
     Private Function RenderUnprojectedBooleanCalculations(
-        ByVal arContext As RenderContext) As List(Of String)
+        ByVal arContext As RenderContext,
+        ByVal arRolePath As FBM.RolePath) As List(Of DerivationText)
 
-        Dim larConditions As New List(Of String)
-        If arContext.RolePath.CalculatedValues Is Nothing Then Return larConditions
+        Dim larConditions As New List(Of DerivationText)
+        If arRolePath Is Nothing OrElse arRolePath.CalculatedValues Is Nothing Then Return larConditions
 
         Dim lsetProjectedIds As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-        For Each lrSource As FBM.DerivationSource In arContext.HeadSourceByRoleId.Values
+        For Each lrSource As FBM.DerivationSource In arContext.AllHeadSources
             If lrSource IsNot Nothing AndAlso lrSource.CalculatedValue IsNot Nothing AndAlso
                Not String.IsNullOrWhiteSpace(lrSource.CalculatedValue.Ref) Then
                 lsetProjectedIds.Add(lrSource.CalculatedValue.Ref)
             End If
         Next
 
-        For Each lrValue As FBM.CalculatedValue In arContext.RolePath.CalculatedValues
+        For Each lrValue As FBM.CalculatedValue In arRolePath.CalculatedValues
             If lrValue Is Nothing OrElse String.IsNullOrWhiteSpace(lrValue.Id) OrElse
                lsetProjectedIds.Contains(lrValue.Id) OrElse
                Not IsBooleanFunction(arContext.Model, lrValue.Function) Then Continue For
 
-            Dim lsCondition As String =
+            Dim lrCondition As DerivationText =
                 RenderCalculatedValue(arContext,
                                       lrValue.Id,
                                       New HashSet(Of String)(StringComparer.OrdinalIgnoreCase))
-            If lsCondition <> "" Then larConditions.Add(lsCondition)
+            If lrCondition <> "" Then larConditions.Add(lrCondition)
         Next
 
         Return larConditions
@@ -3081,7 +3487,7 @@ Public Module BostonDerivationRenderer
 
     Private Function RenderConditionNode(ByVal arContext As RenderContext,
                                          ByVal arCondition As FBM.ConditionNode,
-                                         ByVal aCalculationStack As HashSet(Of String)) As String
+                                         ByVal aCalculationStack As HashSet(Of String)) As DerivationText
         If arCondition Is Nothing Then Return ""
 
         If TypeOf arCondition Is FBM.ConditionAnd Then
@@ -3099,12 +3505,12 @@ Public Module BostonDerivationRenderer
         End If
 
         If TypeOf arCondition Is FBM.ConditionNot Then
-            Dim lsNested As String =
+            Dim lrNested As DerivationText =
                 RenderConditionNode(arContext,
                                     DirectCast(arCondition, FBM.ConditionNot).Item,
                                     aCalculationStack)
-            If lsNested = "" Then Return ""
-            Return "not (" & lsNested & ")"
+            If lrNested = "" Then Return ""
+            Return "not (" & lrNested & ")"
         End If
 
         If TypeOf arCondition Is FBM.CalculatedCondition Then
@@ -3128,20 +3534,20 @@ Public Module BostonDerivationRenderer
     Private Function RenderConditionList(ByVal arContext As RenderContext,
                                          ByVal aarConditions As List(Of FBM.ConditionNode),
                                          ByVal asJoiner As String,
-                                         ByVal aCalculationStack As HashSet(Of String)) As String
+                                         ByVal aCalculationStack As HashSet(Of String)) As DerivationText
         If aarConditions Is Nothing Then Return ""
 
-        Dim larText As New List(Of String)
+        Dim larText As New List(Of DerivationText)
         For Each lrCondition As FBM.ConditionNode In aarConditions
-            Dim lsText As String = RenderConditionNode(arContext, lrCondition, aCalculationStack)
-            If lsText <> "" Then larText.Add(lsText)
+            Dim lrText As DerivationText = RenderConditionNode(arContext, lrCondition, aCalculationStack)
+            If lrText <> "" Then larText.Add(lrText)
         Next
-        Return String.Join(asJoiner, larText)
+        Return DerivationText.Join(asJoiner, larText)
     End Function
 
     Private Function RenderConditionValue(ByVal arContext As RenderContext,
                                           ByVal arValue As FBM.ConditionValueContainer,
-                                          ByVal aCalculationStack As HashSet(Of String)) As String
+                                          ByVal aCalculationStack As HashSet(Of String)) As DerivationText
         If arValue Is Nothing OrElse arValue.Item Is Nothing Then
             Return "[ERROR: Missing condition operand.]"
         End If
@@ -3158,7 +3564,7 @@ Public Module BostonDerivationRenderer
         End If
 
         If TypeOf arValue.Item Is FBM.Constant Then
-            Return DirectCast(arValue.Item, FBM.Constant).Value
+            Return ValueText(DirectCast(arValue.Item, FBM.Constant).Value)
         End If
 
         Return "[ERROR: Unsupported condition operand.]"
@@ -3166,7 +3572,7 @@ Public Module BostonDerivationRenderer
 
     Private Function RenderCalculatedValue(ByVal arContext As RenderContext,
                                            ByVal asCalculatedValueId As String,
-                                           ByVal aCalculationStack As HashSet(Of String)) As String
+                                           ByVal aCalculationStack As HashSet(Of String)) As DerivationText
         If String.IsNullOrWhiteSpace(asCalculatedValueId) Then
             Return "[ERROR: Missing CalculatedValue reference.]"
         End If
@@ -3180,20 +3586,53 @@ Public Module BostonDerivationRenderer
             Return "[ERROR: CalculatedValue '" & CleanError(asCalculatedValueId) & "' was not found.]"
         End If
 
+        Dim larOrderedInputs As New List(Of FBM.Input)
+        If lrValue.Inputs IsNot Nothing AndAlso lrValue.Inputs.Input IsNot Nothing Then
+            larOrderedInputs.AddRange(lrValue.Inputs.Input)
+        End If
+        If larOrderedInputs.Any(Function(x) x IsNot Nothing AndAlso x.Parameter IsNot Nothing AndAlso
+                                   Not String.IsNullOrWhiteSpace(x.Parameter.Ref)) Then
+            ' NORMA renders in Function.ParameterCollection order, resolving each
+            ' input by its Parameter reference; XML input order is not argument order.
+            Dim lrFunction As FBM.Function = Nothing
+            If arContext.Model.Function IsNot Nothing AndAlso lrValue.Function IsNot Nothing Then
+                lrFunction = arContext.Model.Function.FirstOrDefault(
+                    Function(x) x IsNot Nothing AndAlso
+                        String.Equals(x.id, lrValue.Function.Ref, StringComparison.OrdinalIgnoreCase))
+            End If
+            If lrFunction Is Nothing OrElse lrFunction.Parameters Is Nothing OrElse
+               lrFunction.Parameters.Count = 0 Then
+                Return "[ERROR: Referenced calculation parameters have no Function definition.]"
+            End If
+            Dim larMappedInputs As New List(Of FBM.Input)
+            For Each lrParameter As FBM.Parameter In lrFunction.Parameters
+                If lrParameter Is Nothing Then Return "[ERROR: Missing Function parameter.]"
+                Dim larMatches As List(Of FBM.Input) = larOrderedInputs.Where(
+                    Function(x) x IsNot Nothing AndAlso x.Parameter IsNot Nothing AndAlso
+                        String.Equals(x.Parameter.Ref, lrParameter.id, StringComparison.OrdinalIgnoreCase)).ToList()
+                If larMatches.Count <> 1 Then
+                    Return "[ERROR: Calculation requires exactly one input for parameter '" &
+                        CleanError(lrParameter.id) & "'.]"
+                End If
+                larMappedInputs.Add(larMatches(0))
+            Next
+            If larMappedInputs.Count <> larOrderedInputs.Count Then
+                Return "[ERROR: Calculation contains an unmatched parameter input.]"
+            End If
+            larOrderedInputs = larMappedInputs
+        End If
+
         aCalculationStack.Add(asCalculatedValueId)
-        Dim larInputs As New List(Of String)
+        Dim larInputs As New List(Of DerivationText)
         Dim lsFunctionName As String =
             ResolveFunctionName(arContext.Model, lrValue.Function)
 
-        If lrValue.Inputs IsNot Nothing AndAlso lrValue.Inputs.Input IsNot Nothing Then
-            For Each lrInput As FBM.Input In lrValue.Inputs.Input
-                larInputs.Add(RenderCalculatedInput(arContext,
-                                                    lrInput,
-                                                    aCalculationStack,
-                                                    lsFunctionName))
-            Next
-        End If
-
+        For Each lrInput As FBM.Input In larOrderedInputs
+            larInputs.Add(RenderCalculatedInput(arContext,
+                                                lrInput,
+                                                aCalculationStack,
+                                                lsFunctionName))
+        Next
         aCalculationStack.Remove(asCalculatedValueId)
 
         If lrValue.AggregationContext IsNot Nothing AndAlso
@@ -3202,32 +3641,32 @@ Public Module BostonDerivationRenderer
            FunctionHasBagInput(arContext.Model, lrValue.Function) Then
 
             Dim lsRootReference As String = lrValue.AggregationContext.PathRoot.Ref
-            Dim lsRootName As String = ""
+            Dim lrRootName As DerivationText = ""
             Dim lrRoot As FBM.RootObjectType = Nothing
 
             If arContext.RootById.TryGetValue(lsRootReference, lrRoot) Then
-                lsRootName =
+                lrRootName =
                     DisplayName(arContext,
                                 CanonicalKey(arContext, RootKey(lsRootReference)),
                                 Nothing)
-                If lsRootName = "" Then lsRootName = RootObjectTypeName(lrRoot)
+                If lrRootName = "" Then lrRootName = ObjectText(RootObjectTypeName(lrRoot), lrRoot.BostonModelElement)
             End If
 
             Return lsFunctionName & "(each " & larInputs(0) &
-                   " for that " & lsRootName & ")"
+                   " for that " & lrRootName & ")"
         End If
 
         If IsInfixFunction(lsFunctionName) AndAlso larInputs.Count = 2 Then
             Return larInputs(0) & " " & lsFunctionName & " " & larInputs(1)
         End If
 
-        Return lsFunctionName & "(" & String.Join(", ", larInputs) & ")"
+        Return lsFunctionName & "(" & DerivationText.Join(", ", larInputs) & ")"
     End Function
 
     Private Function RenderCalculatedInput(ByVal arContext As RenderContext,
                                            ByVal arInput As FBM.Input,
                                            ByVal aCalculationStack As HashSet(Of String),
-                                           ByVal asParentFunctionName As String) As String
+                                           ByVal asParentFunctionName As String) As DerivationText
         If arInput Is Nothing OrElse arInput.Source Is Nothing OrElse
            arInput.Source.Item Is Nothing Then
             Return "[ERROR: Missing CalculatedValue input.]"
@@ -3246,7 +3685,7 @@ Public Module BostonDerivationRenderer
         If TypeOf arInput.Source.Item Is FBM.CalculatedValueRef Then
             Dim lsChildCalculatedValueId As String =
                 DirectCast(arInput.Source.Item, FBM.CalculatedValueRef).Ref
-            Dim lsRenderedChild As String =
+            Dim lrRenderedChild As DerivationText =
                 RenderCalculatedValue(arContext,
                                       lsChildCalculatedValueId,
                                       aCalculationStack)
@@ -3258,14 +3697,14 @@ Public Module BostonDerivationRenderer
                IsArithmeticFunction(
                    ResolveFunctionName(arContext.Model,
                                        lrChildValue.Function)) Then
-                Return "(" & lsRenderedChild & ")"
+                Return "(" & lrRenderedChild & ")"
             End If
 
-            Return lsRenderedChild
+            Return lrRenderedChild
         End If
 
         If TypeOf arInput.Source.Item Is FBM.Constant Then
-            Return DirectCast(arInput.Source.Item, FBM.Constant).Value
+            Return ValueText(DirectCast(arInput.Source.Item, FBM.Constant).Value)
         End If
 
         Return "[ERROR: Unsupported CalculatedValue input.]"
@@ -3289,7 +3728,7 @@ Public Module BostonDerivationRenderer
     End Function
 
     Private Function RenderPathedRoleValue(ByVal arContext As RenderContext,
-                                           ByVal asPathedRoleId As String) As String
+                                           ByVal asPathedRoleId As String) As DerivationText
         Dim lrRole As FBM.Role = Nothing
         arContext.RoleByPathedRoleId.TryGetValue(asPathedRoleId, lrRole)
         If lrRole Is Nothing Then
@@ -3302,7 +3741,7 @@ Public Module BostonDerivationRenderer
     End Function
 
     Private Function RenderPathRootValue(ByVal arContext As RenderContext,
-                                         ByVal asPathRootId As String) As String
+                                         ByVal asPathRootId As String) As DerivationText
         If String.IsNullOrWhiteSpace(asPathRootId) Then
             Return "[ERROR: Missing PathRoot reference.]"
         End If
@@ -3312,13 +3751,13 @@ Public Module BostonDerivationRenderer
             Return "[ERROR: PathRoot '" & CleanError(asPathRootId) & "' was not found.]"
         End If
 
-        Dim lsRootName As String =
+        Dim lrRootName As DerivationText =
             DisplayName(arContext,
                         CanonicalKey(arContext, RootKey(asPathRootId)),
                         Nothing)
-        If lsRootName = "" Then lsRootName = RootObjectTypeName(lrRoot)
+        If lrRootName = "" Then lrRootName = ObjectText(RootObjectTypeName(lrRoot), lrRoot.BostonModelElement)
 
-        Return lsRootName
+        Return lrRootName
     End Function
 
     Private Function ResolveFunctionName(ByVal arModel As FBM.Model,
@@ -3372,13 +3811,33 @@ Public Module BostonDerivationRenderer
         Return False
     End Function
 
-    Private Function RenderUndevelopedFactType(ByVal arFactType As FBM.FactType) As String
+    Private Function RenderUndevelopedFactType(ByVal arFactType As FBM.FactType) As DerivationText
         Dim lrReading As FBM.FactTypeReading = PreferredReading(arFactType)
         If lrReading Is Nothing Then
             Return "[ERROR: No Fact Type Reading exists for '" &
                    SafeFactTypeName(arFactType) & "']"
         End If
-        Return lrReading.GetReadingText()
+        ' Match GetReadingText's unquantified reading, including raw bound text
+        ' and spacing. Do not apply the developed derivation's bound-text rules.
+        Dim lrResult As New DerivationText
+        lrResult.Append(PredicateText(lrReading.FrontText & " "))
+        Dim larParts As List(Of FBM.PredicatePart) = SafePredicateParts(lrReading)
+        For liIndex As Integer = 0 To larParts.Count - 1
+            Dim lrPart As FBM.PredicatePart = larParts(liIndex)
+            If lrPart Is Nothing Then Return DerivationText.Piece("Error", OutputStyle.Error)
+            lrResult.Append(PredicateText(lrPart.PreBoundText))
+            If lrPart.Role Is Nothing OrElse lrPart.Role.JoinedORMObject Is Nothing Then
+                lrResult.Append(DerivationText.Piece("[Missing Model Element]", OutputStyle.Error))
+            Else
+                lrResult.Append(ObjectText(RolePlayerName(lrPart.Role), lrPart.Role.JoinedORMObject))
+            End If
+            lrResult.Append(PredicateText(lrPart.PostBoundText))
+            If liIndex < larParts.Count - 1 OrElse lrPart.PredicatePartText <> "" Then lrResult.Append(" ")
+            lrResult.Append(PredicateText(lrPart.PredicatePartText))
+            If liIndex < larParts.Count - 1 Then lrResult.Append(" ")
+        Next
+        If lrReading.FollowingText <> "" Then lrResult.Append(PredicateText(" " & lrReading.FollowingText))
+        Return lrResult.Trim()
     End Function
 
     Private Function PreferredReading(ByVal arFactType As FBM.FactType) As FBM.FactTypeReading
@@ -3432,22 +3891,59 @@ Public Module BostonDerivationRenderer
         Return lrRole
     End Function
 
+    Private Function NextSameFactTypePathedRole(
+        ByVal aarPathedRoles As List(Of FBM.PathedRole),
+        ByVal aiIndex As Integer,
+        ByVal aarSubPaths As List(Of FBM.RoleSubPath)) As FBM.PathedRole
+
+        If aarPathedRoles IsNot Nothing AndAlso aiIndex < aarPathedRoles.Count Then
+            Dim lrNext As FBM.PathedRole = aarPathedRoles(aiIndex)
+            If lrNext IsNot Nothing AndAlso
+               String.Equals(lrNext.Purpose, "SameFactType", StringComparison.OrdinalIgnoreCase) Then
+                Return lrNext
+            End If
+            Return Nothing ' A join starts a different occurrence; do not scan past it.
+        End If
+
+        ' NORMA GetNextSameFactTypePathedRole also checks the split paths when
+        ' the entry is the last role in its containing path.
+        If aarSubPaths IsNot Nothing Then
+            For Each lrSubPath As FBM.RoleSubPath In aarSubPaths
+                If lrSubPath Is Nothing Then Continue For
+                Dim lrNext As FBM.PathedRole =
+                    NextSameFactTypePathedRole(lrSubPath.PathedRole, 0, lrSubPath.SubPath)
+                If lrNext IsNot Nothing Then Return lrNext
+            Next
+        End If
+        Return Nothing
+    End Function
+
     Private Function ResolveSameFactTypeLinkRole(
         ByVal arCurrentOccurrence As FactOccurrence,
         ByVal arPathedRole As FBM.PathedRole,
         ByVal arResolvedRole As FBM.Role) As FBM.Role
 
         If arCurrentOccurrence Is Nothing OrElse
-           arCurrentOccurrence.FactType Is Nothing OrElse
-           Not arCurrentOccurrence.FactType.IsLinkFactType OrElse
-           arCurrentOccurrence.FactType.LinkFactTypeRole Is Nothing OrElse
-           arCurrentOccurrence.FactType.RoleGroup Is Nothing OrElse
            arPathedRole Is Nothing OrElse
            Not String.Equals(arPathedRole.Purpose,
                              "SameFactType",
-                             StringComparison.OrdinalIgnoreCase) OrElse
+                             StringComparison.OrdinalIgnoreCase) Then
+            Return arResolvedRole
+        End If
+
+        Return ResolveRoleProxyInLinkFactType(arCurrentOccurrence.FactType, arResolvedRole)
+    End Function
+
+    Private Function ResolveRoleProxyInLinkFactType(
+        ByVal arFactType As FBM.FactType,
+        ByVal arResolvedRole As FBM.Role) As FBM.Role
+
+        If arFactType Is Nothing OrElse
+           Not arFactType.IsLinkFactType OrElse
+           arFactType.LinkFactTypeRole Is Nothing OrElse
+           arFactType.RoleGroup Is Nothing OrElse
            arResolvedRole Is Nothing OrElse
-           Not SameRole(arCurrentOccurrence.FactType.LinkFactTypeRole,
+           Not SameRole(arFactType.LinkFactTypeRole,
                         arResolvedRole) Then
             Return arResolvedRole
         End If
@@ -3455,11 +3951,10 @@ Public Module BostonDerivationRenderer
         ' NORMA's implied objectification Fact Type contains a RoleProxy for
         ' an original role of the objectified Fact Type. Boston represents the
         ' same construct as a Link Fact Type whose LinkFactTypeRole points to
-        ' that original role. For a SameFactType path step, use the corresponding
-        ' role inside the active Link Fact Type so both PathedRoles are verbalised
-        ' by one implied-Fact-Type reading.
+        ' that original role. Resolve into the selected Link Fact Type in either
+        ' traversal direction, retaining the PathedRole's existing binding key.
         Dim larCorrespondingRoles As List(Of FBM.Role) =
-            arCurrentOccurrence.FactType.RoleGroup.
+            arFactType.RoleGroup.
                 Where(
                     Function(x) x IsNot Nothing AndAlso
                                 SameModelObject(x.JoinedORMObject,
@@ -3536,17 +4031,32 @@ Public Module BostonDerivationRenderer
 
     Private Function DisplayName(ByVal arContext As RenderContext,
                                  ByVal asCanonicalKey As String,
-                                 ByVal arFallbackRole As FBM.Role) As String
+                                 ByVal arFallbackRole As FBM.Role) As DerivationText
         Dim lsName As String = ""
         If asCanonicalKey <> "" Then arContext.DisplayNameByKey.TryGetValue(asCanonicalKey, lsName)
         If lsName = "" Then lsName = RolePlayerName(arFallbackRole)
 
+        Dim lrObject As FBM.ModelObject = Nothing
+        If arFallbackRole IsNot Nothing Then lrObject = arFallbackRole.JoinedORMObject
+        If lrObject Is Nothing OrElse Not String.Equals(lrObject.Id, lsName, StringComparison.Ordinal) Then
+            lrObject = Nothing
+            If arContext.Model.EntityType IsNot Nothing Then
+                lrObject = arContext.Model.EntityType.FirstOrDefault(Function(x) x IsNot Nothing AndAlso String.Equals(x.Id, lsName, StringComparison.Ordinal))
+            End If
+            If lrObject Is Nothing AndAlso arContext.Model.ValueType IsNot Nothing Then
+                lrObject = arContext.Model.ValueType.FirstOrDefault(Function(x) x IsNot Nothing AndAlso String.Equals(x.Id, lsName, StringComparison.Ordinal))
+            End If
+            If lrObject Is Nothing AndAlso arContext.Model.FactType IsNot Nothing Then
+                lrObject = arContext.Model.FactType.FirstOrDefault(Function(x) x IsNot Nothing AndAlso String.Equals(x.Id, lsName, StringComparison.Ordinal))
+            End If
+        End If
+        Dim lsAlias As String = Nothing
         Dim liAlias As Integer = 0
         If asCanonicalKey <> "" AndAlso
            arContext.AliasNumberByKey.TryGetValue(asCanonicalKey, liAlias) Then
-            lsName &= " " & liAlias.ToString()
+            lsAlias = liAlias.ToString()
         End If
-        Return lsName
+        Return ObjectText(lsName, lrObject, lsAlias)
     End Function
 
     Private Function RootObjectTypeName(ByVal arRoot As FBM.RootObjectType) As String
@@ -3561,11 +4071,11 @@ Public Module BostonDerivationRenderer
     End Function
 
     Private Function BoundRolePlayer(ByVal arPart As FBM.PredicatePart,
-                                     ByVal asRolePlayerName As String) As String
-        If arPart Is Nothing Then Return asRolePlayerName
-        Return NormalisePreBoundText(arPart.PreBoundText) &
-               If(asRolePlayerName, "") &
-               NormalisePostBoundText(arPart.PostBoundText)
+                                     ByVal arRolePlayerName As DerivationText) As DerivationText
+        If arPart Is Nothing Then Return arRolePlayerName
+        Return PredicateText(NormalisePreBoundText(arPart.PreBoundText)) &
+               arRolePlayerName &
+               PredicateText(NormalisePostBoundText(arPart.PostBoundText))
     End Function
 
     Private Function NormalisePreBoundText(ByVal asText As String) As String
@@ -3615,23 +4125,23 @@ Public Module BostonDerivationRenderer
         Return arFactType.Name
     End Function
 
-    Private Sub AppendRaw(ByVal arBuilder As StringBuilder,
-                          ByVal asText As String)
-        If String.IsNullOrEmpty(asText) Then Exit Sub
-        arBuilder.Append(asText)
+    Private Sub AppendRaw(ByVal arBuilder As DerivationText,
+                          ByVal arText As DerivationText)
+        If arText Is Nothing OrElse arText.Length = 0 Then Exit Sub
+        arBuilder.Append(arText)
     End Sub
 
-    Private Sub AppendWord(ByVal arBuilder As StringBuilder,
-                           ByVal asText As String)
-        If String.IsNullOrWhiteSpace(asText) Then Exit Sub
-        Dim lsText As String = asText.Trim()
+    Private Sub AppendWord(ByVal arBuilder As DerivationText,
+                           ByVal arText As DerivationText)
+        If arText Is Nothing OrElse String.IsNullOrWhiteSpace(arText.Text) Then Exit Sub
+        Dim lrText As DerivationText = arText.Trim()
         If arBuilder.Length > 0 AndAlso
-           arBuilder(arBuilder.Length - 1) <> "("c AndAlso
-           Not arBuilder.ToString().EndsWith(HtmlBreak, StringComparison.OrdinalIgnoreCase) AndAlso
-           Not Char.IsWhiteSpace(arBuilder(arBuilder.Length - 1)) Then
+           arBuilder.Text(arBuilder.Length - 1) <> "("c AndAlso
+           Not arBuilder.Text.EndsWith(vbCrLf, StringComparison.OrdinalIgnoreCase) AndAlso
+           Not Char.IsWhiteSpace(arBuilder.Text(arBuilder.Length - 1)) Then
             arBuilder.Append(" ")
         End If
-        arBuilder.Append(lsText)
+        arBuilder.Append(lrText)
     End Sub
 
     Private Function CleanError(ByVal asText As String) As String

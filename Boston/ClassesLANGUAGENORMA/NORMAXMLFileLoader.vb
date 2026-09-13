@@ -3159,7 +3159,9 @@ SkipRoleConstraint:
                         lrRole.Id = loRoleProxyXElement.Attribute("ref").Value
                         lrRole = arModel.Role.Find(Function(x) x.Id = lrRole.Id)
 
-                        If Not lrRole.FactType.IsObjectified Then GoTo SkippedRole
+                        Dim larLinkFactTypes = lrRole.FactType.getLinkFactTypes
+
+                        If Not lrRole.FactType.IsObjectified And larLinkFactTypes.Count = 0 Then GoTo SkippedRole
 
                         Dim loLinkFTRoleXElement As XElement = loElement.<orm:FactRoles>.<orm:Role>.First
 
@@ -3170,6 +3172,11 @@ SkipRoleConstraint:
 
                         lrLinkFTRole.Id = loLinkFTRoleXElement.Attribute("id").Value
                         lrLinkFTRole.FactType.NORMAReferenceId = loElement.Attribute("id").Value
+
+                        Dim lrOtherLinkFTRole As FBM.Role = lrLinkFTRole.FactType.GetOtherRoleOfBinaryFactType(lrLinkFTRole.Id)
+                        Dim loOtherRoleXElement As XElement = loElement.<orm:FactRoles>.<orm:RoleProxy>.First
+                        Dim lsOtherRoleId As String = loOtherRoleXElement.Attribute("id").Value
+                        lrOtherLinkFTRole.Id = lsOtherRoleId
 SkippedRole:
 
                     Catch ex As Exception

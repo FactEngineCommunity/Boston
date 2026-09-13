@@ -3057,7 +3057,8 @@ Public Class frmToolboxORMVerbalisation
                     lrVerbaliser.HTW.WriteBreak()
                 Else
                     lrVerbaliser.VerbaliseIndent()
-                    lrVerbaliser.VerbaliseBlackText(BostonDerivationRenderer.RenderDerivationEnglish(arFactType.Model, arFactType))
+                    BostonDerivationRenderer.RenderDerivationEnglish(arFactType.Model, arFactType, lrVerbaliser)
+                    'lrVerbaliser.VerbaliseBlackText(BostonDerivationRenderer.RenderDerivationEnglish(arFactType.Model, arFactType))
                     lrVerbaliser.HTW.WriteBreak()
                 End If
 
