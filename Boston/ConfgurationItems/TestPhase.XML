@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceTable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ReferenceTableId="301" Name="TestPhase">
+  <ReferenceTuples>
+    <ReferenceTuple RowId="nc606404-3a67-413c-9df0-9659ad34e71e">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Acceptance test" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="a1b8b6d4-5a72-44c3-b4a1-f1bb27d2adf1">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Alpha" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="b2f9d95e-4a38-41f2-b2c2-71f9125ab903">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Beta" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="c3a0f81d-7b6e-45c2-8d36-6dbf8b26b95c">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Component test" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="d4e3b21f-6c47-4c8b-b5a4-6a31b8b77a4e">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Integration test" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="e5d5a4b3-9e8f-489a-912a-2dc1c747e5fb">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Pilot test" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="f6b4a8d2-50b1-45d9-8b65-9d3b72f54a02">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Several" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="a7e3f0c5-83f2-4ac4-b6f9-319db6b99873">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="System test" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="b8d4c1f9-27c3-4b9e-b48e-51e6d9f7e313">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Unit test" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="c9b7a3e4-41f5-4a89-982b-6eae47df51bc">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPhase" Value="Other" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+  </ReferenceTuples>
+</ReferenceTable>

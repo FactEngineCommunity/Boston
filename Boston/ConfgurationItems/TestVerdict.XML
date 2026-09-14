@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceTable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ReferenceTableId="303" Name="TestVerdict">
+  <ReferenceTuples>
+    <ReferenceTuple RowId="ac606404-3a67-413c-9df0-9659ad34e71e">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestVerdict" Value="PASSED" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="b1b8b6d4-5a72-44c3-b4a1-f1bb27d2adf1">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestVerdict" Value="FAILED" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="c2f9d95e-4a38-41f2-b2c2-71f9125ab903">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestVerdict" Value="IN PROGRESS" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+  </ReferenceTuples>
+</ReferenceTable>

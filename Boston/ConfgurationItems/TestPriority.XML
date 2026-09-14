@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceTable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ReferenceTableId="302" Name="TestPriority">
+  <ReferenceTuples>
+    <ReferenceTuple RowId="oc606404-3a67-413c-9df0-9659ad34e71e">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPriority" Value="Highest" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="p1b8b6d4-5a72-44c3-b4a1-f1bb27d2adf1">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPriority" Value="High" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="q2f9d95e-4a38-41f2-b2c2-71f9125ab903">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPriority" Value="Medium" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="r3a0f81d-7b6e-45c2-8d36-6dbf8b26b95c">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPriority" Value="Low" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="s4e3b21f-6c47-4c8b-b5a4-6a31b8b77a4e">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestPriority" Value="Lowest" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+  </ReferenceTuples>
+</ReferenceTable>

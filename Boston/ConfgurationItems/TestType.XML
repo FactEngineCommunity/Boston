@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceTable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ReferenceTableId="300" Name="TestType">
+  <ReferenceTuples>
+    <ReferenceTuple RowId="bc606404-3a67-413c-9df0-9659ad34e71e">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Documentation" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="b1c0f89a-4d6a-4b72-942b-8b4cecc73460">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Fitness for use" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="c41b1b0d-f4fa-4b84-936e-06a3347ff830">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Functionality" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="fa6617a0-b7f4-4d73-9e87-6ddca6cbbe5c">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Installability" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="91f47b09-828b-4581-bef4-cb7b932a6ff9">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Performance" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="b17f5057-fd34-4e83-a872-4c69cc5d2c74">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Maintainability" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="fa77332e-3b16-42da-bd8b-7026a9ff44f9">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Regression" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="ed73d9eb-8c83-4e83-bb1f-bb73040b22cc">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Reliability" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="1e1bbd7f-6885-48a9-8c55-1839589b223f">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Service" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="fd7a0b0a-4f94-47d0-b5a4-5d9b36e7d3e5">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Smoke" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="46b9e018-8a24-43a2-95ff-97a4e7e9834b">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Other" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+    <ReferenceTuple RowId="d6157d71-f71e-4214-a9bb-07a9e34f4179">
+      <KeyValuePairs>
+        <KeyValuePair Key="TestType" Value="Usability" />
+      </KeyValuePairs>
+    </ReferenceTuple>
+  </ReferenceTuples>
+</ReferenceTable>
