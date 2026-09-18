@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel17
+    <Serializable()>
     Public Class Role
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -16,9 +16,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
@@ -28,9 +28,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _SequenceNr As Integer = 1
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property SequenceNr() As Integer
             Get
                 Return Me._SequenceNr
@@ -40,9 +40,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Mandatory As Boolean = False
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Mandatory() As Boolean
             Get
                 Return Me._Mandatory
@@ -52,7 +52,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _JoinedObjectTypeId As String
         <XmlAttribute()>
         Public Property JoinedObjectTypeId() As String

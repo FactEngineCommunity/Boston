@@ -1,13 +1,13 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
+Namespace XMLModel17
 
-    <Serializable()> _
+    <Serializable()>
     Public Class EntityType
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -17,9 +17,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _GUID As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property GUID As String
             Get
                 Return Me._GUID
@@ -29,7 +29,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Name As String
         <XmlAttribute()>
         Public Property Name() As String
@@ -64,7 +64,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Instance As New List(Of String)
         Public Property Instance() As List(Of String)
             Get
@@ -75,9 +75,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ReferenceModeValueTypeId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ReferenceModeValueTypeId() As String
             Get
                 Return Me._ReferenceModeValueTypeId
@@ -87,9 +87,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ReferenceSchemeRoleConstraintId As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ReferenceSchemeRoleConstraintId() As String
             Get
                 Return Me._ReferenceSchemeRoleConstraintId
@@ -99,9 +99,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsObjectifyingEntityType As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsObjectifyingEntityType() As Boolean
             Get
                 Return Me._IsObjectifyingEntityType
@@ -111,7 +111,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ReferenceMode As String
         <XmlAttribute()>
         Public Property ReferenceMode() As String
@@ -145,9 +145,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsIndependent As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsIndependent As Boolean
             Get
                 Return Me._IsIndependent
@@ -157,9 +157,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsPersonal As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsPersonal As Boolean
             Get
                 Return Me._IsPersonal
@@ -169,9 +169,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsAbsorbed As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsAbsorbed As Boolean
             Get
                 Return Me._IsAbsorbed
@@ -181,9 +181,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsMDAModelElement As Boolean
             Get
                 Return Me._IsMDAModelElement
@@ -193,9 +193,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsDerived As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsDerived As Boolean
             Get
                 Return Me._IsDerived
@@ -205,9 +205,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _DerivationText As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property DerivationText As String
             Get
                 Return Me._DerivationText
@@ -217,9 +217,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _LongDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property LongDescription() As String
             Get
                 Return Me._LongDescription
@@ -229,7 +229,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ShortDescription As String = ""
         <XmlAttribute()>
         Public Property ShortDescription() As String

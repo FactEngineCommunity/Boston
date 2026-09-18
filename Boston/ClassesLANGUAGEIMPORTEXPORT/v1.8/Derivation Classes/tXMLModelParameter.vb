@@ -1,10 +1,10 @@
 ﻿Imports System.Xml.Serialization
 Imports edu.stanford.nlp.trees
 
-Namespace XMLModel17
+Namespace XMLModel
     <Serializable()>
     Public Class Parameter
-        Implements IEquatable(Of XMLModel17.Parameter)
+        Implements IEquatable(Of XMLModel.Parameter)
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String

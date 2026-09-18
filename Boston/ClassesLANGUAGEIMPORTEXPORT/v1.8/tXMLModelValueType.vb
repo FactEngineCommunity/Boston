@@ -29,13 +29,25 @@ Namespace XMLModel
         End Property
 
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
             End Get
             Set(ByVal value As String)
                 Me._Name = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _DBName As String = ""
+        <XmlAttribute()>
+        Public Property DBName() As String
+            Get
+                Return Me._DBName
+            End Get
+            Set(ByVal value As String)
+                Me._DBName = value
             End Set
         End Property
 
@@ -119,13 +131,28 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _IsIndependent As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsIndependent As Boolean
             Get
                 Return Me._IsIndependent
             End Get
             Set(ByVal value As Boolean)
                 Me._IsIndependent = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' If the Value Type IsIndependent, then there is an ObjectifyingFactType that objectifies the Value Type, else Nothing
+        ''' </summary>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ObjectifyingFactTypeId As String = Nothing
+        <XmlAttribute()>
+        Public Property ObjectifyingFactTypeId As String
+            Get
+                Return Me._ObjectifyingFactTypeId
+            End Get
+            Set(ByVal value As String)
+                Me._ObjectifyingFactTypeId = value
             End Set
         End Property
 
@@ -138,6 +165,16 @@ Namespace XMLModel
             End Get
             Set(ByVal value As Boolean)
                 Me._IsMDAModelElement = value
+            End Set
+        End Property
+
+        Private _SubtypeRelationships As New List(Of XMLModel.SubtypeRelationship)
+        Public Property SubtypeRelationships() As List(Of XMLModel.SubtypeRelationship)
+            Get
+                Return Me._SubtypeRelationships
+            End Get
+            Set(ByVal value As List(Of XMLModel.SubtypeRelationship))
+                Me._SubtypeRelationships = value
             End Set
         End Property
 

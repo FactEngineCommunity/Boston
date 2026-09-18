@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
+Namespace XMLModel17
 
-    <Serializable()> _
+    <Serializable()>
     Partial Public Class ValueType
 
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -16,9 +16,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _GUID As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property GUID As String
             Get
                 Return Me._GUID
@@ -52,7 +52,7 @@ Namespace XMLModel
         End Property
 
         Private _DataType As pcenumORMDataType
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property DataType() As pcenumORMDataType
             Get
                 Return Me._DataType
@@ -63,7 +63,7 @@ Namespace XMLModel
         End Property
 
         Private _DataTypePrecision As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property DataTypePrecision() As Integer
             Get
                 Return Me._DataTypePrecision
@@ -74,7 +74,7 @@ Namespace XMLModel
         End Property
 
         Private _DataTypeLength As Integer
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property DataTypeLength() As Integer
             Get
                 Return Me._DataTypeLength
@@ -105,9 +105,9 @@ Namespace XMLModel
         End Property
 
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _LongDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property LongDescription() As String
             Get
                 Return Me._LongDescription
@@ -117,9 +117,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ShortDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ShortDescription() As String
             Get
                 Return Me._ShortDescription
@@ -129,7 +129,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsIndependent As Boolean
         <XmlAttribute()>
         Public Property IsIndependent As Boolean
@@ -156,9 +156,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _IsMDAModelElement As Boolean
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property IsMDAModelElement As Boolean
             Get
                 Return Me._IsMDAModelElement

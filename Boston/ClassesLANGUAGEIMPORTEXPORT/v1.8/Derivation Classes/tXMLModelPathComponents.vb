@@ -1,6 +1,6 @@
 Imports System.Xml.Serialization
 
-Namespace XMLModel17
+Namespace XMLModel
 
     ''' <summary>
     ''' Wrapper for the set of path components that make up a derivation.

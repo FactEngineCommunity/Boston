@@ -1,6 +1,6 @@
 Imports System.Xml.Serialization
 
-Namespace XMLModel17
+Namespace XMLModel
 
     ''' <summary>
     ''' Represents a single NORMA-style derivation projection within a Fact Type derivation path.

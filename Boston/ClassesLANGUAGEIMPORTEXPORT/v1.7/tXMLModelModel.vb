@@ -4,18 +4,18 @@ Imports System.Threading.Tasks
 Imports System.Xml.Serialization
 Imports Boston.FBMMetaModel
 
-Namespace XMLModel
+Namespace XMLModel17
 
     ''' <summary>
     ''' v1.3 Adds the GUID field to the ValueType, FactType and RoleConstraint classes.
     ''' </summary>
     ''' <remarks></remarks>
-    <Serializable()> _
+    <Serializable()>
     Public Class Model
 
         <XmlAttribute()>
         Public XSDVersionNr As Double = 1.7
-        Public ORMModel As New XMLModel.ORMModel
+        Public ORMModel As New XMLModel17.ORMModel
         Public ORMDiagram As New List(Of XMLModel.Page)
 
         ' Build a dictionaries for faster search
@@ -71,7 +71,7 @@ Namespace XMLModel
                 Dim lrSubtypeRelationship As FBM.SubtypeRelationship
                 Dim lrXMLSubtypeRelationship As XMLModel.SubtypeRelationship
 
-                Me.ORMModel = New XMLModel.ORMModel
+                Me.ORMModel = New XMLModel17.ORMModel
                 Me.ORMModel.ModelId = arFBMModel.ModelId
                 Me.ORMModel.Name = arFBMModel.Name
                 Me.ORMModel.CoreVersionNumber = arFBMModel.CoreVersionNumber
@@ -1573,7 +1573,7 @@ SkipRoleConstraint:
                     Catch ex As Exception
                         prApplication.ThrowMessage("Error loading Role Constraint: " & lrXMLRoleConstraint.Id, pcenumErrorType.Warning, ex.StackTrace, True, False, False,, True, ex)
                     End Try
-            Next 'RoleConstraint
+                Next 'RoleConstraint
 
                 ' Build a dictionary for faster search
                 Me.RoleConstraintDictionary = lrModel.RoleConstraint.ToDictionary(Function(x) x.Id)
@@ -1865,21 +1865,21 @@ SkipModelNote:
                             End If
                         End Try
                         lrValueTypeInstance.ValueType = lrValueType
-                            lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
-                            lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
-                            lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
-                            lrValueTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
+                        lrValueTypeInstance.DataType = lrValueTypeInstance.ValueType.DataType
+                        lrValueTypeInstance.DataTypeLength = lrValueTypeInstance.ValueType.DataTypeLength
+                        lrValueTypeInstance.DataTypePrecision = lrValueTypeInstance.ValueType.DataTypePrecision
+                        lrValueTypeInstance.InstanceNumber = lrConceptInstance.InstanceNumber
                         lrValueTypeInstance.ValueConstraint = lrValueTypeInstance.ValueType.ValueConstraint.Clone
                         lrValueTypeInstance.IsIndependent = lrValueTypeInstance.ValueType.IsIndependent
 
                         lrValueTypeInstance.Name = lrConceptInstance.Symbol
-                            lrValueTypeInstance.DBName = lrValueType.DBName
-                            lrValueTypeInstance.X = lrConceptInstance.X
-                            lrValueTypeInstance.Y = lrConceptInstance.Y
+                        lrValueTypeInstance.DBName = lrValueType.DBName
+                        lrValueTypeInstance.X = lrConceptInstance.X
+                        lrValueTypeInstance.Y = lrConceptInstance.Y
 
-                            lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
-                        Catch ex As Exception
-                            Call Me.ReportModelLoadingError(arModel, ex.Message)
+                        lrPage.ValueTypeInstance.Add(lrValueTypeInstance)
+                    Catch ex As Exception
+                        Call Me.ReportModelLoadingError(arModel, ex.Message)
                         GoTo SkipValueTypeInstance
                     End Try
 SkipValueTypeInstance:

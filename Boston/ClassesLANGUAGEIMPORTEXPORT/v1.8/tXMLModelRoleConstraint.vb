@@ -182,6 +182,16 @@ Namespace XMLModel
             End Set
         End Property
 
+        Private _ValueConstraint As New List(Of String)
+        Public Property ValueConstraint() As List(Of String)
+            Get
+                Return Me._ValueConstraint
+            End Get
+            Set(ByVal value As List(Of String))
+                Me._ValueConstraint = value
+            End Set
+        End Property
+
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _LongDescription As String = ""

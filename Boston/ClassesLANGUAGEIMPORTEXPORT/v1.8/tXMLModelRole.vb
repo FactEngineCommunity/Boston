@@ -54,13 +54,25 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _JoinedObjectTypeId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property JoinedObjectTypeId() As String
             Get
                 Return Me._JoinedObjectTypeId
             End Get
             Set(ByVal value As String)
                 Me._JoinedObjectTypeId = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _JoinedObjectType As Object
+        <XmlIgnore()>
+        Public Property JoinedObjectType As Object
+            Get
+                Return Me._JoinedObjectType
+            End Get
+            Set(ByVal value As Object)
+                Me._JoinedObjectType = value
             End Set
         End Property
 

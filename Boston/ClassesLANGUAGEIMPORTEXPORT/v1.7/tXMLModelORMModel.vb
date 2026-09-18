@@ -1,11 +1,12 @@
 ﻿Imports System.Reflection
 Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel17
+
+    <Serializable()>
     Public Class ORMModel
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public ModelId As String = ""
 
         <XmlAttribute()>
@@ -70,4 +71,5 @@ Namespace XMLModel
         End Function
 
     End Class
+
 End Namespace

@@ -1,6 +1,6 @@
 Imports System.Xml.Serialization
 
-Namespace XMLModel17
+Namespace XMLModel
 
     ''' <summary>
     ''' A derivation path for a derived Fact Type.

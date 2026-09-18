@@ -3412,8 +3412,8 @@ Public Class frmToolboxEnterpriseExplorer
                 Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
             End If
 
-            lrExportModel.ORMModel.ModelId = lrModel.ModelId
-            lrExportModel.ORMModel.Name = lrModel.Name
+            lrExportModel.FBMModel.ModelId = lrModel.ModelId
+            lrExportModel.FBMModel.Name = lrModel.Name
 
             If My.Settings.ExportFBMExcludeMDAModelElements Then
                 If MsgBox("Important: Your configuration settings will only allow the export of Object-Role Models. Are you happy to proceed?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then
@@ -3846,6 +3846,12 @@ LoadExistingModel:
                         objStreamReader.Close()
                         lrModel = lrXMLModel.MapToFBMModel
                     Case Is = "1.7"
+                        lrSerializer = New XmlSerializer(GetType(XMLModel17.Model))
+                        Dim lrXMLModel As New XMLModel17.Model
+                        lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                        objStreamReader.Close()
+                        lrModel = lrXMLModel.MapToFBMModel
+                    Case Is = "1.8"
                         lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
                         Dim lrXMLModel As New XMLModel.Model
                         lrXMLModel = lrSerializer.Deserialize(objStreamReader)
@@ -5007,8 +5013,8 @@ SkipReloading:
             '-----------------------------------------
             lrModel = Me.TreeView.SelectedNode.Tag.Tag
 
-            lrExportModel.ORMModel.ModelId = lrModel.ModelId
-            lrExportModel.ORMModel.Name = lrModel.Name
+            lrExportModel.FBMModel.ModelId = lrModel.ModelId
+            lrExportModel.FBMModel.Name = lrModel.Name
 
             Call lrExportModel.MapFromFBMModel(lrModel)
 
@@ -6125,8 +6131,8 @@ SkipReloading:
 
             With New WaitCursor
 
-                lrFBMModel.ORMModel.ModelId = lrModel.ModelId
-                lrFBMModel.ORMModel.Name = lrModel.Name
+                lrFBMModel.FBMModel.ModelId = lrModel.ModelId
+                lrFBMModel.FBMModel.Name = lrModel.Name
 
                 Dim lbExcludeMDAModelElements As Boolean = My.Settings.ExportFBMExcludeMDAModelElements
 
@@ -6378,8 +6384,8 @@ SkipReloading:
                 Call Me.SetWorkingEnvironmentForObject(Me.TreeView.SelectedNode.Tag)
             End If
 
-            lrExportModel.ORMModel.ModelId = lrModel.ModelId
-            lrExportModel.ORMModel.Name = lrModel.Name
+            lrExportModel.FBMModel.ModelId = lrModel.ModelId
+            lrExportModel.FBMModel.Name = lrModel.Name
 
             If My.Settings.ExportFBMExcludeMDAModelElements Then
                 If MsgBox("Important: Your configuration settings will only allow the export of Object-Role Models. Are you happy to proceed?", MsgBoxStyle.YesNoCancel) <> MsgBoxResult.Yes Then

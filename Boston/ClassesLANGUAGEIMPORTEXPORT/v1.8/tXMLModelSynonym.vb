@@ -1,6 +1,6 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel17
+Namespace XMLModel
 
     <Serializable()>
     Partial Public Class Synonym

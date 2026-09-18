@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel17
+    <Serializable()>
     Public Class Fact
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -16,7 +16,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Data As New List(Of XMLModel.FactData)
         Public Property Data() As List(Of XMLModel.FactData)
             Get

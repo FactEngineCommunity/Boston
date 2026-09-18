@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel17
+    <Serializable()>
     Public Class SubtypeRelationship
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _ParentEntityTypeId As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ParentEntityTypeId() As String
             Get
                 Return Me._ParentEntityTypeId
@@ -16,7 +16,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _SubtypingFactTypeId As String
         <XmlAttribute()>
         Public Property SubtypingFactTypeId() As String

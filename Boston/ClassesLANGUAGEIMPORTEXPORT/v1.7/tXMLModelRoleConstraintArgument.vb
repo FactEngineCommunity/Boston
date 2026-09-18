@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
+Namespace XMLModel17
 
-    <Serializable()> _
+    <Serializable()>
     Public Class RoleConstraintArgument
 
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -16,9 +16,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _SequenceNr As Integer = 1
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property SequenceNr As Integer
             Get
                 Return Me._SequenceNr
@@ -28,7 +28,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Role As New List(Of XMLModel.RoleReference)
         Public Property Role As List(Of XMLModel.RoleReference)
             Get
@@ -39,7 +39,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _JoinPath As New XMLModel.JoinPath
         Public Property JoinPath As XMLModel.JoinPath
             Get

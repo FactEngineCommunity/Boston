@@ -1,15 +1,15 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
+Namespace XMLModel17
 
-    <Serializable()> _
+    <Serializable()>
     Public Class JoinPath
 
         ''' <summary>
         ''' The set of Roles traversed in order to form the JoinPath.
         ''' </summary>
         ''' <remarks></remarks>
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RolePath As New List(Of XMLModel.RoleReference)
         Public Property RolePath As List(Of XMLModel.RoleReference)
             Get
@@ -20,7 +20,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _JoinPathError As pcenumJoinPathError = pcenumJoinPathError.None
         <XmlAttribute()>
         Public Property JoinPathError As pcenumJoinPathError

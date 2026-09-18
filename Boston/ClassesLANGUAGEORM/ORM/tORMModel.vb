@@ -5397,8 +5397,8 @@ SkipRDSProcessing:
                 '-----------------------------------------
                 'Get the Model from the selected TreeNode
                 '-----------------------------------------
-                lrExportModel.ORMModel.ModelId = Me.ModelId
-                lrExportModel.ORMModel.Name = Me.Name
+                lrExportModel.FBMModel.ModelId = Me.ModelId
+                lrExportModel.FBMModel.Name = Me.Name
 
                 If Me.Loaded = False Then Exit Sub
 
@@ -7819,6 +7819,12 @@ XMLDeserialisation:
                             objStreamReader.Close()
                             lrXMLModel.MapToFBMModel(Me)
                         Case Is = "1.7"
+                            lrSerializer = New XmlSerializer(GetType(XMLModel17.Model))
+                            Dim lrXMLModel As New XMLModel17.Model
+                            lrXMLModel = lrSerializer.Deserialize(objStreamReader)
+                            objStreamReader.Close()
+                            lrXMLModel.MapToFBMModel(Me, aoBackgroundWorker, abSkipAlreadyLoadedModelElements)
+                        Case Is = "1.8"
                             lrSerializer = New XmlSerializer(GetType(XMLModel.Model))
                             Dim lrXMLModel As New XMLModel.Model
                             lrXMLModel = lrSerializer.Deserialize(objStreamReader)
@@ -8022,7 +8028,9 @@ SkipReloading:
                 End Try
 
                 Dim larPage As New List(Of FBM.Page)
-                For Each loPage In xml.<Model>.<ORMDiagram>.<Page>
+
+                '20260915-VM-Was <Model>.<ORMDiagram>.<Page>, but v1.8 of the .fbm XML format moved to <FBMDiagram>
+                For Each loPage In xml.<Model>...<Page>
                     Dim lrPage As New FBM.Page(Me,
                                                loPage.Attribute("Id").Value,
                                                loPage.Attribute("Name").Value,

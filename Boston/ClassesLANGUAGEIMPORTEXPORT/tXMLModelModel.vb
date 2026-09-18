@@ -7,7 +7,7 @@ Namespace XMLModel
 
         <XmlAttribute()> _
         Public XSDVersionNr As Single = 0.81
-        Public ORMModel As New XMLModel.ORMModel
+        Public ORMModel As New XMLModel.FBMModel
         Public ORMDiagram As New List(Of XMLModel.Page)
 
         ''' <summary>

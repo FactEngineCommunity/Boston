@@ -1,7 +1,7 @@
 Imports System.Xml.Serialization
 Imports Boston.FBM
 
-Namespace XMLModel17
+Namespace XMLModel
 
     ''' <summary>
     ''' Reference to a role participating in a SubPath.

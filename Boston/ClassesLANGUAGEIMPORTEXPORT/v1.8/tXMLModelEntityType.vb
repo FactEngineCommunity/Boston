@@ -31,13 +31,36 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _Name As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Name() As String
             Get
                 Return Me._Name
             End Get
             Set(ByVal value As String)
                 Me._Name = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _DBName As String = ""
+        <XmlAttribute()>
+        Public Property DBName() As String
+            Get
+                Return Me._DBName
+            End Get
+            Set(ByVal value As String)
+                Me._DBName = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _GraphLabel As New List(Of String)
+        Public Property GraphLabel() As List(Of String)
+            Get
+                Return Me._GraphLabel
+            End Get
+            Set(ByVal value As List(Of String))
+                Me._GraphLabel = value
             End Set
         End Property
 
@@ -90,13 +113,25 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _ReferenceMode As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ReferenceMode() As String
             Get
                 Return Me._ReferenceMode
             End Get
             Set(ByVal value As String)
                 Me._ReferenceMode = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _HideReferenceMode As Boolean
+        <XmlAttribute()>
+        Public Property HideReferenceMode() As Boolean
+            Get
+                Return Me._HideReferenceMode
+            End Get
+            Set(ByVal value As Boolean)
+                Me._HideReferenceMode = value
             End Set
         End Property
 
@@ -196,13 +231,25 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _ShortDescription As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property ShortDescription() As String
             Get
                 Return Me._ShortDescription
             End Get
             Set(ByVal value As String)
                 Me._ShortDescription = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ModelElementFlags As New List(Of FBM.ModelElementFlag)
+        <XmlElement()>
+        Public Property ModelElementFlags() As List(Of FBM.ModelElementFlag)
+            Get
+                Return Me._ModelElementFlags
+            End Get
+            Set(ByVal value As List(Of FBM.ModelElementFlag))
+                Me._ModelElementFlags = value
             End Set
         End Property
 

@@ -1,12 +1,12 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace XMLModel
-    <Serializable()> _
+Namespace XMLModel17
+    <Serializable()>
     Public Class FactTypeReading
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _Id As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property Id() As String
             Get
                 Return Me._Id
@@ -16,9 +16,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _FrontReadingText As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property FrontReadingText As String
             Get
                 Return Me._FrontReadingText
@@ -28,9 +28,9 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _FollowingReadingText As String = ""
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property FollowingReadingText As String
             Get
                 Return Me._FollowingReadingText
@@ -40,7 +40,7 @@ Namespace XMLModel
             End Set
         End Property
 
-        <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _PredicateParts As New List(Of XMLModel.PredicatePart)
         Public Property PredicateParts() As List(Of XMLModel.PredicatePart)
             Get

@@ -1,6 +1,6 @@
 Imports System.Xml.Serialization
 
-Namespace XMLModel17
+Namespace XMLModel
 
     ''' <summary>
     ''' Container for condition expression nodes in a RolePath.
