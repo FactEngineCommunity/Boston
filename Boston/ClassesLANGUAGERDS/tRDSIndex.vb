@@ -261,7 +261,7 @@ Namespace RDS
                 'CodeSafe
                 If Me.Column.Contains(arColumn) Then Exit Sub
 
-                Me.Column.Add(arColumn)
+                Me.Column.AddUnique(arColumn)
                 arColumn.addIndex(Me)
 
                 'CodeSafe
@@ -530,6 +530,9 @@ Abort:
 
         End Sub
 
+        Protected Overrides Sub Finalize()
+            MyBase.Finalize()
+        End Sub
     End Class
 
 End Namespace

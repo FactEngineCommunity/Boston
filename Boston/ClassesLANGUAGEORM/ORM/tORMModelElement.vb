@@ -1,0 +1,2524 @@
+Imports System.ComponentModel
+Imports MindFusion.Diagramming
+Imports System.Xml.Serialization
+Imports System.Reflection
+Imports System.Runtime.CompilerServices
+Imports Newtonsoft.Json
+Imports System.Linq.Expressions
+
+Namespace FBM
+
+    <Serializable()>
+    Public Class ModelObject
+        Inherits FBM.Concept
+        Implements IEquatable(Of FBM.ModelObject)
+        Implements ICloneable
+
+        <XmlIgnore()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _Model As FBM.Model
+        <XmlIgnore()>
+        Public Overridable Property Model() As FBM.Model
+            Get
+                Return Me._Model
+            End Get
+            Set(ByVal value As FBM.Model)
+                Me._Model = value
+            End Set
+        End Property
+
+
+        Public WithEvents _Concept As FBM.Concept
+
+        <XmlIgnore()>
+        <JsonProperty()>
+        <Browsable(False),
+        [ReadOnly](True),
+        BindableAttribute(False)>
+        Public Overridable Property Concept As FBM.Concept  'New 'The Concept that is related to the ModelObject within the Model/ModelDictionary
+            Get
+                Return Me._Concept
+            End Get
+            Set(value As FBM.Concept)
+                Me._Concept = value
+            End Set
+        End Property
+
+        <XmlElement>
+        Public ClassificationValue As New List(Of KnowledgeGraph.ConceptClassificationValue)
+
+        <XmlElement>
+        Public ModelElementFlag As New List(Of FBM.ModelElementFlag)
+
+        <XmlElement>
+        Public Interlink As New List(Of Interlink.Interlink)
+
+        Public ReadOnly Property ModelLevelElement As FBM.ModelObject
+            Get
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.ValueTypeInstance)
+                        Return CType(Me, Object).ValueType
+                    Case Is = GetType(FBM.EntityTypeInstance)
+                        Return CType(Me, Object).EntityType
+                    Case Is = GetType(FBM.FactTypeInstance)
+                        Return CType(Me, Object).FactType
+                    Case Else
+                        Return Nothing
+                End Select
+            End Get
+        End Property
+
+        <JsonIgnore()>
+        <XmlIgnore()>
+        Public _ModelError As New List(Of FBM.ModelError)
+
+        <JsonIgnore()>
+        <XmlIgnore()>
+        Public Overridable Property ModelError As List(Of FBM.ModelError)
+            Get
+                Return _ModelError
+            End Get
+            Set(value As List(Of FBM.ModelError))
+                Me._ModelError = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ConceptType As pcenumConceptType
+
+        ''' <summary>
+        ''' Just used for EntityTypes and FactTypes.
+        ''' </summary>
+        ''' <returns></returns>
+        <XmlIgnore()>
+        Public Property ReferenceMode As String
+            Get
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Return CType(Me, FBM.EntityType).ReferenceMode
+                End Select
+                Return ""
+            End Get
+            Set(value As String)
+                'Nothing to do here.
+            End Set
+        End Property
+
+        <XmlIgnore>
+        Public ReadOnly Property HasSimpleReferenceScheme As Boolean
+            Get
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Return CType(Me, FBM.EntityType).HasSimpleReferenceScheme
+                    Case Is = GetType(FBM.FactType)
+                        Dim lrFactType = CType(Me, FBM.FactType)
+                        Return lrFactType.ReferenceModeEntityType IsNot Nothing AndAlso lrFactType.ReferenceModeEntityType.HasSimpleReferenceScheme
+                    Case Is = GetType(FBM.ValueType)
+                        Return CType(Me, FBM.ValueType).IsIndependent
+                    Case Else
+                        Return False
+                End Select
+            End Get
+        End Property
+
+
+
+        <XmlAttribute()>
+        Public Overridable Property ConceptType As pcenumConceptType
+            Get
+                Return Me._ConceptType
+            End Get
+            Set(value As pcenumConceptType)
+                Me._ConceptType = value
+            End Set
+        End Property
+
+        <XmlAttribute()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _Name As String = ""
+        <XmlIgnore()>
+        <CategoryAttribute("Name"),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("A unique Name for the model object.")>
+        Public Overridable Property Name() As String
+            Get
+                Return _Name
+            End Get
+            Set(ByVal value As String)
+                '------------------------------------------------------
+                'See Me.SetName for management of Me.Id and Me.Symbol
+                '------------------------------------------------------
+                _Name = value
+            End Set
+        End Property
+
+        Private _DataLineageItemName As String = Nothing
+        Public Property DataLineageItemName As String
+            Get
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.ValueType),
+                             GetType(FBM.EntityType)
+                        Return Me.Id & " - Object Type"
+                    Case Is = GetType(FBM.FactType)
+                        If CType(Me, FBM.FactType).IsObjectified Then
+                            Return Me.Id & " - Object Type"
+                        Else
+                            Return Me.Id & " - Fact Type"
+                        End If
+                    Case Else
+                        'General Concept or Failsafe.
+                        Return Me.Id & " - Object Type"
+                End Select
+            End Get
+            Set(value As String)
+                Me._DataLineageItemName = value
+            End Set
+        End Property
+
+
+        <XmlAttribute()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _DBName As String = ""
+        <XmlIgnore()>
+        <CategoryAttribute("DB Level"),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("A unique Name for the model object in the underlying target database.")>
+        Public Overridable Property DBName() As String
+            Get
+                Dim lsDBName As String = _DBName
+                'If lsDBName Is Nothing Or lsDBName = "" Then
+                '    lsDBName = Me.Name
+                'End If
+                Return lsDBName
+            End Get
+            Set(ByVal value As String)
+                '------------------------------------------------------
+                'See Me.SetName for management of Me.Id and Me.Symbol
+                '------------------------------------------------------
+                _DBName = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        Public ReadOnly Property DBVariableName As String
+            Get
+                Return Me.DBName.Replace(" ", "")
+            End Get
+        End Property
+
+        <XmlAttribute()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _IsDatabaseReservedWord As Boolean = False
+        ''' <summary>
+        ''' FactEngine specific. Used to change names like 'Order' to '[Order]'. See Me.DatabaseName
+        ''' </summary>
+
+        <XmlIgnore()>
+        <CategoryAttribute("DB Level"),
+        DefaultValueAttribute(GetType(String), ""),
+        DescriptionAttribute("True if the Model Element is a database reserved word (E.g. Order in SQLite).")>
+        Public Property IsDatabaseReservedWord As Boolean
+            Get
+                If Me.Model Is Nothing Then
+                    Return Me._IsDatabaseReservedWord
+                Else
+
+                    Select Case Me.Model.TargetDatabaseType
+                        Case Is = pcenumDatabaseType.SQLite
+                            Select Case Me.Id.LCase
+                                Case Is = "order", "transaction"
+                                    Return True
+                                Case Else
+                                    Return False
+                            End Select
+                        Case Is = pcenumDatabaseType.None
+                            Return Me._IsDatabaseReservedWord
+                    End Select
+                End If
+
+            End Get
+            Set(value As Boolean)
+                Me._IsDatabaseReservedWord = value
+            End Set
+        End Property
+
+        Public Overridable Property IsMDAModelElement As Boolean
+
+        ''' <summary>
+        ''' Used only if the ModelElement is an EntityType. True if the EntityType is an ObjectifyingEntityType for an ObjectifiedFactType.
+        ''' </summary>
+        <XmlAttribute()>
+        Public IsObjectifyingEntityType As Boolean = False
+
+        ''' <summary>
+        ''' Used only if the ModelElement is an EntityType. The ObjectifiedFactType for the EntityType/ModelElement if IsObjectifyingEntityType.
+        ''' </summary>
+        <XmlIgnore()>
+        Public ObjectifiedFactType As FBM.FactType = Nothing
+
+        Public ReadOnly Property ReferenceSchemeRoleConstraint As FBM.RoleConstraint
+            Get
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Return CType(Me, FBM.EntityType).ReferenceModeRoleConstraint
+                    Case Is = GetType(FBM.FactType)
+                        Dim lrFactType = CType(Me, FBM.FactType)
+                        If lrFactType.IsObjectified Then
+                            Dim lrRoleConstraint = lrFactType.ObjectifyingEntityType.ReferenceModeRoleConstraint
+                            If lrRoleConstraint Is Nothing Then
+
+                                lrFactType = Me.Model.FactType.Find(Function(x) x.Id = lrFactType.Id)
+
+                                Dim larRoleConstraint = From InternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
+                                                        Where InternalUniquenessConstraint.IsPreferredIdentifier
+                                                        Select InternalUniquenessConstraint
+
+                                If larRoleConstraint.Count = 0 Then
+                                    Return Nothing
+                                Else
+                                    Return larRoleConstraint.First
+                                End If
+                            Else
+                                Return lrRoleConstraint
+                            End If
+                        Else
+                            Dim larRoleConstraint = From InternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
+                                                    Where InternalUniquenessConstraint.IsPreferredIdentifier
+                                                    Select InternalUniquenessConstraint
+
+                            If larRoleConstraint.Count = 0 Then
+                                Return Nothing
+                            Else
+                                Return larRoleConstraint.First
+                            End If
+                        End If
+                    Case Else 'Value type
+                        Return Nothing
+                End Select
+            End Get
+        End Property
+
+        <XmlIgnore()>
+        Public ReadOnly Property DatabaseName As String
+            Get
+                Dim lsName As String
+                Dim lsNameStartWrapperCharacter As String = "["
+                Dim lsNameEndWrapperCharacter As String = "]"
+                If Me.Model IsNot Nothing Then
+                    Select Case Me.Model.TargetDatabaseType
+                        Case pcenumDatabaseType.Snowflake
+                            lsNameStartWrapperCharacter = """"
+                            lsNameEndWrapperCharacter = """"
+                        Case Else
+                            lsNameStartWrapperCharacter = "["
+                            lsNameEndWrapperCharacter = "]"
+                    End Select
+                End If
+
+                If Me.IsDatabaseReservedWord Then
+                    lsName = lsNameStartWrapperCharacter
+                    Dim lrTable As RDS.Table = getCorrespondingRDSTable()
+                    If lrTable IsNot Nothing Then
+                        lsName &= lrTable.DBName & lsNameEndWrapperCharacter
+                    ElseIf Me.DBName <> "" Then
+                        lsName &= Me.DBName & lsNameEndWrapperCharacter
+                    Else
+                        lsName &= Me.Id & lsNameEndWrapperCharacter
+                    End If
+                    Return lsName
+                Else
+                    If Me.DBName = "" Then
+                        Return Me.Id
+                    Else
+                        Return Me.DBName
+                    End If
+
+                End If
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' Id and acts as Name in Boston.
+        ''' </summary>
+        <XmlAttribute()>
+        Public Id As String = System.Guid.NewGuid.ToString 'The unique Identifier of the ModelObject within the Model.
+
+        ''' <summary>
+        ''' The equivalent Graph label/s in the Graph view. May be more than one, which is a form of subtyping in graph dbs like Neo4j.
+        ''' </summary>
+        <XmlElement>
+        Public GraphLabel As New List(Of RDS.GraphLabel)
+
+        <XmlAttribute>
+        Public ReadOnly Property PropertyGraphLabel As String
+            Get
+                If Me.GraphLabel.Count > 0 Then
+                    Return Me.GraphLabel(0).Label
+                Else
+                    Return Me.DBName
+                End If
+            End Get
+        End Property
+
+        <XmlIgnore()>
+        Private _GUID As String = System.Guid.NewGuid.ToString
+
+        <XmlAttribute()>
+        Public Property GUID As String
+            Get
+                If Me.NORMAReferenceId = "" Then 'Default is ""
+                    Return Me._GUID
+                Else
+                    Return Me.NORMAReferenceId
+                End If
+            End Get
+            Set(value As String)
+                Me._GUID = value
+            End Set
+        End Property
+
+        <JsonIgnore()>
+        Public _IsAbsorbed As Boolean = False
+        <XmlAttribute()>
+        Public Property IsAbsorbed As Boolean
+            Get
+                Return Me._IsAbsorbed
+            End Get
+            Set(value As Boolean)
+                Me._IsAbsorbed = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        Public Overridable Property IsObjectified() As Boolean
+            Get
+                If Me.ConceptType = pcenumConceptType.FactType Then
+                    Return False
+                Else
+                    Return Nothing
+                End If
+            End Get
+            Set(value As Boolean)
+                'Nothing to do here.
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _IsDerived As Boolean = False
+
+        <XmlAttribute()>
+        Public Overridable Property IsDerived As Boolean
+            Get
+                Return Me._IsDerived
+            End Get
+            Set(value As Boolean)
+                Me._IsDerived = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        <JsonIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _DerivationText As String = ""
+
+        <XmlAttribute()>
+        Public Overridable Property DerivationText As String
+            Get
+                Return Me._DerivationText
+            End Get
+            Set(value As String)
+                Me._DerivationText = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Only set by the FactEngine FEQL Processor at query time, so that FBM objects are not coupled to the FactEngine.
+        ''' </summary>
+        <XmlIgnore()>
+        Public DerivationType As FactEngine.pcenumFEQLDerivationType = FactEngine.Constants.pcenumFEQLDerivationType.None
+
+        <XmlIgnore()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ShortDescription As String = ""
+        <XmlIgnore()>
+        <CategoryAttribute("Description (Informal)"),
+             Browsable(True),
+             [ReadOnly](False),
+             BindableAttribute(True),
+             DefaultValueAttribute(""),
+             DesignOnly(False),
+             DescriptionAttribute("Enter a description."),
+             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Shadows Property ShortDescription() As String
+            Get
+                Return _ShortDescription
+            End Get
+            Set(ByVal Value As String)
+                _ShortDescription = Value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        <System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _LongDescription As String = ""
+        <XmlIgnore()>
+        <CategoryAttribute("Description (Informal)"),
+             Browsable(True),
+             [ReadOnly](False),
+             BindableAttribute(True),
+             DefaultValueAttribute(""),
+             DesignOnly(False),
+             DescriptionAttribute("Enter a description."),
+             Editor(GetType(System.ComponentModel.Design.MultilineStringEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Shadows Property LongDescription() As String
+            Get
+                Return _LongDescription
+            End Get
+            Set(ByVal Value As String)
+                _LongDescription = Value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Only used for Entity Types, Fact Types....those ModelObject ConceptTypes that can be Subtypes | Supertypes.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <JsonIgnore()>
+        <XmlIgnore()>
+        Public _parentModelObjectList As New List(Of FBM.ModelObject) 'String = "" '0 -not sub type, otherwise used to store entity_id of super type, if this entity is a subtype
+
+        <JsonIgnore()>
+        <XmlIgnore()>
+        <Browsable(False)>
+        Property parentModelObjectList() As List(Of FBM.ModelObject)
+            Get
+                Dim larParentModelObjects = From SubtypeRelationship In Me.SubtypeRelationship
+                                            Select SubtypeRelationship.parentModelElement
+
+                Return larParentModelObjects.ToList
+            End Get
+            Set(ByVal value As List(Of FBM.ModelObject))
+                Me._parentModelObjectList = value
+            End Set
+        End Property
+
+        <JsonIgnore()>
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Public _childModelObjectList As New List(Of FBM.ModelObject) 'String = "" '0 -not sub type, otherwise used to store entity_id of super type, if this entity is a subtype
+
+        <JsonIgnore()>
+        <XmlIgnore()>
+        <Browsable(False)>
+        Property childModelObjectList() As List(Of FBM.ModelObject)
+            Get
+                Return Me._childModelObjectList
+            End Get
+            Set(ByVal value As List(Of FBM.ModelObject))
+                Me._childModelObjectList = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Instances of this EntityType as exist as FactData against Roles within FactTypes where those Roles join this EntityType.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <XmlIgnore()>
+        Public Instance As New List(Of String)
+
+        <XmlIgnore()>
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _Instances As New FEStrings.StringCollection
+
+        <XmlIgnore()>
+        <CategoryAttribute("Instances"),
+         Browsable(True),
+         [ReadOnly](False),
+         DescriptionAttribute("A list of sample Values for this Model Element."),
+         Editor(GetType(tStringCollectionEditor), GetType(System.Drawing.Design.UITypeEditor))>
+        Public Property Instances As FEStrings.StringCollection 'StringCollection 
+            '   DefaultValueAttribute(""), _
+            '   BindableAttribute(True), _
+            '   DesignOnly(False), _
+            Get
+                Dim lrStringCollection As New FEStrings.StringCollection
+                lrStringCollection.AddRange(Me.Instance.ToArray)
+                Return lrStringCollection
+            End Get
+            Set(ByVal Value As FEStrings.StringCollection)
+                Me.Instance = Value.Cast(Of String).ToList
+                '----------------------------------------------------
+                'Update the set of Concepts/Symbols/Values
+                '  within the 'value_constraint' for this ValueType.
+                '----------------------------------------------------
+                'Dim lsString As String
+                'For Each lsString In Me._ValueConstraintList
+                '    Dim lrConcept As New FBM.Concept(lsString)
+                '    If Me._ValueConstraint.Contains(lrConcept) Then
+                '        '-------------------------------------------------
+                '        'Nothing to do, because the Concept/Symbol/Value
+                '        '  already exists for the 'value_constraint'
+                '        '  for this ValueType.
+                '        '-------------------------------------------------
+                '    Else
+                '        '-------------------------------------------
+                '        'Add the Concept/Symbol/Value to the Model
+                '        '-----------------------------------------
+                '        Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, lrConcept.Symbol, pcenumConceptType.Value)
+                '        Me.Model.AddModelDictionaryEntry(lrModelDictionaryEntry)
+                '        '-----------------------------------------
+                '        'Add the Concept/Symbol/Value to the
+                '        '  'value_constraint' for this ValueType
+                '        '-----------------------------------------
+                '        Me._ValueConstraint.Add(lrConcept)
+                '    End If
+                'Next
+            End Set
+        End Property
+
+
+        ''' <summary>
+        ''' Used for TypeDB schema generation only at this stage. Defaults to 'entity' for an Entity Type or 'relation' for a Fact Type etc if no Supertype is found.
+        ''' </summary>
+        ''' <returns></returns>
+        <XmlIgnore()>
+        Public ReadOnly Property PrimarySupertypeName As String
+            Get
+                Dim lsPrimarySupertypeName As String = "thing"
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.ValueType)
+                        lsPrimarySupertypeName = "attribute"
+                    Case Is = GetType(FBM.EntityType)
+                        lsPrimarySupertypeName = "entity"
+                    Case Is = GetType(FBM.FactType)
+                        lsPrimarySupertypeName = "relation"
+                End Select
+
+                If Me.SubtypeRelationship.Count > 0 Then
+                    Dim lrPrimarySubtypeRelationship As FBM.SubtypeRelationship
+                    lrPrimarySubtypeRelationship = Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship)
+                    If lrPrimarySubtypeRelationship IsNot Nothing Then
+                        lsPrimarySupertypeName = lrPrimarySubtypeRelationship.parentModelElement.Id
+                    End If
+                End If
+
+                Return lsPrimarySupertypeName
+            End Get
+
+        End Property
+
+        ''' <summary>
+        ''' Used for hiding or showing property elements.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <XmlIgnore()>
+        <NonSerialized()>
+        Public m_dctd As DynamicTypeDescriptor.DynamicCustomTypeDescriptor
+
+        ''' <summary>
+        ''' Only used (at this stage) for generating CQL. Temporarily populated.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <NonSerialized()>
+        Public PreboundReadingText As String = ""
+
+
+        Private _SubtypeRelationship As New List(Of FBM.SubtypeRelationship)
+
+        <XmlElement()>
+        Public Overridable Property SubtypeRelationship As List(Of FBM.SubtypeRelationship)
+            Get
+                Return Me._SubtypeRelationship
+            End Get
+            Set(value As List(Of FBM.SubtypeRelationship))
+                Me._SubtypeRelationship = value
+            End Set
+        End Property
+
+        <XmlIgnore()>
+        Public Overridable ReadOnly Property isSubtype As Boolean
+            Get
+                Return Me.SubtypeRelationship.Count > 0
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' PGS Relationship Node is typically an EntityType with a Binary Primary Key 
+        '''   and where there are two RDS Relationships among the RDS Column.Relation(ships) of the Columns of the Primary Key.
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property IsCandidatePGSRelationshipNode
+            Get
+                Dim lrRDSTable As RDS.Table = Nothing
+
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+
+                        lrRDSTable = CType(Me, FBM.EntityType).getCorrespondingRDSTable(False)
+                    Case Is = GetType(FBM.FactType)
+
+                        lrRDSTable = CType(Me, FBM.FactType).getCorrespondingRDSTable(Nothing, True)
+                End Select
+
+                'CodeSafe
+                If lrRDSTable Is Nothing Then Return False
+
+                Dim larRelationship = (From Column In lrRDSTable.getPrimaryKeyColumns
+                                       From Relationship In Column.Relation
+                                       Select Relationship).Distinct
+
+                If TypeOf Me Is FBM.FactType Then
+
+                    Dim larUniqueJoinedObject = (From Role In CType(Me, FBM.FactType).RoleGroup
+                                                 Where Role.JoinsValueType Is Nothing
+                                                 Select Role.JoinedORMObject).Distinct
+
+                    If larUniqueJoinedObject.Count = 2 Then Return True
+
+                ElseIf larRelationship.Count = 2 Then
+
+                    Return True
+                End If
+
+                Return False
+
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' Only used (at this stage) for generating CQL Temporarily populated.
+        ''' </summary>
+        ''' <remarks></remarks>
+        <NonSerialized()>
+        Public PostboundReadingText As String = ""
+
+
+        ''' <summary>
+        ''' Used for Reverse Engineering NORMA files.
+        ''' </summary>
+        <XmlIgnore()>
+        Public NORMAName As String = "" 'The Original NORMA name for the ModelObject. Used because Boston limits Concept/Symbol lengths to 100, whereas NORMA names are boundless.
+
+        <XmlIgnore()>
+        Public NORMAReferenceId As String = ""
+
+        <NonSerialized()>
+        Public Event ChangedToFactType(ByRef arFactType As FBM.FactType)
+        <NonSerialized()>
+        Public Event ConceptSwitched(ByRef arConcept As FBM.Concept)
+        <NonSerialized()>
+        Public Event DBNameChanged(ByVal asDBName As String)
+        <NonSerialized()>
+        Public Event GraphLabelAdded(ByVal asNewGraphLabel As String)
+        <NonSerialized()>
+        Public Event LongDescriptionChanged(ByVal asLongDescription As String)
+        <NonSerialized()>
+        Public Event NameChanged(ByVal asOldName As String, ByVal asNewName As String)
+        <NonSerialized()>
+        Public Event RemovedFromModel()
+        <NonSerialized()>
+        Public Event ShortDescriptionChanged(ByVal asShortDescription As String)
+        <NonSerialized()>
+        Public Event SubtypeRelationshipAdded(ByRef arSubtypeConstraint As FBM.SubtypeRelationship)
+        <NonSerialized()>
+        Public Event SubtypeRelationshipRemoved(ByRef arSubtypeConstraint As FBM.SubtypeRelationship)
+
+        ''' <summary>
+        ''' Parameterless Constructor.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub New()
+
+        End Sub
+
+        Public Sub New(ByVal asSymbol As String, Optional ByVal aiConceptType As pcenumConceptType = pcenumConceptType.None)
+
+            Me.Symbol = Trim(asSymbol)
+            Me.Id = Trim(asSymbol)
+            Me.Name = Trim(asSymbol)
+
+            Me.ConceptType = aiConceptType
+
+        End Sub
+
+        Public Overloads Function Equals(ByVal other As FBM.ModelObject) As Boolean Implements IEquatable(Of FBM.ModelObject).Equals
+
+            If Me.Id = other.Id Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Function EqualsByName(ByVal other As FBM.ModelObject) As Boolean
+
+            If Me.Name = other.Name Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        ''' <summary>
+        ''' Overridden by the ModelObject (e.g. ValueType) represented by the ModelObject.
+        ''' </summary>
+        ''' <param name="other"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overridable Function EqualsBySignature(ByVal other As FBM.ModelObject) As Boolean
+
+            Return False
+
+        End Function
+
+        Public Overloads Function EqualsBySymbol(ByVal other As FBM.ModelObject) As Boolean
+
+            If Me.Symbol = other.Symbol Then
+                Return True
+            Else
+                Return False
+            End If
+
+        End Function
+
+        Public Overridable Overloads Function Clone() As Object Implements System.ICloneable.Clone
+
+            Dim lrModelObject As New FBM.ModelObject
+
+            With Me
+                lrModelObject.ConceptType = .ConceptType
+                lrModelObject.Id = .Id
+                lrModelObject.Name = .Name
+                lrModelObject.Symbol = .Symbol
+                lrModelObject.Instance = .Instance
+                lrModelObject.ShortDescription = .ShortDescription
+                lrModelObject.LongDescription = .LongDescription
+
+            End With
+
+            Return lrModelObject
+
+        End Function
+
+        Public Overridable Overloads Function Clone(ByRef arModel As FBM.Model,
+                                                    Optional ByVal abAddToModel As Boolean = False,
+                                                    Optional ByVal abIsMDAModelElement As Boolean = False) As Object
+            Return New Object
+
+        End Function
+
+        Public Overridable Overloads Function Clone(ByRef arModel As FBM.Model) As FBM.ModelObject
+
+            Dim lrModelObject As New FBM.ModelObject
+
+            With Me
+                lrModelObject.Model = arModel
+                lrModelObject.ConceptType = .ConceptType
+                lrModelObject.Id = .Id
+                lrModelObject.Name = .Name
+                lrModelObject.Symbol = .Symbol
+                lrModelObject.Instance = .Instance
+                lrModelObject.ShortDescription = .ShortDescription
+                lrModelObject.LongDescription = .LongDescription
+            End With
+
+            Return lrModelObject
+
+        End Function
+
+
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+        Public Overridable Function CloneInstance(ByRef arPage As FBM.Page,
+                                                  Optional ByVal abAddToPage As Boolean = False,
+                                                  Optional ByVal abIgnoreExistingInstance As Boolean = False) As FBM.ModelObject
+
+            Dim lrPageObject As New FBM.PageObject
+
+            Try
+
+                With Me
+                    lrPageObject.ConceptType = .ConceptType
+                    lrPageObject.Model = arPage.Model
+                    lrPageObject.Page = arPage
+                    lrPageObject.Id = .Id
+                    lrPageObject.ShortDescription = .ShortDescription
+                    lrPageObject.LongDescription = .LongDescription
+                End With
+
+                Return lrPageObject
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                lsMessage = "Error: tModelObject.CloneInstance"
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+
+        End Function
+
+
+        Public Overridable Function CloneEntityType(ByRef arModel As FBM.Model) As FBM.ModelObject
+
+            Dim lrEntityType As New FBM.EntityType
+
+            With Me
+                lrEntityType.ConceptType = pcenumConceptType.EntityType
+                lrEntityType.Id = Me.Id
+                lrEntityType.Name = Me.Name
+                lrEntityType.Model = arModel
+                lrEntityType.ShortDescription = .ShortDescription
+                lrEntityType.LongDescription = .LongDescription
+            End With
+
+            Return lrEntityType
+
+        End Function
+
+        Public Overridable Function CloneValueType(ByRef arModel As FBM.Model) As FBM.ModelObject
+
+            Dim lrValueType As New FBM.ValueType
+
+            With Me
+                lrValueType.ConceptType = pcenumConceptType.ValueType
+                lrValueType.Id = Me.Id
+                lrValueType.Name = Me.Name
+                lrValueType.Model = arModel
+                lrValueType.ShortDescription = .ShortDescription
+                lrValueType.LongDescription = .LongDescription
+            End With
+
+            Return lrValueType
+
+        End Function
+
+
+        Public Overridable Function CloneFactType(ByRef arModel As FBM.Model) As FBM.ModelObject
+
+            Dim lrFactType As New FBM.FactType
+
+            With Me
+                lrFactType.ConceptType = pcenumConceptType.FactType
+                lrFactType.Id = Me.Id
+                lrFactType.Name = Me.Name
+                lrFactType.Model = arModel
+                lrFactType.ShortDescription = .ShortDescription
+                lrFactType.LongDescription = .LongDescription
+            End With
+
+            Return lrFactType
+
+        End Function
+
+        <MethodImplAttribute(MethodImplOptions.Synchronized)>
+        Public Function CloneEntityTypeInstance(ByRef arPage As FBM.Page) As FBM.EntityTypeInstance
+
+            Dim lrEntityTypeInstance As New FBM.EntityTypeInstance
+
+            Try
+                With Me
+                    lrEntityTypeInstance.Model = arPage.Model
+                    lrEntityTypeInstance.Page = arPage
+                    lrEntityTypeInstance.Name = .Name
+                    lrEntityTypeInstance.Id = Me.Name
+                End With
+
+                Return lrEntityTypeInstance
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return lrEntityTypeInstance
+            End Try
+
+
+        End Function
+
+
+        Public Function CloneRoleConstraintInstance(ByRef arPage As FBM.Page) As FBM.RoleConstraintInstance
+
+            Dim lrRoleConstraintInstance As New FBM.RoleConstraintInstance
+
+            With Me
+                lrRoleConstraintInstance.Name = .Name
+                lrRoleConstraintInstance.Id = Me.Name
+                lrRoleConstraintInstance.Symbol = Me.Name
+                lrRoleConstraintInstance.Page = arPage
+                lrRoleConstraintInstance.Model = arPage.Model
+            End With
+
+            Return lrRoleConstraintInstance
+
+        End Function
+
+        Public Sub AddDataInstance(ByVal asDataInstance As String)
+
+            Me.Instance.AddUnique(asDataInstance)
+
+        End Sub
+
+        Public Sub AddModelElementFlag(ByVal arModelElementFlag As FBM.ModelElementFlag)
+
+            Try
+                Me.ModelElementFlag.AddUnique(arModelElementFlag)
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' Adds a BinaryFactType relation between the EntityType and a ValueType. Adds the ValueType to the Model if it does not already exist.
+        ''' </summary>
+        ''' <param name="arValueType"></param>
+        ''' <param name="aiRelationMultiplicityValue"></param>
+        ''' <remarks></remarks>
+        Public Function AddBinaryRelationToValueType(ByRef arValueType As FBM.ValueType,
+                                                     ByVal aiRelationMultiplicityValue As pcenumBinaryRelationMultiplicityType,
+                                                     Optional ByVal abAddToModel As Boolean = False) As FBM.FactType
+
+            Try
+                '------------------------------------------------------------------------------
+                'Add the ValueType to the Model if it does not already exist within the Model
+                '------------------------------------------------------------------------------
+                If Me.Model.ValueType.Find(AddressOf arValueType.Equals) IsNot Nothing Then
+                    '-------------------------------------------
+                    'ValueType already exists within the Model
+                    '-------------------------------------------
+                Else
+                    Me.Model.AddValueType(arValueType)
+                End If
+
+                '---------------------------------------
+                'Create the FactType for the relation.
+                '---------------------------------------
+                Dim lrFactType As New FBM.FactType
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim lsFactTypeName As String = Me.Name & arValueType.Name
+                Dim larRole As New List(Of FBM.Role)
+
+                '---------------------------------------------------------------------
+                'Create the list of ModelObjects referenced by Roles in the FactType
+                '---------------------------------------------------------------------
+                larModelObject.Add(Me)
+                larModelObject.Add(arValueType)
+                '---------------------
+                'Create the FactType
+                '---------------------
+                lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True,,, abAddToModel)
+
+                '-----------------------------------------------------------------------------------
+                'Create the InternalUniquenessConstraint (MultiplicityConstraint) for the FactType
+                '-----------------------------------------------------------------------------------
+                Select Case aiRelationMultiplicityValue
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                        larRole.Clear()
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(arValueType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                End Select
+
+                Return lrFactType
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        ''' <summary>
+        ''' Adds a BinaryFactType relation between the EntityType and a ValueType. Adds the ValueType to the Model if it does not already exist.
+        ''' </summary>
+        ''' <param name="aiRelationMultiplicityValue"></param>
+        ''' <remarks></remarks>
+        Public Function AddBinaryRelationToNEwEntityType(ByVal aiRelationMultiplicityValue As pcenumBinaryRelationMultiplicityType,
+                                                         Optional ByVal abAddToModel As Boolean = False) As FBM.FactType
+
+            Try
+                '------------------------------------------------------------------------------
+                'Add the ValueType to the Model if it does not already exist within the Model
+                '------------------------------------------------------------------------------
+                Dim lrNewEntityType As FBM.EntityType = Me.Model.CreateEntityType("NewEntityType", True, True, False, False)
+
+                '---------------------------------------
+                'Create the FactType for the relation.
+                '---------------------------------------
+                Dim lrFactType As New FBM.FactType
+                Dim larModelObject As New List(Of FBM.ModelObject)
+                Dim lsFactTypeName As String = Me.Name & lrNewEntityType.Name
+                Dim larRole As New List(Of FBM.Role)
+
+                '---------------------------------------------------------------------
+                'Create the list of ModelObjects referenced by Roles in the FactType
+                '---------------------------------------------------------------------
+                larModelObject.Add(Me)
+                larModelObject.Add(lrNewEntityType)
+                '---------------------
+                'Create the FactType
+                '---------------------
+                lrFactType = Me.Model.CreateFactType(lsFactTypeName, larModelObject, False, True,,, abAddToModel)
+
+                '-----------------------------------------------------------------------------------
+                'Create the InternalUniquenessConstraint (MultiplicityConstraint) for the FactType
+                '-----------------------------------------------------------------------------------
+                Select Case aiRelationMultiplicityValue
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                        larRole.Clear()
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(lrNewEntityType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.OneToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(lrNewEntityType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToOne
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                    Case Is = pcenumBinaryRelationMultiplicityType.ManyToMany
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(Me))
+                        larRole.Add(lrFactType.FindFirstRoleByModelObject(lrNewEntityType))
+                        Call lrFactType.CreateInternalUniquenessConstraint(larRole)
+                End Select
+
+                Return lrFactType
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+
+            End Try
+
+        End Function
+
+
+        Public Overridable Function CanSafelyRemoveFromModel() As Boolean
+            Return False
+        End Function
+
+        ''' <summary>
+        ''' Creates a SubtypeRelationship for the Model Element.
+        ''' </summary>
+        ''' <param name="arParentModelElement"></param>
+        ''' <param name="abIsPrimarySubtypeRelationship"></param>
+        ''' <param name="asSubtypeRoleId">Used when importing NORMA .orm files.</param>
+        ''' <param name="asSupertypeRoleId">Used when importing NORMA .orm files.</param>
+        ''' <param name="abCreateFactType">False if called from DuplexServiceClient when a SubtypeRelationshipFactType has been received for adding to the Model.</param>
+        ''' <returns></returns>
+        Public Overridable Function CreateSubtypeRelationship(ByVal arParentModelElement As FBM.ModelObject,
+                                                              Optional ByVal abIsPrimarySubtypeRelationship As Boolean = False,
+                                                              Optional ByVal asSubtypeRoleId As String = Nothing,
+                                                              Optional ByVal asSupertypeRoleId As String = Nothing,
+                                                              Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                              Optional ByVal arUsingFactType As FBM.FactType = Nothing) As FBM.SubtypeRelationship
+
+            Return Nothing
+        End Function
+
+        ''' <summary>
+        ''' Used when Copying/Pasting. E.g. Change the Model of the ModelElement to the Model that the ModelElement has been pasted to.
+        ''' </summary>
+        ''' <param name="arTargetModel"></param>
+        ''' <param name="abAddToModel"></param>
+        ''' <param name="abReturnExistingModelElementIfExists"></param>
+        Public Overridable Function ChangeModel(ByRef arTargetModel As FBM.Model,
+                                       ByVal abAddToModel As Boolean,
+                                       Optional ByVal abReturnExistingModelElementIfExists As Boolean = False) As FBM.ModelObject
+
+            Me.Model = arTargetModel
+
+            Return Me
+
+        End Function
+
+        ''' <summary>
+        ''' Ultimately returns the topmost Supertype that is not Absorbed from within in the upper hierarchy,
+        '''   ELSE returns the ModelObject itself.
+        ''' </summary>
+        ''' <param name="abRequireLocalSimpleReferenceScheme">If True the ModelElement requires a local Simple Reference Scheme </param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetTopmostNonAbsorbedSupertype(Optional ByVal abRequireLocalSimpleReferenceScheme As Boolean = False) As FBM.ModelObject
+
+            Try
+                If Me.SubtypeRelationship.Count = 0 Then
+                    Return Me
+                ElseIf Me.IsAbsorbed = False Then
+                    If abRequireLocalSimpleReferenceScheme Then
+                        If Me.GetType = GetType(FBM.EntityType) Then
+                            If CType(Me, FBM.EntityType).ReferenceModeValueType Is Nothing Then
+                                Try
+                                    Return Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship).parentModelElement.GetTopmostNonAbsorbedSupertype(abRequireLocalSimpleReferenceScheme)
+                                Catch ex As Exception
+                                    Return Me
+                                End Try
+                            Else
+                                Return Me
+                            End If
+                        Else
+                            Return Me
+                        End If
+                    Else
+                        Return Me
+                    End If
+                Else
+                    Return Me.parentModelObjectList(0).GetTopmostNonAbsorbedSupertype()
+                    'For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    '    '20200722-Need to fix this to discern between the PK SubtypeRelationship and other.
+                    '    '  For now just return the first one.
+                    '    If Not lrSubtypeRelationship.parentEntityType.IsAbsorbed Then
+                    '        Return lrSubtypeRelationship.parentEntityType
+                    '    End If
+                    'Next
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+            '20200722-Need to fix this to discern between the PK SubtypeRelationship and other.
+            '  For now just return the first one.
+            'Return Me.parentModelObjectList(0).GetTopmostNonAbsorbedSupertype()
+
+        End Function
+
+        ''' <summary>
+        ''' If the EntityType is a Subtype, then returns the topmost Supertype in the hierarchy,
+        '''   ELSE returns the EntityType itself.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetTopmostSupertype(Optional abPrimarySubtypeRelationshipOnly As Boolean = False) As FBM.ModelObject
+
+            If Me.parentModelObjectList.Count = 0 Then
+                Return Me
+            End If
+
+            If abPrimarySubtypeRelationshipOnly Then
+                Dim lrPrimarySubtypeRelationship As FBM.SubtypeRelationship = Nothing
+                lrPrimarySubtypeRelationship = Me.SubtypeRelationship.Find(Function(x) x.IsPrimarySubtypeRelationship)
+                If lrPrimarySubtypeRelationship Is Nothing Then
+                    Return Me
+                Else
+                    Return lrPrimarySubtypeRelationship.parentModelElement.GetTopmostSupertype(abPrimarySubtypeRelationshipOnly)
+                End If
+            Else
+                Return Me.parentModelObjectList(0).GetTopmostSupertype(abPrimarySubtypeRelationshipOnly)
+            End If
+
+        End Function
+
+        Public Function getOutgoingFactTypeReadingPredicates() As List(Of String)
+
+            Dim larOutgoingFactType = From FactType In Me.Model.FactType
+                                      From Role In FactType.RoleGroup
+                                      Where Role.JoinedORMObject.Id = Me.Id
+                                      Where Role.HasInternalUniquenessConstraint
+                                      Select FactType
+
+            Dim larFactTypeReadingPredicates = From FactType In larOutgoingFactType
+                                               From FactTypeReading In FactType.FactTypeReading
+                                               Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = Me.Id
+                                               Select FactTypeReading.GetPredicateText Distinct
+
+            Return larFactTypeReadingPredicates.ToList
+
+        End Function
+
+        Public Function getOutgoingFactTypes(Optional ByVal abAnyFactType As Boolean = False) As List(Of FBM.FactType)
+
+            Dim larFactType As New List(Of FBM.FactType)
+
+            Try
+                If abAnyFactType Then
+                    larFactType = (From FactType In Me.Model.FactType
+                                   From Role In FactType.RoleGroup
+                                   Where Role.JoinedORMObject.Id = Me.Id
+                                   Select FactType).ToList
+                Else
+                    larFactType = (From FactType In Me.Model.FactType
+                                   From Role In FactType.RoleGroup
+                                   Where Role.JoinedORMObject.Id = Me.Id
+                                   Where Role.InternalUniquenessConstraint.Count > 0
+                                   Select FactType).ToList
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+            Return larFactType
+
+        End Function
+
+        ''' <summary>
+        ''' Returns a set of FactTypes that have Roles joined to the ModelElement.
+        '''   See rules in the code.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function getIncomingFactTypes() As List(Of FBM.FactType)
+
+            Dim larFactType As New List(Of FBM.FactType)
+
+            Try
+                Dim larIncomingFactType = From FactType In Me.Model.FactType
+                                          From Role In FactType.RoleGroup
+                                          Where Role.JoinedORMObject IsNot Nothing 'CodeSafe
+                                          Where Role.JoinedORMObject.Id = Me.Id
+                                          Where (
+                                              (FactType.IsManyTo1BinaryFactType And Role.InternalUniquenessConstraint.Count = 0) Or
+                                              (FactType.HasPartialButMultiRoleConstraint Or FactType.HasTotalRoleConstraint)
+                                              )
+                                          Select FactType
+
+                Return larIncomingFactType.ToList
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return larFactType
+            End Try
+        End Function
+
+        Public Function getIncomingFactTypeReadings(Optional ByVal aiMaximumFactTypeArity As Integer = 10) As List(Of FBM.FactTypeReading)
+
+            Dim larFactTypeReading As New List(Of FBM.FactTypeReading)
+
+            Try
+                Dim larRelatedFactType = From FactType In Me.Model.FactType
+                                         From Role In FactType.RoleGroup
+                                         Where Role.JoinedORMObject IsNot Nothing
+                                         Where Role.JoinedORMObject.Id = Me.Id
+                                         Select FactType
+
+                larFactTypeReading = (From FactType In larRelatedFactType
+                                      From FactTypeReading In FactType.FactTypeReading
+                                      From PredicatePart In FactTypeReading.PredicatePart
+                                      Where FactType.Arity <= aiMaximumFactTypeArity
+                                      Where PredicatePart.SequenceNr > 1
+                                      Where PredicatePart.Role.JoinedORMObject.Id = Me.Id
+                                      Select FactTypeReading Distinct).ToList
+
+                Return larFactTypeReading
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larFactTypeReading
+            End Try
+
+        End Function
+
+
+        Public Function getOutgoingFactTypeReadings(Optional ByVal aiMaximumFactTypeArity As Integer = 10) As List(Of FBM.FactTypeReading)
+
+            Dim larFactTypeReading As New List(Of FBM.FactTypeReading)
+
+            Try
+                Dim larRelatedFactType = From FactType In Me.Model.FactType
+                                         From Role In FactType.RoleGroup
+                                         Where Role.JoinedORMObject.Id = Me.Id
+                                         Select FactType
+
+                larFactTypeReading = (From FactType In larRelatedFactType
+                                      From FactTypeReading In FactType.FactTypeReading
+                                      Where FactType.Arity <= aiMaximumFactTypeArity
+                                      Where FactTypeReading.PredicatePart(0).Role.JoinedORMObject.Id = Me.Id
+                                      Select FactTypeReading Distinct).ToList
+
+                Return larFactTypeReading
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larFactTypeReading
+            End Try
+
+        End Function
+
+        Public Function getPartialFactTypeReadings() As List(Of FBM.FactTypeReading)
+
+            Dim larFactType = From FactType In Me.Model.FactType.FindAll(Function(x) x.Arity > 2)
+                              From Role In FactType.RoleGroup
+                              Where Role.JoinedORMObject.Id = Me.Id
+                              Select FactType
+
+            Dim larFactTypeReading = From FactType In larFactType
+                                     From FactTypeReading In FactType.FactTypeReading
+                                     From PredicatePart In FactTypeReading.PredicatePart
+                                     Where PredicatePart.SequenceNr < FactType.Arity
+                                     Where PredicatePart.Role.JoinedORMObject.Id = Me.Id
+                                     Select FactTypeReading Distinct
+
+            Return larFactTypeReading.ToList
+
+        End Function
+
+        ''' <summary>
+        ''' Returns the unique Signature of the ModelObject
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Overrided in FBM.EntityType, FBM.Valuetype, FBM.FactType, FBM.RoleConstraint, FBM.ModelNote</remarks>
+        Public Overridable Function GetSignature() As String
+
+            Dim lsSignature As String
+
+            lsSignature = Me.Id
+
+            Return lsSignature
+
+        End Function
+
+        Public Overridable Function getSubtypes(Optional ByVal abPrimarySubtypeRelationshipsOnly As Boolean = False) As List(Of FBM.ModelObject)
+            Return New List(Of ModelObject)
+        End Function
+
+        Public Function getSupertypes() As List(Of FBM.ModelObject)
+
+            Dim larModelElement As New List(Of FBM.ModelObject)
+            Try
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+                    larModelElement.AddUnique(lrSubtypeRelationship.parentModelElement)
+                    larModelElement.AddRange(lrSubtypeRelationship.parentModelElement.getSupertypes)
+                Next
+
+                Return larModelElement
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of FBM.ModelObject)
+            End Try
+
+        End Function
+
+        Public Overridable Function hasPredicateToModelElement(ByVal asPredicate As String,
+                                                               ByVal arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                Dim liCount = (From FactType In Me.Model.FactType
+                               From Role1 In FactType.RoleGroup
+                               From Role2 In FactType.RoleGroup
+                               Where FactType.Arity = 2
+                               Where Role1.JoinedORMObject Is Me
+                               Where Role2 Is FactType.GetOtherRoleOfBinaryFactType(Role1.Id)
+                               Where Role2.JoinedORMObject.Id = arModelElement.Id
+                               Where FactType.FactTypeReading.Any(Function(x) x.PredicatePart.Any(Function(y) y.PredicatePartText = Trim(asPredicate)))
+                               Select FactType).Count
+
+                Return liCount > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
+        Public Overridable Function HasPrimaryReferenceScheme() As Boolean
+
+            If Me.ConceptType = pcenumConceptType.ValueType Then
+                Return False
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Overridable Function IsBinaryFactType() As Boolean
+
+            If Me.ConceptType = pcenumConceptType.FactType Then
+                Return False
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Function IsInstanceObjectType() As Boolean
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.ValueTypeInstance),
+                              GetType(FBM.EntityTypeInstance),
+                              GetType(FBM.FactTypeInstance),
+                              GetType(FBM.RoleInstance),
+                              GetType(FBM.RoleConstraintInstance),
+                              GetType(FBM.tUniquenessConstraint),
+                              GetType(FBM.RoleConstraintRoleInstance),
+                              GetType(FBM.ModelNoteInstance),
+                              GetType(FBM.FactTable),
+                              GetType(FBM.EntityTypeName),
+                              GetType(FBM.FactTypeName),
+                              GetType(FBM.FactTypeReadingInstance),
+                              GetType(FBM.FactTypeDerivationText)
+                        Return True
+
+                    Case Else
+                        Return False
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+
+                Return False
+
+            End Try
+
+        End Function
+
+        Public Function isSubtypeOfModelElement(ByRef arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                For Each lrSubtypeRelationship In Me.SubtypeRelationship
+
+                    If lrSubtypeRelationship.parentModelElement Is arModelElement Then
+                        Return True
+                    ElseIf lrSubtypeRelationship.parentModelElement.isSubtypeOfModelElement(arModelElement) Then
+                        Return True
+                    End If
+                Next
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+        Public Function isSupertypeOfModelElement(ByRef arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                For Each lrSubtypeRelationship In arModelElement.SubtypeRelationship
+
+                    If lrSubtypeRelationship.parentModelElement Is Me Then
+                        Return True
+                    ElseIf Me.isSupertypeOfModelElement(lrSubtypeRelationship.parentModelElement) Then
+                        Return True
+                    End If
+                Next
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+        Public Function isUnaryFactType() As Boolean
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.FactType)
+                        If CType(Me, FBM.FactType).Arity = 1 Then Return True
+                    Case Else
+                        Return False
+                End Select
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+                Return False
+            End Try
+        End Function
+
+        Public ReadOnly Property ReferenceModeEntityType As FBM.EntityType
+            Get
+                If Me.isReferenceModeFactType Then
+                    Dim larEntitType = From EntityType In Me.Model.EntityType
+                                       Where EntityType.ReferenceModeFactType IsNot Nothing
+                                       Where EntityType.ReferenceModeFactType.Id = Me.Id
+                                       Select EntityType
+
+                    Return larEntitType.First
+                Else
+                    Return Nothing
+                End If
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' Only for use with Entity Types and Fact Types.
+        ''' </summary>
+        <XmlIgnore()>
+        Public WithEvents ReferenceModeValueType As FBM.ValueType = Nothing
+
+        Public Function isReferenceModeFactType() As Boolean
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.FactType), GetType(FBM.FactTypeInstance)
+
+                        'CodeSafe
+                        If Me.Model Is Nothing Then Return False
+
+                        Dim larEntitType = From EntityType In Me.Model.EntityType
+                                           Where EntityType.ReferenceModeFactType IsNot Nothing
+                                           Where EntityType.ReferenceModeFactType.Id = Me.Id
+                                           Select EntityType
+
+                        Return larEntitType.Count > 0
+
+                    Case Else
+                        Return False
+                End Select
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
+        Public Function isReferenceModeValueType() As Boolean
+
+            Try
+
+                If Me.GetType = GetType(FBM.ValueType) Then
+
+                    Dim larEntitType = From EntityType In Me.Model.EntityType
+                                       Where EntityType.ReferenceModeValueType IsNot Nothing
+                                       Where EntityType.ReferenceModeValueType Is Me
+                                       Select EntityType
+
+                    Return larEntitType.Count > 0
+                Else
+                    Return False
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
+        Public Function hasModelElementAsDownstreamSubtype(ByRef arModelElement As FBM.ModelObject) As Boolean
+
+            Try
+                For Each lrModelElement In Me.HasSubtype
+                    If lrModelElement Is arModelElement Then
+                        Return True
+                    Else
+                        If lrModelElement.hasModelElementAsDownstreamSubtype(arModelElement) Then
+                            Return True
+                        End If
+                    End If
+                Next
+
+                Return False
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+        Public Overridable Function HasSubTypes() As Boolean
+
+            Try
+                Dim larSubtypeModelObject = From ModelObject In Me.Model.getModelObjects
+                                            From SubtypeRelationship In ModelObject.SubtypeRelationship
+                                            Where SubtypeRelationship.parentModelElement.Id = Me.Id
+                                            Select SubtypeRelationship.ModelElement
+
+                Return larSubtypeModelObject.Count > 0
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return False
+            End Try
+
+        End Function
+
+        Public Function HasSubtype() As List(Of FBM.ModelObject)
+
+            Try
+                Dim larSubtypeModelObject = From ModelObject In Me.Model.getModelObjects
+                                            From SubtypeRelationship In ModelObject.SubtypeRelationship
+                                            Where SubtypeRelationship.parentModelElement Is Me
+                                            Select SubtypeRelationship.ModelElement
+
+                Return larSubtypeModelObject.ToList
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return New List(Of ModelObject)
+            End Try
+
+        End Function
+
+        Public Overridable Function HasTotalRoleConstraint() As Boolean
+
+            If Me.ConceptType = pcenumConceptType.FactType Then
+                Return False
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Sub DeleteConceptClassifications()
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+                    Dim lrWhereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.ModelId = Me.Model.ModelId And p.Concept = Me.Id
+                    Dim lrDataStore As New DataStore.Store
+                    Call lrDataStore.Delete(Of KnowledgeGraph.ConceptClassificationValue)(lrWhereClause)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub DeleteModelElementFlags()
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+                    Dim lrWhereClause As Expression(Of Func(Of FBM.ModelElementFlag, Boolean)) = Function(p) p.ModelId = Me.Model.ModelId And p.Concept = Me.Id
+                    Dim lrDataStore As New DataStore.Store
+                    Call lrDataStore.Delete(Of FBM.ModelElementFlag)(lrWhereClause)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        ''' <summary>
+        ''' Generates the FEKL for the ModelElement.
+        ''' </summary>
+        ''' <param name="abDontAddNewLine"></param>
+        ''' <param name="abUseEntityGrouping">True to Nest ValueType FEKL within the Entity (EntityType|FactType) FEKL using HAVING Clause</param>
+        ''' <returns></returns>
+        Public Overridable Function GenerateFEKLLine(Optional ByVal abDontAddNewLine As Boolean = False, Optional ByVal abUseEntityGrouping As Boolean = False) As String
+            Return "<Error>"
+        End Function
+
+        ''' <summary>
+        ''' Used for ValueTypes, EntityTypes, Objectified FactTypes. Returns the set of Roles of FactTypes that reference the ModelObject.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overridable Function GetAdjoinedRoles(Optional abIgnoreReferenceModeFactTypes As Boolean = False,
+                                                     Optional abIgnoreLinkFactTypes As Boolean = False) As List(Of FBM.Role)
+
+            Dim larReturnRoles As New List(Of FBM.Role)
+
+            Try
+                Dim lrRole As FBM.Role
+
+
+                Dim larRoles = (From FactType In Me.Model.FactType.FindAll(Function(x) x.IsPreferredReferenceMode = Not abIgnoreReferenceModeFactTypes)
+                                From Role In FactType.RoleGroup
+                                Where Role.JoinedORMObject IsNot Nothing
+                                Where Role.JoinedORMObject.Id = Me.Id
+                                Select Role).ToList
+
+                If abIgnoreLinkFactTypes Then
+                    Call larRoles.RemoveAll(Function(x) x.FactType.IsLinkFactType)
+                End If
+
+                For Each lrRole In larRoles
+                    larReturnRoles.Add(lrRole)
+                Next
+                Return larReturnRoles
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return larReturnRoles
+            End Try
+
+
+        End Function
+
+        ''' <summary>
+        ''' Overridden at the Instance level to return the Model level ModelObject for the Instance.
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overridable Function getBaseModelObject() As FBM.ModelObject
+            Return New FBM.ModelObject
+        End Function
+
+        Public Sub GetConceptClassifications()
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+                    Dim lrWhereClause As Expression(Of Func(Of KnowledgeGraph.ConceptClassificationValue, Boolean)) = Function(p) p.ModelId = Me.Model.ModelId And p.Concept = Me.Id
+                    Dim lrDataStore As New DataStore.Store
+                    Me.ClassificationValue = lrDataStore.Get(Of KnowledgeGraph.ConceptClassificationValue)(lrWhereClause)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub GetModelElementFlags()
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+                    Dim lrWhereClause As Expression(Of Func(Of FBM.ModelElementFlag, Boolean)) = Function(p) p.ModelId = Me.Model.ModelId And p.Concept = Me.Id
+                    Dim lrDataStore As New DataStore.Store
+                    Me.ModelElementFlag = lrDataStore.Get(Of FBM.ModelElementFlag)(lrWhereClause)
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub GetInterlinks()
+
+            Try
+                If My.Settings.DatabaseType = pcenumDatabaseType.SQLite.ToString Then
+
+                    Dim lrWhereClause As Expression(Of Func(Of Interlink.Interlink, Boolean)) = Function(p) p.ModelId = Me.Model.ModelId And
+                                                                                                            p.ModelElementId = Me.Id
+                    Dim lrDataStore As New DataStore.Store
+                    Me.Interlink = lrDataStore.Get(Of Interlink.Interlink)(lrWhereClause)
+
+                    For Each lrInterlink In Me.Interlink
+                        lrInterlink.Model = Me.Model
+                        lrInterlink.TargetModel = prApplication.Models.Find(Function(x) x.ModelId = lrInterlink.TargetModelId)
+                    Next
+                End If
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Function getConnectedFactTypes() As List(Of FBM.FactType)
+
+            Dim larFactType = From FactType In Me.Model.FactType
+                              From Role In FactType.RoleGroup
+                              Where Role.JoinedORMObject.Id = Me.Id
+                              Select FactType
+
+            Return larFactType.ToList
+
+        End Function
+
+        Public Overridable Function getCorrespondingCMMLActor() As CMML.Actor
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Return CType(Me, FBM.EntityType).getCorrespondingCMMLActor
+                    Case Is = GetType(FBM.FactType)
+                        If CType(Me, FBM.FactType).IsObjectified Then
+                            Return CType(Me, FBM.FactType).getCorrespondingCMMLActor
+                        ElseIf CType(Me, FBM.FactType).HasTotalRoleConstraint Then
+                            Return CType(Me, FBM.FactType).getCorrespondingCMMLActor
+                        Else
+                            Return Nothing
+                        End If
+                    Case Else
+                        Return Nothing
+                End Select
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Function
+
+        Public Overridable Function getCorrespondingRDSTable() As RDS.Table
+
+            Try
+                Select Case Me.GetType
+                    Case Is = GetType(FBM.EntityType)
+                        Return CType(Me, FBM.EntityType).getCorrespondingRDSTable
+                    Case Is = GetType(FBM.FactType)
+                        If CType(Me, FBM.FactType).IsObjectified Then
+                            Return CType(Me, FBM.FactType).getCorrespondingRDSTable
+                        ElseIf CType(Me, FBM.FactType).HasTotalRoleConstraint Then
+                            Return CType(Me, FBM.FactType).getCorrespondingRDSTable
+                        Else
+                            Return Nothing
+                        End If
+                    Case Is = GetType(FBM.Role)
+                        Return Nothing
+                    Case Else
+                        Return New RDS.Table
+                End Select
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+        End Function
+
+        ''' <summary>
+        ''' Used to make saving to the database much quicker. Only hit the database if it is required.
+        '''   NB Initially only implemented on Fact/FactInstances/ConceptInstance, which take up the bulk of a CMML enabled model (i.e. e.g. post v4.0 release of Boston).
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overridable Sub makeDirty()
+            Call Me.Model.MakeDirty(False, False)
+            Me.isDirty = True
+        End Sub
+
+        ''' <summary>
+        ''' Removes an Instance for the ModelElement. For EntityTypes, ValueTypes and FactTypes.
+        ''' </summary>
+        ''' <param name="asInstance"></param>
+        ''' <remarks></remarks>
+        Public Overridable Sub removeInstance(ByVal asInstance As String)
+
+        End Sub
+
+        ''' <summary>
+        ''' Removes an Instance for the ModelElement. For EntityTypes, ValueTypes and FactTypes.
+        ''' </summary>
+        ''' <param name="asOriginalInstance">The original Instance being renamed/replaced.</param>
+        ''' <param name="asNewInstance">The Instance value to replace the original Instance.</param>
+        ''' <remarks></remarks>
+        Public Overridable Sub renameInstance(ByVal asOriginalInstance As String, ByVal asNewInstance As String)
+
+        End Sub
+
+        Public Overridable Function RemoveFromModel(Optional ByVal abForceRemoval As Boolean = False,
+                                                    Optional ByVal abCheckForErrors As Boolean = True,
+                                                    Optional ByVal abDoDatabaseProcessing As Boolean = True,
+                                                    Optional ByVal abIncludeSubtypeRelationshipFactTypes As Boolean = True,
+                                                    Optional ByVal abRemoveIndex As Boolean = True,
+                                                    Optional ByVal abIsPartOfSimpleReferenceScheme As Boolean = False) As Boolean '(ByRef arError As FBM.ModelError) As Boolean
+            '----------------------------------------------------
+            'Shadowed in tEntityType, tValueType, FBM.tFactType etc
+            '----------------------------------------------------
+        End Function
+
+        Public Sub RemoveModelElementFlag(ByVal arModelElementFlag As FBM.ModelElementFlag)
+
+            Try
+                Me.ModelElementFlag.RemoveAll(AddressOf arModelElementFlag.Equals)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Overridable Sub RemoveSubtypeRelationship(ByRef arSubtypeConstraint As FBM.SubtypeRelationship)
+            Me.SubtypeRelationship.Remove(arSubtypeConstraint)
+            RaiseEvent SubtypeRelationshipRemoved(arSubtypeConstraint)
+        End Sub
+
+        Public Sub SetPropertyAttributes(ByRef arObject As Object, ByVal asProperty As String, ByVal abIsBrowsable As Boolean)
+
+            Try
+
+                'Me.m_dctd = DynamicTypeDescriptor.ProviderInstaller.Install(Me)
+                'Me.m_dctd.PropertySortOrder = DynamicTypeDescriptor.CustomSortOrder.AscendingByName
+                'Me.m_dctd.CategorySortOrder = DynamicTypeDescriptor.CustomSortOrder.DescendingByName
+
+
+                ' now lets modify some attribute of PropA
+                Dim cpd As DynamicTypeDescriptor.CustomPropertyDescriptor = Me.m_dctd.GetProperty(asProperty)
+                'cpd.SetDisplayName("New display name of PropA")
+                'cpd.SetDescription("New description of PropA")
+                'cpd.SetCategory("Fact Type")
+                cpd.SetIsBrowsable(abIsBrowsable) ';  // hides the property
+                cpd.SetIsReadOnly(False) '; // disables the property
+
+                'cpd.CategoryId = 4
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetIsMDAModelElement()
+
+            Try
+                Me.IsMDAModelElement = True
+                Call Me.makeDirty()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace)
+            End Try
+
+        End Sub
+
+        Public Sub SetIsReferenceTable(ByVal abIsReferenceTable As Boolean)
+
+            Try
+                Dim lrModelElementFlag As FBM.ModelElementFlag
+
+                lrModelElementFlag = Me.ModelElementFlag.Find(Function(x) x.ModelElementFlagType = pcenumModelElementFlagType.IsReferenceTable)
+
+                If lrModelElementFlag IsNot Nothing Then
+                    lrModelElementFlag.Value = abIsReferenceTable
+                Else
+                    lrModelElementFlag = New FBM.ModelElementFlag(Me.Model, Me, pcenumModelElementFlagType.IsReferenceTable, abIsReferenceTable)
+                    Call Me.AddModelElementFlag(lrModelElementFlag)
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+
+        End Sub
+
+        Public Sub SetLongDescription(ByVal asLongDescription As String)
+
+            Try
+                Me.LongDescription = asLongDescription
+
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id And x.ConceptType = Me.ConceptType)
+
+                If lrDictionaryEntry IsNot Nothing Then
+                    lrDictionaryEntry.LongDescription = asLongDescription
+                    lrDictionaryEntry.isDirty = True
+                    Call lrDictionaryEntry.Save()
+                End If
+
+                RaiseEvent LongDescriptionChanged(asLongDescription)
+
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                lsMessage.AppendLine("ModelElement.ConceptType" & Me.ConceptType.ToString)
+
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' Sets the CompoundReferenceScheme.RoleConstraint for the EntityType.
+        ''' NB Precondition: EntityType has no ReferenceMode (SimpleReferenceScheme), else throws exception.
+        ''' </summary>
+        ''' <param name="arRoleConstraint">The RoleConstraint that defines the CompoundReferenceScheme for the EntityType</param>
+        ''' <remarks></remarks>
+        Public Overridable Function SetCompoundReferenceSchemeRoleConstraint(ByRef arRoleConstraint As FBM.RoleConstraint) As Boolean
+            Return False
+        End Function
+
+
+        Public Sub SetDBName(ByVal asDBName As String)
+
+            Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id And x.Realisations.Contains(Me.ConceptType))
+
+            If lrDictionaryEntry IsNot Nothing Then
+                lrDictionaryEntry.DBName = asDBName
+                lrDictionaryEntry.isDirty = True
+                Call lrDictionaryEntry.Save()
+            Else
+                'CodeSafe
+                Dim lrModelDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Id, Me.ConceptType, Me.ShortDescription, Me.LongDescription,, True)
+                Me.Model.AddModelDictionaryEntry(lrModelDictionaryEntry,,,,, True, True)
+            End If
+
+            Me.DBName = asDBName
+
+            RaiseEvent DBNameChanged(asDBName)
+
+            Me.isDirty = True
+            Me.Model.MakeDirty(False, False)
+        End Sub
+
+
+        Public Overridable Function setName(ByVal asNewName As String,
+                                            Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                            Optional ByVal abSuppressModelSave As Boolean = False,
+                                            Optional ByVal abSetDBNameAsNewName As Boolean = False) As Boolean
+            'See inherited Classes.
+        End Function
+
+        Public Overridable Function SetReferenceMode(ByVal asReferenceMode As String,
+                                                     Optional ByVal abSimpleAssignment As Boolean = False,
+                                                     Optional ByVal asValueTypeName As String = Nothing,
+                                                     Optional ByVal abBroadcastInterfaceEvent As Boolean = True,
+                                                     Optional ByVal aiORMDataType As pcenumORMDataType = pcenumORMDataType.TextVariableLength,
+                                                     Optional ByVal abSuppressModelSave As Boolean = False,
+                                                     Optional ByVal abSuppressSettingReferenceModeFTVT As Boolean = False) As FBM.ValueType
+            Return Nothing
+
+        End Function
+
+        Public Sub SetShortDescription(ByVal asShortDescription As String)
+
+            Try
+                Me.ShortDescription = asShortDescription
+
+                Dim lrDictionaryEntry = Me.Model.ModelDictionary.Find(Function(x) x.Symbol = Me.Id And x.ConceptType = Me.ConceptType)
+
+                If lrDictionaryEntry IsNot Nothing Then
+                    lrDictionaryEntry.ShortDescription = asShortDescription
+                    lrDictionaryEntry.isDirty = True
+                    Call lrDictionaryEntry.Save()
+                End If
+
+                RaiseEvent ShortDescriptionChanged(asShortDescription)
+
+                Me.isDirty = True
+                Me.Model.MakeDirty(False, False)
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                lsMessage.AppendLine("ModelElement.ConceptType: " & Me.ConceptType.ToString)
+
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' As Modified by RefreshShape of relative [ModelElement]Instance.
+        ''' </summary>
+        ''' <param name="asOldGraphLabel">The old GraphLabel</param>
+        ''' <param name="asNewGraphLabel">The new GraphLabel</param>
+        Public Sub ModifyOrAddGraphLabel(ByVal asOldGraphLabel As String, asNewGraphLabel As String)
+
+            Try
+
+                '-------------------------------------------------------------
+                'Update GraphLabel member value of the particular GraphLabel.
+                '-------------------------------------------------------------
+                Dim lrSubtypeModelElement As FBM.ModelObject
+                'Subtyping
+                lrSubtypeModelElement = Me.Model.GetModelObjectByName(asNewGraphLabel, True)
+
+                Dim liIndex = Me.GraphLabel.FindIndex(Function(x) x.Label = asOldGraphLabel)
+
+                If liIndex >= 0 Then
+
+                    Me.GraphLabel.Item(liIndex).Label = asNewGraphLabel
+
+                    If lrSubtypeModelElement IsNot Nothing Then
+                        lrSubtypeModelElement.setName(asNewGraphLabel, False)
+                    End If
+
+                ElseIf Me.GraphLabel.Find(Function(x) x.Label = asNewGraphLabel) Is Nothing Then
+                    Me.GraphLabel.Add(New RDS.GraphLabel(Me, asNewGraphLabel))
+
+                    Select Case Me.GetType
+                        Case Is = GetType(FBM.EntityType)
+                        Case Else
+                    End Select
+
+                    If Me.IsCandidatePGSNode And lrSubtypeModelElement Is Nothing And Not Me.IsCandidatePGSRelationshipNode Then
+                        'Must add as a new Subtype
+                        'Create an EntityType/ObjectType for the FBM (FactBasedModel)
+                        'I.e. Is the Node Type being created in the Graph View.
+                        Dim lsEntityTypeName = asNewGraphLabel
+                        'Create a unique Node/EntityType Name.
+                        lsEntityTypeName = Me.Model.CreateUniqueEntityTypeName(lsEntityTypeName, 0)
+                        Dim lrEntityType As New FBM.EntityType(Me.Model, pcenumLanguage.ORMModel, lsEntityTypeName, , True)
+                        Call Me.Model.AddEntityType(lrEntityType, True, False, , True, False)
+
+                        Call lrEntityType.CreateSubtypeRelationship(Me, True, , , False, Nothing)
+
+                    End If
+
+                    RaiseEvent GraphLabelAdded(asNewGraphLabel)
+                End If
+
+                Me.makeDirty()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,)
+            End Try
+
+        End Sub
+
+        Public Function IsCandidatePGSNode() As Boolean
+
+            Select Case Me.GetType
+                Case Is = GetType(FBM.EntityType)
+                    Return True
+                Case Is = GetType(FBM.FactType)
+                    Return Me.IsCandidatePGSRelationshipNode
+                Case Else
+                    Return False
+            End Select
+
+        End Function
+
+        Public Function SwitchConcept(ByVal arNewConcept As Concept, ByVal aiConceptType As pcenumConceptType) As FBM.DictionaryEntry
+
+            Dim lsOriginalSymbol As String = ""
+            Dim lsDebugMessage As String = ""
+            Dim lsMessage As String
+
+            Try
+                Dim lrOriginalDictionaryEntry As New FBM.DictionaryEntry(Me.Model, Me.Concept.Symbol, pcenumConceptType.Value)
+                Dim lrNewDictionaryEntry As New FBM.DictionaryEntry(Me.Model, arNewConcept.Symbol, pcenumConceptType.Value)
+
+                lsOriginalSymbol = Me.Concept.Symbol
+
+                If (lrOriginalDictionaryEntry.Concept.Symbol = lrNewDictionaryEntry.Concept.Symbol) Then
+                    '--------------------
+                    'Nothing to do here
+                    '--------------------
+                    Return lrOriginalDictionaryEntry
+                Else
+                    '--------------------------------------------------------
+                    'See if the NewSymbol is already in the ModelDictionary
+                    '--------------------------------------------------------                    
+                    If Me.Model.ModelDictionary.Find(AddressOf lrNewDictionaryEntry.Equals) IsNot Nothing Then
+                        '----------------------------------------------------------------------------------------------------------
+                        'The NewConcept exists in the ModelDictionary
+                        '  Substitute the existing Concept for a ModelDictionary entry (Concept) that already exists in the Model
+                        '----------------------------------------------------------------------------                     
+                        lrOriginalDictionaryEntry = Me.Model.ModelDictionary.Find(AddressOf lrOriginalDictionaryEntry.Equals)
+
+                        If lrOriginalDictionaryEntry IsNot Nothing Then
+
+                            Call Me.Model.DeprecateRealisationsForDictionaryEntry(lrOriginalDictionaryEntry, aiConceptType, True)
+
+                            '20200928-VM-Not sure how this works
+                            'Dim laiConceptType = {pcenumConceptType.ValueType, pcenumConceptType.EntityType, pcenumConceptType.FactType}
+                            'If (lrNewDictionaryEntry.Realisations.Count = 0) Then
+                            '    Call TableModelDictionary.ModifySymbol(Me.Model, lrOriginalDictionaryEntry, arNewConcept.Symbol, Me.ConceptType)
+                            'End If
+
+                        Else
+                            '----------------------------------------------------------------------------------------------------------------------------------
+                            'Throw a warning message but do not interupt programme flow.
+                            '  We're going to deprecate Realisations for the DictionaryEntry anyway.
+                            '----------------------------------------------------------------------------------------------------------------------------------
+                            lsMessage = "Original DictionaryEntry for FactData.Concept not found in the ModelDictionary"
+                            'Call prApplication.ThrowMessage(lsMessage, pcenumErrorType.Warning)
+                        End If
+
+                        Me.Concept = lrNewDictionaryEntry.Concept
+
+                        lrNewDictionaryEntry = Me.Model.AddModelDictionaryEntry(lrNewDictionaryEntry, True, True, False, False, False, True, False, False)
+
+                        lrNewDictionaryEntry.AddConceptType(Me.ConceptType)
+
+                        Return lrNewDictionaryEntry
+                    Else
+                        '--------------------------------------------------------------------------------------------------
+                        'The lrNewDictionaryEntry/arNewConcept does not exist in the ModelDictionary.
+                        '  Modify the existing DictionaryEntry in the database, effectively updating the ModelDictionary.
+                        '  NB PRECONDITION: The DictionaryEntry/Concept being switched is already in the ModelDictionary.
+                        '    This will be True in 99.999% of cases.
+                        '-------------------------------------------------------------------------
+                        '-------------------------------------------------------------
+                        'Make sure that the database reflects the new Concept.Symbol
+                        '-------------------------------------------------------------
+                        arNewConcept.Save()
+                        Call TableModelDictionary.ModifySymbol(Me.Model, lrOriginalDictionaryEntry, arNewConcept.Symbol, Me.ConceptType)
+
+                        '-----------------------------------------------------------------------------------------------
+                        'Switch the Symbol of the Concept, which effectively changes the existing ModelDictionaryEntry
+                        Me.Concept.Symbol = arNewConcept.Symbol
+                        Try
+                            'I.e. the .Net Dictionary that accompanies the ModelDictionary
+                            Me.Model.Dictionary.RenameKey(lrOriginalDictionaryEntry.Symbol, lrNewDictionaryEntry.Symbol)
+                        Catch ex As Exception
+                            Me.Model.AddModelDictionaryEntry(lrNewDictionaryEntry)
+                        End Try
+
+                        Return lrNewDictionaryEntry
+                    End If
+
+                    If Me.Model.Loaded Then Call Me.makeDirty()
+
+
+                    RaiseEvent ConceptSwitched(Me.Concept)
+
+                End If
+
+            Catch ex As Exception
+                Dim lsMessage1 As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage1 = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage1 &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage1, pcenumErrorType.Critical, ex.StackTrace)
+
+                Return Nothing
+            End Try
+
+        End Function
+
+        Public Sub RaiseEventNameChanged(ByVal asOldName As String, ByVal asNewName As String)
+
+            Dim larPageConceptInstance = From Page In Me.Model.Page
+                                         From ConceptInstance In Page.ConceptInstance
+                                         Where ConceptInstance.Symbol = asOldName
+                                         Select New With {.Page = Page, .ConceptInstance = ConceptInstance}
+
+            For Each lrPageConceptInstance In larPageConceptInstance
+                lrPageConceptInstance.ConceptInstance.Symbol = asNewName
+                lrPageConceptInstance.Page.MakeDirty()
+            Next
+
+            RaiseEvent NameChanged(asOldName, asNewName)
+
+        End Sub
+
+        Public Sub TriggerChangedToFactType(ByRef arFactType As FBM.FactType)
+            RaiseEvent ChangedToFactType(arFactType)
+        End Sub
+
+        Public Sub TriggerRemovedFromModel()
+
+            Try
+                Dim larPageConceptInstance = (From Page In Me.Model.Page
+                                              From ConceptInstance In Page.ConceptInstance
+                                              Where ConceptInstance.Symbol = Me.Id
+                                              Select New With {.Page = Page, .ConceptInstance = ConceptInstance}).ToList
+
+                For Each lrPageConceptInstance In larPageConceptInstance
+                    lrPageConceptInstance.Page.ConceptInstance.Remove(lrPageConceptInstance.ConceptInstance)
+                    lrPageConceptInstance.Page.ConceptInstance.RemoveAll(AddressOf lrPageConceptInstance.ConceptInstance.EqualsBySymbolType)
+                    lrPageConceptInstance.Page.MakeDirty()
+
+#Region "ConceptType specific processing"
+                    Select Case lrPageConceptInstance.ConceptInstance.ConceptType
+                        Case Is = pcenumConceptType.FactType
+
+                            Dim lrDummyFactType As Object = Me
+
+                            Try
+                                Dim lrFactType As FBM.FactType = CType(lrDummyFactType, FBM.FactType)
+
+                                For Each lrInternalUniquenessConstraint In lrFactType.InternalUniquenessConstraint
+                                    Dim lrInternalUniquenessConstraintConceptInstance = lrInternalUniquenessConstraint.CloneInstance(lrPageConceptInstance.Page).CloneConceptInstance
+                                    lrPageConceptInstance.Page.ConceptInstance.RemoveAll(AddressOf lrInternalUniquenessConstraintConceptInstance.EqualsBySymbolType)
+                                Next
+
+                                For Each lrFact In lrFactType.Fact
+
+                                    Dim lrFactConceptInstance = lrFact.CloneInstance(lrPageConceptInstance.Page, True).CloneConceptInstance()
+                                    lrPageConceptInstance.Page.ConceptInstance.RemoveAll(AddressOf lrFactConceptInstance.EqualsBySymbolType)
+
+                                    For Each lrFactData In lrFact.Data
+                                        Dim lrFactDataConceptInstance = lrFactData.CloneInstance(lrPageConceptInstance.Page).CloneConceptInstance
+                                        lrPageConceptInstance.Page.ConceptInstance.RemoveAll(AddressOf lrFactDataConceptInstance.EqualsBySymbolRoleId)
+                                    Next
+
+                                Next
+                            Catch
+                                'We tried.
+                            End Try
+
+                    End Select
+#End Region
+
+                Next
+                RaiseEvent RemovedFromModel()
+
+            Catch ex As Exception
+                Dim lsMessage As String
+                Dim mb As MethodBase = MethodInfo.GetCurrentMethod()
+
+                lsMessage = "Error: " & mb.ReflectedType.Name & "." & mb.Name
+                lsMessage &= vbCrLf & vbCrLf & ex.Message
+                prApplication.ThrowMessage(lsMessage, pcenumErrorType.Critical, ex.StackTrace,,,,,, ex)
+            End Try
+        End Sub
+
+    End Class
+
+End Namespace

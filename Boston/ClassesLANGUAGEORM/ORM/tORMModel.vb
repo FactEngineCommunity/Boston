@@ -1141,7 +1141,7 @@ Namespace FBM
                                             Else
                                                 lrIndex = lrTable.Index.Find(Function(x) x.IsPrimaryKey)
 
-                                                If lrIndex Is Nothing Then
+                                                If lrIndex Is Nothing And arRoleConstraint.IsPreferredIdentifier Then
 
                                                     'Not a biggie at this stage, but do need to fix this.
                                                     'CodeSafe: Create the index.
