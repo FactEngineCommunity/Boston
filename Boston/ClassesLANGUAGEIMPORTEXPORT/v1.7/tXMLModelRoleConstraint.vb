@@ -161,6 +161,18 @@ Namespace XMLModel17
         End Property
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ValueRangeType As String
+        <XmlAttribute()>
+        Public Property ValueRangeType() As String
+            Get
+                Return Me._ValueRangeType
+            End Get
+            Set(ByVal value As String)
+                Me._ValueRangeType = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _RoleConstraintRoles As New List(Of XMLModel.RoleConstraintRole)
         Public Property RoleConstraintRoles() As List(Of XMLModel.RoleConstraintRole)
             Get

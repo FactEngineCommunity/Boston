@@ -658,6 +658,7 @@ SkipModelLevelFactType:
                     lrXMLRoleConstraint.MaximumFrequencyCount = lrRoleConstraint.MaximumFrequencyCount
                     lrXMLRoleConstraint.Cardinality = lrRoleConstraint.Cardinality
                     lrXMLRoleConstraint.CardinalityRangeType = lrRoleConstraint.CardinalityRangeType.ToString
+                    lrXMLRoleConstraint.ValueRangeType = lrRoleConstraint.ValueRangeType.ToString
                     lrXMLRoleConstraint.LongDescription = lrRoleConstraint.LongDescription
                     lrXMLRoleConstraint.ShortDescription = lrRoleConstraint.ShortDescription
                     lrXMLRoleConstraint.IsMDAModelElement = lrRoleConstraint.IsMDAModelElement
@@ -1432,6 +1433,17 @@ SkipSubtypeRelationship:
                             Case Is = pcenumCardinalityRangeType.Between.ToString
                                 lrRoleConstraint.CardinalityRangeType = pcenumCardinalityRangeType.Between
                         End Select
+
+                        Dim liValueRangeType As pcenumValueRangeType
+                        If Not String.IsNullOrWhiteSpace(lrXMLRoleConstraint.ValueRangeType) AndAlso
+                                       [Enum].TryParse(
+                                           lrXMLRoleConstraint.ValueRangeType,
+                                           ignoreCase:=False,
+                                           result:=liValueRangeType) AndAlso
+                                       [Enum].IsDefined(GetType(pcenumValueRangeType), liValueRangeType) Then
+
+                            lrRoleConstraint.ValueRangeType = liValueRangeType
+                        End If
                         lrRoleConstraint.IsMDAModelElement = lrXMLRoleConstraint.IsMDAModelElement
                         lrRoleConstraint.ShortDescription = lrXMLRoleConstraint.ShortDescription
                         lrRoleConstraint.LongDescription = lrXMLRoleConstraint.LongDescription

@@ -3510,6 +3510,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxErrorList.resx">
       <DependentUpon>frmToolboxErrorList.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Toolboxes\frmToolboxGraphSchemaManager.resx">
       <DependentUpon>frmToolboxGraphSchemaManager.vb</DependentUpon>

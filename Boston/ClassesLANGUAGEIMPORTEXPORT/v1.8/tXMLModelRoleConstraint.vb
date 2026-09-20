@@ -150,13 +150,25 @@ Namespace XMLModel
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _CardinalityRangeType As String
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Property CardinalityRangeType() As String
             Get
                 Return Me._CardinalityRangeType
             End Get
             Set(ByVal value As String)
                 Me._CardinalityRangeType = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _ValueRangeType As String
+        <XmlAttribute()>
+        Public Property ValueRangeType() As String
+            Get
+                Return Me._ValueRangeType
+            End Get
+            Set(ByVal value As String)
+                Me._ValueRangeType = value
             End Set
         End Property
 

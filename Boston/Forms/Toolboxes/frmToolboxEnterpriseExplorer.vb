@@ -3936,6 +3936,8 @@ LoadExistingModel:
                 Dim lrPage As FBM.Page '(lrModel)
                 Dim lrCorePage As FBM.Page
 
+                'EntityRelationshipDiagrams
+#Region "EntityRelationshipDiagrams"
                 lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreEntityRelationshipDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
 
                 If lrCorePage Is Nothing Then
@@ -3944,7 +3946,25 @@ LoadExistingModel:
 
                 lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
 
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreProperty.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreProperty.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
+
+                lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreRelationship.ToString) 'AddressOf lrCorePage.EqualsByName)
+
+                If lrCorePage Is Nothing Then
+                    Throw New Exception("Couldn't find Page, '" & pcenumCMMLCorePage.CoreRelationship.ToString & "', in the Core Model.")
+                End If
+
+                lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the EntityRelationshipDiagram into the metamodel
+#End Region
+
                 'StateTransitionDiagrams
+#Region "StateTransitionDiagrams"
                 lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreStateTransitionDiagram.ToString) 'AddressOf lrCorePage.EqualsByName)
 
                 If lrCorePage Is Nothing Then
@@ -3952,8 +3972,9 @@ LoadExistingModel:
                 End If
 
                 lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the StateTransitionDiagram into the metamodel
-
+#End Region
                 'Derivations
+#Region "Derivations"
                 lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreDerivations.ToString) 'AddressOf lrCorePage.EqualsByName)
 
                 If lrCorePage Is Nothing Then
@@ -3961,8 +3982,10 @@ LoadExistingModel:
                 End If
 
                 lrPage = lrCorePage.Clone(lrModel, False, True, False) 'Clone the Page Model Elements for the CoreDerivations into the metamodel
+#End Region
 
                 'UseCaseDiagrams
+#Region "UseCaseDiagrams"
                 lrCorePage = prApplication.CMML.Core.Page.Find(Function(x) x.Name = pcenumCMMLCorePage.CoreUMLUseCaseDiagram.ToString)
 
                 If lrCorePage Is Nothing Then
@@ -3970,6 +3993,7 @@ LoadExistingModel:
                 End If
 
                 lrPage = lrCorePage.Clone(lrModel, False, True, False)
+#End Region
                 '==================================================
 
                 Call lrModel.createEntityRelationshipArtifacts()
