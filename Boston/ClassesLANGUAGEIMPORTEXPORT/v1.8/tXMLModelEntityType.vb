@@ -64,6 +64,18 @@ Namespace XMLModel
             End Set
         End Property
 
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _CardinalityConstraint As String = ""
+        <XmlAttribute()>
+        Public Property CardinalityConstraint() As String
+            Get
+                Return Me._CardinalityConstraint
+            End Get
+            Set(ByVal value As String)
+                Me._CardinalityConstraint = value
+            End Set
+        End Property
+
         <DebuggerBrowsable(DebuggerBrowsableState.Never)> _
         Private _Instance As New List(Of String)
         Public Property Instance() As List(Of String)

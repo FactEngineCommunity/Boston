@@ -54,6 +54,18 @@ Namespace XMLModel17
         End Property
 
         <DebuggerBrowsable(DebuggerBrowsableState.Never)>
+        Private _CardinalityConstraint As String = ""
+        <XmlAttribute()>
+        Public Property CardinalityConstraint() As String
+            Get
+                Return Me._CardinalityConstraint
+            End Get
+            Set(ByVal value As String)
+                Me._CardinalityConstraint = value
+            End Set
+        End Property
+
+        <DebuggerBrowsable(DebuggerBrowsableState.Never)>
         Private _GraphLabel As New List(Of String)
         Public Property GraphLabel() As List(Of String)
             Get
