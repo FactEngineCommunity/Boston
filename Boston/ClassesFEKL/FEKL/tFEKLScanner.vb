@@ -4,6 +4,8 @@ Imports System
 Imports System.Collections.Generic
 Imports System.Text.RegularExpressions
 Imports System.Xml.Serialization
+Imports System.Threading.Tasks
+
 
 
 Namespace FEKL
@@ -511,12 +513,32 @@ Namespace FEKL
 
                 For i = 0 To scantokens.Count - 1
                     Dim r As Regex = Patterns(scantokens(i))
-                    Dim m As Match = r.Match(m_input)
-                    If m.Success AndAlso m.Index = 0 AndAlso ((m.Length > len) OrElse (scantokens(i) < index AndAlso m.Length = len)) Then
-                        len = m.Length
+                    Dim timeoutDuration As Integer = 10 ' Adjust as needed
+
+                    Dim cts As New System.Threading.CancellationTokenSource()
+                    Dim matchingTask = System.Threading.Tasks.Task.Run(
+                                                                    Function()
+                                                                        Return r.Match(m_input)
+                                                                    End Function, cts.Token)
+
+                    If Not matchingTask.Wait(timeoutDuration, cts.Token) Then
+                        ' Handle the timeout scenario
+                        cts.Cancel()
+                    ElseIf matchingTask.Result.Success AndAlso matchingTask.Result.Index = 0 AndAlso ((matchingTask.Result.Length > len) OrElse (scantokens(i) < index AndAlso matchingTask.Result.Length = len)) Then
+                        ' Pattern matched successfully, handle the result
+                        'Dim m As Match = r.Match(m_input)
+                        len = matchingTask.Result.Length
                         index = scantokens(i)
                         Exit For
                     End If
+
+                    '20230820-VM-Was
+                    ''Dim m As Match = r.Match(m_input)
+                    'If m.Success AndAlso m.Index = 0 AndAlso ((m.Length > len) OrElse (scantokens(i) < index AndAlso m.Length = len)) Then
+                    '    len = m.Length
+                    '    index = scantokens(i)
+                    '    Exit For
+                    'End If
                 Next i
 
                 If index >= 0 AndAlso len >= 0 Then
@@ -707,8 +729,10 @@ Namespace FEKL
         WHITESPACE  = 149
     End Enum
 
-    <Serializable()> _
+    <Serializable()>
     Public Class Token 
+        Implements ICloneable
+
         Private m_startPos As Integer
         Private m_endPos As Integer
         Private m_text As String
@@ -769,7 +793,7 @@ Namespace FEKL
             End Set
         End Property
 
-        <XmlAttribute()> _
+        <XmlAttribute()>
         Public Type As TokenType
 
         Public Sub New()
@@ -801,6 +825,29 @@ Namespace FEKL
                 Return Type.ToString()
             End If
         End Function
+
+        Public Function Clone() As Object Implements ICloneable.Clone
+            Dim lrToken As New Token
+            Dim lrSkippedToken As Token
+            With Me
+                lrToken.m_startPos = .m_startPos
+                lrToken.m_endPos = .m_endPos
+                lrToken.m_text = .m_text
+                lrToken.m_value = .m_value
+                lrToken.Type = .Type
+
+                ' contains all prior skipped symbols
+                If .m_skipped IsNot Nothing Then
+                    lrToken.m_skipped = New List(Of Token)
+                    For Each lrSkippedToken In .m_skipped
+                        lrToken.m_skipped.Add(lrSkippedToken.Clone)
+                    Next
+                End If
+            End With
+
+            Return lrToken
+        End Function
+
     End Class
 #End Region
 End Namespace
